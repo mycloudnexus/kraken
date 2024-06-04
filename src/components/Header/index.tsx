@@ -11,9 +11,12 @@ import {
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { useCallback } from "react";
+import { DEFAULT_PRODUCT } from "@/utils/constants/product";
+import { useAppStore } from "@/stores/app.store";
 
 const Header = () => {
   const navigate = useNavigate();
+  const { currentProduct } = useAppStore();
   const goHome = useCallback(() => {
     () => {
       navigate("/");
@@ -28,12 +31,13 @@ const Header = () => {
       </div>
       <div className={styles.rightMenu}>
         <Select
-          value="MEF LSO Sonata API Adaptors"
+          allowClear={false}
+          value={currentProduct}
           className={styles.select}
           options={[
             {
-              value: "MEF LSO Sonata API Adaptors",
-              label: <span>MEF LSO Sonata API Adaptors</span>,
+              value: DEFAULT_PRODUCT,
+              label: <span>MEF Sonata API</span>,
             },
           ]}
           suffixIcon={
@@ -45,7 +49,7 @@ const Header = () => {
         />
         <Input
           placeholder="Search"
-          suffix={<SearchOutlined style={{ cursor: 'pointer' }} />}
+          suffix={<SearchOutlined style={{ cursor: "pointer" }} />}
           style={{ borderRadius: "156px" }}
         />
         <QuestionCircleOutlined />
