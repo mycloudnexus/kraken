@@ -5,7 +5,7 @@ name: Bump Version
 on:
   pull_request:
     branches:
-      - develop
+      - main
     types: [closed]
 
 jobs:

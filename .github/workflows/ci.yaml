@@ -8,7 +8,7 @@ on:
     types: [opened, synchronize, reopened]
   push:
     branches:
-      - develop
+      - main
 
 jobs:
   run-ci:
