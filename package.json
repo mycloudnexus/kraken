@@ -1,0 +1,46 @@
+{
+  "name": "kraken-portal",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:coverage": "vitest --coverage"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^5.3.7",
+    "@tanstack/react-query": "^5.40.0",
+    "@types/node": "^20.14.0",
+    "antd": "^5.17.4",
+    "axios": "^1.7.2",
+    "lodash": "^4.17.21",
+    "path": "^0.12.7",
+    "qs": "^6.12.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.23.1",
+    "usehooks-ts": "^3.1.0",
+    "zustand": "^4.5.2"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.17.4",
+    "@types/qs": "^6.9.15",
+    "@types/react": "^18.2.66",
+    "@types/react-dom": "^18.2.22",
+    "@typescript-eslint/eslint-plugin": "^7.2.0",
+    "@typescript-eslint/parser": "^7.2.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.6",
+    "sass": "^1.77.4",
+    "typescript": "^5.2.2",
+    "vite": "^5.2.0",
+    "vite-plugin-svgr": "^4.2.0",
+    "vitest": "^1.6.0"
+  }
+}
