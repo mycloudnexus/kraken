@@ -1,0 +1,23 @@
+---
+
+name: Deploy to Dev
+
+concurrency: dev
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-deploy-dev:
+    name: Build and Deploy
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    uses: Console-Core/syseng-github-actions-workflows/.github/workflows/kraken-nodejs-build-deploy-dev.yaml@main
+    secrets: inherit
+    with:
+      service-short-name: kraken-portal
+      deployment-config-repo: Console-Core/kraken-deployment-config

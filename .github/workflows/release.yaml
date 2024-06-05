@@ -1,0 +1,18 @@
+---
+
+name: Bump Version
+
+on:
+  pull_request:
+    branches:
+      - develop
+    types: [closed]
+
+jobs:
+  do-release:
+    name: Github Release
+    if: github.event.pull_request.merged == true
+    uses: Console-Core/syseng-github-actions-workflows/.github/workflows/console-core-nodejs-release.yaml@main
+    secrets: inherit
+    with:
+      nodejs-version: "20.12"
