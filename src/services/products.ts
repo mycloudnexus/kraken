@@ -13,3 +13,10 @@ export const getListComponents = (
 export const getComponentAPIDoc = (productId: string, componentId: string) => {
   return request(`${PRODUCT}/${productId}/components/${componentId}/api-docs`);
 };
+
+export const createNewComponent = (productId: string, data: any) => {
+  return request(`${PRODUCT}/${productId}/components`, {
+    method: "POST",
+    data,
+  });
+};

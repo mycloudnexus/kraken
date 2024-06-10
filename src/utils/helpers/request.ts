@@ -26,8 +26,7 @@ const onError = (error: AxiosError) => {
 
 const request = axios.create({
   timeout: 50000,
-  // @ts-ignore
-  baseURL: window?.env?.API_BASE_URL || import.meta.env.VITE_PCCW_BASE_API,
+  baseURL: import.meta.env.VITE_PCCW_BASE_API,
 });
 request.interceptors.request.use(
   (config): InternalAxiosRequestConfig<any> => {

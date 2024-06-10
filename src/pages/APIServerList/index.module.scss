@@ -1,0 +1,46 @@
+.root {
+  padding: 27px 48px;
+}
+
+.content {
+  margin-top: 32px;
+  box-sizing: border-box;
+
+  table {
+    border-radius: 8px;
+    border: 1px solid #f0f0f0;
+  }
+  :global {
+    .ant-table-expanded-row-level-1 {
+      td {
+        background: #fff !important;
+      }
+    }
+    .ant-table-row-level-0 {
+      td {
+        background: #fafafa;
+      }
+    }
+    .ant-table-tbody {
+      tr:first-child {
+        td:first-child {
+          border-top-left-radius: 8px;
+        }
+        td:last-child {
+          border-top-right-radius: 8px;
+        }
+      }
+      tr:last-child {
+        td:first-child {
+          border-bottom-left-radius: 8px;
+        }
+        td:last-child {
+          border-bottom-right-radius: 8px;
+        }
+        td {
+          border-bottom: none;
+        }
+      }
+    }
+  }
+}

@@ -18,9 +18,8 @@ const Header = () => {
   const navigate = useNavigate();
   const { currentProduct } = useAppStore();
   const goHome = useCallback(() => {
-    () => {
-      navigate("/");
-    };
+    navigate("/");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

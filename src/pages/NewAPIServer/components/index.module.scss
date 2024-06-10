@@ -1,0 +1,174 @@
+.bar {
+  min-width: 240px;
+  width: 240px;
+  padding: 24px 4px 16px;
+  box-sizing: border-box;
+  border-right: 1px solid #d9d9d9;
+  height: calc(100vh - 58px);
+  max-height: calc(100vh - 58px);
+  background: #fff;
+  position: sticky;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.barTop {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.stepBar {
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  justify-content: space-between;
+  max-height: 40vh;
+}
+
+.step {
+  gap: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  span {
+    color: #8c8c8c;
+  }
+  :global {
+    .ant-avatar-circle {
+      border: 2px solid #8c8c8c;
+      border-radius: 50%;
+      background: #fff;
+    }
+  }
+}
+
+.active {
+  span {
+    color: #f632fa;
+  }
+  :global {
+    .ant-avatar-circle {
+      border: 2px solid #f632fa;
+    }
+  }
+}
+
+.version {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+}
+
+.collapseBtn {
+  display: flex;
+  justify-content: flex-end;
+  margin-right: 24px;
+}
+
+.paper {
+  margin-top: 4px;
+  background: #fff;
+  padding: 16px 20px;
+}
+
+.transfer {
+  :global {
+    .ant-transfer-list {
+      height: calc(100vh - 308px);
+    }
+    .ant-transfer-operation {
+      .ant-btn-primary {
+        border-radius: 50% !important;
+        background: #c9cdd4;
+        color: #000;
+        &:disabled {
+          background: #f7f8fa;
+          color: #c9cdd4;
+        }
+      }
+    }
+    .ant-input-affix-wrapper {
+      background: #f7f8fa;
+      input {
+        order: 1;
+      }
+      .ant-input-prefix {
+        order: 2;
+      }
+      .ant-input-suffix:not(:has(.ant-input-clear-icon-hidden)) {
+        order: 3;
+      }
+      .ant-input-suffix:has(.ant-input-clear-icon-hidden) {
+        display: none;
+      }
+    }
+    .ant-transfer-list-header {
+      background: #f7f8fa;
+      label {
+        order: 1;
+      }
+      .ant-transfer-list-header-title {
+        text-align: left;
+        order: 2;
+      }
+      .ant-transfer-list-header-selected {
+        text-align: right;
+        order: 3;
+        color: #86909c;
+        font-size: 12px;
+      }
+    }
+  }
+}
+
+.inputUrl {
+  width: 50%;
+  min-width: 200px;
+}
+
+.infoWrapper {
+  background: #fff;
+  width: 100%;
+  max-width: calc((100vw - 280px) * 2 / 3);
+  height: calc(100vh - 98px);
+  padding: 10px 20px;
+  box-sizing: border-box;
+  > div {
+    position: relative;
+  }
+}
+
+.selectAPIWrapper {
+  position: relative;
+}
+
+.tableSwagger {
+  box-sizing: border-box;
+  margin-top: 12px;
+  .specialTd {
+    background: #f5f5f5;
+  }
+  td {
+    padding: 12px;
+    border-bottom: 1px solid #f5f5f5;
+  }
+  border-spacing: 0;
+}
+
+.tableParams {
+  margin-top: 12px;
+}
+
+.stepHandler {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 14px;
+}

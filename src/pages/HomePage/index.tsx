@@ -60,7 +60,7 @@ const HomePage = () => {
           <div className={styles.cardWrapper}>
             <Row gutter={[38, 38]}>
               {componentList?.data?.map((item: IComponent) => (
-                <Col md={12} sm={24}>
+                <Col md={12} sm={24} key={item?.id}>
                   <HomePageCard
                     version={get(item, "metadata.labels.mef-api-release", "")}
                     icon={icon(get(item, "metadata.name", ""))}

@@ -2,6 +2,11 @@ import Text from "@/components/Text";
 import styles from "./index.module.scss";
 import { useBoolean } from "usehooks-ts";
 import { Button, Typography } from "antd";
+import { useNavigate } from "react-router-dom";
+import { useManualGetComponentList } from "@/hooks/product";
+import { isEmpty } from "lodash";
+import { API_SERVER_KEY } from "@/utils/constants/product";
+import { useAppStore } from "@/stores/app.store";
 type Props = {
   description: string;
   title: string;
@@ -17,11 +22,29 @@ const HomePageCard = ({
   icon,
   version = "",
 }: Props) => {
+  const { currentProduct } = useAppStore();
+  const navigate = useNavigate();
   const {
     value: isHover,
     setTrue: trueHover,
     setFalse: falseHover,
   } = useBoolean(false);
+  const { mutateAsync: runGet } = useManualGetComponentList();
+
+  const load = async () => {
+    const dataList = await runGet({
+      productId: currentProduct,
+      params: {
+        kind: API_SERVER_KEY,
+      },
+    } as any);
+    if (isEmpty(dataList?.data?.data)) {
+      navigate(`/component/${currentProduct}/new`);
+      return;
+    }
+
+    navigate(`/component/${currentProduct}/list`);
+  };
   return (
     <div
       className={styles.card}
@@ -48,7 +71,12 @@ const HomePageCard = ({
       {isHover && (
         <span className={styles.hoverContent}>
           <div className={styles.hoverWrapper}>
-            <Button shape="round" type="primary" className={styles.btn}>
+            <Button
+              shape="round"
+              type="primary"
+              className={styles.btn}
+              onClick={load}
+            >
               Seller API Set up
             </Button>
             <Button shape="round" type="primary" className={styles.btn}>
