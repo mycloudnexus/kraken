@@ -1,4 +1,6 @@
-import { isEmpty } from "lodash";
+import RequestMethod from "@/components/Method";
+import { Button, Table } from "antd";
+import { ColumnType } from "antd/es/table";
 import { useMemo } from "react";
 
 type Props = {
@@ -19,15 +21,42 @@ const ExpandRow = ({ item }: Props) => {
     });
   }, [item]);
 
-  if (isEmpty(data)) {
-    return <td>No data</td>;
-  }
-  return data?.map((dataItem: any) => (
-    <tr key={dataItem.name}>
-      <td>{dataItem?.name}</td>
-      <td>{dataItem?.method}</td>
-    </tr>
-  ));
+  const columns: ColumnType<any>[] = useMemo(
+    () => [
+      {
+        dataIndex: "name",
+        width: 400,
+      },
+      {
+        dataIndex: "method",
+        render: (method: string) => <RequestMethod method={method} />,
+        width: 200,
+      },
+      {
+        dataIndex: "name",
+      },
+      {
+        dataIndex: "",
+        align: "right",
+        render: () => (
+          <Button type="text" style={{ color: "#1677ff" }}>
+            View
+          </Button>
+        ),
+      },
+    ],
+    []
+  );
+
+  return (
+    <Table
+      prefixCls="expand-table"
+      showHeader={false}
+      columns={columns}
+      dataSource={data}
+      pagination={false}
+    />
+  );
 };
 
 export default ExpandRow;

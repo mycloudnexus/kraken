@@ -6,14 +6,17 @@
   margin-top: 32px;
   box-sizing: border-box;
 
-  table {
-    border-radius: 8px;
-    border: 1px solid #f0f0f0;
-  }
   :global {
+    .ant-table {
+      border-radius: 8px;
+      border: 1px solid #f0f0f0;
+    }
     .ant-table-expanded-row-level-1 {
       td {
         background: #fff !important;
+      }
+      .ant-table-cell {
+        padding: 0;
       }
     }
     .ant-table-row-level-0 {

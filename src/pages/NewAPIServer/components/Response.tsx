@@ -1,13 +1,16 @@
 import Flex from "@/components/Flex";
-import { Button } from "antd";
-import { isEmpty } from "lodash";
+import { Button, Empty, Tree } from "antd";
+import { get, isEmpty } from "lodash";
 import { useEffect, useMemo, useState } from "react";
+import styles from "./index.module.scss";
+import { schemaParses } from "@/utils/helpers/schema";
 
 type Props = {
   item: Record<string, any>;
+  schemas: any;
 };
 
-const Response = ({ item }: Props) => {
+const Response = ({ item, schemas }: Props) => {
   const [selectedResponse, setSelectedResponse] = useState<string>("");
   const responseKeys = useMemo(() => Object.keys(item || {}), [item]);
   useEffect(() => {
@@ -16,6 +19,29 @@ const Response = ({ item }: Props) => {
     }
     setSelectedResponse(responseKeys[0]);
   }, [responseKeys]);
+
+  const currentSchema = useMemo(() => {
+    if (!selectedResponse || isEmpty(item) || isEmpty(schemas)) {
+      return undefined;
+    }
+    const schemaUrl = get(
+      item,
+      `${selectedResponse}.content.application/json.schema.$ref`,
+      get(
+        item,
+        `${selectedResponse}.content.application/xml
+      .schema.$ref`,
+        ""
+      )
+    ).replace("#/components/schemas/", "");
+    return schemaParses(
+      schemaUrl,
+      schemas,
+      "",
+      styles.nodeTitle,
+      styles.nodeExample
+    );
+  }, [selectedResponse, item, schemas]);
 
   return (
     <div>
@@ -37,6 +63,13 @@ const Response = ({ item }: Props) => {
           </Button>
         ))}
       </Flex>
+      <div className={styles.tree}>
+        {!isEmpty(currentSchema) ? (
+          <Tree treeData={currentSchema} />
+        ) : (
+          <Empty />
+        )}
+      </div>
     </div>
   );
 };

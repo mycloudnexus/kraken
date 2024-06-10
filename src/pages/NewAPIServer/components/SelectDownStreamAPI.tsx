@@ -53,6 +53,7 @@ const SelectDownStreamAPI = ({
   const [selectedAPI, setSelectedAPI] = useState<any>();
   const [transferData, setTransferData] = useState<any>([]);
   const [targetKeys, setTargetKeys] = useState<TransferProps["targetKeys"]>([]);
+  const [schemas, setSchemas] = useState<any>([]);
 
   const file = Form.useWatch("file", form);
   const loadFile = async () => {
@@ -65,6 +66,7 @@ const SelectDownStreamAPI = ({
       });
 
       const data = yaml.load(decode(swaggerData as any)) as any;
+      setSchemas(data?.components?.schemas);
       setTransferData(tranformSwaggerToArray(data));
     } catch (error) {
       notification.error({ message: "Please select a valid swagger file" });
@@ -130,7 +132,7 @@ const SelectDownStreamAPI = ({
           <BtnStep onNext={onNext} onPrev={onPrev} currentStep={currentStep} />
         </div>
         <div className={styles.apiDetail} style={{ flex: 2 }}>
-          <SwaggerInfo item={selectedAPI} />
+          <SwaggerInfo item={selectedAPI} schemas={schemas}/>
         </div>
       </Flex>
     </div>

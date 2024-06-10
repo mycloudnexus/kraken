@@ -65,6 +65,7 @@ const NewAPIServer = () => {
           name: values.name,
           version: 1,
           key: `mef.sonata.api-target-spec.${values.name
+            ?.replace(" ", "")
             ?.substring(0, 4)
             .toLowerCase()}`,
           description: values.description,

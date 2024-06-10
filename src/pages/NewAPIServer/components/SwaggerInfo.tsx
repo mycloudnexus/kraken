@@ -4,6 +4,8 @@ import { isEmpty } from "lodash";
 import { Table } from "antd";
 import { useMemo } from "react";
 import Response from "./Response";
+import RequestBody from "./RequestBody";
+import RequestMethod from "@/components/Method";
 
 type Props = {
   item: {
@@ -12,9 +14,10 @@ type Props = {
     info: any;
     description: string;
   };
+  schemas: any;
 };
 
-const SwaggerInfo = ({ item }: Props) => {
+const SwaggerInfo = ({ item, schemas }: Props) => {
   const columns = useMemo(
     () => [
       {
@@ -49,7 +52,9 @@ const SwaggerInfo = ({ item }: Props) => {
               </tr>
               <tr>
                 <td className={styles.specialTd}>Method</td>
-                <td>{item?.description?.toUpperCase()}</td>
+                <td>
+                  <RequestMethod method={item?.description} />
+                </td>
               </tr>
               <tr>
                 <td className={styles.specialTd}>Path</td>
@@ -60,21 +65,23 @@ const SwaggerInfo = ({ item }: Props) => {
                 <td>{item?.info?.description}</td>
               </tr>
             </table>
+            {!isEmpty(item?.info?.parameters) && (
+              <div className={styles.tableParams}>
+                <Text.LightLarge>Parameters</Text.LightLarge>
+                <Table
+                  rowKey={(item: any) => item.name}
+                  dataSource={item?.info?.parameters}
+                  columns={columns}
+                  pagination={false}
+                />
+              </div>
+            )}
             <div className={styles.tableParams}>
-              <Text.LightLarge>Parameters</Text.LightLarge>
-              <Table
-                rowKey={(item: any) => item.name}
-                dataSource={item?.info?.parameters}
-                columns={columns}
-                pagination={false}
-              />
-            </div>
-            <div className={styles.tableParams}>
-              <Text.LightLarge>Request body</Text.LightLarge>
+              <RequestBody item={item?.info?.requestBody} schemas={schemas} />
             </div>
             <div className={styles.tableParams}>
               <Text.LightLarge>Response</Text.LightLarge>
-              <Response item={item?.info?.responses} />
+              <Response item={item?.info?.responses} schemas={schemas} />
             </div>
           </>
         )}
