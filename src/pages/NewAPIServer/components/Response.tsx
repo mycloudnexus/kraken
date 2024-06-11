@@ -24,18 +24,30 @@ const Response = ({ item, schemas }: Props) => {
     if (!selectedResponse || isEmpty(item) || isEmpty(schemas)) {
       return undefined;
     }
+    const objectKey = get(
+      Object.keys(get(item, `${selectedResponse}.content`, {})),
+      "[0]",
+      ""
+    );
     const schemaUrl = get(
       item,
-      `${selectedResponse}.content.application/json.schema.$ref`,
+      `[${selectedResponse}].content[${objectKey}].schema.items.$ref`,
       get(
         item,
-        `${selectedResponse}.content.application/xml
-      .schema.$ref`,
-        ""
+        `[${selectedResponse}].content[${objectKey}].schema.$ref`,
+        get(
+          item,
+          `${selectedResponse}.content[${objectKey}]
+              .schema.$ref`,
+          ""
+        )
       )
-    ).replace("#/components/schemas/", "");
+    );
+    if (typeof schemaUrl !== "string") {
+      return undefined;
+    }
     return schemaParses(
-      schemaUrl,
+      schemaUrl.replace("#/components/schemas/", ""),
       schemas,
       "",
       styles.nodeTitle,

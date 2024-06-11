@@ -1,4 +1,4 @@
-import { Tree } from "antd";
+import { Button, Tree } from "antd";
 import { get, isEmpty } from "lodash";
 import { useMemo } from "react";
 import styles from "./index.module.scss";
@@ -15,18 +15,27 @@ const RequestBody = ({ item, schemas }: Props) => {
     if (isEmpty(item?.content)) {
       return undefined;
     }
+    const objectKey = get(Object.keys(get(item, `content`, {})), "[0]", "");
+
     const schemaUrl = get(
       item,
-      `content.application/json.schema.$ref`,
+      `content[${objectKey}].schema.items.$ref`,
       get(
         item,
-        `.content.application/xml
+        `content[${objectKey}].schema.$ref`,
+        get(
+          item,
+          `content[${objectKey}]
         .schema.$ref`,
-        ""
+          ""
+        )
       )
-    ).replace("#/components/schemas/", "");
+    );
+    if (typeof schemaUrl !== "string") {
+      return undefined;
+    }
     return schemaParses(
-      schemaUrl,
+      schemaUrl.replace("#/components/schemas/", ""),
       schemas,
       "",
       styles.nodeTitle,
@@ -38,6 +47,16 @@ const RequestBody = ({ item, schemas }: Props) => {
   ) : (
     <>
       <Text.LightLarge>Request body</Text.LightLarge>
+      <div>
+        <Button
+          style={{
+            borderColor: "#1677ff",
+            color: "#1677ff",
+          }}
+        >
+          API spec
+        </Button>
+      </div>
       <div className={styles.tree}>
         <Tree treeData={data} />
       </div>

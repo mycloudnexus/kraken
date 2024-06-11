@@ -55,6 +55,7 @@ const ExpandRow = ({ item }: Props) => {
       columns={columns}
       dataSource={data}
       pagination={false}
+      rowKey={(r) => r.name + r.method}
     />
   );
 };

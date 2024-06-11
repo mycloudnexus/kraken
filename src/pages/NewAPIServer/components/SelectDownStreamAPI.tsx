@@ -69,6 +69,7 @@ const SelectDownStreamAPI = ({
       setSchemas(data?.components?.schemas);
       setTransferData(tranformSwaggerToArray(data));
     } catch (error) {
+      form.setFieldValue("file", undefined);
       notification.error({ message: "Please select a valid swagger file" });
     }
   };
@@ -116,9 +117,14 @@ const SelectDownStreamAPI = ({
                 onChange={handleChange}
                 render={(item) => (
                   <div
+                    style={{ width: "100%" }}
                     key={`${item.title} - ${item.description}`}
                     role="none"
-                    onClick={() => setSelectedAPI(item)}
+                    onClick={(e) => {
+                      e?.stopPropagation();
+                      e?.preventDefault();
+                      setSelectedAPI(item);
+                    }}
                   >{`${item.title} - ${item.description}`}</div>
                 )}
                 locale={{
@@ -132,7 +138,7 @@ const SelectDownStreamAPI = ({
           <BtnStep onNext={onNext} onPrev={onPrev} currentStep={currentStep} />
         </div>
         <div className={styles.apiDetail} style={{ flex: 2 }}>
-          <SwaggerInfo item={selectedAPI} schemas={schemas}/>
+          <SwaggerInfo item={selectedAPI} schemas={schemas} />
         </div>
       </Flex>
     </div>

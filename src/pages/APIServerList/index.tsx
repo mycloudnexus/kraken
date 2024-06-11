@@ -6,11 +6,12 @@ import Flex from "@/components/Flex";
 import Text from "@/components/Text";
 import { Button, Table } from "antd";
 import { useNavigate } from "react-router";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { isEmpty } from "lodash";
 import ExpandRow from "./components/ExpandRow";
 
 const APIServerList = () => {
+  const [expandedRowKeys, setExpandedRowKeys] = useState<string[]>([]);
   const { currentProduct } = useAppStore();
   const { data: dataList, isLoading } = useGetComponentList(currentProduct, {
     kind: API_SERVER_KEY,
@@ -42,6 +43,11 @@ const APIServerList = () => {
       },
     ];
   }, []);
+
+  useEffect(() => {
+    setExpandedRowKeys(dataList?.data?.map((item: { id: any }) => item?.id));
+  }, [dataList?.data]);
+
   return (
     <div className={styles.root}>
       <Flex justifyContent="space-between">
@@ -61,6 +67,8 @@ const APIServerList = () => {
           dataSource={dataList?.data}
           pagination={false}
           expandable={{
+            expandedRowKeys,
+            onExpandedRowsChange: (newKeys: any) => setExpandedRowKeys(newKeys),
             rowExpandable: (record) => !isEmpty(record),
             expandedRowRender: (record) => <ExpandRow item={record} />,
           }}

@@ -8,7 +8,7 @@ import SelectDownStreamAPI from "./components/SelectDownStreamAPI";
 import BtnStep from "./components/BtnStep";
 import { API_SERVER_KEY } from "@/utils/constants/product";
 import { useCreateNewComponent } from "@/hooks/product";
-import { get } from "lodash";
+import { get, isEmpty } from "lodash";
 import { useAppStore } from "@/stores/app.store";
 import { useNavigate } from "react-router-dom";
 
@@ -16,7 +16,8 @@ const NewAPIServer = () => {
   const { currentProduct: id } = useAppStore();
   const [form] = Form.useForm();
   const [step, setStep] = useState(0);
-  const { mutateAsync: runCreate } = useCreateNewComponent();
+  const { mutateAsync: runCreate, isPending: loadingCreate } =
+    useCreateNewComponent();
   const navigate = useNavigate();
 
   const handleNext = async () => {
@@ -66,8 +67,8 @@ const NewAPIServer = () => {
           version: 1,
           key: `mef.sonata.api-target-spec.${values.name
             ?.replace(" ", "")
-            ?.substring(0, 4)
-            .toLowerCase()}`,
+            ?.substring(0, 3)
+            .toLowerCase()}${new Date().getTime()}`,
           description: values.description,
         },
         spec: {
@@ -107,11 +108,23 @@ const NewAPIServer = () => {
             currentStep={step}
           />
           {step !== 1 && (
-            <BtnStep
-              onNext={handleNext}
-              onPrev={handlePrev}
-              currentStep={step}
-            />
+            <Form.Item noStyle shouldUpdate>
+              {({ getFieldValue }) => {
+                const disabled =
+                  (isEmpty(getFieldValue("name")) ||
+                    isEmpty(getFieldValue("file"))) &&
+                  step === 0;
+                return (
+                  <BtnStep
+                    disabled={disabled}
+                    loading={loadingCreate}
+                    onNext={handleNext}
+                    onPrev={handlePrev}
+                    currentStep={step}
+                  />
+                );
+              }}
+            </Form.Item>
           )}
         </div>
       </div>

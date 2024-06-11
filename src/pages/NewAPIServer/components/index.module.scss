@@ -190,13 +190,20 @@
 }
 
 .nodeTitle {
-  flex: 3;
+  flex: 1;
   padding: 2px 4px;
   background: #fff;
+  word-break: break-all;
 }
 
 .nodeExample {
-  flex: 2;
+  word-break: break-all;
+
   padding: 2px 4px;
   background: #fff;
+  width: 200px;
+
+  @media (max-width: 1600px) {
+    width: 150px;
+  }
 }
