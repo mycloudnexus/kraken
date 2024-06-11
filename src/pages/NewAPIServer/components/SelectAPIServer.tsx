@@ -22,6 +22,7 @@ const SelectAPIServer = ({ form, active }: Props) => {
   const file = Form.useWatch("file", form);
   const handleReplace = async () => {
     await form.setFieldValue("file", null);
+    await form.setFieldValue("selectedAPIs", []);
     closeModal();
     const fileSelector = document.getElementById("upload-file");
     if (fileSelector) {

@@ -9,15 +9,27 @@ import { useNavigate } from "react-router";
 import { useEffect, useMemo, useState } from "react";
 import { isEmpty } from "lodash";
 import ExpandRow from "./components/ExpandRow";
+import APIServerModal from "@/components/APIServerModal";
+import { useBoolean } from "usehooks-ts";
 
 const APIServerList = () => {
+  const {
+    value: isOpenModal,
+    setTrue: openModal,
+    setFalse: closeModal,
+  } = useBoolean(false);
   const [expandedRowKeys, setExpandedRowKeys] = useState<string[]>([]);
   const { currentProduct } = useAppStore();
-  const { data: dataList, isLoading } = useGetComponentList(currentProduct, {
+  const {
+    data: dataList,
+    isLoading,
+    refetch: refresh,
+  } = useGetComponentList(currentProduct, {
     kind: API_SERVER_KEY,
     size: 1000,
   });
   const navigate = useNavigate();
+  const [selectedAPI, setSelectedAPI] = useState("");
 
   const columns = useMemo(() => {
     return [
@@ -34,14 +46,23 @@ const APIServerList = () => {
         width: 100,
       },
       {
-        render: () => (
-          <Button type="text" style={{ color: "#1677ff" }}>
+        dataIndex: "metadata",
+        render: ({ key = "" }) => (
+          <Button
+            type="text"
+            style={{ color: "#1677ff" }}
+            onClick={() => {
+              setSelectedAPI(key);
+              openModal();
+            }}
+          >
             View
           </Button>
         ),
         width: 100,
       },
     ];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -50,6 +71,14 @@ const APIServerList = () => {
 
   return (
     <div className={styles.root}>
+      {isOpenModal && (
+        <APIServerModal
+          id={selectedAPI}
+          isOpen={isOpenModal}
+          onClose={closeModal}
+          refresh={refresh}
+        />
+      )}
       <Flex justifyContent="space-between">
         <Text.BoldLarge size="20px">Seller API Server Setup</Text.BoldLarge>
         <Button

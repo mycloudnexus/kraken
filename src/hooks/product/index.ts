@@ -1,7 +1,9 @@
 import {
   createNewComponent,
+  editComponentDetail,
   getComponentAPIDoc,
   getEnvActivity,
+  getComponentDetail,
   getListComponents,
   getListEnvActivities,
   getListEnvs,
@@ -20,6 +22,8 @@ export const PRODUCT_CACHE_KEYS = {
   get_product_env_list: "get_product_env_list",
   get_product_env_activity_list: "get_product_env_activity_list",
   get_product_env_activity_detail: "get_product_env_activity_detail",
+  get_component_detail: "get_component_detail",
+  edit_component_detail: "edit_component_detail",
 };
 
 export const useGetProductComponents = (
@@ -125,5 +129,28 @@ export const useGetProductEnvActivityDetail = (
     queryFn: () => getEnvActivity(productId, envId, activityId),
     enabled: Boolean(productId && envId && activityId),
     select: (data) => data.data,
+  });
+};
+
+export const useGetComponentDetail = (
+  productId: string,
+  componentId: string
+) => {
+  const { data, ...result } = useQuery<any, Error>({
+    queryKey: [PRODUCT_CACHE_KEYS.get_component_detail, productId, componentId],
+    queryFn: () => getComponentDetail(productId, componentId),
+    enabled: Boolean(productId && componentId),
+  });
+  return {
+    data: get(data, "data"),
+    ...result,
+  };
+};
+
+export const useEditComponent = () => {
+  return useMutation<any, Error>({
+    mutationKey: [PRODUCT_CACHE_KEYS.edit_component_detail],
+    mutationFn: ({ productId, componentId, data }: any) =>
+      editComponentDetail(productId, componentId, data),
   });
 };
