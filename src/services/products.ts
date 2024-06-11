@@ -20,3 +20,22 @@ export const createNewComponent = (productId: string, data: any) => {
     data,
   });
 };
+
+export const getListEnvs = (productId: string) =>
+  request(`${PRODUCT}/${productId}/envs`);
+
+export const getListEnvActivities = (
+  productId: string,
+  envId: string,
+  params: unknown
+) =>
+  request(`${PRODUCT}/${productId}/envs/${envId}/api-activities`, {
+    params,
+  });
+
+export const getEnvActivity = (
+  productId: string,
+  envId: string,
+  activityId: string
+) =>
+  request(`${PRODUCT}/${productId}/envs/${envId}/api-activities/${activityId}`);

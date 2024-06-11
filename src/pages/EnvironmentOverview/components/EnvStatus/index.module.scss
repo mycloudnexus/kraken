@@ -1,0 +1,32 @@
+.statusWrapper {
+  --color-border: inherit;
+  --color-background: inherit;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 10px 20px;
+  background-color: var(--color-background);
+  color: var(--color-border);
+
+  &.success {
+    --color-border: #52c41a;
+    --color-background: #f6ffed;
+  }
+  &.error {
+    --color-border: #f5222d;
+    --color-background: #fff1f0;
+  }
+  &.warning {
+    --color-border: #fadb14;
+    --color-background: #feffe6;
+  }
+}
+
+.dataPlaneInfo {
+  border-radius: 4px;
+  padding: 4px 8px;
+  background-color: var(--color-border);
+  color: #fff;
+  .dataPlaneInfoIcon {
+    color: rgba(#fff, 0.45);
+  }
+}

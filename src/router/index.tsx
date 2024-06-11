@@ -1,5 +1,7 @@
 import BasicLayout from "@/components/Layout/BasicLayout";
 import APIServerList from "@/pages/APIServerList";
+import EnvironmentActivityLog from "@/pages/EnvironmentActivityLog";
+import EnvironmentOverview from "@/pages/EnvironmentOverview";
 import HomePage from "@/pages/HomePage";
 import NewAPIServer from "@/pages/NewAPIServer";
 import { createBrowserRouter } from "react-router-dom";
@@ -23,6 +25,19 @@ const router = createBrowserRouter([
           {
             path: "list",
             element: <APIServerList />,
+          },
+        ],
+      },
+      {
+        path: "env",
+        children: [
+          {
+            path: "",
+            element: <EnvironmentOverview />,
+          },
+          {
+            path: ":envId",
+            element: <EnvironmentActivityLog />,
           },
         ],
       },

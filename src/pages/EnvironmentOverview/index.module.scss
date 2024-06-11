@@ -1,0 +1,15 @@
+.overviewWrapper {
+  padding: 16px 24px;
+}
+.overviewItem {
+  flex: 1;
+  border-radius: 8px;
+  border: 1px solid #dde1e5;
+  background: #fff;
+  padding: 22px 24px;
+}
+.componentList {
+  max-height: 124px;
+  align-self: stretch;
+  overflow-y: auto;
+}

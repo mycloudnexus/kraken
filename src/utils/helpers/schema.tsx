@@ -1,5 +1,8 @@
 import Flex from "@/components/Flex";
 import { get, isEmpty } from "lodash";
+import { Typography } from "antd";
+
+const { Text } = Typography;
 
 export const findSchema = (firstURL: string, schemas: any) => {
   let schema = get(schemas, `${firstURL}.properties`);
@@ -59,6 +62,57 @@ export const schemaParses = (
         nodeTitleClassName,
         nodeExampleClassName
       ),
+    };
+  });
+  return result;
+};
+
+const renderValue = (value: any, typeOfValue: string) => {
+  if (typeOfValue === "string") {
+    return <>"{value}"</>;
+  }
+  if (["number", "boolean"].includes(typeOfValue)) {
+    return <>{`${value}`}</>;
+  }
+  return <>&nbsp;</>;
+};
+
+export const parseObjectDescriptionToTreeData = (
+  keys: Record<string, any>,
+  titleClassName: string,
+  exampleClassName: string,
+  level = 0,
+  prefix = ""
+) => {
+  const result: any = Object.entries(keys).map(([key, value]) => {
+    const typeOfValue = typeof value;
+
+    return {
+      title: (
+        <Flex justifyContent="flex-start" style={{ width: "100%" }} gap={4}>
+          <Text className={titleClassName} ellipsis={{ tooltip: true }}>
+            "{key}"
+          </Text>
+          <Text
+            className={exampleClassName}
+            style={{ flex: `0 0 calc((40% + ${24 * level * 0.4}px))` }}
+            ellipsis={{ tooltip: true }}
+          >
+            {renderValue(value, typeOfValue)}
+          </Text>
+        </Flex>
+      ),
+      key: `${prefix}_${key}`,
+      children:
+        typeOfValue === "object"
+          ? parseObjectDescriptionToTreeData(
+              value as Record<string, any>,
+              titleClassName,
+              exampleClassName,
+              level + 1,
+              `${prefix}_${key}`
+            )
+          : undefined,
     };
   });
   return result;
