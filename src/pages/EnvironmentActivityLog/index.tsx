@@ -2,8 +2,8 @@ import Text from "@/components/Text";
 import { useGetProductEnvActivities, useGetProductEnvs } from "@/hooks/product";
 import { useCommonListProps } from "@/hooks/useCommonListProps";
 import { toDateTime } from "@/libs/dayjs";
+import { useAppStore } from "@/stores/app.store";
 import { DEFAULT_PAGING } from "@/utils/constants/common";
-import { DEFAULT_PRODUCT } from "@/utils/constants/product";
 import { parseObjectDescriptionToTreeData } from "@/utils/helpers/schema";
 import { IActivityLog } from "@/utils/types/env.type";
 import { DownOutlined, UpOutlined } from "@ant-design/icons";
@@ -118,7 +118,8 @@ const renderExpandRow: ExpandableConfig<any>["expandedRowRender"] = (
 );
 const EnvironmentActivityLog = () => {
   const { envId } = useParams();
-  const { data: envData } = useGetProductEnvs(DEFAULT_PRODUCT);
+  const { currentProduct } = useAppStore();
+  const { data: envData } = useGetProductEnvs(currentProduct);
 
   const {
     tableData,
@@ -131,7 +132,7 @@ const EnvironmentActivityLog = () => {
     handlePaginationShowSizeChange,
   } = useCommonListProps({}, initPagination);
   const { data, isLoading } = useGetProductEnvActivities(
-    DEFAULT_PRODUCT,
+    currentProduct,
     String(envId),
     queryParams
   );

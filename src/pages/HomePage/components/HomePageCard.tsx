@@ -1,12 +1,14 @@
 import Text from "@/components/Text";
-import styles from "./index.module.scss";
-import { useBoolean } from "usehooks-ts";
-import { Button, Typography } from "antd";
-import { useNavigate } from "react-router-dom";
 import { useManualGetComponentList } from "@/hooks/product";
-import { isEmpty } from "lodash";
-import { API_SERVER_KEY } from "@/utils/constants/product";
 import { useAppStore } from "@/stores/app.store";
+import { API_SERVER_KEY } from "@/utils/constants/product";
+import { ROUTES } from "@/utils/constants/route";
+import { Button, Typography } from "antd";
+import { isEmpty } from "lodash";
+import { useNavigate } from "react-router-dom";
+import { useBoolean } from "usehooks-ts";
+import styles from "./index.module.scss";
+
 type Props = {
   description: string;
   title: string;
@@ -45,6 +47,9 @@ const HomePageCard = ({
 
     navigate(`/component/${currentProduct}/list`);
   };
+  const toEnvOverview = () => {
+    navigate(ROUTES.ENV_OVERVIEW);
+  };
   return (
     <div
       className={styles.card}
@@ -82,7 +87,12 @@ const HomePageCard = ({
             <Button shape="round" type="primary" className={styles.btn}>
               Standard API Mapping
             </Button>
-            <Button shape="round" type="primary" className={styles.btn}>
+            <Button
+              shape="round"
+              type="primary"
+              className={styles.btn}
+              onClick={toEnvOverview}
+            >
               Environment Overview
             </Button>
           </div>

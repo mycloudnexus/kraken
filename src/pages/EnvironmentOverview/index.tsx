@@ -1,22 +1,23 @@
 import Text from "@/components/Text";
 import { useGetProductEnvs } from "@/hooks/product";
 import { toDateTime, toTime } from "@/libs/dayjs";
-import { DEFAULT_PRODUCT } from "@/utils/constants/product";
+import { useAppStore } from "@/stores/app.store";
+import { ROUTES } from "@/utils/constants/route";
 import { MoreOutlined } from "@ant-design/icons";
 import { Button, Dropdown, Flex, MenuProps, Spin } from "antd";
 import { useCallback, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import EnvStatus from "./components/EnvStatus";
 import { showModalConfirmRotate } from "./components/ModalConfirmRotateAPIKey";
 import { showModalShowNew } from "./components/ModalShowAPIKey";
 import styles from "./index.module.scss";
-import { useNavigate } from "react-router-dom";
-import { ROUTES } from "@/utils/constants/route";
 
 const availableEnvs = ["dev", "production", "uat", "stage"];
 
 const EnvironmentOverview = () => {
   const navigate = useNavigate();
-  const { data, isLoading } = useGetProductEnvs(DEFAULT_PRODUCT);
+  const { currentProduct } = useAppStore();
+  const { data, isLoading } = useGetProductEnvs(currentProduct);
   const modalConfirmRef = useRef<any>();
   const onConfirmRotate = () => () => {
     modalConfirmRef?.current?.destroy();

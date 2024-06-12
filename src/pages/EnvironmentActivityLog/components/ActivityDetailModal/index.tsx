@@ -1,13 +1,13 @@
-import { useGetProductEnvActivityDetail } from "@/hooks/product";
-import { DEFAULT_PRODUCT } from "@/utils/constants/product";
-import { Collapse, Flex, Modal, Spin, Table, Tag, Tree } from "antd";
-import { useCallback, useMemo } from "react";
-import styles from "./index.module.scss";
 import Text from "@/components/Text";
-import LogMethodTag from "../LogMethodTag";
-import { IActivityLog } from "@/utils/types/env.type";
-import { ColumnsType } from "antd/es/table";
+import { useGetProductEnvActivityDetail } from "@/hooks/product";
+import { useAppStore } from "@/stores/app.store";
 import { parseObjectDescriptionToTreeData } from "@/utils/helpers/schema";
+import { IActivityLog } from "@/utils/types/env.type";
+import { Collapse, Flex, Modal, Spin, Table, Tag, Tree } from "antd";
+import { ColumnsType } from "antd/es/table";
+import { useCallback, useMemo } from "react";
+import LogMethodTag from "../LogMethodTag";
+import styles from "./index.module.scss";
 
 interface Props {
   envId: string;
@@ -21,8 +21,9 @@ const ActivityDetailModal = ({
   open,
   setOpen,
 }: Readonly<Props>) => {
+  const { currentProduct } = useAppStore();
   const { data, isLoading } = useGetProductEnvActivityDetail(
-    DEFAULT_PRODUCT,
+    currentProduct,
     envId,
     activityId
   );
