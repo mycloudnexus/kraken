@@ -1,4 +1,5 @@
 import BasicLayout from "@/components/Layout/BasicLayout";
+import APIServerEditSelection from "@/pages/APIServerEditSelection";
 import APIServerList from "@/pages/APIServerList";
 import EnvironmentActivityLog from "@/pages/EnvironmentActivityLog";
 import EnvironmentOverview from "@/pages/EnvironmentOverview";
@@ -16,15 +17,24 @@ const router = createBrowserRouter([
         element: <HomePage />,
       },
       {
-        path: "component/:id",
+        path: "component",
         children: [
           {
-            path: "new",
-            element: <NewAPIServer />,
-          },
-          {
-            path: "list",
-            element: <APIServerList />,
+            path: ":id",
+            children: [
+              {
+                path: "new",
+                element: <NewAPIServer />,
+              },
+              {
+                path: "list",
+                element: <APIServerList />,
+              },
+              {
+                path: "edit/:componentId/api",
+                element: <APIServerEditSelection />,
+              },
+            ],
           },
         ],
       },

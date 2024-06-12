@@ -101,9 +101,6 @@ const SelectDownStreamAPI = ({
           <div className={styles.paper}>
             <Form.Item noStyle name="selectedAPIs" valuePropName="targetKeys">
               <Transfer
-                listStyle={{
-                  width: "calc(50% - 22px)",
-                }}
                 filterOption={(inputValue: string, option: any) =>
                   option.key.indexOf(inputValue) > -1
                 }

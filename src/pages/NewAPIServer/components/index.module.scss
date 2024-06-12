@@ -81,6 +81,7 @@
   :global {
     .ant-transfer-list {
       height: calc(100vh - 308px);
+      flex: 1;
     }
     .ant-transfer-operation {
       .ant-btn-primary {
@@ -123,6 +124,13 @@
         color: #86909c;
         font-size: 12px;
       }
+    }
+    .ant-transfer-list-content-item {
+      padding: 0;
+    }
+    .ant-checkbox-wrapper,
+    .ant-transfer-list-content-item-text {
+      padding: 5px 0 5px 12px;
     }
   }
 }

@@ -38,6 +38,8 @@ const HomePageCard = ({
       productId: currentProduct,
       params: {
         kind: API_SERVER_KEY,
+        size: 1,
+        page: 0,
       },
     } as any);
     if (isEmpty(dataList?.data?.data)) {

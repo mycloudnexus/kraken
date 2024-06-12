@@ -3,7 +3,7 @@ import { Button, Empty, Tree } from "antd";
 import { get, isEmpty } from "lodash";
 import { useEffect, useMemo, useState } from "react";
 import styles from "./index.module.scss";
-import { schemaParses } from "@/utils/helpers/schema";
+import { exampleParse, schemaParses } from "@/utils/helpers/schema";
 
 type Props = {
   item: Record<string, any>;
@@ -29,6 +29,14 @@ const Response = ({ item, schemas }: Props) => {
       "[0]",
       ""
     );
+    const example = get(
+      item,
+      `[${selectedResponse}].content[${objectKey}].examples.response.value`,
+      get(item, `[${selectedResponse}].content[${objectKey}].example`)
+    );
+    if (!isEmpty(example)) {
+      return exampleParse(example, "", styles.nodeTitle, styles.nodeExample);
+    }
     const schemaUrl = get(
       item,
       `[${selectedResponse}].content[${objectKey}].schema.items.$ref`,

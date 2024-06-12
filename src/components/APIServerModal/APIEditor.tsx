@@ -11,7 +11,7 @@ import {
 import Text from "../Text";
 import { PaperClipOutlined, UploadOutlined } from "@ant-design/icons";
 import Flex from "../Flex";
-import { cloneDeep, get, isEmpty, set } from "lodash";
+import { cloneDeep, get, isEmpty, isEqual, set } from "lodash";
 import { isURL } from "@/utils/helpers/url";
 import { useEffect } from "react";
 import { decode } from "js-base64";
@@ -83,6 +83,9 @@ const APIEditor = ({ detail, onClose, refresh, componentId }: Props) => {
       set(data, "facets.baseSpec.path", values.link);
       set(data, "facets.baseSpec.content", swaggerData);
       set(data, "facets.environments", values.environments);
+      if (!isEqual(swaggerData, detail?.facets?.baseSpec?.content)) {
+        set(data, "facets.selectedAPIs", []);
+      }
       await runUpdate({ productId: currentProduct, componentId, data } as any);
       refresh?.();
       notification.success({ message: "Edit success" });

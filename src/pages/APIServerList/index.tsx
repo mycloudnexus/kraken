@@ -38,8 +38,15 @@ const APIServerList = () => {
         render: (metadata: any) => metadata?.name,
       },
       {
-        render: () => (
-          <Button type="text" style={{ color: "#1677ff" }}>
+        dataIndex: "metadata",
+        render: (metadata: any) => (
+          <Button
+            type="text"
+            style={{ color: "#1677ff" }}
+            onClick={() =>
+              navigate(`/component/${currentProduct}/edit/${metadata.key}/api`)
+            }
+          >
             Add API
           </Button>
         ),
@@ -63,7 +70,7 @@ const APIServerList = () => {
       },
     ];
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [currentProduct]);
 
   useEffect(() => {
     setExpandedRowKeys(dataList?.data?.map((item: { id: any }) => item?.id));

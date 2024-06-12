@@ -1,6 +1,6 @@
 import Flex from "@/components/Flex";
-import { get, isEmpty } from "lodash";
-import { Typography } from "antd";
+import { get, isArray, isBoolean, isEmpty, isObject } from "lodash";
+import { TreeDataNode, Typography } from "antd";
 
 const { Text } = Typography;
 
@@ -116,4 +116,71 @@ export const parseObjectDescriptionToTreeData = (
     };
   });
   return result;
+};
+
+export const renderExampleValue = (value: any) => {
+  if (typeof value === "string") {
+    return `"${value}"`;
+  }
+  if (isArray(value)) {
+    return `"array"`;
+  }
+  if (isObject(value)) {
+    return `"array"`;
+  }
+  if (isBoolean(value)) {
+    return "boolean";
+  }
+  return "";
+};
+
+/**
+ * Parses the given example object into a tree data structure.
+ * @param example - The example object to parse.
+ * @param prefix - The prefix to use for the keys in the tree data. Default is an empty string.
+ * @param nodeTitleClassName - The CSS class name for the title element.
+ * @param nodeExampleClassName - The CSS class name for the example element.
+ * @returns The parsed tree data structure, or undefined if the example is empty.
+ */
+export const exampleParse = (
+  example: Record<string, any>,
+  prefix = "" as string,
+  nodeTitleClassName = "" as string,
+  nodeExampleClassName = "" as string
+): TreeDataNode[] | undefined => {
+  if (isEmpty(example)) {
+    return undefined;
+  }
+  const keys = Object.keys(example);
+  return keys.map((key: string) => {
+    const nodeTitle = (
+      <Flex
+        justifyContent="flex-start"
+        style={{ width: "100%", alignItems: "stretch" }}
+        gap={3}
+      >
+        <span className={nodeTitleClassName}>{key}</span>
+
+        <span className={nodeExampleClassName}>
+          {renderExampleValue(example[key])}
+        </span>
+      </Flex>
+    );
+
+    const children =
+      !isEmpty(example[key]) && typeof example[key] === "object"
+        ? exampleParse(
+            example[key],
+            `${prefix}_${key}`,
+            nodeTitleClassName,
+            nodeExampleClassName
+          )
+        : undefined;
+
+    return {
+      key: `${prefix}_${key}`,
+      title: nodeTitle,
+      children,
+    };
+  });
 };
