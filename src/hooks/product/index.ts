@@ -1,15 +1,21 @@
 import {
   createNewComponent,
+  deployProduct,
   editComponentDetail,
   getComponentAPIDoc,
-  getEnvActivity,
   getComponentDetail,
+  getEnvActivity,
+  getListComponentVersions,
   getListComponents,
+  getListDeployments,
   getListEnvActivities,
   getListEnvs,
 } from "@/services/products";
+import { queryClient } from "@/utils/helpers/reactQuery";
 import { IPagingData } from "@/utils/types/common.type";
+import { IProductWithComponentVersion } from "@/utils/types/component.type";
 import { IActivityDetail, IActivityLog, IEnv } from "@/utils/types/env.type";
+import { IEnvComponent } from "@/utils/types/envComponent.type";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { get } from "lodash";
@@ -24,6 +30,9 @@ export const PRODUCT_CACHE_KEYS = {
   get_product_env_activity_detail: "get_product_env_activity_detail",
   get_component_detail: "get_component_detail",
   edit_component_detail: "edit_component_detail",
+  get_product_deployment_list: "get_product_deployment_list",
+  get_product_component_version_list: "get_product_component_version_list",
+  deploy_product: "deploy_product",
 };
 
 export const useGetProductComponents = (
@@ -87,11 +96,11 @@ export const useManualGetComponentList = () => {
   });
 };
 
-export const useGetProductEnvs = (productId: string) => {
+export const useGetProductEnvs = (productId: string, enabled = true) => {
   return useQuery<AxiosResponse, Error, IPagingData<IEnv>>({
     queryKey: [PRODUCT_CACHE_KEYS.get_product_env_list, productId],
     queryFn: () => getListEnvs(productId),
-    enabled: Boolean(productId),
+    enabled: enabled && Boolean(productId),
     select: (data) => data.data,
   });
 };
@@ -152,5 +161,49 @@ export const useEditComponent = () => {
     mutationKey: [PRODUCT_CACHE_KEYS.edit_component_detail],
     mutationFn: ({ productId, componentId, data }: any) =>
       editComponentDetail(productId, componentId, data),
+  });
+};
+
+export const useGetProductDeployments = (
+  productId: string,
+  params: unknown
+) => {
+  return useQuery<any, Error, IPagingData<IEnvComponent>>({
+    queryKey: [
+      PRODUCT_CACHE_KEYS.get_product_deployment_list,
+      productId,
+      params,
+    ],
+    queryFn: () => getListDeployments(productId, params),
+    enabled: Boolean(productId),
+    select: (data) => data.data,
+  });
+};
+
+export const useGetProductComponentVersions = (
+  productId: string,
+  enabled = true
+) => {
+  return useQuery<any, Error, IProductWithComponentVersion[]>({
+    queryKey: [
+      PRODUCT_CACHE_KEYS.get_product_component_version_list,
+      productId,
+    ],
+    queryFn: () => getListComponentVersions(productId),
+    enabled: enabled && Boolean(productId),
+    select: (data) => data.data,
+  });
+};
+
+export const useDeployProduct = () => {
+  return useMutation<any, Error>({
+    mutationKey: [PRODUCT_CACHE_KEYS.deploy_product],
+    mutationFn: ({ productId, envId, data }: any) =>
+      deployProduct(productId, envId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [PRODUCT_CACHE_KEYS.get_product_deployment_list],
+      });
+    },
   });
 };

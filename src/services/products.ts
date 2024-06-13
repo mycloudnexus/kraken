@@ -53,3 +53,21 @@ export const editComponentDetail = (
     data,
   });
 };
+
+export const getListDeployments = (productId: string, params: unknown) =>
+  request(`${PRODUCT}/${productId}/deployments`, {
+    params,
+  });
+
+export const getListComponentVersions = (productId: string) =>
+  request(`${PRODUCT}/${productId}/component-versions`);
+
+export const deployProduct = (
+  productId: string,
+  envId: string,
+  data: unknown
+) =>
+  request(`${PRODUCT}/${productId}/envs/${envId}/deployment`, {
+    method: "POST",
+    data,
+  });

@@ -1,5 +1,13 @@
-.overviewWrapper {
-  padding: 16px 24px;
+.pageWrapper {
+  box-sizing: border-box;
+  height: 100%;
+  padding: 16px 20px;
+  background-color: #f4f4f4;
+}
+.sectionWrapper {
+  border-radius: 4px;
+  padding: 16px 20px;
+  background-color: #fff;
 }
 .overviewItem {
   flex: 1;
@@ -12,4 +20,12 @@
   max-height: 124px;
   align-self: stretch;
   overflow-y: auto;
+}
+.deploymentFilterWrapper {
+  padding: 12px 24px 9px;
+  background-color: #fafafa;
+}
+.deploymentHistoryTableWrapper {
+  padding: 24px;
+  background-color: #fff;
 }
