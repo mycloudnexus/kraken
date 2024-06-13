@@ -100,32 +100,24 @@ const NewAPIServer = () => {
         <div className={styles.container}>
           <SelectAPIServer form={form} active={step === 0} />
           <AddEnv form={form} active={step === 2} />
-          <SelectDownStreamAPI
-            form={form}
-            active={step === 1}
-            onNext={handleNext}
-            onPrev={handlePrev}
-            currentStep={step}
-          />
-          {step !== 1 && (
-            <Form.Item noStyle shouldUpdate>
-              {({ getFieldValue }) => {
-                const disabled =
-                  (isEmpty(getFieldValue("name")) ||
-                    isEmpty(getFieldValue("file"))) &&
-                  step === 0;
-                return (
-                  <BtnStep
-                    disabled={disabled}
-                    loading={loadingCreate}
-                    onNext={handleNext}
-                    onPrev={handlePrev}
-                    currentStep={step}
-                  />
-                );
-              }}
-            </Form.Item>
-          )}
+          <SelectDownStreamAPI form={form} active={step === 1} />
+          <Form.Item noStyle shouldUpdate>
+            {({ getFieldValue }) => {
+              const disabled =
+                (isEmpty(getFieldValue("name")) ||
+                  isEmpty(getFieldValue("file"))) &&
+                step === 0;
+              return (
+                <BtnStep
+                  disabled={disabled}
+                  loading={loadingCreate}
+                  onNext={handleNext}
+                  onPrev={handlePrev}
+                  currentStep={step}
+                />
+              );
+            }}
+          </Form.Item>
         </div>
       </div>
     </Form>

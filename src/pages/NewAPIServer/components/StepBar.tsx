@@ -1,61 +1,242 @@
-import styles from "./index.module.scss";
 import StepIcon from "@/assets/stepstart.svg";
-import ETIcon from "@/assets/et.svg";
-import { Avatar, Button, Divider } from "antd";
-import clsx from "clsx";
-import { DoubleLeftOutlined } from "@ant-design/icons";
 import Text from "@/components/Text";
+import {
+  CheckCircleFilled,
+  CloseOutlined,
+  DownOutlined,
+  UpOutlined,
+} from "@ant-design/icons";
+import { Button, Collapse, CollapseProps } from "antd";
+import clsx from "clsx";
+import { CSSProperties, useRef, useState } from "react";
+import type { DraggableData, DraggableEvent } from "react-draggable";
+import Draggable from "react-draggable";
+import styles from "./index.module.scss";
 
 type Props = {
   currentStep: number;
 };
 
-const Step = ({ active = false, step = "1", content = "" }) => {
+interface IStepTitle {
+  activeKey: string | string[];
+  stepKey: string;
+  isFinished: boolean;
+  content: string;
+  isCurrentStep?: boolean;
+}
+
+interface IStepIndicator {
+  currentStep: number;
+}
+
+const StepTitle = ({
+  activeKey,
+  stepKey,
+  isFinished,
+  content,
+  isCurrentStep,
+}: IStepTitle) => {
   return (
-    <div className={clsx(styles.step, { [styles.active]: active })}>
-      <Avatar size={51}>{step}</Avatar>
-      <Text.NormalMedium color="#595959">{content}</Text.NormalMedium>
+    <div
+      className={clsx(styles.collapseTitle, {
+        [styles.active]: activeKey === stepKey,
+      })}
+    >
+      {isFinished ? (
+        <CheckCircleFilled style={{ color: "#389E0D" }} />
+      ) : (
+        <CheckCircleFilled
+          style={{ color: isCurrentStep ? "#2962FF" : "#DDE1E5" }}
+        />
+      )}
+      <span style={{ paddingLeft: 8 }}> {content}</span>
     </div>
   );
 };
 
-const StepBar = ({ currentStep = 0 }: Props) => {
+const StepIndicator = ({ currentStep }: IStepIndicator) => {
   return (
-    <div className={styles.bar}>
-      <div className={styles.barTop}>
-        <StepIcon />
-        <Text.Custom size="24px" style={{ marginTop: 22 }}>
-          Let’s get you start!
-        </Text.Custom>
-        <div className={styles.stepBar}>
-          <Step
-            active={currentStep === 0}
-            step="1"
-            content="Select your API server"
-          />
-          <Step
-            active={currentStep === 1}
-            step="2"
-            content="Select downstream API"
-          />
-          <Step active={currentStep === 2} step="3" content="Add environment" />
-        </div>
-      </div>
-      <div>
-        <div className={styles.version}>
-          <Text.LightSmall color="#00000040">
-            V1.0 | A product by
-          </Text.LightSmall>
-          <ETIcon />
-        </div>
-        <Divider style={{ margin: "16px 0" }} />
-        <div className={styles.collapseBtn}>
-          <Button style={{ borderColor: "#D9D9D9" }}>
-            <DoubleLeftOutlined style={{ color: "#D9D9D9" }} />
-          </Button>
-        </div>
-      </div>
+    <div style={{ display: "flex", flexDirection: "row" }}>
+      <div
+        className={clsx(styles.stepIndicator, {
+          [styles.stepIndicatorActive]: currentStep === 0,
+        })}
+      />
+      <div
+        className={clsx(styles.stepIndicator, {
+          [styles.stepIndicatorActive]: currentStep === 1,
+        })}
+      />
+      <div
+        className={clsx(styles.stepIndicator, {
+          [styles.stepIndicatorActive]: currentStep === 2,
+        })}
+      />
     </div>
+  );
+};
+
+const getItems: (
+  panelStyle: CSSProperties,
+  currentStep: number,
+  activeKey: string | string[]
+) => CollapseProps["items"] = (panelStyle, currentStep, activeKey) => [
+  {
+    key: "0",
+    label: (
+      <StepTitle
+        activeKey={activeKey}
+        isCurrentStep={currentStep === 0}
+        stepKey="0"
+        content="1. Basic Information of API server"
+        isFinished={currentStep > 0}
+      />
+    ),
+    children: (
+      <Text.LightMedium>
+        Add basic information to your API server and upload API spec, with which
+        the system can abstract your API list.
+      </Text.LightMedium>
+    ),
+    style: panelStyle,
+  },
+  {
+    key: "1",
+    label: (
+      <StepTitle
+        isCurrentStep={currentStep === 1}
+        activeKey={activeKey}
+        stepKey="1"
+        content="2. Select Seller APIs"
+        isFinished={currentStep > 1}
+      />
+    ),
+    children: (
+      <Text.LightMedium>
+        Select seller APIs from seller API spec list which will be used in
+        Sonata API mapping, and add to the right.
+        <br />
+        <br />
+        You can add multiple APIs to the right side.
+      </Text.LightMedium>
+    ),
+    style: panelStyle,
+  },
+  {
+    key: "2",
+    label: (
+      <StepTitle
+        isCurrentStep={currentStep === 2}
+        activeKey={activeKey}
+        stepKey="2"
+        content="3. Add environment Variables"
+        isFinished={currentStep > 2}
+      />
+    ),
+    children: (
+      <Text.LightMedium>Select the environments and add URLs.</Text.LightMedium>
+    ),
+    style: panelStyle,
+  },
+];
+
+const StepBar = ({ currentStep = 0 }: Props) => {
+  const [isOpen, setIsOpen] = useState(true);
+  const [isStart, setIsStart] = useState(false);
+  const [activeKey, setActiveKey] = useState<string | string[]>("1");
+  const [bounds, setBounds] = useState({
+    left: 0,
+    top: 0,
+    bottom: 0,
+    right: 0,
+  });
+  const draggleRef = useRef<HTMLDivElement>(null);
+
+  const panelStyle: React.CSSProperties = {
+    marginBottom: 24,
+    borderRadius: 4,
+    border: "1px solid #DDE1E5",
+  };
+
+  const onStart = (_event: DraggableEvent, uiData: DraggableData) => {
+    const { clientWidth, clientHeight } = window.document.documentElement;
+    const targetRect = draggleRef.current?.getBoundingClientRect();
+    if (!targetRect) {
+      return;
+    }
+    setBounds({
+      left: -targetRect.left + uiData.x,
+      right: clientWidth - (targetRect.right - uiData.x),
+      top: -targetRect.top + uiData.y,
+      bottom: clientHeight - (targetRect.bottom - uiData.y),
+    });
+  };
+
+  const onChange = (key: string | string[]) => {
+    setActiveKey(key);
+  };
+
+  return (
+    <Draggable
+      bounds={bounds}
+      nodeRef={draggleRef}
+      onStart={(event, uiData) => onStart(event, uiData)}
+    >
+      <div
+        ref={draggleRef}
+        className={clsx(styles.draggableModal, {
+          [styles.hiddenModal]: !isOpen,
+        })}
+      >
+        {isStart && <StepIndicator currentStep={currentStep} />}
+        <div
+          className={styles.closeIcon}
+          onClick={() => setIsOpen(false)}
+          role="none"
+        >
+          <CloseOutlined style={{ color: "#00000073" }} />
+        </div>
+        {!isStart ? (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexDirection: "column",
+            }}
+          >
+            <p style={{ marginBottom: 39, fontWeight: 500, fontSize: 20 }}>
+              Starting with seller API setup
+            </p>
+            <StepIcon />
+            <Button
+              style={{ marginTop: 71 }}
+              type="primary"
+              shape="default"
+              onClick={() => setIsStart(true)}
+            >
+              Start the tutorial
+            </Button>
+          </div>
+        ) : (
+          <div>
+            <p style={{ fontWeight: 500, fontSize: 20 }}>Seller API setup</p>
+            <Collapse
+              items={getItems(panelStyle, currentStep, activeKey[0])}
+              bordered={false}
+              style={{ backgroundColor: "white" }}
+              expandIcon={({ isActive }) =>
+                !isActive ? <DownOutlined /> : <UpOutlined />
+              }
+              expandIconPosition="end"
+              accordion
+              defaultActiveKey={["0"]}
+              onChange={onChange}
+            />
+          </div>
+        )}
+      </div>
+    </Draggable>
   );
 };
 

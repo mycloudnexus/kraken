@@ -9,18 +9,14 @@ import {
   notification,
 } from "antd";
 import { useEffect, useState } from "react";
-import { isEmpty } from "lodash";
+import { get, isEmpty } from "lodash";
 import SwaggerInfo from "./SwaggerInfo";
-import BtnStep from "./BtnStep";
 import yaml from "js-yaml";
 import { decode } from "js-base64";
 
 type Props = {
   form: FormInstance<any>;
   active: boolean;
-  onNext: () => void;
-  onPrev: () => void;
-  currentStep: number;
 };
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -43,13 +39,7 @@ export const tranformSwaggerToArray = (data: any) => {
   return pathsArray;
 };
 
-const SelectDownStreamAPI = ({
-  form,
-  active,
-  currentStep,
-  onPrev,
-  onNext,
-}: Props) => {
+const SelectDownStreamAPI = ({ form, active }: Props) => {
   const [selectedAPI, setSelectedAPI] = useState<any>();
   const [transferData, setTransferData] = useState<any>([]);
   const [targetKeys, setTargetKeys] = useState<TransferProps["targetKeys"]>([]);
@@ -66,8 +56,10 @@ const SelectDownStreamAPI = ({
       });
 
       const data = yaml.load(decode(swaggerData as any)) as any;
+      const newTransferData = tranformSwaggerToArray(data);
       setSchemas(data?.components?.schemas);
-      setTransferData(tranformSwaggerToArray(data));
+      setTransferData(newTransferData);
+      setSelectedAPI(get(newTransferData, "[0]"));
     } catch (error) {
       form.setFieldValue("file", undefined);
       notification.error({ message: "Please select a valid swagger file" });
@@ -86,7 +78,14 @@ const SelectDownStreamAPI = ({
   }, [file]);
 
   return (
-    <div style={{ display: active ? "block" : "none" }}>
+    <div
+      style={{
+        display: active ? "flex" : "none",
+        flexDirection: "column",
+        flex: 1,
+        boxSizing: "border-box",
+      }}
+    >
       <Flex
         justifyContent="flex-start"
         gap={16}
@@ -132,9 +131,11 @@ const SelectDownStreamAPI = ({
               />
             </Form.Item>
           </div>
-          <BtnStep onNext={onNext} onPrev={onPrev} currentStep={currentStep} />
         </div>
-        <div className={styles.apiDetail} style={{ flex: 2 }}>
+        <div
+          className={styles.apiDetail}
+          style={{ flex: 2, boxSizing: "border-box" }}
+        >
           <SwaggerInfo item={selectedAPI} schemas={schemas} />
         </div>
       </Flex>

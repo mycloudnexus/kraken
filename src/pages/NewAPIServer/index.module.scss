@@ -1,10 +1,13 @@
 .root {
   display: flex;
   background: #f0f2f5;
+  height: calc(100vh - 58px);
 }
 
 .container {
   padding: 20px;
   width: 100%;
   min-width: 800px;
+  display: flex;
+  flex-direction: column;
 }

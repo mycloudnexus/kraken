@@ -47,15 +47,55 @@
   }
 }
 
+.draggableModal {
+  cursor: move;
+  position: absolute;
+  z-index: 1000;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.2);
+  border: 1px solid #f4f4f4;
+  padding: 32px;
+  background-color: #fff;
+  bottom: 60px;
+  right: 60px;
+  width: 350px;
+}
+
+.hiddenModal {
+  display: none;
+}
+
+.collapseTitle {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.closeIcon {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.stepIndicator {
+  height: 10px;
+  width: 56px;
+  border-radius: 5px;
+  background-color: #dde1e5;
+  margin-right: 8px;
+}
+
+.stepIndicatorActive {
+  background-color: #2962FF;
+}
+
 .active {
-  span {
-    color: #f632fa;
-  }
-  :global {
-    .ant-avatar-circle {
-      border: 2px solid #f632fa;
-    }
-  }
+  font-weight: 700;
+  color: #595959;
 }
 
 .version {
@@ -80,7 +120,7 @@
 .transfer {
   :global {
     .ant-transfer-list {
-      height: calc(100vh - 308px);
+      height: calc(100vh - 244px);
       flex: 1;
     }
     .ant-transfer-operation {
@@ -145,7 +185,7 @@
   background: #fff;
   width: 100%;
   max-width: calc((100vw - 280px) * 2 / 3);
-  height: calc(100vh - 98px);
+  height: calc(100vh - 134px);
   padding: 10px 20px;
   box-sizing: border-box;
   > div {

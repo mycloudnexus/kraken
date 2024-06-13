@@ -11,12 +11,18 @@ const AddEnv = ({ form, active }: Props) => {
   const isStage = Form.useWatch("isStage", form);
   const isUat = Form.useWatch("isUat", form);
   return (
-    <div style={{ display: active ? "block" : "none" }}>
+    <div
+      style={{
+        display: active ? "flex" : "none",
+        flex: 1,
+        flexDirection: "column",
+      }}
+    >
       <Text.BoldLarge>Add information for the API server</Text.BoldLarge>
       <p>
         <Text.NormalLarge>Console connect application</Text.NormalLarge>
       </p>
-      <div className={styles.paper}>
+      <div className={styles.paper} style={{ flex: 1 }}>
         <Row gutter={[40, 16]}>
           <Col span={24}>
             <Text.LightLarge>
@@ -35,7 +41,7 @@ const AddEnv = ({ form, active }: Props) => {
               className={styles.inputUrl}
               rules={[{ required: isSIT, message: "Please fill the url" }]}
             >
-              <Input placeholder="Add URL"  disabled={!isSIT} />
+              <Input placeholder="Add URL" disabled={!isSIT} />
             </Form.Item>
           </Col>
           <Col span={4}>
@@ -50,7 +56,7 @@ const AddEnv = ({ form, active }: Props) => {
               className={styles.inputUrl}
               rules={[{ required: isProd, message: "Please fill the url" }]}
             >
-              <Input placeholder="Add URL"  disabled={!isProd} />
+              <Input placeholder="Add URL" disabled={!isProd} />
             </Form.Item>
           </Col>
           <Col span={4}>
@@ -65,7 +71,7 @@ const AddEnv = ({ form, active }: Props) => {
               className={styles.inputUrl}
               rules={[{ required: isStage, message: "Please fill the url" }]}
             >
-              <Input placeholder="Add URL"  disabled={!isStage} />
+              <Input placeholder="Add URL" disabled={!isStage} />
             </Form.Item>
           </Col>
           <Col span={4}>
@@ -80,7 +86,7 @@ const AddEnv = ({ form, active }: Props) => {
               className={styles.inputUrl}
               rules={[{ required: isUat, message: "Please fill the url" }]}
             >
-              <Input placeholder="Add URL"  disabled={!isUat} />
+              <Input placeholder="Add URL" disabled={!isUat} />
             </Form.Item>
           </Col>
         </Row>
