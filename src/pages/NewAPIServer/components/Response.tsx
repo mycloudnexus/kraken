@@ -32,7 +32,11 @@ const Response = ({ item, schemas }: Props) => {
     const example = get(
       item,
       `[${selectedResponse}].content[${objectKey}].examples.response.value`,
-      get(item, `[${selectedResponse}].content[${objectKey}].example`)
+      get(
+        item,
+        `[${selectedResponse}].content[${objectKey}].example`,
+        get(item, `[${selectedResponse}].content[${objectKey}].examples`)
+      )
     );
     if (!isEmpty(example)) {
       return exampleParse(example, "", styles.nodeTitle, styles.nodeExample);

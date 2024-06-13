@@ -27,19 +27,23 @@ const APIServerEditSelection = () => {
   const { mutateAsync: runUpdate } = useEditComponent();
 
   useEffect(() => {
-    if (isEmpty(detailData)) {
-      return;
+    try {
+      if (isEmpty(detailData)) {
+        return;
+      }
+      const base64data = get(detailData, "facets.baseSpec.content");
+      let swaggerData;
+      let fileDecode = "";
+      if (base64data) {
+        fileDecode = decode(get(detailData, "facets.baseSpec.content"));
+        swaggerData = jsYaml.load(fileDecode) as any;
+        setSchemas(swaggerData?.components?.schemas);
+        setTransferData(tranformSwaggerToArray(swaggerData));
+      }
+      setTargetKeys(get(detailData, "facets.selectedAPIs"));
+    } catch (error) {
+      notification.error({ message: "Error. Please try again" });
     }
-    const base64data = get(detailData, "facets.baseSpec.content");
-    let swaggerData;
-    let fileDecode = "";
-    if (base64data) {
-      fileDecode = decode(get(detailData, "facets.baseSpec.content"));
-      swaggerData = jsYaml.load(fileDecode) as any;
-      setSchemas(swaggerData?.components?.schemas);
-      setTransferData(tranformSwaggerToArray(swaggerData));
-    }
-    setTargetKeys(get(detailData, "facets.selectedAPIs"));
   }, [detailData]);
 
   const handleChange: TransferProps["onChange"] = (newTargetKeys) => {
@@ -50,6 +54,7 @@ const APIServerEditSelection = () => {
     try {
       const data = cloneDeep(detailData);
       set(data, "facets.selectedAPIs", targetKeys);
+      set(data, "metadata.version", get(data, "metadata.version", 1) + 1);
       await runUpdate({ productId: currentProduct, componentId, data } as any);
       notification.success({ message: "Edit success" });
       navigate(-1);

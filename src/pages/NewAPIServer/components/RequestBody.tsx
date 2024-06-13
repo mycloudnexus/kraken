@@ -2,7 +2,7 @@ import { Button, Tree } from "antd";
 import { get, isEmpty } from "lodash";
 import { useMemo } from "react";
 import styles from "./index.module.scss";
-import { schemaParses } from "@/utils/helpers/schema";
+import { exampleParse, schemaParses } from "@/utils/helpers/schema";
 import Text from "@/components/Text";
 
 type Props = {
@@ -16,7 +16,19 @@ const RequestBody = ({ item, schemas }: Props) => {
       return undefined;
     }
     const objectKey = get(Object.keys(get(item, `content`, {})), "[0]", "");
+    const example = get(
+      item,
+      `content[${objectKey}].examples.response.value`,
+      get(
+        item,
+        `content[${objectKey}].example`,
+        get(item, `content[${objectKey}].examples`)
+      )
+    );
 
+    if (!isEmpty(example)) {
+      return exampleParse(example, "", styles.nodeTitle, styles.nodeExample);
+    }
     const schemaUrl = get(
       item,
       `content[${objectKey}].schema.items.$ref`,
@@ -33,6 +45,15 @@ const RequestBody = ({ item, schemas }: Props) => {
     );
     if (typeof schemaUrl !== "string") {
       return undefined;
+    }
+    const schemaProperties = get(item, `content[${objectKey}].schema.properties`);
+    if (!isEmpty(schemaProperties)) {
+      return exampleParse(
+        schemaProperties,
+        "",
+        styles.nodeTitle,
+        styles.nodeExample
+      );
     }
     return schemaParses(
       schemaUrl.replace("#/components/schemas/", ""),

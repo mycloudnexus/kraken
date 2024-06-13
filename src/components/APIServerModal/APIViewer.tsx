@@ -1,4 +1,4 @@
-import { Button, Table } from "antd";
+import { Button, Table, notification } from "antd";
 import Text from "../Text";
 import styles from "./index.module.scss";
 import { useMemo } from "react";
@@ -7,6 +7,8 @@ import { decode } from "js-base64";
 import jsYaml from "js-yaml";
 import Flex from "../Flex";
 import { PaperClipOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
+import { useAppStore } from "@/stores/app.store";
 
 type Props = {
   detail: any;
@@ -15,13 +17,25 @@ type Props = {
 };
 
 const APIViewer = ({ detail, onClose, enableEdit }: Props) => {
+  const { currentProduct } = useAppStore();
+  const navigate = useNavigate();
+
+  const handleGoEditAPI = () =>
+    navigate(
+      `/component/${currentProduct}/edit/${get(detail, "metadata.key")}/api`
+    );
+
   const fileName = useMemo(() => {
-    if (!get(detail, "facets.baseSpec.content")) {
-      return "";
+    try {
+      if (!get(detail, "facets.baseSpec.content")) {
+        return "";
+      }
+      const fileData = decode(get(detail, "facets.baseSpec.content"));
+      const swaggerData = jsYaml.load(fileData);
+      return get(swaggerData, "info.title");
+    } catch (error) {
+      notification.error({ message: "Can not load yaml" });
     }
-    const fileData = decode(get(detail, "facets.baseSpec.content"));
-    const swaggerData = jsYaml.load(fileData);
-    return get(swaggerData, "info.title");
   }, [detail]);
 
   const basicDetailCol = useMemo(
@@ -81,13 +95,15 @@ const APIViewer = ({ detail, onClose, enableEdit }: Props) => {
           pagination={false}
         />
       </div>
-      <div>
-        <Text.LightMedium>API spec</Text.LightMedium>
-        <Flex gap={9} justifyContent="flex-start">
-          <PaperClipOutlined />
-          <Text.LightMedium>{fileName}</Text.LightMedium>
-        </Flex>
-      </div>
+      {fileName ? (
+        <div>
+          <Text.LightMedium>API spec</Text.LightMedium>
+          <Flex gap={9} justifyContent="flex-start">
+            <PaperClipOutlined />
+            <Text.LightMedium>{fileName}</Text.LightMedium>
+          </Flex>
+        </div>
+      ) : null}
       <div className={styles.environment}>
         <Text.LightMedium>Environment Variables</Text.LightMedium>
         <Table
@@ -98,7 +114,7 @@ const APIViewer = ({ detail, onClose, enableEdit }: Props) => {
         />
       </div>
       <Flex className={styles.modalFooter} justifyContent="flex-end" gap={12}>
-        <Button>Add new API</Button>
+        <Button onClick={handleGoEditAPI}>Add new API</Button>
         <Button onClick={enableEdit}>Edit</Button>
         <Button type="primary" onClick={onClose}>
           OK

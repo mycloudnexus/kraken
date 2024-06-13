@@ -170,7 +170,7 @@ export const exampleParse = (
     const children =
       !isEmpty(example[key]) && typeof example[key] === "object"
         ? exampleParse(
-            example[key],
+            isArray(example[key]) ? example[key][0] : example[key],
             `${prefix}_${key}`,
             nodeTitleClassName,
             nodeExampleClassName

@@ -11,9 +11,9 @@ import {
 import Text from "../Text";
 import { PaperClipOutlined, UploadOutlined } from "@ant-design/icons";
 import Flex from "../Flex";
-import { cloneDeep, get, isEmpty, isEqual, set } from "lodash";
+import { cloneDeep, get, isEmpty, set } from "lodash";
 import { isURL } from "@/utils/helpers/url";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { decode } from "js-base64";
 import jsYaml from "js-yaml";
 import styles from "./index.module.scss";
@@ -31,6 +31,7 @@ const APIEditor = ({ detail, onClose, refresh, componentId }: Props) => {
   const { currentProduct } = useAppStore();
   const { mutateAsync: runUpdate } = useEditComponent();
   const [form] = Form.useForm();
+  const [isChangedFile, setIsChangedFile] = useState(false);
   const file = Form.useWatch("file", form);
 
   const isSIT = Form.useWatch("isSIT", form);
@@ -39,33 +40,39 @@ const APIEditor = ({ detail, onClose, refresh, componentId }: Props) => {
   const isUat = Form.useWatch("isUat", form);
 
   useEffect(() => {
-    if (isEmpty(detail)) {
-      return;
-    }
-    const base64data = get(detail, "facets.baseSpec.content");
-    let swaggerData;
-    let fileDecode = "";
-    if (base64data) {
-      fileDecode = decode(get(detail, "facets.baseSpec.content"));
-      swaggerData = jsYaml.load(fileDecode);
-    }
+    try {
+      if (isEmpty(detail)) {
+        return;
+      }
+      const base64data = get(detail, "facets.baseSpec.content");
+      let swaggerData;
+      let fileDecode = "";
+      if (base64data) {
+        fileDecode = decode(get(detail, "facets.baseSpec.content"));
+        swaggerData = jsYaml.load(fileDecode);
+      }
 
-    form.setFieldsValue({
-      name: get(detail, "metadata.name"),
-      description: get(detail, "metadata.description"),
-      link: get(detail, "facets.baseSpec.path"),
-      file: {
-        file: new File(
-          [fileDecode],
-          `${get(swaggerData, "info.title", "file")}.yaml`
-        ),
-      },
-      isSIT: !!get(detail, "facets.environments.sit"),
-      isProd: !!get(detail, "facets.environments.prod"),
-      isStage: !!get(detail, "facets.environments.stage"),
-      isUat: !!get(detail, "facets.environments.uat"),
-      environments: get(detail, "facets.environments"),
-    });
+      form.setFieldsValue({
+        name: get(detail, "metadata.name"),
+        description: get(detail, "metadata.description"),
+        link: get(detail, "facets.baseSpec.path"),
+        file: {
+          file: isEmpty(base64data)
+            ? undefined
+            : new File(
+                [fileDecode],
+                `${get(swaggerData, "info.title", "file")}.yaml`
+              ),
+        },
+        isSIT: !!get(detail, "facets.environments.sit"),
+        isProd: !!get(detail, "facets.environments.prod"),
+        isStage: !!get(detail, "facets.environments.stage"),
+        isUat: !!get(detail, "facets.environments.uat"),
+        environments: get(detail, "facets.environments"),
+      });
+    } catch (error) {
+      notification.error({ message: "Error. Please try again" });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [detail]);
 
@@ -81,11 +88,12 @@ const APIEditor = ({ detail, onClose, refresh, componentId }: Props) => {
       set(data, "metadata.name", values.name);
       set(data, "metadata.description", values.description);
       set(data, "facets.baseSpec.path", values.link);
-      set(data, "facets.baseSpec.content", swaggerData);
       set(data, "facets.environments", values.environments);
-      if (!isEqual(swaggerData, detail?.facets?.baseSpec?.content)) {
+      if (isChangedFile) {
         set(data, "facets.selectedAPIs", []);
+        set(data, "facets.baseSpec.content", swaggerData);
       }
+      set(data, "metadata.version", get(data, "metadata.version", 1) + 1);
       await runUpdate({ productId: currentProduct, componentId, data } as any);
       refresh?.();
       notification.success({ message: "Edit success" });
@@ -165,14 +173,17 @@ const APIEditor = ({ detail, onClose, refresh, componentId }: Props) => {
                 id="upload-file"
                 showUploadList={false}
                 multiple={false}
-                beforeUpload={() => false}
+                beforeUpload={() => {
+                  setIsChangedFile(true);
+                  return false;
+                }}
               >
                 <Button icon={<UploadOutlined />}>Click to upload</Button>
               </Upload>
             </Form.Item>
           </Col>
           <Col span={24} style={{ marginTop: -16 }}>
-            {file ? (
+            {file?.file ? (
               <Flex gap={9} justifyContent="flex-start">
                 <PaperClipOutlined />
                 <Text.LightMedium>
