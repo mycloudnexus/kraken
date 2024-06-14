@@ -1,10 +1,13 @@
-import LogMethodTag from "@/components/LogMethodTag";
 import Text from "@/components/Text";
+import { useGetComponentDetail } from "@/hooks/product";
+import { useAppStore } from "@/stores/app.store";
 import { DoubleLeftOutlined } from "@ant-design/icons";
-import { Button, Divider, Flex, List } from "antd";
+import { Button, Divider, Flex, List, Spin, Tabs } from "antd";
 import clsx from "clsx";
-import { useState } from "react";
+import { uniq } from "lodash";
+import { useMemo, useState } from "react";
 import { showModalConfirmCreateVersion } from "./components/ModalConfirmCreateVersion";
+import RenderList, { IMapProductAndType } from "./components/RenderList";
 import styles from "./index.module.scss";
 
 const listVersion = [
@@ -29,21 +32,46 @@ const envAndVersion = [
     env: "Production",
   },
 ];
-const mappings = [
-  {
-    id: "1",
-    method: "POST",
-    path: "/geographicAddressValidation",
-    description: "Creates a geographicAddressValidation",
-  },
-  {
-    id: "2",
-    method: "GET",
-    path: "/geographicAddress/{id}",
-    description: "Retrieves a GeographicAddress entity",
-  },
-];
+
 const StandardAPIMapping = () => {
+  const { currentProduct } = useAppStore();
+  const { data, isLoading } = useGetComponentDetail(
+    currentProduct,
+    "mef.sonata.api.quote"
+  );
+  const { noTab, tabs } = useMemo(() => {
+    if (isLoading) {
+      return {
+        noTab: true,
+        tabs: [],
+      };
+    }
+    const tabs: string[] = uniq(
+      data?.facets?.supportedProductTypesAndActions?.reduce(
+        (agg: string[], s: IMapProductAndType) => [
+          ...agg,
+          ...(s?.productTypes ?? []),
+        ],
+        []
+      )
+    );
+    if (tabs.length === 0) {
+      return {
+        noTab: true,
+        tabs: [],
+      };
+    }
+    const tabWithInfo = tabs.map((tab: string) => ({
+      name: tab,
+      data: data?.facets?.supportedProductTypesAndActions?.filter(
+        (s: IMapProductAndType) => s?.productTypes?.includes(tab)
+      ),
+    }));
+    return {
+      noTab: false,
+      tabs: tabWithInfo,
+    };
+  }, [data, isLoading]);
   const [activeVersion, setActiveVersion] = useState("current");
   return (
     <Flex align="stretch" className={styles.pageWrapper}>
@@ -121,26 +149,19 @@ const StandardAPIMapping = () => {
             ))}
           </Flex>
         </Flex>
-        {mappings.map((mapping) => (
-          <Flex
-            align="center"
-            justify="space-between"
-            key={mapping.id}
-            className={styles.mappingWrapper}
-          >
-            <Flex align="center" gap={16}>
-              <LogMethodTag method={mapping.method} />
-              <Text.NormalMedium>{mapping.path}</Text.NormalMedium>
-              <Text.NormalMedium color="rgba(0,0,0,0.45)">
-                {mapping.description}
-              </Text.NormalMedium>
-            </Flex>
-            <Flex align="center" gap={8}>
-              <Button>View</Button>
-              <Button type="primary">Mapping</Button>
-            </Flex>
-          </Flex>
-        ))}
+        <Spin spinning={isLoading}>
+          {noTab ? (
+            <RenderList data={data?.facets?.supportedProductTypesAndActions} />
+          ) : (
+            <Tabs
+              items={tabs.map(({ name, data }) => ({
+                key: name,
+                label: name,
+                children: <RenderList data={data} />,
+              }))}
+            />
+          )}
+        </Spin>
       </Flex>
     </Flex>
   );
