@@ -4,6 +4,7 @@ import {
   CheckCircleFilled,
   CloseOutlined,
   DownOutlined,
+  MinusOutlined,
   UpOutlined,
 } from "@ant-design/icons";
 import { Button, Collapse, CollapseProps } from "antd";
@@ -12,9 +13,12 @@ import { CSSProperties, useRef, useState } from "react";
 import type { DraggableData, DraggableEvent } from "react-draggable";
 import Draggable from "react-draggable";
 import styles from "./index.module.scss";
+import Flex from "@/components/Flex";
 
 type Props = {
   currentStep: number;
+  activeKey: string | string[];
+  setActiveKey: (activeKey: string | string[]) => void;
 };
 
 interface IStepTitle {
@@ -78,9 +82,15 @@ const StepIndicator = ({ currentStep }: IStepIndicator) => {
 
 const getItems: (
   panelStyle: CSSProperties,
+  panelStyleActive: CSSProperties,
   currentStep: number,
   activeKey: string | string[]
-) => CollapseProps["items"] = (panelStyle, currentStep, activeKey) => [
+) => CollapseProps["items"] = (
+  panelStyle,
+  panelStyleActive,
+  currentStep,
+  activeKey
+) => [
   {
     key: "0",
     label: (
@@ -98,7 +108,7 @@ const getItems: (
         the system can abstract your API list.
       </Text.LightMedium>
     ),
-    style: panelStyle,
+    style: activeKey === "0" ? panelStyleActive : panelStyle,
   },
   {
     key: "1",
@@ -120,7 +130,7 @@ const getItems: (
         You can add multiple APIs to the right side.
       </Text.LightMedium>
     ),
-    style: panelStyle,
+    style: activeKey === "1" ? panelStyleActive : panelStyle,
   },
   {
     key: "2",
@@ -136,14 +146,13 @@ const getItems: (
     children: (
       <Text.LightMedium>Select the environments and add URLs.</Text.LightMedium>
     ),
-    style: panelStyle,
+    style: activeKey === "2" ? panelStyleActive : panelStyle,
   },
 ];
 
-const StepBar = ({ currentStep = 0 }: Props) => {
+const StepBar = ({ currentStep = 0, activeKey, setActiveKey }: Props) => {
   const [isOpen, setIsOpen] = useState(true);
   const [isStart, setIsStart] = useState(false);
-  const [activeKey, setActiveKey] = useState<string | string[]>("1");
   const [bounds, setBounds] = useState({
     left: 0,
     top: 0,
@@ -156,6 +165,11 @@ const StepBar = ({ currentStep = 0 }: Props) => {
     marginBottom: 24,
     borderRadius: 4,
     border: "1px solid #DDE1E5",
+  };
+  const panelStyleActive: React.CSSProperties = {
+    marginBottom: 24,
+    borderRadius: 4,
+    border: "1px solid #2962FF",
   };
 
   const onStart = (_event: DraggableEvent, uiData: DraggableData) => {
@@ -188,53 +202,70 @@ const StepBar = ({ currentStep = 0 }: Props) => {
           [styles.hiddenModal]: !isOpen,
         })}
       >
-        {isStart && <StepIndicator currentStep={currentStep} />}
-        <div
-          className={styles.closeIcon}
-          onClick={() => setIsOpen(false)}
-          role="none"
-        >
-          <CloseOutlined style={{ color: "#00000073" }} />
-        </div>
-        {!isStart ? (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexDirection: "column",
-            }}
-          >
-            <p style={{ marginBottom: 39, fontWeight: 500, fontSize: 20 }}>
-              Starting with seller API setup
-            </p>
-            <StepIcon />
-            <Button
-              style={{ marginTop: 71 }}
-              type="primary"
-              shape="default"
-              onClick={() => setIsStart(true)}
-            >
-              Start the tutorial
-            </Button>
-          </div>
-        ) : (
-          <div>
-            <p style={{ fontWeight: 500, fontSize: 20 }}>Seller API setup</p>
-            <Collapse
-              items={getItems(panelStyle, currentStep, activeKey[0])}
-              bordered={false}
-              style={{ backgroundColor: "white" }}
-              expandIcon={({ isActive }) =>
-                !isActive ? <DownOutlined /> : <UpOutlined />
-              }
-              expandIconPosition="end"
-              accordion
-              defaultActiveKey={["0"]}
-              onChange={onChange}
+        <div className={styles.barHeader}>
+          <Text.Custom size="20px" bold="500">
+            Seller API Setup
+          </Text.Custom>
+          <Flex justifyContent="flex-end" gap={12}>
+            <MinusOutlined
+              onClick={() => setIsOpen(false)}
+              style={{ color: "#00000073" }}
             />
-          </div>
-        )}
+            <CloseOutlined
+              onClick={() => setIsOpen(false)}
+              style={{ color: "#00000073" }}
+            />
+          </Flex>
+        </div>
+        <div className={styles.barContent}>
+          {isStart && <StepIndicator currentStep={currentStep} />}
+
+          {!isStart ? (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                flexDirection: "column",
+              }}
+            >
+              <p style={{ marginBottom: 39, fontWeight: 500, fontSize: 20 }}>
+                Starting with seller API setup
+              </p>
+              <StepIcon />
+              <Button
+                style={{ marginTop: 71 }}
+                type="primary"
+                shape="default"
+                onClick={() => setIsStart(true)}
+              >
+                Start the tutorial
+              </Button>
+            </div>
+          ) : (
+            <div>
+              <p style={{ fontWeight: 500, fontSize: 20 }}>Seller API setup</p>
+              <Collapse
+                activeKey={activeKey}
+                items={getItems(
+                  panelStyle,
+                  panelStyleActive,
+                  currentStep,
+                  activeKey[0]
+                )}
+                bordered={false}
+                style={{ backgroundColor: "white" }}
+                expandIcon={({ isActive }) =>
+                  !isActive ? <DownOutlined /> : <UpOutlined />
+                }
+                expandIconPosition="end"
+                accordion
+                defaultActiveKey={["0"]}
+                onChange={onChange}
+              />
+            </div>
+          )}
+        </div>
       </div>
     </Draggable>
   );

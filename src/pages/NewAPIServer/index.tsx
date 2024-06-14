@@ -13,6 +13,7 @@ import { useAppStore } from "@/stores/app.store";
 import { useNavigate } from "react-router-dom";
 
 const NewAPIServer = () => {
+  const [activeKey, setActiveKey] = useState<string | string[]>("0");
   const { currentProduct: id } = useAppStore();
   const [form] = Form.useForm();
   const [step, setStep] = useState(0);
@@ -37,6 +38,7 @@ const NewAPIServer = () => {
         form.submit();
         return;
       }
+      setActiveKey([(step + 1).toString()]);
       setStep(step + 1);
     } catch (error) {
       return;
@@ -48,6 +50,7 @@ const NewAPIServer = () => {
       navigate(`/component/${id}/list`);
       return;
     }
+    setActiveKey([(step - 1).toString()]);
     setStep(step - 1);
   };
 
@@ -96,7 +99,11 @@ const NewAPIServer = () => {
   return (
     <Form form={form} onFinish={onFinish}>
       <div className={styles.root}>
-        <StepBar currentStep={step} />
+        <StepBar
+          currentStep={step}
+          activeKey={activeKey}
+          setActiveKey={setActiveKey}
+        />
         <div className={styles.container}>
           <SelectAPIServer form={form} active={step === 0} />
           <AddEnv form={form} active={step === 2} />

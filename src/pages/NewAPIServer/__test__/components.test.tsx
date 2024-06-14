@@ -8,7 +8,7 @@ test("test API step bar", () => {
   const { container } = render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <StepBar currentStep={1} />
+        <StepBar currentStep={1} activeKey={"3"} setActiveKey={vi.fn()} />
       </BrowserRouter>
     </QueryClientProvider>
   );
