@@ -1,10 +1,15 @@
 import Text from "@/components/Text";
-import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { Modal } from "antd";
 
-export const showModalConfirmCreateVersion = (onOk?: () => any) => {
+export const showModalConfirmCreateVersion = ({
+  onOk,
+  className,
+}: {
+  onOk?: () => any;
+  className?: string;
+}) => {
   return Modal.confirm({
-    icon: <ExclamationCircleOutlined />,
+    icon: <></>,
     title: "You are going to create a new version",
     content: (
       <Text.NormalMedium>
@@ -15,8 +20,8 @@ export const showModalConfirmCreateVersion = (onOk?: () => any) => {
     okButtonProps: {
       type: "primary",
     },
-    okText: "Rotate",
-    okType: "danger",
+    okText: "OK",
     onOk,
+    className,
   });
 };

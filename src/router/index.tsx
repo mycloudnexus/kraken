@@ -53,8 +53,13 @@ const router = createBrowserRouter([
         ],
       },
       {
-        path: "api-mapping",
-        element: <StandardAPIMapping />,
+        path: "api-mapping/:componentId",
+        children: [
+          {
+            path: "",
+            element: <StandardAPIMapping />,
+          },
+        ],
       },
     ],
   },

@@ -1,16 +1,23 @@
 import Text from "@/components/Text";
-import { useGetComponentDetail } from "@/hooks/product";
-import { useAppStore } from "@/stores/app.store";
+import {
+  useGetComponentDetail,
+  useCreateNewVersion,
+  useGetVersionList,
+} from "@/hooks/product";
 import { DoubleLeftOutlined } from "@ant-design/icons";
-import { Button, Divider, Flex, List, Spin, Tabs } from "antd";
+
+import { Button, Divider, Flex, List, notification, Spin, Tabs } from "antd";
 import clsx from "clsx";
-import { uniq } from "lodash";
+
 import { useMemo, useState } from "react";
 import { showModalConfirmCreateVersion } from "./components/ModalConfirmCreateVersion";
 import RenderList, { IMapProductAndType } from "./components/RenderList";
 import styles from "./index.module.scss";
+import { get, uniq } from "lodash";
+import { useParams } from "react-router";
+import { useAppStore } from "@/stores/app.store";
 
-const listVersion = [
+const listVersionDefault = [
   {
     key: "current",
     label: "Current Mapping",
@@ -35,9 +42,10 @@ const envAndVersion = [
 
 const StandardAPIMapping = () => {
   const { currentProduct } = useAppStore();
+  const { componentId } = useParams();
   const { data, isLoading } = useGetComponentDetail(
     currentProduct,
-    "mef.sonata.api.quote"
+    componentId ?? ""
   );
   const { noTab, tabs } = useMemo(() => {
     if (isLoading) {
@@ -73,6 +81,43 @@ const StandardAPIMapping = () => {
     };
   }, [data, isLoading]);
   const [activeVersion, setActiveVersion] = useState("current");
+  const { mutateAsync: runCreateNewVersion } = useCreateNewVersion();
+  const { data: versionData } = useGetVersionList(
+    currentProduct,
+    componentId ?? "",
+    {
+      page: 0,
+      size: 100,
+      componentKey: componentId,
+    }
+  );
+
+  const listVersion = useMemo(() => {
+    const listVersionData = get(versionData, "data", []).map((item) => ({
+      key: get(item, "version", get(item, "id")),
+      label: `Version ${get(item, "version", "")}`,
+    }));
+    return [...listVersionDefault, ...listVersionData];
+  }, [versionData]);
+
+  const handleCreateNewVersion = async () => {
+    try {
+      const data: any = {
+        componentKey: componentId,
+        productId: currentProduct,
+        componentId,
+      };
+      const result = await runCreateNewVersion(data);
+      if (!result.success) {
+        throw new Error(result.message);
+      }
+      notification.success({ message: "Create new version success" });
+    } catch (error) {
+      notification.error({
+        message: get(error, "message", "Error. Please try again"),
+      });
+    }
+  };
   return (
     <Flex align="stretch" className={styles.pageWrapper}>
       <Flex vertical justify="space-between" className={styles.leftWrapper}>
@@ -80,7 +125,7 @@ const StandardAPIMapping = () => {
           itemLayout="vertical"
           dataSource={listVersion}
           className={styles.list}
-          renderItem={(item) => {
+          renderItem={(item: { key: string; label: string }) => {
             const highlighted = activeVersion === item.key;
             return (
               <List.Item
@@ -110,7 +155,6 @@ const StandardAPIMapping = () => {
           gap={8}
           className={styles.leftBottomWrapper}
         >
-          <Button type="primary">Create new version</Button>
           <Text.NormalSmall color="#bfbfbf">Version 1.0</Text.NormalSmall>
           <Divider style={{ margin: 0 }} />
           <Button className={styles.switcherBtn}>
@@ -124,7 +168,10 @@ const StandardAPIMapping = () => {
           <Button
             type="primary"
             onClick={() => {
-              showModalConfirmCreateVersion();
+              showModalConfirmCreateVersion({
+                className: styles.modalCreate,
+                onOk: handleCreateNewVersion,
+              });
             }}
           >
             Create new version

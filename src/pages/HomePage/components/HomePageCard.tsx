@@ -14,6 +14,7 @@ type Props = {
   title: string;
   icon: any;
   version: string;
+  id?: string;
 };
 
 const { Paragraph } = Typography;
@@ -23,6 +24,7 @@ const HomePageCard = ({
   title = "",
   icon,
   version = "",
+  id = "",
 }: Props) => {
   const { currentProduct } = useAppStore();
   const navigate = useNavigate();
@@ -53,7 +55,7 @@ const HomePageCard = ({
     navigate(ROUTES.ENV_OVERVIEW);
   };
   const toAPIMapping = () => {
-    navigate(ROUTES.API_MAPPING);
+    navigate(`${ROUTES.API_MAPPING}/${id}`);
   };
   return (
     <div

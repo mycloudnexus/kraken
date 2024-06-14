@@ -17,7 +17,7 @@
 }
 .list {
   width: 100%;
-  padding: 16px 0;
+  padding: 16px 4px;
 
   :global(.ant-list-items) {
     display: flex;
@@ -26,6 +26,7 @@
   }
   :global(.ant-list-item) {
     padding: 0;
+    border-block-end: unset;
   }
 }
 .item {
@@ -35,9 +36,27 @@
 .activeItem {
   background-color: #e6f7ff;
   color: #096dd9;
+  border-right: 3px solid #2962ff;
 }
 .mainWrapper {
   flex: 1;
   padding: 26px 20px 10px;
   background-color: #f0f2f5;
+}
+
+.mappingWrapper {
+  border-radius: 8px;
+  padding: 16px 20px;
+  background-color: #fff;
+}
+
+.modalCreate {
+  :global {
+    .ant-modal-confirm-btns {
+      margin-top: 24px;
+    }
+    .ant-modal-content {
+      padding: 32px !important;
+    }
+  }
 }

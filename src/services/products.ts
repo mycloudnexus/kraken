@@ -1,5 +1,6 @@
 import { PRODUCT } from "@/utils/constants/api";
 import request from "@/utils/helpers/request";
+import { INewVersionParams } from "@/utils/types/product.type";
 
 export const getListComponents = (
   productId: string,
@@ -72,3 +73,26 @@ export const deployProduct = (
     method: "POST",
     data,
   });
+
+export const createNewVersion = (data: INewVersionParams) => {
+  const { productId, componentId, componentKey, versionName, version } = data;
+  return request(`${PRODUCT}/${productId}/components/${componentId}/versions`, {
+    method: "POST",
+    data: {
+      componentKey,
+      versionName,
+      version,
+    },
+  });
+};
+
+export const getVersionList = (
+  productId: string,
+  componentId: string,
+  params: Record<string, any>
+) => {
+  return request(`${PRODUCT}/${productId}/components/${componentId}/versions`, {
+    method: "GET",
+    params,
+  });
+};

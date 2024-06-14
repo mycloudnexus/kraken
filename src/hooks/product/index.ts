@@ -1,5 +1,6 @@
 import {
   createNewComponent,
+  createNewVersion,
   deployProduct,
   editComponentDetail,
   getComponentAPIDoc,
@@ -10,10 +11,14 @@ import {
   getListDeployments,
   getListEnvActivities,
   getListEnvs,
+  getVersionList,
 } from "@/services/products";
 import { queryClient } from "@/utils/helpers/reactQuery";
 import { IPagingData, IUnifiedAsset } from "@/utils/types/common.type";
-import { IProductWithComponentVersion } from "@/utils/types/component.type";
+import {
+  IComponentVersion,
+  IProductWithComponentVersion,
+} from "@/utils/types/component.type";
 import { IActivityDetail, IActivityLog, IEnv } from "@/utils/types/env.type";
 import { IEnvComponent } from "@/utils/types/envComponent.type";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -33,6 +38,8 @@ export const PRODUCT_CACHE_KEYS = {
   get_product_deployment_list: "get_product_deployment_list",
   get_product_component_version_list: "get_product_component_version_list",
   deploy_product: "deploy_product",
+  create_new_version: "create_new_version",
+  get_version_list: "get_version_list",
 };
 
 export const useGetProductComponents = (
@@ -202,5 +209,30 @@ export const useDeployProduct = () => {
         queryKey: [PRODUCT_CACHE_KEYS.get_product_deployment_list],
       });
     },
+  });
+};
+
+export const useCreateNewVersion = () => {
+  return useMutation<any, Error>({
+    mutationKey: [PRODUCT_CACHE_KEYS.create_new_version],
+    mutationFn: (data: any) => createNewVersion(data),
+  });
+};
+
+export const useGetVersionList = (
+  productId: string,
+  componentId: string,
+  params: Record<string, any>
+) => {
+  return useQuery<any, Error, IPagingData<IComponentVersion>>({
+    queryKey: [
+      PRODUCT_CACHE_KEYS.get_version_list,
+      productId,
+      componentId,
+      params,
+    ],
+    queryFn: () => getVersionList(productId, componentId, params),
+    enabled: Boolean(productId && componentId),
+    select: (data) => data.data,
   });
 };

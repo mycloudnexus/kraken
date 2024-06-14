@@ -62,6 +62,7 @@ const HomePage = () => {
               {componentList?.data?.map((item: IComponent) => (
                 <Col md={12} sm={24} key={item?.id}>
                   <HomePageCard
+                    id={get(item, "metadata.key", "")}
                     version={get(item, "metadata.labels.mef-api-release", "")}
                     icon={icon(get(item, "metadata.name", ""))}
                     title={item?.metadata?.name}

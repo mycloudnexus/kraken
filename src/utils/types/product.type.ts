@@ -16,3 +16,11 @@ export interface IMetadata {
   key: string;
   description?: string;
 }
+
+export interface INewVersionParams {
+  productId: string;
+  componentId: string;
+  componentKey: string;
+  versionName?: string;
+  version?: string;
+}
