@@ -39,6 +39,7 @@ export const getEnvActivity = (
   activityId: string
 ) =>
   request(`${PRODUCT}/${productId}/envs/${envId}/api-activities/${activityId}`);
+
 export const getComponentDetail = (productId: string, componentId: string) => {
   return request(`${PRODUCT}/${productId}/components/${componentId}`);
 };

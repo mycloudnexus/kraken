@@ -5,6 +5,7 @@ import EnvironmentActivityLog from "@/pages/EnvironmentActivityLog";
 import EnvironmentOverview from "@/pages/EnvironmentOverview";
 import HomePage from "@/pages/HomePage";
 import NewAPIServer from "@/pages/NewAPIServer";
+import StandardAPIMapping from "@/pages/StandardAPIMapping";
 import { createBrowserRouter } from "react-router-dom";
 
 const router = createBrowserRouter([
@@ -50,6 +51,10 @@ const router = createBrowserRouter([
             element: <EnvironmentActivityLog />,
           },
         ],
+      },
+      {
+        path: "api-mapping",
+        element: <StandardAPIMapping />,
       },
     ],
   },

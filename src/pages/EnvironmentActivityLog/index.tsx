@@ -1,3 +1,4 @@
+import LogMethodTag from "@/components/LogMethodTag";
 import Text from "@/components/Text";
 import { useGetProductEnvActivities, useGetProductEnvs } from "@/hooks/product";
 import { useCommonListProps } from "@/hooks/useCommonListProps";
@@ -23,7 +24,6 @@ import { ExpandableConfig } from "antd/es/table/interface";
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import ActivityDetailModal from "./components/ActivityDetailModal";
-import LogMethodTag from "./components/LogMethodTag";
 import styles from "./index.module.scss";
 
 const initPagination = {

@@ -1,5 +1,6 @@
 import { Tag } from "antd";
 import { useMemo } from "react";
+import styles from "./index.module.scss";
 
 const availableMethods = ["POST", "GET", "PUT", "PATCH", "DELETE"];
 
@@ -22,7 +23,7 @@ const LogMethodTag = ({ method }: Readonly<Props>) => {
   if (!correctMethod) return null;
 
   return (
-    <Tag bordered={false} color={color}>
+    <Tag bordered={false} color={color} className={styles.tag}>
       {method}
     </Tag>
   );

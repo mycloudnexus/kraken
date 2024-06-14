@@ -60,8 +60,8 @@ const ModalNewDeployment = ({ open, setOpen }: Readonly<Props>) => {
         label: <Text.NormalSmall>{product.name}</Text.NormalSmall>,
         children: (
           <Checkbox.Group
-            options={product.componentVersions.map(({ id, name }) => ({
-              label: name,
+            options={product.componentVersions.map(({ id, version }) => ({
+              label: version,
               value: id,
               disabled:
                 selectVersion?.[product.key]?.length > 0 &&

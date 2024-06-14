@@ -52,6 +52,9 @@ const HomePageCard = ({
   const toEnvOverview = () => {
     navigate(ROUTES.ENV_OVERVIEW);
   };
+  const toAPIMapping = () => {
+    navigate(ROUTES.API_MAPPING);
+  };
   return (
     <div
       className={styles.card}
@@ -86,7 +89,12 @@ const HomePageCard = ({
             >
               Seller API Set up
             </Button>
-            <Button shape="round" type="primary" className={styles.btn}>
+            <Button
+              shape="round"
+              type="primary"
+              className={styles.btn}
+              onClick={toAPIMapping}
+            >
               Standard API Mapping
             </Button>
             <Button

@@ -105,7 +105,7 @@ const EnvironmentOverview = () => {
     handlePaginationShowSizeChange,
   } = useCommonListProps(
     {
-      history: false,
+      history: true,
     },
     initPagination
   );

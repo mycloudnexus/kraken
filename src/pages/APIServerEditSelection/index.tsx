@@ -52,12 +52,18 @@ const APIServerEditSelection = () => {
 
   const handleAPI = async () => {
     try {
-      const data = cloneDeep(detailData);
-      set(data, "facets.selectedAPIs", targetKeys);
-      set(data, "metadata.version", get(data, "metadata.version", 1) + 1);
-      await runUpdate({ productId: currentProduct, componentId, data } as any);
-      notification.success({ message: "Edit success" });
-      navigate(-1);
+      if (detailData) {
+        const data = cloneDeep(detailData);
+        set(data, "facets.selectedAPIs", targetKeys);
+        set(data, "metadata.version", get(data, "metadata.version", 1) + 1);
+        await runUpdate({
+          productId: currentProduct,
+          componentId,
+          data,
+        } as any);
+        notification.success({ message: "Edit success" });
+        navigate(-1);
+      }
     } catch (error) {
       notification.error({
         message: get(error, "message", "Error. Please try again"),

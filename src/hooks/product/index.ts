@@ -12,7 +12,7 @@ import {
   getListEnvs,
 } from "@/services/products";
 import { queryClient } from "@/utils/helpers/reactQuery";
-import { IPagingData } from "@/utils/types/common.type";
+import { IPagingData, IUnifiedAsset } from "@/utils/types/common.type";
 import { IProductWithComponentVersion } from "@/utils/types/component.type";
 import { IActivityDetail, IActivityLog, IEnv } from "@/utils/types/env.type";
 import { IEnvComponent } from "@/utils/types/envComponent.type";
@@ -145,15 +145,12 @@ export const useGetComponentDetail = (
   productId: string,
   componentId: string
 ) => {
-  const { data, ...result } = useQuery<any, Error>({
+  return useQuery<any, Error, IUnifiedAsset>({
     queryKey: [PRODUCT_CACHE_KEYS.get_component_detail, productId, componentId],
     queryFn: () => getComponentDetail(productId, componentId),
     enabled: Boolean(productId && componentId),
+    select: (data) => data.data,
   });
-  return {
-    data: get(data, "data"),
-    ...result,
-  };
 };
 
 export const useEditComponent = () => {

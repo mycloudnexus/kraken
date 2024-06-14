@@ -1,3 +1,4 @@
+import LogMethodTag from "@/components/LogMethodTag";
 import Text from "@/components/Text";
 import { useGetProductEnvActivityDetail } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
@@ -6,7 +7,6 @@ import { IActivityLog } from "@/utils/types/env.type";
 import { Collapse, Flex, Modal, Spin, Table, Tag, Tree } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { useCallback, useMemo } from "react";
-import LogMethodTag from "../LogMethodTag";
 import styles from "./index.module.scss";
 
 interface Props {
