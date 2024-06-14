@@ -1,3 +1,8 @@
+.mappingWrapper {
+  border-radius: 8px;
+  padding: 16px 20px;
+  background-color: #fff;
+}
 .collapse {
   > :global(.ant-collapse-item) {
     > :global(.ant-collapse-header) {
