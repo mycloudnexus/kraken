@@ -60,7 +60,7 @@ const StepTitle = ({
 
 const StepIndicator = ({ currentStep }: IStepIndicator) => {
   return (
-    <div style={{ display: "flex", flexDirection: "row" }}>
+    <div style={{ display: "flex", flexDirection: "row", marginBottom: 16 }}>
       <div
         className={clsx(styles.stepIndicator, {
           [styles.stepIndicatorActive]: currentStep === 0,
@@ -244,7 +244,6 @@ const StepBar = ({ currentStep = 0, activeKey, setActiveKey }: Props) => {
             </div>
           ) : (
             <div>
-              <p style={{ fontWeight: 500, fontSize: 20 }}>Seller API setup</p>
               <Collapse
                 activeKey={activeKey}
                 items={getItems(

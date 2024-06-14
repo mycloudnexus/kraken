@@ -267,3 +267,12 @@
   padding: 32px;
   width: 350px;
 }
+
+.dragger {
+  :global {
+    .ant-upload-drag {
+      width: 395px;
+      height: fit-content;
+    }
+  }
+}
