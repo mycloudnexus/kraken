@@ -16,6 +16,7 @@ import styles from "./index.module.scss";
 import { get, uniq } from "lodash";
 import { useParams } from "react-router";
 import { useAppStore } from "@/stores/app.store";
+import { SUCCESS_CODE } from "@/utils/constants/api";
 
 const listVersionDefault = [
   {
@@ -108,7 +109,7 @@ const StandardAPIMapping = () => {
         componentId,
       };
       const result = await runCreateNewVersion(data);
-      if (!result.success) {
+      if (+result.code !== SUCCESS_CODE) {
         throw new Error(result.message);
       }
       notification.success({ message: "Create new version success" });

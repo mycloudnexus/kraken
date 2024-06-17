@@ -216,6 +216,11 @@ export const useCreateNewVersion = () => {
   return useMutation<any, Error>({
     mutationKey: [PRODUCT_CACHE_KEYS.create_new_version],
     mutationFn: (data: any) => createNewVersion(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [PRODUCT_CACHE_KEYS.get_version_list],
+      });
+    },
   });
 };
 
