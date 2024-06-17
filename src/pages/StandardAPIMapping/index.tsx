@@ -9,7 +9,7 @@ import { DoubleLeftOutlined } from "@ant-design/icons";
 import { Button, Divider, Flex, List, notification, Spin, Tabs } from "antd";
 import clsx from "clsx";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { showModalConfirmCreateVersion } from "./components/ModalConfirmCreateVersion";
 import RenderList, { IMapProductAndType } from "./components/RenderList";
 import styles from "./index.module.scss";
@@ -81,6 +81,7 @@ const StandardAPIMapping = () => {
       tabs: tabWithInfo,
     };
   }, [data, isLoading]);
+
   const [activeVersion, setActiveVersion] = useState("current");
   const { mutateAsync: runCreateNewVersion } = useCreateNewVersion();
   const { data: versionData } = useGetVersionList(
@@ -119,6 +120,18 @@ const StandardAPIMapping = () => {
       });
     }
   };
+
+  const [tab, setTab] = useState("");
+
+  useEffect(() => {
+    if (!noTab) {
+      setTab("");
+    }
+    if (tabs.length) {
+      setTab(tabs[0].name);
+    }
+  }, [noTab, tabs]);
+
   return (
     <Flex align="stretch" className={styles.pageWrapper}>
       <Flex vertical justify="space-between" className={styles.leftWrapper}>
@@ -199,14 +212,21 @@ const StandardAPIMapping = () => {
         </Flex>
         <Spin spinning={isLoading}>
           {noTab ? (
-            <RenderList data={data?.facets?.supportedProductTypesAndActions} />
+            <RenderList
+              data={data?.facets?.supportedProductTypesAndActions}
+              componentId={componentId}
+              tab={undefined}
+            />
           ) : (
             <Tabs
               items={tabs.map(({ name, data }) => ({
                 key: name,
                 label: name,
-                children: <RenderList data={data} />,
+                children: (
+                  <RenderList data={data} componentId={componentId} tab={tab} />
+                ),
               }))}
+              onChange={(key) => setTab(key)}
             />
           )}
         </Spin>

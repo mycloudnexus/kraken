@@ -1,0 +1,30 @@
+.breadcrumb {
+  padding: 10px 20px;
+}
+.mainWrapper {
+  flex: 1;
+  background-color: #f0f2f5;
+  padding: 0 20px;
+  > .center {
+    flex: 1;
+    border-radius: 4px;
+    padding: 12px 20px;
+    background-color: #fff;
+  }
+  > .left {
+    flex: 0 0 370px;
+    border-radius: 4px;
+    padding: 16px;
+    background-color: #fff;
+  }
+}
+.bottomWrapper {
+  padding: 12px 20px;
+  background-color: #f0f2f5;
+  :global(.ant-btn-primary:disabled) {
+    color: #fff;
+    background-color: #1677ff;
+    box-shadow: 0 2px 0 rgba(5, 145, 255, 0.1);
+    opacity: 0.4;
+  }
+}

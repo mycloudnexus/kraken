@@ -55,7 +55,7 @@ const HomePageCard = ({
     navigate(ROUTES.ENV_OVERVIEW);
   };
   const toAPIMapping = () => {
-    navigate(`${ROUTES.API_MAPPING}/${id}`);
+    navigate(ROUTES.API_MAPPING(id));
   };
   return (
     <div

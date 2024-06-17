@@ -3,6 +3,9 @@ import Text from "@/components/Text";
 import { Button, Collapse, Flex } from "antd";
 import { useCallback } from "react";
 import styles from "./index.module.scss";
+import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
+import { useNavigate } from "react-router-dom";
+import { ROUTES } from "@/utils/constants/route";
 
 export interface IMapProductAndType {
   path: string;
@@ -11,12 +14,43 @@ export interface IMapProductAndType {
   productTypes?: string[];
 }
 
-const RenderList = ({ data }: { data?: IMapProductAndType[] }) => {
+const buildQuery = (
+  mapItem: IMapProductAndType,
+  tab?: string,
+  actionType?: string
+) => {
+  let query: Record<string, any> = {
+    method: mapItem.method,
+    path: mapItem.path,
+  };
+  if (tab) {
+    query.productType = tab.toLocaleLowerCase();
+  }
+  if (actionType) {
+    query.actionType = actionType;
+  }
+  return query;
+};
+
+interface Props {
+  data?: IMapProductAndType[];
+  componentId?: string;
+  tab?: string;
+}
+const RenderList = ({ data, componentId, tab }: Readonly<Props>) => {
+  const navigate = useNavigate();
+  const { setQuery } = useNewApiMappingStore();
   const hasAction = useCallback(
     (s: IMapProductAndType) => (s.actionTypes?.length ?? 0) > 0,
     []
   );
-  if (!data) return null
+  const gotoMapping =
+    (mapItem: IMapProductAndType, tab?: string, actionType?: string) => () => {
+      const query = buildQuery(mapItem, tab, actionType);
+      setQuery(JSON.stringify(query));
+      navigate(ROUTES.NEW_API_MAPPING(componentId!));
+    };
+  if (!data) return null;
   return (
     <Flex vertical gap={12}>
       {data.map((s: IMapProductAndType) => (
@@ -32,15 +66,17 @@ const RenderList = ({ data }: { data?: IMapProductAndType[] }) => {
             <Flex align="center" gap={16}>
               <LogMethodTag method={s.method.toUpperCase()} />
               <Text.NormalMedium>{s.path}</Text.NormalMedium>
-              <Text.NormalMedium color="rgba(0,0,0,0.45)">
-                Description??
-              </Text.NormalMedium>
+              <Text.NormalMedium color="rgba(0,0,0,0.45)"> </Text.NormalMedium>
             </Flex>
             <Flex align="center" gap={8}>
               <Button style={{ marginRight: hasAction(s) ? 96 : 0 }}>
                 View
               </Button>
-              {!hasAction(s) ? <Button type="primary">Mapping</Button> : null}
+              {!hasAction(s) ? (
+                <Button type="primary" onClick={gotoMapping(s, tab)}>
+                  Mapping
+                </Button>
+              ) : null}
             </Flex>
           </Flex>
           {hasAction(s) && (
@@ -53,10 +89,12 @@ const RenderList = ({ data }: { data?: IMapProductAndType[] }) => {
                     <Flex align="center" gap={12}>
                       <Text.NormalLarge>{type}</Text.NormalLarge>
                       <Text.NormalMedium color="rgba(0, 0, 0, 0.45)">
-                        Description??
+                        {" "}
                       </Text.NormalMedium>
                     </Flex>
-                    <Button type="primary">Mapping</Button>
+                    <Button type="primary" onClick={gotoMapping(s, tab, type)}>
+                      Mapping
+                    </Button>
                   </Flex>
                 ),
               }))}
@@ -69,4 +107,4 @@ const RenderList = ({ data }: { data?: IMapProductAndType[] }) => {
   );
 };
 
-export default RenderList
+export default RenderList;
