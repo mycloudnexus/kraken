@@ -13,8 +13,14 @@ import { Link, useParams } from "react-router-dom";
 import styles from "./index.module.scss";
 import RequestMapping from "./components/RequestMapping";
 import ResponseMapping from "./components/ResponseMapping";
+import StepBar from "@/components/StepBar";
+import { EStep } from "@/utils/constants/common";
+import { useState } from "react";
+import RightSelection from "./components/RightSelection";
 
 const NewAPIMapping = () => {
+  const [activeKey, setActiveKey] = useState<string | string[]>("0");
+  const [step] = useState(0);
   const { componentId } = useParams();
   const breadcrumb: BreadcrumbProps["items"] = [
     {
@@ -49,12 +55,20 @@ const NewAPIMapping = () => {
   ];
   return (
     <Flex vertical style={{ backgroundColor: "#f0f2f5", height: "100%" }}>
+      <StepBar
+        type={EStep.MAPPING}
+        currentStep={step}
+        activeKey={activeKey}
+        setActiveKey={setActiveKey}
+      />
       <Breadcrumb items={breadcrumb} className={styles.breadcrumb} />
       <Flex gap={20} className={styles.mainWrapper}>
         <div className={styles.center}>
           <Tabs items={items} />
         </div>
-        <div className={styles.left}>Left data</div>
+        <div className={styles.left}>
+          <RightSelection />
+        </div>
       </Flex>
       <Flex
         align="center"

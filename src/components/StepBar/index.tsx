@@ -1,4 +1,3 @@
-import StepIcon from "@/assets/stepstart.svg";
 import Text from "@/components/Text";
 import {
   CheckCircleFilled,
@@ -7,18 +6,20 @@ import {
   MinusOutlined,
   UpOutlined,
 } from "@ant-design/icons";
-import { Button, Collapse, CollapseProps } from "antd";
+import { Collapse, CollapseProps } from "antd";
 import clsx from "clsx";
-import { CSSProperties, useRef, useState } from "react";
+import { CSSProperties, useMemo, useRef, useState } from "react";
 import type { DraggableData, DraggableEvent } from "react-draggable";
 import Draggable from "react-draggable";
 import styles from "./index.module.scss";
 import Flex from "@/components/Flex";
+import { EStep } from "@/utils/constants/common";
 
 type Props = {
   currentStep: number;
   activeKey: string | string[];
   setActiveKey: (activeKey: string | string[]) => void;
+  type: string;
 };
 
 interface IStepTitle {
@@ -32,6 +33,18 @@ interface IStepTitle {
 interface IStepIndicator {
   currentStep: number;
 }
+
+const panelStyle: React.CSSProperties = {
+  marginBottom: 24,
+  borderRadius: 4,
+  border: "1px solid #DDE1E5",
+};
+
+const panelStyleActive: React.CSSProperties = {
+  marginBottom: 24,
+  borderRadius: 4,
+  border: "1px solid #2962FF",
+};
 
 const StepTitle = ({
   activeKey,
@@ -60,7 +73,14 @@ const StepTitle = ({
 
 const StepIndicator = ({ currentStep }: IStepIndicator) => {
   return (
-    <div style={{ display: "flex", flexDirection: "row", marginBottom: 16 }}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        marginBottom: 20,
+        marginTop: -12,
+      }}
+    >
       <div
         className={clsx(styles.stepIndicator, {
           [styles.stepIndicatorActive]: currentStep === 0,
@@ -80,7 +100,7 @@ const StepIndicator = ({ currentStep }: IStepIndicator) => {
   );
 };
 
-const getItems: (
+const getAPIItems: (
   panelStyle: CSSProperties,
   panelStyleActive: CSSProperties,
   currentStep: number,
@@ -150,9 +170,99 @@ const getItems: (
   },
 ];
 
-const StepBar = ({ currentStep = 0, activeKey, setActiveKey }: Props) => {
+const getMappingItems: (
+  panelStyle: CSSProperties,
+  panelStyleActive: CSSProperties,
+  currentStep: number,
+  activeKey: string | string[]
+) => CollapseProps["items"] = (
+  panelStyle,
+  panelStyleActive,
+  currentStep,
+  activeKey
+) => [
+  {
+    key: "0",
+    label: (
+      <StepTitle
+        activeKey={activeKey}
+        isCurrentStep={currentStep === 0}
+        stepKey="0"
+        content="1. Select Seller API"
+        isFinished={currentStep > 0}
+      />
+    ),
+    children: (
+      <Text.LightMedium>
+        Select Seller API that can fulfill the functionality of the standard
+        sonata API that you are working on.
+        <br />
+        <br />
+        Right now we are only supporting to select one Seller API, if the seller
+        has multiple APIs to work together, please let us know.
+      </Text.LightMedium>
+    ),
+    style: activeKey === "0" ? panelStyleActive : panelStyle,
+  },
+  {
+    key: "1",
+    label: (
+      <StepTitle
+        isCurrentStep={currentStep === 1}
+        activeKey={activeKey}
+        stepKey="1"
+        content="2. Map standard Sonata API request to seller API request."
+        isFinished={currentStep > 1}
+      />
+    ),
+    children: (
+      <Text.LightMedium>
+        It requires you to map some required properties in the standard to the
+        corresponding properties in selected seller API, the property can be
+        from path parameters, query parameters or request body in both sides.
+        <br />
+        <br />
+        Not all standard sonata APIs requires request Mapping
+      </Text.LightMedium>
+    ),
+    style: activeKey === "1" ? panelStyleActive : panelStyle,
+  },
+  {
+    key: "2",
+    label: (
+      <StepTitle
+        isCurrentStep={currentStep === 2}
+        activeKey={activeKey}
+        stepKey="2"
+        content="3. Map Seller API response to Sonata API response."
+        isFinished={currentStep > 2}
+      />
+    ),
+    children: (
+      <Text.LightMedium>
+        It may require you to do the following tasks based on different APIs.
+        <ul className={styles.ulList}>
+          <li>property mapping</li>
+          <li>state mapping</li>
+          <ul>
+            <li>used in product order</li>
+          </ul>
+          <li>
+            specify the property for unique identifier of the request in seller
+            side
+          </li>
+          <ul>
+            <li>used in product quote or order</li>
+          </ul>
+        </ul>
+      </Text.LightMedium>
+    ),
+    style: activeKey === "2" ? panelStyleActive : panelStyle,
+  },
+];
+
+const StepBar = ({ currentStep = 0, activeKey, setActiveKey, type }: Props) => {
   const [isOpen, setIsOpen] = useState(true);
-  const [isStart, setIsStart] = useState(false);
   const [bounds, setBounds] = useState({
     left: 0,
     top: 0,
@@ -160,17 +270,6 @@ const StepBar = ({ currentStep = 0, activeKey, setActiveKey }: Props) => {
     right: 0,
   });
   const draggleRef = useRef<HTMLDivElement>(null);
-
-  const panelStyle: React.CSSProperties = {
-    marginBottom: 24,
-    borderRadius: 4,
-    border: "1px solid #DDE1E5",
-  };
-  const panelStyleActive: React.CSSProperties = {
-    marginBottom: 24,
-    borderRadius: 4,
-    border: "1px solid #2962FF",
-  };
 
   const onStart = (_event: DraggableEvent, uiData: DraggableData) => {
     const { clientWidth, clientHeight } = window.document.documentElement;
@@ -190,6 +289,47 @@ const StepBar = ({ currentStep = 0, activeKey, setActiveKey }: Props) => {
     setActiveKey(key);
   };
 
+  const items = useMemo(() => {
+    switch (type) {
+      case EStep.API_SERVER:
+        return getAPIItems(
+          panelStyle,
+          panelStyleActive,
+          currentStep,
+          activeKey[0]
+        );
+      case EStep.MAPPING:
+        return getMappingItems(
+          panelStyle,
+          panelStyleActive,
+          currentStep,
+          activeKey[0]
+        );
+      default:
+        return [];
+    }
+  }, [activeKey, currentStep, type]);
+
+  const titleContentText = useMemo(() => {
+    switch (type) {
+      case EStep.API_SERVER:
+        return {
+          title: "Seller API Setup",
+          description: "Starting with seller API setup",
+        };
+      case EStep.MAPPING:
+        return {
+          title: "Mapping",
+          description: "Starting with mapping",
+        };
+      default:
+        return {
+          title: "",
+          description: "",
+        };
+    }
+  }, [type]);
+
   return (
     <Draggable
       bounds={bounds}
@@ -204,7 +344,7 @@ const StepBar = ({ currentStep = 0, activeKey, setActiveKey }: Props) => {
       >
         <div className={styles.barHeader}>
           <Text.Custom size="20px" bold="500">
-            Seller API Setup
+            {titleContentText.title}
           </Text.Custom>
           <Flex justifyContent="flex-end" gap={12}>
             <MinusOutlined
@@ -218,52 +358,22 @@ const StepBar = ({ currentStep = 0, activeKey, setActiveKey }: Props) => {
           </Flex>
         </div>
         <div className={styles.barContent}>
-          {isStart && <StepIndicator currentStep={currentStep} />}
-
-          {!isStart ? (
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                flexDirection: "column",
-              }}
-            >
-              <p style={{ marginBottom: 39, fontWeight: 500, fontSize: 20 }}>
-                Starting with seller API setup
-              </p>
-              <StepIcon />
-              <Button
-                style={{ marginTop: 71 }}
-                type="primary"
-                shape="default"
-                onClick={() => setIsStart(true)}
-              >
-                Start the tutorial
-              </Button>
-            </div>
-          ) : (
-            <div>
-              <Collapse
-                activeKey={activeKey}
-                items={getItems(
-                  panelStyle,
-                  panelStyleActive,
-                  currentStep,
-                  activeKey[0]
-                )}
-                bordered={false}
-                style={{ backgroundColor: "white" }}
-                expandIcon={({ isActive }) =>
-                  !isActive ? <DownOutlined /> : <UpOutlined />
-                }
-                expandIconPosition="end"
-                accordion
-                defaultActiveKey={["0"]}
-                onChange={onChange}
-              />
-            </div>
-          )}
+          <StepIndicator currentStep={currentStep} />
+          <div>
+            <Collapse
+              activeKey={activeKey}
+              items={items}
+              bordered={false}
+              style={{ backgroundColor: "white" }}
+              expandIcon={({ isActive }) =>
+                !isActive ? <DownOutlined /> : <UpOutlined />
+              }
+              expandIconPosition="end"
+              accordion
+              defaultActiveKey={["0"]}
+              onChange={onChange}
+            />
+          </div>
         </div>
       </div>
     </Draggable>

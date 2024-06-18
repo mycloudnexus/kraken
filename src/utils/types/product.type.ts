@@ -7,6 +7,7 @@ export interface IComponent {
   parentId: string;
   createdAt: string;
   updatedAt: string;
+  facets: Record<string, any>;
 }
 
 export interface IMetadata {

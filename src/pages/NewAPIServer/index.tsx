@@ -1,6 +1,5 @@
 import { useState } from "react";
 import styles from "./index.module.scss";
-import StepBar from "./components/StepBar";
 import SelectAPIServer from "./components/SelectAPIServer";
 import { Form, notification } from "antd";
 import AddEnv from "./components/AddEnv";
@@ -11,6 +10,8 @@ import { useCreateNewComponent } from "@/hooks/product";
 import { get, isEmpty } from "lodash";
 import { useAppStore } from "@/stores/app.store";
 import { useNavigate } from "react-router-dom";
+import StepBar from "@/components/StepBar";
+import { EStep } from "@/utils/constants/common";
 
 const NewAPIServer = () => {
   const [activeKey, setActiveKey] = useState<string | string[]>("0");
@@ -100,6 +101,7 @@ const NewAPIServer = () => {
     <Form form={form} onFinish={onFinish}>
       <div className={styles.root}>
         <StepBar
+          type={EStep.API_SERVER}
           currentStep={step}
           activeKey={activeKey}
           setActiveKey={setActiveKey}

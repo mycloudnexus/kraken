@@ -47,28 +47,6 @@
   }
 }
 
-.draggableModal {
-  cursor: move;
-  position: absolute;
-  z-index: 1000;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.2);
-  border: 1px solid #f4f4f4;
-
-  background-color: #fff;
-  bottom: 60px;
-  right: 60px;
-}
-
-.hiddenModal {
-  display: none;
-}
-
-.collapseTitle {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
 .closeIcon {
   position: absolute;
   top: 24px;
@@ -78,18 +56,6 @@
   &:hover {
     opacity: 0.8;
   }
-}
-
-.stepIndicator {
-  height: 10px;
-  width: 56px;
-  border-radius: 5px;
-  background-color: #dde1e5;
-  margin-right: 8px;
-}
-
-.stepIndicatorActive {
-  background-color: #2962ff;
 }
 
 .active {
@@ -253,19 +219,6 @@
   @media (max-width: 1600px) {
     width: 150px;
   }
-}
-
-.barHeader {
-  display: flex;
-  justify-content: space-between;
-  border-bottom: 1px solid #f0f0f0;
-  padding: 16px 32px;
-  width: 350px;
-}
-
-.barContent {
-  padding: 32px;
-  width: 350px;
 }
 
 .dragger {
