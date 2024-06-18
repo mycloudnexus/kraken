@@ -5,7 +5,6 @@ export interface IPagingData<T> {
   size: number;
 }
 export interface IPagingParams {
-
   page: number;
   size: number;
 }

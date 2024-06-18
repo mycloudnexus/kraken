@@ -1,8 +1,10 @@
 import { PRODUCT } from "@/utils/constants/api";
 import request from "@/utils/helpers/request";
 import { INewVersionParams } from "@/utils/types/product.type";
+import { ICreateParameter } from "@/utils/types/env.type";
 
 import type { IPagingParams } from '@/utils/types/common.type'
+
 
 export const getListComponents = (
   productId: string,
@@ -83,17 +85,29 @@ export const getAllApiKeyList = (productId: string, params: IPagingParams) => {
   }))
 };
 
+
+
+export const createApiKey = (payload: ICreateParameter) => {
+  const { productId, envId, name } = payload
+  return request(`${PRODUCT}/${productId}/envs/${envId}/api-tokens`, {
+    method: "POST",
+    data: {
+      name,
+    },
+  });
+};
+
 export const getAllDataPlaneList = (productId: string, params: IPagingParams) => {
-  return (request(`${PRODUCT}/${productId}/env-clients`, {
+  return request(`${PRODUCT}/${productId}/env-clients`, {
     method: "GET",
     params
-  }))
+  })
 };
 export const getRunningComponentList = (productId: string, params: any) => {
-  return (request(`${PRODUCT}/${productId}/deployments`, {
+  return request(`${PRODUCT}/${productId}/deployments`, {
     method: "GET",
     params
-  }))
+  })
 };
 export const createNewVersion = (data: INewVersionParams) => {
   const { productId, componentId, componentKey, versionName, version } = data;

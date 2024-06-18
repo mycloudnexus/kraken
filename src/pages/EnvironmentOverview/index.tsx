@@ -1,11 +1,13 @@
 import ComponentIcon from "@/assets/component.svg";
 import Text from "@/components/Text";
+import dayjs from "dayjs";
 import {
   useGetProductDeployments,
   useGetProductEnvs,
   useGetAllApiKeyList,
   useGetAllDataPlaneList,
   useGetRunningComponentList,
+  useCreateApiKey,
 } from "@/hooks/product";
 import { useCommonListProps } from "@/hooks/useCommonListProps";
 import { toDateTime, toTime } from "@/libs/dayjs";
@@ -26,9 +28,10 @@ import {
   Table,
   Tag,
   Col,
+  notification,
 } from "antd";
 import { ColumnsType } from "antd/es/table";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DeploymentStatus from "./components/DeploymentStatus";
 import EnvStatus from "./components/EnvStatus";
@@ -36,7 +39,6 @@ import { showModalConfirmRotate } from "./components/ModalConfirmRotateAPIKey";
 import ModalNewDeployment from "./components/ModalNewDeployment";
 import { showModalShowNew } from "./components/ModalShowAPIKey";
 import styles from "./index.module.scss";
-import datass from "./envlist.json";
 
 const initPagination = {
   pageSize: 5,
@@ -50,7 +52,7 @@ const initPaginationParams = {
 const EnvironmentOverview = () => {
   const navigate = useNavigate();
   const { currentProduct } = useAppStore();
-  const { data: envsq, isLoading: loadingEnvs } =
+  const { data: envs, isLoading: loadingEnvs } =
     useGetProductEnvs(currentProduct);
 
   const { data: apiKey } = useGetAllApiKeyList(
@@ -62,19 +64,36 @@ const EnvironmentOverview = () => {
     currentProduct,
     initPaginationParams
   );
-  //
 
   const { data: runningComponent } = useGetRunningComponentList(
     currentProduct,
     { history: false }
   );
+
+  const { mutateAsync: createApiKeyMutate } = useCreateApiKey();
   const [open, setOpen] = useState(false);
   const modalConfirmRef = useRef<any>();
-  const onConfirmRotate = () => () => {
-    modalConfirmRef?.current?.destroy();
-    showModalShowNew(
-      "abcdefefacnakcnabcdefefacnakcnabcdefefacnakcnabcdefefacnakcnabcdefefacnakcnabcdefefacnakcn"
-    );
+
+  const generateApiKey = useCallback(
+    async (envId: string, evName: string, closeConfirm = false) => {
+      const name = `${evName}_${dayjs.utc().format("YYYY-MM-DD HH:mm:ss")}`;
+      try {
+        const res = await createApiKeyMutate({
+          productId: currentProduct,
+          envId,
+          name,
+        } as any);
+
+        closeConfirm && modalConfirmRef?.current?.destroy();
+        showModalShowNew(res?.data?.token);
+      } catch (e: any) {
+        notification.error({ message: e?.data?.error || "generate failed" });
+      }
+    },
+    [currentProduct]
+  );
+  const onConfirmRotate = (id: string, name: string) => () => {
+    return generateApiKey(id, name, true);
   };
 
   const dropdownItems: (envId: string, envName: string) => MenuProps["items"] =
@@ -115,7 +134,7 @@ const EnvironmentOverview = () => {
           onClick: () => {
             modalConfirmRef.current = showModalConfirmRotate(
               envName,
-              onConfirmRotate()
+              onConfirmRotate(envId, envName)
             );
           },
         },
@@ -123,17 +142,15 @@ const EnvironmentOverview = () => {
       []
     );
 
-  const envs = useMemo(() => {
-    return datass.data;
-  }, [envsq]);
-
   const getDataPlaneInfo = useCallback(
     (id: string) => {
-      if (!dataPlane?.data) return null;
+      if (!dataPlane?.data) return {};
       const list = dataPlane.data.filter((i) => i.envId === id);
       const status = list.every((n) => n.status === "OK");
-      const dataPlaneNum = list.filter((n) => n.status === "OK")?.length;
-      return { status, dataPlaneNum };
+      const len = list.length;
+      const disConnectNum = list.filter((n) => n.status !== "OK")?.length;
+      const connectNum = list.filter((n) => n.status === "OK")?.length;
+      return { len, status, disConnectNum, connectNum };
     },
     [dataPlane]
   );
@@ -245,8 +262,9 @@ const EnvironmentOverview = () => {
         <Spin spinning={loadingEnvs}>
           <Flex gap={36}>
             {envs?.data.map((env) => {
-              const haveApiKey = !!apiKey?.data.find(
-                (i) => i.name === env.name
+              const haveApiKey = !!apiKey?.data.find((i) => i.envId === env.id);
+              const { disConnectNum, connectNum, len } = getDataPlaneInfo(
+                env.id
               );
               return (
                 <Flex
@@ -258,18 +276,24 @@ const EnvironmentOverview = () => {
                   <Flex justify="space-between" align="center">
                     <Text.BoldMedium>{env.name}</Text.BoldMedium>
                     <Dropdown
-                      disabled
+                      disabled={!haveApiKey}
                       menu={{
                         items: dropdownItems(env.id, env.name),
                       }}
                     >
-                      <MoreOutlined />
+                      <MoreOutlined
+                        style={{
+                          cursor: haveApiKey ? "default" : "not-allowed",
+                        }}
+                      />
                     </Dropdown>
                   </Flex>
                   <EnvStatus
                     apiKey={haveApiKey}
                     status={getDataPlaneInfo(env.id)?.status}
-                    dataPlane={getDataPlaneInfo(env.id)?.dataPlaneNum}
+                    disConnect={disConnectNum}
+                    connect={connectNum}
+                    dataPlane={len}
                   />
                   <div className={styles.runningContainer}>
                     {getRunningList(env.id)?.map((r) => (
@@ -295,7 +319,14 @@ const EnvironmentOverview = () => {
                       </Text.NormalSmall>
                     </Flex>
                   ) : (
-                    <Button type="primary">Create API Key</Button>
+                    <Button
+                      type="primary"
+                      onClick={() => {
+                        generateApiKey(env.id, env.name);
+                      }}
+                    >
+                      Create API Key
+                    </Button>
                   )}
                 </Flex>
               );

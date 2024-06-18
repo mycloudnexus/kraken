@@ -72,5 +72,13 @@ export interface IRunningComponentItem {
   components: IRunningComponent[],
 
 }
+export interface ICreateParameter {
+  productId: string,
+  envId: string,
+  name: string,
+}
+
+
+
 
 

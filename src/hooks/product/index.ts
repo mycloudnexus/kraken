@@ -11,12 +11,13 @@ import {
   getListDeployments,
   getListEnvActivities,
   getAllApiKeyList, getAllDataPlaneList, getRunningComponentList, getListEnvs,
-  getVersionList,
+  getVersionList, createApiKey
 } from "@/services/products";
 import { queryClient } from "@/utils/helpers/reactQuery";
 import { IPagingData, IPagingParams, IUnifiedAsset } from "@/utils/types/common.type";
 import { IProductWithComponentVersion, IComponentVersion } from "@/utils/types/component.type";
 import { IActivityDetail, IActivityLog, IEnv, IApiKeyDetail, IDataPlaneDetail, IRunningComponentItem } from "@/utils/types/env.type";
+
 
 import { IEnvComponent } from "@/utils/types/envComponent.type";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -41,6 +42,7 @@ export const PRODUCT_CACHE_KEYS = {
   get_running_component: "get_running_component",
   create_new_version: "create_new_version",
   get_version_list: "get_version_list",
+  create_api_key: "create_api_key",
 };
 
 export const useGetProductComponents = (
@@ -229,7 +231,19 @@ export const useGetAllApiKeyList = (
   });
 };
 
-//getAllDataPlaneList
+export const useCreateApiKey = () => {
+  return useMutation<any, Error>({
+    mutationKey: [PRODUCT_CACHE_KEYS.create_api_key],
+    mutationFn: (data: any): any => createApiKey(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [PRODUCT_CACHE_KEYS.get_all_api_key],
+      });
+    },
+  });
+
+};
+
 
 export const useGetAllDataPlaneList = (
   productId: string,
@@ -246,7 +260,6 @@ export const useGetAllDataPlaneList = (
     select: (data) => data.data,
   });
 };
-//getRunningComponentList
 export const useGetRunningComponentList = (
   productId: string,
   params: any,
