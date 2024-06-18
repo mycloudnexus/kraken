@@ -10,16 +10,14 @@ import {
   getListComponents,
   getListDeployments,
   getListEnvActivities,
-  getListEnvs,
+  getAllApiKeyList, getAllDataPlaneList, getRunningComponentList, getListEnvs,
   getVersionList,
 } from "@/services/products";
 import { queryClient } from "@/utils/helpers/reactQuery";
-import { IPagingData, IUnifiedAsset } from "@/utils/types/common.type";
-import {
-  IComponentVersion,
-  IProductWithComponentVersion,
-} from "@/utils/types/component.type";
-import { IActivityDetail, IActivityLog, IEnv } from "@/utils/types/env.type";
+import { IPagingData, IPagingParams, IUnifiedAsset } from "@/utils/types/common.type";
+import { IProductWithComponentVersion, IComponentVersion } from "@/utils/types/component.type";
+import { IActivityDetail, IActivityLog, IEnv, IApiKeyDetail, IDataPlaneDetail, IRunningComponentItem } from "@/utils/types/env.type";
+
 import { IEnvComponent } from "@/utils/types/envComponent.type";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
@@ -38,6 +36,9 @@ export const PRODUCT_CACHE_KEYS = {
   get_product_deployment_list: "get_product_deployment_list",
   get_product_component_version_list: "get_product_component_version_list",
   deploy_product: "deploy_product",
+  get_all_api_key: "get_all_api_key",
+  get_all_data_plane: "get_all_data_plane",
+  get_running_component: "get_running_component",
   create_new_version: "create_new_version",
   get_version_list: "get_version_list",
 };
@@ -212,6 +213,55 @@ export const useDeployProduct = () => {
   });
 };
 
+export const useGetAllApiKeyList = (
+  productId: string,
+  params: IPagingParams,
+  enabled = true
+) => {
+  return useQuery<AxiosResponse, Error, IPagingData<IApiKeyDetail>>({
+    queryKey: [
+      PRODUCT_CACHE_KEYS.get_all_api_key,
+      productId,
+    ],
+    queryFn: () => getAllApiKeyList(productId, params),
+    enabled: enabled && Boolean(productId),
+    select: (data) => data.data,
+  });
+};
+
+//getAllDataPlaneList
+
+export const useGetAllDataPlaneList = (
+  productId: string,
+  params: IPagingParams,
+  enabled = true
+) => {
+  return useQuery<AxiosResponse, Error, IPagingData<IDataPlaneDetail>>({
+    queryKey: [
+      PRODUCT_CACHE_KEYS.get_all_data_plane,
+      productId,
+    ],
+    queryFn: () => getAllDataPlaneList(productId, params),
+    enabled: enabled && Boolean(productId),
+    select: (data) => data.data,
+  });
+};
+//getRunningComponentList
+export const useGetRunningComponentList = (
+  productId: string,
+  params: any,
+  enabled = true
+) => {
+  return useQuery<AxiosResponse, Error, IPagingData<IRunningComponentItem>>({
+    queryKey: [
+      PRODUCT_CACHE_KEYS.get_running_component,
+      productId,
+    ],
+    queryFn: () => getRunningComponentList(productId, params),
+    enabled: enabled && Boolean(productId),
+    select: (data) => data.data,
+  });
+};
 export const useCreateNewVersion = () => {
   return useMutation<any, Error>({
     mutationKey: [PRODUCT_CACHE_KEYS.create_new_version],

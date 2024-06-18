@@ -1,6 +1,12 @@
 import ComponentIcon from "@/assets/component.svg";
 import Text from "@/components/Text";
-import { useGetProductDeployments, useGetProductEnvs } from "@/hooks/product";
+import {
+  useGetProductDeployments,
+  useGetProductEnvs,
+  useGetAllApiKeyList,
+  useGetAllDataPlaneList,
+  useGetRunningComponentList,
+} from "@/hooks/product";
 import { useCommonListProps } from "@/hooks/useCommonListProps";
 import { toDateTime, toTime } from "@/libs/dayjs";
 import { useAppStore } from "@/stores/app.store";
@@ -14,13 +20,15 @@ import {
   Form,
   Input,
   MenuProps,
+  Row,
   Select,
   Spin,
   Table,
   Tag,
+  Col,
 } from "antd";
 import { ColumnsType } from "antd/es/table";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DeploymentStatus from "./components/DeploymentStatus";
 import EnvStatus from "./components/EnvStatus";
@@ -28,18 +36,38 @@ import { showModalConfirmRotate } from "./components/ModalConfirmRotateAPIKey";
 import ModalNewDeployment from "./components/ModalNewDeployment";
 import { showModalShowNew } from "./components/ModalShowAPIKey";
 import styles from "./index.module.scss";
+import datass from "./envlist.json";
 
-const availableEnvs = ["dev", "production", "uat", "stage"];
 const initPagination = {
   pageSize: 5,
   current: 0,
+};
+const initPaginationParams = {
+  size: 20,
+  page: 0,
 };
 
 const EnvironmentOverview = () => {
   const navigate = useNavigate();
   const { currentProduct } = useAppStore();
-  const { data: envs, isLoading: loadingEnvs } =
+  const { data: envsq, isLoading: loadingEnvs } =
     useGetProductEnvs(currentProduct);
+
+  const { data: apiKey } = useGetAllApiKeyList(
+    currentProduct,
+    initPaginationParams
+  );
+
+  const { data: dataPlane } = useGetAllDataPlaneList(
+    currentProduct,
+    initPaginationParams
+  );
+  //
+
+  const { data: runningComponent } = useGetRunningComponentList(
+    currentProduct,
+    { history: false }
+  );
   const [open, setOpen] = useState(false);
   const modalConfirmRef = useRef<any>();
   const onConfirmRotate = () => () => {
@@ -48,6 +76,7 @@ const EnvironmentOverview = () => {
       "abcdefefacnakcnabcdefefacnakcnabcdefefacnakcnabcdefefacnakcnabcdefefacnakcnabcdefefacnakcn"
     );
   };
+
   const dropdownItems: (envId: string, envName: string) => MenuProps["items"] =
     useCallback(
       (envId, envName) => [
@@ -93,6 +122,30 @@ const EnvironmentOverview = () => {
       ],
       []
     );
+
+  const envs = useMemo(() => {
+    return datass.data;
+  }, [envsq]);
+
+  const getDataPlaneInfo = useCallback(
+    (id: string) => {
+      if (!dataPlane?.data) return null;
+      const list = dataPlane.data.filter((i) => i.envId === id);
+      const status = list.every((n) => n.status === "OK");
+      const dataPlaneNum = list.filter((n) => n.status === "OK")?.length;
+      return { status, dataPlaneNum };
+    },
+    [dataPlane]
+  );
+  const getRunningList = useCallback(
+    (id: string) => {
+      if (!runningComponent?.data) return [];
+      const list = runningComponent.data.find((i) => i.id === id)?.components;
+
+      return list;
+    },
+    [runningComponent]
+  );
 
   const {
     tableData,
@@ -191,33 +244,43 @@ const EnvironmentOverview = () => {
         </Flex>
         <Spin spinning={loadingEnvs}>
           <Flex gap={36}>
-            {availableEnvs.map((env) => {
-              const envData = envs?.data?.find((item) => item.name === env);
+            {envs?.data.map((env) => {
+              const haveApiKey = !!apiKey?.data.find(
+                (i) => i.name === env.name
+              );
               return (
                 <Flex
                   vertical
                   gap={16}
-                  key={env}
+                  key={env.id}
                   className={styles.overviewItem}
                 >
                   <Flex justify="space-between" align="center">
-                    <Text.BoldMedium>{env}</Text.BoldMedium>
-                    {envData && (
-                      <Dropdown
-                        menu={{
-                          items: dropdownItems(envData.id, envData.name),
-                        }}
-                      >
-                        <MoreOutlined />
-                      </Dropdown>
-                    )}
+                    <Text.BoldMedium>{env.name}</Text.BoldMedium>
+                    <Dropdown
+                      disabled
+                      menu={{
+                        items: dropdownItems(env.id, env.name),
+                      }}
+                    >
+                      <MoreOutlined />
+                    </Dropdown>
                   </Flex>
                   <EnvStatus
-                    apiKey={undefined}
-                    status={undefined}
-                    dataPlane={undefined}
+                    apiKey={haveApiKey}
+                    status={getDataPlaneInfo(env.id)?.status}
+                    dataPlane={getDataPlaneInfo(env.id)?.dataPlaneNum}
                   />
-                  {envData?.createdAt && (
+                  <div className={styles.runningContainer}>
+                    {getRunningList(env.id)?.map((r) => (
+                      <Row justify={"space-between"} key={r.id}>
+                        <Col>{r.name}</Col>
+                        <Col>{r.version}</Col>
+                      </Row>
+                    ))}
+                  </div>
+
+                  {haveApiKey ? (
                     <Flex
                       justify="space-between"
                       align="center"
@@ -227,10 +290,12 @@ const EnvironmentOverview = () => {
                         Last Deployed at
                       </Text.NormalSmall>
                       <Text.NormalSmall style={{ color: "#00000073" }}>
-                        {toDateTime(envData.createdAt, true)} |{" "}
-                        {toTime(envData.createdAt)}
+                        {toDateTime(env.createdAt, true)} |{" "}
+                        {toTime(env.createdAt)}
                       </Text.NormalSmall>
                     </Flex>
+                  ) : (
+                    <Button type="primary">Create API Key</Button>
                   )}
                 </Flex>
               );

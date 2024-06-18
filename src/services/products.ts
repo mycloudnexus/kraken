@@ -2,6 +2,8 @@ import { PRODUCT } from "@/utils/constants/api";
 import request from "@/utils/helpers/request";
 import { INewVersionParams } from "@/utils/types/product.type";
 
+import type { IPagingParams } from '@/utils/types/common.type'
+
 export const getListComponents = (
   productId: string,
   params: Record<string, any>
@@ -74,6 +76,25 @@ export const deployProduct = (
     data,
   });
 
+export const getAllApiKeyList = (productId: string, params: IPagingParams) => {
+  return (request(`${PRODUCT}/${productId}/env-api-tokens`, {
+    method: "GET",
+    params
+  }))
+};
+
+export const getAllDataPlaneList = (productId: string, params: IPagingParams) => {
+  return (request(`${PRODUCT}/${productId}/env-clients`, {
+    method: "GET",
+    params
+  }))
+};
+export const getRunningComponentList = (productId: string, params: any) => {
+  return (request(`${PRODUCT}/${productId}/deployments`, {
+    method: "GET",
+    params
+  }))
+};
 export const createNewVersion = (data: INewVersionParams) => {
   const { productId, componentId, componentKey, versionName, version } = data;
   return request(`${PRODUCT}/${productId}/components/${componentId}/versions`, {

@@ -34,3 +34,43 @@ export interface IActivityDetail {
   main: IActivityLog;
   branches: IActivityLog[];
 }
+
+export interface IApiKeyDetail {
+  id: string,
+  productId: string,
+  createdAt: string,
+  name: string,
+  envId: string,
+  expiresAt: number,
+  revoked: boolean
+}
+export interface IDataPlaneDetail {
+  id: string,
+  updatedAt: string,
+  createdAt: string,
+  clientIp: string,
+  envId: string,
+  status: string,
+
+}
+
+export interface IRunningComponent {
+  id: string,
+  name: string,
+  version: string,
+  key: string,
+  componentName: string,
+
+
+}
+export interface IRunningComponentItem {
+  id: string,
+  updatedAt: string,
+  createdAt: string,
+  name: string,
+  status: string,
+  components: IRunningComponent[],
+
+}
+
+

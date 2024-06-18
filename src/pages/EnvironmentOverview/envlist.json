@@ -1,0 +1,35 @@
+{
+  "code": 200,
+  "message": "OK",
+  "data": {
+    "data": [
+      {
+        "id": "32b4832f-fb2f-4c99-b89a-c5c995b18dfc",
+        "productId": "mef.sonata",
+        "createdAt": "2024-05-30T13:02:03.224486Z",
+        "name": "dev"
+      },
+      {
+        "id": "32b4832f-febr2f-4c99-b89a-c5c995b18dfc",
+        "productId": "mef.sonata",
+        "createdAt": "2024-05-30T13:02:03.224486Z",
+        "name": "uat"
+      },
+      {
+        "id": "32b4832f-fb2ff-4c99-b89a-c5c995b18dfc",
+        "productId": "mef.sonata",
+        "createdAt": "2024-05-30T13:02:03.224486Z",
+        "name": "stage"
+      },
+      {
+        "id": "32b4832f-fb2f-4c99hh-b89a-c5c995b18dfc",
+        "productId": "mef.sonata",
+        "createdAt": "2024-05-30T13:02:03.224486Z",
+        "name": "production"
+      }
+    ],
+    "total": 4,
+    "page": 0,
+    "size": 20
+  }
+}

@@ -9,9 +9,9 @@ import {
 } from "@ant-design/icons";
 
 interface Props {
-  apiKey?: string;
-  status?: string;
-  dataPlane?: string;
+  apiKey?: boolean;
+  status?: boolean;
+  dataPlane?: number;
 }
 
 const EnvStatus = ({ apiKey, status, dataPlane }: Readonly<Props>) => {
@@ -20,7 +20,7 @@ const EnvStatus = ({ apiKey, status, dataPlane }: Readonly<Props>) => {
       <Flex
         vertical
         gap={6}
-        className={classes(styles.statusWrapper, styles.warning)}
+        className={classes(styles.statusWrapper, styles.notice)}
       >
         <Text.BoldMedium>Connect to data plane</Text.BoldMedium>
         <Text.NormalMedium>
@@ -30,21 +30,20 @@ const EnvStatus = ({ apiKey, status, dataPlane }: Readonly<Props>) => {
       </Flex>
     );
   }
-  const connected = status === "connected";
   return (
     <Flex
       vertical
       gap={10}
       className={classes(styles.statusWrapper, {
-        [styles.success]: connected,
-        [styles.error]: !connected,
+        [styles.success]: status,
+        [styles.error]: !status,
       })}
       align="flex-start"
     >
       <Flex align="center" gap={8}>
         <CheckCircleFilled />
         <Text.NormalMedium>
-          {connected ? "Connected" : "Disconnected"}
+          {status ? "Connected" : "Disconnected"}
         </Text.NormalMedium>
       </Flex>
       <Flex align="center" gap={8} className={styles.dataPlaneInfo}>

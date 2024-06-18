@@ -19,6 +19,15 @@
     --color-border: #fadb14;
     --color-background: #feffe6;
   }
+  &.notice {
+    border: 10px;
+    --color-background: var(--DayBreak-Blue-1, #E6F7FF);
+    --color-border: var(--Text-secondary, rgba(0, 0, 0, 0.85));
+    border-radius: 8px
+
+
+    
+  }
 }
 
 .dataPlaneInfo {

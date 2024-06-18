@@ -4,6 +4,12 @@ export interface IPagingData<T> {
   page: number;
   size: number;
 }
+export interface IPagingParams {
+
+  page: number;
+  size: number;
+}
+
 
 export interface IMetadata {
   id: string;
