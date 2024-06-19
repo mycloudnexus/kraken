@@ -18,7 +18,7 @@ const LogMethodTag = ({ method }: Readonly<Props>) => {
       PUT: "orange",
       DELETE: "red",
     }[method];
-  }, [method]);
+  }, [method, correctMethod]);
 
   if (!correctMethod) return null;
 

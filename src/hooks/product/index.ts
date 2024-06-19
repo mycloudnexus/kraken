@@ -1,8 +1,11 @@
 import {
+  createApiKey,
   createNewComponent,
   createNewVersion,
   deployProduct,
   editComponentDetail,
+  getAllApiKeyList,
+  getAllDataPlaneList,
   getComponentAPIDoc,
   getComponentDetail,
   getEnvActivity,
@@ -10,14 +13,28 @@ import {
   getListComponents,
   getListDeployments,
   getListEnvActivities,
-  getAllApiKeyList, getAllDataPlaneList, getRunningComponentList, getListEnvs,
-  getVersionList, createApiKey
+  getListEnvs,
+  getRunningComponentList,
+  getVersionList,
 } from "@/services/products";
 import { queryClient } from "@/utils/helpers/reactQuery";
-import { IPagingData, IPagingParams, IUnifiedAsset } from "@/utils/types/common.type";
-import { IProductWithComponentVersion, IComponentVersion } from "@/utils/types/component.type";
-import { IActivityDetail, IActivityLog, IEnv, IApiKeyDetail, IDataPlaneDetail, IRunningComponentItem } from "@/utils/types/env.type";
-
+import {
+  IPagingData,
+  IPagingParams,
+  IUnifiedAsset,
+} from "@/utils/types/common.type";
+import {
+  IComponentVersion,
+  IProductWithComponentVersion,
+} from "@/utils/types/component.type";
+import {
+  IActivityDetail,
+  IActivityLog,
+  IApiKeyDetail,
+  IDataPlaneDetail,
+  IEnv,
+  IRunningComponentItem,
+} from "@/utils/types/env.type";
 
 import { IEnvComponent } from "@/utils/types/envComponent.type";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -87,15 +104,12 @@ export const useGetComponentList = (
   productId: string,
   params: Record<string, any>
 ) => {
-  const { data, ...result } = useQuery<any, Error>({
+  return useQuery<any, Error>({
     queryKey: [PRODUCT_CACHE_KEYS.get_component_list, productId, params],
     queryFn: () => getListComponents(productId, params),
     enabled: Boolean(productId),
+    select: (data) => data?.data,
   });
-  return {
-    data: get(data, "data"),
-    ...result,
-  };
 };
 
 export const useManualGetComponentList = () => {
@@ -221,10 +235,7 @@ export const useGetAllApiKeyList = (
   enabled = true
 ) => {
   return useQuery<AxiosResponse, Error, IPagingData<IApiKeyDetail>>({
-    queryKey: [
-      PRODUCT_CACHE_KEYS.get_all_api_key,
-      productId,
-    ],
+    queryKey: [PRODUCT_CACHE_KEYS.get_all_api_key, productId],
     queryFn: () => getAllApiKeyList(productId, params),
     enabled: enabled && Boolean(productId),
     select: (data) => data.data,
@@ -241,9 +252,7 @@ export const useCreateApiKey = () => {
       });
     },
   });
-
 };
-
 
 export const useGetAllDataPlaneList = (
   productId: string,
@@ -251,10 +260,7 @@ export const useGetAllDataPlaneList = (
   enabled = true
 ) => {
   return useQuery<AxiosResponse, Error, IPagingData<IDataPlaneDetail>>({
-    queryKey: [
-      PRODUCT_CACHE_KEYS.get_all_data_plane,
-      productId,
-    ],
+    queryKey: [PRODUCT_CACHE_KEYS.get_all_data_plane, productId],
     queryFn: () => getAllDataPlaneList(productId, params),
     enabled: enabled && Boolean(productId),
     select: (data) => data.data,
@@ -266,10 +272,7 @@ export const useGetRunningComponentList = (
   enabled = true
 ) => {
   return useQuery<AxiosResponse, Error, IPagingData<IRunningComponentItem>>({
-    queryKey: [
-      PRODUCT_CACHE_KEYS.get_running_component,
-      productId,
-    ],
+    queryKey: [PRODUCT_CACHE_KEYS.get_running_component, productId],
     queryFn: () => getRunningComponentList(productId, params),
     enabled: enabled && Boolean(productId),
     select: (data) => data.data,

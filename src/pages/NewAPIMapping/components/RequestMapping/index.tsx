@@ -1,34 +1,39 @@
-import Text from "@/components/Text";
-import { useGetComponentList } from "@/hooks/product";
-import { useAppStore } from "@/stores/app.store";
-import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
-import { Collapse, Flex, Tag } from "antd";
-import { capitalize } from "lodash";
 import MappingIcon from "@/assets/newAPIMapping/mapping-icon.svg";
-import styles from "./index.module.scss";
 import LogMethodTag from "@/components/LogMethodTag";
+import Text from "@/components/Text";
+import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
+import { EnumRightType } from "@/utils/types/common.type";
 import { RightOutlined } from "@ant-design/icons";
+import { Collapse, CollapseProps, Flex, Tag, Typography } from "antd";
+import { capitalize } from "lodash";
+import SonataPropMapping from "../SonataPropMapping";
+import styles from "./index.module.scss";
 
-const RequestMapping = () => {
-  const { currentProduct } = useAppStore();
+interface Props {
+  openRight?: (value: EnumRightType) => void;
+}
+const RequestMapping = ({ openRight }: Readonly<Props>) => {
   const { query } = useNewApiMappingStore();
-  const queryData = JSON.parse(query ?? '{}');
-  const { data: mappingFile } =
-    useGetComponentList(currentProduct, {
-      kind: "kraken.component.api-target",
-      q: query,
-      facetIncluded: true,
-      page: 0,
-      size: 20,
-    });
-  const { data: sellerAPIList } =
-    useGetComponentList(currentProduct, {
-      kind: "kraken.component.api-target-spec",
-      facetIncluded: true,
-      page: 0,
-      size: 20,
-    });
-  console.log(mappingFile, sellerAPIList, queryData);
+  const queryData = JSON.parse(query ?? "{}");
+  const items: CollapseProps["items"] = [
+    {
+      key: "1",
+      label: (
+        <>
+          <div>
+            <Text.NormalLarge>Property mapping</Text.NormalLarge>
+          </div>
+          <div>
+            <Text.NormalMedium color="rgba(0, 0, 0, 0.45)">
+              Please map the following Sonata API response properties with
+              Seller API response
+            </Text.NormalMedium>
+          </div>
+        </>
+      ),
+      children: <SonataPropMapping openRight={openRight} />,
+    },
+  ];
   return (
     <>
       <Flex gap={60}>
@@ -63,31 +68,36 @@ const RequestMapping = () => {
         <Flex
           align="center"
           gap={6}
-          style={{ flex: "0 0 calc(50% - 30px)" }}
+          style={{ flex: "0 0 calc(50% - 30px)", width: "calc(50% - 30px)" }}
           className={styles.sonataAPIBasicInfoWrapper}
         >
           <LogMethodTag method={queryData?.method?.toUpperCase()} />
-          <Text.NormalMedium style={{ color: "#595959" }}>
+          <Typography.Text
+            style={{ flex: 1, color: "#595959" }}
+            ellipsis={{ tooltip: true }}
+          >
             {queryData?.path}
-          </Text.NormalMedium>
+          </Typography.Text>
         </Flex>
-        <div style={{ width: 42 }}>
+        <div style={{ flex: "0 0 42px", width: 42 }}>
           <MappingIcon />
         </div>
         <Flex
           align="center"
           justify="space-between"
-          style={{ flex: "0 0 calc(50% - 30px)" }}
+          style={{ flex: "0 0 calc(50% - 30px)", width: "calc(50% - 30px)" }}
           className={styles.sellerAPIBasicInfoWrapper}
         >
           <Flex align="center" gap={12}>
             <LogMethodTag method="GET" />
-            <Text.NormalMedium>/api/pricing/calculate</Text.NormalMedium>
+            <Typography.Text style={{ flex: 1 }} ellipsis={{ tooltip: true }}>
+              /api/pricing/calculate
+            </Typography.Text>
           </Flex>
           <RightOutlined style={{ color: "rgba(0, 0, 0, 0.45)" }} />
         </Flex>
-        <Collapse />
       </Flex>
+      <Collapse ghost items={items} className={styles.collapse} />
     </>
   );
 };

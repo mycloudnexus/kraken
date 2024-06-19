@@ -1,4 +1,8 @@
+import StepBar from "@/components/StepBar";
 import Text from "@/components/Text";
+import { useAppStore } from "@/stores/app.store";
+import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
+import { EStep } from "@/utils/constants/common";
 import { ROUTES } from "@/utils/constants/route";
 import { LeftOutlined } from "@ant-design/icons";
 import {
@@ -9,19 +13,26 @@ import {
   Tabs,
   TabsProps,
 } from "antd";
+import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import styles from "./index.module.scss";
 import RequestMapping from "./components/RequestMapping";
 import ResponseMapping from "./components/ResponseMapping";
-import StepBar from "@/components/StepBar";
-import { EStep } from "@/utils/constants/common";
-import { useState } from "react";
+import RightAddSonataProp from "./components/RightAddSonataProp";
 import RightSelection from "./components/RightSelection";
+import useGetApiSpec from "./components/useGetApiSpec";
+import styles from "./index.module.scss";
+import { EnumRightType } from "@/utils/types/common.type";
 
 const NewAPIMapping = () => {
+  const { componentId } = useParams();
+  const { currentProduct } = useAppStore();
+  const { query } = useNewApiMappingStore();
+  const queryData = JSON.parse(query ?? "{}");
   const [activeKey, setActiveKey] = useState<string | string[]>("0");
   const [step] = useState(0);
-  const { componentId } = useParams();
+  const [rightType, setRightType] = useState<EnumRightType | undefined>(
+    EnumRightType.AddSonataProp
+  );
   const breadcrumb: BreadcrumbProps["items"] = [
     {
       title: (
@@ -45,7 +56,7 @@ const NewAPIMapping = () => {
     {
       key: "request",
       label: "Request mapping",
-      children: <RequestMapping />,
+      children: <RequestMapping openRight={setRightType} />,
     },
     {
       key: "response",
@@ -53,6 +64,8 @@ const NewAPIMapping = () => {
       children: <ResponseMapping />,
     },
   ];
+  const { jsonSpec } = useGetApiSpec(currentProduct, query ?? "{}");
+
   return (
     <Flex vertical style={{ backgroundColor: "#f0f2f5", height: "100%" }}>
       <StepBar
@@ -66,8 +79,11 @@ const NewAPIMapping = () => {
         <div className={styles.center}>
           <Tabs items={items} />
         </div>
-        <div className={styles.left}>
-          <RightSelection />
+        <div className={styles.right}>
+          {rightType === EnumRightType.AddSonataProp && (
+            <RightAddSonataProp spec={jsonSpec} method={queryData?.method} />
+          )}
+          {rightType === EnumRightType.SelectSellerAPI && <RightSelection />}
         </div>
       </Flex>
       <Flex

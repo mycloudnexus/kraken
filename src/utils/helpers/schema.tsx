@@ -84,6 +84,7 @@ export const parseObjectDescriptionToTreeData = (
   level = 0,
   prefix = ""
 ) => {
+  if (!keys) return []
   const result: any = Object.entries(keys).map(([key, value]) => {
     const typeOfValue = typeof value;
 
@@ -103,6 +104,7 @@ export const parseObjectDescriptionToTreeData = (
         </Flex>
       ),
       key: `${prefix}_${key}`,
+      selectable: typeOfValue !== "object",
       children:
         typeOfValue === "object"
           ? parseObjectDescriptionToTreeData(
@@ -114,6 +116,22 @@ export const parseObjectDescriptionToTreeData = (
             )
           : undefined,
     };
+  });
+  return result;
+};
+
+export const convertSchemaToTypeOnly = (keys: Record<string, any>) => {
+  const result: any = {};
+  Object.entries(keys).forEach(([key, propData]) => {
+    if (["string", "number", "boolean"].includes(propData.type)) {
+      result[key] = propData.type;
+    }
+    if (propData.type === "array") {
+      result[key] = convertSchemaToTypeOnly(propData.items.properties);
+    }
+    if (propData.type === "object") {
+      result[key] = convertSchemaToTypeOnly(propData.properties);
+    }
   });
   return result;
 };

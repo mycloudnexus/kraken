@@ -11,3 +11,16 @@
   border-radius: 6px;
   border: 1px solid #dde1e5;
 }
+.collapse {
+  margin-top: 26px;
+  > :global(.ant-collapse-item) {
+    > :global(.ant-collapse-header) {
+      padding-inline: 0;
+    }
+    > :global(.ant-collapse-content) {
+      > :global(.ant-collapse-content-box) {
+        padding-inline: 0;
+      }
+    }
+  }
+}

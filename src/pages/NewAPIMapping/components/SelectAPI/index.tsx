@@ -100,7 +100,7 @@ const SelectAPI = ({ onSelect }: Props) => {
       <Text.BoldLarge>Select API</Text.BoldLarge>
       <div className={styles.content}>
         {dataList?.data?.map((item: IComponent) => (
-          <APIItem item={item} onSelect={onSelect} />
+          <APIItem item={item} onSelect={onSelect} key={item.id} />
         ))}
         {isEmpty(dataList?.data) && <Empty />}
       </div>

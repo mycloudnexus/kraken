@@ -9,7 +9,6 @@ export interface IPagingParams {
   size: number;
 }
 
-
 export interface IMetadata {
   id: string;
   name: string;
@@ -48,4 +47,10 @@ export interface IUnifiedAsset {
   updatedAt: string;
   updatedBy: string;
   syncMetadata: ISyncMetadata;
+}
+
+export enum EnumRightType {
+  SelectSellerAPI,
+  AddSonataProp,
+  AddSellerProp,
 }

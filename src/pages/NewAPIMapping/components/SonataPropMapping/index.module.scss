@@ -1,0 +1,68 @@
+.sonataPropMappingWrapper {
+  box-sizing: border-box;
+  flex: 0 0 calc(50% - 30px);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: calc(50% - 30px);
+  border-radius: 6px;
+  padding: 18px;
+  background-color: #f0f2f5;
+}
+.sellerPropMappingWrapper {
+  box-sizing: border-box;
+  flex: 0 0 calc(50% - 30px);
+  width: calc(50% - 30px);
+  border: 1px solid #dde1e5;
+  border-radius: 6px;
+  padding: 18px;
+  .sellerPropItemWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 34px;
+    margin-bottom: 12px;
+    border-radius: 2px;
+    padding-inline: 12px;
+    background-color: #f2f3f5;
+    cursor: pointer;
+  }
+}
+.addMappingDiv {
+  border: 1px solid #165dff;
+  border-radius: 2px;
+  padding: 4px 12px;
+  background-color: #fff;
+  cursor: pointer;
+}
+.tree {
+  background-color: transparent;
+  :global(.ant-tree-treenode) {
+    padding-bottom: 12px;
+  }
+  :global(.ant-tree-switcher_open),
+  :global(.ant-tree-switcher_close) {
+    display: none;
+  }
+  :global(.ant-tree-switcher-leaf-line) {
+    &:before {
+      bottom: -16px;
+    }
+  }
+}
+.sonataAPIPropItem {
+  border-radius: 4px;
+  padding: 5px 8px;
+  background-color: #fff;
+}
+.alignArrowList {
+  flex: 0 0 28px;
+  display: flex;
+  flex-direction: column;
+  row-gap: 23.67px;
+  width: 28px;
+  padding-block: 18px;
+}
+.alignArrowWrapper {
+  display: flex;
+}

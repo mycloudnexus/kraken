@@ -19,7 +19,7 @@ const buildQuery = (
   tab?: string,
   actionType?: string
 ) => {
-  let query: Record<string, any> = {
+  const query: Record<string, any> = {
     method: mapItem.method,
     path: mapItem.path,
   };
