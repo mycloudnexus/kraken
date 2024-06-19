@@ -29,6 +29,7 @@ import {
   Tag,
   Col,
   notification,
+  Tooltip,
 } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -106,28 +107,7 @@ const EnvironmentOverview = () => {
             navigate(ROUTES.ENV_ACTIVITY_LOG(envId));
           },
         },
-        {
-          key: "view-details",
-          label: "View details",
-          children: [
-            {
-              key: "address-validate",
-              label: "Address Validation",
-            },
-            {
-              key: "quality",
-              label: "Product offering quality",
-            },
-            {
-              key: "quote",
-              label: "Quote",
-            },
-            {
-              key: "order",
-              label: "Order",
-            },
-          ],
-        },
+
         {
           key: "refresh-key",
           label: "Rotate API key",
@@ -272,36 +252,50 @@ const EnvironmentOverview = () => {
                   gap={16}
                   key={env.id}
                   className={styles.overviewItem}
+                  justify="space-between"
                 >
-                  <Flex justify="space-between" align="center">
-                    <Text.BoldMedium>{env.name}</Text.BoldMedium>
-                    <Dropdown
-                      disabled={!haveApiKey}
-                      menu={{
-                        items: dropdownItems(env.id, env.name),
-                      }}
-                    >
-                      <MoreOutlined
-                        style={{
-                          cursor: haveApiKey ? "default" : "not-allowed",
+                  <div>
+                    <Flex justify="space-between" style={{ marginBottom: 16 }}>
+                      <Text.BoldMedium>{env.name}</Text.BoldMedium>
+                      <Dropdown
+                        disabled={!haveApiKey}
+                        menu={{
+                          items: dropdownItems(env.id, env.name),
                         }}
-                      />
-                    </Dropdown>
-                  </Flex>
-                  <EnvStatus
-                    apiKey={haveApiKey}
-                    status={getDataPlaneInfo(env.id)?.status}
-                    disConnect={disConnectNum}
-                    connect={connectNum}
-                    dataPlane={len}
-                  />
-                  <div className={styles.runningContainer}>
-                    {getRunningList(env.id)?.map((r) => (
-                      <Row justify={"space-between"} key={r.id}>
-                        <Col>{r.name}</Col>
-                        <Col>{r.version}</Col>
-                      </Row>
-                    ))}
+                      >
+                        <MoreOutlined
+                          style={{
+                            cursor: haveApiKey ? "default" : "not-allowed",
+                          }}
+                        />
+                      </Dropdown>
+                    </Flex>
+                    <EnvStatus
+                      apiKey={haveApiKey}
+                      status={getDataPlaneInfo(env.id)?.status}
+                      disConnect={disConnectNum}
+                      connect={connectNum}
+                      dataPlane={len}
+                    />
+                    <div className={styles.runningContainer}>
+                      {getRunningList(env.id)?.map((r) => (
+                        <Row justify={"space-between"} key={r.id}>
+                          {r.componentName?.length > 50 ? (
+                            <Tooltip title={r.componentName}>
+                              <Col span={21} className={styles.running}>
+                                {r.componentName}
+                              </Col>
+                            </Tooltip>
+                          ) : (
+                            <Col span={21} className={styles.running}>
+                              {r.componentName}
+                            </Col>
+                          )}
+
+                          <Col>{r.version}</Col>
+                        </Row>
+                      ))}
+                    </div>
                   </div>
 
                   {haveApiKey ? (

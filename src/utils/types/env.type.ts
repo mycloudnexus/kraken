@@ -65,11 +65,12 @@ export interface IRunningComponent {
 }
 export interface IRunningComponentItem {
   id: string,
-  updatedAt: string,
-  createdAt: string,
+  updatedAt?: string,
+  createdAt?: string,
   name: string,
   status: string,
   components: IRunningComponent[],
+
 
 }
 export interface ICreateParameter {
