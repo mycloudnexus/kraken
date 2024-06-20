@@ -3,6 +3,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  max-height: calc(100% - 35px);
   overflow-y: auto;
 }
 
@@ -18,7 +19,8 @@
   box-sizing: border-box;
   cursor: pointer;
 
-  &:hover {
+  &:hover,
+  &.active {
     background: #dbe4fb;
   }
 }

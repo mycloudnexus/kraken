@@ -93,6 +93,7 @@ const APIViewer = ({ detail, onClose, enableEdit }: Props) => {
             },
           ]}
           pagination={false}
+          rowKey="name"
         />
       </div>
       {fileName ? (
@@ -111,6 +112,7 @@ const APIViewer = ({ detail, onClose, enableEdit }: Props) => {
           className={styles.environmentTable}
           dataSource={environmentData}
           pagination={false}
+          rowKey="name"
         />
       </div>
       <Flex className={styles.modalFooter} justifyContent="flex-end" gap={12}>

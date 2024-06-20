@@ -1,16 +1,16 @@
-import { useGetComponentList } from "@/hooks/product";
-import styles from "./index.module.scss";
-import { useAppStore } from "@/stores/app.store";
-import { API_SERVER_KEY } from "@/utils/constants/product";
+import APIServerModal from "@/components/APIServerModal";
 import Flex from "@/components/Flex";
 import Text from "@/components/Text";
+import { useGetComponentList } from "@/hooks/product";
+import { useAppStore } from "@/stores/app.store";
+import { COMPONENT_KIND_API_TARGET_SPEC } from "@/utils/constants/product";
 import { Button, Table } from "antd";
-import { useNavigate } from "react-router";
-import { useEffect, useMemo, useState } from "react";
 import { isEmpty } from "lodash";
-import ExpandRow from "./components/ExpandRow";
-import APIServerModal from "@/components/APIServerModal";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router";
 import { useBoolean } from "usehooks-ts";
+import ExpandRow from "./components/ExpandRow";
+import styles from "./index.module.scss";
 
 const APIServerList = () => {
   const {
@@ -25,7 +25,7 @@ const APIServerList = () => {
     isLoading,
     refetch: refresh,
   } = useGetComponentList(currentProduct, {
-    kind: API_SERVER_KEY,
+    kind: COMPONENT_KIND_API_TARGET_SPEC,
     size: 1000,
   });
   const navigate = useNavigate();

@@ -1,7 +1,7 @@
 import Text from "@/components/Text";
 import { useManualGetComponentList } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
-import { API_SERVER_KEY } from "@/utils/constants/product";
+import { COMPONENT_KIND_API_TARGET_SPEC } from "@/utils/constants/product";
 import { ROUTES } from "@/utils/constants/route";
 import { Button, Typography } from "antd";
 import { isEmpty } from "lodash";
@@ -39,7 +39,7 @@ const HomePageCard = ({
     const dataList = await runGet({
       productId: currentProduct,
       params: {
-        kind: API_SERVER_KEY,
+        kind: COMPONENT_KIND_API_TARGET_SPEC,
         size: 1,
         page: 0,
       },

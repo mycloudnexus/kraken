@@ -1,17 +1,17 @@
-import { useState } from "react";
-import styles from "./index.module.scss";
-import SelectAPIServer from "./components/SelectAPIServer";
-import { Form, notification } from "antd";
-import AddEnv from "./components/AddEnv";
-import SelectDownStreamAPI from "./components/SelectDownStreamAPI";
-import BtnStep from "./components/BtnStep";
-import { API_SERVER_KEY } from "@/utils/constants/product";
-import { useCreateNewComponent } from "@/hooks/product";
-import { get, isEmpty } from "lodash";
-import { useAppStore } from "@/stores/app.store";
-import { useNavigate } from "react-router-dom";
 import StepBar from "@/components/StepBar";
+import { useCreateNewComponent } from "@/hooks/product";
+import { useAppStore } from "@/stores/app.store";
 import { EStep } from "@/utils/constants/common";
+import { COMPONENT_KIND_API_TARGET_SPEC } from "@/utils/constants/product";
+import { Form, notification } from "antd";
+import { get, isEmpty } from "lodash";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import AddEnv from "./components/AddEnv";
+import BtnStep from "./components/BtnStep";
+import SelectAPIServer from "./components/SelectAPIServer";
+import SelectDownStreamAPI from "./components/SelectDownStreamAPI";
+import styles from "./index.module.scss";
 
 const NewAPIServer = () => {
   const [activeKey, setActiveKey] = useState<string | string[]>("0");
@@ -65,7 +65,7 @@ const NewAPIServer = () => {
       });
       const data = {
         description: values.description,
-        kind: API_SERVER_KEY,
+        kind: COMPONENT_KIND_API_TARGET_SPEC,
         metadata: {
           name: values.name,
           version: 1,

@@ -97,7 +97,7 @@ const RightAddSonataProp = ({ spec, method }: Readonly<Props>) => {
     if (requestBodyTree) {
       items.push({
         key: "request",
-        label: "Request body parameters",
+        label: "Request body",
         children: (
           <div className={styles.tree}>
             <Tree treeData={requestBodyTree} selectable />

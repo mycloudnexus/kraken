@@ -8,12 +8,10 @@ import { Collapse, CollapseProps, Flex, Tag, Typography } from "antd";
 import { capitalize } from "lodash";
 import SonataPropMapping from "../SonataPropMapping";
 import styles from "./index.module.scss";
+import clsx from "clsx";
 
-interface Props {
-  openRight?: (value: EnumRightType) => void;
-}
-const RequestMapping = ({ openRight }: Readonly<Props>) => {
-  const { query } = useNewApiMappingStore();
+const RequestMapping = () => {
+  const { query, sellerApi, rightSide, setRightSide } = useNewApiMappingStore();
   const queryData = JSON.parse(query ?? "{}");
   const items: CollapseProps["items"] = [
     {
@@ -31,7 +29,7 @@ const RequestMapping = ({ openRight }: Readonly<Props>) => {
           </div>
         </>
       ),
-      children: <SonataPropMapping openRight={openRight} />,
+      children: <SonataPropMapping />,
     },
   ];
   return (
@@ -86,13 +84,29 @@ const RequestMapping = ({ openRight }: Readonly<Props>) => {
           align="center"
           justify="space-between"
           style={{ flex: "0 0 calc(50% - 30px)", width: "calc(50% - 30px)" }}
-          className={styles.sellerAPIBasicInfoWrapper}
+          className={clsx(styles.sellerAPIBasicInfoWrapper, {
+            [styles.highlight]: rightSide === EnumRightType.SelectSellerAPI,
+          })}
+          onClick={() => {
+            setRightSide(EnumRightType.SelectSellerAPI);
+          }}
         >
           <Flex align="center" gap={12}>
-            <LogMethodTag method="GET" />
-            <Typography.Text style={{ flex: 1 }} ellipsis={{ tooltip: true }}>
-              /api/pricing/calculate
-            </Typography.Text>
+            {sellerApi ? (
+              <>
+                <LogMethodTag method={sellerApi.method.toUpperCase()} />
+                <Typography.Text
+                  style={{ flex: 1 }}
+                  ellipsis={{ tooltip: true }}
+                >
+                  {sellerApi.url}
+                </Typography.Text>
+              </>
+            ) : (
+              <Typography.Text>
+                Please select API from the side bar
+              </Typography.Text>
+            )}
           </Flex>
           <RightOutlined style={{ color: "rgba(0, 0, 0, 0.45)" }} />
         </Flex>

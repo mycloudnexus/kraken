@@ -1,16 +1,18 @@
-import Text from "@/components/Text";
-import styles from "./index.module.scss";
-import { Col, Row, Spin } from "antd";
-import HomePageCard from "./components/HomePageCard";
 import AddressIcon from "@/assets/home/address.svg";
 import OrderIcon from "@/assets/home/order.svg";
 import ProductIcon from "@/assets/home/product.svg";
 import QuoteIcon from "@/assets/home/quote.svg";
-import { useAppStore } from "@/stores/app.store";
+import Text from "@/components/Text";
 import { useGetProductComponents } from "@/hooks/product";
+import { useAppStore } from "@/stores/app.store";
+import { COMPONENT_KIND_API } from "@/utils/constants/product";
 import { IComponent } from "@/utils/types/product.type";
+import { Col, Row, Spin } from "antd";
 import { get } from "lodash";
 import { useCallback } from "react";
+import HomePageCard from "./components/HomePageCard";
+import styles from "./index.module.scss";
+
 const HomePage = () => {
   const { currentProduct } = useAppStore();
   const { data: componentList, isLoading } = useGetProductComponents(
@@ -18,7 +20,7 @@ const HomePage = () => {
     {
       size: 100,
       page: 0,
-      kind: "kraken.component.api",
+      kind: COMPONENT_KIND_API,
       facetIncluded: false,
     }
   );

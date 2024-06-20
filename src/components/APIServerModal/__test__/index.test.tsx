@@ -19,7 +19,6 @@ test("API modal", () => {
 test("API Viewer", () => {
   const { container } = render(
     <BrowserRouter>
-      {" "}
       <APIViewer
         detail={{
           kind: "kraken.component.api-target-spec",

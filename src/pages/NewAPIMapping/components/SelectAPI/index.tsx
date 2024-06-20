@@ -1,31 +1,77 @@
+import ServerIcon from "@/assets/server-icon.svg";
+import Flex from "@/components/Flex";
+import RequestMethod from "@/components/Method";
 import Text from "@/components/Text";
 import { useGetComponentList } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
-import { API_SERVER_KEY } from "@/utils/constants/product";
-import styles from "./index.module.scss";
+import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
+import { COMPONENT_KIND_API_TARGET_SPEC } from "@/utils/constants/product";
 import { IComponent } from "@/utils/types/product.type";
-import { useBoolean } from "usehooks-ts";
-import Flex from "@/components/Flex";
 import { DownOutlined, RightOutlined } from "@ant-design/icons";
+import { Button, Empty, Spin, Tooltip, Typography } from "antd";
+import clsx from "clsx";
+import jsYaml from "js-yaml";
 import { get, isEmpty } from "lodash";
-import { Button, Empty, Spin, Tooltip } from "antd";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import RequestMethod from "@/components/Method";
-import ServerIcon from "@/assets/server-icon.svg";
-
-type Props = {
-  onSelect?: (value: any) => void;
-};
+import swaggerClient from "swagger-client";
+import { useBoolean } from "usehooks-ts";
+import styles from "./index.module.scss";
 
 type ItemProps = {
   item: IComponent;
-  onSelect?: (value: any) => void;
 };
 
-const APIItem = ({ item, onSelect }: ItemProps) => {
+const APIItem = ({ item }: ItemProps) => {
   const navigate = useNavigate();
   const { currentProduct } = useAppStore();
+  const { sellerApi, setSellerApi } = useNewApiMappingStore();
   const { value: isOpen, toggle: toggleOpen } = useBoolean(true);
+  const baseSpec = useMemo(() => {
+    const encoded = item?.facets?.baseSpec?.content;
+    if (!encoded) return undefined;
+    const yamlContent = atob(encoded.slice(31))
+      .replace(/(â)/g, "")
+      .replace(/(â)/g, "");
+    return jsYaml.load(yamlContent);
+  }, [item]);
+
+  const [resolvedSpec, setResolvedSpec] = useState<any>();
+  useEffect(() => {
+    if (!baseSpec) return;
+    (async () => {
+      const result = await swaggerClient.resolve({ spec: baseSpec });
+      setResolvedSpec(result.spec);
+    })();
+  }, [baseSpec]);
+
+  const onSelect = (key: string) => {
+    const [url, method] = key.split(" ");
+    if (!resolvedSpec) {
+      const selectedSellerApi = {
+        url,
+        method,
+        spec: undefined,
+      };
+      setSellerApi(selectedSellerApi);
+    }
+    const listSpec: any[] = [];
+    Object.entries(resolvedSpec.paths).forEach(
+      ([path, methodObj]: [string, any]) => {
+        Object.entries(methodObj).forEach(([method, spec]) => {
+          listSpec.push({
+            url: path,
+            method,
+            spec,
+          });
+        });
+      }
+    );
+    const selectedSpec = listSpec.find(
+      (item) => item.url === url && item.method === method
+    );
+    setSellerApi(selectedSpec);
+  };
   return (
     <div>
       <Flex justifyContent="space-between">
@@ -61,15 +107,23 @@ const APIItem = ({ item, onSelect }: ItemProps) => {
         {isOpen &&
           item?.facets?.selectedAPIs?.map((key: string) => {
             const [url, method] = key.split(" ");
+            const active =
+              url === sellerApi?.url && method === sellerApi?.method;
             return (
               <div
-                className={styles.card}
-                onClick={() => onSelect?.(key)}
+                className={clsx(styles.card, {
+                  [styles.active]: active,
+                })}
+                onClick={() => onSelect(key)}
                 role="none"
               >
                 <Flex justifyContent="flex-start" gap={8} alignItems="center">
-                  <ServerIcon />
-                  <Text.LightMedium>{url?.replace("/", "")}</Text.LightMedium>
+                  <div style={{ flex: "0 0 16px", width: "16px" }}>
+                    <ServerIcon />
+                  </div>
+                  <Typography.Text ellipsis={{ tooltip: true }}>
+                    {url?.replace("/", "")}
+                  </Typography.Text>
                 </Flex>
                 <Flex
                   justifyContent="flex-start"
@@ -78,7 +132,9 @@ const APIItem = ({ item, onSelect }: ItemProps) => {
                 >
                   <RequestMethod method={method} />
                   <Tooltip title={url}>
-                    <Text.LightMedium>{url}</Text.LightMedium>
+                    <Typography.Text ellipsis={{ tooltip: true }}>
+                      {url}
+                    </Typography.Text>
                   </Tooltip>
                 </Flex>
               </div>
@@ -89,10 +145,10 @@ const APIItem = ({ item, onSelect }: ItemProps) => {
   );
 };
 
-const SelectAPI = ({ onSelect }: Props) => {
+const SelectAPI = () => {
   const { currentProduct } = useAppStore();
   const { data: dataList, isLoading } = useGetComponentList(currentProduct, {
-    kind: API_SERVER_KEY,
+    kind: COMPONENT_KIND_API_TARGET_SPEC,
     size: 1000,
   });
   return (
@@ -100,7 +156,7 @@ const SelectAPI = ({ onSelect }: Props) => {
       <Text.BoldLarge>Select API</Text.BoldLarge>
       <div className={styles.content}>
         {dataList?.data?.map((item: IComponent) => (
-          <APIItem item={item} onSelect={onSelect} key={item.id} />
+          <APIItem item={item} key={item.id} />
         ))}
         {isEmpty(dataList?.data) && <Empty />}
       </div>

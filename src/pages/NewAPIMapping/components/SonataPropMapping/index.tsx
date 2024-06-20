@@ -6,6 +6,7 @@ import { FolderFilled, RightOutlined } from "@ant-design/icons";
 import { Button, Flex, Tree, TreeDataNode, Typography } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import styles from "./index.module.scss";
+import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 
 const { DirectoryTree } = Tree;
 const treeData: TreeDataNode[] = [
@@ -75,19 +76,17 @@ const renderIcon = (props: any) =>
   props.isLeaf ? null : <FolderFilled style={{ color: "#bfbfbf" }} />;
 const renderSwitcherIcon = () => <></>;
 
-interface Props {
-  openRight?: (value: EnumRightType) => void;
-}
-const SonataPropMapping = ({ openRight }: Readonly<Props>) => {
+const SonataPropMapping = () => {
+  const { setRightSide } = useNewApiMappingStore();
   const [showSelect, setShowSelect] = useState(false);
   const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
   const alignList = useMemo(() => buildArrowList(expandedKeys), [expandedKeys]);
 
   useEffect(() => {
     if (showSelect) {
-      openRight?.(EnumRightType.AddSonataProp);
+      setRightSide(EnumRightType.AddSonataProp);
     }
-  }, [showSelect, openRight]);
+  }, [showSelect, setRightSide]);
   return (
     <Flex gap={16}>
       <div className={styles.sonataPropMappingWrapper}>

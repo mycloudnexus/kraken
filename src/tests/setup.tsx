@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom/vitest";
-
+import { beforeAll } from "vitest";
 Object.defineProperty(window, "matchMedia", {
   writable: true,
   value: vi.fn().mockImplementation((query) => ({
@@ -12,4 +12,9 @@ Object.defineProperty(window, "matchMedia", {
     removeEventListener: vi.fn(),
     dispatchEvent: vi.fn(),
   })),
+});
+
+beforeAll(() => {
+  const { getComputedStyle } = window;
+  window.getComputedStyle = (elt) => getComputedStyle(elt);
 });

@@ -10,6 +10,10 @@
   padding: 18px 20px;
   border-radius: 6px;
   border: 1px solid #dde1e5;
+  cursor: pointer;
+  &.highlight {
+    border-color: #2962ff;
+  }
 }
 .collapse {
   margin-top: 26px;

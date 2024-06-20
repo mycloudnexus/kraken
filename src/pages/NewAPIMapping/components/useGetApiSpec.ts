@@ -1,10 +1,15 @@
-import { useMemo } from "react";
 import { useGetComponentList } from "@/hooks/product";
+import {
+  COMPONENT_KIND_API,
+  COMPONENT_KIND_API_SPEC,
+  COMPONENT_KIND_API_TARGET,
+} from "@/utils/constants/product";
 import jsYaml from "js-yaml";
+import { useMemo } from "react";
 
 const useGetApiSpec = (currentProduct: string, query: string) => {
   const { data: mappingFile } = useGetComponentList(currentProduct, {
-    kind: "kraken.component.api-target",
+    kind: COMPONENT_KIND_API_TARGET,
     q: query,
     facetIncluded: true,
     page: 0,
@@ -13,10 +18,10 @@ const useGetApiSpec = (currentProduct: string, query: string) => {
   const metadataKey = mappingFile?.data?.[0]?.metadata?.key;
 
   const { data: apiComponentList } = useGetComponentList(currentProduct, {
-    kind: "kraken.component.api",
+    kind: COMPONENT_KIND_API,
   });
   const { data: apiSpecList } = useGetComponentList(currentProduct, {
-    kind: "kraken.component.api-spec",
+    kind: COMPONENT_KIND_API_SPEC,
   });
 
   const apiSpecMetadataKey = useMemo(() => {
