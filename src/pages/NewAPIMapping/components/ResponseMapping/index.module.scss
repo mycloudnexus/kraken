@@ -1,0 +1,34 @@
+.card {
+  border: 1px solid;
+  border-radius: 6px;
+  padding: 18px;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.mainCard {
+  @extend .card;
+  background: #f0f2f5;
+  border-color: #f0f2f5;
+}
+
+.mappingCard {
+  @extend .card;
+  border-color: #dde1e5;
+}
+
+.input {
+  background: #f2f3f5;
+}
+
+.select:not(:global(.ant-select-focused)) {
+  :global {
+    .ant-select-selector {
+      background: #f2f3f5 !important;
+    }
+  }
+}
+
+.selectPopup {
+  display: none;
+}

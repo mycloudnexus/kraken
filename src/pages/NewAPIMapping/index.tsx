@@ -22,11 +22,13 @@ import RightAddSonataProp from "./components/RightAddSonataProp";
 import SelectAPI from "./components/SelectAPI";
 import useGetApiSpec from "./components/useGetApiSpec";
 import styles from "./index.module.scss";
+import SelectResponseProperty from "./components/SelectResponseProperty";
+import { isEmpty } from "lodash";
 
 const NewAPIMapping = () => {
   const { componentId } = useParams();
   const { currentProduct } = useAppStore();
-  const { query, rightSide, setRightSide, reset } = useNewApiMappingStore();
+  const { query, rightSide, setResponseMapping } = useNewApiMappingStore();
   const queryData = JSON.parse(query ?? "{}");
   const [activeKey, setActiveKey] = useState<string | string[]>("0");
   const [step] = useState(0);
@@ -61,14 +63,13 @@ const NewAPIMapping = () => {
       children: <ResponseMapping />,
     },
   ];
-  const { jsonSpec } = useGetApiSpec(currentProduct, query ?? "{}");
+  const { jsonSpec, mappers } = useGetApiSpec(currentProduct, query ?? "{}");
 
   useEffect(() => {
-    setRightSide(EnumRightType.SelectSellerAPI);
-    return () => {
-      reset();
-    };
-  }, []);
+    if (!isEmpty(mappers?.response)) {
+      setResponseMapping(mappers?.response);
+    }
+  }, [mappers?.response]);
 
   return (
     <Flex vertical style={{ backgroundColor: "#f0f2f5", height: "100%" }}>
@@ -88,6 +89,9 @@ const NewAPIMapping = () => {
             <RightAddSonataProp spec={jsonSpec} method={queryData?.method} />
           )}
           {rightSide === EnumRightType.SelectSellerAPI && <SelectAPI />}
+          {rightSide === EnumRightType.AddSellerResponse && (
+            <SelectResponseProperty />
+          )}
         </div>
       </Flex>
       <Flex

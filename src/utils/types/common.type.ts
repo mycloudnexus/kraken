@@ -53,4 +53,5 @@ export enum EnumRightType {
   SelectSellerAPI,
   AddSonataProp,
   AddSellerProp,
+  AddSellerResponse,
 }

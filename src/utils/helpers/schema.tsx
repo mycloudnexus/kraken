@@ -84,7 +84,7 @@ export const parseObjectDescriptionToTreeData = (
   level = 0,
   prefix = ""
 ) => {
-  if (!keys) return []
+  if (!keys) return [];
   const result: any = Object.entries(keys).map(([key, value]) => {
     const typeOfValue = typeof value;
 
@@ -103,7 +103,7 @@ export const parseObjectDescriptionToTreeData = (
           </Text>
         </Flex>
       ),
-      key: `${prefix}_${key}`,
+      key: `${prefix ? prefix + "_" : ""}${key}`,
       selectable: typeOfValue !== "object",
       children:
         typeOfValue === "object"
@@ -112,7 +112,7 @@ export const parseObjectDescriptionToTreeData = (
               titleClassName,
               exampleClassName,
               level + 1,
-              `${prefix}_${key}`
+              `${prefix ? prefix + "_" : ""}${key}`
             )
           : undefined,
     };

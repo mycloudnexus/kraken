@@ -1,0 +1,40 @@
+.tree {
+  padding: 16px;
+  border: 1px solid #ddd;
+  background-color: #f5f5f5;
+  max-width: 100%;
+  max-height: 500px;
+  overflow: auto;
+
+  :global(.ant-tree-list) {
+    background-color: #f5f5f5;
+  }
+  :global(.ant-tree-treenode),
+  :global(.ant-tree-node-content-wrapper) {
+    width: 100%;
+    &:hover {
+      background-color: #f5f5f5;
+    }
+    &:global(.ant-tree-node-selected) {
+      .treeTitle,
+      .treeValue {
+        background-color: #bae7ff;
+      }
+    }
+  }
+}
+
+.nodeTitle {
+  flex: 1;
+  padding: 2px 4px;
+  background: #fff;
+  word-break: break-all;
+}
+
+.nodeExample {
+  word-break: break-all;
+
+  padding: 2px 4px;
+  background: #fff;
+  width: 50px;
+}

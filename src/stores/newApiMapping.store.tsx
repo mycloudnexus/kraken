@@ -13,6 +13,8 @@ type NewApiMappingStore = {
   setRequestMapping: (mapping: any[]) => void;
   setResponseMapping: (mapping: any) => void;
   reset: () => void;
+  activeResponseName?: string;
+  setActiveResponseName: (a?: string) => void;
 };
 
 const defaultData = {
@@ -21,6 +23,7 @@ const defaultData = {
   rightSide: undefined,
   requestMapping: [],
   responseMapping: undefined,
+  activeResponseName: undefined,
 };
 
 export const useNewApiMappingStore = create<NewApiMappingStore>()((set) => ({
@@ -31,4 +34,5 @@ export const useNewApiMappingStore = create<NewApiMappingStore>()((set) => ({
   setRequestMapping: (requestMapping) => set({ requestMapping }),
   setResponseMapping: (responseMapping) => set({ responseMapping }),
   reset: () => set(defaultData),
+  setActiveResponseName: (value?: string) => set({ activeResponseName: value }),
 }));

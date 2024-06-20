@@ -3,19 +3,29 @@ import {
   COMPONENT_KIND_API,
   COMPONENT_KIND_API_SPEC,
   COMPONENT_KIND_API_TARGET,
+  COMPONENT_KIND_API_TARGET_MAPPER,
 } from "@/utils/constants/product";
 import jsYaml from "js-yaml";
 import { useMemo } from "react";
 
 const useGetApiSpec = (currentProduct: string, query: string) => {
-  const { data: mappingFile } = useGetComponentList(currentProduct, {
+  const { data: mapperResponse } = useGetComponentList(currentProduct, {
+    kind: COMPONENT_KIND_API_TARGET_MAPPER,
+    q: query,
+    facetIncluded: true,
+    page: 0,
+    size: 20,
+  });
+  const mappers = mapperResponse?.data?.[0]?.facets?.endpoints?.[0]?.mappers;
+
+  const { data: targetResponse } = useGetComponentList(currentProduct, {
     kind: COMPONENT_KIND_API_TARGET,
     q: query,
     facetIncluded: true,
     page: 0,
     size: 20,
   });
-  const metadataKey = mappingFile?.data?.[0]?.metadata?.key;
+  const metadataKey = targetResponse?.data?.[0]?.metadata?.key;
 
   const { data: apiComponentList } = useGetComponentList(currentProduct, {
     kind: COMPONENT_KIND_API,
@@ -33,7 +43,6 @@ const useGetApiSpec = (currentProduct: string, query: string) => {
       link.relationship.includes("api-spec")
     )?.targetAssetKey;
   }, [apiComponentList, metadataKey]);
-
   const apiSpec = useMemo(() => {
     if (!apiSpecList || !apiSpecMetadataKey) return undefined;
     return apiSpecList?.data?.find(
@@ -47,6 +56,7 @@ const useGetApiSpec = (currentProduct: string, query: string) => {
     return jsYaml.load(yamlContent);
   }, [apiSpec]);
   return {
+    mappers,
     jsonSpec,
   };
 };
