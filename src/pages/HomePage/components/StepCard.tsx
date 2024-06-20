@@ -70,7 +70,7 @@ const StepCard = () => {
                 <p>{i.desc}</p>
               </Col>
               {n !== 3 && (
-                <Col span={1}>
+                <Col span={1} style={{ textAlign: "center" }}>
                   <RightArrow />
                 </Col>
               )}
