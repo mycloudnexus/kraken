@@ -59,6 +59,7 @@ const EnvStatus = ({
       vertical
       gap={10}
       className={classes(styles.statusWrapper, {
+        [styles.nothing]: dataPlane === 0,
         [styles.success]: status,
         [styles.error]: isDisConnect,
         [styles.warning]: connectStatus === "someConnect",
@@ -72,18 +73,23 @@ const EnvStatus = ({
         <InfoCircleOutlined className={styles.dataPlaneInfoIcon} />
       </Flex>
       <Flex align="center" gap={8}>
-        {isDisConnect ? (
-          <CloseCircleOutlined />
-        ) : connectStatus === "allConnect" ? (
-          <CheckCircleFilled />
+        {dataPlane == 0 ? (
+          <Text.LightSmall style={{ color: "transparent" }}>''</Text.LightSmall>
         ) : (
-          <ExclamationCircleOutlined />
+          <>
+            {isDisConnect ? (
+              <CloseCircleOutlined />
+            ) : connectStatus === "allConnect" ? (
+              <CheckCircleFilled />
+            ) : (
+              <ExclamationCircleOutlined />
+            )}
+            <Text.LightSmall>
+              {`${isDisConnect ? disConnect : connect} / ${dataPlane} `}
+              {isDisConnect ? "Disconnected" : "Connected"}
+            </Text.LightSmall>
+          </>
         )}
-
-        <Text.LightSmall>
-          {`${isDisConnect ? disConnect : connect} / ${dataPlane} `}
-          {isDisConnect ? "Disconnected" : "Connected"}
-        </Text.LightSmall>
       </Flex>
     </Flex>
   );

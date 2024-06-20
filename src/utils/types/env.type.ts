@@ -78,6 +78,14 @@ export interface ICreateParameter {
   envId: string,
   name: string,
 }
+export interface ICreateParameter {
+  productId: string,
+  envId: string,
+  name: string,
+}
+
+
+
 
 
 

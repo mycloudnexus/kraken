@@ -1,20 +1,32 @@
+
 .homePage {
-  width: 100%;
-  min-height: calc(100vh - 58px);
-  display: flex;
-  justify-content: center;
-  background: url('/homebg.svg');
-  background-repeat: no-repeat;
-  background-size: cover; 
-  padding-bottom: 64px;
-  box-sizing: border-box;
+  background: var(--Page-bg, #F0F2F5);
+  padding: 32px 20px 20px 20px;
+  overflow-y:scroll;
+  height: 100%;
+
+  h1{
+    color: #343434;
+    font-size: 38px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 46px; 
+    margin: 0;
+    margin-bottom: 24px;
+
+
+      }
+  .bottomItem{
+    padding: 10px 20px;
+    background: var(--Page-container-bg, #FFF);
+    color: var(--Text-Text_accent, #2962FF);
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 28px; 
+
+
+  }
+
 }
 
-.cardWrapper {
-  margin-top: 35px;
-}
-
-.container {
-  width: 80%;
-  padding-top: 10vh;
-}

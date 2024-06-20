@@ -131,3 +131,15 @@ export const getVersionList = (
     params,
   });
 };
+
+
+
+export const getRunningVersionList = (
+  productId: string,
+  componentId: string,
+) => {
+  return request(`${PRODUCT}/${productId}/components/${componentId}/running-versions`, {
+    method: "GET",
+  });
+};
+

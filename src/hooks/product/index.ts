@@ -13,9 +13,10 @@ import {
   getListComponents,
   getListDeployments,
   getListEnvActivities,
-  getListEnvs,
   getRunningComponentList,
+  getListEnvs,
   getVersionList,
+  getRunningVersionList
 } from "@/services/products";
 import { queryClient } from "@/utils/helpers/reactQuery";
 import {
@@ -37,8 +38,9 @@ import {
 } from "@/utils/types/env.type";
 
 
+
 import { IEnvComponent } from "@/utils/types/envComponent.type";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueries } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { get } from "lodash";
 
@@ -61,6 +63,7 @@ export const PRODUCT_CACHE_KEYS = {
   create_new_version: "create_new_version",
   get_version_list: "get_version_list",
   create_api_key: "create_api_key",
+  get_running_version: "get_running_version",
 };
 
 export const useGetProductComponents = (
@@ -253,7 +256,9 @@ export const useCreateApiKey = () => {
       });
     },
   });
+
 };
+
 
 export const useGetAllDataPlaneList = (
   productId: string,
@@ -308,3 +313,35 @@ export const useGetVersionList = (
     select: (data) => data.data,
   });
 };
+
+export const useGetRunningVersion = (
+  productId: string,
+  componentId: string
+) => {
+  return useQuery<any, Error, IPagingData<IComponentVersion>>({
+    queryKey: [
+      PRODUCT_CACHE_KEYS.get_running_version,
+      productId,
+      componentId,
+
+    ],
+    queryFn: () => getRunningVersionList(productId, componentId),
+    enabled: Boolean(productId && componentId),
+    select: (data) => data.data,
+  });
+};
+
+
+export const useGetRunningVersionList = (params: any) => {
+  const { componentIds = [], productId } = params;
+  return useQueries({
+    queries: componentIds.map((id: string) => ({
+      queryKey: [PRODUCT_CACHE_KEYS.get_running_version, id],
+      queryFn: () => getRunningVersionList(productId, id),
+      enabled: Boolean(productId && id),
+      select: (data: any) => data.data,
+    })),
+  })
+
+};
+

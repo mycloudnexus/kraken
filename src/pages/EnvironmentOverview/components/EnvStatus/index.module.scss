@@ -15,19 +15,19 @@
     --color-background: var(--Accent-Accent_Red, #FF3864);
   }
   &.warning {
-
     --color-background: var(--Accent-Accent_Orange, #FF9A2E);
     --color-border:#fff;
-
   }
   &.notice {
     border: 10px;
     --color-background: var(--DayBreak-Blue-1, #E6F7FF);
     --color-border: var(--Text-secondary, rgba(0, 0, 0, 0.85));
     border-radius: 8px
+  }
+  &.nothing {
 
-
-    
+    --color-background: var(--Accent-Accent_Purple, #9156E4);
+    --color-border:#fff;
   }
  
 }
