@@ -1,10 +1,12 @@
-import { fireEvent, render, renderHook, waitFor } from "@testing-library/react";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient } from "@/utils/helpers/reactQuery";
-import { BrowserRouter } from "react-router-dom";
-import SelectResponseProperty from "@/pages/NewAPIMapping/components/SelectResponseProperty";
 import ResponseMapping from "@/pages/NewAPIMapping/components/ResponseMapping";
+import RightAddSellerProp from "@/pages/NewAPIMapping/components/RightAddSellerProp";
+import RightAddSonataProp from "@/pages/NewAPIMapping/components/RightAddSonataProp";
+import SelectResponseProperty from "@/pages/NewAPIMapping/components/SelectResponseProperty";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
+import { queryClient } from "@/utils/helpers/reactQuery";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { fireEvent, render, renderHook, waitFor } from "@testing-library/react";
+import { BrowserRouter } from "react-router-dom";
 
 beforeAll(() => {
   const { result } = renderHook(() => useNewApiMappingStore());
@@ -72,4 +74,26 @@ test("component new api map page", () => {
     fireEvent.select(select, { target: { value: "acknowledged" } });
     fireEvent.click(element);
   });
+});
+
+test("component RightAddSellerProp", () => {
+  const { container } = render(
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <RightAddSellerProp />
+      </BrowserRouter>
+    </QueryClientProvider>
+  );
+  expect(container).toBeInTheDocument();
+});
+
+test("component RightAddSonataProp", () => {
+  const { container } = render(
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <RightAddSonataProp spec={undefined} method="GET" />
+      </BrowserRouter>
+    </QueryClientProvider>
+  );
+  expect(container).toBeInTheDocument();
 });

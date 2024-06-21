@@ -64,7 +64,7 @@ const RenderList = ({ data, componentId, tab }: Readonly<Props>) => {
         >
           <Flex align="center" justify="space-between">
             <Flex align="center" gap={16}>
-              <LogMethodTag method={s.method.toUpperCase()} />
+              <LogMethodTag method={s.method} />
               <Text.NormalMedium>{s.path}</Text.NormalMedium>
               <Text.NormalMedium color="rgba(0,0,0,0.45)"> </Text.NormalMedium>
             </Flex>

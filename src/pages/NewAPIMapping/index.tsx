@@ -14,21 +14,33 @@ import {
   Tabs,
   TabsProps,
 } from "antd";
+import { isEmpty, uniqBy } from "lodash";
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import RequestMapping from "./components/RequestMapping";
 import ResponseMapping from "./components/ResponseMapping";
+import RightAddSellerProp from "./components/RightAddSellerProp";
 import RightAddSonataProp from "./components/RightAddSonataProp";
 import SelectAPI from "./components/SelectAPI";
+import SelectResponseProperty from "./components/SelectResponseProperty";
 import useGetApiSpec from "./components/useGetApiSpec";
 import styles from "./index.module.scss";
-import SelectResponseProperty from "./components/SelectResponseProperty";
-import { isEmpty } from "lodash";
 
 const NewAPIMapping = () => {
   const { componentId } = useParams();
+  const location = useLocation();
   const { currentProduct } = useAppStore();
-  const { query, rightSide, setResponseMapping } = useNewApiMappingStore();
+  const {
+    query,
+    rightSide,
+    requestMapping,
+    rightSideInfo,
+    setRequestMapping,
+    setRightSide,
+    setRightSideInfo,
+    setResponseMapping,
+    reset,
+  } = useNewApiMappingStore();
   const queryData = JSON.parse(query ?? "{}");
   const [activeKey, setActiveKey] = useState<string | string[]>("0");
   const [step] = useState(0);
@@ -51,6 +63,17 @@ const NewAPIMapping = () => {
       ),
     },
   ];
+  const { jsonSpec, mappers } = useGetApiSpec(currentProduct, query ?? "{}");
+  useEffect(() => {
+    if (!requestMapping.length && mappers?.request?.length) {
+      setRequestMapping(mappers?.request ?? []);
+    }
+  }, [mappers, requestMapping, setRequestMapping]);
+  useEffect(() => {
+    if (!isEmpty(mappers?.response)) {
+      setResponseMapping(mappers?.response);
+    }
+  }, [mappers?.response]);
   const items: TabsProps["items"] = [
     {
       key: "request",
@@ -63,14 +86,71 @@ const NewAPIMapping = () => {
       children: <ResponseMapping />,
     },
   ];
-  const { jsonSpec, mappers } = useGetApiSpec(currentProduct, query ?? "{}");
+  const handleSelectSonataProp = (selected: any) => {
+    if (rightSideInfo?.method === "add") {
+      const updatedMapping = uniqBy(
+        [
+          ...requestMapping,
+          {
+            sourceLocation: selected.location,
+            source: selected.name,
+            title: selected.title,
+          },
+        ],
+        (rm) =>
+          `${rm.source}_${rm.sourceLocation}_${rm.target}_${rm.targetLocation}`
+      );
+      setRequestMapping(updatedMapping);
+    }
+    if (rightSideInfo?.method === "update") {
+      const updatedMapping = uniqBy(
+        requestMapping.map((rm) => {
+          if (
+            rm.source === rightSideInfo?.previousData?.source &&
+            rm.sourceLocation === rightSideInfo?.previousData?.sourceLocation
+          ) {
+            return {
+              ...rm,
+              source: selected.name,
+              sourceLocation: selected.location,
+            };
+          }
+          return rm;
+        }),
+        (rm) =>
+          `${rm.source}_${rm.sourceLocation}_${rm.target}_${rm.targetLocation}`
+      );
+      setRequestMapping(updatedMapping);
+    }
+    setRightSideInfo(undefined);
+    setRightSide(undefined);
+  };
+  const handleSelectSellerProp = (selected: any) => {
+    const updatedMapping = uniqBy(
+      requestMapping.map((rm) => {
+        if (
+          rm.target === rightSideInfo?.previousData?.target &&
+          rm.targetLocation === rightSideInfo?.previousData?.targetLocation
+        ) {
+          return {
+            ...rm,
+            target: selected.name,
+            targetLocation: selected.location,
+          };
+        }
+        return rm;
+      }),
+      (rm) =>
+        `${rm.source}_${rm.sourceLocation}_${rm.target}_${rm.targetLocation}`
+    );
+    setRequestMapping(updatedMapping);
+  };
 
   useEffect(() => {
-    if (!isEmpty(mappers?.response)) {
-      setResponseMapping(mappers?.response);
-    }
-  }, [mappers?.response]);
-
+    return () => {
+      reset();
+    };
+  }, [location]);
   return (
     <Flex vertical style={{ backgroundColor: "#f0f2f5", height: "100%" }}>
       <StepBar
@@ -86,9 +166,16 @@ const NewAPIMapping = () => {
         </div>
         <div className={styles.right}>
           {rightSide === EnumRightType.AddSonataProp && (
-            <RightAddSonataProp spec={jsonSpec} method={queryData?.method} />
+            <RightAddSonataProp
+              spec={jsonSpec}
+              method={queryData?.method}
+              onSelect={handleSelectSonataProp}
+            />
           )}
           {rightSide === EnumRightType.SelectSellerAPI && <SelectAPI />}
+          {rightSide === EnumRightType.AddSellerProp && (
+            <RightAddSellerProp onSelect={handleSelectSellerProp} />
+          )}
           {rightSide === EnumRightType.AddSellerResponse && (
             <SelectResponseProperty />
           )}

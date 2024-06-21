@@ -5,33 +5,51 @@ import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { EnumRightType } from "@/utils/types/common.type";
 import { RightOutlined } from "@ant-design/icons";
 import { Collapse, CollapseProps, Flex, Tag, Typography } from "antd";
-import { capitalize } from "lodash";
+import { capitalize, groupBy } from "lodash";
 import SonataPropMapping from "../SonataPropMapping";
 import styles from "./index.module.scss";
 import clsx from "clsx";
+import { useEffect, useMemo } from "react";
+import { IRequestMapping } from "@/utils/types/component.type";
 
 const RequestMapping = () => {
-  const { query, sellerApi, rightSide, setRightSide } = useNewApiMappingStore();
+  const { query, sellerApi, rightSide, setRightSide, requestMapping } =
+    useNewApiMappingStore();
+  useEffect(() => {
+    console.log("1", sellerApi);
+  }, [sellerApi]);
   const queryData = JSON.parse(query ?? "{}");
-  const items: CollapseProps["items"] = [
-    {
-      key: "1",
-      label: (
-        <>
-          <div>
-            <Text.NormalLarge>Property mapping</Text.NormalLarge>
-          </div>
-          <div>
-            <Text.NormalMedium color="rgba(0, 0, 0, 0.45)">
-              Please map the following Sonata API response properties with
-              Seller API response
-            </Text.NormalMedium>
-          </div>
-        </>
-      ),
-      children: <SonataPropMapping />,
-    },
-  ];
+  const items: CollapseProps["items"] = useMemo(() => {
+    if (requestMapping.length === 0) {
+      return [
+        {
+          label: <Text.NormalLarge>Property mapping</Text.NormalLarge>,
+          key: "title",
+          children: <SonataPropMapping list={[]} title="Property mapping" />,
+        },
+      ];
+    }
+    const requestMappingGroupedByTitle = groupBy(
+      requestMapping,
+      (request) => request.title
+    );
+    return Object.entries(requestMappingGroupedByTitle).map(
+      ([title, listMapping]) => ({
+        key: title,
+        label: <Text.NormalLarge>{title}</Text.NormalLarge>,
+        children: (
+          <SonataPropMapping
+            list={listMapping as IRequestMapping[]}
+            title={title}
+          />
+        ),
+      })
+    );
+  }, [requestMapping]);
+  const defaultActiveKeys = useMemo(() => {
+    if (requestMapping.length === 0) return ["title"];
+    return requestMapping.map((rm) => rm.title);
+  }, [requestMapping]);
   return (
     <>
       <Flex gap={60}>
@@ -69,7 +87,7 @@ const RequestMapping = () => {
           style={{ flex: "0 0 calc(50% - 30px)", width: "calc(50% - 30px)" }}
           className={styles.sonataAPIBasicInfoWrapper}
         >
-          <LogMethodTag method={queryData?.method?.toUpperCase()} />
+          <LogMethodTag method={queryData?.method} />
           <Typography.Text
             style={{ flex: 1, color: "#595959" }}
             ellipsis={{ tooltip: true }}
@@ -94,7 +112,7 @@ const RequestMapping = () => {
           <Flex align="center" gap={12}>
             {sellerApi ? (
               <>
-                <LogMethodTag method={sellerApi.method.toUpperCase()} />
+                <LogMethodTag method={sellerApi.method} />
                 <Typography.Text
                   style={{ flex: 1 }}
                   ellipsis={{ tooltip: true }}
@@ -111,7 +129,12 @@ const RequestMapping = () => {
           <RightOutlined style={{ color: "rgba(0, 0, 0, 0.45)" }} />
         </Flex>
       </Flex>
-      <Collapse ghost items={items} className={styles.collapse} />
+      <Collapse
+        ghost
+        items={items}
+        defaultActiveKey={defaultActiveKeys}
+        className={styles.collapse}
+      />
     </>
   );
 };

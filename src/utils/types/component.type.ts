@@ -11,3 +11,13 @@ export interface IProductWithComponentVersion {
   name: string;
   componentVersions: IComponentVersion[];
 }
+
+export interface IRequestMapping {
+  name: string;
+  description: string;
+  source: string;
+  sourceLocation: string;
+  target: string;
+  targetLocation: string;
+  title: string;
+}

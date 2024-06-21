@@ -1,6 +1,5 @@
 import ServerIcon from "@/assets/server-icon.svg";
 import Flex from "@/components/Flex";
-import RequestMethod from "@/components/Method";
 import Text from "@/components/Text";
 import { useGetComponentList } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
@@ -17,6 +16,7 @@ import { useNavigate } from "react-router-dom";
 import swaggerClient from "swagger-client";
 import { useBoolean } from "usehooks-ts";
 import styles from "./index.module.scss";
+import LogMethodTag from "@/components/LogMethodTag";
 
 type ItemProps = {
   item: IComponent;
@@ -130,7 +130,7 @@ const APIItem = ({ item }: ItemProps) => {
                   gap={12}
                   style={{ marginTop: 12 }}
                 >
-                  <RequestMethod method={method} />
+                  <LogMethodTag method={method} />
                   <Tooltip title={url}>
                     <Typography.Text ellipsis={{ tooltip: true }}>
                       {url}

@@ -103,7 +103,7 @@ export const parseObjectDescriptionToTreeData = (
           </Text>
         </Flex>
       ),
-      key: `${prefix ? prefix + "_" : ""}${key}`,
+      key: prefix ? `${prefix}.${key}` : key,
       selectable: typeOfValue !== "object",
       children:
         typeOfValue === "object"
@@ -112,7 +112,7 @@ export const parseObjectDescriptionToTreeData = (
               titleClassName,
               exampleClassName,
               level + 1,
-              `${prefix ? prefix + "_" : ""}${key}`
+              prefix ? `${prefix}.${key}` : key
             )
           : undefined,
     };

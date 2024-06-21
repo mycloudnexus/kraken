@@ -8,7 +8,8 @@ interface Props {
   method: string;
 }
 const LogMethodTag = ({ method }: Readonly<Props>) => {
-  const correctMethod = availableMethods.includes(method);
+  const uppercasedMethod = method?.toLocaleUpperCase();
+  const correctMethod = availableMethods.includes(uppercasedMethod);
   const color = useMemo(() => {
     if (!correctMethod) return "default";
     return {
@@ -17,14 +18,14 @@ const LogMethodTag = ({ method }: Readonly<Props>) => {
       PATCH: "cyan",
       PUT: "orange",
       DELETE: "red",
-    }[method];
-  }, [method, correctMethod]);
+    }[uppercasedMethod];
+  }, [uppercasedMethod, correctMethod]);
 
   if (!correctMethod) return null;
 
   return (
     <Tag bordered={false} color={color} className={styles.tag}>
-      {method}
+      {uppercasedMethod}
     </Tag>
   );
 };
