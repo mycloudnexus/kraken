@@ -24,7 +24,7 @@ const APIServerEditSelection = () => {
   const [schemas, setSchemas] = useState<any>([]);
   const [targetKeys, setTargetKeys] = useState<TransferProps["targetKeys"]>([]);
   const navigate = useNavigate();
-  const { mutateAsync: runUpdate } = useEditComponent();
+  const { mutateAsync: runUpdate, isPending } = useEditComponent();
 
   useEffect(() => {
     try {
@@ -34,13 +34,15 @@ const APIServerEditSelection = () => {
       const base64data = get(detailData, "facets.baseSpec.content");
       let swaggerData;
       let fileDecode = "";
+      let newData;
       if (base64data) {
         fileDecode = decode(get(detailData, "facets.baseSpec.content"));
         swaggerData = jsYaml.load(fileDecode) as any;
         setSchemas(swaggerData?.components?.schemas);
-        setTransferData(tranformSwaggerToArray(swaggerData));
+        newData = tranformSwaggerToArray(swaggerData);
+        setTransferData(newData);
+        setSelectedAPI(get(newData, "[0]"));
       }
-      setTargetKeys(get(detailData, "facets.selectedAPIs"));
     } catch (error) {
       notification.error({ message: "Error. Please try again" });
     }
@@ -120,7 +122,12 @@ const APIServerEditSelection = () => {
         </div>
         <Flex justifyContent="flex-end" gap={12} style={{ marginTop: 14 }}>
           <Button onClick={() => navigate(-1)}>Cancel</Button>
-          <Button type="primary" onClick={handleAPI}>
+          <Button
+            type="primary"
+            onClick={handleAPI}
+            disabled={isPending}
+            loading={isPending}
+          >
             OK
           </Button>
         </Flex>

@@ -29,7 +29,7 @@ type Props = {
 
 const APIEditor = ({ detail, onClose, refresh, componentId }: Props) => {
   const { currentProduct } = useAppStore();
-  const { mutateAsync: runUpdate } = useEditComponent();
+  const { mutateAsync: runUpdate, isPending } = useEditComponent();
   const [form] = Form.useForm();
   const [isChangedFile, setIsChangedFile] = useState(false);
   const file = Form.useWatch("file", form);
@@ -271,7 +271,12 @@ const APIEditor = ({ detail, onClose, refresh, componentId }: Props) => {
               gap={12}
             >
               <Button onClick={onClose}>Cancel</Button>
-              <Button type="primary" htmlType="submit">
+              <Button
+                type="primary"
+                htmlType="submit"
+                disabled={isPending}
+                loading={isPending}
+              >
                 OK
               </Button>
             </Flex>
