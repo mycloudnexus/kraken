@@ -8,7 +8,15 @@ import clsx from "clsx";
 import { Button, Input, Select, Typography } from "antd";
 import { DeleteOutlined, RightOutlined } from "@ant-design/icons";
 import React, { useEffect, useState } from "react";
-import { get, isEmpty } from "lodash";
+import {
+  chain,
+  cloneDeep,
+  difference,
+  fromPairs,
+  get,
+  isEmpty,
+  set,
+} from "lodash";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { EnumRightType } from "@/utils/types/common.type";
 
@@ -25,9 +33,37 @@ const ResponseMapping = () => {
     responseMapping,
     setActiveResponseName,
     query,
+    setResponseMapping,
   } = useNewApiMappingStore();
   const queryData = JSON.parse(query ?? "{}");
   const [listMapping, setListMapping] = useState<IMapping[]>([]);
+
+  const handleSelect = (v: string, key: number) => {
+    const cloneArr = cloneDeep(listMapping);
+    const index = listMapping.findIndex((l) => l.key === key);
+    set(cloneArr, `[${index}].from`, v);
+    setListMapping(cloneArr);
+  };
+
+  useEffect(() => {
+    const newData = chain(listMapping)
+      .groupBy("name")
+      .map((items, name) => ({
+        name,
+        valueMapping: fromPairs(items.map((item) => [item.from, item.to])),
+      }))
+      .value();
+    if (isEmpty(newData)) {
+      return;
+    }
+    const newResponse = cloneDeep(responseMapping);
+    for (const n of newData) {
+      const index = newResponse?.findIndex((i: any) => (i.name = n.name));
+      set(newResponse, `[${index}].valueMapping`, n.valueMapping);
+    }
+    setResponseMapping(newResponse);
+  }, [listMapping]);
+
   const handleAdd = (name: string) => {
     setListMapping([
       ...listMapping,
@@ -41,6 +77,12 @@ const ResponseMapping = () => {
   };
   const handleDelete = (key: number) => {
     setListMapping(listMapping.filter((item) => item.key !== key));
+  };
+  const handleChangeInput = (v: string, key: number) => {
+    const cloneArr = cloneDeep(listMapping);
+    const index = listMapping.findIndex((l) => l.key === key);
+    set(cloneArr, `[${index}].to`, v);
+    setListMapping(cloneArr);
   };
   useEffect(() => {
     if (isEmpty(sellerApi)) {
@@ -140,15 +182,17 @@ const ResponseMapping = () => {
                               gap={12}
                             >
                               <Select
+                                data-testid="select-sonata-state"
+                                onSelect={(v) => handleSelect(v, key)}
                                 placeholder="State"
                                 style={{ flex: 1 }}
                                 value={from}
-                                options={item?.targetValues?.map(
-                                  (name: string) => ({
-                                    title: name,
-                                    value: name,
-                                  })
-                                )}
+                                options={difference(
+                                  item?.targetValues,
+                                  listMapping
+                                    ?.filter((l) => l.name === item.name)
+                                    .map((item) => item.from)
+                                ).map((item) => ({ title: item, value: item }))}
                               />
                               {index !== 0 && (
                                 <DeleteOutlined
@@ -163,6 +207,7 @@ const ResponseMapping = () => {
                       type="primary"
                       style={{ marginTop: 16 }}
                       onClick={() => handleAdd(item?.name)}
+                      data-testid="btn-add-state"
                     >
                       Add state
                     </Button>
@@ -233,6 +278,9 @@ const ResponseMapping = () => {
                             style={{ width: "100%" }}
                             value={to}
                             className={styles.input}
+                            onChange={(e) =>
+                              handleChangeInput(e.target.value, key)
+                            }
                           />
                         </React.Fragment>
                       ))}
