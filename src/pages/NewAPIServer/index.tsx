@@ -12,6 +12,7 @@ import BtnStep from "./components/BtnStep";
 import SelectAPIServer from "./components/SelectAPIServer";
 import SelectDownStreamAPI from "./components/SelectDownStreamAPI";
 import styles from "./index.module.scss";
+import PreviewAPIServer from "./components/PreviewAPIServer";
 
 const NewAPIServer = () => {
   const [activeKey, setActiveKey] = useState<string | string[]>("0");
@@ -35,7 +36,7 @@ const NewAPIServer = () => {
           ["environments", "stage"],
         ]);
       }
-      if (step === 2) {
+      if (step === 3) {
         form.submit();
         return;
       }
@@ -97,6 +98,11 @@ const NewAPIServer = () => {
     }
   };
 
+  const handleBack = (step: number) => {
+    setStep(step);
+    setActiveKey([step.toString()]);
+  };
+
   return (
     <Form form={form} onFinish={onFinish}>
       <div className={styles.root}>
@@ -110,15 +116,26 @@ const NewAPIServer = () => {
           <SelectAPIServer form={form} active={step === 0} />
           <AddEnv form={form} active={step === 2} />
           <SelectDownStreamAPI form={form} active={step === 1} />
+          <PreviewAPIServer
+            form={form}
+            active={step === 3}
+            handleBack={handleBack}
+          />
           <Form.Item noStyle shouldUpdate>
             {({ getFieldValue }) => {
               const disabled =
                 (isEmpty(getFieldValue("name")) ||
                   isEmpty(getFieldValue("file"))) &&
                 step === 0;
+              const disabledEnv =
+                isEmpty(getFieldValue(["environments", "sit"])) &&
+                isEmpty(getFieldValue(["environments", "prod"])) &&
+                isEmpty(getFieldValue(["environments", "stage"])) &&
+                isEmpty(getFieldValue(["environments", "uat"])) &&
+                step == 2;
               return (
                 <BtnStep
-                  disabled={disabled}
+                  disabled={disabled || disabledEnv}
                   loading={loadingCreate}
                   onNext={handleNext}
                   onPrev={handlePrev}

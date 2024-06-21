@@ -2,6 +2,7 @@ import Flex from "@/components/Flex";
 import Text from "@/components/Text";
 import styles from "./index.module.scss";
 import {
+  Empty,
   Form,
   FormInstance,
   Transfer,
@@ -40,6 +41,7 @@ export const tranformSwaggerToArray = (data: any) => {
 };
 
 const SelectDownStreamAPI = ({ form, active }: Props) => {
+  const name = Form.useWatch("name", form);
   const [selectedAPI, setSelectedAPI] = useState<any>();
   const [transferData, setTransferData] = useState<any>([]);
   const [targetKeys, setTargetKeys] = useState<TransferProps["targetKeys"]>([]);
@@ -93,11 +95,11 @@ const SelectDownStreamAPI = ({ form, active }: Props) => {
         className={styles.selectAPIWrapper}
       >
         <div style={{ flex: 3 }}>
-          <Text.BoldLarge>Select API for the API server</Text.BoldLarge>
-          <p>
-            <Text.NormalLarge>Console connect application</Text.NormalLarge>
-          </p>
+          <Text.BoldLarge>Select Seller APIs</Text.BoldLarge>
           <div className={styles.paper}>
+            <div style={{ marginBottom: 12 }}>
+              <Text.NormalLarge>{name}</Text.NormalLarge>
+            </div>
             <Form.Item noStyle name="selectedAPIs" valuePropName="targetKeys">
               <Transfer
                 filterOption={(inputValue: string, option: any) =>
@@ -127,6 +129,9 @@ const SelectDownStreamAPI = ({ form, active }: Props) => {
                   itemUnit: "",
                   itemsUnit: "",
                   searchPlaceholder: "Please select",
+                  notFoundContent: (
+                    <Empty description="Please select API from the API list" />
+                  ),
                 }}
               />
             </Form.Item>

@@ -8,9 +8,10 @@ import Text from "@/components/Text";
 type Props = {
   item: any;
   schemas: any;
+  showTitle?: boolean;
 };
 
-const RequestBody = ({ item, schemas }: Props) => {
+const RequestBody = ({ item, schemas, showTitle = true }: Props) => {
   const data = useMemo(() => {
     if (isEmpty(item?.content)) {
       return undefined;
@@ -46,7 +47,10 @@ const RequestBody = ({ item, schemas }: Props) => {
     if (typeof schemaUrl !== "string") {
       return undefined;
     }
-    const schemaProperties = get(item, `content[${objectKey}].schema.properties`);
+    const schemaProperties = get(
+      item,
+      `content[${objectKey}].schema.properties`
+    );
     if (!isEmpty(schemaProperties)) {
       return exampleParse(
         schemaProperties,
@@ -67,8 +71,8 @@ const RequestBody = ({ item, schemas }: Props) => {
     <></>
   ) : (
     <>
-      <Text.LightLarge>Request body</Text.LightLarge>
-      <div>
+      {showTitle && <Text.LightLarge>Request body</Text.LightLarge>}
+      <div style={{ marginTop: showTitle ? 0 : 12 }}>
         <Button
           style={{
             borderColor: "#1677ff",

@@ -4,7 +4,7 @@ import { DownOutlined, RightOutlined } from "@ant-design/icons";
 import { Button, Input, Tag, Tree } from "antd";
 import { useBoolean } from "usehooks-ts";
 import styles from "./index.module.scss";
-import { Key, useMemo } from "react";
+import { Key, useCallback, useMemo, useState } from "react";
 import { clone, get, isEmpty, set } from "lodash";
 
 import {
@@ -25,6 +25,7 @@ const SelectResponseProperty = () => {
     setActiveResponseName,
   } = useNewApiMappingStore();
   const { value: isOpen, toggle: toggleOpen } = useBoolean(true);
+  const [searchValue, setSearchValue] = useState("");
 
   const dataTree = useMemo(() => {
     if (isEmpty(sellerApi)) return [];
@@ -70,6 +71,22 @@ const SelectResponseProperty = () => {
     );
   }, [sellerApi]);
 
+  const findMatchingElements = useCallback((data: any, search: string): any => {
+    if (!search) {
+      return data;
+    }
+    return data?.filter((i: any) => {
+      if (i.key?.includes(search)) {
+        return true;
+      }
+      if (!isEmpty(i.children)) {
+        return !isEmpty(findMatchingElements(i.children, search));
+      }
+      return false;
+    });
+  }, []);
+
+  const newTreeData = findMatchingElements(dataTree, searchValue);
   return (
     <div>
       <Text.BoldLarge>Select response property</Text.BoldLarge>
@@ -77,6 +94,8 @@ const SelectResponseProperty = () => {
         <Search
           placeholder="input search text"
           style={{ width: "80%", marginBottom: 8 }}
+          value={searchValue}
+          onChange={(e) => setSearchValue(e.target.value)}
         />
         <Flex justifyContent="flex-start" gap={2}>
           <Tag color="green">String</Tag>
@@ -103,7 +122,7 @@ const SelectResponseProperty = () => {
           <div style={{ marginTop: 8 }}>
             <div className={styles.tree}>
               <Tree
-                treeData={dataTree}
+                treeData={newTreeData}
                 selectable
                 onSelect={(keys: Key[]) => {
                   const mainKey: any = get(keys, "[0]");

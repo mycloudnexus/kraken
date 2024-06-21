@@ -85,7 +85,7 @@
 .transfer {
   :global {
     .ant-transfer-list {
-      height: calc(100vh - 244px);
+      height: calc(100vh - 234px);
       flex: 1;
     }
     .ant-transfer-operation {
@@ -145,32 +145,22 @@
   min-width: 200px;
 }
 
-.infoWrapper {
-  overflow-y: auto;
-  background: #fff;
-  width: 100%;
-  max-width: calc((100vw - 280px) * 2 / 3);
-  height: calc(100vh - 134px);
-  padding: 10px 20px;
-  box-sizing: border-box;
-  > div {
-    position: relative;
-  }
-}
-
 .selectAPIWrapper {
   position: relative;
 }
 
 .tableSwagger {
-  box-sizing: border-box;
   margin-top: 12px;
+  width: 100%;
+  box-sizing: border-box;
   .specialTd {
     background: #f5f5f5;
   }
   td {
-    padding: 12px;
-    border-bottom: 1px solid #f5f5f5;
+    padding: 4px 0;
+  }
+  th {
+    text-align: left;
   }
   border-spacing: 0;
 }
@@ -226,6 +216,40 @@
     .ant-upload-drag {
       width: 395px;
       height: fit-content;
+    }
+  }
+}
+
+.infoWrapper {
+  overflow-y: auto;
+  width: 100%;
+  max-width: calc((100vw - 280px) * 2 / 3);
+  padding: 10px 20px;
+  box-sizing: border-box;
+  height: calc(100vh - 192px);
+  > div {
+    position: relative;
+  }
+}
+
+.infoRoot {
+  background: #fff;
+}
+
+.infoHeader {
+  padding: 16px 20px;
+  border-bottom: 1px solid #f0f0f0;
+  height: 58px;
+  box-sizing: border-box;
+}
+
+.swaggerCollapse {
+  :global {
+    .ant-collapse-header {
+      padding: 0 !important;
+    }
+    .ant-collapse-content-box {
+      padding: 0 !important;
     }
   }
 }

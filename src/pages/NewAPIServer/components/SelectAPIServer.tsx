@@ -49,10 +49,10 @@ const SelectAPIServer = ({ form, active }: Props) => {
         onOk={handleReplace}
         onCancel={closeModal}
       />
-      <Text.BoldLarge>Add information for the API server</Text.BoldLarge>
+      <Text.BoldLarge>Add information for Seller API server</Text.BoldLarge>
       <div className={styles.paper} style={{ flex: 1 }}>
         <Form.Item
-          label="API server name"
+          label="Seller API Server Name"
           name="name"
           rules={[
             {

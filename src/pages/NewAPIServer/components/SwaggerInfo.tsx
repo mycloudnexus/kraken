@@ -1,11 +1,13 @@
 import Text from "@/components/Text";
 import styles from "./index.module.scss";
-import { isEmpty } from "lodash";
-import { Table } from "antd";
+import { get, isEmpty } from "lodash";
+import { Collapse, Table } from "antd";
 import { useMemo } from "react";
 import Response from "./Response";
 import RequestBody from "./RequestBody";
 import RequestMethod from "@/components/Method";
+import TitleIcon from "@/assets/title-icon.svg";
+import Flex from "@/components/Flex";
 
 type Props = {
   item: {
@@ -38,53 +40,165 @@ const SwaggerInfo = ({ item, schemas }: Props) => {
   );
 
   return (
-    <div className={styles.infoWrapper}>
-      <div>
-        <Text.Custom size="20px">API details</Text.Custom>
-        {!isEmpty(item) && (
-          <>
-            <table className={styles.tableSwagger} role="none">
-              <tr>
-                <td className={styles.specialTd}>Name</td>
-                <td>
-                  {item?.title} - {item?.description}
-                </td>
-              </tr>
-              <tr>
-                <td className={styles.specialTd}>Method</td>
-                <td>
-                  <RequestMethod method={item?.description} />
-                </td>
-              </tr>
-              <tr>
-                <td className={styles.specialTd}>Path</td>
-                <td>{item?.title}</td>
-              </tr>
-              <tr>
-                <td className={styles.specialTd}>Description</td>
-                <td>{item?.info?.description}</td>
-              </tr>
-            </table>
-            {!isEmpty(item?.info?.parameters) && (
-              <div className={styles.tableParams}>
-                <Text.LightLarge>Parameters</Text.LightLarge>
-                <Table
-                  rowKey={(item: any) => item.name}
-                  dataSource={item?.info?.parameters}
-                  columns={columns}
-                  pagination={false}
+    <div className={styles.infoRoot}>
+      <div className={styles.infoHeader}>
+        <Text.NormalLarge>
+          {get(
+            item,
+            "info.summary",
+            get(
+              item,
+              "info.description",
+              `${item?.title} - ${item?.description}`
+            )
+          )}
+        </Text.NormalLarge>
+      </div>
+      <div className={styles.infoWrapper}>
+        <div>
+          {!isEmpty(item) && (
+            <>
+              <Collapse
+                defaultActiveKey={["collapse-content"]}
+                className={styles.swaggerCollapse}
+                ghost
+                expandIconPosition="end"
+                items={[
+                  {
+                    key: "collapse-content",
+                    label: (
+                      <Flex gap={8} justifyContent="flex-start">
+                        <TitleIcon />
+                        <Text.NormalLarge>Basics</Text.NormalLarge>
+                      </Flex>
+                    ),
+                    children: (
+                      <div>
+                        <table className={styles.tableSwagger} role="none">
+                          <tr>
+                            <th>
+                              <Text.LightMedium color="#00000073">
+                                Method
+                              </Text.LightMedium>
+                            </th>
+                            <th>
+                              <Text.LightMedium color="#00000073">
+                                Path
+                              </Text.LightMedium>
+                            </th>
+                          </tr>
+                          <tr>
+                            <td>
+                              <RequestMethod method={item?.description} />
+                            </td>
+                            <td>
+                              <td>{item?.title}</td>
+                            </td>
+                          </tr>
+                        </table>
+                        <table className={styles.tableSwagger}>
+                          <tr>
+                            <th>
+                              <Text.LightMedium color="#00000073">
+                                Description
+                              </Text.LightMedium>
+                            </th>
+                          </tr>
+                          <tr>
+                            <td>{item?.info?.description}</td>
+                          </tr>
+                        </table>
+                      </div>
+                    ),
+                  },
+                ]}
+              />
+              {!isEmpty(item?.info?.parameters) && (
+                <Collapse
+                  style={{ marginTop: 12 }}
+                  defaultActiveKey={["collapse-params-content"]}
+                  className={styles.swaggerCollapse}
+                  ghost
+                  expandIconPosition="end"
+                  items={[
+                    {
+                      key: "collapse-params-content",
+                      label: (
+                        <Flex gap={8} justifyContent="flex-start">
+                          <TitleIcon />
+                          <Text.NormalLarge>Parameters</Text.NormalLarge>
+                        </Flex>
+                      ),
+                      children: (
+                        <Table
+                          style={{ marginTop: 12 }}
+                          rowKey={(item: any) => item.name}
+                          dataSource={item?.info?.parameters}
+                          columns={columns}
+                          pagination={false}
+                        />
+                      ),
+                    },
+                  ]}
                 />
-              </div>
-            )}
-            <div className={styles.tableParams}>
-              <RequestBody item={item?.info?.requestBody} schemas={schemas} />
-            </div>
-            <div className={styles.tableParams}>
-              <Text.LightLarge>Response</Text.LightLarge>
-              <Response item={item?.info?.responses} schemas={schemas} />
-            </div>
-          </>
-        )}
+              )}
+              {!isEmpty(item?.info?.requestBody) && (
+                <Collapse
+                  style={{ marginTop: 12 }}
+                  defaultActiveKey={["collapse-body-content"]}
+                  className={styles.swaggerCollapse}
+                  ghost
+                  expandIconPosition="end"
+                  items={[
+                    {
+                      key: "collapse-body-content",
+                      label: (
+                        <Flex gap={8} justifyContent="flex-start">
+                          <TitleIcon />
+                          <Text.NormalLarge>Request</Text.NormalLarge>
+                        </Flex>
+                      ),
+                      children: (
+                        <RequestBody
+                          showTitle={false}
+                          item={item?.info?.requestBody}
+                          schemas={schemas}
+                        />
+                      ),
+                    },
+                  ]}
+                />
+              )}
+
+              <Collapse
+                style={{ marginTop: 12 }}
+                defaultActiveKey={["collapse-response-content"]}
+                className={styles.swaggerCollapse}
+                ghost
+                expandIconPosition="end"
+                items={[
+                  {
+                    key: "collapse-response-content",
+                    label: (
+                      <Flex gap={8} justifyContent="flex-start">
+                        <TitleIcon />
+                        <Text.NormalLarge>Response</Text.NormalLarge>
+                      </Flex>
+                    ),
+                    children: (
+                      <div style={{ marginTop: 12 }}>
+                        <Response
+                          item={item?.info?.responses}
+                          schemas={schemas}
+                        />
+                      </div>
+                    ),
+                  },
+                ]}
+              />
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

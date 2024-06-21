@@ -6,6 +6,7 @@ type Props = {
   active: boolean;
 };
 const AddEnv = ({ form, active }: Props) => {
+  const name = Form.useWatch("name", form);
   const isSIT = Form.useWatch("isSIT", form);
   const isProd = Form.useWatch("isProd", form);
   const isStage = Form.useWatch("isStage", form);
@@ -18,16 +19,17 @@ const AddEnv = ({ form, active }: Props) => {
         flexDirection: "column",
       }}
     >
-      <Text.BoldLarge>Add information for the API server</Text.BoldLarge>
-      <p>
-        <Text.NormalLarge>Console connect application</Text.NormalLarge>
-      </p>
+      <Text.BoldLarge>Add base URL for environment variables</Text.BoldLarge>
       <div className={styles.paper} style={{ flex: 1 }}>
         <Row gutter={[40, 16]}>
           <Col span={24}>
-            <Text.LightLarge>
-              Environment Variables <span style={{ color: "#FF4D4F" }}>*</span>
-            </Text.LightLarge>
+            <Text.NormalLarge>{name}</Text.NormalLarge>
+          </Col>
+          <Col span={24}>
+            <Text.NormalMedium>
+              Base URL for environment variables{" "}
+              <span style={{ color: "#FF4D4F" }}>*</span>
+            </Text.NormalMedium>
           </Col>
           <Col span={4}>
             <Form.Item name="isSIT" valuePropName="checked">
