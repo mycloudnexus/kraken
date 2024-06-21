@@ -1,10 +1,10 @@
 import LogMethodTag from "@/components/LogMethodTag";
-import Text from "@/components/Text";
+
 import { useGetProductEnvActivityDetail } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
 import { parseObjectDescriptionToTreeData } from "@/utils/helpers/schema";
 import { IActivityLog } from "@/utils/types/env.type";
-import { Collapse, Flex, Modal, Spin, Table, Tag, Tree } from "antd";
+import { Flex, Button, Spin, Table, Tree, Drawer, Typography } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { useCallback, useMemo } from "react";
 import styles from "./index.module.scss";
@@ -28,11 +28,11 @@ const ActivityDetailModal = ({
     activityId
   );
   const activityList = useMemo(
-    () => (data ? [data.main, ...data.branches] : []),
+    () => (data ? [data.main, ...(data.branches ?? [])] : []),
     [data]
   );
   const collapseItems = useCallback(
-    (activity: IActivityLog) => {
+    (activity: IActivityLog): any => {
       const parameterList = Object.entries(activity.queryParameters).map(
         ([key, value]) => ({
           key,
@@ -51,100 +51,81 @@ const ActivityDetailModal = ({
           render: (item) => `${item.type}`,
         },
       ];
-      return [
-        {
-          key: "param",
-          label: "Parameters",
-          children: (
-            <Table
-              columns={parameterColumns}
-              dataSource={parameterList}
-              pagination={false}
-            />
-          ),
-        },
-        {
-          key: "request",
-          label: "Request body",
-          children: (
-            <div className={styles.tree}>
-              <Tree
-                treeData={parseObjectDescriptionToTreeData(
-                  activity.request,
-                  styles.treeTitle,
-                  styles.treeExample
-                )}
-              />
-            </div>
-          ),
-        },
-        {
-          key: "response",
-          label: "Response",
-          children: (
-            <div className={styles.tree}>
-              <Tree
-                treeData={parseObjectDescriptionToTreeData(
-                  activity.response,
-                  styles.treeTitle,
-                  styles.treeExample
-                )}
-              />
-            </div>
-          ),
-        },
-      ];
+      return { parameterList, parameterColumns };
     },
     [data]
   );
+
   const handleOk = () => setOpen(false);
   return (
-    <Modal
-      title="View downstream API"
+    <Drawer
+      title="View Details"
+      onClose={handleOk}
       open={open}
-      onOk={handleOk}
-      cancelButtonProps={{
-        style: {
-          display: "none",
-        },
-      }}
-      onCancel={handleOk}
-      width="auto"
+      width={"80%"}
+      footer={
+        <div style={{ textAlign: "right" }}>
+          <Button type="primary" onClick={handleOk}>
+            OK
+          </Button>
+        </div>
+      }
     >
       <Spin spinning={isLoading}>
         <Flex
-          gap={33}
+          gap={18}
           align="stretch"
-          style={{ maxHeight: "calc(100vh - 240px)" }}
+          style={{ maxHeight: "calc(100vh - 108px)" }}
         >
-          {activityList?.map((activity) => (
-            <div
-              className={styles.activityWrapper}
-              key={`${activity.method}_${activity.path}`}
-            >
-              <Flex vertical gap={24} className={styles.activityHeader}>
-                <Text.Custom size="24px">
-                  geographicAddressValidation
-                </Text.Custom>
-                <Flex gap={8} align="center">
-                  <LogMethodTag method={activity.method} />
-                  <Tag bordered={false}>{activity.path}</Tag>
-                  <Text.NormalMedium style={{ color: "#8c8c8c" }}>
-                    Creates a GeographicAddressValidation
-                  </Text.NormalMedium>
+          {activityList?.map((activity, n) => (
+            <div className={styles.activity} key={activity.requestId}>
+              <h1>{n === 0 ? "Sonota API" : "Seller API"}</h1>
+              <div
+                className={styles.activityWrapper}
+                key={`${activity.method}_${activity.path}`}
+              >
+                <Flex vertical gap={24} className={styles.activityHeader}>
+                  <Flex gap={8} align="center">
+                    <LogMethodTag method={activity.method} />
+                    <Typography.Text ellipsis={{ tooltip: true }}>
+                      {activity.path}
+                    </Typography.Text>
+                  </Flex>
                 </Flex>
-              </Flex>
-              <Collapse
-                items={collapseItems(activity)}
-                bordered={false}
-                defaultActiveKey={["param", "request", "response"]}
-                className={styles.collapseWrapper}
-              />
+                <div className={styles.activityBody}>
+                  <h3>Parameters</h3>
+                  <Table
+                    columns={collapseItems(activity)?.parameterColumns}
+                    dataSource={collapseItems(activity)?.parameterList}
+                    pagination={false}
+                  />
+                  <h3>Request body</h3>
+                  <div className={styles.tree}>
+                    <Tree
+                      treeData={parseObjectDescriptionToTreeData(
+                        activity.request,
+                        styles.treeTitle,
+                        styles.treeExample
+                      )}
+                    />
+                  </div>
+                  <h3>Responses</h3>
+                  <div className={styles.tree}>
+                    <Tree
+                      treeData={parseObjectDescriptionToTreeData(
+                        activity.response,
+                        styles.treeTitle,
+                        styles.treeExample
+                      )}
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
           ))}
         </Flex>
       </Spin>
-    </Modal>
+    </Drawer>
   );
 };
 

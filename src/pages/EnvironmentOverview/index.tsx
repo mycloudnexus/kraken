@@ -1,4 +1,3 @@
-import ComponentIcon from "@/assets/component.svg";
 import Text from "@/components/Text";
 import dayjs from "dayjs";
 import {
@@ -29,7 +28,7 @@ import {
   Tag,
   Col,
   notification,
-  Tooltip,
+  Typography,
 } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -185,7 +184,7 @@ const EnvironmentOverview = () => {
     {
       key: "env",
       title: "Environment",
-      render: (h) => <Tag bordered={false}>{h.name}</Tag>,
+      render: (h) => h.name,
     },
     {
       key: "components",
@@ -194,7 +193,6 @@ const EnvironmentOverview = () => {
         <Flex vertical gap={20}>
           {h.components.map((component: any) => (
             <Flex gap={4} align="center" key={component.id}>
-              <ComponentIcon />
               {component.componentName}
             </Flex>
           ))}
@@ -221,13 +219,8 @@ const EnvironmentOverview = () => {
     },
     {
       key: "createdAt",
-      title: "Timestamp",
+      title: "Deployed time",
       render: (h) => toDateTime(h.createdAt),
-    },
-    {
-      key: "action",
-      title: "Action",
-      render: () => <>Version detail | Mapping | View details</>,
     },
   ];
   return (
@@ -280,17 +273,12 @@ const EnvironmentOverview = () => {
                     <div className={styles.runningContainer}>
                       {getRunningList(env.id)?.map((r) => (
                         <Row justify={"space-between"} key={r.id}>
-                          {r.componentName?.length > 50 ? (
-                            <Tooltip title={r.componentName}>
-                              <Col span={21} className={styles.running}>
-                                {r.componentName}
-                              </Col>
-                            </Tooltip>
-                          ) : (
-                            <Col span={21} className={styles.running}>
-                              {r.componentName}
-                            </Col>
-                          )}
+                          <Typography.Text
+                            className={styles.running}
+                            ellipsis={{ tooltip: true }}
+                          >
+                            {r.componentName}
+                          </Typography.Text>
 
                           <Col>{r.version}</Col>
                         </Row>
