@@ -100,24 +100,23 @@ const ApiComponents = () => {
           {componentList?.data?.map((i: IUnifiedAsset, n: number) => {
             const { targetSpec = {}, targetYaml = {} } = getTargetSpecItem(i);
             const supportInfo = getSupportInfo(i);
+            const title = targetYaml.info?.title;
+            const apis = i.facets.supportedProductTypesAndActions?.length ?? 0;
             return (
               <Col className={styles.apiContainer} key={i.id}>
                 {
                   <Row justify={"space-between"} align={"top"}>
                     <Col span={19}>
                       <Row style={{ width: "100%" }}>
-                        <img
-                          src={targetSpec.metadata?.logo}
-                          alt={targetYaml.info?.title}
-                        ></img>
+                        <img src={targetSpec.metadata?.logo} alt={title}></img>
                         <Col className={styles.titleContainer}>
                           <Row className={styles.title} align={"middle"}>
-                            <b> {targetYaml.info?.title}</b>
-                            <span>
-                              {i.facets.supportedProductTypesAndActions
-                                ?.length ?? 0}
-                            </span>
-                            Apis
+                            {getTextDom(
+                              <b>{title}</b>,
+                              title?.length > 18,
+                              title
+                            )}
+                            <span>{apis}</span> Api
                           </Row>
                           <Row>
                             {Object.keys(i.metadata.labels).map((l) => {
@@ -143,6 +142,7 @@ const ApiComponents = () => {
                     </Col>
                   </Row>
                 }
+
                 {getTextDom(
                   <p className={styles.desc}>{targetYaml.info?.description}</p>,
                   targetYaml.info?.description?.length > 310,

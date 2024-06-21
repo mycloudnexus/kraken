@@ -34,17 +34,25 @@ const HomePage = () => {
       <ApiComponents />
       <Row justify={"space-between"}>
         <Col span={11}>
-          <Row justify={"space-between"} className={styles.bottomItem}>
+          <Row
+            justify={"space-between"}
+            className={styles.bottomItem}
+            onClick={() => navigate(`/env`)}
+          >
             <Col>Environments overview </Col>
-            <Col onClick={() => navigate(`/env`)}>
+            <Col>
               <MoreIcon />
             </Col>
           </Row>
         </Col>
         <Col span={11}>
-          <Row justify={"space-between"} className={styles.bottomItem}>
+          <Row
+            justify={"space-between"}
+            className={styles.bottomItem}
+            onClick={navigateApi}
+          >
             <Col>Seller APIs {`(${apiList?.total ?? 0})`}</Col>
-            <Col onClick={navigateApi}>
+            <Col>
               <MoreIcon />
             </Col>
           </Row>
