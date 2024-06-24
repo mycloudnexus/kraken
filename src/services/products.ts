@@ -3,8 +3,7 @@ import request from "@/utils/helpers/request";
 import { INewVersionParams } from "@/utils/types/product.type";
 import { ICreateParameter } from "@/utils/types/env.type";
 
-import type { IPagingParams } from '@/utils/types/common.type'
-
+import type { IPagingParams } from "@/utils/types/common.type";
 
 export const getListComponents = (
   productId: string,
@@ -79,16 +78,14 @@ export const deployProduct = (
   });
 
 export const getAllApiKeyList = (productId: string, params: IPagingParams) => {
-  return (request(`${PRODUCT}/${productId}/env-api-tokens`, {
+  return request(`${PRODUCT}/${productId}/env-api-tokens`, {
     method: "GET",
-    params
-  }))
+    params,
+  });
 };
 
-
-
 export const createApiKey = (payload: ICreateParameter) => {
-  const { productId, envId, name } = payload
+  const { productId, envId, name } = payload;
   return request(`${PRODUCT}/${productId}/envs/${envId}/api-tokens`, {
     method: "POST",
     data: {
@@ -97,17 +94,20 @@ export const createApiKey = (payload: ICreateParameter) => {
   });
 };
 
-export const getAllDataPlaneList = (productId: string, params: IPagingParams) => {
+export const getAllDataPlaneList = (
+  productId: string,
+  params: IPagingParams
+) => {
   return request(`${PRODUCT}/${productId}/env-clients`, {
     method: "GET",
-    params
-  })
+    params,
+  });
 };
 export const getRunningComponentList = (productId: string, params: any) => {
   return request(`${PRODUCT}/${productId}/deployments`, {
     method: "GET",
-    params
-  })
+    params,
+  });
 };
 export const createNewVersion = (data: INewVersionParams) => {
   const { productId, componentId, componentKey, versionName, version } = data;
@@ -132,14 +132,28 @@ export const getVersionList = (
   });
 };
 
-
-
 export const getRunningVersionList = (
   productId: string,
-  componentId: string,
+  componentId: string
 ) => {
-  return request(`${PRODUCT}/${productId}/components/${componentId}/running-versions`, {
-    method: "GET",
-  });
+  return request(
+    `${PRODUCT}/${productId}/components/${componentId}/running-versions`,
+    {
+      method: "GET",
+    }
+  );
 };
 
+export const updateTargetMapper = (
+  productId: string,
+  componentId: string,
+  data: unknown
+) => {
+  return request(
+    `${PRODUCT}/${productId}/components/${componentId}/targetMapper`,
+    {
+      method: "PATCH",
+      data,
+    }
+  );
+};

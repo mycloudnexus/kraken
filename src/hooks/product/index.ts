@@ -16,7 +16,8 @@ import {
   getRunningComponentList,
   getListEnvs,
   getVersionList,
-  getRunningVersionList
+  getRunningVersionList,
+  updateTargetMapper,
 } from "@/services/products";
 import { queryClient } from "@/utils/helpers/reactQuery";
 import {
@@ -36,8 +37,6 @@ import {
   IEnv,
   IRunningComponentItem,
 } from "@/utils/types/env.type";
-
-
 
 import { IEnvComponent } from "@/utils/types/envComponent.type";
 import { useMutation, useQuery, useQueries } from "@tanstack/react-query";
@@ -64,6 +63,7 @@ export const PRODUCT_CACHE_KEYS = {
   get_version_list: "get_version_list",
   create_api_key: "create_api_key",
   get_running_version: "get_running_version",
+  update_target_mapper: "update_target_mapper",
 };
 
 export const useGetProductComponents = (
@@ -256,9 +256,7 @@ export const useCreateApiKey = () => {
       });
     },
   });
-
 };
-
 
 export const useGetAllDataPlaneList = (
   productId: string,
@@ -319,18 +317,12 @@ export const useGetRunningVersion = (
   componentId: string
 ) => {
   return useQuery<any, Error, IPagingData<IComponentVersion>>({
-    queryKey: [
-      PRODUCT_CACHE_KEYS.get_running_version,
-      productId,
-      componentId,
-
-    ],
+    queryKey: [PRODUCT_CACHE_KEYS.get_running_version, productId, componentId],
     queryFn: () => getRunningVersionList(productId, componentId),
     enabled: Boolean(productId && componentId),
     select: (data) => data.data,
   });
 };
-
 
 export const useGetRunningVersionList = (params: any) => {
   const { componentIds = [], productId } = params;
@@ -341,7 +333,13 @@ export const useGetRunningVersionList = (params: any) => {
       enabled: Boolean(productId && id),
       select: (data: any) => data.data,
     })),
-  })
-
+  });
 };
 
+export const useUpdateTargetMapper = () => {
+  return useMutation<any, Error>({
+    mutationKey: [PRODUCT_CACHE_KEYS.update_target_mapper],
+    mutationFn: ({ productId, componentId, data }: any) =>
+      updateTargetMapper(productId, componentId, data),
+  });
+};

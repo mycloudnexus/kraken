@@ -13,10 +13,11 @@ import {
   Flex,
   Tabs,
   TabsProps,
+  notification,
 } from "antd";
-import { isEmpty, uniqBy } from "lodash";
+import { cloneDeep, get, isEmpty, uniqBy } from "lodash";
 import { useEffect, useState } from "react";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import RequestMapping from "./components/RequestMapping";
 import ResponseMapping from "./components/ResponseMapping";
 import RightAddSellerProp from "./components/RightAddSellerProp";
@@ -25,15 +26,18 @@ import SelectAPI from "./components/SelectAPI";
 import SelectResponseProperty from "./components/SelectResponseProperty";
 import useGetApiSpec from "./components/useGetApiSpec";
 import styles from "./index.module.scss";
+import { useUpdateTargetMapper } from "@/hooks/product";
 
 const NewAPIMapping = () => {
   const { componentId } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
   const { currentProduct } = useAppStore();
   const {
     query,
     rightSide,
     requestMapping,
+    responseMapping,
     rightSideInfo,
     setRequestMapping,
     setRightSide,
@@ -41,6 +45,8 @@ const NewAPIMapping = () => {
     setResponseMapping,
     reset,
   } = useNewApiMappingStore();
+  const { mutateAsync: updateTargetMapper, isPending } =
+    useUpdateTargetMapper();
   const queryData = JSON.parse(query ?? "{}");
   const [activeKey, setActiveKey] = useState<string | string[]>("0");
   const [step] = useState(0);
@@ -63,7 +69,10 @@ const NewAPIMapping = () => {
       ),
     },
   ];
-  const { jsonSpec, mappers } = useGetApiSpec(currentProduct, query ?? "{}");
+  const { jsonSpec, mappers, mapperResponse } = useGetApiSpec(
+    currentProduct,
+    query ?? "{}"
+  );
   useEffect(() => {
     if (!requestMapping.length && mappers?.request?.length) {
       setRequestMapping(mappers?.request ?? []);
@@ -74,6 +83,7 @@ const NewAPIMapping = () => {
       setResponseMapping(mappers?.response);
     }
   }, [mappers?.response]);
+  const [tabActiveKey, setTabActiveKey] = useState("request");
   const items: TabsProps["items"] = [
     {
       key: "request",
@@ -145,6 +155,36 @@ const NewAPIMapping = () => {
     );
     setRequestMapping(updatedMapping);
   };
+  const handleCancel = () => {
+    navigate(-1);
+  };
+  const handleNext = () => {
+    setTabActiveKey("response");
+  };
+  const handlePrev = () => {
+    setTabActiveKey("request");
+  };
+  const handleSave = async () => {
+    console.log(mapperResponse, requestMapping, responseMapping)
+    try {
+      const data = cloneDeep(mapperResponse.data[0]);
+      data.facets.endpoints[0].mappers = {
+        request: requestMapping,
+        response: responseMapping,
+      };
+      const res = await updateTargetMapper({
+        productId: currentProduct,
+        componentId: data.metadata.id,
+        data,
+      } as any);
+      notification.success({ message: res.message });
+      navigate(-1);
+    } catch (error) {
+      notification.error({
+        message: get(error, "message", "Error on creating/updating mapping"),
+      });
+    }
+  };
 
   useEffect(() => {
     return () => {
@@ -162,7 +202,11 @@ const NewAPIMapping = () => {
       <Breadcrumb items={breadcrumb} className={styles.breadcrumb} />
       <Flex gap={20} className={styles.mainWrapper}>
         <div className={styles.center}>
-          <Tabs items={items} />
+          <Tabs
+            items={items}
+            activeKey={tabActiveKey}
+            onChange={(ak) => setTabActiveKey(ak)}
+          />
         </div>
         <div className={styles.right}>
           {rightSide === EnumRightType.AddSonataProp && (
@@ -187,11 +231,22 @@ const NewAPIMapping = () => {
         gap={8}
         className={styles.bottomWrapper}
       >
-        <Button>Cancel</Button>
-        <Button>Save and exit</Button>
-        <Button type="primary" disabled>
-          Next
+        <Button type="text" onClick={handleCancel}>
+          Cancel
         </Button>
+        {tabActiveKey === "request" && (
+          <Button type="primary" onClick={handleNext}>
+            Next
+          </Button>
+        )}
+        {tabActiveKey === "response" && (
+          <>
+            <Button onClick={handlePrev}>Previous</Button>
+            <Button type="primary" onClick={handleSave} loading={isPending}>
+              Save and exit
+            </Button>
+          </>
+        )}
       </Flex>
     </Flex>
   );

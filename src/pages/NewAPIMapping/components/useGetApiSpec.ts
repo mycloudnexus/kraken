@@ -56,6 +56,7 @@ const useGetApiSpec = (currentProduct: string, query: string) => {
     return jsYaml.load(yamlContent);
   }, [apiSpec]);
   return {
+    mapperResponse,
     mappers,
     jsonSpec,
   };
