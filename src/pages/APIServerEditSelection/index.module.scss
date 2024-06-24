@@ -1,8 +1,11 @@
 .root {
-  background: #f0f2f5;
-  padding: 2px 0 12px;
   height: calc(100vh - 58px);
   max-height: calc(100vh - 58px);
+  background: #f0f2f5;
+}
+
+.container {
+  padding: 2px 0 0;
   box-sizing: border-box;
   padding-left: 8px;
 }
@@ -18,6 +21,7 @@
   padding: 14px 20px;
   width: 100%;
   box-sizing: border-box;
+  border-radius: 4px;
 }
 
 .transfer {
@@ -30,7 +34,7 @@
       padding: 5px 0 5px 12px;
     }
     .ant-transfer-list {
-      height: calc(100vh - 308px);
+      height: calc(100vh - 230px);
       flex: 1;
     }
     .ant-transfer-operation {
@@ -76,4 +80,12 @@
       }
     }
   }
+}
+
+.appTitle {
+  margin-bottom: 12px;
+}
+
+.info {
+  height: calc(100vh - 194px);
 }

@@ -156,6 +156,7 @@ const EnvironmentActivityLog = () => {
               <span
                 onClick={() => navigate("/env")}
                 className={styles.breadHeader}
+                role="none"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

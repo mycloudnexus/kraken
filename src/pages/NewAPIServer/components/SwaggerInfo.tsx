@@ -8,6 +8,7 @@ import RequestBody from "./RequestBody";
 import RequestMethod from "@/components/Method";
 import TitleIcon from "@/assets/title-icon.svg";
 import Flex from "@/components/Flex";
+import clsx from "clsx";
 
 type Props = {
   item: {
@@ -17,9 +18,10 @@ type Props = {
     description: string;
   };
   schemas: any;
+  className?: string;
 };
 
-const SwaggerInfo = ({ item, schemas }: Props) => {
+const SwaggerInfo = ({ item, schemas, className }: Props) => {
   const columns = useMemo(
     () => [
       {
@@ -54,7 +56,7 @@ const SwaggerInfo = ({ item, schemas }: Props) => {
           )}
         </Text.NormalLarge>
       </div>
-      <div className={styles.infoWrapper}>
+      <div className={clsx([styles.infoWrapper, className])}>
         <div>
           {!isEmpty(item) && (
             <>

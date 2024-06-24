@@ -1,4 +1,4 @@
-import { Modal, Table, notification } from "antd";
+import { Button, Col, Drawer, Row, Table, notification } from "antd";
 import { decode } from "js-base64";
 import jsYaml from "js-yaml";
 import { get } from "lodash";
@@ -8,6 +8,8 @@ import styles from "./index.module.scss";
 import RequestMethod from "../Method";
 import RequestBody from "@/pages/NewAPIServer/components/RequestBody";
 import Response from "@/pages/NewAPIServer/components/Response";
+import Flex from "../Flex";
+import { CloseOutlined } from "@ant-design/icons";
 
 type Props = {
   content: string;
@@ -33,39 +35,6 @@ const APIViewerModal = ({ selectedAPI, content, isOpen, onClose }: Props) => {
       notification.error({ message: "Can not load yaml" });
     }
   }, [selectedAPI, content]);
-
-  const basicCol = useMemo(
-    () => [
-      {
-        title: "Name",
-        dataIndex: "name",
-      },
-      {
-        title: "Method",
-        dataIndex: "method",
-        render: (method: string) => <RequestMethod method={method} />,
-      },
-      {
-        title: "Description",
-        dataIndex: "description",
-      },
-    ],
-    []
-  );
-
-  const basicData = useMemo(() => {
-    if (!viewData || !selectedAPI) {
-      return undefined;
-    }
-    const selectedArray = selectedAPI.split(" ");
-    return [
-      {
-        name: get(selectedArray, "[0]"),
-        method: get(selectedArray, "[1]"),
-        description: viewData?.description,
-      },
-    ];
-  }, [viewData, selectedAPI]);
 
   const paramCol = useMemo(
     () => [
@@ -96,28 +65,72 @@ const APIViewerModal = ({ selectedAPI, content, isOpen, onClose }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewData]);
 
+  const basicData = useMemo(() => {
+    if (!viewData || !selectedAPI) {
+      return undefined;
+    }
+    const selectedArray = selectedAPI.split(" ");
+    return {
+      name: get(selectedArray, "[0]"),
+      method: get(selectedArray, "[1]"),
+      description: viewData?.description,
+    };
+  }, [viewData, selectedAPI]);
+
   return (
-    <Modal
+    <Drawer
       className={styles.modal}
       open={isOpen}
-      onOk={onClose}
+      title={
+        <Flex justifyContent="space-between">
+          <Text.BoldLarge>API details</Text.BoldLarge>
+          <CloseOutlined
+            style={{ color: "#00000073" }}
+            onClick={onClose}
+            role="none"
+          />
+        </Flex>
+      }
       closable={false}
-      cancelButtonProps={{ style: { display: "none" } }}
-      width="80vw"
+      width="65vw"
+      footer={
+        <Flex justifyContent="flex-end">
+          <Button type="primary" onClick={onClose}>
+            OK
+          </Button>
+        </Flex>
+      }
     >
       <div>
-        <Text.BoldLarge>View API</Text.BoldLarge>
         <div className={styles.basicInfo}>
-          <Table
-            className={styles.table}
-            pagination={false}
-            columns={basicCol}
-            dataSource={basicData}
-          />
+          <Row gutter={[12, 20]}>
+            <Col span={8}>
+              <Flex flexDirection="column" alignItems="flex-start" gap={8}>
+                <Text.LightMedium color="#00000073">Method</Text.LightMedium>
+                <RequestMethod method={basicData?.method} />
+              </Flex>
+            </Col>
+            <Col span={16}>
+              <Flex flexDirection="column" alignItems="flex-start" gap={8}>
+                <Text.LightMedium color="#00000073">Path</Text.LightMedium>
+                <Text.LightMedium>{basicData?.name}</Text.LightMedium>
+              </Flex>
+            </Col>
+            <Col span={24}>
+              <Flex flexDirection="column" alignItems="flex-start" gap={8}>
+                <Text.LightMedium color="#00000073">
+                  Description
+                </Text.LightMedium>
+                <Text.LightMedium>{basicData?.description}</Text.LightMedium>
+              </Flex>
+            </Col>
+          </Row>
         </div>
         {paramData ? (
           <div className={styles.params}>
-            <Text.LightMedium>Parameters</Text.LightMedium>
+            <div className={styles.title}>
+              <Text.NormalMedium>Parameters</Text.NormalMedium>
+            </div>
             <Table
               className={styles.table}
               columns={paramCol}
@@ -129,18 +142,27 @@ const APIViewerModal = ({ selectedAPI, content, isOpen, onClose }: Props) => {
         <div className={styles.apiDetail}>
           {viewData?.requestBody && (
             <div style={{ flex: 1 }}>
-              <RequestBody item={viewData.requestBody} schemas={schemas} />
+              <div className={styles.title}>
+                <Text.NormalMedium>Request body</Text.NormalMedium>
+              </div>
+              <RequestBody
+                item={viewData.requestBody}
+                schemas={schemas}
+                showTitle={false}
+              />
             </div>
           )}
           {viewData?.responses && (
             <div style={{ flex: 1 }}>
-              <Text.LightLarge>Response</Text.LightLarge>
+              <div className={styles.title}>
+                <Text.NormalMedium>Response</Text.NormalMedium>
+              </div>
               <Response item={viewData.responses} schemas={schemas} />
             </div>
           )}
         </div>
       </div>
-    </Modal>
+    </Drawer>
   );
 };
 

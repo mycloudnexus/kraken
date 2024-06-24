@@ -6,11 +6,12 @@ import styles from "./index.module.scss";
 import Text from "@/components/Text";
 import Flex from "@/components/Flex";
 import { useEffect, useState } from "react";
-import { Button, Transfer, TransferProps, notification } from "antd";
+import { Button, Empty, Transfer, TransferProps, notification } from "antd";
 import { cloneDeep, get, isEmpty, set } from "lodash";
 import { decode } from "js-base64";
 import jsYaml from "js-yaml";
 import { tranformSwaggerToArray } from "../NewAPIServer/components/SelectDownStreamAPI";
+import { LeftOutlined } from "@ant-design/icons";
 
 const APIServerEditSelection = () => {
   const { currentProduct } = useAppStore();
@@ -75,68 +76,91 @@ const APIServerEditSelection = () => {
   };
 
   return (
-    <Flex
-      justifyContent="flex-start"
-      gap={16}
-      alignItems="flex-start"
-      className={styles.root}
-    >
-      <div className={styles.transferSection}>
-        <Text.BoldLarge>Select API for the API server</Text.BoldLarge>
-        <p>
-          <Text.NormalLarge>Console connect application</Text.NormalLarge>
-        </p>
-        <div className={styles.paper}>
-          <Transfer
-            filterOption={(inputValue: string, option: any) =>
-              option.key.indexOf(inputValue) > -1
-            }
-            listStyle={{
-              boxSizing: "border-box",
-            }}
-            dataSource={transferData}
-            titles={["API list", "Selected API"]}
-            showSelectAll
-            showSearch
-            selectionsIcon={<></>}
-            locale={{
-              itemUnit: "",
-              itemsUnit: "",
-              searchPlaceholder: "Please select",
-            }}
-            className={styles.transfer}
-            onChange={handleChange}
-            render={(item) => (
-              <div
-                style={{ width: "100%" }}
-                key={`${item.title} - ${item.description}`}
-                role="none"
-                onClick={(e) => {
-                  e?.stopPropagation();
-                  e?.preventDefault();
-                  setSelectedAPI(item);
-                }}
-              >{`${item.title} - ${item.description}`}</div>
-            )}
-            targetKeys={targetKeys}
+    <div className={styles.root}>
+      <Flex
+        justifyContent="flex-start"
+        gap={16}
+        alignItems="flex-start"
+        className={styles.container}
+      >
+        <div className={styles.transferSection}>
+          <Flex
+            gap={8}
+            justifyContent="flex-start"
+            style={{ cursor: "pointer", marginBottom: 4 }}
+            role="none"
+            onClick={() => navigate(-1)}
+          >
+            <LeftOutlined style={{ fontSize: 8 }} />
+            <Text.LightLarge color="#434343">
+              <span>Seller API Setup</span>
+              <span style={{ color: "#848587" }}>/Edit select API</span>
+            </Text.LightLarge>
+          </Flex>
+          <div className={styles.paper}>
+            <div className={styles.appTitle}>
+              <Text.NormalLarge>
+                {get(detailData, "metadata.name")}
+              </Text.NormalLarge>
+            </div>
+            <Transfer
+              filterOption={(inputValue: string, option: any) =>
+                option.key.indexOf(inputValue) > -1
+              }
+              listStyle={{
+                boxSizing: "border-box",
+              }}
+              dataSource={transferData}
+              titles={["API list", "Selected API"]}
+              showSelectAll
+              showSearch
+              selectionsIcon={<></>}
+              locale={{
+                searchPlaceholder: "Please select",
+                itemUnit: "",
+                itemsUnit: "",
+                notFoundContent: (
+                  <Empty description="Please select API from the API list" />
+                ),
+              }}
+              className={styles.transfer}
+              onChange={handleChange}
+              render={(item) => (
+                <div
+                  style={{ width: "100%" }}
+                  key={`${item.title} - ${item.description}`}
+                  role="none"
+                  onClick={(e) => {
+                    e?.stopPropagation();
+                    e?.preventDefault();
+                    setSelectedAPI(item);
+                  }}
+                >{`${item.title} - ${item.description}`}</div>
+              )}
+              targetKeys={targetKeys}
+            />
+          </div>
+        </div>
+        <div className={styles.apiDetail} style={{ flex: 2 }}>
+          <SwaggerInfo
+            item={selectedAPI}
+            schemas={schemas}
+            className={styles.info}
           />
         </div>
-        <Flex justifyContent="flex-end" gap={12} style={{ marginTop: 14 }}>
-          <Button onClick={() => navigate(-1)}>Cancel</Button>
-          <Button
-            type="primary"
-            onClick={handleAPI}
-            disabled={isPending}
-            loading={isPending}
-          >
-            OK
-          </Button>
-        </Flex>
-      </div>
-      <div className={styles.apiDetail} style={{ flex: 2 }}>
-        <SwaggerInfo item={selectedAPI} schemas={schemas} />
-      </div>
-    </Flex>
+      </Flex>
+      <Flex justifyContent="flex-end" gap={12} style={{ padding: 12 }}>
+        <Button onClick={() => navigate(-1)}>Cancel</Button>
+        <Button
+          type="primary"
+          onClick={handleAPI}
+          disabled={isPending}
+          loading={isPending}
+        >
+          OK
+        </Button>
+      </Flex>
+    </div>
   );
 };
 
