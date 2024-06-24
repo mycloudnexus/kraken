@@ -1,5 +1,5 @@
 import StepBar from "@/components/StepBar";
-import { useCreateNewComponent } from "@/hooks/product";
+import { useCreateNewComponent, useGetProductEnvs } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
 import { EStep } from "@/utils/constants/common";
 import { COMPONENT_KIND_API_TARGET_SPEC } from "@/utils/constants/product";
@@ -17,6 +17,8 @@ import PreviewAPIServer from "./components/PreviewAPIServer";
 const NewAPIServer = () => {
   const [activeKey, setActiveKey] = useState<string | string[]>("0");
   const { currentProduct: id } = useAppStore();
+  const { data: dataEnv } = useGetProductEnvs(id);
+  const env = get(dataEnv, "data", []);
   const [form] = Form.useForm();
   const [step, setStep] = useState(0);
   const { mutateAsync: runCreate, isPending: loadingCreate } =
@@ -29,12 +31,7 @@ const NewAPIServer = () => {
         await form.validateFields(["file", "name", "description", "link"]);
       }
       if (step === 2) {
-        await form.validateFields([
-          ["environments", "sit"],
-          ["environments", "uat"],
-          ["environments", "prod"],
-          ["environments", "stage"],
-        ]);
+        await form.validateFields(env?.map((e) => ["environments", e.name]));
       }
       if (step === 3) {
         form.submit();
@@ -114,7 +111,7 @@ const NewAPIServer = () => {
         />
         <div className={styles.container}>
           <SelectAPIServer form={form} active={step === 0} />
-          <AddEnv form={form} active={step === 2} />
+          <AddEnv form={form} active={step === 2} env={env} />
           <SelectDownStreamAPI form={form} active={step === 1} />
           <PreviewAPIServer
             form={form}
@@ -127,12 +124,17 @@ const NewAPIServer = () => {
                 (isEmpty(getFieldValue("name")) ||
                   isEmpty(getFieldValue("file"))) &&
                 step === 0;
-              const disabledEnv =
-                isEmpty(getFieldValue(["environments", "sit"])) &&
-                isEmpty(getFieldValue(["environments", "prod"])) &&
-                isEmpty(getFieldValue(["environments", "stage"])) &&
-                isEmpty(getFieldValue(["environments", "uat"])) &&
-                step == 2;
+
+              const checkConditionEnv = () => {
+                return env.reduce((prev, curr) => {
+                  return (
+                    prev ||
+                    (!!getFieldValue(`is${curr.name}`) &&
+                      !isEmpty(getFieldValue(["environments", curr.name])))
+                  );
+                }, false);
+              };
+              const disabledEnv = !checkConditionEnv() && step == 2;
               return (
                 <BtnStep
                   disabled={disabled || disabledEnv}

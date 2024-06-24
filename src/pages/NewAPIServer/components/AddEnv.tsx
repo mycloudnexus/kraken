@@ -1,16 +1,15 @@
 import Text from "@/components/Text";
 import styles from "./index.module.scss";
 import { Col, Form, Row, Input, Checkbox, FormInstance } from "antd";
+import { IEnv } from "@/utils/types/env.type";
 type Props = {
   form: FormInstance<any>;
   active: boolean;
+  env: IEnv[];
 };
-const AddEnv = ({ form, active }: Props) => {
+const AddEnv = ({ form, active, env }: Props) => {
   const name = Form.useWatch("name", form);
-  const isSIT = Form.useWatch("isSIT", form);
-  const isProd = Form.useWatch("isProd", form);
-  const isStage = Form.useWatch("isStage", form);
-  const isUat = Form.useWatch("isUat", form);
+
   return (
     <div
       style={{
@@ -31,66 +30,42 @@ const AddEnv = ({ form, active }: Props) => {
               <span style={{ color: "#FF4D4F" }}>*</span>
             </Text.NormalMedium>
           </Col>
-          <Col span={4}>
-            <Form.Item name="isSIT" valuePropName="checked">
-              <Checkbox>Development</Checkbox>
-            </Form.Item>
-          </Col>
-          <Col span={20}>
-            <Form.Item
-              name={["environments", "sit"]}
-              label="URL:"
-              className={styles.inputUrl}
-              rules={[{ required: isSIT, message: "Please fill the url" }]}
-            >
-              <Input placeholder="Add URL" disabled={!isSIT} />
-            </Form.Item>
-          </Col>
-          <Col span={4}>
-            <Form.Item name="isProd" valuePropName="checked">
-              <Checkbox>Production</Checkbox>
-            </Form.Item>
-          </Col>
-          <Col span={20}>
-            <Form.Item
-              name={["environments", "prod"]}
-              label="URL:"
-              className={styles.inputUrl}
-              rules={[{ required: isProd, message: "Please fill the url" }]}
-            >
-              <Input placeholder="Add URL" disabled={!isProd} />
-            </Form.Item>
-          </Col>
-          <Col span={4}>
-            <Form.Item name="isStage" valuePropName="checked">
-              <Checkbox>Stage</Checkbox>
-            </Form.Item>
-          </Col>
-          <Col span={20}>
-            <Form.Item
-              name={["environments", "stage"]}
-              label="URL:"
-              className={styles.inputUrl}
-              rules={[{ required: isStage, message: "Please fill the url" }]}
-            >
-              <Input placeholder="Add URL" disabled={!isStage} />
-            </Form.Item>
-          </Col>
-          <Col span={4}>
-            <Form.Item name="isUat" valuePropName="checked">
-              <Checkbox>UAT</Checkbox>
-            </Form.Item>
-          </Col>
-          <Col span={20}>
-            <Form.Item
-              name={["environments", "uat"]}
-              label="URL:"
-              className={styles.inputUrl}
-              rules={[{ required: isUat, message: "Please fill the url" }]}
-            >
-              <Input placeholder="Add URL" disabled={!isUat} />
-            </Form.Item>
-          </Col>
+          {env?.map((e) => (
+            <>
+              <Col span={4}>
+                <Form.Item name={`is${e.name}`} valuePropName="checked">
+                  <Checkbox
+                    onChange={(event) => {
+                      if (!event.target.checked) {
+                        form.setFieldValue(["environments", e.name], undefined);
+                      }
+                    }}
+                  >
+                    {e.name}
+                  </Checkbox>
+                </Form.Item>
+              </Col>
+              <Col span={20}>
+                <Form.Item noStyle shouldUpdate>
+                  {({ getFieldValue }) => {
+                    const isEnv = getFieldValue(`is${e.name}`);
+                    return (
+                      <Form.Item
+                        name={["environments", e.name]}
+                        label="URL:"
+                        className={styles.inputUrl}
+                        rules={[
+                          { required: isEnv, message: "Please fill the url" },
+                        ]}
+                      >
+                        <Input placeholder="Add URL" disabled={!isEnv} />
+                      </Form.Item>
+                    );
+                  }}
+                </Form.Item>
+              </Col>
+            </>
+          ))}
         </Row>
       </div>
     </div>
