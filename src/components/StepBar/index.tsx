@@ -1,5 +1,6 @@
 import Text from "@/components/Text";
 import {
+  ArrowsAltOutlined,
   CheckCircleFilled,
   CloseOutlined,
   DownOutlined,
@@ -263,6 +264,7 @@ const getMappingItems: (
 
 const StepBar = ({ currentStep = 0, activeKey, setActiveKey, type }: Props) => {
   const [isOpen, setIsOpen] = useState(true);
+  const [isMinimize, setIsMinimize] = useState(false);
   const [bounds, setBounds] = useState({
     left: 0,
     top: 0,
@@ -347,17 +349,26 @@ const StepBar = ({ currentStep = 0, activeKey, setActiveKey, type }: Props) => {
             {titleContentText.title}
           </Text.Custom>
           <Flex justifyContent="flex-end" gap={12}>
-            <MinusOutlined
-              onClick={() => setIsOpen(false)}
-              style={{ color: "#00000073" }}
-            />
-            <CloseOutlined
-              onClick={() => setIsOpen(false)}
-              style={{ color: "#00000073" }}
-            />
+            {!isMinimize ? (
+              <>
+                <MinusOutlined
+                  onClick={() => setIsMinimize(true)}
+                  style={{ color: "#00000073" }}
+                />
+                <CloseOutlined
+                  onClick={() => setIsOpen(false)}
+                  style={{ color: "#00000073" }}
+                />
+              </>
+            ) : (
+              <ArrowsAltOutlined
+                onClick={() => setIsMinimize(false)}
+                style={{ color: "#00000073", fontSize: 16 }}
+              />
+            )}
           </Flex>
         </div>
-        <div className={styles.barContent}>
+        {!isMinimize && <div className={styles.barContent}>
           <StepIndicator currentStep={currentStep} />
           <div>
             <Collapse
@@ -374,7 +385,7 @@ const StepBar = ({ currentStep = 0, activeKey, setActiveKey, type }: Props) => {
               onChange={onChange}
             />
           </div>
-        </div>
+        </div>}
       </div>
     </Draggable>
   );

@@ -1,18 +1,12 @@
 import Text from "@/components/Text";
 import styles from "./index.module.scss";
 import { Form, Input, Upload, Button, FormInstance, notification } from "antd";
-import {
-  InboxOutlined,
-  PaperClipOutlined,
-  UploadOutlined,
-} from "@ant-design/icons";
+import { PaperClipOutlined, UploadOutlined } from "@ant-design/icons";
 import Flex from "@/components/Flex";
 import { get, isEmpty } from "lodash";
 import { useBoolean } from "usehooks-ts";
 import ReplaceFileModal from "./ReplaceFileModal";
 import { isURL } from "@/utils/helpers/url";
-
-const { Dragger } = Upload;
 
 type Props = {
   form: FormInstance<any>;
@@ -118,33 +112,6 @@ const SelectAPIServer = ({ form, active }: Props) => {
             </Button>
           )}
         </Form.Item>
-        {isEmpty(file?.file) && (
-          <Form.Item noStyle name="file">
-            <Dragger
-              accept=".yaml"
-              multiple={false}
-              showUploadList={false}
-              className={styles.dragger}
-              beforeUpload={(file) => {
-                if (!/^.*\.yaml$/.test(file.name)) {
-                  notification.warning({ message: "Only accept yaml file" });
-                }
-                return false;
-              }}
-            >
-              <p className="ant-upload-drag-icon">
-                <InboxOutlined />
-              </p>
-              <p className="ant-upload-text">
-                Click or drag file to this area to upload
-              </p>
-              <p className="ant-upload-hint">
-                Support for a single or bulk upload. Strictly prohibit from
-                uploading company data or other band files
-              </p>
-            </Dragger>
-          </Form.Item>
-        )}
         {file ? (
           <Flex gap={9} justifyContent="flex-start">
             <PaperClipOutlined />
