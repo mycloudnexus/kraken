@@ -1,12 +1,14 @@
-import { Button, Table, notification } from "antd";
+import { Button, Col, Row, notification } from "antd";
 import Text from "../Text";
 import styles from "./index.module.scss";
 import { useMemo } from "react";
 import { get } from "lodash";
-import { decode } from "js-base64";
-import jsYaml from "js-yaml";
 import Flex from "../Flex";
 import { PaperClipOutlined } from "@ant-design/icons";
+import TitleIcon from "@/assets/title-icon.svg";
+import RequestMethod from "../Method";
+import jsYaml from "js-yaml";
+import { decode } from "js-base64";
 import { useNavigate } from "react-router-dom";
 import { useAppStore } from "@/stores/app.store";
 
@@ -16,15 +18,9 @@ type Props = {
   enableEdit?: () => void;
 };
 
-const APIViewer = ({ detail, onClose, enableEdit }: Props) => {
-  const { currentProduct } = useAppStore();
+const APIViewer = ({ detail, enableEdit }: Props) => {
   const navigate = useNavigate();
-
-  const handleGoEditAPI = () =>
-    navigate(
-      `/component/${currentProduct}/edit/${get(detail, "metadata.key")}/api`
-    );
-
+  const { currentProduct } = useAppStore();
   const fileName = useMemo(() => {
     try {
       if (!get(detail, "facets.baseSpec.content")) {
@@ -38,38 +34,6 @@ const APIViewer = ({ detail, onClose, enableEdit }: Props) => {
     }
   }, [detail]);
 
-  const basicDetailCol = useMemo(
-    () => [
-      {
-        title: "Application Name",
-        dataIndex: "name",
-      },
-      {
-        title: "Description",
-        dataIndex: "description",
-      },
-      {
-        title: "Online API document link",
-        dataIndex: "link",
-      },
-    ],
-    []
-  );
-
-  const environmentCol = useMemo(
-    () => [
-      {
-        title: "Environment Name",
-        dataIndex: "name",
-      },
-      {
-        title: "URL",
-        dataIndex: "url",
-      },
-    ],
-    []
-  );
-
   const environmentData = useMemo(() => {
     const env = get(detail, "facets.environments");
     if (!env) {
@@ -81,47 +45,133 @@ const APIViewer = ({ detail, onClose, enableEdit }: Props) => {
 
   return (
     <div>
-      <Text.BoldLarge>View API server</Text.BoldLarge>
-      <div className={styles.basicDetailTable}>
-        <Table
-          columns={basicDetailCol}
-          dataSource={[
-            {
-              name: get(detail, "metadata.name"),
-              description: get(detail, "metadata.description"),
-              link: get(detail, "facets.baseSpec.path"),
-            },
-          ]}
-          pagination={false}
-          rowKey="name"
-        />
-      </div>
-      {fileName ? (
-        <div>
-          <Text.LightMedium>API spec</Text.LightMedium>
-          <Flex gap={9} justifyContent="flex-start">
-            <PaperClipOutlined />
-            <Text.LightMedium>{fileName}</Text.LightMedium>
+      <div
+        className={styles.paper}
+        style={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          gap: 24,
+          width: "100%",
+          boxSizing: "border-box",
+        }}
+      >
+        <Flex alignItems="flex-start" flexDirection="column" gap={12}>
+          <Flex gap={8} justifyContent="flex-start">
+            <TitleIcon />
+            <Text.NormalLarge>Seller API Server basics</Text.NormalLarge>
+            <Button
+              type="text"
+              style={{ color: "#2962FF" }}
+              onClick={enableEdit}
+            >
+              Edit
+            </Button>
           </Flex>
-        </div>
-      ) : null}
-      <div className={styles.environment}>
-        <Text.LightMedium>Environment Variables</Text.LightMedium>
-        <Table
-          columns={environmentCol}
-          className={styles.environmentTable}
-          dataSource={environmentData}
-          pagination={false}
-          rowKey="name"
-        />
+          <div>
+            <Row gutter={[20, 20]}>
+              <Col span={8}>
+                <Flex flexDirection="column" alignItems="flex-start" gap={8}>
+                  <Text.LightMedium color="#00000073">
+                    Seller API Server Name
+                  </Text.LightMedium>
+                  <Text.LightMedium>
+                    {get(detail, "metadata.name", "")}
+                  </Text.LightMedium>
+                </Flex>
+              </Col>
+              <Col span={16}>
+                <Flex flexDirection="column" alignItems="flex-start" gap={8}>
+                  <Text.LightMedium color="#00000073">
+                    Online API document link
+                  </Text.LightMedium>
+                  <Text.LightMedium>
+                    {get(detail, "metadata.link", "-")}
+                  </Text.LightMedium>
+                </Flex>
+              </Col>
+              <Col span={24}>
+                <Flex flexDirection="column" alignItems="flex-start" gap={8}>
+                  <Text.LightMedium color="#00000073">
+                    Description
+                  </Text.LightMedium>
+                  <Text.LightMedium>
+                    {get(detail, "metadata.description", "-")}
+                  </Text.LightMedium>
+                </Flex>
+              </Col>
+              <Col span={24}>
+                <Flex flexDirection="column" alignItems="flex-start" gap={4}>
+                  <Text.NormalMedium color="#000000D9">
+                    API spec in yaml format
+                  </Text.NormalMedium>
+                  <Flex gap={9} justifyContent="flex-start">
+                    <PaperClipOutlined />
+                    <Text.LightMedium>{fileName}</Text.LightMedium>
+                  </Flex>
+                </Flex>
+              </Col>
+            </Row>
+          </div>
+        </Flex>
+        <Flex alignItems="flex-start" flexDirection="column" gap={12}>
+          <Flex gap={8} justifyContent="flex-start">
+            <TitleIcon />
+            <Text.NormalLarge>Seller API</Text.NormalLarge>
+            <Button
+              type="text"
+              style={{ color: "#2962FF" }}
+              onClick={() =>
+                navigate(
+                  `/component/${currentProduct}/edit/${get(
+                    detail,
+                    "metadata.key"
+                  )}/api`
+                )
+              }
+            >
+              Edit
+            </Button>
+          </Flex>
+          <Flex flexDirection="column" gap={8} alignItems="flex-start">
+            {get(detail, "facets.selectedAPIs")?.map((api: string) => (
+              <Flex key={api} gap={8} justifyContent="flex-start">
+                <div style={{ width: 58 }}>
+                  <RequestMethod method={get(api.split(" "), "[1]")} />
+                </div>
+                <Text.LightMedium>
+                  {get(api.split(" "), "[0]")}
+                </Text.LightMedium>
+              </Flex>
+            ))}
+          </Flex>
+        </Flex>
+        <Flex flexDirection="column" gap={12} alignItems="flex-start">
+          <Flex gap={8} justifyContent="flex-start">
+            <TitleIcon />
+            <Text.NormalLarge>
+              Base URL for environment variables
+            </Text.NormalLarge>
+            <Button
+              type="text"
+              style={{ color: "#2962FF" }}
+              onClick={enableEdit}
+            >
+              Edit
+            </Button>
+          </Flex>
+          <Flex flexDirection="column" gap={8} alignItems="flex-start">
+            {environmentData?.map((e) => (
+              <Flex gap={8} justifyContent="flex-start" key={e.name}>
+                <Text.LightMedium style={{ width: 120 }}>
+                  {e.name}
+                </Text.LightMedium>
+                <Text.LightMedium>URL: {e.url}</Text.LightMedium>
+              </Flex>
+            ))}
+          </Flex>
+        </Flex>
       </div>
-      <Flex className={styles.modalFooter} justifyContent="flex-end" gap={12}>
-        <Button onClick={handleGoEditAPI}>Add new API</Button>
-        <Button onClick={enableEdit}>Edit</Button>
-        <Button type="primary" onClick={onClose}>
-          OK
-        </Button>
-      </Flex>
     </div>
   );
 };

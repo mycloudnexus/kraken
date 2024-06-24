@@ -9,7 +9,15 @@ test("PreviewAPIServer new", () => {
   const { container } = render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <PreviewAPIServer form={form} active={true} handleBack={vi.fn()} />
+        <PreviewAPIServer
+          form={form}
+          active={true}
+          handleBack={vi.fn()}
+          env={[
+            { name: "dev", id: "1", productId: "mef.sonata", createdAt: "" },
+            { name: "sit", id: "2", productId: "mef.sonata", createdAt: "" },
+          ]}
+        />
       </BrowserRouter>
     </QueryClientProvider>
   );

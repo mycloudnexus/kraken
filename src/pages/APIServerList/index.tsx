@@ -11,6 +11,7 @@ import { useNavigate } from "react-router";
 import { useBoolean } from "usehooks-ts";
 import ExpandRow from "./components/ExpandRow";
 import styles from "./index.module.scss";
+import ServerIcon from "@/assets/server-icon.svg";
 
 const APIServerList = () => {
   const {
@@ -35,7 +36,12 @@ const APIServerList = () => {
     return [
       {
         dataIndex: "metadata",
-        render: (metadata: any) => metadata?.name,
+        render: (metadata: any) => (
+          <Flex justifyContent="flex-start" gap={8}>
+            <ServerIcon />
+            {metadata?.name}
+          </Flex>
+        ),
       },
       {
         dataIndex: "metadata",

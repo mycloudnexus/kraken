@@ -42,6 +42,7 @@ const APIServerEditSelection = () => {
         newData = tranformSwaggerToArray(swaggerData);
         setTransferData(newData);
         setSelectedAPI(get(newData, "[0]"));
+        setTargetKeys(get(detailData, "facets.selectedAPIs", []));
       }
     } catch (error) {
       notification.error({ message: "Error. Please try again" });

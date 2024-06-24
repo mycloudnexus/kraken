@@ -117,6 +117,7 @@ const NewAPIServer = () => {
             form={form}
             active={step === 3}
             handleBack={handleBack}
+            env={env}
           />
           <Form.Item noStyle shouldUpdate>
             {({ getFieldValue }) => {

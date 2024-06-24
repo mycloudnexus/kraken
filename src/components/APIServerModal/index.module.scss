@@ -1,28 +1,12 @@
-.table {
+.drawer {
   :global {
-    .ant-table-content {
-      border: 1px solid #f0f0f0;
-      border-radius: 8px;
-    }
-    td {
-      border-bottom: 0 !important;
+    .ant-drawer-body {
+      padding: 20px;
     }
   }
 }
 
-.basicDetailTable {
-  @extend .table;
-  margin: 12px 0;
-}
-
-.environment {
-  @extend .table;
-  margin-top: 12px;
-  .environmentTable {
-    margin-top: 12px;
-  }
-}
-
-.modalFooter {
-  margin-top: 24px;
+.inputUrl {
+  width: 50%;
+  min-width: 200px;
 }

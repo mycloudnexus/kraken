@@ -1,9 +1,13 @@
-import { useGetComponentDetail } from "@/hooks/product";
+import { useEditComponent, useGetComponentDetail } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
-import { Modal, Spin } from "antd";
+import { Button, Drawer, Form, Spin } from "antd";
 import { useBoolean } from "usehooks-ts";
 import APIEditor from "./APIEditor";
 import APIViewer from "./APIViewer";
+import { CloseOutlined } from "@ant-design/icons";
+import Flex from "../Flex";
+import Text from "../Text";
+import styles from "./index.module.scss";
 
 type Props = {
   isOpen: boolean;
@@ -14,11 +18,47 @@ type Props = {
 
 const APIServerModal = ({ id, isOpen, refresh, onClose }: Props) => {
   const { currentProduct } = useAppStore();
-  const { data: componentDetail, isLoading } = useGetComponentDetail(currentProduct, id);
+
+  const { mutateAsync: runUpdate, isPending } = useEditComponent();
+  const { data: componentDetail, isLoading } = useGetComponentDetail(
+    currentProduct,
+    id
+  );
   const { value: isEdit, setTrue: enableEdit } = useBoolean(false);
+  const [form] = Form.useForm();
 
   return (
-    <Modal width={"80vw"} closable={false} open={isOpen} footer={<></>}>
+    <Drawer
+      className={styles.drawer}
+      width={"80vw"}
+      closable={false}
+      open={isOpen}
+      footer={
+        <Flex justifyContent="flex-end" gap={12}>
+          <Button onClick={onClose}>Cancel</Button>
+          <Button
+            disabled={isPending}
+            loading={isPending}
+            type="primary"
+            onClick={() => {
+              if (isEdit) {
+                form.submit();
+              } else {
+                onClose?.();
+              }
+            }}
+          >
+            OK
+          </Button>
+        </Flex>
+      }
+      title={
+        <Flex justifyContent="space-between">
+          <Text.NormalLarge>View API Server</Text.NormalLarge>
+          <CloseOutlined onClick={onClose} style={{ color: "#00000073" }} />
+        </Flex>
+      }
+    >
       <Spin spinning={isLoading}>
         {isEdit ? (
           <APIEditor
@@ -26,6 +66,8 @@ const APIServerModal = ({ id, isOpen, refresh, onClose }: Props) => {
             onClose={onClose}
             refresh={refresh}
             componentId={id}
+            form={form}
+            runUpdate={runUpdate}
           />
         ) : (
           <APIViewer
@@ -35,7 +77,7 @@ const APIServerModal = ({ id, isOpen, refresh, onClose }: Props) => {
           />
         )}
       </Spin>
-    </Modal>
+    </Drawer>
   );
 };
 

@@ -4,24 +4,23 @@ import Text from "@/components/Text";
 import TitleIcon from "@/assets/title-icon.svg";
 import Flex from "@/components/Flex";
 import RequestMethod from "@/components/Method";
-import { get, isEmpty } from "lodash";
+import { get } from "lodash";
 import { PaperClipOutlined } from "@ant-design/icons";
+import { IEnv } from "@/utils/types/env.type";
 
 type Props = {
   form: FormInstance<any>;
   active: boolean;
   handleBack: (step: number) => void;
+  env: IEnv[];
 };
 
-const PreviewAPIServer = ({ form, active, handleBack }: Props) => {
+const PreviewAPIServer = ({ form, active, handleBack, env }: Props) => {
   const selectedAPIs = Form.useWatch("selectedAPIs", form);
-  const sit = Form.useWatch(["environments", "sit"], form);
-  const prod = Form.useWatch(["environments", "prod"], form);
-  const stage = Form.useWatch(["environments", "stage"], form);
-  const uat = Form.useWatch(["environments", "uat"], form);
   const name = Form.useWatch("name", form);
   const link = Form.useWatch("link", form);
   const file = Form.useWatch("file", form);
+  const description = Form.useWatch("description", form);
   return (
     <div
       style={{
@@ -40,7 +39,7 @@ const PreviewAPIServer = ({ form, active, handleBack }: Props) => {
           flexDirection: "column",
           gap: 12,
           width: "100%",
-          boxSizing: 'border-box'
+          boxSizing: "border-box",
         }}
       >
         <Flex gap={8} justifyContent="flex-start">
@@ -55,9 +54,9 @@ const PreviewAPIServer = ({ form, active, handleBack }: Props) => {
           </Button>
         </Flex>
         <div>
-          <Row gutter={[12, 12]}>
+          <Row gutter={[20, 20]}>
             <Col span={8}>
-              <Flex flexDirection="column" alignItems="flex-start">
+              <Flex flexDirection="column" alignItems="flex-start" gap={8}>
                 <Text.LightMedium color="#00000073">
                   Seller API Server Name
                 </Text.LightMedium>
@@ -65,26 +64,26 @@ const PreviewAPIServer = ({ form, active, handleBack }: Props) => {
               </Flex>
             </Col>
             <Col span={16}>
-              <Flex flexDirection="column" alignItems="flex-start">
+              <Flex flexDirection="column" alignItems="flex-start" gap={8}>
                 <Text.LightMedium color="#00000073">
                   Online API document link
                 </Text.LightMedium>
-                <Text.LightMedium>{link}</Text.LightMedium>
+                <Text.LightMedium>{link ?? "-"}</Text.LightMedium>
               </Flex>
             </Col>
             <Col span={24}>
-              <Flex flexDirection="column" alignItems="flex-start">
+              <Flex flexDirection="column" alignItems="flex-start" gap={8}>
                 <Text.LightMedium color="#00000073">
                   Description
                 </Text.LightMedium>
-                <Text.LightMedium>{link}</Text.LightMedium>
+                <Text.LightMedium>{description ?? "-"}</Text.LightMedium>
               </Flex>
             </Col>
             <Col span={24}>
-              <Flex flexDirection="column" alignItems="flex-start">
-                <Text.LightMedium color="#000000D9">
+              <Flex flexDirection="column" alignItems="flex-start" gap={4}>
+                <Text.NormalMedium color="#000000D9">
                   API spec in yaml format
-                </Text.LightMedium>
+                </Text.NormalMedium>
                 <Flex gap={9} justifyContent="flex-start">
                   <PaperClipOutlined />
                   <Text.LightMedium>
@@ -128,33 +127,17 @@ const PreviewAPIServer = ({ form, active, handleBack }: Props) => {
           </Button>
         </Flex>
         <Flex flexDirection="column" gap={8} alignItems="flex-start">
-          {!isEmpty(sit) && (
-            <Flex gap={8} justifyContent="flex-start">
-              <Text.LightMedium style={{ width: 120 }}>
-                Development
-              </Text.LightMedium>
-              <Text.LightMedium>{sit}</Text.LightMedium>
-            </Flex>
-          )}
-          {!isEmpty(prod) && (
-            <Flex gap={8} justifyContent="flex-start">
-              <Text.LightMedium style={{ width: 120 }}>
-                Production
-              </Text.LightMedium>
-              <Text.LightMedium>{prod}</Text.LightMedium>
-            </Flex>
-          )}
-          {!isEmpty(stage) && (
-            <Flex gap={8} justifyContent="flex-start">
-              <Text.LightMedium style={{ width: 120 }}>Stage</Text.LightMedium>
-              <Text.LightMedium>{stage}</Text.LightMedium>
-            </Flex>
-          )}
-          {!isEmpty(uat) && (
-            <Flex gap={8} justifyContent="flex-start">
-              <Text.LightMedium style={{ width: 120 }}>UAT</Text.LightMedium>
-              <Text.LightMedium>{uat}</Text.LightMedium>
-            </Flex>
+          {env?.map((e) =>
+            form.getFieldValue(["environments", e.name]) ? (
+              <Flex gap={8} justifyContent="flex-start" key={e.name}>
+                <Text.LightMedium style={{ width: 120 }}>
+                  {e.name}
+                </Text.LightMedium>
+                <Text.LightMedium>
+                  URL: {form.getFieldValue(["environments", e.name])}
+                </Text.LightMedium>
+              </Flex>
+            ) : null
           )}
         </Flex>
       </div>
