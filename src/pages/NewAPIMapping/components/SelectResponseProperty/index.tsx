@@ -60,6 +60,7 @@ const SelectResponseProperty = () => {
       `content[${contentType}].schema.items.properties`,
       get(response, `content[${contentType}].schema.properties`, {})
     );
+
     if (isEmpty(properties)) {
       return [];
     }
@@ -131,7 +132,11 @@ const SelectResponseProperty = () => {
                     const index = cloneObj.findIndex(
                       (i: any) => i.name === activeResponseName
                     );
-                    set(cloneObj, `[${index}].source`, `@{{responseBody.${mainKey}}}`);
+                    set(
+                      cloneObj,
+                      `[${index}].source`,
+                      `@{{responseBody.${mainKey}}}`
+                    );
                     set(cloneObj, `[${index}].sourceLocation`, `BODY`);
                     setResponseMapping(cloneObj);
                     setActiveResponseName(undefined);

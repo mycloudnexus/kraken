@@ -92,6 +92,12 @@ const ResponseMapping = () => {
     setRightSide(EnumRightType.AddSellerResponse);
   }, [sellerApi]);
 
+  useEffect(() => {
+    if (isEmpty(responseMapping)) {
+      setListMapping([]);
+    }
+  }, [responseMapping]);
+
   return (
     <div className={styles.root}>
       <Flex gap={16} justifyContent="flex-start">

@@ -129,6 +129,9 @@ export const parseObjectDescriptionToTreeData = (
 
 export const convertSchemaToTypeOnly = (keys: Record<string, any>) => {
   const result: any = {};
+  if (isEmpty(keys)) {
+    return {};
+  }
   Object.entries(keys).forEach(([key, propData]) => {
     if (["string", "number", "boolean"].includes(propData.type)) {
       result[key] = propData.type;
@@ -177,7 +180,7 @@ export const exampleParse = (
     return undefined;
   }
   const keys = Object.keys(example);
-  return keys.map((key: string) => {
+  return keys?.map((key: string) => {
     const nodeTitle = (
       <Flex
         justifyContent="flex-start"

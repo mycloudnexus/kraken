@@ -7,8 +7,12 @@ import { useAppStore } from "@/stores/app.store";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { COMPONENT_KIND_API_TARGET_SPEC } from "@/utils/constants/product";
 import { IComponent } from "@/utils/types/product.type";
-import { DownOutlined, RightOutlined } from "@ant-design/icons";
-import { Button, Empty, Spin, Tooltip, Typography } from "antd";
+import {
+  DownOutlined,
+  ExclamationCircleOutlined,
+  RightOutlined,
+} from "@ant-design/icons";
+import { Button, Empty, Input, Modal, Spin, Tooltip, Typography } from "antd";
 import clsx from "clsx";
 import jsYaml from "js-yaml";
 import { get, isEmpty } from "lodash";
@@ -20,13 +24,25 @@ import styles from "./index.module.scss";
 
 type ItemProps = {
   item: IComponent;
+  isOneItem: boolean;
+  setSellerApi: (api: any) => void;
+  selectedAPI: any;
+  setSelectedServer: (server: string) => void;
 };
 
-const APIItem = ({ item }: ItemProps) => {
+export const APIItem = ({
+  item,
+  isOneItem,
+  setSellerApi,
+  selectedAPI,
+  setSelectedServer,
+}: ItemProps) => {
+  console.log("🚀 ~ item:", item);
   const navigate = useNavigate();
   const { currentProduct } = useAppStore();
-  const { sellerApi, setSellerApi, setServerKey } = useNewApiMappingStore();
-  const { value: isOpen, toggle: toggleOpen } = useBoolean(true);
+  const { sellerApi } = useNewApiMappingStore();
+  const { value: isOpen, toggle: toggleOpen } = useBoolean(isOneItem);
+  const [searchValue, setSearchValue] = useState("");
   const baseSpec = useMemo(() => {
     const encoded = item?.facets?.baseSpec?.content;
     if (!encoded) return undefined;
@@ -57,7 +73,7 @@ const APIItem = ({ item }: ItemProps) => {
         spec: undefined,
       };
       setSellerApi(selectedSellerApi);
-      setServerKey(serverKey);
+      setSelectedServer(serverKey);
     }
     const listSpec: any[] = [];
     Object.entries(resolvedSpec.paths).forEach(
@@ -76,8 +92,18 @@ const APIItem = ({ item }: ItemProps) => {
       (item) => item.url === url && item.method === method
     );
     setSellerApi(selectedSpec);
-    setServerKey(serverKey);
+    setSelectedServer(serverKey);
   };
+
+  const selectedAPIs = useMemo(() => {
+    if (isEmpty(searchValue)) {
+      return item?.facets?.selectedAPIs;
+    }
+    return item?.facets?.selectedAPIs?.filter((api: string) =>
+      api?.toLocaleLowerCase?.().includes(searchValue?.toLocaleLowerCase?.())
+    );
+  }, [searchValue]);
+
   return (
     <div>
       <Flex justifyContent="space-between">
@@ -109,14 +135,28 @@ const APIItem = ({ item }: ItemProps) => {
         gap={12}
         alignItems="flex-start"
         justifyContent="flex-start"
+        style={{ width: "100%" }}
       >
+        {isOpen && (
+          <div className={styles.search}>
+            <Input.Search
+              placeholder="Search"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              allowClear
+            />
+          </div>
+        )}
         {isOpen &&
-          item?.facets?.selectedAPIs?.map((key: string) => {
+          selectedAPIs?.map((key: string) => {
             const [url, method] = key.split(" ");
-            const active =
-              item?.metadata?.name === sellerApi?.name &&
-              url === sellerApi?.url &&
-              method === sellerApi?.method;
+            const active = selectedAPI
+              ? item?.metadata?.name === selectedAPI?.name &&
+                url === selectedAPI?.url &&
+                method === selectedAPI?.method
+              : item?.metadata?.name === sellerApi?.name &&
+                url === sellerApi?.url &&
+                method === sellerApi?.method;
             return (
               <div
                 className={clsx(styles.card, {
@@ -156,20 +196,130 @@ const APIItem = ({ item }: ItemProps) => {
 
 const SelectAPI = () => {
   const { currentProduct } = useAppStore();
-  const { data: dataList, isLoading } = useGetComponentList(currentProduct, {
+  const [selectedAPI, setSelectedAPI] = useState<any>();
+  const [selectedServer, setSelectedServer] = useState<string>("");
+  const { setSellerApi, setServerKey, sellerApi, reset } =
+    useNewApiMappingStore();
+  const navigate = useNavigate();
+  const {
+    data: dataList,
+    isLoading,
+    isSuccess,
+  } = useGetComponentList(currentProduct, {
     kind: COMPONENT_KIND_API_TARGET_SPEC,
     size: 1000,
   });
+
+  const handleMapSave = () => {
+    setSellerApi(selectedAPI);
+    setServerKey(selectedServer);
+    setSelectedAPI(undefined);
+    setSelectedServer("");
+  };
+
+  const handleOK = () => {
+    if (isEmpty(sellerApi)) {
+      handleMapSave();
+      return;
+    }
+    Modal.confirm({
+      width: 500,
+      icon: <ExclamationCircleOutlined />,
+      title:
+        "You are going to switch to another seller API, do you want to save the mappings of current selected API?",
+      content: (
+        <Text.LightMedium>
+          Select yes will save the mappings and switch to another API.
+          <br />
+          Select no will drop the mappings and switch.
+        </Text.LightMedium>
+      ),
+      footer: (_, { CancelBtn, OkBtn }) => (
+        <Flex gap={8} justifyContent="flex-end">
+          <CancelBtn />
+          <Button
+            type="default"
+            onClick={() => {
+              reset();
+              handleMapSave();
+              Modal.destroyAll();
+            }}
+          >
+            Drop and switch
+          </Button>
+          <OkBtn />
+        </Flex>
+      ),
+      okButtonProps: {
+        type: "primary",
+      },
+      okText: "Save and switch",
+      onOk: handleMapSave,
+      cancelButtonProps: {
+        type: "text",
+        style: {
+          color: "#1890FF",
+        },
+      },
+    });
+  };
+  const itemLength = dataList?.data?.length ?? 0;
+
+  useEffect(() => {
+    if (isEmpty(dataList?.data) && isSuccess) {
+      Modal.confirm({
+        icon: <ExclamationCircleOutlined />,
+        title: "No Seller API Server information to configure",
+        content: (
+          <Text.LightMedium>
+            You need to do Seller API Server setup before configure
+          </Text.LightMedium>
+        ),
+        okButtonProps: {
+          type: "primary",
+          danger: true,
+        },
+        okText: "API Server setup",
+        onOk: () => navigate(`/component/${currentProduct}/new`),
+      });
+    }
+  }, [dataList, isSuccess]);
+
   return (
-    <Spin spinning={isLoading} className={styles.loading}>
-      <Text.BoldLarge>Select API</Text.BoldLarge>
-      <div className={styles.content}>
-        {dataList?.data?.map((item: IComponent) => (
-          <APIItem item={item} key={item.id} />
-        ))}
-        {isEmpty(dataList?.data) && <Empty />}
+    <div className={styles.root}>
+      <div className={styles.header}>
+        <Text.NormalLarge>Select Seller API</Text.NormalLarge>
       </div>
-    </Spin>
+      <Spin spinning={isLoading} className={styles.loading}>
+        <div className={styles.container}>
+          <div className={styles.content}>
+            {dataList?.data?.map((item: IComponent) => (
+              <APIItem
+                item={item}
+                key={item.id}
+                isOneItem={itemLength === 0}
+                setSellerApi={setSelectedAPI}
+                selectedAPI={selectedAPI}
+                setSelectedServer={setSelectedServer}
+              />
+            ))}
+            {isEmpty(dataList?.data) && <Empty />}
+          </div>
+        </div>
+      </Spin>
+      <Flex
+        justifyContent="flex-end"
+        style={{ padding: 14, borderTop: "1px solid #F0F0F0 " }}
+      >
+        <Button
+          disabled={isEmpty(selectedAPI)}
+          type="primary"
+          onClick={handleOK}
+        >
+          OK
+        </Button>
+      </Flex>
+    </div>
   );
 };
 

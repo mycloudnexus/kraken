@@ -1,6 +1,7 @@
 import ResponseMapping from "@/pages/NewAPIMapping/components/ResponseMapping";
 import RightAddSellerProp from "@/pages/NewAPIMapping/components/RightAddSellerProp";
 import RightAddSonataProp from "@/pages/NewAPIMapping/components/RightAddSonataProp";
+import { APIItem } from "@/pages/NewAPIMapping/components/SelectAPI";
 import SelectResponseProperty from "@/pages/NewAPIMapping/components/SelectResponseProperty";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { queryClient } from "@/utils/helpers/reactQuery";
@@ -56,8 +57,8 @@ beforeAll(() => {
   ]);
 });
 
-test("component new api map page", () => {
-  const { container, getByTestId } = render(
+test("component new api map page", async () => {
+  const { container, getByTestId } = await render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <ResponseMapping />
@@ -92,6 +93,41 @@ test("component RightAddSonataProp", () => {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <RightAddSonataProp spec={undefined} method="GET" />
+      </BrowserRouter>
+    </QueryClientProvider>
+  );
+  expect(container).toBeInTheDocument();
+});
+
+test("APIItem", () => {
+  const { container } = render(
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <APIItem
+          isOneItem={false}
+          item={
+            {
+              kind: "kraken.component.api-target-spec",
+              metadata: {
+                id: "b7d7b3ee-f336-4066-97f9-23bd39ec1a82",
+                name: "console connect 12",
+                version: 0,
+                key: "mef.sonata.api-target-spec.con1718940696857",
+                description: "ABC",
+              },
+              facets: {
+                environments: {},
+                selectedAPIs: ["/productOrder/{id} patch"],
+                baseSpec: {
+                  path: "http://localhost:5173/component/mef.sonata.api.poq/new",
+                },
+              },
+            } as any
+          }
+          setSellerApi={vi.fn()}
+          selectedAPI={"ABC"}
+          setSelectedServer={vi.fn()}
+        />
       </BrowserRouter>
     </QueryClientProvider>
   );

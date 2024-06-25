@@ -81,10 +81,10 @@ const NewAPIMapping = () => {
     }
   }, [mappers, requestMapping, setRequestMapping]);
   useEffect(() => {
-    if (!isEmpty(mappers?.response)) {
+    if (!isEmpty(mappers?.response) && isEmpty(responseMapping)) {
       setResponseMapping(mappers?.response);
     }
-  }, [mappers?.response]);
+  }, [mappers?.response, responseMapping]);
   const [tabActiveKey, setTabActiveKey] = useState("request");
   const items: TabsProps["items"] = [
     {
@@ -222,7 +222,12 @@ const NewAPIMapping = () => {
             onChange={(ak) => setTabActiveKey(ak)}
           />
         </div>
-        <div className={styles.right}>
+        <div
+          className={styles.right}
+          style={
+            rightSide === EnumRightType.SelectSellerAPI ? { padding: 0 } : {}
+          }
+        >
           {rightSide === EnumRightType.AddSonataProp && (
             <RightAddSonataProp
               spec={jsonSpec}
