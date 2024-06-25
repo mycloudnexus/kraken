@@ -16,8 +16,8 @@ const RequestMapping = () => {
   const { query, sellerApi, rightSide, setRightSide, requestMapping } =
     useNewApiMappingStore();
   useEffect(() => {
-    console.log("1", sellerApi);
-  }, [sellerApi]);
+    console.log("1", requestMapping);
+  }, [requestMapping]);
   const queryData = JSON.parse(query ?? "{}");
   const items: CollapseProps["items"] = useMemo(() => {
     if (requestMapping.length === 0) {
@@ -84,7 +84,6 @@ const RequestMapping = () => {
         <Flex
           align="center"
           gap={6}
-          style={{ flex: "0 0 calc(50% - 30px)", width: "calc(50% - 30px)" }}
           className={styles.sonataAPIBasicInfoWrapper}
         >
           <LogMethodTag method={queryData?.method} />
@@ -101,7 +100,6 @@ const RequestMapping = () => {
         <Flex
           align="center"
           justify="space-between"
-          style={{ flex: "0 0 calc(50% - 30px)", width: "calc(50% - 30px)" }}
           className={clsx(styles.sellerAPIBasicInfoWrapper, {
             [styles.highlight]: rightSide === EnumRightType.SelectSellerAPI,
           })}
@@ -109,7 +107,7 @@ const RequestMapping = () => {
             setRightSide(EnumRightType.SelectSellerAPI);
           }}
         >
-          <Flex align="center" gap={12}>
+          <Flex align="center" gap={12} style={{ width: "100%" }}>
             {sellerApi ? (
               <>
                 <LogMethodTag method={sellerApi.method} />

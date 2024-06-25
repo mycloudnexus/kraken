@@ -57,7 +57,7 @@ const RightAddSellerProp = ({ onSelect }: Readonly<Props>) => {
   );
 
   return (
-    <Flex vertical gap={16} style={{ width: "100%", height: "100%" }}>
+    <Flex vertical gap={16} style={{ width: "100%", minHeight: "100%" }}>
       <Text.BoldLarge>Add mapping property from Seller API</Text.BoldLarge>
       <Collapse
         ghost

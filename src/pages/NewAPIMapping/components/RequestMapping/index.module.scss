@@ -1,4 +1,6 @@
 .sonataAPIBasicInfoWrapper {
+  flex: 0 0 calc(50% - 30px);
+  width: calc(50% - 30px);
   box-sizing: border-box;
   padding: 18px 20px;
   border-radius: 6px;
@@ -6,6 +8,8 @@
   background-color: #f0f2f5;
 }
 .sellerAPIBasicInfoWrapper {
+  flex: 0 0 calc(50% - 30px);
+  width: calc(50% - 30px);
   box-sizing: border-box;
   padding: 18px 20px;
   border-radius: 6px;

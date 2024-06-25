@@ -21,7 +21,7 @@ const SelectResponseProperty = () => {
     sellerApi,
     activeResponseName,
     responseMapping,
-    setRequestMapping,
+    setResponseMapping,
     setActiveResponseName,
   } = useNewApiMappingStore();
   const { value: isOpen, toggle: toggleOpen } = useBoolean(true);
@@ -135,7 +135,7 @@ const SelectResponseProperty = () => {
                     );
                     set(cloneObj, `[${index}].source`, `{{${source}}}`);
                     set(cloneObj, `[${index}].sourceLocation`, `BODY`);
-                    setRequestMapping(cloneObj);
+                    setResponseMapping(cloneObj);
                     setActiveResponseName(undefined);
                   }
                 }}

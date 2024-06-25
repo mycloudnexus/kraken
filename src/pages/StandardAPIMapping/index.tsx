@@ -6,7 +6,16 @@ import {
 } from "@/hooks/product";
 import { DoubleLeftOutlined } from "@ant-design/icons";
 
-import { Button, Divider, Flex, List, notification, Spin, Tabs } from "antd";
+import {
+  Button,
+  Divider,
+  Flex,
+  List,
+  notification,
+  Spin,
+  Tabs,
+  Typography,
+} from "antd";
 import clsx from "clsx";
 
 import { useEffect, useMemo, useState } from "react";
@@ -17,11 +26,12 @@ import { get, uniq } from "lodash";
 import { useParams } from "react-router";
 import { useAppStore } from "@/stores/app.store";
 import { SUCCESS_CODE } from "@/utils/constants/api";
+import ContactIcon from "@/assets/standardAPIMapping/contact.svg";
 
 const listVersionDefault = [
   {
-    key: "current",
-    label: "Current Mapping",
+    key: "draft",
+    label: "Draft version",
   },
 ];
 const envAndVersion = [
@@ -37,7 +47,7 @@ const envAndVersion = [
     env: "Stage",
   },
   {
-    env: "Production",
+    env: "Prod",
   },
 ];
 
@@ -82,7 +92,7 @@ const StandardAPIMapping = () => {
     };
   }, [data, isLoading]);
 
-  const [activeVersion, setActiveVersion] = useState("current");
+  const [activeVersion, setActiveVersion] = useState("draft");
   const { mutateAsync: runCreateNewVersion } = useCreateNewVersion();
   const { data: versionData } = useGetVersionList(
     currentProduct,
@@ -132,37 +142,69 @@ const StandardAPIMapping = () => {
     }
   }, [noTab, tabs]);
 
+  const componentName = get(data, "metadata.name", "");
+
   return (
     <Flex align="stretch" className={styles.pageWrapper}>
       <Flex vertical justify="space-between" className={styles.leftWrapper}>
-        <List
-          itemLayout="vertical"
-          dataSource={listVersion}
-          className={styles.list}
-          renderItem={(item: { key: string; label: string }) => {
-            const highlighted = activeVersion === item.key;
-            return (
-              <List.Item
-                key={item.key}
-                onClick={
-                  !highlighted
-                    ? () => {
-                        setActiveVersion(item.key);
-                      }
-                    : undefined
-                }
-              >
-                <div
-                  className={clsx(styles.item, {
-                    [styles.activeItem]: highlighted,
-                  })}
+        <Flex vertical gap={8}>
+          <Flex vertical gap={8} className={styles.envWrapper}>
+            <Flex align="center" gap={8}>
+              <div className={styles.componentIconWrapper}>
+                <ContactIcon />
+              </div>
+              <Typography.Text ellipsis={{ tooltip: true }}>
+                {componentName}
+              </Typography.Text>
+            </Flex>
+            <Flex gap={8} wrap="wrap">
+              {envAndVersion.map((item) => (
+                <Flex
+                  key={item.env}
+                  justify="space-between"
+                  className={styles.envItem}
                 >
-                  {item.label}
-                </div>
-              </List.Item>
-            );
-          }}
-        />
+                  <Typography.Text style={{ fontSize: 12 }}>
+                    {item.env}
+                  </Typography.Text>
+                  <Typography.Text
+                    style={{ fontSize: 12, color: "rgba(0,0,0,0.45)" }}
+                  >
+                    {item.version ?? "n/a"}
+                  </Typography.Text>
+                </Flex>
+              ))}
+            </Flex>
+          </Flex>
+          <List
+            itemLayout="vertical"
+            dataSource={listVersion}
+            className={styles.list}
+            renderItem={(item: { key: string; label: string }) => {
+              const highlighted = activeVersion === item.key;
+              return (
+                <List.Item
+                  key={item.key}
+                  onClick={
+                    !highlighted
+                      ? () => {
+                          setActiveVersion(item.key);
+                        }
+                      : undefined
+                  }
+                >
+                  <div
+                    className={clsx(styles.item, {
+                      [styles.activeItem]: highlighted,
+                    })}
+                  >
+                    {item.label}
+                  </div>
+                </List.Item>
+              );
+            }}
+          />
+        </Flex>
         <Flex
           vertical
           align="center"
@@ -178,7 +220,7 @@ const StandardAPIMapping = () => {
       </Flex>
       <Flex vertical gap={12} className={styles.mainWrapper}>
         <Flex align="center" justify="space-between">
-          <Text.Custom size="20">Standard API Mapping</Text.Custom>
+          <Text.Custom size="20">Draft version</Text.Custom>
           <Button
             type="primary"
             onClick={() => {
@@ -191,45 +233,32 @@ const StandardAPIMapping = () => {
             Create new version
           </Button>
         </Flex>
-        <Flex align="center" justify="space-between">
-          <Flex align="center" gap={24}>
-            <Text.NormalLarge>Current configure</Text.NormalLarge>
-            <Text.NormalMedium>
-              Created at: 2024-05-15 04:34:56
-            </Text.NormalMedium>
-            <Text.NormalMedium>By user name</Text.NormalMedium>
-          </Flex>
-          <Flex align="center" gap={16}>
-            {envAndVersion.map((item) => (
-              <Flex key={item.env} gap={4} style={{ padding: "4px 8px" }}>
-                <Text.NormalSmall>{item.env}</Text.NormalSmall>
-                <Text.NormalSmall color="rgba(0,0,0,0.45)">
-                  {item.version ?? "n/a"}
-                </Text.NormalSmall>
-              </Flex>
-            ))}
-          </Flex>
-        </Flex>
-        <Spin spinning={isLoading}>
-          {noTab ? (
-            <RenderList
-              data={data?.facets?.supportedProductTypesAndActions}
-              componentId={componentId}
-              tab={undefined}
-            />
-          ) : (
-            <Tabs
-              items={tabs.map(({ name, data }) => ({
-                key: name,
-                label: name,
-                children: (
-                  <RenderList data={data} componentId={componentId} tab={tab} />
-                ),
-              }))}
-              onChange={(key) => setTab(key)}
-            />
-          )}
-        </Spin>
+        <div className={styles.versionListWrapper}>
+          <Spin spinning={isLoading}>
+            {noTab ? (
+              <RenderList
+                data={data?.facets?.supportedProductTypesAndActions}
+                componentId={componentId}
+                tab={undefined}
+              />
+            ) : (
+              <Tabs
+                items={tabs.map(({ name, data }) => ({
+                  key: name,
+                  label: name,
+                  children: (
+                    <RenderList
+                      data={data}
+                      componentId={componentId}
+                      tab={tab}
+                    />
+                  ),
+                }))}
+                onChange={(key) => setTab(key)}
+              />
+            )}
+          </Spin>
+        </div>
       </Flex>
     </Flex>
   );

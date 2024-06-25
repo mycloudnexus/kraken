@@ -5,6 +5,28 @@
   flex: 0 0 240px;
   width: 240px;
   border: 1px solid #d9d9d9;
+  padding: 16px 4px;
+}
+.envWrapper {
+  padding: 0 0 8px 20px;
+  border-bottom: 1px solid #dde1e5;
+}
+.componentIconWrapper {
+  width: 17px;
+  border-radius: 5px;
+  padding: 4px;
+  background-color: #91d5ff;
+  > svg {
+    display: block;
+  }
+}
+.envItem {
+  box-sizing: border-box;
+  flex: 0 0 calc(50% - 4px);
+  width: calc(50% - 4px);
+  border-radius: 4px;
+  background-color: #f0f2f5;
+  padding: 4px 8px;
 }
 .leftBottomWrapper {
   padding: 7px 10px;
@@ -17,8 +39,6 @@
 }
 .list {
   width: 100%;
-  padding: 16px 4px;
-
   :global(.ant-list-items) {
     display: flex;
     flex-direction: column;
@@ -40,14 +60,8 @@
 }
 .mainWrapper {
   flex: 1;
-  padding: 26px 20px 10px;
+  padding: 10px 20px;
   background-color: #f0f2f5;
-}
-
-.mappingWrapper {
-  border-radius: 8px;
-  padding: 16px 20px;
-  background-color: #fff;
 }
 
 .modalCreate {
@@ -59,4 +73,10 @@
       padding: 32px !important;
     }
   }
+}
+.versionListWrapper {
+  flex: 1;
+  border-radius: 4px;
+  background-color: #fff;
+  padding: 12px 20px;
 }
