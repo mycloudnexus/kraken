@@ -4,6 +4,13 @@ import { TreeDataNode, Typography } from "antd";
 
 const { Text } = Typography;
 
+const buildPrefix = (prefix: string, key: string) => {
+  if (prefix) {
+    return `${prefix}.${key}`;
+  }
+  return key;
+};
+
 export const findSchema = (firstURL: string, schemas: any) => {
   let schema = get(schemas, `${firstURL}.properties`);
   let schemaUrl = firstURL;
@@ -103,7 +110,7 @@ export const parseObjectDescriptionToTreeData = (
           </Text>
         </Flex>
       ),
-      key: prefix ? `${prefix}.${key}` : key,
+      key: buildPrefix(prefix, key),
       selectable: typeOfValue !== "object",
       children:
         typeOfValue === "object"
@@ -112,7 +119,7 @@ export const parseObjectDescriptionToTreeData = (
               titleClassName,
               exampleClassName,
               level + 1,
-              prefix ? `${prefix}.${key}` : key
+              buildPrefix(prefix, key)
             )
           : undefined,
     };
@@ -189,14 +196,14 @@ export const exampleParse = (
       !isEmpty(example[key]) && typeof example[key] === "object"
         ? exampleParse(
             isArray(example[key]) ? example[key][0] : example[key],
-            `${prefix}_${key}`,
+            buildPrefix(prefix, key),
             nodeTitleClassName,
             nodeExampleClassName
           )
         : undefined;
 
     return {
-      key: `${prefix}_${key}`,
+      key: buildPrefix(prefix, key),
       title: nodeTitle,
       children,
     };

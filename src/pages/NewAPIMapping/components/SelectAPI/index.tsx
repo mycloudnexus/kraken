@@ -124,6 +124,7 @@ const APIItem = ({ item }: ItemProps) => {
                 })}
                 onClick={() => onSelect(key)}
                 role="none"
+                key={key}
               >
                 <Flex justifyContent="flex-start" gap={8} alignItems="center">
                   <div style={{ flex: "0 0 16px", width: "16px" }}>

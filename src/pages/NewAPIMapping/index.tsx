@@ -1,3 +1,4 @@
+import Flex from "@/components/Flex";
 import StepBar from "@/components/StepBar";
 import Text from "@/components/Text";
 import { useUpdateTargetMapper } from "@/hooks/product";
@@ -11,7 +12,6 @@ import {
   Breadcrumb,
   BreadcrumbProps,
   Button,
-  Flex,
   Tabs,
   TabsProps,
   notification,
@@ -201,7 +201,12 @@ const NewAPIMapping = () => {
     };
   }, [location]);
   return (
-    <Flex vertical style={{ backgroundColor: "#f0f2f5", height: "100%" }}>
+    <Flex
+      flexDirection="column"
+      alignItems="stretch"
+      justifyContent="flex-start"
+      style={{ backgroundColor: "#f0f2f5", height: "100%" }}
+    >
       <StepBar
         type={EStep.MAPPING}
         currentStep={step}
@@ -234,12 +239,7 @@ const NewAPIMapping = () => {
           )}
         </div>
       </Flex>
-      <Flex
-        align="center"
-        justify="flex-end"
-        gap={8}
-        className={styles.bottomWrapper}
-      >
+      <Flex justifyContent="flex-end" gap={8} className={styles.bottomWrapper}>
         <Button type="text" onClick={handleCancel}>
           Cancel
         </Button>

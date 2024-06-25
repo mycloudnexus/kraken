@@ -127,13 +127,11 @@ const SelectResponseProperty = () => {
                 onSelect={(keys: Key[]) => {
                   const mainKey: any = get(keys, "[0]");
                   if (activeResponseName && typeof mainKey === "string") {
-                    const source = mainKey?.replace("_", ".");
-
                     const cloneObj = clone(responseMapping);
                     const index = cloneObj.findIndex(
                       (i: any) => i.name === activeResponseName
                     );
-                    set(cloneObj, `[${index}].source`, `@{{responseBody.${source}}}`);
+                    set(cloneObj, `[${index}].source`, `@{{responseBody.${mainKey}}}`);
                     set(cloneObj, `[${index}].sourceLocation`, `BODY`);
                     setResponseMapping(cloneObj);
                     setActiveResponseName(undefined);
