@@ -27,7 +27,7 @@ const RightAddSonataProp = ({
   defaultProp,
   onSelect,
 }: Readonly<Props>) => {
-  const { rightSideInfo } = useNewApiMappingStore();
+  const { rightSide, rightSideInfo } = useNewApiMappingStore();
   const [resolvedSpec, setResolvedSpec] = useState<any>();
   const [selectedProp, setSelectedProp] = useState<any>(defaultProp);
   useEffect(() => {
@@ -75,15 +75,16 @@ const RightAddSonataProp = ({
     );
   }, [correctSpec]);
 
-  const { handleAddProp, collapseItems } = useCommonAddProp(
+  const { handleAddProp, collapseItems } = useCommonAddProp({
+    rightSide: rightSide!,
     selectedProp,
     rightSideInfo,
     pathParameters,
     queryParameters,
     requestBodyTree,
     setSelectedProp,
-    onSelect
-  );
+    onSelect,
+  });
 
   return (
     <Flex vertical gap={16} style={{ width: "100%", minHeight: "100%" }}>

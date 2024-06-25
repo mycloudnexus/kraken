@@ -1,3 +1,12 @@
+.sonataAPIBasicInfoWrapper {
+  flex: 0 0 calc(50% - 30px);
+  width: calc(50% - 30px);
+  box-sizing: border-box;
+  padding: 18px 20px;
+  border-radius: 6px;
+  border: 1px solid #f0f0f0;
+  background-color: #f0f2f5;
+}
 .card {
   border: 1px solid;
   border-radius: 6px;

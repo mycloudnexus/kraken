@@ -9,22 +9,19 @@ import { capitalize, groupBy } from "lodash";
 import SonataPropMapping from "../SonataPropMapping";
 import styles from "./index.module.scss";
 import clsx from "clsx";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { IRequestMapping } from "@/utils/types/component.type";
 
 const RequestMapping = () => {
   const { query, sellerApi, rightSide, setRightSide, requestMapping } =
     useNewApiMappingStore();
-  useEffect(() => {
-    console.log("1", requestMapping);
-  }, [requestMapping]);
   const queryData = JSON.parse(query ?? "{}");
   const items: CollapseProps["items"] = useMemo(() => {
     if (requestMapping.length === 0) {
       return [
         {
           label: <Text.NormalLarge>Property mapping</Text.NormalLarge>,
-          key: "title",
+          key: "Property mapping",
           children: <SonataPropMapping list={[]} title="Property mapping" />,
         },
       ];

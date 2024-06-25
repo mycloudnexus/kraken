@@ -1,18 +1,31 @@
 import TypeTag from "@/components/TypeTag";
+import { EnumRightType } from "@/utils/types/common.type";
 import { CollapseProps, Flex, Tree, Typography, notification } from "antd";
 import clsx from "clsx";
 import { Dispatch, useCallback, useMemo } from "react";
 import styles from "./RightAddSellerProp/index.module.scss";
 
-export const useCommonAddProp = (
-  selectedProp: any,
-  rightSideInfo: any,
-  pathParameters: any,
-  queryParameters: any,
-  requestBodyTree: any,
-  setSelectedProp: Dispatch<any>,
-  onSelect?: (prop: any) => void
-) => {
+interface Props {
+  rightSide: EnumRightType;
+  selectedProp: any;
+  rightSideInfo: any;
+  pathParameters: any;
+  queryParameters: any;
+  requestBodyTree: any;
+  setSelectedProp: Dispatch<any>;
+  onSelect?: (prop: any) => void;
+}
+
+export const useCommonAddProp = ({
+  rightSide,
+  selectedProp,
+  rightSideInfo,
+  pathParameters,
+  queryParameters,
+  requestBodyTree,
+  setSelectedProp,
+  onSelect,
+}: Props) => {
   const handleAddProp = useCallback(() => {
     if (!selectedProp) {
       notification.error({ message: "Please select one property!" });
@@ -106,12 +119,24 @@ export const useCommonAddProp = (
               treeData={requestBodyTree}
               selectable
               selectedKeys={
-                selectedProp?.location === "BODY" ? [selectedProp?.name] : []
+                selectedProp?.location === "BODY"
+                  ? [
+                      selectedProp?.name
+                        .replace("@{{", "")
+                        .replace("}}", "")
+                        .replace("requestBody.", "")
+                        .replace("responseBody.", ""),
+                    ]
+                  : []
               }
               onSelect={(_, e) => {
                 setSelectedProp({
                   location: "BODY",
-                  name: e.node.key,
+                  name: `@{{${
+                    rightSide === EnumRightType.AddSonataProp
+                      ? "requestBody"
+                      : "responseBody"
+                  }.${e.node.key}}}`,
                 });
               }}
             />

@@ -1,5 +1,6 @@
 import ServerIcon from "@/assets/server-icon.svg";
 import Flex from "@/components/Flex";
+import LogMethodTag from "@/components/LogMethodTag";
 import Text from "@/components/Text";
 import { useGetComponentList } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
@@ -16,7 +17,6 @@ import { useNavigate } from "react-router-dom";
 import swaggerClient from "swagger-client";
 import { useBoolean } from "usehooks-ts";
 import styles from "./index.module.scss";
-import LogMethodTag from "@/components/LogMethodTag";
 
 type ItemProps = {
   item: IComponent;
@@ -25,7 +25,7 @@ type ItemProps = {
 const APIItem = ({ item }: ItemProps) => {
   const navigate = useNavigate();
   const { currentProduct } = useAppStore();
-  const { sellerApi, setSellerApi } = useNewApiMappingStore();
+  const { sellerApi, setSellerApi, setServerKey } = useNewApiMappingStore();
   const { value: isOpen, toggle: toggleOpen } = useBoolean(true);
   const baseSpec = useMemo(() => {
     const encoded = item?.facets?.baseSpec?.content;
@@ -46,20 +46,25 @@ const APIItem = ({ item }: ItemProps) => {
   }, [baseSpec]);
 
   const onSelect = (key: string) => {
+    const name = get(item, "metadata.name");
+    const serverKey = get(item, "metadata.key");
     const [url, method] = key.split(" ");
     if (!resolvedSpec) {
       const selectedSellerApi = {
+        name,
         url,
         method,
         spec: undefined,
       };
       setSellerApi(selectedSellerApi);
+      setServerKey(serverKey);
     }
     const listSpec: any[] = [];
     Object.entries(resolvedSpec.paths).forEach(
       ([path, methodObj]: [string, any]) => {
         Object.entries(methodObj).forEach(([method, spec]) => {
           listSpec.push({
+            name,
             url: path,
             method,
             spec,
@@ -71,6 +76,7 @@ const APIItem = ({ item }: ItemProps) => {
       (item) => item.url === url && item.method === method
     );
     setSellerApi(selectedSpec);
+    setServerKey(serverKey);
   };
   return (
     <div>
@@ -108,7 +114,9 @@ const APIItem = ({ item }: ItemProps) => {
           item?.facets?.selectedAPIs?.map((key: string) => {
             const [url, method] = key.split(" ");
             const active =
-              url === sellerApi?.url && method === sellerApi?.method;
+              item?.metadata?.name === sellerApi?.name &&
+              url === sellerApi?.url &&
+              method === sellerApi?.method;
             return (
               <div
                 className={clsx(styles.card, {

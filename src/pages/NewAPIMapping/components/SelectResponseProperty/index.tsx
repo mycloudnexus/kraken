@@ -133,7 +133,7 @@ const SelectResponseProperty = () => {
                     const index = cloneObj.findIndex(
                       (i: any) => i.name === activeResponseName
                     );
-                    set(cloneObj, `[${index}].source`, `{{${source}}}`);
+                    set(cloneObj, `[${index}].source`, `@{{responseBody.${source}}}`);
                     set(cloneObj, `[${index}].sourceLocation`, `BODY`);
                     setResponseMapping(cloneObj);
                     setActiveResponseName(undefined);

@@ -1,5 +1,6 @@
 import StepBar from "@/components/StepBar";
 import Text from "@/components/Text";
+import { useUpdateTargetMapper } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { EStep } from "@/utils/constants/common";
@@ -26,7 +27,6 @@ import SelectAPI from "./components/SelectAPI";
 import SelectResponseProperty from "./components/SelectResponseProperty";
 import useGetApiSpec from "./components/useGetApiSpec";
 import styles from "./index.module.scss";
-import { useUpdateTargetMapper } from "@/hooks/product";
 
 const NewAPIMapping = () => {
   const { componentId } = useParams();
@@ -36,9 +36,11 @@ const NewAPIMapping = () => {
   const {
     query,
     rightSide,
+    serverKey,
     requestMapping,
     responseMapping,
     rightSideInfo,
+    sellerApi,
     setRequestMapping,
     setRightSide,
     setRightSideInfo,
@@ -154,6 +156,8 @@ const NewAPIMapping = () => {
         `${rm.source}_${rm.sourceLocation}_${rm.target}_${rm.targetLocation}`
     );
     setRequestMapping(updatedMapping);
+    setRightSideInfo(undefined);
+    setRightSide(undefined);
   };
   const handleCancel = () => {
     navigate(-1);
@@ -165,12 +169,17 @@ const NewAPIMapping = () => {
     setTabActiveKey("request");
   };
   const handleSave = async () => {
-    console.log(mapperResponse, requestMapping, responseMapping)
     try {
       const data = cloneDeep(mapperResponse.data[0]);
-      data.facets.endpoints[0].mappers = {
-        request: requestMapping,
-        response: responseMapping,
+      data.facets.endpoints[0] = {
+        ...data.facets.endpoints[0],
+        serverKey,
+        method: sellerApi.method,
+        path: sellerApi.url,
+        mappers: {
+          request: requestMapping,
+          response: responseMapping,
+        },
       };
       const res = await updateTargetMapper({
         productId: currentProduct,

@@ -14,7 +14,7 @@ interface Props {
 }
 
 const RightAddSellerProp = ({ onSelect }: Readonly<Props>) => {
-  const { sellerApi, rightSideInfo } = useNewApiMappingStore();
+  const { rightSide, sellerApi, rightSideInfo } = useNewApiMappingStore();
   const [selectedProp, setSelectedProp] = useState<any>({
     location: rightSideInfo?.previousData?.targetLocation,
     name: rightSideInfo?.previousData?.target,
@@ -46,15 +46,16 @@ const RightAddSellerProp = ({ onSelect }: Readonly<Props>) => {
     );
   }, [sellerApi]);
 
-  const { handleAddProp, collapseItems } = useCommonAddProp(
+  const { handleAddProp, collapseItems } = useCommonAddProp({
+    rightSide: rightSide!,
     selectedProp,
     rightSideInfo,
     pathParameters,
     queryParameters,
     requestBodyTree,
     setSelectedProp,
-    onSelect
-  );
+    onSelect,
+  });
 
   return (
     <Flex vertical gap={16} style={{ width: "100%", minHeight: "100%" }}>

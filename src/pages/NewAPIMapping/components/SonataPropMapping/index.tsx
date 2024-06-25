@@ -10,6 +10,7 @@ import {
 import { Button, Flex, Tooltip, Typography } from "antd";
 import { useState } from "react";
 import styles from "./index.module.scss";
+import { get } from "lodash";
 
 interface RequestMappingProps {
   rm: IRequestMapping;
@@ -17,8 +18,18 @@ interface RequestMappingProps {
 }
 
 const RequestMappingItem = ({ rm, title }: Readonly<RequestMappingProps>) => {
-  const { setRightSide, setRightSideInfo } = useNewApiMappingStore();
+  const { requestMapping, setRightSide, setRightSideInfo, setRequestMapping } =
+    useNewApiMappingStore();
   const [showRemoveBtn, setShowRemoveBtn] = useState(false);
+  const handleDelete = () => {
+    setRequestMapping(
+      requestMapping.filter((item) =>
+        ["source", "sourceLocation", "target", "targetLocation"].some(
+          (path) => get(item, path) !== get(rm, path)
+        )
+      )
+    );
+  };
   return (
     <Flex
       align="center"
@@ -40,13 +51,13 @@ const RequestMappingItem = ({ rm, title }: Readonly<RequestMappingProps>) => {
           });
         }}
       >
-        {rm.sourceLocation}.{rm.source}{" "}
+        {rm.source}{" "}
         <Tooltip title={rm.description}>
           <InfoCircleOutlined style={{ color: "rgba(0, 0, 0, 0.45)" }} />
         </Tooltip>
       </Flex>
       {showRemoveBtn && (
-        <Button type="text">
+        <Button type="text" onClick={handleDelete}>
           <DeleteOutlined />
         </Button>
       )}
@@ -124,10 +135,8 @@ const SonataPropMapping = ({ list, title }: Readonly<Props>) => {
                 });
               }}
             >
-              {rm.target && rm.targetLocation ? (
-                <>
-                  {rm.targetLocation}.{rm.target}
-                </>
+              {rm.target ? (
+                <>{rm.target}</>
               ) : (
                 <Typography.Text style={{ color: "#86909c" }}>
                   Select property

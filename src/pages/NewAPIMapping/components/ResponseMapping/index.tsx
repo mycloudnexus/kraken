@@ -1,13 +1,13 @@
-import Text from "@/components/Text";
-import styles from "./index.module.scss";
-import Flex from "@/components/Flex";
 import MappingIcon from "@/assets/newAPIMapping/mapping-icon-response.svg";
-import RequestMethod from "@/components/Method";
 import ExpandCard from "@/components/ExpandCard";
-import clsx from "clsx";
-import { Button, Input, Select, Typography } from "antd";
+import Flex from "@/components/Flex";
+import RequestMethod from "@/components/Method";
+import Text from "@/components/Text";
+import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
+import { EnumRightType } from "@/utils/types/common.type";
 import { DeleteOutlined, RightOutlined } from "@ant-design/icons";
-import React, { useEffect, useState } from "react";
+import { Button, Input, Select, Typography } from "antd";
+import clsx from "clsx";
 import {
   chain,
   cloneDeep,
@@ -17,8 +17,9 @@ import {
   isEmpty,
   set,
 } from "lodash";
-import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
-import { EnumRightType } from "@/utils/types/common.type";
+import React, { useEffect, useState } from "react";
+import styles from "./index.module.scss";
+import LogMethodTag from "@/components/LogMethodTag";
 
 interface IMapping {
   key: number;
@@ -95,7 +96,7 @@ const ResponseMapping = () => {
     <div className={styles.root}>
       <Flex gap={16} justifyContent="flex-start">
         <div className="flex-1">
-          <Text.NormalLarge>Sonota API</Text.NormalLarge>
+          <Text.NormalLarge>Sonata API</Text.NormalLarge>
         </div>
         <div style={{ visibility: "hidden" }}>
           <MappingIcon />
@@ -105,12 +106,15 @@ const ResponseMapping = () => {
         </div>
       </Flex>
       <Flex gap={16} justifyContent="flex-start" style={{ marginTop: 16 }}>
-        <div className="flex-1 word-break-all">
-          <div className={styles.mainCard} style={{ boxSizing: "border-box" }}>
-            <RequestMethod method={queryData?.method?.toUpperCase?.()} />
-            <Text.LightMedium>{queryData?.path}</Text.LightMedium>
-          </div>
-        </div>
+        <Flex gap={6} className={styles.sonataAPIBasicInfoWrapper}>
+          <LogMethodTag method={queryData?.method} />
+          <Typography.Text
+            style={{ flex: 1, color: "#595959" }}
+            ellipsis={{ tooltip: true }}
+          >
+            {queryData?.path}
+          </Typography.Text>
+        </Flex>
         <MappingIcon />
         <div className="flex-1 word-break-all">
           <div
