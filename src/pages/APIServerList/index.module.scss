@@ -1,15 +1,24 @@
 .root {
-  padding: 27px 48px;
+  padding: 14px 20px;
+  background: #f0f2f5;
 }
 
 .content {
-  margin-top: 32px;
+  background: #fff;
+  margin-top: 14px;
   box-sizing: border-box;
+  padding: 16px 20px;
+  border-radius: 4px;
 
   :global {
+    .expand-table {
+      box-sizing: border-box;
+      table {
+        table-layout: fixed !important;
+      }
+    }
     .ant-table {
       border-radius: 8px;
-      border: 1px solid #f0f0f0;
     }
     .ant-table-expanded-row-level-1 {
       td {

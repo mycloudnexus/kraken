@@ -15,10 +15,9 @@ import { useAppStore } from "@/stores/app.store";
 type Props = {
   detail: any;
   onClose?: () => void;
-  enableEdit?: () => void;
 };
 
-const APIViewer = ({ detail, enableEdit }: Props) => {
+const APIViewer = ({ detail }: Props) => {
   const navigate = useNavigate();
   const { currentProduct } = useAppStore();
   const fileName = useMemo(() => {
@@ -60,13 +59,6 @@ const APIViewer = ({ detail, enableEdit }: Props) => {
           <Flex gap={8} justifyContent="flex-start">
             <TitleIcon />
             <Text.NormalLarge>Seller API Server basics</Text.NormalLarge>
-            <Button
-              type="text"
-              style={{ color: "#2962FF" }}
-              onClick={enableEdit}
-            >
-              Edit
-            </Button>
           </Flex>
           <div>
             <Row gutter={[20, 20]}>
@@ -152,13 +144,6 @@ const APIViewer = ({ detail, enableEdit }: Props) => {
             <Text.NormalLarge>
               Base URL for environment variables
             </Text.NormalLarge>
-            <Button
-              type="text"
-              style={{ color: "#2962FF" }}
-              onClick={enableEdit}
-            >
-              Edit
-            </Button>
           </Flex>
           <Flex flexDirection="column" gap={8} alignItems="flex-start">
             {environmentData?.map((e) => (

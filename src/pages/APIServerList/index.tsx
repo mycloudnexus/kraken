@@ -4,7 +4,7 @@ import Text from "@/components/Text";
 import { useGetComponentList } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
 import { COMPONENT_KIND_API_TARGET_SPEC } from "@/utils/constants/product";
-import { Button, Table } from "antd";
+import { Button, ConfigProvider, Table } from "antd";
 import { isEmpty } from "lodash";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
@@ -83,41 +83,45 @@ const APIServerList = () => {
   }, [dataList?.data]);
 
   return (
-    <div className={styles.root}>
-      {isOpenModal && (
-        <APIServerModal
-          id={selectedAPI}
-          isOpen={isOpenModal}
-          onClose={closeModal}
-          refresh={refresh}
-        />
-      )}
-      <Flex justifyContent="space-between">
-        <Text.BoldLarge size="20px">Seller API Server Setup</Text.BoldLarge>
-        <Button
-          type="primary"
-          onClick={() => navigate(`/component/${currentProduct}/new`)}
-        >
-          + Add API Server
-        </Button>
-      </Flex>
-      <div className={styles.content}>
-        <Table
-          loading={isLoading}
-          showHeader={false}
-          columns={columns}
-          dataSource={dataList?.data}
-          pagination={false}
-          expandable={{
-            expandedRowKeys,
-            onExpandedRowsChange: (newKeys: any) => setExpandedRowKeys(newKeys),
-            rowExpandable: (record) => !isEmpty(record),
-            expandedRowRender: (record) => <ExpandRow item={record} />,
-          }}
-          rowKey={(item) => item?.id}
-        />
+    <ConfigProvider table={{ style: { borderColor: "#F0F0F0" } }}>
+      <div className={styles.root}>
+        {isOpenModal && (
+          <APIServerModal
+            id={selectedAPI}
+            isOpen={isOpenModal}
+            onClose={closeModal}
+            refresh={refresh}
+          />
+        )}
+        <Flex justifyContent="space-between">
+          <Text.LightLarge>Seller API Setup</Text.LightLarge>
+          <Button
+            type="primary"
+            onClick={() => navigate(`/component/${currentProduct}/new`)}
+          >
+            + Add API Server
+          </Button>
+        </Flex>
+        <div className={styles.content}>
+          <Table
+            size="small"
+            loading={isLoading}
+            showHeader={false}
+            columns={columns}
+            dataSource={dataList?.data}
+            pagination={false}
+            expandable={{
+              expandedRowKeys,
+              onExpandedRowsChange: (newKeys: any) =>
+                setExpandedRowKeys(newKeys),
+              rowExpandable: (record) => !isEmpty(record),
+              expandedRowRender: (record) => <ExpandRow item={record} />,
+            }}
+            rowKey={(item) => item?.id}
+          />
+        </div>
       </div>
-    </div>
+    </ConfigProvider>
   );
 };
 

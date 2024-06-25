@@ -36,6 +36,7 @@ const APIServerModal = ({ id, isOpen, refresh, onClose }: Props) => {
       footer={
         <Flex justifyContent="flex-end" gap={12}>
           <Button onClick={onClose}>Cancel</Button>
+          {!isEdit && <Button onClick={enableEdit}>Edit</Button>}
           <Button
             disabled={isPending}
             loading={isPending}
@@ -70,11 +71,7 @@ const APIServerModal = ({ id, isOpen, refresh, onClose }: Props) => {
             runUpdate={runUpdate}
           />
         ) : (
-          <APIViewer
-            detail={componentDetail}
-            onClose={onClose}
-            enableEdit={enableEdit}
-          />
+          <APIViewer detail={componentDetail} onClose={onClose} />
         )}
       </Spin>
     </Drawer>

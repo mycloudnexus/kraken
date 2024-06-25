@@ -39,7 +39,7 @@ const ExpandRow = ({ item }: Props) => {
       {
         dataIndex: "method",
         render: (method: string) => <RequestMethod method={method} />,
-        width: 200,
+        width: 120,
       },
       {
         dataIndex: "name",
@@ -74,6 +74,7 @@ const ExpandRow = ({ item }: Props) => {
         selectedAPI={selectedAPI}
       />
       <Table
+        size="small"
         prefixCls="expand-table"
         showHeader={false}
         columns={columns}
