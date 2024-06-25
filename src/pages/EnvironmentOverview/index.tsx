@@ -13,7 +13,7 @@ import { toDateTime, toTime } from "@/libs/dayjs";
 import { useAppStore } from "@/stores/app.store";
 import { ROUTES } from "@/utils/constants/route";
 import { IEnvComponent } from "@/utils/types/envComponent.type";
-import { MoreOutlined, PlusOutlined } from "@ant-design/icons";
+import { MoreOutlined } from "@ant-design/icons";
 import {
   Button,
   Dropdown,
@@ -72,6 +72,7 @@ const EnvironmentOverview = () => {
 
   const { mutateAsync: createApiKeyMutate } = useCreateApiKey();
   const [open, setOpen] = useState(false);
+  const [currentEnvId, setCurrentEnvId] = useState<string | undefined>();
   const modalConfirmRef = useRef<any>();
 
   const generateApiKey = useCallback(
@@ -96,30 +97,42 @@ const EnvironmentOverview = () => {
     return generateApiKey(id, name, true);
   };
 
-  const dropdownItems: (envId: string, envName: string) => MenuProps["items"] =
-    useCallback(
-      (envId, envName) => [
-        {
-          key: "view-log",
-          label: "API activity log",
-          onClick: () => {
-            navigate(ROUTES.ENV_ACTIVITY_LOG(envId));
-          },
+  const dropdownItems: (
+    envId: string,
+    envName: string,
+    len: number
+  ) => MenuProps["items"] = useCallback(
+    (envId, envName, len = 0) => [
+      {
+        key: "view-log",
+        label: "API activity log",
+        onClick: () => {
+          navigate(ROUTES.ENV_ACTIVITY_LOG(envId));
         },
+      },
 
-        {
-          key: "refresh-key",
-          label: "Rotate API key",
-          onClick: () => {
-            modalConfirmRef.current = showModalConfirmRotate(
-              envName,
-              onConfirmRotate(envId, envName)
-            );
-          },
+      {
+        key: "refresh-key",
+        label: "Rotate API key",
+        onClick: () => {
+          modalConfirmRef.current = showModalConfirmRotate(
+            envName,
+            onConfirmRotate(envId, envName)
+          );
         },
-      ],
-      []
-    );
+      },
+      {
+        key: "create",
+        label: "Create new deployment",
+        onClick: () => {
+          setCurrentEnvId(envId);
+          setOpen(true);
+        },
+        disabled: len === 0,
+      },
+    ],
+    []
+  );
 
   const getDataPlaneInfo = useCallback(
     (id: string) => {
@@ -141,6 +154,19 @@ const EnvironmentOverview = () => {
       return list;
     },
     [runningComponent]
+  );
+
+  const getLastDeploymentTime = useCallback(
+    (id: any) => {
+      if (!runningComponent?.data) return [];
+      const target = runningComponent?.data.find((i) => i.id === id);
+
+      if (!target?.createdAt) return "-";
+      return `${toDateTime(target.createdAt, true)} | ${toTime(
+        target.createdAt
+      )}`;
+    },
+    [runningComponent?.data]
   );
 
   const {
@@ -228,17 +254,16 @@ const EnvironmentOverview = () => {
       <Flex vertical gap={14} className={styles.sectionWrapper}>
         <Flex justify="space-between" align="center">
           <Text.BoldLarge>Environment Overview</Text.BoldLarge>
-          <Button type="primary" onClick={() => setOpen(true)}>
-            <PlusOutlined /> Add deployment
-          </Button>
         </Flex>
         <Spin spinning={loadingEnvs}>
           <Flex gap={36}>
             {envs?.data.map((env) => {
               const haveApiKey = !!apiKey?.data.find((i) => i.envId === env.id);
-              const { disConnectNum, connectNum, len } = getDataPlaneInfo(
-                env.id
-              );
+              const {
+                disConnectNum,
+                connectNum,
+                len = 0,
+              } = getDataPlaneInfo(env.id);
               return (
                 <Flex
                   vertical
@@ -247,13 +272,13 @@ const EnvironmentOverview = () => {
                   className={styles.overviewItem}
                   justify="space-between"
                 >
-                  <div>
+                  <div style={{ width: "100%" }}>
                     <Flex justify="space-between" style={{ marginBottom: 16 }}>
                       <Text.BoldMedium>{env.name}</Text.BoldMedium>
                       <Dropdown
                         disabled={!haveApiKey}
                         menu={{
-                          items: dropdownItems(env.id, env.name),
+                          items: dropdownItems(env.id, env.name, len),
                         }}
                       >
                         <MoreOutlined
@@ -296,8 +321,7 @@ const EnvironmentOverview = () => {
                         Last Deployed at
                       </Text.NormalSmall>
                       <Text.NormalSmall style={{ color: "#00000073" }}>
-                        {toDateTime(env.createdAt, true)} |{" "}
-                        {toTime(env.createdAt)}
+                        {getLastDeploymentTime(env.id)}
                       </Text.NormalSmall>
                     </Flex>
                   ) : (
@@ -367,7 +391,13 @@ const EnvironmentOverview = () => {
           }}
         />
       </Flex>
-      <ModalNewDeployment open={open} setOpen={setOpen} />
+
+      <ModalNewDeployment
+        open={open}
+        setOpen={setOpen}
+        runningComponent={runningComponent}
+        currentEnvId={currentEnvId!}
+      />
     </Flex>
   );
 };

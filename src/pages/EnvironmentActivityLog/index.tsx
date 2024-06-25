@@ -86,7 +86,7 @@ const EnvironmentActivityLog = () => {
     }
   }, [data, isLoading]);
   const handleFormValuesChange = (t: any, values: any) => {
-    const { requestTime = [] } = t;
+    const { requestTime = [] } = t ?? {};
     const params = _.omit(values, ["requestTime"]);
     params.requestStartTime = requestTime[0]
       ? dayjs(requestTime[0]).valueOf()
@@ -147,6 +147,7 @@ const EnvironmentActivityLog = () => {
       ),
     },
   ];
+  console.log("=>a-b", tableData);
   return (
     <div className={styles.wrapper}>
       <Breadcrumb
@@ -242,7 +243,10 @@ const EnvironmentActivityLog = () => {
         </Flex>
         <div className={styles.tableWrapper}>
           <Table
-            dataSource={tableData}
+            dataSource={[...tableData]?.sort(
+              (a: any, b: any) =>
+                dayjs(b.createdAt).valueOf() - dayjs(a.createdAt).valueOf()
+            )}
             columns={columns}
             rowKey={(record) =>
               `${record.method}_${record.requestId}_${record.createdAt}`

@@ -2,130 +2,186 @@ import Text from "@/components/Text";
 import {
   useDeployProduct,
   useGetProductComponentVersions,
-  useGetProductEnvs,
 } from "@/hooks/product";
+import type { IComponentVersion } from "@/utils/types/component.type";
 import { useAppStore } from "@/stores/app.store";
-import { Checkbox, Collapse, Modal, Radio, notification } from "antd";
-import { flatten, omit } from "lodash";
-import { useCallback, useMemo, useState } from "react";
+
+import { Select, Modal, notification, Form, Tag, Spin } from "antd";
+
+import { useCallback, useEffect } from "react";
 import styles from "./index.module.scss";
 
 interface Props {
   open: boolean;
   setOpen: (value: boolean) => void;
+  runningComponent: any;
+  currentEnvId: string;
 }
-const ModalNewDeployment = ({ open, setOpen }: Readonly<Props>) => {
+const ModalNewDeployment = ({
+  open,
+  setOpen,
+  runningComponent,
+  currentEnvId = "",
+}: Readonly<Props>) => {
   const { currentProduct } = useAppStore();
-  const { data: envs, isLoading: loadingEnvs } = useGetProductEnvs(
-    currentProduct,
-    open
-  );
+
   const { data: componentVersions, isLoading: loadingComponentVersions } =
     useGetProductComponentVersions(currentProduct, open);
   const { mutateAsync: deployProduct, isPending: deploying } =
     useDeployProduct();
-  const [selectEnv, setSelectEnv] = useState<string | undefined>();
-  const [selectVersion, setSelectVersion] = useState<Record<string, string[]>>(
-    {}
-  );
+
+  const [form] = Form.useForm();
   const handleCancel = () => {
     setOpen(false);
   };
-  const envOptions = useMemo(() => {
-    if (!loadingEnvs) {
-      return envs?.data?.map((env) => ({
-        label: env.name,
-        value: env.id,
-      }));
-    }
-    return [];
-  }, [envs, loadingEnvs]);
-  const handleCheckboxOnChange = useCallback(
-    (key: string) => (checkedValues: string[]) =>
-      setSelectVersion((sv) => {
-        if (checkedValues.length) {
-          return {
-            ...sv,
-            [key]: checkedValues,
-          };
-        }
-        return omit(sv, key);
-      }),
-    []
-  );
-  const componentVersionCollapseItems = useMemo(() => {
-    if (!loadingComponentVersions) {
-      return componentVersions?.map((product) => ({
-        key: product.key,
-        label: <Text.NormalSmall>{product.name}</Text.NormalSmall>,
-        children: (
-          <Checkbox.Group
-            options={product.componentVersions.map(({ id, version }) => ({
-              label: version,
-              value: id,
-              disabled:
-                selectVersion?.[product.key]?.length > 0 &&
-                selectVersion?.[product.key]?.includes(id) === false,
-            }))}
-            className={styles.verticalRadio}
-            onChange={handleCheckboxOnChange(product.key)}
-          />
-        ),
-      }));
-    }
-    return [];
-  }, [
-    componentVersions,
-    loadingComponentVersions,
-    selectVersion,
-    handleCheckboxOnChange,
-  ]);
-  const handleOk = async () => {
-    const allSelectedVersions = flatten(Object.values(selectVersion));
-    const selectedComponentVersions = flatten(
-      componentVersions?.map((cv) => cv.componentVersions)
-    )
-      .filter((v) => allSelectedVersions.includes(v.id))
-      .map(({ id, name, version, key }) => ({ id, name, version, key }));
+
+  useEffect(() => {
+    if (!componentVersions?.length) return;
+    const r = new Array(componentVersions.length).fill(undefined);
+
+    form.setFieldsValue({
+      versions: r,
+    });
+  }, [componentVersions, form]);
+
+  const onFinish = useCallback(async () => {
+    if (!componentVersions || !currentEnvId) return;
+    const values = await form.validateFields();
+    const t = values.versions
+      ?.filter((v: any) => v)
+      ?.map((i: string) => {
+        const [index = 0, versionId] = i.split("@");
+        const list =
+          componentVersions[Number(index)].componentVersions ??
+          ([] as IComponentVersion[]);
+
+        const { id, name, version, key } =
+          list?.find((f) => f.id === versionId) ?? {};
+        return { id, name, version, key };
+      });
+
     try {
       await deployProduct({
         product: currentProduct,
-        envId: selectEnv,
-        data: selectedComponentVersions,
+        envId: currentEnvId,
+        data: t,
       } as any);
       notification.success({ message: "Deploy product successfully!" });
       setOpen(false);
     } catch {
       notification.error({ message: "Error when deploy product!" });
     }
-  };
+  }, [componentVersions, currentEnvId]);
 
+  const getOptions = useCallback(
+    (i: number) => {
+      if (!componentVersions) return [];
+      const t = componentVersions[i];
+
+      const currentVersion =
+        runningComponent?.data.find((f: any) => f.id === currentEnvId)
+          ?.components ?? [];
+
+      return t.componentVersions.map((c) => {
+        const runningVersion = currentVersion
+          .map((v: any) => v.id)
+          ?.includes(c.id);
+        return {
+          label: (
+            <div>
+              Version {c.version}
+              <span>
+                {runningVersion ? (
+                  <Tag
+                    bordered={false}
+                    color="success"
+                    style={{ marginLeft: 4 }}
+                  >
+                    Running
+                  </Tag>
+                ) : (
+                  ""
+                )}
+              </span>
+            </div>
+          ),
+          value: `${i}@${c.id}`,
+          disabled: runningVersion,
+        };
+      });
+    },
+    [componentVersions, runningComponent, currentEnvId]
+  );
   return (
     <Modal
       title="New deployment"
       open={open}
-      onOk={handleOk}
+      onOk={onFinish}
       onCancel={handleCancel}
-      okText="Deploy"
       okButtonProps={{
         loading: deploying,
+        disabled: deploying,
       }}
+      cancelButtonProps={{ disabled: deploying }}
     >
-      <Text.BoldLarge className={styles.title}>Environment</Text.BoldLarge>
-      <Radio.Group
-        options={envOptions}
-        style={{ paddingLeft: 8, marginBottom: 12 }}
-        onChange={({ target: { value } }) => setSelectEnv(value)}
-        className={styles.verticalRadio}
-      />
       <Text.BoldLarge className={styles.title}>
         Select API components to deploy
       </Text.BoldLarge>
-      <Collapse
-        ghost
-        items={componentVersionCollapseItems}
-        className={styles.collapse}
-      />
+      <Spin spinning={loadingComponentVersions}>
+        <Form
+          name="componentVersion"
+          onFinish={onFinish}
+          style={{ maxWidth: 600 }}
+          layout="vertical"
+          form={form}
+          className={styles.formContainer}
+        >
+          <Form.List
+            name="versions"
+            rules={[
+              {
+                validator: async (_aa) => {
+                  const { versions } = form.getFieldsValue();
+                  const haveVersion = versions.some((v: any) => v);
+                  if (!haveVersion) {
+                    return Promise.reject(
+                      new Error(
+                        "Please select version for at least one component"
+                      )
+                    );
+                  }
+                  return Promise.resolve();
+                },
+              },
+            ]}
+          >
+            {(fields, _, { errors }) => {
+              return (
+                <>
+                  {fields.map((field, index) => (
+                    <Form.Item
+                      label={componentVersions?.[index].name}
+                      required={false}
+                      key={field.key}
+                    >
+                      <Form.Item {...field} noStyle>
+                        <Select
+                          placeholder="No selection"
+                          style={{ width: "60%" }}
+                          options={getOptions(index)}
+                        />
+                      </Form.Item>
+                    </Form.Item>
+                  ))}
+                  <Form.Item>
+                    <Form.ErrorList errors={errors} />
+                  </Form.Item>
+                </>
+              );
+            }}
+          </Form.List>
+        </Form>
+      </Spin>
     </Modal>
   );
 };
