@@ -168,7 +168,7 @@ const NewAPIMapping = () => {
   const handlePrev = () => {
     setTabActiveKey("request");
   };
-  const handleSave = async () => {
+  const handleSave = async (isExit?: boolean) => {
     try {
       const data = cloneDeep(mapperResponse.data[0]);
       data.facets.endpoints[0] = {
@@ -187,7 +187,10 @@ const NewAPIMapping = () => {
         data,
       } as any);
       notification.success({ message: res.message });
-      navigate(-1);
+      if (isExit) {
+        navigate(-1);
+      }
+      return true;
     } catch (error) {
       notification.error({
         message: get(error, "message", "Error on creating/updating mapping"),
@@ -235,7 +238,9 @@ const NewAPIMapping = () => {
               onSelect={handleSelectSonataProp}
             />
           )}
-          {rightSide === EnumRightType.SelectSellerAPI && <SelectAPI />}
+          {rightSide === EnumRightType.SelectSellerAPI && (
+            <SelectAPI save={() => handleSave(false)} />
+          )}
           {rightSide === EnumRightType.AddSellerProp && (
             <RightAddSellerProp onSelect={handleSelectSellerProp} />
           )}
@@ -256,7 +261,11 @@ const NewAPIMapping = () => {
         {tabActiveKey === "response" && (
           <>
             <Button onClick={handlePrev}>Previous</Button>
-            <Button type="primary" onClick={handleSave} loading={isPending}>
+            <Button
+              type="primary"
+              onClick={() => handleSave(true)}
+              loading={isPending}
+            >
               Save and exit
             </Button>
           </>

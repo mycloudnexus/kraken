@@ -15,12 +15,13 @@ import {
 import { Button, Empty, Input, Modal, Spin, Tooltip, Typography } from "antd";
 import clsx from "clsx";
 import jsYaml from "js-yaml";
-import { get, isEmpty } from "lodash";
+import { cloneDeep, get, isEmpty } from "lodash";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import swaggerClient from "swagger-client";
 import { useBoolean } from "usehooks-ts";
 import styles from "./index.module.scss";
+import useGetApiSpec from "../useGetApiSpec";
 
 type ItemProps = {
   item: IComponent;
@@ -37,12 +38,12 @@ export const APIItem = ({
   selectedAPI,
   setSelectedServer,
 }: ItemProps) => {
-  console.log("🚀 ~ item:", item);
   const navigate = useNavigate();
   const { currentProduct } = useAppStore();
   const { sellerApi } = useNewApiMappingStore();
   const { value: isOpen, toggle: toggleOpen } = useBoolean(isOneItem);
   const [searchValue, setSearchValue] = useState("");
+
   const baseSpec = useMemo(() => {
     const encoded = item?.facets?.baseSpec?.content;
     if (!encoded) return undefined;
@@ -194,12 +195,18 @@ export const APIItem = ({
   );
 };
 
-const SelectAPI = () => {
+const SelectAPI = ({ save }: { save: () => Promise<true | undefined> }) => {
   const { currentProduct } = useAppStore();
   const [selectedAPI, setSelectedAPI] = useState<any>();
   const [selectedServer, setSelectedServer] = useState<string>("");
-  const { setSellerApi, setServerKey, sellerApi, reset } =
-    useNewApiMappingStore();
+  const {
+    setSellerApi,
+    setServerKey,
+    sellerApi,
+    reset,
+    query,
+    setResponseMapping,
+  } = useNewApiMappingStore();
   const navigate = useNavigate();
   const {
     data: dataList,
@@ -210,11 +217,24 @@ const SelectAPI = () => {
     size: 1000,
   });
 
+  const { mappers } = useGetApiSpec(currentProduct, query ?? "{}");
+
   const handleMapSave = () => {
     setSellerApi(selectedAPI);
     setServerKey(selectedServer);
     setSelectedAPI(undefined);
     setSelectedServer("");
+  };
+
+  const resetMapping = () => {
+    reset();
+    const newApiMapping = cloneDeep(mappers?.response).map((rm: any) => ({
+      ...rm,
+      sourceLocation: undefined,
+      source: undefined,
+      valueMapping: undefined,
+    }));
+    setResponseMapping(newApiMapping);
   };
 
   const handleOK = () => {
@@ -240,7 +260,7 @@ const SelectAPI = () => {
           <Button
             type="default"
             onClick={() => {
-              reset();
+              resetMapping();
               handleMapSave();
               Modal.destroyAll();
             }}
@@ -254,7 +274,12 @@ const SelectAPI = () => {
         type: "primary",
       },
       okText: "Save and switch",
-      onOk: handleMapSave,
+      onOk: async () => {
+        await save();
+        resetMapping();
+        handleMapSave();
+        Modal.destroyAll();
+      },
       cancelButtonProps: {
         type: "text",
         style: {
