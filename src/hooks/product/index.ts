@@ -171,12 +171,13 @@ export const useGetProductEnvActivityDetail = (
 
 export const useGetComponentDetail = (
   productId: string,
-  componentId: string
+  componentId: string,
+  open = true
 ) => {
   return useQuery<any, Error, IUnifiedAsset>({
     queryKey: [PRODUCT_CACHE_KEYS.get_component_detail, productId, componentId],
     queryFn: () => getComponentDetail(productId, componentId),
-    enabled: Boolean(productId && componentId),
+    enabled: Boolean(productId && componentId && open),
     select: (data) => data.data,
   });
 };

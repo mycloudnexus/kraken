@@ -3,10 +3,14 @@ import Text from "@/components/Text";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { ROUTES } from "@/utils/constants/route";
 import { Button, Flex, Tag, Typography } from "antd";
-import { capitalize } from "lodash";
-import { useCallback } from "react";
+import { capitalize, get } from "lodash";
+import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./index.module.scss";
+import APIViewerModal from "@/components/APIViewerModal";
+import { useBoolean } from "usehooks-ts";
+import { useGetComponentDetail } from "@/hooks/product";
+import { useAppStore } from "@/stores/app.store";
 
 export interface IMapProductAndType {
   path: string;
@@ -39,8 +43,21 @@ interface Props {
   tab?: string;
 }
 const RenderList = ({ data, componentId, tab }: Readonly<Props>) => {
+  const { currentProduct } = useAppStore();
+  const {
+    value: isOpenModal,
+    setTrue: openModal,
+    setFalse: closeModal,
+  } = useBoolean(false);
+  const { data: dataDetail } = useGetComponentDetail(
+    currentProduct,
+    (componentId ?? "").replace(".api.", ".api-spec."),
+    isOpenModal
+  );
+  const [selectedAPI, setSelectedAPI] = useState("");
   const navigate = useNavigate();
   const { setQuery } = useNewApiMappingStore();
+
   const hasAction = useCallback(
     (s: IMapProductAndType) => (s.actionTypes?.length ?? 0) > 0,
     []
@@ -51,9 +68,22 @@ const RenderList = ({ data, componentId, tab }: Readonly<Props>) => {
       setQuery(JSON.stringify(query));
       navigate(ROUTES.NEW_API_MAPPING(componentId!));
     };
+  const handleViewAPI = async (mapItem: IMapProductAndType) => {
+    const path = `/${get(mapItem, "path", "")?.split("/").slice(5).join("/")}`;
+    setSelectedAPI(`${path} ${mapItem.method}`);
+    openModal();
+  };
   if (!data) return null;
   return (
     <Flex vertical gap={12}>
+      {isOpenModal && (
+        <APIViewerModal
+          content={get(dataDetail, "facets.baseSpec.content", "")}
+          isOpen={isOpenModal}
+          onClose={closeModal}
+          selectedAPI={selectedAPI}
+        />
+      )}
       {data.map((s: IMapProductAndType) => (
         <Flex
           vertical
@@ -68,7 +98,11 @@ const RenderList = ({ data, componentId, tab }: Readonly<Props>) => {
               <LogMethodTag method={s.method} />
               <Text.NormalMedium>{s.path}</Text.NormalMedium>
               <Text.NormalMedium color="rgba(0,0,0,0.45)"> </Text.NormalMedium>
-              <Button type="link" style={{ paddingInline: 4 }}>
+              <Button
+                type="link"
+                style={{ paddingInline: 4 }}
+                onClick={() => handleViewAPI(s)}
+              >
                 View
               </Button>
             </Flex>

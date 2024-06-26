@@ -3,7 +3,12 @@ import { Button, Empty, Tree } from "antd";
 import { get, isEmpty } from "lodash";
 import { useEffect, useMemo, useState } from "react";
 import styles from "./index.module.scss";
-import { exampleParse, schemaParses } from "@/utils/helpers/schema";
+import {
+  convertSchemaToTypeOnly,
+  exampleParse,
+  parseObjectDescriptionToTreeData,
+  schemaParses,
+} from "@/utils/helpers/schema";
 
 type Props = {
   item: Record<string, any>;
@@ -40,6 +45,23 @@ const Response = ({ item, schemas }: Props) => {
     );
     if (!isEmpty(example)) {
       return exampleParse(example, "", styles.nodeTitle, styles.nodeExample);
+    }
+    const properties = get(
+      item,
+      `[${selectedResponse}].content[${objectKey}].schema.items.properties`,
+      get(
+        item,
+        `[${selectedResponse}].content[${objectKey}].schema.properties`,
+        {}
+      )
+    );
+    if (!isEmpty(properties)) {
+      const simplifiedProperties = convertSchemaToTypeOnly(properties);
+      return parseObjectDescriptionToTreeData(
+        simplifiedProperties,
+        styles.nodeTitle,
+        styles.nodeExample
+      );
     }
     const schemaUrl = get(
       item,

@@ -1,5 +1,4 @@
 import { Button, Col, Drawer, Row, Table, notification } from "antd";
-import { decode } from "js-base64";
 import jsYaml from "js-yaml";
 import { get } from "lodash";
 import { useEffect, useMemo, useState } from "react";
@@ -10,6 +9,8 @@ import RequestBody from "@/pages/NewAPIServer/components/RequestBody";
 import Response from "@/pages/NewAPIServer/components/Response";
 import Flex from "../Flex";
 import { CloseOutlined } from "@ant-design/icons";
+import swaggerClient from "swagger-client";
+import { decode } from "js-base64";
 
 type Props = {
   content: string;
@@ -22,18 +23,23 @@ const APIViewerModal = ({ selectedAPI, content, isOpen, onClose }: Props) => {
   const [schemas, setSchemas] = useState<any>();
   const [viewData, setViewData] = useState<any>();
 
-  useEffect(() => {
+  const loadContent = async () => {
     try {
       if (selectedAPI && content) {
         const selectedArray = selectedAPI.split(" ");
-        const decodeData = decode(content);
-        const data = jsYaml.load(decodeData);
+        const yamlContent = jsYaml.load(decode(content));
+        const result = await swaggerClient.resolve({ spec: yamlContent });
+        const data = get(result, "spec");
         setSchemas(get(data, "components.schemas"));
         setViewData(get(data, `paths.${selectedArray[0]}.${selectedArray[1]}`));
       }
     } catch (error) {
       notification.error({ message: "Can not load yaml" });
     }
+  };
+
+  useEffect(() => {
+    loadContent();
   }, [selectedAPI, content]);
 
   const paramCol = useMemo(
@@ -92,7 +98,7 @@ const APIViewerModal = ({ selectedAPI, content, isOpen, onClose }: Props) => {
         </Flex>
       }
       closable={false}
-      width="65vw"
+      width="70vw"
       footer={
         <Flex justifyContent="flex-end">
           <Button type="primary" onClick={onClose}>
