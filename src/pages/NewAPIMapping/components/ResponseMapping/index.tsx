@@ -1,14 +1,14 @@
 import MappingIcon from "@/assets/newAPIMapping/mapping-icon-response.svg";
 import ExpandCard from "@/components/ExpandCard";
 import Flex from "@/components/Flex";
-import RequestMethod from "@/components/Method";
 import Text from "@/components/Text";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { EnumRightType } from "@/utils/types/common.type";
 import { DeleteOutlined, RightOutlined } from "@ant-design/icons";
-import { Button, Input, Select, Typography } from "antd";
+import { Button, Input, Select, Tag, Typography } from "antd";
 import clsx from "clsx";
 import {
+  capitalize,
   chain,
   cloneDeep,
   difference,
@@ -27,17 +27,41 @@ interface IMapping {
   to?: string;
   name?: string;
 }
+
+const buildInitListMapping = (responseMapping: any[]) => {
+  let k = 1;
+  const list: IMapping[] = [];
+  responseMapping.forEach((item) => {
+    Object.entries((item.valueMapping ?? {}) as Record<string, string>).map(
+      ([from, to]) => {
+        const mapItem = {
+          key: k,
+          from,
+          to,
+          name: item.name,
+        };
+        list.push(mapItem);
+        k++;
+      }
+    );
+  });
+  return list;
+};
+
 const ResponseMapping = () => {
   const {
-    setRightSide,
-    sellerApi,
-    responseMapping,
-    setActiveResponseName,
     query,
+    responseMapping,
+    rightSide,
+    sellerApi,
+    setActiveResponseName,
     setResponseMapping,
+    setRightSide,
   } = useNewApiMappingStore();
   const queryData = JSON.parse(query ?? "{}");
-  const [listMapping, setListMapping] = useState<IMapping[]>([]);
+  const [listMapping, setListMapping] = useState<IMapping[]>(
+    buildInitListMapping(responseMapping)
+  );
 
   const handleSelect = (v: string, key: number) => {
     const cloneArr = cloneDeep(listMapping);
@@ -101,9 +125,23 @@ const ResponseMapping = () => {
   return (
     <div className={styles.root}>
       <Flex gap={16} justifyContent="flex-start">
-        <div className="flex-1">
+        <Flex
+          justifyContent="flex-start"
+          gap={8}
+          style={{
+            boxSizing: "border-box",
+            flex: "0 0 calc(50% - 30px)",
+            padding: 10,
+          }}
+        >
           <Text.NormalLarge>Sonata API</Text.NormalLarge>
-        </div>
+          {queryData?.productType && (
+            <Tag>{queryData.productType.toUpperCase()}</Tag>
+          )}
+          {queryData?.actionType && (
+            <Tag>{capitalize(queryData.actionType)}</Tag>
+          )}
+        </Flex>
         <div style={{ visibility: "hidden" }}>
           <MappingIcon />
         </div>
@@ -122,33 +160,34 @@ const ResponseMapping = () => {
           </Typography.Text>
         </Flex>
         <MappingIcon />
-        <div className="flex-1 word-break-all">
-          <div
-            className={styles.mappingCard}
-            style={{
-              cursor: "pointer",
-              borderColor: isEmpty(sellerApi) ? "#165DFF" : "#dde1e5",
-            }}
-            role="none"
-            onClick={() => {
-              setRightSide(EnumRightType.SelectSellerAPI);
-            }}
-          >
-            {isEmpty(sellerApi) ? (
-              <Flex justifyContent="space-between" style={{ width: "100%" }}>
-                <Typography.Text style={{ flex: 1 }}>
-                  Please select API from the side bar
-                </Typography.Text>
-                <RightOutlined style={{ color: "rgba(0, 0, 0, 0.45)" }} />
-              </Flex>
-            ) : (
+        <Flex
+          justifyContent="space-between"
+          className={clsx(styles.sellerAPIBasicInfoWrapper, {
+            [styles.highlight]: rightSide === EnumRightType.SelectSellerAPI,
+          })}
+          onClick={() => {
+            setRightSide(EnumRightType.SelectSellerAPI);
+          }}
+        >
+          <Flex gap={12} style={{ width: "100%" }}>
+            {sellerApi ? (
               <>
-                <RequestMethod method={sellerApi?.method} />
-                <Text.LightMedium>{sellerApi?.url}</Text.LightMedium>
+                <LogMethodTag method={sellerApi.method} />
+                <Typography.Text
+                  style={{ flex: 1 }}
+                  ellipsis={{ tooltip: true }}
+                >
+                  {sellerApi.url}
+                </Typography.Text>
               </>
+            ) : (
+              <Typography.Text>
+                Please select API from the side bar
+              </Typography.Text>
             )}
-          </div>
-        </div>
+          </Flex>
+          <RightOutlined style={{ color: "rgba(0, 0, 0, 0.45)" }} />
+        </Flex>
       </Flex>
       {responseMapping?.map((item: any) => (
         <div style={{ marginTop: 26 }} key={`main-${item?.name}`}>

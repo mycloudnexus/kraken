@@ -13,8 +13,8 @@ export const showModalConfirmCreateVersion = ({
     title: "You are going to create a new version",
     content: (
       <Text.NormalMedium>
-        Create a new version will keep all your configuration stable and ready
-        to deploy. What version you want to create?
+        Creating a Version can be regarded a snapshot of all the mappings under
+        this API component.
       </Text.NormalMedium>
     ),
     okButtonProps: {

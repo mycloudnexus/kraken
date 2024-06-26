@@ -7,6 +7,18 @@
   border: 1px solid #f0f0f0;
   background-color: #f0f2f5;
 }
+.sellerAPIBasicInfoWrapper {
+  flex: 0 0 calc(50% - 30px);
+  width: calc(50% - 30px);
+  box-sizing: border-box;
+  padding: 18px 20px;
+  border-radius: 6px;
+  border: 1px solid #dde1e5;
+  cursor: pointer;
+  &.highlight {
+    border-color: #2962ff;
+  }
+}
 .card {
   border: 1px solid;
   border-radius: 6px;
@@ -23,6 +35,7 @@
 
 .mappingCard {
   @extend .card;
+  gap: 12px;
   border-color: #dde1e5;
 }
 
