@@ -16,7 +16,8 @@ const useGetApiSpec = (currentProduct: string, query: string) => {
     page: 0,
     size: 20,
   });
-  const mappers = mapperResponse?.data?.[0]?.facets?.endpoints?.[0]?.mappers;
+  const endpoint = mapperResponse?.data?.[0]?.facets?.endpoints?.[0];
+  const mappers = endpoint?.mappers;
 
   const { data: targetResponse } = useGetComponentList(currentProduct, {
     kind: COMPONENT_KIND_API_TARGET,
@@ -55,8 +56,16 @@ const useGetApiSpec = (currentProduct: string, query: string) => {
     const yamlContent = atob(apiSpec?.facets?.baseSpec?.content);
     return jsYaml.load(yamlContent);
   }, [apiSpec]);
+
+  const serverKeyInfo = {
+    method: endpoint?.method,
+    path: endpoint?.path,
+    serverKey: endpoint?.serverKey,
+  };
+
   return {
     mapperResponse,
+    serverKeyInfo,
     mappers,
     jsonSpec,
   };

@@ -328,7 +328,7 @@ const SelectAPI = ({ save }: { save: () => Promise<true | undefined> }) => {
                 setSelectedServer={setSelectedServer}
               />
             ))}
-            {isEmpty(dataList?.data) && <Empty />}
+            {!isLoading && isEmpty(dataList?.data) && <Empty />}
           </div>
         </div>
       </Spin>

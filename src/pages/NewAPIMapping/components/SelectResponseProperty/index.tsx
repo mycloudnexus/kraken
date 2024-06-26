@@ -9,7 +9,6 @@ import { clone, get, isEmpty, set } from "lodash";
 
 import {
   convertSchemaToTypeOnly,
-  exampleParse,
   parseObjectDescriptionToTreeData,
 } from "@/utils/helpers/schema";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
@@ -38,22 +37,6 @@ const SelectResponseProperty = () => {
       return [];
     }
     const contentType = get(Object.keys(response.content), "[0]");
-    const example = get(
-      response,
-      `content[${contentType}].examples.response.value[0]`,
-      get(
-        response,
-        `content[${contentType}].examples.response.value`,
-        get(
-          response,
-          `content[${contentType}].example`,
-          get(response, `content[${contentType}].examples`)
-        )
-      )
-    );
-    if (!isEmpty(example)) {
-      return exampleParse(example, "", styles.nodeTitle, styles.nodeExample);
-    }
 
     const properties = get(
       response,

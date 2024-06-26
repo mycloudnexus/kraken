@@ -6,7 +6,7 @@ import SelectResponseProperty from "@/pages/NewAPIMapping/components/SelectRespo
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { queryClient } from "@/utils/helpers/reactQuery";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { fireEvent, render, renderHook, waitFor } from "@testing-library/react";
+import { fireEvent, render, renderHook } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 
 beforeAll(() => {
@@ -58,7 +58,7 @@ beforeAll(() => {
 });
 
 test("component new api map page", async () => {
-  const { container, getByTestId } = await render(
+  const { container, getByTestId } = render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <ResponseMapping />
@@ -69,12 +69,8 @@ test("component new api map page", async () => {
   expect(container).toBeInTheDocument();
   const element = getByTestId("btn-add-state");
   fireEvent.click(element);
-  waitFor(() => {
-    const select = getByTestId("select-sonata-state");
-    expect(select).toBeInTheDocument();
-    fireEvent.select(select, { target: { value: "acknowledged" } });
-    fireEvent.click(element);
-  });
+  const select = getByTestId("select-sonata-state");
+  expect(select).toBeInTheDocument();
 });
 
 test("component RightAddSellerProp", () => {

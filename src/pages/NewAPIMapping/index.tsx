@@ -26,6 +26,7 @@ import RightAddSonataProp from "./components/RightAddSonataProp";
 import SelectAPI from "./components/SelectAPI";
 import SelectResponseProperty from "./components/SelectResponseProperty";
 import useGetApiSpec from "./components/useGetApiSpec";
+import useGetDefaultSellerApi from "./components/useGetDefaultSellerApi";
 import styles from "./index.module.scss";
 
 const NewAPIMapping = () => {
@@ -45,13 +46,15 @@ const NewAPIMapping = () => {
     setRightSide,
     setRightSideInfo,
     setResponseMapping,
+    setSellerApi,
+    setServerKey,
     reset,
   } = useNewApiMappingStore();
   const { mutateAsync: updateTargetMapper, isPending } =
     useUpdateTargetMapper();
   const queryData = JSON.parse(query ?? "{}");
   const [activeKey, setActiveKey] = useState<string | string[]>("0");
-  const [step] = useState(0);
+  const [step, setStep] = useState(0);
   const breadcrumb: BreadcrumbProps["items"] = [
     {
       title: (
@@ -71,10 +74,24 @@ const NewAPIMapping = () => {
       ),
     },
   ];
-  const { jsonSpec, mappers, mapperResponse } = useGetApiSpec(
+  const { jsonSpec, serverKeyInfo, mappers, mapperResponse } = useGetApiSpec(
     currentProduct,
     query ?? "{}"
   );
+  const { sellerApi: defaultSellerApi, serverKey: defaultServerKey } =
+    useGetDefaultSellerApi(currentProduct, serverKeyInfo);
+
+  useEffect(() => {
+    if (!sellerApi && defaultSellerApi) {
+      setSellerApi(defaultSellerApi);
+    }
+  }, [sellerApi, setSellerApi, defaultSellerApi]);
+
+  useEffect(() => {
+    if (!serverKey && defaultServerKey) {
+      setServerKey(defaultServerKey);
+    }
+  }, [defaultServerKey, serverKey, setServerKey]);
   useEffect(() => {
     if (!requestMapping.length && mappers?.request?.length) {
       setRequestMapping(mappers?.request ?? []);
@@ -86,6 +103,7 @@ const NewAPIMapping = () => {
     }
   }, [mappers?.response, responseMapping]);
   const [tabActiveKey, setTabActiveKey] = useState("request");
+
   const items: TabsProps["items"] = [
     {
       key: "request",
@@ -164,9 +182,13 @@ const NewAPIMapping = () => {
   };
   const handleNext = () => {
     setTabActiveKey("response");
+    setStep(2);
+    setActiveKey("2");
   };
   const handlePrev = () => {
     setTabActiveKey("request");
+    setStep(1);
+    setActiveKey("1");
   };
   const handleSave = async (isExit?: boolean) => {
     try {
@@ -190,6 +212,8 @@ const NewAPIMapping = () => {
       if (isExit) {
         navigate(-1);
       }
+      setStep(1);
+      setActiveKey("1");
       return true;
     } catch (error) {
       notification.error({
@@ -197,6 +221,17 @@ const NewAPIMapping = () => {
       });
     }
   };
+
+  useEffect(() => {
+    if (rightSide === EnumRightType.SelectSellerAPI) {
+      setStep(0);
+      setActiveKey("0");
+    }
+    if (rightSide === EnumRightType.AddSonataProp || rightSide === EnumRightType.AddSellerProp) {
+      setStep(1);
+      setActiveKey('1');
+    }
+  }, [rightSide]);
 
   useEffect(() => {
     return () => {
