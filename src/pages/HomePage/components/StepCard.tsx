@@ -50,13 +50,18 @@ const StepCard = () => {
           />
         </svg>
       </Row>
-      <Row className={styles.stepRow} align={"middle"}>
+      <Row
+        className={styles.stepRow}
+        align={"middle"}
+        justify={"space-between"}
+      >
         {step.map((i, n) => {
           return (
             <Fragment key={i.step}>
               <Col span={5} className={styles.stepDetail}>
                 <h5>{i.step}</h5>
                 <span
+                  className={styles.title}
                   style={{
                     color:
                       n > 1
@@ -66,11 +71,16 @@ const StepCard = () => {
                 >
                   {i.title}
                 </span>
-                {i.icon}
+                <div className={styles.iconContainer}> {i.icon}</div>
+
                 <p>{i.desc}</p>
               </Col>
               {n !== 3 && (
-                <Col span={1} style={{ textAlign: "center" }}>
+                <Col
+                  span={1}
+                  className={styles.arrow}
+                  style={{ textAlign: "center" }}
+                >
                   <RightArrow />
                 </Col>
               )}

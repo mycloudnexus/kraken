@@ -3,6 +3,7 @@
   height: 100%;
   padding: 16px 20px;
   background-color: #f4f4f4;
+
 }
 .runningContainer{
 
@@ -33,7 +34,7 @@
     }
   }
   .running{
-    max-width: 90%;
+    max-width: 80%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -48,6 +49,14 @@
   border-radius: 4px;
   padding: 16px 20px;
   background-color: #fff;
+
+}
+.overviewContainer{
+
+  display: flex;
+  min-width: 580px;
+  overflow-y: scroll;
+
 }
 .overviewItem {
   flex: 1;
@@ -55,6 +64,13 @@
   border: 1px solid #dde1e5;
   background: #fff;
   padding: 22px 24px;
+
+  overflow: auto; 
+
+
+  &:not(:last-child){
+    margin-right: 10px;
+  }
 }
 .componentList {
   max-height: 124px;

@@ -32,8 +32,8 @@ const HomePage = () => {
       <h1>MEF LSO Sonata Adapters</h1>
       <StepCard />
       <ApiComponents />
-      <Row justify={"space-between"}>
-        <Col span={11}>
+      <Row justify={"space-between"} gutter={[36, 0]}>
+        <Col span={12}>
           <Row
             justify={"space-between"}
             className={styles.bottomItem}
@@ -45,7 +45,7 @@ const HomePage = () => {
             </Col>
           </Row>
         </Col>
-        <Col span={11}>
+        <Col span={12}>
           <Row
             justify={"space-between"}
             className={styles.bottomItem}

@@ -256,7 +256,7 @@ const EnvironmentOverview = () => {
           <Text.BoldLarge>Environment Overview</Text.BoldLarge>
         </Flex>
         <Spin spinning={loadingEnvs}>
-          <Flex gap={36}>
+          <div className={styles.overviewContainer}>
             {envs?.data.map((env) => {
               const haveApiKey = !!apiKey?.data.find((i) => i.envId === env.id);
               const {
@@ -337,7 +337,7 @@ const EnvironmentOverview = () => {
                 </Flex>
               );
             })}
-          </Flex>
+          </div>
         </Spin>
       </Flex>
       <Flex
@@ -373,6 +373,7 @@ const EnvironmentOverview = () => {
           </Form>
         </Flex>
         <Table
+          scroll={{ x: 600 }}
           dataSource={tableData}
           columns={columns}
           rowKey="id"

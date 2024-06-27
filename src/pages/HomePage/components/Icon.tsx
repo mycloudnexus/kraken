@@ -189,8 +189,8 @@ export const Step2Icon = () => (
 export const Step3Icon = () => (
   <svg
     width="260"
-    height="146"
-    viewBox="0 0 260 146"
+    height="130"
+    viewBox="0 0 260 130"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
   >

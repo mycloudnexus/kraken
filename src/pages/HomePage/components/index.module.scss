@@ -16,6 +16,8 @@
     margin-bottom: 20px;
   
   }
+
+
   .stepDetail{
     padding: 0 16px 16px;
     text-align: center;
@@ -41,6 +43,15 @@
       line-height: 28px; 
 
     }
+    .title{
+      overflow: hidden;
+     
+      width: 100%;
+      display: -webkit-box;
+      -webkit-box-orient:vertical ;
+      -webkit-line-clamp:2 ;
+      min-height: 48px;
+    }
     span{
       color: var(--Texts-Primary, var(--Text-primary, rgba(0, 0, 0, 0.85)));
       font-size: 16px;
@@ -48,14 +59,19 @@
       font-weight: 400;
       line-height: 24px; 
     }
-    svg{
-      width: fit-content;
-      margin: 9px 0;
+    .iconContainer{
+      max-width: 100%;
+
+      svg{
+        margin: 9px 0;
+      }
+
     }
+   
     p{
       overflow: hidden;
       color: var(--Text-secondary, rgba(0, 0, 0, 0.45));
-
+height: 80px;
       font-size: 12px;
       font-style: normal;
       font-weight: 400;
@@ -65,8 +81,19 @@
       -webkit-box-orient:vertical ;
       -webkit-line-clamp:4 ;
 
+
+    }
+    svg{
+      max-width: 100%;
+      height: auto;
     }
 
+  }
+  .arrow{
+    svg{
+      height: auto;
+      max-width: 100%;
+    }
   }
 
 }
