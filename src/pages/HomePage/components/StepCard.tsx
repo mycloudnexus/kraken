@@ -30,7 +30,8 @@ const step = [
   },
 ];
 
-const StepCard = () => {
+const StepCard = (props: { navigateApi: () => void }) => {
+  const { navigateApi } = props;
   return (
     <div className={styles.stepContainer}>
       <Row justify={"space-between"}>
@@ -64,10 +65,11 @@ const StepCard = () => {
                   className={styles.title}
                   style={{
                     color:
-                      n > 1
+                      n == 2
                         ? "var(--Text-Text_accent, #2962FF)"
                         : "var(--Text-primary, rgba(0, 0, 0, 0.85)",
                   }}
+                  onClick={n == 2 ? navigateApi : undefined}
                 >
                   {i.title}
                 </span>

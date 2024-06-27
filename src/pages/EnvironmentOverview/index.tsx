@@ -65,10 +65,7 @@ const EnvironmentOverview = () => {
     initPaginationParams
   );
 
-  const { data: runningComponent } = useGetRunningComponentList(
-    currentProduct,
-    { history: false }
-  );
+  const { data: runningComponent } = useGetRunningComponentList(currentProduct);
 
   const { mutateAsync: createApiKeyMutate } = useCreateApiKey();
   const [open, setOpen] = useState(false);

@@ -273,12 +273,11 @@ export const useGetAllDataPlaneList = (
 };
 export const useGetRunningComponentList = (
   productId: string,
-  params: any,
   enabled = true
 ) => {
   return useQuery<AxiosResponse, Error, IPagingData<IRunningComponentItem>>({
     queryKey: [PRODUCT_CACHE_KEYS.get_running_component, productId],
-    queryFn: () => getRunningComponentList(productId, params),
+    queryFn: () => getRunningComponentList(productId),
     enabled: enabled && Boolean(productId),
     select: (data) => data.data,
   });

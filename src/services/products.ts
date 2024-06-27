@@ -103,12 +103,12 @@ export const getAllDataPlaneList = (
     params,
   });
 };
-export const getRunningComponentList = (productId: string, params: any) => {
-  return request(`${PRODUCT}/${productId}/deployments`, {
+export const getRunningComponentList = (productId: string) => {
+  return request(`${PRODUCT}/${productId}/running-components`, {
     method: "GET",
-    params,
   });
 };
+
 export const createNewVersion = (data: INewVersionParams) => {
   const { productId, componentId, componentKey, versionName, version } = data;
   return request(`${PRODUCT}/${productId}/components/${componentId}/versions`, {

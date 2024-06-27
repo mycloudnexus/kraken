@@ -30,7 +30,7 @@ const HomePage = () => {
   return (
     <div className={styles.homePage}>
       <h1>MEF LSO Sonata Adapters</h1>
-      <StepCard />
+      <StepCard navigateApi={navigateApi} />
       <ApiComponents />
       <Row justify={"space-between"} gutter={[36, 0]}>
         <Col span={12}>
