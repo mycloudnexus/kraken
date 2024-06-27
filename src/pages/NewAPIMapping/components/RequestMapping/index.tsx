@@ -44,7 +44,7 @@ const RequestMapping = () => {
     );
   }, [requestMapping]);
   const defaultActiveKeys = useMemo(() => {
-    if (requestMapping.length === 0) return ["title"];
+    if (requestMapping.length === 0) return ["Property mapping"];
     return requestMapping.map((rm) => rm.title);
   }, [requestMapping]);
   return (

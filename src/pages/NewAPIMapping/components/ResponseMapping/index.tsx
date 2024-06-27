@@ -14,10 +14,11 @@ import {
   difference,
   fromPairs,
   get,
+  groupBy,
   isEmpty,
   set,
 } from "lodash";
-import React, { useEffect, useState } from "react";
+import React, { Fragment, useEffect, useMemo, useState } from "react";
 import styles from "./index.module.scss";
 import LogMethodTag from "@/components/LogMethodTag";
 
@@ -47,6 +48,185 @@ const buildInitListMapping = (responseMapping: any[]) => {
   });
   return list;
 };
+
+interface MappingCollapseProps {
+  title: string;
+  items: any[];
+  listMapping: IMapping[];
+  handleSelect: (value: string, key: number) => void;
+  handleAdd: (value: string) => void;
+  handleDelete: (key: number) => void;
+  handleChangeInput: (value: string, key: number) => void;
+  openSelectorForProp: (value?: string) => void;
+}
+
+const MappingCollapse = ({
+  title,
+  items,
+  listMapping,
+  handleSelect,
+  handleAdd,
+  handleDelete,
+  handleChangeInput,
+  openSelectorForProp,
+}: Readonly<MappingCollapseProps>) => (
+  <div style={{ marginTop: 26 }} key={`main-${title}`}>
+    <ExpandCard title={title} defaultValue description={""}>
+      <Flex gap={16} justifyContent="flex-start" alignItems="stretch">
+        <Flex
+          className={clsx(["flex-1", styles.mainCard])}
+          flexDirection="column"
+          alignItems="flex-start"
+          justifyContent="flex-start"
+          gap={4}
+        >
+          <Text.BoldMedium>Property from Sonata API response</Text.BoldMedium>
+          {items.map((item) => (
+            <Fragment key={item.target}>
+              <Text.LightMedium lineHeight="32px">
+                {!isEmpty(item?.target)
+                  ? item?.target
+                  : "No mapping to Sonata API is required"}
+              </Text.LightMedium>
+              {!isEmpty(item?.targetValues) && (
+                <div style={{ marginTop: 18, width: "100%" }}>
+                  <Flex
+                    style={{ width: "100%" }}
+                    flexDirection="column"
+                    gap={8}
+                    alignItems="flex-start"
+                  >
+                    {listMapping
+                      ?.filter((i) => i.name === item?.name)
+                      ?.map(({ key, from }, index) => (
+                        <React.Fragment key={`state-${key}`}>
+                          <Text.BoldMedium>Sonata state</Text.BoldMedium>
+                          <Flex
+                            justifyContent="flex-start"
+                            style={{ width: "100%" }}
+                            gap={12}
+                          >
+                            <Select
+                              data-testid="select-sonata-state"
+                              onSelect={(v) => handleSelect(v, key)}
+                              placeholder="State"
+                              style={{ flex: 1 }}
+                              value={from}
+                              options={difference(
+                                item?.targetValues,
+                                listMapping
+                                  ?.filter((l) => l.name === item.name)
+                                  .map((item) => item.from)
+                              ).map((item) => ({
+                                title: item,
+                                value: item,
+                              }))}
+                            />
+                            {index !== 0 && (
+                              <DeleteOutlined
+                                onClick={() => handleDelete(key)}
+                              />
+                            )}
+                          </Flex>
+                        </React.Fragment>
+                      ))}
+                  </Flex>
+                  <Button
+                    type="primary"
+                    style={{ marginTop: 16 }}
+                    onClick={() => handleAdd(item?.name)}
+                    data-testid="btn-add-state"
+                  >
+                    Add state
+                  </Button>
+                </div>
+              )}
+            </Fragment>
+          ))}
+        </Flex>
+        <Flex
+          flexDirection="column"
+          justifyContent="flex-start"
+          gap={25}
+          style={{ marginTop: 57 }}
+        >
+          {Array.from(
+            {
+              length: items.length,
+            },
+            (_, i) => i
+          ).map((key) => (
+            <MappingIcon key={`icon-${key}`} />
+          ))}
+          {items.map((item) => (
+            <>
+              {listMapping?.filter((i) => i.name === item?.name).length > 0 ? (
+                <Flex flexDirection="column" gap={59} style={{ marginTop: 48 }}>
+                  {listMapping
+                    ?.filter((i) => i.name === item?.name)
+                    .map((key) => (
+                      <MappingIcon key={`icon-${key}`} />
+                    ))}
+                </Flex>
+              ) : null}
+            </>
+          ))}
+        </Flex>
+        <Flex
+          className={clsx(["flex-1", styles.mappingCard])}
+          flexDirection="column"
+          alignItems="flex-start"
+          gap={4}
+          justifyContent="flex-start"
+        >
+          <Text.BoldMedium>Property from Seller API response</Text.BoldMedium>
+          {items.map((item) => (
+            <Fragment key={item.target}>
+              <Select
+                placeholder="Select response property"
+                suffixIcon={<RightOutlined />}
+                style={{ width: "100%" }}
+                className={styles.select}
+                popupClassName={styles.selectPopup}
+                value={isEmpty(item?.source) ? undefined : get(item, "source")}
+                onClick={() => {
+                  openSelectorForProp(item?.name);
+                }}
+              />
+              {listMapping?.filter((i) => i.name === item.name).length > 0 && (
+                <div style={{ marginTop: 18, width: "100%" }}>
+                  <Flex
+                    style={{ width: "100%" }}
+                    flexDirection="column"
+                    gap={8}
+                    alignItems="flex-start"
+                  >
+                    {listMapping
+                      ?.filter((i) => i.name === item.name)
+                      ?.map(({ key, to }) => (
+                        <React.Fragment key={`enum-${key}`}>
+                          <Text.BoldMedium>Seller state</Text.BoldMedium>
+                          <Input
+                            placeholder="Input seller state"
+                            style={{ width: "100%" }}
+                            value={to}
+                            className={styles.input}
+                            onChange={(e) =>
+                              handleChangeInput(e.target.value, key)
+                            }
+                          />
+                        </React.Fragment>
+                      ))}
+                  </Flex>
+                </div>
+              )}
+            </Fragment>
+          ))}
+        </Flex>
+      </Flex>
+    </ExpandCard>
+  </div>
+);
 
 const ResponseMapping = () => {
   const {
@@ -109,6 +289,10 @@ const ResponseMapping = () => {
     set(cloneArr, `[${index}].to`, v);
     setListMapping(cloneArr);
   };
+  const openSelectorForProp = (name?: string) => {
+    setActiveResponseName(name);
+    setRightSide(EnumRightType.AddSellerResponse);
+  };
   useEffect(() => {
     if (isEmpty(sellerApi)) {
       return;
@@ -120,6 +304,10 @@ const ResponseMapping = () => {
     if (isEmpty(responseMapping)) {
       setListMapping([]);
     }
+  }, [responseMapping]);
+
+  const responseMappingGroupedByTitle = useMemo(() => {
+    return groupBy(responseMapping, "title");
   }, [responseMapping]);
 
   return (
@@ -189,157 +377,18 @@ const ResponseMapping = () => {
           <RightOutlined style={{ color: "rgba(0, 0, 0, 0.45)" }} />
         </Flex>
       </Flex>
-      {responseMapping?.map((item: any) => (
-        <div style={{ marginTop: 26 }} key={`main-${item?.name}`}>
-          <ExpandCard
-            title={item?.title}
-            defaultValue
-            description={item?.description}
-          >
-            <Flex gap={16} justifyContent="flex-start" alignItems="stretch">
-              <Flex
-                className={clsx(["flex-1", styles.mainCard])}
-                flexDirection="column"
-                alignItems="flex-start"
-                justifyContent="flex-start"
-                gap={4}
-              >
-                <Text.BoldMedium>
-                  Property from Sonata API response
-                </Text.BoldMedium>
-                <Text.LightMedium lineHeight="30px">
-                  {!isEmpty(item?.target)
-                    ? item?.target
-                    : "No mapping to Sonata API is required"}
-                </Text.LightMedium>
-                {!isEmpty(item?.targetValues) && (
-                  <div style={{ marginTop: 18, width: "100%" }}>
-                    <Flex
-                      style={{ width: "100%" }}
-                      flexDirection="column"
-                      gap={8}
-                      alignItems="flex-start"
-                    >
-                      {listMapping
-                        ?.filter((i) => i.name === item?.name)
-                        ?.map(({ key, from }, index) => (
-                          <React.Fragment key={`state-${key}`}>
-                            <Text.BoldMedium>Sonata state</Text.BoldMedium>
-                            <Flex
-                              justifyContent="flex-start"
-                              style={{ width: "100%" }}
-                              gap={12}
-                            >
-                              <Select
-                                data-testid="select-sonata-state"
-                                onSelect={(v) => handleSelect(v, key)}
-                                placeholder="State"
-                                style={{ flex: 1 }}
-                                value={from}
-                                options={difference(
-                                  item?.targetValues,
-                                  listMapping
-                                    ?.filter((l) => l.name === item.name)
-                                    .map((item) => item.from)
-                                ).map((item) => ({ title: item, value: item }))}
-                              />
-                              {index !== 0 && (
-                                <DeleteOutlined
-                                  onClick={() => handleDelete(key)}
-                                />
-                              )}
-                            </Flex>
-                          </React.Fragment>
-                        ))}
-                    </Flex>
-                    <Button
-                      type="primary"
-                      style={{ marginTop: 16 }}
-                      onClick={() => handleAdd(item?.name)}
-                      data-testid="btn-add-state"
-                    >
-                      Add state
-                    </Button>
-                  </div>
-                )}
-              </Flex>
-              <Flex
-                flexDirection="column"
-                justifyContent="flex-end"
-                gap={58}
-                style={{
-                  marginBottom:
-                    !isEmpty(item?.target) && !isEmpty(item?.targetValues)
-                      ? 78
-                      : 36,
-                }}
-              >
-                <div style={{ marginBottom: 10 }}>
-                  <MappingIcon />
-                </div>
-                {Array.from(
-                  {
-                    length: listMapping?.filter((i) => i.name === item.name)
-                      .length,
-                  },
-                  (_, i) => i
-                ).map((key) => (
-                  <MappingIcon key={`icon-${key}`} />
-                ))}
-              </Flex>
-              <Flex
-                className={clsx(["flex-1", styles.mappingCard])}
-                flexDirection="column"
-                alignItems="flex-start"
-                gap={4}
-                justifyContent="flex-start"
-              >
-                <Text.BoldMedium>
-                  Property from Seller API response
-                </Text.BoldMedium>
-                <Select
-                  placeholder="Select response property"
-                  suffixIcon={<RightOutlined />}
-                  style={{ width: "100%" }}
-                  className={styles.select}
-                  popupClassName={styles.selectPopup}
-                  value={
-                    isEmpty(item?.source) ? undefined : get(item, "source")
-                  }
-                  onClick={() => {
-                    setActiveResponseName(item?.name);
-                    setRightSide(EnumRightType.AddSellerResponse);
-                  }}
-                />
-                <div style={{ marginTop: 18, width: "100%" }}>
-                  <Flex
-                    style={{ width: "100%" }}
-                    flexDirection="column"
-                    gap={8}
-                    alignItems="flex-start"
-                  >
-                    {listMapping
-                      ?.filter((i) => i.name === item.name)
-                      ?.map(({ key, to }) => (
-                        <React.Fragment key={`enum-${key}`}>
-                          <Text.BoldMedium>Seller state</Text.BoldMedium>
-                          <Input
-                            placeholder="Input seller state"
-                            style={{ width: "100%" }}
-                            value={to}
-                            className={styles.input}
-                            onChange={(e) =>
-                              handleChangeInput(e.target.value, key)
-                            }
-                          />
-                        </React.Fragment>
-                      ))}
-                  </Flex>
-                </div>
-              </Flex>
-            </Flex>
-          </ExpandCard>
-        </div>
+      {Object.entries(responseMappingGroupedByTitle).map(([title, items]) => (
+        <MappingCollapse
+          key={`main-${title}`}
+          title={title}
+          items={items}
+          listMapping={listMapping}
+          handleSelect={handleSelect}
+          handleAdd={handleAdd}
+          handleDelete={handleDelete}
+          handleChangeInput={handleChangeInput}
+          openSelectorForProp={openSelectorForProp}
+        />
       ))}
     </div>
   );

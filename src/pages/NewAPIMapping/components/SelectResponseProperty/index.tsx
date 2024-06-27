@@ -1,17 +1,16 @@
 import Flex from "@/components/Flex";
 import Text from "@/components/Text";
-import { DownOutlined, RightOutlined } from "@ant-design/icons";
-import { Button, Input, Tag, Tree } from "antd";
-import { useBoolean } from "usehooks-ts";
-import styles from "./index.module.scss";
-import { Key, useCallback, useMemo, useState } from "react";
-import { clone, get, isEmpty, set } from "lodash";
-
+import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import {
   convertSchemaToTypeOnly,
   parseObjectDescriptionToTreeData,
 } from "@/utils/helpers/schema";
-import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
+import { DownOutlined, RightOutlined } from "@ant-design/icons";
+import { Button, Input, Tag, Tree } from "antd";
+import { clone, get, isEmpty, set } from "lodash";
+import { Key, useCallback, useMemo, useState } from "react";
+import { useBoolean } from "usehooks-ts";
+import styles from "./index.module.scss";
 
 const Search = Input.Search;
 
@@ -73,7 +72,9 @@ const SelectResponseProperty = () => {
   const newTreeData = findMatchingElements(dataTree, searchValue);
   return (
     <div>
-      <Text.BoldLarge>Select response property</Text.BoldLarge>
+      <Text.BoldLarge>
+        Select mapping property from Seller API response
+      </Text.BoldLarge>
       <div style={{ marginTop: 16 }}>
         <Search
           placeholder="input search text"

@@ -10,7 +10,8 @@ import {
 import { Button, Flex, Tooltip, Typography } from "antd";
 import { useState } from "react";
 import styles from "./index.module.scss";
-import { get } from "lodash";
+import { get, isEqual } from "lodash";
+import clsx from "clsx";
 
 interface RequestMappingProps {
   rm: IRequestMapping;
@@ -51,7 +52,9 @@ const RequestMappingItem = ({ rm, title }: Readonly<RequestMappingProps>) => {
           });
         }}
       >
-        {rm.source}{" "}
+        <Typography.Text ellipsis={{ tooltip: true }}>
+          {rm.source}
+        </Typography.Text>
         <Tooltip title={rm.description}>
           <InfoCircleOutlined style={{ color: "rgba(0, 0, 0, 0.45)" }} />
         </Tooltip>
@@ -125,7 +128,9 @@ const SonataPropMapping = ({ list, title }: Readonly<Props>) => {
           {list?.map((rm) => (
             <Flex
               key={rm.name}
-              className={styles.sellerPropItemWrapper}
+              className={clsx(styles.sellerPropItemWrapper, {
+                [styles.active]: isEqual(rm, rightSideInfo?.previousData),
+              })}
               onClick={() => {
                 setRightSide(EnumRightType.AddSellerProp);
                 setRightSideInfo({
@@ -136,7 +141,9 @@ const SonataPropMapping = ({ list, title }: Readonly<Props>) => {
               }}
             >
               {rm.target ? (
-                <>{rm.target}</>
+                <Typography.Text ellipsis={{ tooltip: true }}>
+                  {rm.target}
+                </Typography.Text>
               ) : (
                 <Typography.Text style={{ color: "#86909c" }}>
                   Select property
