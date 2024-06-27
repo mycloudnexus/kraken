@@ -12,9 +12,17 @@ import {
 import Text from "../Text";
 import { PaperClipOutlined, UploadOutlined } from "@ant-design/icons";
 import Flex from "../Flex";
-import { cloneDeep, get, isEmpty, set } from "lodash";
+import {
+  cloneDeep,
+  get,
+  isEmpty,
+  isNull,
+  isUndefined,
+  pickBy,
+  set,
+} from "lodash";
 import { isURL } from "@/utils/helpers/url";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { decode } from "js-base64";
 import jsYaml from "js-yaml";
 import { useAppStore } from "@/stores/app.store";
@@ -47,7 +55,6 @@ const APIEditor = ({
   const env = get(dataEnv, "data", []);
   const [isChangedFile, setIsChangedFile] = useState(false);
   const file = Form.useWatch("file", form);
-
   useEffect(() => {
     try {
       if (isEmpty(detail)) {
@@ -272,48 +279,92 @@ const APIEditor = ({
                 </Text.NormalLarge>
               </Flex>
               <Row gutter={[8, 8]}>
-                {env?.map((e) => (
-                  <>
-                    <Col span={4}>
-                      <Form.Item name={`is${e.name}`} valuePropName="checked">
-                        <Checkbox
-                          onChange={(event) => {
-                            if (!event.target.checked) {
+                <Form.Item
+                  noStyle
+                  shouldUpdate
+                  name="environments"
+                  rules={[
+                    () => ({
+                      validator(_, value) {
+                        const currentValue = pickBy(
+                          value,
+                          (value) =>
+                            !isNull(value) &&
+                            value !== "" &&
+                            !isUndefined(value)
+                        );
+                        const isValue = !isEmpty(currentValue);
+
+                        if (isValue) {
+                          return Promise.resolve();
+                        }
+                        return Promise.reject(
+                          new Error("Please fill at least one environment")
+                        );
+                      },
+                    }),
+                  ]}
+                >
+                  {env?.map((e) => (
+                    <Fragment key={e?.name}>
+                      <Col span={4}>
+                        <Form.Item name={`is${e.name}`} valuePropName="checked">
+                          <Checkbox
+                            onChange={(event) => {
+                              if (!event?.target?.checked) {
+                                form.setFieldValue(
+                                  ["environments", e.name],
+                                  undefined
+                                );
+                              }
                               form.setFieldValue(
-                                ["environments", e.name],
-                                undefined
+                                "is" + e.name,
+                                event.target.checked
                               );
-                            }
+                            }}
+                          >
+                            {e.name}
+                          </Checkbox>
+                        </Form.Item>
+                      </Col>
+                      <Col span={20}>
+                        <Form.Item noStyle shouldUpdate>
+                          {({ getFieldValue }) => {
+                            const isEnv = Boolean(getFieldValue(`is${e.name}`));
+                            return (
+                              <Form.Item
+                                name={["environments", e.name]}
+                                label="URL:"
+                                className={styles.inputUrl}
+                                rules={[
+                                  {
+                                    required: isEnv,
+                                    message: "Please fill the url",
+                                  },
+                                ]}
+                              >
+                                <Input
+                                  placeholder="Add URL"
+                                  disabled={!isEnv}
+                                />
+                              </Form.Item>
+                            );
                           }}
-                        >
-                          {e.name}
-                        </Checkbox>
-                      </Form.Item>
-                    </Col>
-                    <Col span={20}>
-                      <Form.Item noStyle shouldUpdate>
-                        {({ getFieldValue }) => {
-                          const isEnv = getFieldValue(`is${e.name}`);
-                          return (
-                            <Form.Item
-                              name={["environments", e.name]}
-                              label="URL:"
-                              className={styles.inputUrl}
-                              rules={[
-                                {
-                                  required: isEnv,
-                                  message: "Please fill the url",
-                                },
-                              ]}
-                            >
-                              <Input placeholder="Add URL" disabled={!isEnv} />
-                            </Form.Item>
-                          );
-                        }}
-                      </Form.Item>
-                    </Col>
-                  </>
-                ))}
+                        </Form.Item>
+                      </Col>
+                    </Fragment>
+                  ))}
+                  <Form.Item noStyle shouldUpdate>
+                    {({ getFieldError }) => {
+                      const error = getFieldError("environments");
+                      return isEmpty(error) ? null : (
+                        <Text.LightSmall color="red">
+                          Please fill at least one environment
+                        </Text.LightSmall>
+                      );
+                    }}
+                  </Form.Item>
+                </Form.Item>
               </Row>
             </Flex>
           </Col>
