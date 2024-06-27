@@ -308,6 +308,7 @@ const ResponseMapping = () => {
                   }
                   onClick={() => {
                     setActiveResponseName(item?.name);
+                    setRightSide(EnumRightType.AddSellerResponse);
                   }}
                 />
                 <div style={{ marginTop: 18, width: "100%" }}>
