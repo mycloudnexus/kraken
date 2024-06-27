@@ -1,32 +1,6 @@
-.table {
-  :global {
-    .ant-table-content {
-      border: 1px solid #f0f0f0;
-      border-radius: 8px;
-    }
-    td {
-      border-bottom: 0 !important;
-    }
-  }
-}
-
-.params {
-  margin-top: 24px;
-}
-
 .modal {
   :global(.ant-modal-content) {
     max-height: 80vh;
     overflow-y: auto;
   }
-}
-
-.apiDetail {
-  display: flex;
-  margin-top: 24px;
-  gap: 24px;
-}
-
-.title {
-  margin-bottom: 8px;
 }

@@ -1,18 +1,19 @@
 import { render } from "@testing-library/react";
-import ExpandRow from "../components/ExpandRow";
+import APIServerCard from "../components/APIServerCard";
 
 describe("ExpandRow", () => {
   test("renders empty table when selectedAPIs is empty", () => {
-    const { container } = render(<ExpandRow item={{ facets: {} }} />);
+    const { container } = render(
+      <APIServerCard item={{ facets: {} } as any} refresh={vi.fn()} />
+    );
     expect(container).toBeInTheDocument();
   });
 
   test("renders table with data when selectedAPIs is not empty", () => {
     const { container } = render(
-      <ExpandRow
-        item={{
-          facets: { selectedAPIs: ["/api/products POST"] },
-        }}
+      <APIServerCard
+        item={{ facets: {}, metadata: { key: "1", name: "1", id: "1" } } as any}
+        refresh={vi.fn()}
       />
     );
     expect(container).toBeInTheDocument();

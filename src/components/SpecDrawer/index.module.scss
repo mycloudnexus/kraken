@@ -1,0 +1,64 @@
+.drawer {
+  :global {
+    .ant-drawer-body {
+      background: #f0f2f5;
+    }
+  }
+}
+
+.tableList {
+  flex: 1;
+  background: #ffffff;
+  padding: 16px 20px;
+  box-sizing: border-box;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.viewer {
+  flex: 2;
+  background: #fff;
+  border-radius: 4px;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.viewerHeader {
+  z-index: 2;
+  position: sticky;
+  top: 0;
+  padding: 16px 20px;
+  background: #fff;
+  box-shadow: 0px -1px 0px 0px #f0f0f0 inset;
+}
+
+.viewerContent {
+  padding: 10px 20px;
+}
+
+.table {
+  height: 100%;
+  :global {
+    .ant-table-selection-column {
+      display: none;
+    }
+    .ant-table-pagination {
+      display: none;
+    }
+  }
+}
+
+.navBtn {
+  font-size: 8px;
+}
+
+.activePage {
+  background: #f2f3f5;
+  border-radius: 2px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

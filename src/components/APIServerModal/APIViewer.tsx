@@ -78,7 +78,7 @@ const APIViewer = ({ detail }: Props) => {
                     Online API document link
                   </Text.LightMedium>
                   <Text.LightMedium>
-                    {get(detail, "metadata.link", "-")}
+                    {get(detail, "facets.baseSpec.path", "-")}
                   </Text.LightMedium>
                 </Flex>
               </Col>

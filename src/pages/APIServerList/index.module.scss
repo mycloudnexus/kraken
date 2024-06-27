@@ -4,11 +4,10 @@
 }
 
 .content {
-  background: #fff;
-  margin-top: 14px;
+  margin-top: 10px;
   box-sizing: border-box;
-  padding: 16px 20px;
   border-radius: 4px;
+  min-height: calc(100vh - 132px);
 
   :global {
     .expand-table {
