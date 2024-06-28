@@ -9,7 +9,7 @@ import { capitalize, groupBy } from "lodash";
 import SonataPropMapping from "../SonataPropMapping";
 import styles from "./index.module.scss";
 import clsx from "clsx";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { IRequestMapping } from "@/utils/types/component.type";
 
 const RequestMapping = () => {
@@ -43,9 +43,21 @@ const RequestMapping = () => {
       })
     );
   }, [requestMapping]);
-  const defaultActiveKeys = useMemo(() => {
-    if (requestMapping.length === 0) return ["Property mapping"];
-    return requestMapping.map((rm) => rm.title);
+  const [activeKey, setActiveKey] = useState<string[]>([]);
+
+  const handleChangeKey = (key: string | string[]) => {
+    if (typeof key === "string") {
+      setActiveKey([key]);
+      return;
+    }
+    setActiveKey(key);
+  };
+  useEffect(() => {
+    if (requestMapping.length === 0) {
+      setActiveKey(["Property mapping"]);
+      return;
+    }
+    setActiveKey(requestMapping.map((rm) => rm.title));
   }, [requestMapping]);
   return (
     <>
@@ -127,7 +139,8 @@ const RequestMapping = () => {
       <Collapse
         ghost
         items={items}
-        defaultActiveKey={defaultActiveKeys}
+        activeKey={activeKey}
+        onChange={handleChangeKey}
         className={styles.collapse}
       />
     </>
