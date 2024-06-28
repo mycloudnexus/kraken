@@ -6,10 +6,8 @@ export default defineConfig({
   plugins: [
     svgr({
       include: "**/*.svg",
-      exclude: "**/*.svg?url",
       svgrOptions: {
         exportType: "default",
-        
       },
     }),
   ],
