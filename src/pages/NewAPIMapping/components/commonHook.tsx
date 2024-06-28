@@ -1,12 +1,10 @@
 import TypeTag from "@/components/TypeTag";
-import { EnumRightType } from "@/utils/types/common.type";
 import { CollapseProps, Flex, Tree, Typography, notification } from "antd";
 import clsx from "clsx";
 import { Dispatch, useCallback, useMemo } from "react";
 import styles from "./RightAddSellerProp/index.module.scss";
 
 interface Props {
-  rightSide: EnumRightType;
   selectedProp: any;
   rightSideInfo: any;
   pathParameters: any;
@@ -17,7 +15,6 @@ interface Props {
 }
 
 export const useCommonAddProp = ({
-  rightSide,
   selectedProp,
   rightSideInfo,
   pathParameters,
@@ -124,19 +121,14 @@ export const useCommonAddProp = ({
                       selectedProp?.name
                         .replace("@{{", "")
                         .replace("}}", "")
-                        .replace("requestBody.", "")
-                        .replace("responseBody.", ""),
+                        .replace("requestBody.", ""),
                     ]
                   : []
               }
               onSelect={(_, e) => {
                 setSelectedProp({
                   location: "BODY",
-                  name: `@{{${
-                    rightSide === EnumRightType.AddSonataProp
-                      ? "requestBody"
-                      : "responseBody"
-                  }.${e.node.key}}}`,
+                  name: `@{{requestBody.${e.node.key}}}`,
                 });
               }}
             />

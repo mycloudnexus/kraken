@@ -5,12 +5,31 @@ import {
   parseObjectDescriptionToTreeData,
 } from "@/utils/helpers/schema";
 import { Button, Collapse, Flex } from "antd";
-import { merge } from "lodash";
 import { useEffect, useMemo, useState } from "react";
 import swaggerClient from "swagger-client";
 import { useCommonAddProp } from "../commonHook";
 import styles from "./index.module.scss";
 
+export const getCorrectSpec = (spec: any, method: string) => {
+  if (!spec) return;
+  const flattenPathObject: any[] = [];
+
+  for (const path in spec.paths) {
+    const objSpecByMethod = spec.paths[path];
+    for (const method in objSpecByMethod) {
+      const singleSpec = objSpecByMethod[method];
+      flattenPathObject.push({
+        method,
+        path,
+        spec: singleSpec,
+      });
+    }
+  }
+  console.log(flattenPathObject)
+  return flattenPathObject.find(
+    (specWithMetadata) => method === specWithMetadata.method
+  )?.spec;
+};
 interface Props {
   spec: any;
   method: string;
@@ -27,7 +46,7 @@ const RightAddSonataProp = ({
   defaultProp,
   onSelect,
 }: Readonly<Props>) => {
-  const { rightSide, rightSideInfo } = useNewApiMappingStore();
+  const { rightSideInfo } = useNewApiMappingStore();
   const [resolvedSpec, setResolvedSpec] = useState<any>();
   const [selectedProp, setSelectedProp] = useState<any>(defaultProp);
   useEffect(() => {
@@ -38,15 +57,10 @@ const RightAddSonataProp = ({
     })();
   }, [spec]);
 
-  const correctSpec: any = useMemo(() => {
-    if (!resolvedSpec) return;
-    const paths = Object.values(resolvedSpec.paths);
-    const flattenPathObject = {};
-    merge(flattenPathObject, ...paths);
-    return Object.entries(flattenPathObject).find(
-      ([specMethod]) => method === specMethod
-    )?.[1];
-  }, [resolvedSpec, method]);
+  const correctSpec: any = useMemo(
+    () => getCorrectSpec(resolvedSpec, method),
+    [resolvedSpec, method]
+  );
 
   const pathParameters = useMemo(() => {
     if (!correctSpec?.parameters) return [];
@@ -76,7 +90,6 @@ const RightAddSonataProp = ({
   }, [correctSpec]);
 
   const { handleAddProp, collapseItems } = useCommonAddProp({
-    rightSide: rightSide!,
     selectedProp,
     rightSideInfo,
     pathParameters,

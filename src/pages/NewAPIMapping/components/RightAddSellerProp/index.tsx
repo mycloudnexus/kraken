@@ -14,7 +14,7 @@ interface Props {
 }
 
 const RightAddSellerProp = ({ onSelect }: Readonly<Props>) => {
-  const { rightSide, sellerApi, rightSideInfo } = useNewApiMappingStore();
+  const { sellerApi, rightSideInfo } = useNewApiMappingStore();
   const [selectedProp, setSelectedProp] = useState<any>({
     location: rightSideInfo?.previousData?.targetLocation,
     name: rightSideInfo?.previousData?.target,
@@ -47,7 +47,6 @@ const RightAddSellerProp = ({ onSelect }: Readonly<Props>) => {
   }, [sellerApi]);
 
   const { handleAddProp, collapseItems } = useCommonAddProp({
-    rightSide: rightSide!,
     selectedProp,
     rightSideInfo,
     pathParameters,
@@ -59,7 +58,9 @@ const RightAddSellerProp = ({ onSelect }: Readonly<Props>) => {
 
   return (
     <Flex vertical gap={16} style={{ width: "100%", minHeight: "100%" }}>
-      <Text.BoldLarge>Select mapping property from Seller API request</Text.BoldLarge>
+      <Text.BoldLarge>
+        Select mapping property from Seller API request
+      </Text.BoldLarge>
       <Collapse
         ghost
         items={collapseItems}

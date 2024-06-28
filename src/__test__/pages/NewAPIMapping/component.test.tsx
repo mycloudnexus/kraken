@@ -1,6 +1,8 @@
 import ResponseMapping from "@/pages/NewAPIMapping/components/ResponseMapping";
 import RightAddSellerProp from "@/pages/NewAPIMapping/components/RightAddSellerProp";
-import RightAddSonataProp from "@/pages/NewAPIMapping/components/RightAddSonataProp";
+import RightAddSonataProp, {
+  getCorrectSpec,
+} from "@/pages/NewAPIMapping/components/RightAddSonataProp";
 import { APIItem } from "@/pages/NewAPIMapping/components/SelectAPI";
 import SelectResponseProperty from "@/pages/NewAPIMapping/components/SelectResponseProperty";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
@@ -93,6 +95,23 @@ test("component RightAddSonataProp", () => {
     </QueryClientProvider>
   );
   expect(container).toBeInTheDocument();
+});
+
+test("function getCorrectSpec", () => {
+  const spec = {
+    paths: {
+      "/a/b/c/d": {
+        get: {
+          a: 1,
+        },
+        post: {
+          a: 2,
+        },
+      },
+    },
+  };
+  expect(getCorrectSpec(spec, "get")).toEqual({ a: 1 });
+  expect(getCorrectSpec(spec, "post")).toEqual({ a: 2 });
 });
 
 test("APIItem", () => {
