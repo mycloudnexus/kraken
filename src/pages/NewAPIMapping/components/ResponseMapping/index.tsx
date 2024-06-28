@@ -58,6 +58,7 @@ interface MappingCollapseProps {
   handleDelete: (key: number) => void;
   handleChangeInput: (value: string, key: number) => void;
   openSelectorForProp: (value?: string) => void;
+  handleChangeResponse: (value: string, index: number) => void;
 }
 
 const MappingCollapse = ({
@@ -69,6 +70,7 @@ const MappingCollapse = ({
   handleDelete,
   handleChangeInput,
   openSelectorForProp,
+  handleChangeResponse,
 }: Readonly<MappingCollapseProps>) => (
   <div style={{ marginTop: 26 }} key={`main-${title}`}>
     <ExpandCard title={title} defaultValue description={""}>
@@ -180,18 +182,20 @@ const MappingCollapse = ({
           justifyContent="flex-start"
         >
           <Text.BoldMedium>Property from Seller API response</Text.BoldMedium>
-          {items.map((item) => (
+          {items.map((item, index) => (
             <Fragment key={item.target}>
-              <Select
+              <Input
                 placeholder="Select response property"
-                suffixIcon={<RightOutlined />}
                 style={{ width: "100%" }}
-                className={styles.select}
-                popupClassName={styles.selectPopup}
+                className={styles.input}
                 value={isEmpty(item?.source) ? undefined : get(item, "source")}
                 onClick={() => {
                   openSelectorForProp(item?.name);
                 }}
+                onChange={(e) => handleChangeResponse(e.target.value, index)}
+                suffix={
+                  <RightOutlined style={{ fontSize: 12, color: "#C9CDD4" }} />
+                }
               />
               {listMapping?.filter((i) => i.name === item.name).length > 0 && (
                 <div style={{ marginTop: 18, width: "100%" }}>
@@ -283,16 +287,28 @@ const ResponseMapping = () => {
   const handleDelete = (key: number) => {
     setListMapping(listMapping.filter((item) => item.key !== key));
   };
+
   const handleChangeInput = (v: string, key: number) => {
     const cloneArr = cloneDeep(listMapping);
     const index = listMapping.findIndex((l) => l.key === key);
     set(cloneArr, `[${index}].to`, v);
     setListMapping(cloneArr);
   };
+
   const openSelectorForProp = (name?: string) => {
     setActiveResponseName(name);
     setRightSide(EnumRightType.AddSellerResponse);
   };
+
+  const handleChangeResponse = (value: string, index: number) => {
+    const cloneObj = cloneDeep(responseMapping);
+
+    set(cloneObj, `[${index}].source`, value);
+    set(cloneObj, `[${index}].sourceLocation`, `BODY`);
+    setResponseMapping(cloneObj);
+    setActiveResponseName(undefined);
+  };
+
   useEffect(() => {
     if (isEmpty(sellerApi)) {
       return;
@@ -388,6 +404,7 @@ const ResponseMapping = () => {
           handleDelete={handleDelete}
           handleChangeInput={handleChangeInput}
           openSelectorForProp={openSelectorForProp}
+          handleChangeResponse={handleChangeResponse}
         />
       ))}
     </div>

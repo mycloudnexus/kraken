@@ -25,7 +25,6 @@ export const getCorrectSpec = (spec: any, method: string) => {
       });
     }
   }
-  console.log(flattenPathObject)
   return flattenPathObject.find(
     (specWithMetadata) => method === specWithMetadata.method
   )?.spec;

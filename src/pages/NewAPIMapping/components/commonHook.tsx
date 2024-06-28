@@ -56,7 +56,7 @@ export const useCommonAddProp = ({
                 onClick={() =>
                   setSelectedProp({
                     location: "PATH",
-                    name: `@{{${parameter.name}}}`,
+                    name: `@{{path.${parameter.name}}}`,
                   })
                 }
               >
@@ -90,7 +90,7 @@ export const useCommonAddProp = ({
                 onClick={() =>
                   setSelectedProp({
                     location: "QUERY",
-                    name: `@{{${parameter.name}}}`,
+                    name: `@{{query.${parameter.name}}}`,
                   })
                 }
               >

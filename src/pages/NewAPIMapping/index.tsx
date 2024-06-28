@@ -92,9 +92,26 @@ const NewAPIMapping = () => {
       setServerKey(defaultServerKey);
     }
   }, [defaultServerKey, serverKey, setServerKey]);
+
+  const transformTarget = (from: string, fromSrc: string) => {
+    switch (fromSrc) {
+      case "PATH":
+        return from.replace("@{{", `@{{path.`);
+      case "QUERY":
+        return from.replace("@{{", `@{{query.`);
+      default:
+        return from;
+    }
+  };
+
   useEffect(() => {
     if (!requestMapping.length && mappers?.request?.length) {
-      setRequestMapping(mappers?.request ?? []);
+      const newRequest = mappers?.request?.map((rm: any) => ({
+        ...rm,
+        target: transformTarget(rm.target, rm.targetLocation),
+        source: transformTarget(rm.source, rm.sourceLocation),
+      }));
+      setRequestMapping(newRequest ?? []);
     }
   }, [mappers, requestMapping, setRequestMapping]);
   useEffect(() => {
@@ -199,7 +216,11 @@ const NewAPIMapping = () => {
         method: sellerApi.method,
         path: sellerApi.url,
         mappers: {
-          request: requestMapping,
+          request: requestMapping?.map((rm) => ({
+            ...rm,
+            target: rm.target?.replace("path.", "")?.replace("query.", ""),
+            source: rm.source?.replace("path.", "")?.replace("query.", ""),
+          })),
           response: responseMapping,
         },
       };
@@ -227,9 +248,12 @@ const NewAPIMapping = () => {
       setStep(0);
       setActiveKey("0");
     }
-    if (rightSide === EnumRightType.AddSonataProp || rightSide === EnumRightType.AddSellerProp) {
+    if (
+      rightSide === EnumRightType.AddSonataProp ||
+      rightSide === EnumRightType.AddSellerProp
+    ) {
       setStep(1);
-      setActiveKey('1');
+      setActiveKey("1");
     }
   }, [rightSide]);
 

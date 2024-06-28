@@ -20,17 +20,11 @@
   border-radius: 6px;
   padding: 17px;
   .sellerPropItemWrapper {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 32px;
-    border-radius: 2px;
-    padding-inline: 12px;
-    background-color: #f2f3f5;
+    background: #f2f3f5;
     cursor: pointer;
     &.active {
       border-radius: 2px;
-      border: 1px solid #165DFF;
+      border: 1px solid #165dff;
       background-color: #fff;
     }
   }

@@ -7,10 +7,10 @@ import {
   InfoCircleOutlined,
   RightOutlined,
 } from "@ant-design/icons";
-import { Button, Flex, Tooltip, Typography } from "antd";
+import { Button, Flex, Input, Tooltip, Typography } from "antd";
 import { useState } from "react";
 import styles from "./index.module.scss";
-import { get, isEqual } from "lodash";
+import { cloneDeep, get, isEqual, set } from "lodash";
 import clsx from "clsx";
 
 interface RequestMappingProps {
@@ -72,8 +72,15 @@ interface Props {
   title: string;
 }
 const SonataPropMapping = ({ list, title }: Readonly<Props>) => {
-  const { rightSide, rightSideInfo, setRightSide, setRightSideInfo } =
-    useNewApiMappingStore();
+  console.log("🚀 ~ SonataPropMapping ~ list, title:", list, title);
+  const {
+    rightSide,
+    rightSideInfo,
+    setRightSide,
+    setRightSideInfo,
+    requestMapping,
+    setRequestMapping,
+  } = useNewApiMappingStore();
 
   return (
     <Flex gap={16}>
@@ -125,8 +132,8 @@ const SonataPropMapping = ({ list, title }: Readonly<Props>) => {
       <div className={styles.sellerPropMappingWrapper}>
         <Typography.Text>Property from Seller API response</Typography.Text>
         <div className={styles.responseMappingList}>
-          {list?.map((rm) => (
-            <Flex
+          {list?.map((rm, index) => (
+            <Input
               key={rm.name}
               className={clsx(styles.sellerPropItemWrapper, {
                 [styles.active]: isEqual(rm, rightSideInfo?.previousData),
@@ -139,18 +146,32 @@ const SonataPropMapping = ({ list, title }: Readonly<Props>) => {
                   title,
                 });
               }}
-            >
-              {rm.target ? (
-                <Typography.Text ellipsis={{ tooltip: true }}>
-                  {rm.target}
-                </Typography.Text>
-              ) : (
-                <Typography.Text style={{ color: "#86909c" }}>
-                  Select property
-                </Typography.Text>
-              )}
-              <RightOutlined style={{ color: "#4E5969" }} />
-            </Flex>
+              value={rm.target}
+              placeholder="Select property"
+              suffix={
+                <RightOutlined style={{ fontSize: 12, color: "#C9CDD4" }} />
+              }
+              onChange={(e) => {
+                const newValue = get(e, "target.value", "")
+                  .replace("@{{", "")
+                  .replace("}}", "");
+                let targetLocation = get(rm, "targetLocation", "");
+                if (newValue.includes(".")) {
+                  const splited = newValue.split(".");
+                  const pathValue = get(splited, "[0]", "").toLocaleUpperCase();
+                  targetLocation =
+                    pathValue === "REQUESTBODY" ? "BODY" : pathValue;
+                }
+                const newRequest = cloneDeep(requestMapping);
+                set(
+                  newRequest,
+                  `[${index}].target`,
+                  get(e, "target.value", "")
+                );
+                set(newRequest, `[${index}].targetLocation`, targetLocation);
+                setRequestMapping(newRequest);
+              }}
+            />
           ))}
         </div>
       </div>

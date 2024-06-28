@@ -5,6 +5,7 @@ import RightAddSonataProp, {
 } from "@/pages/NewAPIMapping/components/RightAddSonataProp";
 import { APIItem } from "@/pages/NewAPIMapping/components/SelectAPI";
 import SelectResponseProperty from "@/pages/NewAPIMapping/components/SelectResponseProperty";
+import SonataPropMapping from "@/pages/NewAPIMapping/components/SonataPropMapping";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { queryClient } from "@/utils/helpers/reactQuery";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -142,6 +143,30 @@ test("APIItem", () => {
           setSellerApi={vi.fn()}
           selectedAPI={"ABC"}
           setSelectedServer={vi.fn()}
+        />
+      </BrowserRouter>
+    </QueryClientProvider>
+  );
+  expect(container).toBeInTheDocument();
+});
+
+test("SonataPropMapping", () => {
+  const { container } = render(
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <SonataPropMapping
+          list={
+            [
+              {
+                title: "Property mapping",
+                source: "@{{query.buyerId}}",
+                target: "@{{path.companyName}}",
+                sourceLocation: "QUERY",
+                targetLocation: "PATH",
+              },
+            ] as any
+          }
+          title={"Property mapping"}
         />
       </BrowserRouter>
     </QueryClientProvider>
