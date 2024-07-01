@@ -72,7 +72,6 @@ interface Props {
   title: string;
 }
 const SonataPropMapping = ({ list, title }: Readonly<Props>) => {
-  console.log("🚀 ~ SonataPropMapping ~ list, title:", list, title);
   const {
     rightSide,
     rightSideInfo,

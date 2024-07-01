@@ -149,7 +149,9 @@ const APIServerCard = ({ item, refresh }: Props) => {
                   <Text.LightMedium style={{ width: 120 }}>
                     {e.name}
                   </Text.LightMedium>
-                  <Text.LightMedium>URL: {e.url}</Text.LightMedium>
+                  <Typography.Text style={{ whiteSpace: "break-spaces" }}>
+                    URL: {e.url}
+                  </Typography.Text>
                 </Flex>
               ))}
             </Flex>

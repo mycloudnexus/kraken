@@ -34,7 +34,7 @@ const buildInitListMapping = (responseMapping: any[]) => {
   const list: IMapping[] = [];
   responseMapping.forEach((item) => {
     Object.entries((item.valueMapping ?? {}) as Record<string, string>).map(
-      ([from, to]) => {
+      ([to, from]) => {
         const mapItem = {
           key: k,
           from,
@@ -259,7 +259,7 @@ const ResponseMapping = () => {
       .groupBy("name")
       .map((items, name) => ({
         name,
-        valueMapping: fromPairs(items.map((item) => [item.from, item.to])),
+        valueMapping: fromPairs(items.map((item) => [item.to, item.from])),
       }))
       .value();
     if (isEmpty(newData)) {

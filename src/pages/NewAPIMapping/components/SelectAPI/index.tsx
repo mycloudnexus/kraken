@@ -292,6 +292,7 @@ const SelectAPI = ({ save }: { save: () => Promise<true | undefined> }) => {
 
   useEffect(() => {
     if (isEmpty(dataList?.data) && isSuccess) {
+      Modal.destroyAll();
       Modal.confirm({
         icon: <ExclamationCircleOutlined />,
         title: "No Seller API Server information to configure",
