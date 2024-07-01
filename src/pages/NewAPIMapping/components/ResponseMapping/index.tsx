@@ -395,7 +395,7 @@ const ResponseMapping = () => {
       </Flex>
       {Object.entries(responseMappingGroupedByTitle).map(([title, items]) => (
         <MappingCollapse
-          key={`main-${JSON.stringify(items)}`}
+          key={`main-${title}`}
           title={title}
           items={items}
           listMapping={listMapping}
