@@ -5,7 +5,6 @@ import { useCommonListProps } from "@/hooks/useCommonListProps";
 import { toDateTime } from "@/libs/dayjs";
 import { useAppStore } from "@/stores/app.store";
 import { DEFAULT_PAGING } from "@/utils/constants/common";
-
 import { IActivityLog } from "@/utils/types/env.type";
 
 import {
@@ -21,7 +20,7 @@ import {
 } from "antd";
 import { ColumnsType } from "antd/es/table";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router";
 import ActivityDetailModal from "./components/ActivityDetailModal";
@@ -56,6 +55,7 @@ const EnvironmentActivityLog = () => {
   const navigate = useNavigate();
   const { currentProduct } = useAppStore();
   const { data: envData } = useGetProductEnvs(currentProduct);
+  const [form] = Form.useForm();
 
   const {
     tableData,
@@ -85,19 +85,44 @@ const EnvironmentActivityLog = () => {
       setTableData(updatedTableData!);
     }
   }, [data, isLoading]);
-  const handleFormValuesChange = (t: any, values: any) => {
-    const { requestTime = [] } = t ?? {};
-    const params = _.omit(values, ["requestTime"]);
-    params.requestStartTime = requestTime[0]
-      ? dayjs(requestTime[0]).valueOf()
-      : undefined;
-    params.requestEndTime = requestTime[1]
-      ? dayjs(requestTime[1]).valueOf()
-      : undefined;
 
-    setQueryParams(params);
-  };
-  const [form] = Form.useForm();
+  const handleFormValues = useCallback(
+    (values: any) => {
+      const { requestTime = [] } = values ?? {};
+      const params = _.omit(values, ["requestTime"]);
+      params.requestStartTime = requestTime[0]
+        ? dayjs(requestTime[0]).valueOf()
+        : undefined;
+      params.requestEndTime = requestTime[1]
+        ? dayjs(requestTime[1]).valueOf()
+        : undefined;
+
+      if (!Boolean(params.path)) {
+        delete params.path;
+      }
+
+      setQueryParams(params);
+    },
+    [setQueryParams]
+  );
+
+  const debounceFn = useCallback(
+    _.debounce(() => {
+      const formValue = form.getFieldsValue();
+      handleFormValues(formValue);
+    }, 2000),
+    [form, handleFormValues]
+  );
+
+  const handleFormValuesChange = useCallback(
+    (t: any, values: any) => {
+      if (t.path) return;
+
+      handleFormValues(values);
+    },
+    [handleFormValues]
+  );
+
   const envOptions = useMemo(() => {
     return (
       envData?.data?.map((env) => ({
@@ -147,7 +172,6 @@ const EnvironmentActivityLog = () => {
       ),
     },
   ];
-  console.log("=>a-b", tableData);
   return (
     <div className={styles.wrapper}>
       <Breadcrumb
@@ -235,7 +259,11 @@ const EnvironmentActivityLog = () => {
                   />
                 </Form.Item>
                 <Form.Item name={"path"} noStyle>
-                  <Input placeholder="Input path" size="small" />
+                  <Input
+                    placeholder="Input path"
+                    size="small"
+                    onChange={debounceFn}
+                  />
                 </Form.Item>
               </Space.Compact>
             </Form.Item>
