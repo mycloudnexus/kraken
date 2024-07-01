@@ -1,3 +1,4 @@
+import APIServerModal from "@/components/APIServerModal";
 import Text from "@/components/Text";
 import { IComponent } from "@/utils/types/product.type";
 import { Card, Col, Flex, Row, Tag, Typography, notification } from "antd";
@@ -9,23 +10,25 @@ import { PaperClipOutlined } from "@ant-design/icons";
 import jsYaml from "js-yaml";
 import { decode } from "js-base64";
 import SpecDrawer from "@/components/SpecDrawer";
-import { useNavigate } from "react-router-dom";
-import { useAppStore } from "@/stores/app.store";
 
 type Props = {
   item: IComponent;
+  refresh: () => void;
 };
 
-const APIServerCard = ({ item }: Props) => {
-  const { currentProduct } = useAppStore();
-  const navigate = useNavigate();
+const APIServerCard = ({ item, refresh }: Props) => {
+  const {
+    value: isOpenModal,
+    setTrue: openModal,
+    setFalse: closeModal,
+  } = useBoolean(false);
   const {
     value: isOpenDrawer,
     setTrue: openDrawer,
     setFalse: closeDrawer,
   } = useBoolean(false);
   const handleEdit = () => {
-    navigate(`/component/${currentProduct}/edit/${get(item, "metadata.key")}`);
+    openModal();
   };
 
   const environmentData = useMemo(() => {
@@ -57,6 +60,14 @@ const APIServerCard = ({ item }: Props) => {
           onClose={closeDrawer}
           isOpen={isOpenDrawer}
           content={get(item, "facets.baseSpec.content")}
+        />
+      )}
+      {isOpenModal && (
+        <APIServerModal
+          id={item?.metadata?.key}
+          isOpen={isOpenModal}
+          onClose={closeModal}
+          refresh={refresh}
         />
       )}
       <Card

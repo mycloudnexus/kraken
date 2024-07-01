@@ -10,8 +10,8 @@ import { Button, Empty, Transfer, TransferProps, notification } from "antd";
 import { cloneDeep, get, isEmpty, set } from "lodash";
 import { decode } from "js-base64";
 import jsYaml from "js-yaml";
+import { tranformSwaggerToArray } from "../NewAPIServer/components/SelectDownStreamAPI";
 import { LeftOutlined } from "@ant-design/icons";
-import { tranformSwaggerToArray } from "../NewAPIServer/components/UploadYaml";
 
 const APIServerEditSelection = () => {
   const { currentProduct } = useAppStore();
