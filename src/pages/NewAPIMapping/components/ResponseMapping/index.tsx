@@ -373,7 +373,7 @@ const ResponseMapping = () => {
             setRightSide(EnumRightType.SelectSellerAPI);
           }}
         >
-          <Flex gap={12} style={{ width: "100%" }}>
+          <Flex gap={12} style={{ width: "100%" }} justifyContent="flex-start">
             {sellerApi ? (
               <>
                 <LogMethodTag method={sellerApi.method} />
@@ -395,7 +395,7 @@ const ResponseMapping = () => {
       </Flex>
       {Object.entries(responseMappingGroupedByTitle).map(([title, items]) => (
         <MappingCollapse
-          key={`main-${title}`}
+          key={`main-${JSON.stringify(items)}`}
           title={title}
           items={items}
           listMapping={listMapping}

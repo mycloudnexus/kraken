@@ -12,7 +12,16 @@ import {
   ExclamationCircleOutlined,
   RightOutlined,
 } from "@ant-design/icons";
-import { Button, Empty, Input, Modal, Spin, Tooltip, Typography } from "antd";
+import {
+  Button,
+  Empty,
+  Input,
+  Modal,
+  Spin,
+  Tooltip,
+  Typography,
+  notification,
+} from "antd";
 import clsx from "clsx";
 import jsYaml from "js-yaml";
 import { cloneDeep, get, isEmpty } from "lodash";
@@ -45,20 +54,30 @@ export const APIItem = ({
   const [searchValue, setSearchValue] = useState("");
 
   const baseSpec = useMemo(() => {
-    const encoded = item?.facets?.baseSpec?.content;
-    if (!encoded) return undefined;
-    const yamlContent = atob(encoded.slice(31))
-      .replace(/(â)/g, "")
-      .replace(/(â)/g, "");
-    return jsYaml.load(yamlContent);
+    try {
+      const encoded = item?.facets?.baseSpec?.content;
+      if (!encoded) return undefined;
+      const yamlContent = atob(encoded.slice(31))
+        .replace(/(â)/g, "")
+        .replace(/(â)/g, "");
+      return jsYaml.load(yamlContent);
+    } catch (error) {
+      return "";
+    }
   }, [item]);
 
   const [resolvedSpec, setResolvedSpec] = useState<any>();
   useEffect(() => {
     if (!baseSpec) return;
     (async () => {
-      const result = await swaggerClient.resolve({ spec: baseSpec });
-      setResolvedSpec(result.spec);
+      try {
+        const result = await swaggerClient.resolve({ spec: baseSpec });
+        setResolvedSpec(result.spec);
+      } catch (error) {
+        notification.error({
+          message: "Can not load information from API seller",
+        });
+      }
     })();
   }, [baseSpec]);
 

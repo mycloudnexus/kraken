@@ -32,7 +32,11 @@ const SelectResponseProperty = () => {
       `spec.responses.200`,
       get(sellerApi, `spec.responses.201`, {})
     );
-    if (isEmpty(response)) {
+    if (
+      isEmpty(response) ||
+      isEmpty(response.content) ||
+      isEmpty(Object.keys(response?.content))
+    ) {
       return [];
     }
     const contentType = get(Object.keys(response.content), "[0]");
