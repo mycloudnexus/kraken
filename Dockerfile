@@ -22,11 +22,13 @@ RUN npm run build
 
 RUN ls -al /opt/app/dist
 
-FROM nginxinc/nginx-unprivileged:bookworm
+FROM docker.io/nginxinc/nginx-unprivileged:bookworm
 
 USER 0
 
 RUN apt-get update && apt-get upgrade -y
+
+COPY nginx.conf /etc/nginx/conf.d/defalt.conf
 
 USER 101
 
