@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { get, isEmpty } from "lodash";
 import APIViewerContent from "../APIViewerContent";
 import TableAPIList from "./TableAPIList";
+import { transformApiData } from "@/utils/helpers/swagger";
 
 type Props = {
   content: string;
@@ -20,20 +21,6 @@ export interface IItem {
   path: string;
   api: string;
 }
-
-const transformApiData = (apiData: Record<string, any>) => {
-  if (isEmpty(apiData)) {
-    return [];
-  }
-  return Object.entries(apiData).flatMap(([path, pathData]) =>
-    Object.entries(pathData).map(([method, methodData]) => ({
-      title: get(methodData, "summary", ""),
-      method: method.toLowerCase(),
-      path,
-      api: `${path} ${method.toLowerCase()}`,
-    }))
-  );
-};
 
 const SpecDrawer = ({ content, isOpen, onClose }: Props) => {
   const [tableData, setTableData] = useState<IItem[]>([]);

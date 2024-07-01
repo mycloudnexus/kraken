@@ -253,3 +253,11 @@
     }
   }
 }
+
+.hideRequired {
+  :global {
+    .ant-form-item-required::before {
+      content: "" !important;
+    }
+  }
+}

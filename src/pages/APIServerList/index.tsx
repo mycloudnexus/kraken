@@ -14,11 +14,7 @@ import APIServerCard from "./components/APIServerCard";
 
 const APIServerList = () => {
   const { currentProduct } = useAppStore();
-  const {
-    data: dataList,
-    isLoading,
-    refetch: refresh,
-  } = useGetComponentList(currentProduct, {
+  const { data: dataList, isLoading } = useGetComponentList(currentProduct, {
     kind: COMPONENT_KIND_API_TARGET_SPEC,
     size: 1000,
   });
@@ -45,7 +41,7 @@ const APIServerList = () => {
               style={{ width: "100%" }}
             >
               {dataList?.data?.map((item: IComponent) => (
-                <APIServerCard item={item} key={item.id} refresh={refresh} />
+                <APIServerCard item={item} key={item.id} />
               ))}
             </Flex>
             {isEmpty(dataList?.data) && (
