@@ -1,15 +1,28 @@
+import { message, notification } from "antd";
 import axios, {
   AxiosError,
-  InternalAxiosRequestConfig,
   AxiosResponse,
+  InternalAxiosRequestConfig,
 } from "axios";
 import qs from "qs";
-import { notification } from "antd";
+import { clearData, getData } from "./token";
+import { AXIOS_MESSAGE } from "../constants/message";
+import { ROUTES } from "../constants/route";
 
+const DIRECT_LOGIN_MSG = [
+  AXIOS_MESSAGE.TOKEN_EXPIRED,
+  AXIOS_MESSAGE.TOKEN_INVALID,
+];
 const onError = (error: AxiosError) => {
   console.error("Request Failed:", error.config);
-
   if (error.response) {
+    const errorMsg = (error.response.data as any)?.error;
+    if (DIRECT_LOGIN_MSG.includes(String(errorMsg))) {
+      void message.error("Your session has expired. Please log in again.");
+      clearData("token");
+      window.location.href = ROUTES.LOGIN;
+    }
+
     // Request was made but server responded with something
     // other than 2xx
     console.error("Status:", error.response.status);
@@ -34,6 +47,26 @@ request.interceptors.request.use(
       config.paramsSerializer = {
         serialize: (params: Record<string, any>) =>
           qs.stringify(params, { arrayFormat: "repeat" }),
+      };
+    }
+    return config;
+  },
+  (err) => {
+    return onError(err);
+  }
+);
+
+request.interceptors.request.use(
+  (config: any) => {
+    const token = getData("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    if (config.method === "get") {
+      config.paramsSerializer = {
+        serialize: (params: any) => {
+          return qs.stringify(params, { arrayFormat: "comma" });
+        },
       };
     }
     return config;

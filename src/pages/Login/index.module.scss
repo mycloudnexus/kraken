@@ -1,0 +1,22 @@
+.pageWrapper {
+  width: 100vw;
+  height: 100vh;
+  background-size: cover;
+  overflow: hidden;
+}
+.formWrapper {
+  width: 375px;
+  border-radius: 8px;
+  border: 1px solid #dde1e5;
+  background-color: #fff;
+  padding: 36px 24px;
+}
+.logoWrapper {
+  padding-block: 5.5px;
+}
+.form {
+  align-self: stretch;
+  :global(.ant-form-item) {
+    margin-bottom: 16px;
+  }
+}
