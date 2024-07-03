@@ -58,7 +58,7 @@ interface MappingCollapseProps {
   handleDelete: (key: number) => void;
   handleChangeInput: (value: string, key: number) => void;
   openSelectorForProp: (value?: string) => void;
-  handleChangeResponse: (value: string, index: number) => void;
+  handleChangeResponse: (value: string, title: string) => void;
 }
 
 const MappingCollapse = ({
@@ -72,7 +72,7 @@ const MappingCollapse = ({
   openSelectorForProp,
   handleChangeResponse,
 }: Readonly<MappingCollapseProps>) => (
-  <div style={{ marginTop: 26 }} key={`main-${title}`}>
+  <div style={{ marginTop: 26 }}>
     <ExpandCard title={title} defaultValue description={""}>
       <Flex gap={16} justifyContent="flex-start" alignItems="stretch">
         <Flex
@@ -182,7 +182,7 @@ const MappingCollapse = ({
           justifyContent="flex-start"
         >
           <Text.BoldMedium>Property from Seller API response</Text.BoldMedium>
-          {items.map((item, index) => (
+          {items.map((item) => (
             <Fragment key={item.target}>
               <Input
                 placeholder="Select response property"
@@ -192,7 +192,7 @@ const MappingCollapse = ({
                 onClick={() => {
                   openSelectorForProp(item?.name);
                 }}
-                onChange={(e) => handleChangeResponse(e.target.value, index)}
+                onChange={(e) => handleChangeResponse(e.target.value, title)}
                 suffix={
                   <RightOutlined style={{ fontSize: 12, color: "#C9CDD4" }} />
                 }
@@ -300,9 +300,9 @@ const ResponseMapping = () => {
     setRightSide(EnumRightType.AddSellerResponse);
   };
 
-  const handleChangeResponse = (value: string, index: number) => {
+  const handleChangeResponse = (value: string, title: string) => {
     const cloneObj = cloneDeep(responseMapping);
-
+    const index = cloneObj?.findIndex((i) => i.title === title);
     set(cloneObj, `[${index}].source`, value);
     set(cloneObj, `[${index}].sourceLocation`, `BODY`);
     setResponseMapping(cloneObj);
