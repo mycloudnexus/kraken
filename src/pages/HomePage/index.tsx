@@ -1,5 +1,5 @@
 import styles from "./index.module.scss";
-import { Col, Row } from "antd";
+import { Col, Flex, Row, Spin } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useAppStore } from "@/stores/app.store";
 import { MoreIcon } from "./components/Icon";
@@ -13,7 +13,7 @@ import { isEmpty } from "lodash";
 const HomePage = () => {
   const { currentProduct } = useAppStore();
   const navigate = useNavigate();
-  const { data: apiList } = useGetComponentList(currentProduct, {
+  const { data: apiList, isLoading } = useGetComponentList(currentProduct, {
     kind: COMPONENT_KIND_API_TARGET_SPEC,
     size: 10000,
     page: 0,
@@ -32,32 +32,33 @@ const HomePage = () => {
       <h1>MEF LSO Sonata Adapters</h1>
       <StepCard navigateApi={navigateApi} />
       <ApiComponents />
-      <Row justify={"space-between"} gutter={[36, 0]}>
-        <Col span={12}>
-          <Row
-            justify={"space-between"}
-            className={styles.bottomItem}
-            onClick={() => navigate(`/env`)}
-          >
-            <Col>Environments overview </Col>
-            <Col>
-              <MoreIcon />
-            </Col>
-          </Row>
-        </Col>
-        <Col span={12}>
-          <Row
-            justify={"space-between"}
-            className={styles.bottomItem}
-            onClick={navigateApi}
-          >
-            <Col>Seller APIs {`(${apiList?.total ?? 0})`}</Col>
-            <Col>
-              <MoreIcon />
-            </Col>
-          </Row>
-        </Col>
-      </Row>
+      <Flex gap={36}>
+        <Row
+          justify={"space-between"}
+          className={styles.bottomItem}
+          onClick={() => navigate(`/env`)}
+        >
+          <Col>Environments overview </Col>
+          <Col>
+            <MoreIcon />
+          </Col>
+        </Row>
+
+        <Row
+          justify={"space-between"}
+          className={styles.bottomItem}
+          onClick={navigateApi}
+        >
+          <Col>
+            <Spin spinning={isLoading} style={{ flex: 1 }}>
+              Seller APIs {`(${apiList?.total ?? 0})`}
+            </Spin>
+          </Col>
+          <Col>
+            <MoreIcon />
+          </Col>
+        </Row>
+      </Flex>
     </div>
   );
 };
