@@ -67,10 +67,14 @@ const NewAPIServer = () => {
         metadata: {
           name: values.name,
           version: 1,
-          key: `mef.sonata.api-target-spec.${values.name
-            ?.replace(" ", "")
-            ?.substring(0, 3)
-            .toLowerCase()}${new Date().getTime()}`,
+          key: get(
+            componentDetail,
+            "metadata.key",
+            `mef.sonata.api-target-spec.${values.name
+              ?.replace(" ", "")
+              ?.substring(0, 3)
+              .toLowerCase()}${new Date().getTime()}`
+          ),
           description: values.description,
         },
         spec: {
@@ -83,7 +87,11 @@ const NewAPIServer = () => {
         },
       };
       if (!isEmpty(componentDetail?.id)) {
-        set(data, "metadata.version", get(data, "metadata.version", 1) + 1);
+        set(
+          data,
+          "metadata.version",
+          get(componentDetail, "metadata.version", 1) + 1
+        );
       }
 
       const res = isEmpty(componentDetail?.id)
@@ -100,7 +108,11 @@ const NewAPIServer = () => {
       navigate(`/component/${id}/list`);
     } catch (error) {
       notification.error({
-        message: get(error, "message", "Error. Please contact administration"),
+        message: get(
+          error,
+          "data.message",
+          "Error. Please contact administration"
+        ),
       });
     }
   };
