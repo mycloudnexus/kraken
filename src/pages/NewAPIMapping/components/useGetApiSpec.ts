@@ -9,13 +9,16 @@ import jsYaml from "js-yaml";
 import { useMemo } from "react";
 
 const useGetApiSpec = (currentProduct: string, query: string) => {
-  const { data: mapperResponse } = useGetComponentList(currentProduct, {
-    kind: COMPONENT_KIND_API_TARGET_MAPPER,
-    q: query,
-    facetIncluded: true,
-    page: 0,
-    size: 20,
-  });
+  const { data: mapperResponse, isLoading } = useGetComponentList(
+    currentProduct,
+    {
+      kind: COMPONENT_KIND_API_TARGET_MAPPER,
+      q: query,
+      facetIncluded: true,
+      page: 0,
+      size: 20,
+    }
+  );
   const endpoint = mapperResponse?.data?.[0]?.facets?.endpoints?.[0];
   const mappers = endpoint?.mappers;
 
@@ -68,6 +71,7 @@ const useGetApiSpec = (currentProduct: string, query: string) => {
     serverKeyInfo,
     mappers,
     jsonSpec,
+    loadingMapper: isLoading,
   };
 };
 

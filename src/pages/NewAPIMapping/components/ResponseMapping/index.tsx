@@ -12,6 +12,7 @@ import {
   chain,
   cloneDeep,
   difference,
+  every,
   fromPairs,
   get,
   groupBy,
@@ -317,7 +318,7 @@ const ResponseMapping = () => {
   }, [sellerApi]);
 
   useEffect(() => {
-    if (isEmpty(responseMapping)) {
+    if (every(responseMapping, (it) => isEmpty(it.valueMapping))) {
       setListMapping([]);
     }
   }, [responseMapping]);

@@ -1,7 +1,7 @@
 import Flex from "@/components/Flex";
 import StepBar from "@/components/StepBar";
 import Text from "@/components/Text";
-import { useUpdateTargetMapper } from "@/hooks/product";
+import { PRODUCT_CACHE_KEYS, useUpdateTargetMapper } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { EStep } from "@/utils/constants/common";
@@ -28,6 +28,7 @@ import SelectResponseProperty from "./components/SelectResponseProperty";
 import useGetApiSpec from "./components/useGetApiSpec";
 import useGetDefaultSellerApi from "./components/useGetDefaultSellerApi";
 import styles from "./index.module.scss";
+import { queryClient } from "@/utils/helpers/reactQuery";
 
 const NewAPIMapping = () => {
   const { componentId } = useParams();
@@ -52,6 +53,7 @@ const NewAPIMapping = () => {
   } = useNewApiMappingStore();
   const { mutateAsync: updateTargetMapper, isPending } =
     useUpdateTargetMapper();
+  const [firstTimeLoad, setFirstTimeLoad] = useState(true);
   const queryData = JSON.parse(query ?? "{}");
   const [activeKey, setActiveKey] = useState<string | string[]>("0");
   const [step, setStep] = useState(0);
@@ -74,10 +76,8 @@ const NewAPIMapping = () => {
       ),
     },
   ];
-  const { jsonSpec, serverKeyInfo, mappers, mapperResponse } = useGetApiSpec(
-    currentProduct,
-    query ?? "{}"
-  );
+  const { jsonSpec, serverKeyInfo, mappers, mapperResponse, loadingMapper } =
+    useGetApiSpec(currentProduct, query ?? "{}");
   const { sellerApi: defaultSellerApi, serverKey: defaultServerKey } =
     useGetDefaultSellerApi(currentProduct, serverKeyInfo);
 
@@ -105,7 +105,7 @@ const NewAPIMapping = () => {
   };
 
   useEffect(() => {
-    if (!requestMapping.length && mappers?.request?.length) {
+    if (firstTimeLoad && !isEmpty(mappers?.request)) {
       const newRequest = mappers?.request?.map((rm: any) => ({
         ...rm,
         target: transformTarget(rm.target, rm.targetLocation),
@@ -113,12 +113,23 @@ const NewAPIMapping = () => {
       }));
       setRequestMapping(newRequest ?? []);
     }
-  }, [mappers, requestMapping, setRequestMapping]);
+  }, [mappers?.request, firstTimeLoad]);
+
   useEffect(() => {
-    if (!isEmpty(mappers?.response) && isEmpty(responseMapping)) {
+    if (firstTimeLoad && !isEmpty(mappers?.response)) {
       setResponseMapping(mappers?.response);
+      setFirstTimeLoad(false);
     }
-  }, [mappers?.response, responseMapping]);
+  }, [mappers?.response, firstTimeLoad]);
+
+  useEffect(() => {
+    return () => {
+      queryClient.removeQueries({
+        queryKey: [PRODUCT_CACHE_KEYS.get_component_list],
+      });
+    };
+  }, []);
+
   const [tabActiveKey, setTabActiveKey] = useState("request");
 
   const items: TabsProps["items"] = [
@@ -131,6 +142,7 @@ const NewAPIMapping = () => {
       key: "response",
       label: "Response mapping",
       children: <ResponseMapping />,
+      disabled: loadingMapper,
     },
   ];
   const handleSelectSonataProp = (selected: any) => {
