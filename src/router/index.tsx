@@ -43,8 +43,14 @@ const router = createBrowserRouter([
                 element: <APIServerList />,
               },
               {
-                path: "edit/:componentId/api",
-                element: <APIServerEditSelection />,
+                path: "edit/:componentId",
+                children: [
+                  { path: "", element: <NewAPIServer /> },
+                  {
+                    path: "api",
+                    element: <APIServerEditSelection />,
+                  },
+                ],
               },
             ],
           },

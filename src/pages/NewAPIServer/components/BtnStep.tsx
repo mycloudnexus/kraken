@@ -5,15 +5,13 @@ import { ExclamationCircleFilled } from "@ant-design/icons";
 
 type Props = {
   onNext: () => void;
-  onPrev: () => void;
-  currentStep: number;
   disabled?: boolean;
   loading?: boolean;
 };
 
 const { confirm } = Modal;
 
-const BtnStep = ({ onNext, onPrev, currentStep, disabled, loading }: Props) => {
+const BtnStep = ({ onNext, disabled, loading }: Props) => {
   const navigate = useNavigate();
   const showConfirm = () => {
     confirm({
@@ -38,7 +36,6 @@ const BtnStep = ({ onNext, onPrev, currentStep, disabled, loading }: Props) => {
       <Button onClick={showConfirm} type="text">
         Cancel
       </Button>
-      {currentStep > 0 && <Button onClick={onPrev}>Previous</Button>}
       <Button
         type="primary"
         shape="default"
@@ -46,7 +43,7 @@ const BtnStep = ({ onNext, onPrev, currentStep, disabled, loading }: Props) => {
         disabled={loading || disabled}
         loading={loading}
       >
-        {currentStep === 3 ? "Save and exit" : "Next"}
+        Save
       </Button>
     </div>
   );

@@ -1,6 +1,13 @@
 .root {
   padding: 14px 20px;
   background: #f0f2f5;
+  :global {
+    .ant-card-head,
+    .ant-card-body {
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+  }
 }
 
 .content {

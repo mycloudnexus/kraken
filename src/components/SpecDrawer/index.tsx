@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { get, isEmpty } from "lodash";
 import APIViewerContent from "../APIViewerContent";
 import TableAPIList from "./TableAPIList";
+import { transformApiData } from "@/utils/helpers/swagger";
 
 type Props = {
   content: string;
@@ -21,28 +22,16 @@ export interface IItem {
   api: string;
 }
 
-const transformApiData = (apiData: Record<string, any>) => {
-  if (isEmpty(apiData)) {
-    return [];
-  }
-  return Object.entries(apiData).flatMap(([path, pathData]) =>
-    Object.entries(pathData).map(([method, methodData]) => ({
-      title: get(methodData, "summary", ""),
-      method: method.toLowerCase(),
-      path,
-      api: `${path} ${method.toLowerCase()}`,
-    }))
-  );
-};
-
 const SpecDrawer = ({ content, isOpen, onClose }: Props) => {
   const [tableData, setTableData] = useState<IItem[]>([]);
   const [selectedAPI, setSelectedAPI] = useState("");
+  const [title, setTitle] = useState("");
   const loadContent = () => {
     try {
       if (content) {
         const yamlContent = jsYaml.load(decode(content));
         const result = transformApiData(get(yamlContent, "paths", {}));
+        setTitle(get(yamlContent, "info.title", ""));
         setTableData(result);
         setSelectedAPI(get(result, "[0].api", ""));
       }
@@ -82,9 +71,7 @@ const SpecDrawer = ({ content, isOpen, onClose }: Props) => {
       <Flex gap={14} style={{ height: "100%" }}>
         <div className={styles.tableList}>
           <div style={{ marginBottom: 12 }}>
-            <Text.NormalLarge>
-              Console connect application API spec
-            </Text.NormalLarge>
+            <Text.NormalLarge>{title}</Text.NormalLarge>
           </div>
           <TableAPIList
             data={tableData}

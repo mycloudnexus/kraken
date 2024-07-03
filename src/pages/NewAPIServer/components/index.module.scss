@@ -141,7 +141,7 @@
 }
 
 .inputUrl {
-  width: 50%;
+  width: 100%;
   min-width: 200px;
 }
 
@@ -250,6 +250,14 @@
     }
     .ant-collapse-content-box {
       padding: 0 !important;
+    }
+  }
+}
+
+.hideRequired {
+  :global {
+    .required-label {
+      display: none;
     }
   }
 }

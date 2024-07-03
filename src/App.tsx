@@ -12,8 +12,15 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ConfigProvider
-        button={{ style: { borderRadius: 4 } }}
         input={{ style: { borderRadius: 4 } }}
+        theme={{
+          components: {
+            Button: {
+              colorPrimary: "#2962FF",
+              borderRadius: 4,
+            },
+          },
+        }}
       >
         <RouterProvider router={router} />
       </ConfigProvider>
