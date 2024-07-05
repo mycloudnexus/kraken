@@ -99,17 +99,26 @@ const RightAddSonataProp = ({
   });
 
   return (
-    <Flex vertical gap={16} style={{ width: "100%", minHeight: "100%" }}>
-      <Text.BoldLarge>Add mapping property from Sonata API</Text.BoldLarge>
-      <Collapse
-        ghost
-        items={collapseItems}
-        defaultActiveKey={["path", "query", "request"]}
-        className={styles.collapse}
-        expandIconPosition="end"
-      />
-      <Flex justify="flex-end">
-        <Button type="primary" onClick={handleAddProp}>
+    <Flex
+      vertical
+      gap={16}
+      style={{ width: "100%", height: "100%" }}
+      className={styles.root}
+    >
+      <div className={styles.header}>
+        <Text.BoldLarge>Add mapping property from Sonata API</Text.BoldLarge>
+      </div>
+      <div className={styles.container}>
+        <Collapse
+          ghost
+          items={collapseItems}
+          defaultActiveKey={["path", "query", "request"]}
+          className={styles.collapse}
+          expandIconPosition="end"
+        />
+      </div>
+      <Flex justify="flex-end" className={styles.footer}>
+        <Button type="primary" onClick={handleAddProp} disabled={!selectedProp}>
           OK
         </Button>
       </Flex>

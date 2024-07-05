@@ -62,7 +62,7 @@ const ModalNewDeployment = ({
 
     try {
       await deployProduct({
-        product: currentProduct,
+        productId: currentProduct,
         envId: currentEnvId,
         data: t,
       } as any);

@@ -5,10 +5,9 @@ import Text from "@/components/Text";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { EnumRightType } from "@/utils/types/common.type";
 import { DeleteOutlined, RightOutlined } from "@ant-design/icons";
-import { Button, Input, Select, Tag, Typography } from "antd";
+import { Button, Input, Select } from "antd";
 import clsx from "clsx";
 import {
-  capitalize,
   chain,
   cloneDeep,
   difference,
@@ -21,7 +20,6 @@ import {
 } from "lodash";
 import React, { Fragment, useEffect, useMemo, useState } from "react";
 import styles from "./index.module.scss";
-import LogMethodTag from "@/components/LogMethodTag";
 
 interface IMapping {
   key: number;
@@ -60,6 +58,8 @@ interface MappingCollapseProps {
   handleChangeInput: (value: string, key: number) => void;
   openSelectorForProp: (value?: string) => void;
   handleChangeResponse: (value: string, title: string) => void;
+  activeResponseName?: string;
+  setRightSide: (value?: EnumRightType) => void;
 }
 
 const MappingCollapse = ({
@@ -72,9 +72,15 @@ const MappingCollapse = ({
   handleChangeInput,
   openSelectorForProp,
   handleChangeResponse,
+  activeResponseName,
+  setRightSide,
 }: Readonly<MappingCollapseProps>) => (
-  <div style={{ marginTop: 26 }}>
-    <ExpandCard title={title} defaultValue description={""}>
+  <div style={{ marginTop: 12 }}>
+    <ExpandCard
+      title={title}
+      defaultValue
+      description={get(items, `[${0}].description`)}
+    >
       <Flex gap={16} justifyContent="flex-start" alignItems="stretch">
         <Flex
           className={clsx(["flex-1", styles.mainCard])}
@@ -83,7 +89,6 @@ const MappingCollapse = ({
           justifyContent="flex-start"
           gap={4}
         >
-          <Text.BoldMedium>Property from Sonata API response</Text.BoldMedium>
           {items.map((item) => (
             <Fragment key={item.target}>
               <Text.LightMedium lineHeight="32px">
@@ -103,7 +108,6 @@ const MappingCollapse = ({
                       ?.filter((i) => i.name === item?.name)
                       ?.map(({ key, from }, index) => (
                         <React.Fragment key={`state-${key}`}>
-                          <Text.BoldMedium>Sonata state</Text.BoldMedium>
                           <Flex
                             justifyContent="flex-start"
                             style={{ width: "100%" }}
@@ -151,7 +155,7 @@ const MappingCollapse = ({
           flexDirection="column"
           justifyContent="flex-start"
           gap={25}
-          style={{ marginTop: 57 }}
+          style={{ marginTop: 28 }}
         >
           {Array.from(
             {
@@ -182,15 +186,18 @@ const MappingCollapse = ({
           gap={4}
           justifyContent="flex-start"
         >
-          <Text.BoldMedium>Property from Seller API response</Text.BoldMedium>
           {items.map((item) => (
             <Fragment key={item.target}>
               <Input
                 placeholder="Select response property"
                 style={{ width: "100%" }}
-                className={styles.input}
+                className={clsx(
+                  styles.input,
+                  activeResponseName === item.name && styles.activeInput
+                )}
                 value={isEmpty(item?.source) ? undefined : get(item, "source")}
                 onClick={() => {
+                  setRightSide(EnumRightType.AddSellerResponse);
                   openSelectorForProp(item?.name);
                 }}
                 onChange={(e) => handleChangeResponse(e.target.value, title)}
@@ -210,7 +217,6 @@ const MappingCollapse = ({
                       ?.filter((i) => i.name === item.name)
                       ?.map(({ key, to }) => (
                         <React.Fragment key={`enum-${key}`}>
-                          <Text.BoldMedium>Seller state</Text.BoldMedium>
                           <Input
                             placeholder="Input seller state"
                             style={{ width: "100%" }}
@@ -235,15 +241,12 @@ const MappingCollapse = ({
 
 const ResponseMapping = () => {
   const {
-    query,
     responseMapping,
-    rightSide,
-    sellerApi,
     setActiveResponseName,
     setResponseMapping,
     setRightSide,
+    activeResponseName,
   } = useNewApiMappingStore();
-  const queryData = JSON.parse(query ?? "{}");
   const [listMapping, setListMapping] = useState<IMapping[]>(
     buildInitListMapping(responseMapping)
   );
@@ -311,13 +314,6 @@ const ResponseMapping = () => {
   };
 
   useEffect(() => {
-    if (isEmpty(sellerApi)) {
-      return;
-    }
-    setRightSide(EnumRightType.AddSellerResponse);
-  }, [sellerApi]);
-
-  useEffect(() => {
     if (every(responseMapping, (it) => isEmpty(it.valueMapping))) {
       setListMapping([]);
     }
@@ -329,71 +325,6 @@ const ResponseMapping = () => {
 
   return (
     <div className={styles.root}>
-      <Flex gap={16} justifyContent="flex-start">
-        <Flex
-          justifyContent="flex-start"
-          gap={8}
-          style={{
-            boxSizing: "border-box",
-            flex: "0 0 calc(50% - 30px)",
-            padding: 10,
-          }}
-        >
-          <Text.NormalLarge>Sonata API</Text.NormalLarge>
-          {queryData?.productType && (
-            <Tag>{queryData.productType.toUpperCase()}</Tag>
-          )}
-          {queryData?.actionType && (
-            <Tag>{capitalize(queryData.actionType)}</Tag>
-          )}
-        </Flex>
-        <div style={{ visibility: "hidden" }}>
-          <MappingIcon />
-        </div>
-        <div className="flex-1">
-          <Text.NormalLarge>Seller API</Text.NormalLarge>
-        </div>
-      </Flex>
-      <Flex gap={16} justifyContent="flex-start" style={{ marginTop: 16 }}>
-        <Flex gap={6} className={styles.sonataAPIBasicInfoWrapper}>
-          <LogMethodTag method={queryData?.method} />
-          <Typography.Text
-            style={{ flex: 1, color: "#595959" }}
-            ellipsis={{ tooltip: true }}
-          >
-            {queryData?.path}
-          </Typography.Text>
-        </Flex>
-        <MappingIcon />
-        <Flex
-          justifyContent="space-between"
-          className={clsx(styles.sellerAPIBasicInfoWrapper, {
-            [styles.highlight]: rightSide === EnumRightType.SelectSellerAPI,
-          })}
-          onClick={() => {
-            setRightSide(EnumRightType.SelectSellerAPI);
-          }}
-        >
-          <Flex gap={12} style={{ width: "100%" }} justifyContent="flex-start">
-            {sellerApi ? (
-              <>
-                <LogMethodTag method={sellerApi.method} />
-                <Typography.Text
-                  style={{ flex: 1 }}
-                  ellipsis={{ tooltip: true }}
-                >
-                  {sellerApi.url}
-                </Typography.Text>
-              </>
-            ) : (
-              <Typography.Text>
-                Please select API from the side bar
-              </Typography.Text>
-            )}
-          </Flex>
-          <RightOutlined style={{ color: "rgba(0, 0, 0, 0.45)" }} />
-        </Flex>
-      </Flex>
       {Object.entries(responseMappingGroupedByTitle).map(([title, items]) => (
         <MappingCollapse
           key={`main-${title}`}
@@ -406,6 +337,8 @@ const ResponseMapping = () => {
           handleChangeInput={handleChangeInput}
           openSelectorForProp={openSelectorForProp}
           handleChangeResponse={handleChangeResponse}
+          activeResponseName={activeResponseName}
+          setRightSide={setRightSide}
         />
       ))}
     </div>

@@ -3,6 +3,7 @@ import { CollapseProps, Flex, Tree, Typography, notification } from "antd";
 import clsx from "clsx";
 import { Dispatch, useCallback, useMemo } from "react";
 import styles from "./RightAddSellerProp/index.module.scss";
+import { get } from "lodash";
 
 interface Props {
   selectedProp: any;
@@ -31,6 +32,15 @@ export const useCommonAddProp = ({
     onSelect?.({ ...selectedProp, title: rightSideInfo?.title });
   }, [selectedProp, onSelect, rightSideInfo]);
 
+  const selectedKey = useMemo(
+    () =>
+      get(selectedProp, "name", "")
+        .replace("@{{", "")
+        .replace("}}", "")
+        .replace("requestBody.", ""),
+    [selectedProp]
+  );
+
   const collapseItems = useMemo(() => {
     const items: CollapseProps["items"] = [];
     if (pathParameters.length) {
@@ -50,7 +60,7 @@ export const useCommonAddProp = ({
                 className={clsx(styles.paramItem, {
                   [styles.active]:
                     selectedProp?.location === "PATH" &&
-                    selectedProp?.name === parameter.name,
+                    selectedProp?.name === `@{{path.${parameter.name}}}`,
                 })}
                 key={parameter.name}
                 onClick={() =>
@@ -84,7 +94,7 @@ export const useCommonAddProp = ({
                 className={clsx(styles.paramItem, {
                   [styles.active]:
                     selectedProp?.location === "QUERY" &&
-                    selectedProp?.name === parameter.name,
+                    selectedProp?.name === `@{{query.${parameter.name}}}`,
                 })}
                 key={parameter.name}
                 onClick={() =>
@@ -116,14 +126,7 @@ export const useCommonAddProp = ({
               treeData={requestBodyTree}
               selectable
               selectedKeys={
-                selectedProp?.location === "BODY"
-                  ? [
-                      selectedProp?.name
-                        .replace("@{{", "")
-                        .replace("}}", "")
-                        .replace("requestBody.", ""),
-                    ]
-                  : []
+                selectedProp?.location === "BODY" ? [selectedKey] : []
               }
               onSelect={(_, e) => {
                 setSelectedProp({
@@ -137,7 +140,13 @@ export const useCommonAddProp = ({
       });
     }
     return items;
-  }, [pathParameters, queryParameters, requestBodyTree, selectedProp]);
+  }, [
+    pathParameters,
+    queryParameters,
+    requestBodyTree,
+    selectedProp,
+    selectedKey,
+  ]);
 
   return {
     handleAddProp,

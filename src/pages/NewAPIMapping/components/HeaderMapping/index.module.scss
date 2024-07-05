@@ -7,7 +7,6 @@
   border: 1px solid #f0f0f0;
   background-color: #f0f2f5;
 }
-
 .sellerAPIBasicInfoWrapper {
   flex: 0 0 calc(50% - 30px);
   width: calc(50% - 30px);
@@ -19,33 +18,4 @@
   &.highlight {
     border-color: #2962ff;
   }
-}
-
-.card {
-  border: 1px solid;
-  border-radius: 6px;
-  padding: 18px;
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.mainCard {
-  @extend .card;
-  background: #f0f2f5;
-  border-color: #f0f2f5;
-}
-
-.mappingCard {
-  @extend .card;
-  gap: 12px;
-  border-color: #dde1e5;
-}
-
-.input {
-  background: #f2f3f5;
-}
-
-.activeInput {
-  border: 1px solid #2962ff;
-  background-color: #fff !important;
 }

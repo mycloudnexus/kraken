@@ -1,5 +1,6 @@
 import { useGetComponentList } from "@/hooks/product";
 import { COMPONENT_KIND_API_TARGET_SPEC } from "@/utils/constants/product";
+import { notification } from "antd";
 import jsYaml from "js-yaml";
 import { get } from "lodash";
 import { useEffect, useMemo, useState } from "react";
@@ -28,12 +29,21 @@ const useGetDefaultSellerApi = (
   }, [dataList, serverKeyInfo, isLoading]);
 
   const baseSpec = useMemo(() => {
-    const encoded = apiTargetSpecComponent?.facets?.baseSpec?.content;
-    if (!encoded) return undefined;
-    const yamlContent = atob(encoded.slice(31))
-      .replace(/(â)/g, "")
-      .replace(/(â)/g, "");
-    return jsYaml.load(yamlContent);
+    try {
+      const encoded = apiTargetSpecComponent?.facets?.baseSpec?.content;
+      if (!encoded) return undefined;
+      const yamlContent = atob(encoded.slice(31))
+        .replace(/(â)/g, "")
+        .replace(/(â)/g, "");
+      const result = jsYaml.load(yamlContent);
+      return result;
+    } catch (error) {
+      notification.error({
+        message:
+          "Can not read the info from your api spec file, please upload the correct one",
+      });
+      return undefined;
+    }
   }, [apiTargetSpecComponent]);
 
   const [resolvedSpec, setResolvedSpec] = useState<any>();

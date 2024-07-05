@@ -57,18 +57,20 @@ const RightAddSellerProp = ({ onSelect }: Readonly<Props>) => {
   });
 
   return (
-    <Flex vertical gap={16} style={{ width: "100%", minHeight: "100%" }}>
-      <Text.BoldLarge>
-        Select mapping property from Seller API request
-      </Text.BoldLarge>
-      <Collapse
-        ghost
-        items={collapseItems}
-        defaultActiveKey={["path", "query", "request"]}
-        className={styles.collapse}
-        expandIconPosition="end"
-      />
-      <Flex justify="flex-end">
+    <Flex vertical gap={16} style={{ width: "100%", height: "100%" }}>
+      <div className={styles.header}>
+        <Text.BoldLarge>Add mapping property from seller API</Text.BoldLarge>
+      </div>
+      <div className={styles.container}>
+        <Collapse
+          ghost
+          items={collapseItems}
+          defaultActiveKey={["path", "query", "request"]}
+          className={styles.collapse}
+          expandIconPosition="end"
+        />
+      </div>
+      <Flex justify="flex-end" className={styles.footer}>
         <Button type="primary" onClick={handleAddProp}>
           OK
         </Button>

@@ -84,7 +84,6 @@ const SonataPropMapping = ({ list, title }: Readonly<Props>) => {
   return (
     <Flex gap={16}>
       <div className={styles.sonataPropMappingWrapper}>
-        <Typography.Text>Property from Sonata API</Typography.Text>
         <div className={styles.requestMappingList}>
           {list?.map((requestMapping) => (
             <RequestMappingItem
@@ -129,7 +128,6 @@ const SonataPropMapping = ({ list, title }: Readonly<Props>) => {
         ))}
       </div>
       <div className={styles.sellerPropMappingWrapper}>
-        <Typography.Text>Property from Seller API response</Typography.Text>
         <div className={styles.responseMappingList}>
           {list?.map((rm, index) => (
             <Input

@@ -58,9 +58,8 @@
       background-color: #f5f5f5;
     }
     &:global(.ant-tree-node-selected) {
-      .treeTitle,
-      .treeValue {
-        background-color: #dbe4fb;
+      span > div > span {
+        background-color: #dbe4fb !important;
       }
     }
   }
@@ -75,4 +74,20 @@
 .treeValue {
   padding: 2px 4px;
   background: #fff;
+}
+
+.header {
+  padding: 16px 20px;
+  box-shadow: 0px -1px 0px 0px #f0f0f0 inset;
+}
+
+.container {
+  padding: 16px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.footer {
+  border-top: 1px solid #f0f0f0;
+  padding: 14px 24px;
 }

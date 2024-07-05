@@ -14,7 +14,6 @@ import {
 } from "@ant-design/icons";
 import {
   Button,
-  Empty,
   Input,
   Modal,
   Spin,
@@ -31,6 +30,7 @@ import swaggerClient from "swagger-client";
 import { useBoolean } from "usehooks-ts";
 import styles from "./index.module.scss";
 import useGetApiSpec from "../useGetApiSpec";
+import EmptyIcon from "@/assets/newAPIServer/empty.svg";
 
 type ItemProps = {
   item: IComponent;
@@ -47,10 +47,8 @@ export const APIItem = ({
   selectedAPI,
   setSelectedServer,
 }: ItemProps) => {
-  const navigate = useNavigate();
-  const { currentProduct } = useAppStore();
   const { sellerApi } = useNewApiMappingStore();
-  const { value: isOpen, toggle: toggleOpen } = useBoolean(isOneItem);
+  const { value: isOpen, toggle: toggleOpen } = useBoolean(false);
   const [searchValue, setSearchValue] = useState("");
 
   const baseSpec = useMemo(() => {
@@ -67,6 +65,7 @@ export const APIItem = ({
   }, [item]);
 
   const [resolvedSpec, setResolvedSpec] = useState<any>();
+
   useEffect(() => {
     if (!baseSpec) return;
     (async () => {
@@ -80,6 +79,12 @@ export const APIItem = ({
       }
     })();
   }, [baseSpec]);
+
+  useEffect(() => {
+    if (isOneItem) {
+      toggleOpen();
+    }
+  }, [isOneItem]);
 
   const onSelect = (key: string) => {
     const name = get(item, "metadata.name");
@@ -133,22 +138,8 @@ export const APIItem = ({
           ) : (
             <RightOutlined onClick={toggleOpen} style={{ fontSize: 10 }} />
           )}
-          <Text.LightMedium>{get(item, "metadata.name")}</Text.LightMedium>
+          <Text.NormalMedium>{get(item, "metadata.name")}</Text.NormalMedium>
         </Flex>
-        <Button
-          type="text"
-          style={{ color: "#2962FF", padding: 0 }}
-          onClick={() =>
-            navigate(
-              `/component/${currentProduct}/edit/${get(
-                item,
-                "metadata.key"
-              )}/api`
-            )
-          }
-        >
-          Add API
-        </Button>
       </Flex>
       <Flex
         flexDirection="column"
@@ -227,11 +218,7 @@ const SelectAPI = ({ save }: { save: () => Promise<true | undefined> }) => {
     setResponseMapping,
   } = useNewApiMappingStore();
   const navigate = useNavigate();
-  const {
-    data: dataList,
-    isLoading,
-    isSuccess,
-  } = useGetComponentList(currentProduct, {
+  const { data: dataList, isLoading } = useGetComponentList(currentProduct, {
     kind: COMPONENT_KIND_API_TARGET_SPEC,
     size: 1000,
   });
@@ -309,27 +296,6 @@ const SelectAPI = ({ save }: { save: () => Promise<true | undefined> }) => {
   };
   const itemLength = dataList?.data?.length ?? 0;
 
-  useEffect(() => {
-    if (isEmpty(dataList?.data) && isSuccess) {
-      Modal.destroyAll();
-      Modal.confirm({
-        icon: <ExclamationCircleOutlined />,
-        title: "No Seller API Server information to configure",
-        content: (
-          <Text.LightMedium>
-            You need to do Seller API Server setup before configure
-          </Text.LightMedium>
-        ),
-        okButtonProps: {
-          type: "primary",
-          danger: true,
-        },
-        okText: "API Server setup",
-        onOk: () => navigate(`/component/${currentProduct}/new`),
-      });
-    }
-  }, [dataList, isSuccess]);
-
   return (
     <div className={styles.root}>
       <div className={styles.header}>
@@ -338,17 +304,43 @@ const SelectAPI = ({ save }: { save: () => Promise<true | undefined> }) => {
       <Spin spinning={isLoading} className={styles.loading}>
         <div className={styles.container}>
           <div className={styles.content}>
-            {dataList?.data?.map((item: IComponent) => (
+            {dataList?.data?.map((item: IComponent, index: number) => (
               <APIItem
                 item={item}
                 key={item.id}
-                isOneItem={itemLength === 0}
+                isOneItem={itemLength === 1 && index === 0}
                 setSellerApi={setSelectedAPI}
                 selectedAPI={selectedAPI}
                 setSelectedServer={setSelectedServer}
               />
             ))}
-            {!isLoading && isEmpty(dataList?.data) && <Empty />}
+            {!isLoading && isEmpty(dataList?.data) && (
+              <div className={styles.empty}>
+                <Flex flexDirection="column" gap={24}>
+                  <EmptyIcon />
+                  <Flex gap={9} flexDirection="column">
+                    <Text.NormalMedium>
+                      No seller API server. Please go to set up Seller API
+                      Server
+                    </Text.NormalMedium>
+                    <Text.LightMedium>
+                      Register seller API server by uploading all the
+                      information gathered in investigation stage so that MEF
+                      LSO Sonata Adapter can trigger it in sonata API request by
+                      buyer side.
+                    </Text.LightMedium>
+                    <Button
+                      type="primary"
+                      onClick={() =>
+                        navigate(`/component/${currentProduct}/new`)
+                      }
+                    >
+                      Seller API Setup
+                    </Button>
+                  </Flex>
+                </Flex>
+              </div>
+            )}
           </div>
         </div>
       </Spin>

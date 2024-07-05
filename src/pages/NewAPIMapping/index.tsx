@@ -29,6 +29,7 @@ import useGetApiSpec from "./components/useGetApiSpec";
 import useGetDefaultSellerApi from "./components/useGetDefaultSellerApi";
 import styles from "./index.module.scss";
 import { queryClient } from "@/utils/helpers/reactQuery";
+import HeaderMapping from "./components/HeaderMapping";
 
 const NewAPIMapping = () => {
   const { componentId } = useParams();
@@ -290,18 +291,14 @@ const NewAPIMapping = () => {
       <Breadcrumb items={breadcrumb} className={styles.breadcrumb} />
       <Flex gap={20} className={styles.mainWrapper}>
         <div className={styles.center}>
+          <HeaderMapping />
           <Tabs
             items={items}
             activeKey={tabActiveKey}
             onChange={(ak) => setTabActiveKey(ak)}
           />
         </div>
-        <div
-          className={styles.right}
-          style={
-            rightSide === EnumRightType.SelectSellerAPI ? { padding: 0 } : {}
-          }
-        >
+        <div className={styles.right}>
           {rightSide === EnumRightType.AddSonataProp && (
             <RightAddSonataProp
               spec={jsonSpec}
