@@ -1,3 +1,4 @@
+import { IMapping } from "@/pages/NewAPIMapping/components/ResponseMapping";
 import { EnumRightType } from "@/utils/types/common.type";
 import { omit } from "lodash";
 import { create } from "zustand";
@@ -20,6 +21,8 @@ type NewApiMappingStore = {
   reset: () => void;
   activeResponseName?: string;
   setActiveResponseName: (a?: string) => void;
+  listMappingStateResponse: IMapping[];
+  setListMappingStateResponse: (value?: IMapping[]) => void;
 };
 
 const defaultData = {
@@ -31,6 +34,7 @@ const defaultData = {
   responseMapping: [],
   rightSideInfo: undefined,
   activeResponseName: undefined,
+  listMappingStateResponse: [],
 };
 
 export const useNewApiMappingStore = create<NewApiMappingStore>()((set) => ({
@@ -44,4 +48,6 @@ export const useNewApiMappingStore = create<NewApiMappingStore>()((set) => ({
   setRightSideInfo: (rightSideInfo) => set({ rightSideInfo }),
   reset: () => set(omit(defaultData, "query")),
   setActiveResponseName: (value?: string) => set({ activeResponseName: value }),
+  setListMappingStateResponse: (value?: IMapping[]) =>
+    set({ listMappingStateResponse: value }),
 }));

@@ -56,6 +56,16 @@ const SelectResponseProperty = () => {
     );
 
     if (!isEmpty(example)) {
+      const exampleKeys = get(Object.keys(example), "[0]", "");
+      const firstExample = get(example, `${exampleKeys}.value`);
+      if (!isEmpty(firstExample)) {
+        return exampleParse(
+          firstExample,
+          "",
+          styles.nodeTitle,
+          styles.nodeExample
+        );
+      }
       return exampleParse(example, "", styles.nodeTitle, styles.nodeExample);
     }
 

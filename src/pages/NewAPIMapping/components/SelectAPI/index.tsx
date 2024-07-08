@@ -48,7 +48,7 @@ export const APIItem = ({
   setSelectedServer,
 }: ItemProps) => {
   const { sellerApi } = useNewApiMappingStore();
-  const { value: isOpen, toggle: toggleOpen } = useBoolean(false);
+  const { value: isOpen, toggle: toggleOpen, setTrue } = useBoolean(false);
   const [searchValue, setSearchValue] = useState("");
 
   const baseSpec = useMemo(() => {
@@ -82,7 +82,7 @@ export const APIItem = ({
 
   useEffect(() => {
     if (isOneItem) {
-      toggleOpen();
+      setTrue();
     }
   }, [isOneItem]);
 
@@ -216,6 +216,7 @@ const SelectAPI = ({ save }: { save: () => Promise<true | undefined> }) => {
     reset,
     query,
     setResponseMapping,
+    setRequestMapping,
   } = useNewApiMappingStore();
   const navigate = useNavigate();
   const { data: dataList, isLoading } = useGetComponentList(currentProduct, {
@@ -234,13 +235,21 @@ const SelectAPI = ({ save }: { save: () => Promise<true | undefined> }) => {
 
   const resetMapping = () => {
     reset();
-    const newApiMapping = cloneDeep(mappers?.response).map((rm: any) => ({
+    const newApiRequest = cloneDeep(mappers?.response)
+      .filter((rm: any) => !!rm.requiredMapping)
+      .map((rm: any) => ({
+        ...rm,
+        target: undefined,
+        targetLocation: undefined,
+      }));
+    const newApiResponse = cloneDeep(mappers?.response).map((rm: any) => ({
       ...rm,
       sourceLocation: undefined,
       source: undefined,
       valueMapping: undefined,
     }));
-    setResponseMapping(newApiMapping);
+    setRequestMapping(newApiRequest);
+    setResponseMapping(newApiResponse);
   };
 
   const handleOK = () => {

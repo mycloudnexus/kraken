@@ -16,11 +16,22 @@ import {
   TabsProps,
   notification,
 } from "antd";
-import { cloneDeep, get, isEmpty, uniqBy } from "lodash";
+import {
+  chain,
+  cloneDeep,
+  every,
+  flatMap,
+  get,
+  isEmpty,
+  keys,
+  pickBy,
+  reduce,
+  uniqBy,
+} from "lodash";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import RequestMapping from "./components/RequestMapping";
-import ResponseMapping from "./components/ResponseMapping";
+import ResponseMapping, { IMapping } from "./components/ResponseMapping";
 import RightAddSellerProp from "./components/RightAddSellerProp";
 import RightAddSonataProp from "./components/RightAddSonataProp";
 import SelectAPI from "./components/SelectAPI";
@@ -30,6 +41,33 @@ import useGetDefaultSellerApi from "./components/useGetDefaultSellerApi";
 import styles from "./index.module.scss";
 import { queryClient } from "@/utils/helpers/reactQuery";
 import HeaderMapping from "./components/HeaderMapping";
+import { IRequestMapping } from "@/utils/types/component.type";
+
+export const buildInitListMapping = (responseMapping: any[]) => {
+  let k = 0;
+  let list: IMapping[] = [];
+  for (const item of responseMapping) {
+    if (
+      !isEmpty(item.valueMapping) &&
+      every(item.valueMapping, (v) => !isEmpty(v))
+    ) {
+      let res = chain(item.valueMapping)
+        .groupBy((value) => value)
+        .map((_, from) => {
+          k += 1;
+          return {
+            from,
+            to: keys(pickBy(item.valueMapping, (v) => v === from)),
+            key: k,
+            name: item.name,
+          };
+        })
+        .value();
+      list = [...list, ...res];
+    }
+  }
+  return list;
+};
 
 const NewAPIMapping = () => {
   const { componentId } = useParams();
@@ -51,6 +89,8 @@ const NewAPIMapping = () => {
     setSellerApi,
     setServerKey,
     reset,
+    setListMappingStateResponse,
+    listMappingStateResponse,
   } = useNewApiMappingStore();
   const { mutateAsync: updateTargetMapper, isPending } =
     useUpdateTargetMapper();
@@ -119,6 +159,7 @@ const NewAPIMapping = () => {
   useEffect(() => {
     if (firstTimeLoad && !isEmpty(mappers?.response)) {
       setResponseMapping(mappers?.response);
+      setListMappingStateResponse(buildInitListMapping(mappers?.response));
       setFirstTimeLoad(false);
     }
   }, [mappers?.response, firstTimeLoad]);
@@ -220,8 +261,76 @@ const NewAPIMapping = () => {
     setStep(1);
     setActiveKey("1");
   };
+
+  const validateData = () => {
+    const requiredRequest = requestMapping.filter(
+      (rm: IRequestMapping) => rm.requiredMapping
+    );
+    const isRequiredAllRequest = every(
+      requiredRequest,
+      (rm: IRequestMapping) =>
+        !isEmpty(get(rm, "target")) && !isEmpty(get(rm, "targetLocation"))
+    );
+    const requiredResponse = responseMapping.filter(
+      (rm: IRequestMapping) => rm.requiredMapping
+    );
+    const isRequiredAllResponse = every(
+      requiredResponse,
+      (rm: IRequestMapping) =>
+        !isEmpty(get(rm, "source")) && !isEmpty(get(rm, "sourceLocation"))
+    );
+    if (!isRequiredAllRequest) {
+      notification.error({
+        message: "Please fill all required request mapping fields",
+        description:
+          "Fields required: " +
+          requiredRequest?.map((r) => r.source)?.join(", "),
+      });
+      return true;
+    }
+    if (!isRequiredAllResponse) {
+      notification.error({
+        message: "Please fill all required response mapping fields",
+        description:
+          "Fields required: " +
+          requiredResponse?.map((r) => r.target)?.join(", "),
+      });
+      return true;
+    }
+    return false;
+  };
   const handleSave = async (isExit?: boolean) => {
     try {
+      const isErrorValidation = validateData();
+      if (isErrorValidation) {
+        return;
+      }
+      const newData = chain(listMappingStateResponse)
+        .groupBy("name")
+        .map((items, name) => ({
+          name,
+          valueMapping: flatMap(items, (item) =>
+            item?.to?.map?.((to) => ({ [to]: item.from }))
+          ),
+        }))
+        .value();
+      let newResponse = cloneDeep(responseMapping);
+      if (!isEmpty(newData)) {
+        for (const it of newData) {
+          newResponse = newResponse.map((rm) => {
+            if (rm.name === it.name) {
+              rm.valueMapping = reduce(
+                it.valueMapping,
+                (acc, obj) => {
+                  return { ...acc, ...obj };
+                },
+                {}
+              );
+            }
+            return rm;
+          });
+        }
+      }
       const data = cloneDeep(mapperResponse.data[0]);
       data.facets.endpoints[0] = {
         ...data.facets.endpoints[0],
@@ -234,7 +343,7 @@ const NewAPIMapping = () => {
             target: rm.target?.replace("path.", "")?.replace("query.", ""),
             source: rm.source?.replace("path.", "")?.replace("query.", ""),
           })),
-          response: responseMapping,
+          response: newResponse,
         },
       };
       const res = await updateTargetMapper({
@@ -322,7 +431,7 @@ const NewAPIMapping = () => {
           Cancel
         </Button>
         {tabActiveKey === "request" && (
-          <Button type="primary" onClick={handleNext}>
+          <Button data-testid="btn-next" type="primary" onClick={handleNext}>
             Next
           </Button>
         )}
@@ -330,9 +439,11 @@ const NewAPIMapping = () => {
           <>
             <Button onClick={handlePrev}>Previous</Button>
             <Button
+              data-testid="btn-save"
               type="primary"
               onClick={() => handleSave(true)}
               loading={isPending}
+              disabled={loadingMapper}
             >
               Save and exit
             </Button>

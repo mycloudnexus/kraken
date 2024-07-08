@@ -45,7 +45,25 @@
   background: #f2f3f5;
 }
 
+.select:not(:global(.ant-select-open)) {
+  :global {
+    .ant-select-selector {
+      background: #f2f3f5 !important;
+    }
+  }
+}
+
+.selectPopup {
+  visibility: hidden;
+}
+
 .activeInput {
   border: 1px solid #2962ff;
   background-color: #fff !important;
+}
+
+.target {
+  width: 100%;
+  border-bottom: 1px solid #d9d9d9;
+  padding-bottom: 10px;
 }

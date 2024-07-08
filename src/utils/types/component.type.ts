@@ -20,4 +20,5 @@ export interface IRequestMapping {
   target: string;
   targetLocation: string;
   title: string;
+  requiredMapping?: boolean;
 }

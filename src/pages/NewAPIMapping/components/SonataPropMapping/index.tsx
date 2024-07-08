@@ -8,9 +8,8 @@ import {
   RightOutlined,
 } from "@ant-design/icons";
 import { Button, Flex, Input, Tooltip, Typography } from "antd";
-import { useState } from "react";
 import styles from "./index.module.scss";
-import { cloneDeep, get, isEqual, set } from "lodash";
+import { cloneDeep, get, isEmpty, isEqual, set } from "lodash";
 import clsx from "clsx";
 
 interface RequestMappingProps {
@@ -21,7 +20,6 @@ interface RequestMappingProps {
 const RequestMappingItem = ({ rm, title }: Readonly<RequestMappingProps>) => {
   const { requestMapping, setRightSide, setRightSideInfo, setRequestMapping } =
     useNewApiMappingStore();
-  const [showRemoveBtn, setShowRemoveBtn] = useState(false);
   const handleDelete = () => {
     setRequestMapping(
       requestMapping.filter((item) =>
@@ -32,13 +30,7 @@ const RequestMappingItem = ({ rm, title }: Readonly<RequestMappingProps>) => {
     );
   };
   return (
-    <Flex
-      align="center"
-      gap={4}
-      onMouseEnter={() => setShowRemoveBtn(true)}
-      onMouseLeave={() => setShowRemoveBtn(false)}
-      className={styles.requestMappingItemWrapper}
-    >
+    <Flex align="center" gap={4} className={styles.requestMappingItemWrapper}>
       <Flex
         align="center"
         gap={4}
@@ -55,11 +47,13 @@ const RequestMappingItem = ({ rm, title }: Readonly<RequestMappingProps>) => {
         <Typography.Text ellipsis={{ tooltip: true }}>
           {rm.source}
         </Typography.Text>
-        <Tooltip title={rm.description}>
-          <InfoCircleOutlined style={{ color: "rgba(0, 0, 0, 0.45)" }} />
-        </Tooltip>
+        {!isEmpty(rm.description) && (
+          <Tooltip title={rm.description}>
+            <InfoCircleOutlined style={{ color: "rgba(0, 0, 0, 0.45)" }} />
+          </Tooltip>
+        )}
       </Flex>
-      {showRemoveBtn && (
+      {!rm.requiredMapping && (
         <Button type="text" onClick={handleDelete}>
           <DeleteOutlined />
         </Button>

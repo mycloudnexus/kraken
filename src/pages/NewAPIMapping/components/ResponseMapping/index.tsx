@@ -8,45 +8,23 @@ import { DeleteOutlined, RightOutlined } from "@ant-design/icons";
 import { Button, Input, Select } from "antd";
 import clsx from "clsx";
 import {
-  chain,
   cloneDeep,
   difference,
   every,
-  fromPairs,
   get,
   groupBy,
   isEmpty,
   set,
 } from "lodash";
-import React, { Fragment, useEffect, useMemo, useState } from "react";
+import React, { Fragment, useEffect, useMemo } from "react";
 import styles from "./index.module.scss";
 
-interface IMapping {
+export interface IMapping {
   key: number;
   from?: string;
-  to?: string;
+  to?: string[];
   name?: string;
 }
-
-const buildInitListMapping = (responseMapping: any[]) => {
-  let k = 1;
-  const list: IMapping[] = [];
-  responseMapping.forEach((item) => {
-    Object.entries((item.valueMapping ?? {}) as Record<string, string>).map(
-      ([to, from]) => {
-        const mapItem = {
-          key: k,
-          from,
-          to,
-          name: item.name,
-        };
-        list.push(mapItem);
-        k++;
-      }
-    );
-  });
-  return list;
-};
 
 interface MappingCollapseProps {
   title: string;
@@ -55,7 +33,7 @@ interface MappingCollapseProps {
   handleSelect: (value: string, key: number) => void;
   handleAdd: (value: string) => void;
   handleDelete: (key: number) => void;
-  handleChangeInput: (value: string, key: number) => void;
+  handleChangeInput: (value: string[], key: number) => void;
   openSelectorForProp: (value?: string) => void;
   handleChangeResponse: (value: string, title: string) => void;
   activeResponseName?: string;
@@ -91,11 +69,15 @@ const MappingCollapse = ({
         >
           {items.map((item) => (
             <Fragment key={item.target}>
-              <Text.LightMedium lineHeight="32px">
-                {!isEmpty(item?.target)
-                  ? item?.target
-                  : "No mapping to Sonata API is required"}
-              </Text.LightMedium>
+              <div
+                className={clsx(!isEmpty(item?.targetValues) && styles.target)}
+              >
+                <Text.LightMedium lineHeight="32px">
+                  {!isEmpty(item?.target)
+                    ? item?.target
+                    : "No mapping to Sonata API is required"}
+                </Text.LightMedium>
+              </div>
               {!isEmpty(item?.targetValues) && (
                 <div style={{ marginTop: 18, width: "100%" }}>
                   <Flex
@@ -107,7 +89,7 @@ const MappingCollapse = ({
                     {listMapping
                       ?.filter((i) => i.name === item?.name)
                       ?.map(({ key, from }, index) => (
-                        <React.Fragment key={`state-${key}`}>
+                        <React.Fragment key={`state-${title}-${key}`}>
                           <Flex
                             justifyContent="flex-start"
                             style={{ width: "100%" }}
@@ -168,7 +150,7 @@ const MappingCollapse = ({
           {items.map((item) => (
             <>
               {listMapping?.filter((i) => i.name === item?.name).length > 0 ? (
-                <Flex flexDirection="column" gap={59} style={{ marginTop: 48 }}>
+                <Flex flexDirection="column" gap={28} style={{ marginTop: 30 }}>
                   {listMapping
                     ?.filter((i) => i.name === item?.name)
                     .map((key) => (
@@ -188,23 +170,31 @@ const MappingCollapse = ({
         >
           {items.map((item) => (
             <Fragment key={item.target}>
-              <Input
-                placeholder="Select response property"
+              <div
+                className={clsx(!isEmpty(item?.targetValues) && styles.target)}
                 style={{ width: "100%" }}
-                className={clsx(
-                  styles.input,
-                  activeResponseName === item.name && styles.activeInput
-                )}
-                value={isEmpty(item?.source) ? undefined : get(item, "source")}
-                onClick={() => {
-                  setRightSide(EnumRightType.AddSellerResponse);
-                  openSelectorForProp(item?.name);
-                }}
-                onChange={(e) => handleChangeResponse(e.target.value, title)}
-                suffix={
-                  <RightOutlined style={{ fontSize: 12, color: "#C9CDD4" }} />
-                }
-              />
+              >
+                <Input
+                  placeholder="Select response property"
+                  style={{ width: "100%" }}
+                  className={clsx(
+                    styles.input,
+                    activeResponseName === item.name && styles.activeInput
+                  )}
+                  value={
+                    isEmpty(item?.source) ? undefined : get(item, "source")
+                  }
+                  onClick={() => {
+                    setRightSide(EnumRightType.AddSellerResponse);
+                    openSelectorForProp(item?.name);
+                  }}
+                  onChange={(e) => handleChangeResponse(e.target.value, title)}
+                  suffix={
+                    <RightOutlined style={{ fontSize: 12, color: "#C9CDD4" }} />
+                  }
+                />
+              </div>
+
               {listMapping?.filter((i) => i.name === item.name).length > 0 && (
                 <div style={{ marginTop: 18, width: "100%" }}>
                   <Flex
@@ -216,17 +206,16 @@ const MappingCollapse = ({
                     {listMapping
                       ?.filter((i) => i.name === item.name)
                       ?.map(({ key, to }) => (
-                        <React.Fragment key={`enum-${key}`}>
-                          <Input
-                            placeholder="Input seller state"
-                            style={{ width: "100%" }}
-                            value={to}
-                            className={styles.input}
-                            onChange={(e) =>
-                              handleChangeInput(e.target.value, key)
-                            }
-                          />
-                        </React.Fragment>
+                        <Select
+                          popupClassName={styles.selectPopup}
+                          mode="tags"
+                          key={`enum-${key}`}
+                          placeholder="Input seller state"
+                          style={{ width: "100%" }}
+                          value={to}
+                          className={styles.select}
+                          onChange={(e) => handleChangeInput(e, key)}
+                        />
                       ))}
                   </Flex>
                 </div>
@@ -246,10 +235,9 @@ const ResponseMapping = () => {
     setResponseMapping,
     setRightSide,
     activeResponseName,
+    listMappingStateResponse: listMapping,
+    setListMappingStateResponse: setListMapping,
   } = useNewApiMappingStore();
-  const [listMapping, setListMapping] = useState<IMapping[]>(
-    buildInitListMapping(responseMapping)
-  );
 
   const handleSelect = (v: string, key: number) => {
     const cloneArr = cloneDeep(listMapping);
@@ -257,25 +245,6 @@ const ResponseMapping = () => {
     set(cloneArr, `[${index}].from`, v);
     setListMapping(cloneArr);
   };
-
-  useEffect(() => {
-    const newData = chain(listMapping)
-      .groupBy("name")
-      .map((items, name) => ({
-        name,
-        valueMapping: fromPairs(items.map((item) => [item.to, item.from])),
-      }))
-      .value();
-    if (isEmpty(newData)) {
-      return;
-    }
-    const newResponse = cloneDeep(responseMapping);
-    for (const n of newData) {
-      const index = newResponse?.findIndex((i: any) => (i.name = n.name));
-      set(newResponse, `[${index}].valueMapping`, n.valueMapping);
-    }
-    setResponseMapping(newResponse);
-  }, [listMapping]);
 
   const handleAdd = (name: string) => {
     setListMapping([
@@ -292,7 +261,7 @@ const ResponseMapping = () => {
     setListMapping(listMapping.filter((item) => item.key !== key));
   };
 
-  const handleChangeInput = (v: string, key: number) => {
+  const handleChangeInput = (v: string[], key: number) => {
     const cloneArr = cloneDeep(listMapping);
     const index = listMapping.findIndex((l) => l.key === key);
     set(cloneArr, `[${index}].to`, v);

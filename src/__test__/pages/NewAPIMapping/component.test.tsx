@@ -1,3 +1,4 @@
+import { buildInitListMapping } from "@/pages/NewAPIMapping";
 import ResponseMapping from "@/pages/NewAPIMapping/components/ResponseMapping";
 import RightAddSellerProp from "@/pages/NewAPIMapping/components/RightAddSellerProp";
 import RightAddSonataProp, {
@@ -16,64 +17,180 @@ beforeAll(() => {
   const { result } = renderHook(() => useNewApiMappingStore());
   result.current.setResponseMapping([
     {
-      name: "mapper.order.uni.add.state",
-      title: "Order State Mapping",
-      source: "",
-      target: "@{{status}}",
+      name: "mapper.quote.uni.add.state",
+      title: "Quote State Mapping",
+      source: "@{{responseBody.id}}",
+      target: "@{{quoteItem[*].state}}",
       targetType: "enum",
-      description: "Please map order status between Sonata API and Seller API",
+      description: "quote state mapping",
       targetValues: [
+        "accepted",
         "acknowledged",
-        "assessingCancellation",
-        "held.assessingCharge",
-        "pending.assessingModification",
-        "cancelled",
-        "pendingCancellation",
-        "completed",
-        "failed",
+        "answered",
+        "approved.orderable",
+        "approved.orderableAlternate",
         "inProgress",
-        "partial",
+        "inProgress.draft",
+        "abandoned",
         "rejected",
+        "unableToProvide",
       ],
-      valueMapping: "",
+      valueMapping: {
+        "1": "accepted",
+        "2": "accepted",
+        "3": "accepted",
+        "4": "accepted",
+        a: "inProgress.draft",
+        b: "inProgress.draft",
+        c: "inProgress.draft",
+        d: "inProgress.draft",
+        dd: "accepted",
+        ee: "inProgress",
+        fff: "inProgress",
+      },
       sourceLocation: "BODY",
       targetLocation: "BODY",
+      requiredMapping: true,
     },
     {
-      id: "orderId",
-      name: "mapper.order.uni.add.orderId",
-      title: "Order Id location",
-      source: "",
-      description:
-        "Please specify the field that represent the order Id from Seller API response",
-      sourceLocation: "",
+      name: "mapper.quote.uni.add.price.value",
+      title: "Quote Price Value Mapping",
+      source: "@{{responseBody.externalId}}",
+      target: "@{{quoteItem.quoteItemPrice.price.dutyFreeAmount.value}}",
+      description: "quote price mapping",
+      sourceLocation: "BODY",
+      targetLocation: "BODY",
+      requiredMapping: true,
     },
     {
-      id: "instanceId",
-      name: "mapper.order.uni.add.instanceId",
-      title: "Instance Id location",
-      source: "",
-      description:
-        "Please specify the field that represent the instance Id from Seller API response",
-      sourceLocation: "",
+      name: "mapper.quote.uni.add.price.unit",
+      title: "Quote Price Unit Mapping",
+      source: "@{{responseBody.orderDate}}",
+      target: "@{{quoteItem.quoteItemPrice.price.dutyFreeAmount.unit}}",
+      description: "quote price mapping",
+      sourceLocation: "BODY",
+      targetLocation: "BODY",
+      requiredMapping: true,
+    },
+    {
+      name: "mapper.quote.uni.add.duration.amount",
+      title: "Quote Duration Amount Mapping",
+      source: "@{{responseBody.cancellationDate}}",
+      target: "@{{quoteItem.requestedQuoteItemTerm.duration.amount}}",
+      description: "quote duration amount mapping",
+      sourceLocation: "BODY",
+      targetLocation: "BODY",
+      requiredMapping: true,
+    },
+    {
+      name: "mapper.quote.uni.add.duration.units",
+      title: "Quote Duration Units Mapping",
+      source: "@{{responseBody.state}}",
+      target: "@{{quoteItem[*].requestedQuoteItemTerm.duration.units}}",
+      targetType: "enum",
+      description: "quote duration units mapping",
+      sourceLocation: "BODY",
+      targetLocation: "BODY",
+      requiredMapping: true,
+    },
+  ]);
+  result.current.setListMappingStateResponse([
+    {
+      from: "accepted",
+      to: ["1", "2", "3", "4", "dd"],
+      key: 1,
+      name: "mapper.quote.uni.add.state",
+    },
+    {
+      from: "inProgress.draft",
+      to: ["a", "b", "c", "d"],
+      key: 2,
+      name: "mapper.quote.uni.add.state",
+    },
+    {
+      from: "inProgress",
+      to: ["ee", "fff"],
+      key: 3,
+      name: "mapper.quote.uni.add.state",
+    },
+  ]);
+});
+
+test("parse fnc", () => {
+  const result = buildInitListMapping([
+    {
+      name: "mapper.quote.uni.add.state",
+      title: "Quote State Mapping",
+      source: "@{{responseBody.id}}",
+      target: "@{{quoteItem[*].state}}",
+      targetType: "enum",
+      description: "quote state mapping",
+      targetValues: [
+        "accepted",
+        "acknowledged",
+        "answered",
+        "approved.orderable",
+        "approved.orderableAlternate",
+        "inProgress",
+        "inProgress.draft",
+        "abandoned",
+        "rejected",
+        "unableToProvide",
+      ],
+      valueMapping: {
+        "1": "accepted",
+        "2": "accepted",
+        a: "inProgress.draft",
+        b: "inProgress.draft",
+        dd: "accepted",
+        ee: "inProgress",
+        fff: "inProgress",
+      },
+      sourceLocation: "BODY",
+      targetLocation: "BODY",
+      requiredMapping: true,
+    },
+  ]);
+  expect(result).toEqual([
+    {
+      from: "accepted",
+      key: 1,
+      name: "mapper.quote.uni.add.state",
+      to: ["1", "2", "dd"],
+    },
+    {
+      from: "inProgress.draft",
+      key: 2,
+      name: "mapper.quote.uni.add.state",
+      to: ["a", "b"],
+    },
+    {
+      from: "inProgress",
+      key: 3,
+      name: "mapper.quote.uni.add.state",
+      to: ["ee", "fff"],
     },
   ]);
 });
 
 test("component new api map page", async () => {
-  const { container, getByTestId } = render(
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <ResponseMapping />
-        <SelectResponseProperty />
-      </BrowserRouter>
-    </QueryClientProvider>
-  );
+  const { container, getByTestId, getAllByTestId, getAllByPlaceholderText } =
+    render(
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <ResponseMapping />
+          <SelectResponseProperty />
+        </BrowserRouter>
+      </QueryClientProvider>
+    );
   expect(container).toBeInTheDocument();
   const element = getByTestId("btn-add-state");
   fireEvent.click(element);
-  const select = getByTestId("select-sonata-state");
-  expect(select).toBeInTheDocument();
+  const select = getAllByTestId("select-sonata-state");
+  expect(select.length).toBeGreaterThanOrEqual(1);
+  const input = getAllByPlaceholderText("Select response property");
+  fireEvent.change(input[0], { target: { value: "a" } });
+  fireEvent.keyDown(input[0], { key: "Enter", code: "Enter" });
 });
 
 test("component RightAddSellerProp", () => {
