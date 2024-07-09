@@ -235,12 +235,12 @@ const SelectAPI = ({ save }: { save: () => Promise<true | undefined> }) => {
 
   const resetMapping = () => {
     reset();
-    const newApiRequest = cloneDeep(mappers?.response)
+    const newApiRequest = cloneDeep(mappers?.request)
       .filter((rm: any) => !!rm.requiredMapping)
       .map((rm: any) => ({
         ...rm,
-        target: undefined,
-        targetLocation: undefined,
+        target: "",
+        targetLocation: "",
       }));
     const newApiResponse = cloneDeep(mappers?.response).map((rm: any) => ({
       ...rm,

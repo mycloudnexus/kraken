@@ -31,6 +31,7 @@
   border-radius: 4px;
   background-color: #f0f2f5;
   .paramItem {
+    user-select: none;
     padding: 2px 4px;
     background-color: #fff;
     cursor: pointer;
