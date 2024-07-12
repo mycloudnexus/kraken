@@ -9,13 +9,21 @@ import styles from "./index.module.scss";
 import { useEffect, useMemo, useState } from "react";
 import { IRequestMapping } from "@/utils/types/component.type";
 
+
+const MappingLabel = () => (
+  <>
+    <Text.NormalLarge>Property mapping</Text.NormalLarge>
+    <p className={styles.label}>There is no mandatory property mapping. You can add mapping item as you need.</p>
+  </>
+)
+
 const RequestMapping = () => {
   const { requestMapping } = useNewApiMappingStore();
   const items: CollapseProps["items"] = useMemo(() => {
     if (requestMapping.length === 0) {
       return [
         {
-          label: <Text.NormalLarge>Property mapping</Text.NormalLarge>,
+          label: <MappingLabel />,
           key: "Property mapping",
           children: <SonataPropMapping list={[]} title="Property mapping" />,
         },
@@ -28,7 +36,7 @@ const RequestMapping = () => {
     return Object.entries(requestMappingGroupedByTitle).map(
       ([title, listMapping]) => ({
         key: title,
-        label: <Text.NormalLarge>{title}</Text.NormalLarge>,
+        label: <MappingLabel />,
         children: (
           <SonataPropMapping
             list={listMapping as IRequestMapping[]}

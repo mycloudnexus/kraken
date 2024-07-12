@@ -24,17 +24,18 @@ const HeaderMapping = () => {
           }}
         >
           <Text.NormalLarge>Sonata API</Text.NormalLarge>
-          {queryData?.productType && (
-            <Tooltip title="Product type">
-              <Tag>{queryData.productType.toUpperCase()}</Tag>
-            </Tooltip>
-          )}
-          {queryData?.actionType && (
-            <Tooltip title="Action type">
-              <Tag>{capitalize(queryData.actionType)}</Tag>
-            </Tooltip>
-
-          )}
+          <Flex>
+            {queryData?.productType && (
+              <Tooltip title="Product type">
+                <Tag>{queryData.productType.toUpperCase()}</Tag>
+              </Tooltip>
+            )}
+            {queryData?.actionType && (
+              <Tooltip title="Action type">
+                <Tag>{capitalize(queryData.actionType)}</Tag>
+              </Tooltip>
+            )}
+          </Flex>
         </Flex>
         <Text.NormalLarge
           style={{

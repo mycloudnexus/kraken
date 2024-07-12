@@ -79,7 +79,7 @@ const MappingCollapse = ({
                 </Text.LightMedium>
               </div>
               {!isEmpty(item?.targetValues) && (
-                <div style={{ marginTop: 18, width: "100%" }}>
+                <div style={{ width: "100%" }}>
                   <Flex
                     style={{ width: "100%" }}
                     flexDirection="column"
@@ -122,7 +122,7 @@ const MappingCollapse = ({
                     onClick={() => handleAdd(item?.name)}
                     data-testid="btn-add-state"
                   >
-                    Add state
+                    + { item.title }
                   </Button>
                 </div>
               )}
@@ -171,7 +171,7 @@ const MappingCollapse = ({
                 style={{ width: "100%" }}
               >
                 <Input
-                  placeholder="Select response property"
+                  placeholder="Select or input property"
                   style={{ width: "100%" }}
                   className={clsx(
                     styles.input,

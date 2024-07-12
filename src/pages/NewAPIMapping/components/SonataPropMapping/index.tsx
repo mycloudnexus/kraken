@@ -75,29 +75,46 @@ const SonataPropMapping = ({ list, title }: Readonly<Props>) => {
     setRequestMapping,
   } = useNewApiMappingStore();
 
+  const handleDelete = () => {
+    setRightSide(EnumRightType.SelectSellerAPI);
+    setRightSideInfo(undefined);
+  }
+
+  const notEmptyList = !!list.length
   return (
     <Flex gap={16}>
       <div className={styles.sonataPropMappingWrapper}>
-        <div className={styles.requestMappingList}>
-          {list?.map((requestMapping) => (
-            <RequestMappingItem
-              key={requestMapping.name}
-              rm={requestMapping}
-              title={title}
-            />
-          ))}
-        </div>
+        {notEmptyList &&
+          <>
+            <p className={styles.label}>
+              Property from Sonata API
+            </p>
+            <div className={styles.requestMappingList}>
+              {list?.map((requestMapping) => (
+                <RequestMappingItem
+                  key={requestMapping.name}
+                  rm={requestMapping}
+                  title={title}
+                />
+              ))}
+            </div>
+          </>
+        }
         {rightSide === EnumRightType.AddSonataProp &&
           rightSideInfo?.method === "add" && (
-            <Flex
-              align="center"
-              justify="space-between"
-              className={styles.addMappingDiv}
-            >
-              <Typography.Text style={{ color: "#86909c" }}>
-                Select property
-              </Typography.Text>
-              <RightOutlined style={{ color: "#4E5969" }} />
+            <Flex align="center" gap={4} className={styles.requestMappingItemWrapper}>
+              <Flex
+                align="center"
+                gap={4}
+                className={styles.requestMappingItemInfo}
+              >
+                <Typography.Text ellipsis={{ tooltip: true }}>
+                  Select or input property
+                </Typography.Text>
+              </Flex>
+              <Button type="text" onClick={handleDelete}>
+                <DeleteOutlined />
+              </Button>
             </Flex>
           )}
         <Button
@@ -114,58 +131,69 @@ const SonataPropMapping = ({ list, title }: Readonly<Props>) => {
           Add mapping property
         </Button>
       </div>
-      <div className={styles.alignArrowList}>
-        {list?.map((rm) => (
-          <div key={rm.name} className={styles.alignArrowWrapper}>
-            <MappingIcon />
+      {notEmptyList &&
+        <>
+          <div className={styles.alignArrowList}>
+            {list?.map((rm) => (
+              <div key={rm.name} className={styles.alignArrowWrapper}>
+                <MappingIcon />
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-      <div className={styles.sellerPropMappingWrapper}>
-        <div className={styles.responseMappingList}>
-          {list?.map((rm, index) => (
-            <Input
-              key={rm.name}
-              className={clsx(styles.sellerPropItemWrapper, {
-                [styles.active]: isEqual(rm, rightSideInfo?.previousData),
-              })}
-              onClick={() => {
-                setRightSide(EnumRightType.AddSellerProp);
-                setRightSideInfo({
-                  method: "update",
-                  previousData: rm,
-                  title,
-                });
-              }}
-              value={rm.target}
-              placeholder="Select property"
-              suffix={
-                <RightOutlined style={{ fontSize: 12, color: "#C9CDD4" }} />
-              }
-              onChange={(e) => {
-                const newValue = get(e, "target.value", "")
-                  .replace("@{{", "")
-                  .replace("}}", "");
-                let targetLocation = get(rm, "targetLocation", "");
-                if (newValue.includes(".")) {
-                  const splited = newValue.split(".");
-                  const pathValue = get(splited, "[0]", "").toLocaleUpperCase();
-                  targetLocation =
-                    pathValue === "REQUESTBODY" ? "BODY" : pathValue;
-                }
-                const newRequest = cloneDeep(requestMapping);
-                set(
-                  newRequest,
-                  `[${index}].target`,
-                  get(e, "target.value", "")
-                );
-                set(newRequest, `[${index}].targetLocation`, targetLocation);
-                setRequestMapping(newRequest);
-              }}
-            />
-          ))}
-        </div>
-      </div>
+          <div className={styles.sellerPropMappingWrapper}>
+            <p className={styles.label}>
+
+              Property from Seller API response
+            </p>
+            <div className={styles.responseMappingList}>
+              {list?.map((rm, index) => (
+                <Input
+                  key={rm.name}
+                  className={clsx(styles.sellerPropItemWrapper, {
+                    [styles.active]: isEqual(rm, rightSideInfo?.previousData),
+                  })}
+                  onClick={() => {
+                    setRightSide(EnumRightType.AddSellerProp);
+                    setRightSideInfo({
+                      method: "update",
+                      previousData: rm,
+                      title,
+                    });
+                  }}
+                  value={rm.target}
+                  placeholder="Select property"
+                  suffix={
+                    <RightOutlined style={{ fontSize: 12, color: "#C9CDD4" }} />
+                  }
+                  onChange={(e) => {
+                    const newValue = get(e, "target.value", "")
+                      .replace("@{{", "")
+                      .replace("}}", "");
+                    let targetLocation = get(rm, "targetLocation", "");
+                    if (newValue.includes(".")) {
+                      const splited = newValue.split(".");
+                      const pathValue = get(splited, "[0]", "").toLocaleUpperCase();
+                      targetLocation =
+                        pathValue === "REQUESTBODY" ? "BODY" : pathValue;
+                    }
+                    const newRequest = cloneDeep(requestMapping);
+                    set(
+                      newRequest,
+                      `[${index}].target`,
+                      get(e, "target.value", "")
+                    );
+                    set(newRequest, `[${index}].targetLocation`, targetLocation);
+                    setRequestMapping(newRequest);
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+
+        </>
+
+      }
+
     </Flex>
   );
 };
