@@ -45,11 +45,15 @@
 
 .root {
   height: 100%;
-
   :global {
     .ant-spin-nested-loading {
       height: calc(100% - 112px);
       overflow-y: auto;
+      &::-webkit-scrollbar {
+        display: none;
+      }
+        -ms-overflow-style: none;
+        scrollbar-width: none;
     }
   }
 }

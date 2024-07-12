@@ -130,15 +130,15 @@ export const APIItem = ({
   }, [searchValue]);
 
   return (
-    <div>
+    <>
       <Flex justifyContent="space-between">
-        <Flex justifyContent="flex-start" gap={8} alignItems="center">
+        <Flex justifyContent="flex-start" gap={8} alignItems="center" onClick={toggleOpen} style={{ cursor: 'pointer' }}>
           {isOpen ? (
-            <DownOutlined onClick={toggleOpen} style={{ fontSize: 10 }} />
+            <DownOutlined style={{ fontSize: 10 }} />
           ) : (
-            <RightOutlined onClick={toggleOpen} style={{ fontSize: 10 }} />
+            <RightOutlined style={{ fontSize: 10 }} />
           )}
-          <Text.NormalMedium>{get(item, "metadata.name")}</Text.NormalMedium>
+          <Text.NormalMedium >{get(item, "metadata.name")}</Text.NormalMedium>
         </Flex>
       </Flex>
       <Flex
@@ -201,7 +201,7 @@ export const APIItem = ({
             );
           })}
       </Flex>
-    </div>
+    </>
   );
 };
 
