@@ -57,7 +57,11 @@ const SelectResponseProperty = () => {
 
     if (!isEmpty(example)) {
       const exampleKeys = get(Object.keys(example), "[0]", "");
-      const firstExample = get(example, `${exampleKeys}.value`);
+      const firstExample = get(
+        example,
+        `${exampleKeys}.value.results[0]`,
+        get(example, `${exampleKeys}.value`)
+      );
       if (!isEmpty(firstExample)) {
         return exampleParse(
           firstExample,
@@ -118,6 +122,7 @@ const SelectResponseProperty = () => {
   };
 
   const newTreeData = findMatchingElements(dataTree, searchValue);
+
   return (
     <div className={styles.root}>
       <div className={styles.header}>

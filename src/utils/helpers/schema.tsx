@@ -4,11 +4,11 @@ import { TreeDataNode, Typography } from "antd";
 
 const { Text } = Typography;
 
-const buildPrefix = (prefix: string, key: string) => {
+const buildPrefix = (prefix: string, key: string, arrayPrefix?: string) => {
   if (prefix) {
-    return `${prefix}.${key}`;
+    return `${prefix}${arrayPrefix || ""}.${key}`;
   }
-  return key;
+  return `${key}${arrayPrefix || ""}`;
 };
 
 export const findSchema = (firstURL: string, schemas: any) => {
@@ -81,6 +81,12 @@ const renderValue = (value: any, typeOfValue: string) => {
   if (["number", "boolean"].includes(typeOfValue)) {
     return <>{`${value}`}</>;
   }
+  if (isArray(value)) {
+    return <>"array"</>;
+  }
+  if (isObject(value)) {
+    return <>"object"</>;
+  }
   return <>&nbsp;</>;
 };
 
@@ -95,6 +101,25 @@ export const parseObjectDescriptionToTreeData = (
   const result: any = Object.entries(keys).map(([key, value]) => {
     const typeOfValue = typeof value;
 
+    let children = undefined;
+    if (isObject(value)) {
+      children = parseObjectDescriptionToTreeData(
+        value as Record<string, any>,
+        titleClassName,
+        exampleClassName,
+        level + 1,
+        buildPrefix(prefix, key)
+      );
+    }
+    if (isArray(value)) {
+      children = parseObjectDescriptionToTreeData(
+        get(value, "[0]", {}) as Record<string, any>,
+        titleClassName,
+        exampleClassName,
+        level + 1,
+        buildPrefix(prefix, key, "[*]")
+      );
+    }
     return {
       title: (
         <Flex justifyContent="flex-start" style={{ width: "100%" }} gap={4}>
@@ -110,18 +135,9 @@ export const parseObjectDescriptionToTreeData = (
           </Text>
         </Flex>
       ),
-      key: buildPrefix(prefix, key),
+      key: buildPrefix(prefix, key, isArray(value) ? "[*]" : ""),
       selectable: typeOfValue !== "object",
-      children:
-        typeOfValue === "object"
-          ? parseObjectDescriptionToTreeData(
-              value as Record<string, any>,
-              titleClassName,
-              exampleClassName,
-              level + 1,
-              buildPrefix(prefix, key)
-            )
-          : undefined,
+      children,
     };
   });
   return result;
@@ -137,7 +153,7 @@ export const convertSchemaToTypeOnly = (keys: Record<string, any>) => {
       result[key] = propData.type;
     }
     if (propData.type === "array") {
-      result[key] = convertSchemaToTypeOnly(propData.items.properties);
+      result[key] = [convertSchemaToTypeOnly(propData.items.properties)];
     }
     if (propData.type === "object") {
       result[key] = convertSchemaToTypeOnly(propData.properties);
@@ -154,7 +170,7 @@ export const renderExampleValue = (value: any) => {
     return `"array"`;
   }
   if (isObject(value)) {
-    return `"array"`;
+    return `"object"`;
   }
   if (isBoolean(value)) {
     return "boolean";
@@ -194,19 +210,20 @@ export const exampleParse = (
         </span>
       </Flex>
     );
-
+    const isValueArray = isArray(example[key])
+      ? `[${example[key].length > 1 ? "*" : "0"}]`
+      : "";
     const children =
       !isEmpty(example[key]) && typeof example[key] === "object"
         ? exampleParse(
             isArray(example[key]) ? example[key][0] : example[key],
-            buildPrefix(prefix, key),
+            buildPrefix(prefix, key, isValueArray),
             nodeTitleClassName,
             nodeExampleClassName
           )
         : undefined;
-
     return {
-      key: buildPrefix(prefix, key),
+      key: buildPrefix(prefix, key, isValueArray),
       title: nodeTitle,
       children,
     };
