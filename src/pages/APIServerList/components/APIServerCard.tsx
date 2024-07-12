@@ -77,7 +77,7 @@ const APIServerCard = ({ item }: Props) => {
           </Flex>
         }
       >
-        <Row gutter={[24, 12]}>
+        <Row gutter={[150, 12]}>
           <Col lg={8} md={12}>
             <Flex gap={8} justify="flex-start" align="center">
               <TitleIcon />

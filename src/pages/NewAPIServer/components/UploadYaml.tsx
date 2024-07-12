@@ -1,7 +1,7 @@
 import Text from "@/components/Text";
 import { UploadOutlined, PaperClipOutlined } from "@ant-design/icons";
 import { Upload, notification, Button, Form, FormInstance } from "antd";
-import { isEmpty, get } from "lodash";
+import { get } from "lodash";
 import ReplaceFileModal from "./ReplaceFileModal";
 import { useBoolean } from "usehooks-ts";
 import Flex from "@/components/Flex";
@@ -84,7 +84,7 @@ const UploadYaml = ({ form }: Props) => {
   }, [file?.file]);
 
   return (
-    <div>
+    <div className={styles.uploadYamlRoot}>
       {isOpenDrawer && (
         <SpecDrawer
           onClose={closeDrawer}
@@ -97,7 +97,7 @@ const UploadYaml = ({ form }: Props) => {
         onOk={handleReplace}
         onCancel={closeModal}
       />
-      <Flex gap={8} justifyContent="flex-start">
+      <Flex gap={8} justifyContent="flex-start" style={{ marginBottom: 10 }}>
         <TitleIcon />
         <Text.NormalLarge>API spec </Text.NormalLarge>
         <span style={{ color: "#FF4D4F" }}>*</span>
@@ -108,7 +108,7 @@ const UploadYaml = ({ form }: Props) => {
         label="Upload API Spec in yaml format :"
         rules={[{ required: true, message: "Please upload API spec." }]}
       >
-        {isEmpty(file?.file) ? (
+        {!file?.file ? (
           <Upload
             id="upload-file"
             accept=".yaml"

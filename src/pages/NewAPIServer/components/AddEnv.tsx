@@ -14,7 +14,7 @@ type Props = {
 };
 const AddEnv = ({ form, env }: Props) => {
   return (
-    <Row gutter={[40, 4]}>
+    <Row gutter={[40, 11]} className={styles.addEnvRoot}>
       <Col span={24}>
         <Flex gap={8} justifyContent="flex-start">
           <TitleIcon />

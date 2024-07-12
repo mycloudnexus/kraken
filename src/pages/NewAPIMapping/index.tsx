@@ -230,8 +230,9 @@ const NewAPIMapping = () => {
     const updatedMapping = uniqBy(
       requestMapping.map((rm) => {
         if (
-          rm.target === rightSideInfo?.previousData?.target &&
-          rm.targetLocation === rightSideInfo?.previousData?.targetLocation
+          rm.source === rightSideInfo?.previousData?.source &&
+          rm.sourceLocation === rightSideInfo?.previousData?.sourceLocation &&
+          rm.name === rightSideInfo?.previousData?.name
         ) {
           return {
             ...rm,

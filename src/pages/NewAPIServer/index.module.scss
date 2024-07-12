@@ -2,6 +2,12 @@
   display: flex;
   background: #f0f2f5;
   height: calc(100vh - 58px);
+
+  :global {
+    .ant-form-item {
+      margin-bottom: 18px;
+    }
+  }
 }
 
 .container {

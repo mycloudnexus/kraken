@@ -29,7 +29,7 @@ const APIServerList = () => {
             type="primary"
             onClick={() => navigate(`/component/${currentProduct}/new`)}
           >
-            + Add API Server
+            + Create API server
           </Button>
         </Flex>
         <div className={styles.content}>

@@ -261,3 +261,24 @@
     }
   }
 }
+
+.addEnvRoot {
+  margin-top: 48px;
+  :global {
+    .ant-form-item {
+      margin-bottom: 11px !important;
+    }
+    .required-label {
+      display: none;
+    }
+  }
+}
+
+.uploadYamlRoot {
+  margin-top: 24px;
+  :global {
+    .ant-form-item {
+      margin-bottom: 10px !important;
+    }
+  }
+}

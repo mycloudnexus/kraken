@@ -34,8 +34,8 @@ interface MappingCollapseProps {
   handleAdd: (value: string) => void;
   handleDelete: (key: number) => void;
   handleChangeInput: (value: string[], key: number) => void;
-  openSelectorForProp: (value?: string) => void;
-  handleChangeResponse: (value: string, title: string) => void;
+  openSelectorForProp: (value?: string, target?: string) => void;
+  handleChangeResponse: (value: string, name: string, target: string) => void;
   activeResponseName?: string;
   setRightSide: (value?: EnumRightType) => void;
 }
@@ -88,7 +88,7 @@ const MappingCollapse = ({
                   >
                     {listMapping
                       ?.filter((i) => i.name === item?.name)
-                      ?.map(({ key, from }, index) => (
+                      ?.map(({ key, from }) => (
                         <React.Fragment key={`state-${title}-${key}`}>
                           <Flex
                             justifyContent="flex-start"
@@ -111,11 +111,7 @@ const MappingCollapse = ({
                                 value: item,
                               }))}
                             />
-                            {index !== 0 && (
-                              <DeleteOutlined
-                                onClick={() => handleDelete(key)}
-                              />
-                            )}
+                            <DeleteOutlined onClick={() => handleDelete(key)} />
                           </Flex>
                         </React.Fragment>
                       ))}
@@ -179,16 +175,23 @@ const MappingCollapse = ({
                   style={{ width: "100%" }}
                   className={clsx(
                     styles.input,
-                    activeResponseName === item.name && styles.activeInput
+                    activeResponseName === `${item?.name}-${item?.target}` &&
+                      styles.activeInput
                   )}
                   value={
                     isEmpty(item?.source) ? undefined : get(item, "source")
                   }
                   onClick={() => {
                     setRightSide(EnumRightType.AddSellerResponse);
-                    openSelectorForProp(item?.name);
+                    openSelectorForProp(item?.name, get(item, "target"));
                   }}
-                  onChange={(e) => handleChangeResponse(e.target.value, title)}
+                  onChange={(e) =>
+                    handleChangeResponse(
+                      e.target.value,
+                      item?.name,
+                      item?.target
+                    )
+                  }
                   suffix={
                     <RightOutlined style={{ fontSize: 12, color: "#C9CDD4" }} />
                   }
@@ -268,14 +271,20 @@ const ResponseMapping = () => {
     setListMapping(cloneArr);
   };
 
-  const openSelectorForProp = (name?: string) => {
-    setActiveResponseName(name);
+  const openSelectorForProp = (name?: string, target?: string) => {
+    setActiveResponseName(`${name}-${target}`);
     setRightSide(EnumRightType.AddSellerResponse);
   };
 
-  const handleChangeResponse = (value: string, title: string) => {
+  const handleChangeResponse = (
+    value: string,
+    name: string,
+    target: string
+  ) => {
     const cloneObj = cloneDeep(responseMapping);
-    const index = cloneObj?.findIndex((i) => i.title === title);
+    const index = cloneObj?.findIndex(
+      (i) => i.name === name && i.target === target
+    );
     set(cloneObj, `[${index}].source`, value);
     set(cloneObj, `[${index}].sourceLocation`, `BODY`);
     setResponseMapping(cloneObj);

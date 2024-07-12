@@ -104,9 +104,10 @@ const SelectResponseProperty = () => {
   const handleOK = () => {
     const key = get(selectedKeys, "[0]");
     if (activeResponseName && typeof key === "string") {
+      const [name, target] = activeResponseName.split("-");
       const cloneObj = clone(responseMapping);
       const index = cloneObj.findIndex(
-        (i: any) => i.name === activeResponseName
+        (i: any) => i.name === name && i.target === target
       );
       set(cloneObj, `[${index}].source`, `@{{responseBody.${key}}}`);
       set(cloneObj, `[${index}].sourceLocation`, `BODY`);
