@@ -8,6 +8,21 @@
   border-bottom: 1px solid #f0f0f0;
 }
 
+.tooltip {
+  div {
+    z-index: 1;
+  }
+  display: flex;
+  margin: 5px 5px 25px 5px;
+  flex-direction: column;
+  justify-content: center;
+  row-gap: 10px;
+  button {
+    height: 0%;
+    padding: 0 10px 0 10px;
+  }
+}
+
 .logo {
   display: flex;
   gap: 10px;
@@ -49,4 +64,24 @@
 .selectIcon {
   display: flex;
   flex-direction: column;
+}
+
+.tooltipBlue {
+  :global {
+    .ant-tooltip-arrow::before{
+      background-color: #3391FF !important;
+    }
+  
+    .ant-tooltip-inner {
+      width: 230px;
+      background: linear-gradient(180deg, #3391FF 33.85%, #466FFF 100%);
+      word-wrap: break-word;
+    }
+  
+    .ant-tooltip-content:before {
+      content: url("../../../public/tooltip.png");
+      position: absolute;
+      right: -3px;
+    }
+  }
 }

@@ -15,6 +15,7 @@ import Draggable from "react-draggable";
 import styles from "./index.module.scss";
 import Flex from "@/components/Flex";
 import { EStep } from "@/utils/constants/common";
+import { useTutorialStore } from '@/stores/tutorial.store';
 
 type Props = {
   currentStep: number;
@@ -263,7 +264,7 @@ const getMappingItems: (
 ];
 
 const StepBar = ({ currentStep = 0, activeKey, setActiveKey, type }: Props) => {
-  const [isOpen, setIsOpen] = useState(true);
+  const { openTutorial, setOpenTutorial, setTutorialCompleted } = useTutorialStore();
   const [isMinimize, setIsMinimize] = useState(false);
   const [bounds, setBounds] = useState({
     left: 0,
@@ -286,6 +287,11 @@ const StepBar = ({ currentStep = 0, activeKey, setActiveKey, type }: Props) => {
       bottom: clientHeight - (targetRect.bottom - uiData.y),
     });
   };
+
+  const handleClose = () => {
+    setTutorialCompleted(true);
+    setOpenTutorial(false)
+  }
 
   const onChange = (key: string | string[]) => {
     setActiveKey(key);
@@ -341,7 +347,7 @@ const StepBar = ({ currentStep = 0, activeKey, setActiveKey, type }: Props) => {
       <div
         ref={draggleRef}
         className={clsx(styles.draggableModal, {
-          [styles.hiddenModal]: !isOpen,
+          [styles.hiddenModal]: !openTutorial,
         })}
       >
         <div className={styles.barHeader}>
@@ -356,7 +362,7 @@ const StepBar = ({ currentStep = 0, activeKey, setActiveKey, type }: Props) => {
                   style={{ color: "#00000073" }}
                 />
                 <CloseOutlined
-                  onClick={() => setIsOpen(false)}
+                  onClick={handleClose}
                   style={{ color: "#00000073" }}
                 />
               </>
