@@ -25,11 +25,10 @@ const Login = () => {
         notification.error({ message: "Token not found!" });
       }
     } catch (e) {
-      notification.error({ message: get(e, "data.reason", "Error on login!") });
+      notification.error({ message: get(e, "reason", "Error on login!") });
     }
   };
   const token = getData("token");
-  console.log(token, isTokenExpired());
   if (token && !isTokenExpired()) {
     window.location.href = window.location.origin;
     return null;
@@ -61,7 +60,13 @@ const Login = () => {
           <Form.Item name="password">
             <Input.Password placeholder="Password" required />
           </Form.Item>
-          <Button type="primary" htmlType="submit" loading={isPending} block>
+          <Button
+            data-testid="btn-login"
+            type="primary"
+            htmlType="submit"
+            loading={isPending}
+            block
+          >
             Login
           </Button>
         </Form>

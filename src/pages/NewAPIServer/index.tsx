@@ -110,8 +110,8 @@ const NewAPIServer = () => {
       notification.error({
         message: get(
           error,
-          "data.message",
-          "Error. Please contact administration"
+          "reason",
+          get(error, "message", "Error. Please contact administration")
         ),
       });
     }

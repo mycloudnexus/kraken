@@ -126,7 +126,11 @@ const StandardAPIMapping = () => {
       notification.success({ message: "Create new version success" });
     } catch (error) {
       notification.error({
-        message: get(error, "message", "Error. Please try again"),
+        message: get(
+          error,
+          "reason",
+          get(error, "message", "Error. Please try again")
+        ),
       });
     }
   };
@@ -222,6 +226,7 @@ const StandardAPIMapping = () => {
         <Flex align="center" justify="space-between">
           <Text.Custom size="20">Draft version</Text.Custom>
           <Button
+            data-testid="btn-create-version"
             type="primary"
             onClick={() => {
               showModalConfirmCreateVersion({

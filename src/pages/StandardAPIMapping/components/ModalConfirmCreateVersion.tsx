@@ -19,6 +19,7 @@ export const showModalConfirmCreateVersion = ({
     ),
     okButtonProps: {
       type: "primary",
+      ["data-testid"]: "btn-ok",
     },
     okText: "OK",
     onOk,

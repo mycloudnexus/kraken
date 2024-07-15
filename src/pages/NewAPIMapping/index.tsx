@@ -361,7 +361,11 @@ const NewAPIMapping = () => {
       return true;
     } catch (error) {
       notification.error({
-        message: get(error, "message", "Error on creating/updating mapping"),
+        message: get(
+          error,
+          "reason",
+          get(error, "message", "Error on creating/updating mapping")
+        ),
       });
     }
   };

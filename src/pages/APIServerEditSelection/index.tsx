@@ -70,7 +70,11 @@ const APIServerEditSelection = () => {
       }
     } catch (error) {
       notification.error({
-        message: get(error, "message", "Error. Please try again"),
+        message: get(
+          error,
+          "reason",
+          get(error, "message", "Error. Please try again")
+        ),
       });
     }
   };

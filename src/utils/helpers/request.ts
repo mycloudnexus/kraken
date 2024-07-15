@@ -8,6 +8,7 @@ import qs from "qs";
 import { clearData, getData } from "./token";
 import { AXIOS_MESSAGE } from "../constants/message";
 import { ROUTES } from "../constants/route";
+import { get } from "lodash";
 
 const DIRECT_LOGIN_MSG = [
   AXIOS_MESSAGE.TOKEN_EXPIRED,
@@ -34,7 +35,13 @@ const onError = (error: AxiosError) => {
     console.error("Error Message:", error.message);
   }
 
-  return Promise.reject(error.response || error.message);
+  return Promise.reject(
+    get(
+      error,
+      "response.data",
+      get(error, "message", "Error. Please contact administrator.")
+    )
+  );
 };
 
 const request = axios.create({
