@@ -6,7 +6,7 @@ const { Text } = Typography;
 
 const buildPrefix = (prefix: string, key: string, arrayPrefix?: string) => {
   if (prefix) {
-    return `${prefix}${arrayPrefix || ""}.${key}`;
+    return `${prefix}.${key}${arrayPrefix || ""}`;
   }
   return `${key}${arrayPrefix || ""}`;
 };

@@ -405,7 +405,12 @@ const NewAPIMapping = () => {
           <Tabs
             items={items}
             activeKey={tabActiveKey}
-            onChange={(ak) => setTabActiveKey(ak)}
+            onChange={(ak) => {
+              if (ak === "response" && !isEmpty(sellerApi)) {
+                setRightSide(EnumRightType.AddSellerResponse);
+              }
+              setTabActiveKey(ak);
+            }}
           />
         </div>
         <div className={styles.right}>
