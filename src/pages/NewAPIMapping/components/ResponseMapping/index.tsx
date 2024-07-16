@@ -122,7 +122,7 @@ const MappingCollapse = ({
                     onClick={() => handleAdd(item?.name)}
                     data-testid="btn-add-state"
                   >
-                    + { item.title }
+                    + {item.title}
                   </Button>
                 </div>
               )}
@@ -146,7 +146,7 @@ const MappingCollapse = ({
           {items.map((item) => (
             <>
               {listMapping?.filter((i) => i.name === item?.name).length > 0 ? (
-                <Flex flexDirection="column" gap={28} style={{ marginTop: 30 }}>
+                <Flex flexDirection="column" gap={28} style={{ marginTop: 12 }}>
                   {listMapping
                     ?.filter((i) => i.name === item?.name)
                     .map((key) => (
@@ -199,7 +199,7 @@ const MappingCollapse = ({
               </div>
 
               {listMapping?.filter((i) => i.name === item.name).length > 0 && (
-                <div style={{ marginTop: 18, width: "100%" }}>
+                <div style={{ width: "100%" }}>
                   <Flex
                     style={{ width: "100%" }}
                     flexDirection="column"

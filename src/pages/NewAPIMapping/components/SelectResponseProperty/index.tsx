@@ -57,11 +57,8 @@ const SelectResponseProperty = () => {
 
     if (!isEmpty(example)) {
       const exampleKeys = get(Object.keys(example), "[0]", "");
-      const firstExample = get(
-        example,
-        `${exampleKeys}.value.results[0]`,
-        get(example, `${exampleKeys}.value`)
-      );
+      const firstExample = get(example, `${exampleKeys}.value`);
+
       if (!isEmpty(firstExample)) {
         return exampleParse(
           firstExample,
@@ -110,9 +107,12 @@ const SelectResponseProperty = () => {
     if (activeResponseName && typeof key === "string") {
       const [name, target] = activeResponseName.split("-");
       const cloneObj = clone(responseMapping);
-      const index = cloneObj.findIndex(
-        (i: any) => i.name === name && i.target === target
-      );
+      const index = cloneObj.findIndex((i: any) => {
+        if (target !== "undefined") {
+          return i.name === name && i.target === target;
+        }
+        return i.name === name;
+      });
       set(cloneObj, `[${index}].source`, `@{{responseBody.${key}}}`);
       set(cloneObj, `[${index}].sourceLocation`, `BODY`);
       setResponseMapping(cloneObj);

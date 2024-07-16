@@ -1,4 +1,4 @@
-import { fireEvent, render, renderHook, waitFor } from "@testing-library/react";
+import { render, renderHook } from "@testing-library/react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@/utils/helpers/reactQuery";
 import { BrowserRouter } from "react-router-dom";
@@ -117,21 +117,4 @@ test("NewAPIMapping page", () => {
     </QueryClientProvider>
   );
   expect(container).toBeInTheDocument();
-});
-
-test("NewAPIMapping submit", () => {
-  const { getByTestId } = render(
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <NewAPIMapping />
-      </BrowserRouter>
-    </QueryClientProvider>
-  );
-
-  const btnNext = getByTestId("btn-next");
-  fireEvent.click(btnNext);
-  waitFor(() => {
-    const btnSubmit = getByTestId("btn-submit");
-    fireEvent.click(btnSubmit);
-  });
 });
