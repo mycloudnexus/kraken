@@ -1,6 +1,5 @@
 import ServerIcon from "@/assets/server-icon.svg";
 import Flex from "@/components/Flex";
-import LogMethodTag from "@/components/LogMethodTag";
 import Text from "@/components/Text";
 import { useGetComponentList } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
@@ -31,6 +30,7 @@ import { useBoolean } from "usehooks-ts";
 import styles from "./index.module.scss";
 import useGetApiSpec from "../useGetApiSpec";
 import EmptyIcon from "@/assets/newAPIServer/empty.svg";
+import RequestMethod from "@/components/Method";
 
 type ItemProps = {
   item: IComponent;
@@ -132,13 +132,19 @@ export const APIItem = ({
   return (
     <>
       <Flex justifyContent="space-between">
-        <Flex justifyContent="flex-start" gap={8} alignItems="center" onClick={toggleOpen} style={{ cursor: 'pointer' }}>
+        <Flex
+          justifyContent="flex-start"
+          gap={8}
+          alignItems="center"
+          onClick={toggleOpen}
+          style={{ cursor: "pointer" }}
+        >
           {isOpen ? (
             <DownOutlined style={{ fontSize: 10 }} />
           ) : (
             <RightOutlined style={{ fontSize: 10 }} />
           )}
-          <Text.NormalMedium >{get(item, "metadata.name")}</Text.NormalMedium>
+          <Text.NormalMedium>{get(item, "metadata.name")}</Text.NormalMedium>
         </Flex>
       </Flex>
       <Flex
@@ -190,7 +196,7 @@ export const APIItem = ({
                   gap={12}
                   style={{ marginTop: 12 }}
                 >
-                  <LogMethodTag method={method} />
+                  <RequestMethod method={method} noSpace />
                   <Tooltip title={url}>
                     <Typography.Text ellipsis={{ tooltip: true }}>
                       {url}

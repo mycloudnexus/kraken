@@ -68,7 +68,12 @@ const ApiComponents = () => {
     <>
       <div style={{ margin: "24px 0 16px" }}>
         <Text.Custom size="20px" bold="500">
-          Standard API components ({componentList?.data?.length ?? 0})
+          Standard API components (
+          {Math.min(
+            componentList?.data?.length,
+            componentWithSpec?.data?.length
+          ) ?? 0}
+          )
         </Text.Custom>
       </div>
       <Spin spinning={specLoading || isLoading}>

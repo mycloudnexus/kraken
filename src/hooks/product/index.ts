@@ -18,6 +18,8 @@ import {
   getVersionList,
   getRunningVersionList,
   updateTargetMapper,
+  getMapperDetails,
+  deployToEnv,
 } from "@/services/products";
 import { queryClient } from "@/utils/helpers/reactQuery";
 import {
@@ -64,6 +66,8 @@ export const PRODUCT_CACHE_KEYS = {
   create_api_key: "create_api_key",
   get_running_version: "get_running_version",
   update_target_mapper: "update_target_mapper",
+  get_mapper_details: "get_mapper_details",
+  deploy_to_env: "deploy_to_env",
 };
 
 export const useGetProductComponents = (
@@ -341,5 +345,22 @@ export const useUpdateTargetMapper = () => {
     mutationKey: [PRODUCT_CACHE_KEYS.update_target_mapper],
     mutationFn: ({ productId, componentId, data }: any) =>
       updateTargetMapper(productId, componentId, data),
+  });
+};
+
+export const useGetMapperDetails = (productId: string, componentId: string) => {
+  return useQuery<any, Error, any>({
+    queryKey: [PRODUCT_CACHE_KEYS.get_mapper_details, productId, componentId],
+    queryFn: () => getMapperDetails(productId, componentId),
+    enabled: Boolean(productId && componentId),
+    select: (data) => get(data, "data.details"),
+  });
+};
+
+export const useDeployToEnv = () => {
+  return useMutation<any, Error>({
+    mutationKey: [PRODUCT_CACHE_KEYS.deploy_to_env],
+    mutationFn: ({ productId, componentId, mapperKeys, envId }: any) =>
+      deployToEnv(productId, componentId, mapperKeys, envId),
   });
 };

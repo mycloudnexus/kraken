@@ -157,3 +157,28 @@ export const updateTargetMapper = (
     }
   );
 };
+
+export const getMapperDetails = (productId: string, componentId: string) => {
+  return request(
+    `${PRODUCT}/${productId}/components/${componentId}/mapper-details`,
+    {
+      method: "GET",
+    }
+  );
+};
+
+export const deployToEnv = (
+  productId: string,
+  componentId: string,
+  mapperKeys: string[],
+  envId: string
+) => {
+  return request(`/v2${PRODUCT}/${productId}/api-mapper-deployments`, {
+    method: "POST",
+    data: {
+      componentId,
+      mapperKeys,
+      envId,
+    },
+  });
+};

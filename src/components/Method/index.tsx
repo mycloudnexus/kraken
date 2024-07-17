@@ -1,7 +1,8 @@
 import { Tag } from "antd";
 import { useMemo } from "react";
+import styles from "./index.module.scss";
 
-const RequestMethod = ({ method = "" }) => {
+const RequestMethod = ({ method = "", noSpace = false, disabled = false }) => {
   const methodColor = useMemo(() => {
     switch (method.toLowerCase()) {
       case "get":
@@ -17,7 +18,16 @@ const RequestMethod = ({ method = "" }) => {
     }
   }, [method]);
 
-  return <Tag color={methodColor}>{method.toUpperCase()}</Tag>;
+  return (
+    <Tag
+      className={disabled ? styles.disabled : ""}
+      bordered={false}
+      color={methodColor}
+      style={noSpace ? { marginRight: 0 } : {}}
+    >
+      {method.toUpperCase()}
+    </Tag>
+  );
 };
 
 export default RequestMethod;
