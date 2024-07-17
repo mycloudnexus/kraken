@@ -44,11 +44,11 @@ const Header = () => {
 
   return (
     <div className={styles.header}>
-      <div className={styles.logo} onClick={goHome}>
-        <Logo />
-        KRAKEN
-      </div>
-      <div className={styles.rightMenu}>
+      <Flex gap={48}>
+        <div className={styles.logo} onClick={goHome}>
+          <Logo />
+          KRAKEN
+        </div>
         <Select
           allowClear={false}
           value={currentProduct}
@@ -56,7 +56,7 @@ const Header = () => {
           options={[
             {
               value: DEFAULT_PRODUCT,
-              label: <span>MEF Sonata API</span>,
+              label: <span style={{ fontWeight: 500 }}>MEF Sonata API</span>,
             },
           ]}
           suffixIcon={
@@ -66,6 +66,10 @@ const Header = () => {
             </div>
           }
         />
+      </Flex>
+
+
+      <div className={styles.rightMenu}>
         <Input
           placeholder="Search"
           suffix={<SearchOutlined style={{ cursor: "pointer" }} />}

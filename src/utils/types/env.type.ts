@@ -60,9 +60,8 @@ export interface IRunningComponent {
   version: string,
   key: string,
   componentName: string,
-
-
 }
+
 export interface IRunningComponentItem {
   id: string,
   updatedAt?: string,
@@ -82,6 +81,19 @@ export interface ICreateParameter {
   productId: string,
   envId: string,
   name: string,
+}
+
+export interface IMapperDetails {
+  targetKey: string;
+  targetMapperKey: string;
+  description: string;
+  path: string;
+  method: string;
+  productType: string;
+  actionType?: string;
+  mappingStatus: string;
+  updatedAt: string;
+  diffWithLastDeployed: boolean;
 }
 
 

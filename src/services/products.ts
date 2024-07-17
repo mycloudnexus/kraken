@@ -48,6 +48,10 @@ export const getComponentDetail = (productId: string, componentId: string) => {
   return request(`${PRODUCT}/${productId}/components/${componentId}`);
 };
 
+export const getComponentDetailMapping = (productId: string, componentId: string) => {
+  return request(`${PRODUCT}/${productId}/components/${componentId}/mapper-details`);
+};
+
 export const editComponentDetail = (
   productId: string,
   componentId: string,

@@ -8,6 +8,7 @@ import {
   getAllDataPlaneList,
   getComponentAPIDoc,
   getComponentDetail,
+  getComponentDetailMapping,
   getEnvActivity,
   getListComponentVersions,
   getListComponents,
@@ -37,6 +38,7 @@ import {
   IApiKeyDetail,
   IDataPlaneDetail,
   IEnv,
+  IMapperDetails,
   IRunningComponentItem,
 } from "@/utils/types/env.type";
 
@@ -53,6 +55,7 @@ export const PRODUCT_CACHE_KEYS = {
   get_product_env_list: "get_product_env_list",
   get_product_env_activity_list: "get_product_env_activity_list",
   get_product_env_activity_detail: "get_product_env_activity_detail",
+  get_component_detail_mapping: "get_component_detail_mapping",
   get_component_detail: "get_component_detail",
   edit_component_detail: "edit_component_detail",
   get_product_deployment_list: "get_product_deployment_list",
@@ -181,6 +184,19 @@ export const useGetComponentDetail = (
   return useQuery<any, Error, IUnifiedAsset>({
     queryKey: [PRODUCT_CACHE_KEYS.get_component_detail, productId, componentId],
     queryFn: () => getComponentDetail(productId, componentId),
+    enabled: Boolean(productId && componentId && open),
+    select: (data) => data.data,
+  });
+};
+
+export const useGetComponentDetailMapping = (
+  productId: string,
+  componentId: string,
+  open = true
+) => {
+  return useQuery<any, Error, IMapperDetails>({
+    queryKey: [PRODUCT_CACHE_KEYS.get_component_detail_mapping, productId, componentId],
+    queryFn: () => getComponentDetailMapping(productId, componentId),
     enabled: Boolean(productId && componentId && open),
     select: (data) => data.data,
   });

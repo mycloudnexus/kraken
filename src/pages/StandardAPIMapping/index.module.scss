@@ -1,14 +1,15 @@
 .pageWrapper {
-  height: 100%;
+  height: -webkit-fill-available;
+  padding: 10px 20px;
+  background-color: #f0f2f5;
 }
 .leftWrapper {
-  flex: 0 0 240px;
-  width: 240px;
-  border: 1px solid #d9d9d9;
-  padding: 16px 4px;
+  flex: 1;
+  background-color: #fff;
+  padding: 16px 0px;
 }
 .envWrapper {
-  padding: 0 0 8px 20px;
+  padding: 0 10px 10px 10px;
   border-bottom: 1px solid #dde1e5;
 }
 .componentIconWrapper {
@@ -60,7 +61,7 @@
 }
 .mainWrapper {
   flex: 1;
-  padding: 10px 20px;
+  padding-left: 1px;
   background-color: #f0f2f5;
 }
 
@@ -76,7 +77,6 @@
 }
 .versionListWrapper {
   flex: 1;
-  border-radius: 4px;
   background-color: #fff;
   padding: 12px 20px;
 }
