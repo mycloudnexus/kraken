@@ -210,9 +210,7 @@ export const exampleParse = (
         </span>
       </Flex>
     );
-    const isValueArray = isArray(example[key])
-      ? `[${example[key].length > 1 ? "*" : "0"}]`
-      : "";
+    const isValueArray = isArray(example[key]) ? "[*]" : "";
     const children =
       !isEmpty(example[key]) && typeof example[key] === "object"
         ? exampleParse(

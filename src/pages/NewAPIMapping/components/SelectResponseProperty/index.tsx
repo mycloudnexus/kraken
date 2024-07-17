@@ -102,8 +102,18 @@ const SelectResponseProperty = () => {
     });
   }, []);
 
+  const transformString = (input: string) => {
+    if (input.indexOf("[*]") === -1) {
+      return input;
+    }
+    const parts = input?.replaceAll("[*]", "[0]").split(".").reverse();
+    const newString = parts.join(".")?.replace("[0]", "[*]");
+    return newString.split(".").reverse().join(".");
+  };
+
   const handleOK = () => {
     const key = get(selectedKeys, "[0]");
+    const newKey = transformString(key as unknown as string);
     if (activeResponseName && typeof key === "string") {
       const [name, target] = activeResponseName.split("-");
       const cloneObj = clone(responseMapping);
@@ -113,7 +123,7 @@ const SelectResponseProperty = () => {
         }
         return i.name === name;
       });
-      set(cloneObj, `[${index}].source`, `@{{responseBody.${key}}}`);
+      set(cloneObj, `[${index}].source`, `@{{responseBody.${newKey}}}`);
       set(cloneObj, `[${index}].sourceLocation`, `BODY`);
       setResponseMapping(cloneObj);
       setActiveResponseName(undefined);

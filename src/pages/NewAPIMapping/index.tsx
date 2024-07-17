@@ -302,9 +302,11 @@ const NewAPIMapping = () => {
   };
   const handleSave = async (isExit?: boolean) => {
     try {
-      const isErrorValidation = validateData();
-      if (isErrorValidation) {
-        return;
+      if (isExit) {
+        const isErrorValidation = validateData();
+        if (isErrorValidation) {
+          return;
+        }
       }
       const newData = chain(listMappingStateResponse)
         .groupBy("name")
