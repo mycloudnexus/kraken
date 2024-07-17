@@ -11,6 +11,7 @@ import type { IUnifiedAsset } from "@/utils/types/common.type";
 import { SPEC_VALUE } from "@/utils/constants/product";
 import Text from "@/components/Text";
 import ApiComponent from "./ApiComponent";
+import { get, isEmpty } from "lodash";
 
 const ApiComponents = () => {
   const { currentProduct } = useAppStore();
@@ -21,6 +22,7 @@ const ApiComponents = () => {
       kind: "kraken.component.api",
     }
   );
+
   const { data: componentWithSpec, isLoading: specLoading } =
     useGetProductComponents(currentProduct, {
       kind: "kraken.component.api-spec",
@@ -39,7 +41,7 @@ const ApiComponents = () => {
       );
 
       const targetYaml = yaml.load(
-        decode(targetSpec.facets.baseSpec.content)
+        decode(get(targetSpec, "facets.baseSpec.content", ""))
       ) as any;
       return { targetSpec, targetYaml };
     },
@@ -50,7 +52,7 @@ const ApiComponents = () => {
       if (!i.facets?.supportedProductTypesAndActions) return null;
       const actionTypesArr: string[] = [];
       const productTypesArr: string[] = [];
-      i.facets.supportedProductTypesAndActions.forEach((s: any) => {
+      i.facets?.supportedProductTypesAndActions?.forEach((s: any) => {
         actionTypesArr.push(...(s?.actionTypes ?? []));
         productTypesArr.push(...(s?.productTypes ?? []));
       });
@@ -75,7 +77,11 @@ const ApiComponents = () => {
             const { targetSpec = {}, targetYaml = {} } = getTargetSpecItem(i);
             const supportInfo = getSupportInfo(i);
             const title = targetYaml.info?.title;
-            const apis = i.facets.supportedProductTypesAndActions?.length ?? 0;
+            const apis =
+              i?.facets?.supportedProductTypesAndActions?.length ?? 0;
+            if (isEmpty(targetSpec)) {
+              return null;
+            }
             return (
               <Col lg={12} xl={8} sm={24} key={i.id}>
                 <ApiComponent
