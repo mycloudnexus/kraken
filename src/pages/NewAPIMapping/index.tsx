@@ -67,7 +67,6 @@ const NewAPIMapping = () => {
   const [activeKey, setActiveKey] = useState<string | string[]>("0");
   const [step, setStep] = useState(0);
   const [tabActiveKey, setTabActiveKey] = useState("request");
-  const [isFormTouched, setIsFormTouched] = useState(false);
 
   const { mutateAsync: updateTargetMapper, isPending } = useUpdateTargetMapper();
   const { jsonSpec, serverKeyInfo, mappers, mapperResponse, loadingMapper, componentKey } = useGetApiSpec(currentProduct, query ?? "{}");
@@ -185,7 +184,6 @@ const NewAPIMapping = () => {
     }
     setRightSideInfo(undefined);
     setRightSide(undefined);
-    setIsFormTouched(true);
   }, [rightSideInfo, requestMapping, setRequestMapping]);
 
   const handleSelectSellerProp = useCallback((selected: any) => { 
@@ -209,7 +207,6 @@ const NewAPIMapping = () => {
     setRequestMapping(updatedMapping);
     setRightSideInfo(undefined);
     setRightSide(undefined);
-    setIsFormTouched(true);
   }, [rightSideInfo, requestMapping, setRequestMapping]);
 
   const validateData = useCallback(() => {
@@ -313,7 +310,6 @@ const NewAPIMapping = () => {
   const handleRevert = useCallback(() => {
     setRequestMapping(resetMapping() ?? []);
     setResponseMapping(mappers?.response);
-    setIsFormTouched(false);
   }, [resetMapping, mappers?.response, setRequestMapping, setResponseMapping]);
 
   return (
@@ -356,7 +352,6 @@ const NewAPIMapping = () => {
                 type="primary"
                 onClick={() => handleSave(true)}
                 loading={isPending}
-                disabled={!isFormTouched}
               >
                 Save
               </Button>

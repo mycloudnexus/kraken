@@ -92,9 +92,9 @@ const Response = ({ item, schemas }: Props) => {
   return (
     <div>
       <Flex justifyContent="flex-start" flexWrap="wrap">
-        {responseKeys?.map((rKey: string) => (
+        {responseKeys?.map((rKey: string, index: number) => (
           <Button
-            key={rKey}
+            key={rKey + index}
             style={
               selectedResponse === rKey
                 ? {
