@@ -3,7 +3,7 @@ import { IMapperDetails } from '@/utils/types/env.type';
 import { Collapse, Flex, Tag, Tooltip } from 'antd';
 import { toUpper, get } from 'lodash';
 import { useMemo, useState } from 'react';
-import RequestMethod from '../Method';
+import RequestMethod from '../../../../components/Method';
 import styles from './index.module.scss';
 import { InfoCircleFilled } from '@ant-design/icons';
 
@@ -11,20 +11,18 @@ const Dot = ({ vertical }: { vertical?: boolean }) => (
   <div className={vertical ? styles.dottedLine : styles.dot} />
 )
 
-const CollapseItem = ({ data, isActive, setActiveSelected }: {
+const CollapseItem = ({ data, selectedKey, setActiveSelected }: {
   data: IMapperDetails[];
-  isActive: boolean;
-  setActiveSelected: () => void;
+  selectedKey: string;
+  setActiveSelected: (mapItem: IMapperDetails) => void;
 }) => {
   const keys = Object.keys(data);
   const mapDetails = keys.map(item => (data[Number(item)])).flat() as Array<IMapperDetails>
   return <>
     {mapDetails.map(el => (
-      <Flex justify='space-between' className={styles.collapseItem} onClick={setActiveSelected} key={el.targetMapperKey}>
+      <Flex justify='space-between' className={`${styles.collapseItem} ${selectedKey === el.targetKey ? styles.collapseItemActive : ""} `} onClick={() => {setActiveSelected(el)}} key={el.targetMapperKey}>
         <Flex>
-          {isActive &&
-            <Dot vertical />
-          }
+          <Dot vertical />
           {el.productType &&
             <Tag>
               {toUpper(el.productType)}
@@ -57,21 +55,27 @@ const CollapseLabel = ({ size, isActive, labelProps, }: { size: number, isActive
 
 type MappingDetailsListProps = {
   detailDataMapping: IMapperDetails | undefined;
-  setActiveSelected: () => void;
+  setActiveSelected: (mapItem: IMapperDetails) => void;
 };
 
 const MappingDetailsList = ({ detailDataMapping, setActiveSelected }: MappingDetailsListProps) => {
   const [selectedHeader, setSelectedHeader] = useState<string[] | string>([]);
+  const [selectedKey, setSelectedKey] = useState<string>("");
   const listMapping = useMemo(() => {
     const groupedPaths = groupByPath(get(detailDataMapping, "details", []))
     const object = Object.keys(groupedPaths).map(path => {
+      const handleSelection = (mapItem: IMapperDetails) => {
+        setSelectedKey(mapItem.targetKey)
+        setActiveSelected(mapItem)
+      }
       const method = groupedPaths[path][0].method
       const labelProps = { method, path }
-      const isActive = selectedHeader.includes(path);
+      const isActiveLabel = selectedHeader.includes(path);
+
       return {
         key: path,
-        label: (<CollapseLabel labelProps={labelProps} size={groupedPaths[path].length} isActive={isActive} />),
-        children: (<CollapseItem data={groupedPaths[path]} setActiveSelected={setActiveSelected} isActive={isActive} />),
+        label: (<CollapseLabel labelProps={labelProps} size={groupedPaths[path].length} isActive={isActiveLabel} />),
+        children: (<CollapseItem data={groupedPaths[path]} setActiveSelected={handleSelection} selectedKey={selectedKey} />),
       }
     })
     return object;

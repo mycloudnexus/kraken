@@ -1,19 +1,19 @@
 import Flex from "@/components/Flex";
 import StepBar from "@/components/StepBar";
-import Text from "@/components/Text";
 import { PRODUCT_CACHE_KEYS, useUpdateTargetMapper } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { EStep } from "@/utils/constants/common";
-import { ROUTES } from "@/utils/constants/route";
 import { EnumRightType } from "@/utils/types/common.type";
-import { LeftOutlined } from "@ant-design/icons";
+import { InfoCircleOutlined } from "@ant-design/icons";
+import RollbackIcon from "@/assets/newAPIMapping/Rollback.svg";
+
 import {
-  Breadcrumb,
-  BreadcrumbProps,
   Button,
   Tabs,
   TabsProps,
+  Tag,
+  Tooltip,
   notification,
 } from "antd";
 import {
@@ -28,8 +28,9 @@ import {
   reduce,
   uniqBy,
 } from "lodash";
+import { toDateTime } from "@/libs/dayjs";
 import { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import RequestMapping from "./components/RequestMapping";
 import ResponseMapping, { IMapping } from "./components/ResponseMapping";
 import RightAddSellerProp from "./components/RightAddSellerProp";
@@ -70,7 +71,6 @@ export const buildInitListMapping = (responseMapping: any[]) => {
 };
 
 const NewAPIMapping = () => {
-  const { componentId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
   const { currentProduct } = useAppStore();
@@ -98,25 +98,7 @@ const NewAPIMapping = () => {
   const queryData = JSON.parse(query ?? "{}");
   const [activeKey, setActiveKey] = useState<string | string[]>("0");
   const [step, setStep] = useState(0);
-  const breadcrumb: BreadcrumbProps["items"] = [
-    {
-      title: (
-        <Link
-          to={ROUTES.API_MAPPING(componentId!)}
-          style={{ color: "rgba(0, 0, 0, 0.88)" }}
-        >
-          <LeftOutlined /> Standard API
-        </Link>
-      ),
-    },
-    {
-      title: (
-        <Text.NormalMedium color="rgba(0, 0, 0, 0.45)">
-          Add new mapping
-        </Text.NormalMedium>
-      ),
-    },
-  ];
+
   const { jsonSpec, serverKeyInfo, mappers, mapperResponse, loadingMapper } =
     useGetApiSpec(currentProduct, query ?? "{}");
   const { sellerApi: defaultSellerApi, serverKey: defaultServerKey } =
@@ -145,14 +127,17 @@ const NewAPIMapping = () => {
     }
   };
 
+  const resetMapping = () => {
+    return mappers?.request?.map((rm: any) => ({
+      ...rm,
+      target: transformTarget(rm.target, rm.targetLocation),
+      source: transformTarget(rm.source, rm.sourceLocation),
+    }));
+  }
+
   useEffect(() => {
     if (firstTimeLoad && !isEmpty(mappers?.request)) {
-      const newRequest = mappers?.request?.map((rm: any) => ({
-        ...rm,
-        target: transformTarget(rm.target, rm.targetLocation),
-        source: transformTarget(rm.source, rm.sourceLocation),
-      }));
-      setRequestMapping(newRequest ?? []);
+      setRequestMapping(resetMapping() ?? []);
     }
   }, [mappers?.request, firstTimeLoad]);
 
@@ -173,6 +158,8 @@ const NewAPIMapping = () => {
   }, []);
 
   const [tabActiveKey, setTabActiveKey] = useState("request");
+  const [isFormTouched, setIsFormTouched] = useState(false);
+
 
   const items: TabsProps["items"] = [
     {
@@ -225,6 +212,7 @@ const NewAPIMapping = () => {
     }
     setRightSideInfo(undefined);
     setRightSide(undefined);
+    setIsFormTouched(true)
   };
   const handleSelectSellerProp = (selected: any) => {
     const updatedMapping = uniqBy(
@@ -249,18 +237,10 @@ const NewAPIMapping = () => {
     setRightSideInfo(undefined);
     setRightSide(undefined);
   };
-  const handleCancel = () => {
-    navigate(-1);
-  };
-  const handleNext = () => {
-    setTabActiveKey("response");
-    setStep(2);
-    setActiveKey("2");
-  };
-  const handlePrev = () => {
-    setTabActiveKey("request");
-    setStep(1);
-    setActiveKey("1");
+  const handleRevert = () => {
+    setRequestMapping(resetMapping() ?? []);
+    setResponseMapping(mappers?.response);
+    setIsFormTouched(false)
   };
 
   const validateData = () => {
@@ -391,22 +371,46 @@ const NewAPIMapping = () => {
       reset();
     };
   }, [location]);
+
   return (
-    <Flex
-      flexDirection="column"
-      alignItems="stretch"
-      justifyContent="flex-start"
-      style={{ backgroundColor: "#f0f2f5", height: "100%" }}
-    >
+    <Flex className={styles.container}>
       <StepBar
         type={EStep.MAPPING}
         currentStep={step}
         activeKey={activeKey}
         setActiveKey={setActiveKey}
       />
-      <Breadcrumb items={breadcrumb} className={styles.breadcrumb} />
-      <Flex gap={20} className={styles.mainWrapper}>
+      <Flex gap={8} className={styles.mainWrapper}>
         <div className={styles.center}>
+          <Flex className={styles.breadcrumb} justifyContent="space-between">
+            <Flex className={styles.infoBox}>
+              {queryData.mappingStatus === "incomplete" &&
+                <Flex gap={8}>
+                  <Tag bordered={false} color="error">
+                    Incomplete
+                  </Tag>
+                  {toDateTime(queryData.updatedAt)}
+                  <Tooltip title="Last update">
+                    <InfoCircleOutlined style={{ color: "rgba(0, 0, 0, 0.45)" }} />
+                  </Tooltip>
+                </Flex>
+              }
+            </Flex>
+
+            <Flex justifyContent="flex-end" gap={8} className={styles.bottomWrapper}>
+              <Button onClick={() => alert("Not implemented")}> Deploy to Stage</Button>
+              <Button className={styles.revertButton} onClick={handleRevert}><RollbackIcon /></Button>
+              <Button
+                data-testid="btn-save"
+                type="primary"
+                onClick={() => handleSave(true)}
+                loading={isPending}
+                disabled={!isFormTouched}
+              >
+                Save
+              </Button>
+            </Flex>
+          </Flex>
           <HeaderMapping />
           <Tabs
             items={items}
@@ -437,30 +441,6 @@ const NewAPIMapping = () => {
             <SelectResponseProperty />
           )}
         </div>
-      </Flex>
-      <Flex justifyContent="flex-end" gap={8} className={styles.bottomWrapper}>
-        <Button type="text" onClick={handleCancel}>
-          Cancel
-        </Button>
-        {tabActiveKey === "request" && (
-          <Button data-testid="btn-next" type="primary" onClick={handleNext}>
-            Next
-          </Button>
-        )}
-        {tabActiveKey === "response" && (
-          <>
-            <Button onClick={handlePrev}>Previous</Button>
-            <Button
-              data-testid="btn-save"
-              type="primary"
-              onClick={() => handleSave(true)}
-              loading={isPending}
-              disabled={loadingMapper}
-            >
-              Save and exit
-            </Button>
-          </>
-        )}
       </Flex>
     </Flex>
   );

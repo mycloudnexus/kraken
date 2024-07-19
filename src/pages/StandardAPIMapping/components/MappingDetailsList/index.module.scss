@@ -21,6 +21,11 @@
     border-right: 3px solid #2962FF;
   }
 }
+.collapseItemActive {
+  background-color: rgba(41, 98, 255, 0.2);
+  border-right: 3px solid #2962FF;
+}
+
 .labelWrapper {
   font-weight: 500;
   align-items: center;

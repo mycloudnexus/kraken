@@ -24,11 +24,14 @@ import { LeftOutlined } from "@ant-design/icons";
 const NewAPIServer = () => {
   const { componentId } = useParams();
   const { currentProduct: id } = useAppStore();
+
   const { data: componentDetail, isLoading } = useGetComponentDetail(
     id,
-    componentId ?? ""
+    (componentId ?? "").replace(".api.", ".api-spec.")
   );
+
   const { data: dataEnv } = useGetProductEnvs(id);
+
   const env = get(dataEnv, "data", []);
   const [form] = Form.useForm();
   const { mutateAsync: runCreate, isPending: loadingCreate } =
@@ -128,6 +131,7 @@ const NewAPIServer = () => {
       }
       const environments = get(componentDetail, "facets.environments");
       let newEnv = {};
+      debugger
       const keys = Object.keys(environments);
 
       for (const key of keys) {
