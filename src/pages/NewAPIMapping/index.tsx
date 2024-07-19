@@ -8,14 +8,7 @@ import { EnumRightType } from "@/utils/types/common.type";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import RollbackIcon from "@/assets/newAPIMapping/Rollback.svg";
 
-import {
-  Button,
-  Tabs,
-  TabsProps,
-  Tag,
-  Tooltip,
-  notification,
-} from "antd";
+import { Button, Tabs, TabsProps, Tag, Tooltip, notification } from "antd";
 import {
   chain,
   cloneDeep,
@@ -43,6 +36,7 @@ import styles from "./index.module.scss";
 import { queryClient } from "@/utils/helpers/reactQuery";
 import HeaderMapping from "./components/HeaderMapping";
 import { IRequestMapping } from "@/utils/types/component.type";
+import DeployStandardAPI from "@/components/DeployStandardAPI";
 
 export const buildInitListMapping = (responseMapping: any[]) => {
   let k = 0;
@@ -99,8 +93,14 @@ const NewAPIMapping = () => {
   const [activeKey, setActiveKey] = useState<string | string[]>("0");
   const [step, setStep] = useState(0);
 
-  const { jsonSpec, serverKeyInfo, mappers, mapperResponse, loadingMapper } =
-    useGetApiSpec(currentProduct, query ?? "{}");
+  const {
+    jsonSpec,
+    serverKeyInfo,
+    mappers,
+    mapperResponse,
+    loadingMapper,
+    componentKey,
+  } = useGetApiSpec(currentProduct, query ?? "{}");
   const { sellerApi: defaultSellerApi, serverKey: defaultServerKey } =
     useGetDefaultSellerApi(currentProduct, serverKeyInfo);
 
@@ -133,7 +133,7 @@ const NewAPIMapping = () => {
       target: transformTarget(rm.target, rm.targetLocation),
       source: transformTarget(rm.source, rm.sourceLocation),
     }));
-  }
+  };
 
   useEffect(() => {
     if (firstTimeLoad && !isEmpty(mappers?.request)) {
@@ -159,7 +159,6 @@ const NewAPIMapping = () => {
 
   const [tabActiveKey, setTabActiveKey] = useState("request");
   const [isFormTouched, setIsFormTouched] = useState(false);
-
 
   const items: TabsProps["items"] = [
     {
@@ -212,7 +211,7 @@ const NewAPIMapping = () => {
     }
     setRightSideInfo(undefined);
     setRightSide(undefined);
-    setIsFormTouched(true)
+    setIsFormTouched(true);
   };
   const handleSelectSellerProp = (selected: any) => {
     const updatedMapping = uniqBy(
@@ -240,7 +239,7 @@ const NewAPIMapping = () => {
   const handleRevert = () => {
     setRequestMapping(resetMapping() ?? []);
     setResponseMapping(mappers?.response);
-    setIsFormTouched(false)
+    setIsFormTouched(false);
   };
 
   const validateData = () => {
@@ -384,22 +383,30 @@ const NewAPIMapping = () => {
         <div className={styles.center}>
           <Flex className={styles.breadcrumb} justifyContent="space-between">
             <Flex className={styles.infoBox}>
-              {queryData.mappingStatus === "incomplete" &&
+              {queryData.mappingStatus === "incomplete" && (
                 <Flex gap={8}>
                   <Tag bordered={false} color="error">
                     Incomplete
                   </Tag>
                   {toDateTime(queryData.updatedAt)}
                   <Tooltip title="Last update">
-                    <InfoCircleOutlined style={{ color: "rgba(0, 0, 0, 0.45)" }} />
+                    <InfoCircleOutlined
+                      style={{ color: "rgba(0, 0, 0, 0.45)" }}
+                    />
                   </Tooltip>
                 </Flex>
-              }
+              )}
             </Flex>
 
-            <Flex justifyContent="flex-end" gap={8} className={styles.bottomWrapper}>
-              <Button onClick={() => alert("Not implemented")}> Deploy to Stage</Button>
-              <Button className={styles.revertButton} onClick={handleRevert}><RollbackIcon /></Button>
+            <Flex
+              justifyContent="flex-end"
+              gap={8}
+              className={styles.bottomWrapper}
+            >
+              <DeployStandardAPI metadataKey={componentKey} />
+              <Button className={styles.revertButton} onClick={handleRevert}>
+                <RollbackIcon />
+              </Button>
               <Button
                 data-testid="btn-save"
                 type="primary"

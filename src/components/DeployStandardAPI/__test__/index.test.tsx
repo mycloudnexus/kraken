@@ -8,7 +8,11 @@ test("test Deploy popup", () => {
   const { container } = render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <DeployStandardAPIModal open={true} onClose={vi.fn()} />
+        <DeployStandardAPIModal
+          open={true}
+          onClose={vi.fn()}
+          defaultKey={"abc"}
+        />
       </BrowserRouter>
     </QueryClientProvider>
   );

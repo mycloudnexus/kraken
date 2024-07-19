@@ -9,16 +9,17 @@ import {
 } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
 import { useParams } from "react-router-dom";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { get, isEmpty } from "lodash";
 import RequestMethod from "../Method";
 
 type Props = {
   open: boolean;
   onClose: () => void;
+  defaultKey: string;
 };
 
-const DeployStandardAPIModal = ({ open, onClose }: Props) => {
+const DeployStandardAPIModal = ({ open, onClose, defaultKey }: Props) => {
   const [checkedList, setCheckedList] = useState<string[]>([]);
   const { currentProduct } = useAppStore();
   const { componentId } = useParams();
@@ -68,6 +69,17 @@ const DeployStandardAPIModal = ({ open, onClose }: Props) => {
     }
   };
 
+  useEffect(() => {
+    if (defaultKey && !isEmpty(dataMappers)) {
+      const item = dataMappers.find(
+        (item: any) => item.targetMapperKey === defaultKey
+      );
+      if (item.diffWithStage) {
+        setCheckedList([defaultKey]);
+      }
+    }
+  }, [defaultKey, dataMappers]);
+
   const options = useMemo(() => {
     if (!isEmpty(dataMappers)) {
       return dataMappers.map((item: any) => ({
@@ -107,7 +119,7 @@ const DeployStandardAPIModal = ({ open, onClose }: Props) => {
 
   return (
     <Modal
-      width={800}
+      width={900}
       open={open}
       onCancel={onClose}
       title={<Text.NormalLarge>Deploy to stage</Text.NormalLarge>}

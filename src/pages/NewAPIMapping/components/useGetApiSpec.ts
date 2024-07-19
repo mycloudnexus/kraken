@@ -22,6 +22,7 @@ const useGetApiSpec = (currentProduct: string, query: string) => {
   const endpoint = mapperResponse?.data?.[0]?.facets?.endpoints?.[0];
   const mappers = endpoint?.mappers;
 
+  const componentKey = mapperResponse?.data?.[0]?.metadata?.key;
   const { data: targetResponse } = useGetComponentList(currentProduct, {
     kind: COMPONENT_KIND_API_TARGET,
     q: query,
@@ -72,6 +73,7 @@ const useGetApiSpec = (currentProduct: string, query: string) => {
     mappers,
     jsonSpec,
     loadingMapper: isLoading,
+    componentKey,
   };
 };
 
