@@ -8,7 +8,7 @@ import {
   useGetProductEnvs,
 } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { get, isEmpty } from "lodash";
 import RequestMethod from "../Method";
@@ -29,6 +29,7 @@ const DeployStandardAPIModal = ({ open, onClose, defaultKey }: Props) => {
   );
   const { mutateAsync: deployment } = useDeployToEnv();
   const { data: dataEnv } = useGetProductEnvs(currentProduct);
+  const navigate = useNavigate();
   const stageId = useMemo(() => {
     const stage = dataEnv?.data?.find(
       (env: any) => env.name?.toLowerCase() === "stage"
@@ -62,6 +63,8 @@ const DeployStandardAPIModal = ({ open, onClose, defaultKey }: Props) => {
         envId: stageId,
       } as any);
       notification.success({ message: get(res, "message", "Success!") });
+      onClose?.();
+      navigate("/env");
     } catch (error) {
       notification.error({
         message: get(error, "reason", "Error. Please try again"),

@@ -42,8 +42,6 @@ const UploadYaml = ({ form }: Props) => {
   const file = Form.useWatch("file", form);
   const [content, setContent] = useState("");
   const handleReplace = () => {
-    form.setFieldValue("file", null);
-    form.setFieldValue("selectedAPIs", []);
     closeModal();
     const fileSelector = document.getElementById("upload-file");
     if (fileSelector) {
@@ -107,28 +105,34 @@ const UploadYaml = ({ form }: Props) => {
         name="file"
         label="Upload API Spec in yaml format :"
         rules={[{ required: true, message: "Please upload API spec." }]}
+        style={{ display: file?.file ? "none" : "block" }}
       >
-        {!file?.file ? (
-          <Upload
-            id="upload-file"
-            accept=".yaml"
-            showUploadList={false}
-            multiple={false}
-            beforeUpload={(file) => {
-              if (!/^.*\.yaml$/.test(file.name)) {
-                notification.warning({ message: "Only accept yaml file" });
-              }
-              return false;
-            }}
-          >
-            <Button icon={<UploadOutlined />}>Click to upload</Button>
-          </Upload>
-        ) : (
-          <Button icon={<UploadOutlined />} onClick={openModal}>
-            Click to upload
-          </Button>
-        )}
+        <Upload
+          id="upload-file"
+          accept=".yaml"
+          showUploadList={false}
+          multiple={false}
+          beforeUpload={(file) => {
+            if (!/^.*\.yaml$/.test(file.name)) {
+              notification.warning({ message: "Only accept yaml file" });
+            }
+            form.setFieldValue("selectedAPIs", []);
+            return false;
+          }}
+        >
+          <Button icon={<UploadOutlined />}>Click to upload</Button>
+        </Upload>
       </Form.Item>
+      <Form.Item
+        className={styles.hideRequired}
+        label="Upload API Spec in yaml format :"
+        style={{ display: !file?.file ? "none" : "block" }}
+      >
+        <Button icon={<UploadOutlined />} onClick={openModal}>
+          Click to upload
+        </Button>
+      </Form.Item>
+
       {file ? (
         <Flex gap={9} justifyContent="flex-start">
           <PaperClipOutlined />
