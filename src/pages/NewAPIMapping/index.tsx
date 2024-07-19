@@ -1,13 +1,7 @@
-import Flex from "@/components/Flex";
-import StepBar from "@/components/StepBar";
-import { PRODUCT_CACHE_KEYS, useUpdateTargetMapper } from "@/hooks/product";
-import { useAppStore } from "@/stores/app.store";
-import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
-import { EStep } from "@/utils/constants/common";
-import { EnumRightType } from "@/utils/types/common.type";
+import { useCallback, useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import RollbackIcon from "@/assets/newAPIMapping/Rollback.svg";
-
 import { Button, Tabs, TabsProps, Tag, Tooltip, notification } from "antd";
 import {
   chain,
@@ -16,53 +10,34 @@ import {
   flatMap,
   get,
   isEmpty,
-  keys,
-  pickBy,
   reduce,
   uniqBy,
 } from "lodash";
-import { toDateTime } from "@/libs/dayjs";
-import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import Flex from "@/components/Flex";
+import StepBar from "@/components/StepBar";
 import RequestMapping from "./components/RequestMapping";
-import ResponseMapping, { IMapping } from "./components/ResponseMapping";
+import ResponseMapping from "./components/ResponseMapping";
 import RightAddSellerProp from "./components/RightAddSellerProp";
 import RightAddSonataProp from "./components/RightAddSonataProp";
 import SelectAPI from "./components/SelectAPI";
 import SelectResponseProperty from "./components/SelectResponseProperty";
 import useGetApiSpec from "./components/useGetApiSpec";
 import useGetDefaultSellerApi from "./components/useGetDefaultSellerApi";
-import styles from "./index.module.scss";
-import { queryClient } from "@/utils/helpers/reactQuery";
 import HeaderMapping from "./components/HeaderMapping";
-import { IRequestMapping } from "@/utils/types/component.type";
 import DeployStandardAPI from "@/components/DeployStandardAPI";
-
-export const buildInitListMapping = (responseMapping: any[]) => {
-  let k = 0;
-  let list: IMapping[] = [];
-  for (const item of responseMapping) {
-    if (
-      !isEmpty(item.valueMapping) &&
-      every(item.valueMapping, (v) => !isEmpty(v))
-    ) {
-      let res = chain(item.valueMapping)
-        .groupBy((value) => value)
-        .map((_, from) => {
-          k += 1;
-          return {
-            from,
-            to: keys(pickBy(item.valueMapping, (v) => v === from)),
-            key: k,
-            name: item.name,
-          };
-        })
-        .value();
-      list = [...list, ...res];
-    }
-  }
-  return list;
-};
+import {
+  PRODUCT_CACHE_KEYS,
+  useUpdateTargetMapper,
+} from "@/hooks/product";
+import { useAppStore } from "@/stores/app.store";
+import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
+import { EStep } from "@/utils/constants/common";
+import { EnumRightType } from "@/utils/types/common.type";
+import { toDateTime } from "@/libs/dayjs";
+import { queryClient } from "@/utils/helpers/reactQuery";
+import styles from "./index.module.scss";
+import buildInitListMapping from '@/utils/helpers/buildInitListMapping';
+import transformTarget from '@/utils/helpers/transformTarget';
 
 const NewAPIMapping = () => {
   const location = useLocation();
@@ -86,23 +61,25 @@ const NewAPIMapping = () => {
     setListMappingStateResponse,
     listMappingStateResponse,
   } = useNewApiMappingStore();
-  const { mutateAsync: updateTargetMapper, isPending } =
-    useUpdateTargetMapper();
-  const [firstTimeLoad, setFirstTimeLoad] = useState(true);
   const queryData = JSON.parse(query ?? "{}");
+
+  const [firstTimeLoad, setFirstTimeLoad] = useState(true);
   const [activeKey, setActiveKey] = useState<string | string[]>("0");
   const [step, setStep] = useState(0);
+  const [tabActiveKey, setTabActiveKey] = useState("request");
+  const [isFormTouched, setIsFormTouched] = useState(false);
 
-  const {
-    jsonSpec,
-    serverKeyInfo,
-    mappers,
-    mapperResponse,
-    loadingMapper,
-    componentKey,
-  } = useGetApiSpec(currentProduct, query ?? "{}");
-  const { sellerApi: defaultSellerApi, serverKey: defaultServerKey } =
-    useGetDefaultSellerApi(currentProduct, serverKeyInfo);
+  const { mutateAsync: updateTargetMapper, isPending } = useUpdateTargetMapper();
+  const { jsonSpec, serverKeyInfo, mappers, mapperResponse, loadingMapper, componentKey } = useGetApiSpec(currentProduct, query ?? "{}");
+  const { sellerApi: defaultSellerApi, serverKey: defaultServerKey } = useGetDefaultSellerApi(currentProduct, serverKeyInfo);
+
+  const resetMapping = useCallback(() => {
+    return mappers?.request?.map((rm: any) => ({
+      ...rm,
+      target: transformTarget(rm.target, rm.targetLocation),
+      source: transformTarget(rm.source, rm.sourceLocation),
+    }));
+  }, [mappers?.request]);
 
   useEffect(() => {
     if (!sellerApi && defaultSellerApi) {
@@ -116,30 +93,11 @@ const NewAPIMapping = () => {
     }
   }, [defaultServerKey, serverKey, setServerKey]);
 
-  const transformTarget = (from: string, fromSrc: string) => {
-    switch (fromSrc) {
-      case "PATH":
-        return from.replace("@{{", `@{{path.`);
-      case "QUERY":
-        return from.replace("@{{", `@{{query.`);
-      default:
-        return from;
-    }
-  };
-
-  const resetMapping = () => {
-    return mappers?.request?.map((rm: any) => ({
-      ...rm,
-      target: transformTarget(rm.target, rm.targetLocation),
-      source: transformTarget(rm.source, rm.sourceLocation),
-    }));
-  };
-
   useEffect(() => {
     if (firstTimeLoad && !isEmpty(mappers?.request)) {
       setRequestMapping(resetMapping() ?? []);
     }
-  }, [mappers?.request, firstTimeLoad]);
+  }, [mappers?.request, firstTimeLoad, setRequestMapping, resetMapping]);
 
   useEffect(() => {
     if (firstTimeLoad && !isEmpty(mappers?.response)) {
@@ -147,7 +105,7 @@ const NewAPIMapping = () => {
       setListMappingStateResponse(buildInitListMapping(mappers?.response));
       setFirstTimeLoad(false);
     }
-  }, [mappers?.response, firstTimeLoad]);
+  }, [mappers?.response, firstTimeLoad, setResponseMapping, setListMappingStateResponse]);
 
   useEffect(() => {
     return () => {
@@ -157,8 +115,25 @@ const NewAPIMapping = () => {
     };
   }, []);
 
-  const [tabActiveKey, setTabActiveKey] = useState("request");
-  const [isFormTouched, setIsFormTouched] = useState(false);
+  useEffect(() => {
+    if (rightSide === EnumRightType.SelectSellerAPI) {
+      setStep(0);
+      setActiveKey("0");
+    }
+    if (
+      rightSide === EnumRightType.AddSonataProp ||
+      rightSide === EnumRightType.AddSellerProp
+    ) {
+      setStep(1);
+      setActiveKey("1");
+    }
+  }, [rightSide]);
+
+  useEffect(() => {
+    return () => {
+      reset();
+    };
+  }, [location, reset]);
 
   const items: TabsProps["items"] = [
     {
@@ -173,7 +148,8 @@ const NewAPIMapping = () => {
       disabled: loadingMapper,
     },
   ];
-  const handleSelectSonataProp = (selected: any) => {
+
+  const handleSelectSonataProp = useCallback((selected: any) => {
     if (rightSideInfo?.method === "add") {
       const updatedMapping = uniqBy(
         [
@@ -184,8 +160,7 @@ const NewAPIMapping = () => {
             title: selected.title,
           },
         ],
-        (rm) =>
-          `${rm.source}_${rm.sourceLocation}_${rm.target}_${rm.targetLocation}`
+        (rm) => `${rm.source}_${rm.sourceLocation}_${rm.target}_${rm.targetLocation}`
       );
       setRequestMapping(updatedMapping);
     }
@@ -204,16 +179,16 @@ const NewAPIMapping = () => {
           }
           return rm;
         }),
-        (rm) =>
-          `${rm.source}_${rm.sourceLocation}_${rm.target}_${rm.targetLocation}`
+        (rm) => `${rm.source}_${rm.sourceLocation}_${rm.target}_${rm.targetLocation}`
       );
       setRequestMapping(updatedMapping);
     }
     setRightSideInfo(undefined);
     setRightSide(undefined);
     setIsFormTouched(true);
-  };
-  const handleSelectSellerProp = (selected: any) => {
+  }, [rightSideInfo, requestMapping, setRequestMapping]);
+
+  const handleSelectSellerProp = useCallback((selected: any) => { 
     const updatedMapping = uniqBy(
       requestMapping.map((rm) => {
         if (
@@ -229,56 +204,42 @@ const NewAPIMapping = () => {
         }
         return rm;
       }),
-      (rm) =>
-        `${rm.source}_${rm.sourceLocation}_${rm.target}_${rm.targetLocation}`
+      (rm) => `${rm.source}_${rm.sourceLocation}_${rm.target}_${rm.targetLocation}`
     );
     setRequestMapping(updatedMapping);
     setRightSideInfo(undefined);
     setRightSide(undefined);
-  };
-  const handleRevert = () => {
-    setRequestMapping(resetMapping() ?? []);
-    setResponseMapping(mappers?.response);
-    setIsFormTouched(false);
-  };
+    setIsFormTouched(true);
+  }, [rightSideInfo, requestMapping, setRequestMapping]);
 
-  const validateData = () => {
-    const requiredRequest = requestMapping.filter(
-      (rm: IRequestMapping) => rm.requiredMapping
-    );
+  const validateData = useCallback(() => {
+    const requiredRequest = requestMapping.filter((rm) => rm.requiredMapping);
     const isRequiredAllRequest = every(
       requiredRequest,
-      (rm: IRequestMapping) =>
-        !isEmpty(get(rm, "target")) && !isEmpty(get(rm, "targetLocation"))
+      (rm) => !isEmpty(get(rm, "target")) && !isEmpty(get(rm, "targetLocation"))
     );
-    const requiredResponse = responseMapping.filter(
-      (rm: IRequestMapping) => rm.requiredMapping
-    );
+    const requiredResponse = responseMapping.filter((rm) => rm.requiredMapping);
     const isRequiredAllResponse = every(
       requiredResponse,
-      (rm: IRequestMapping) =>
-        !isEmpty(get(rm, "source")) && !isEmpty(get(rm, "sourceLocation"))
+      (rm) => !isEmpty(get(rm, "source")) && !isEmpty(get(rm, "sourceLocation"))
     );
     if (!isRequiredAllRequest) {
       notification.error({
         message: "Please fill all required request mapping fields",
-        description:
-          "Fields required: " +
-          requiredRequest?.map((r) => r.source)?.join(", "),
+        description: `Fields required: ${requiredRequest.map((r) => r.source).join(", ")}`,
       });
       return true;
     }
     if (!isRequiredAllResponse) {
       notification.error({
         message: "Please fill all required response mapping fields",
-        description:
-          "Fields required: " +
-          requiredResponse?.map((r) => r.target)?.join(", "),
+        description: `Fields required: ${requiredResponse.map((r) => r.target).join(", ")}`,
       });
       return true;
     }
     return false;
-  };
+  }, [requestMapping, responseMapping]);
+
   const handleSave = async (isExit?: boolean) => {
     try {
       if (isExit) {
@@ -292,26 +253,24 @@ const NewAPIMapping = () => {
         .map((items, name) => ({
           name,
           valueMapping: flatMap(items, (item) =>
-            item?.to?.map?.((to) => ({ [to]: item.from }))
+            item?.to?.map((to) => ({ [to]: item.from }))
           ),
         }))
         .value();
       let newResponse = cloneDeep(responseMapping);
       if (!isEmpty(newData)) {
-        for (const it of newData) {
+        newData.forEach((it) => {
           newResponse = newResponse.map((rm) => {
             if (rm.name === it.name) {
               rm.valueMapping = reduce(
                 it.valueMapping,
-                (acc, obj) => {
-                  return { ...acc, ...obj };
-                },
+                (acc, obj) => ({ ...acc, ...obj }),
                 {}
               );
             }
             return rm;
           });
-        }
+        });
       }
       const data = cloneDeep(mapperResponse.data[0]);
       data.facets.endpoints[0] = {
@@ -320,10 +279,10 @@ const NewAPIMapping = () => {
         method: sellerApi.method,
         path: sellerApi.url,
         mappers: {
-          request: requestMapping?.map((rm) => ({
+          request: requestMapping.map((rm) => ({
             ...rm,
-            target: rm.target?.replace("path.", "")?.replace("query.", ""),
-            source: rm.source?.replace("path.", "")?.replace("query.", ""),
+            target: rm.target.replace("path.", "").replace("query.", ""),
+            source: rm.source.replace("path.", "").replace("query.", ""),
           })),
           response: newResponse,
         },
@@ -351,25 +310,11 @@ const NewAPIMapping = () => {
     }
   };
 
-  useEffect(() => {
-    if (rightSide === EnumRightType.SelectSellerAPI) {
-      setStep(0);
-      setActiveKey("0");
-    }
-    if (
-      rightSide === EnumRightType.AddSonataProp ||
-      rightSide === EnumRightType.AddSellerProp
-    ) {
-      setStep(1);
-      setActiveKey("1");
-    }
-  }, [rightSide]);
-
-  useEffect(() => {
-    return () => {
-      reset();
-    };
-  }, [location]);
+  const handleRevert = useCallback(() => {
+    setRequestMapping(resetMapping() ?? []);
+    setResponseMapping(mappers?.response);
+    setIsFormTouched(false);
+  }, [resetMapping, mappers?.response, setRequestMapping, setResponseMapping]);
 
   return (
     <Flex className={styles.container}>
@@ -397,7 +342,6 @@ const NewAPIMapping = () => {
                 </Flex>
               )}
             </Flex>
-
             <Flex
               justifyContent="flex-end"
               gap={8}

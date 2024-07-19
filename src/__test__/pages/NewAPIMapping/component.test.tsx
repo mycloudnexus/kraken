@@ -1,4 +1,3 @@
-import { buildInitListMapping } from "@/pages/NewAPIMapping";
 import ResponseMapping from "@/pages/NewAPIMapping/components/ResponseMapping";
 import RightAddSellerProp from "@/pages/NewAPIMapping/components/RightAddSellerProp";
 import RightAddSonataProp, {
@@ -8,6 +7,7 @@ import { APIItem } from "@/pages/NewAPIMapping/components/SelectAPI";
 import SelectResponseProperty from "@/pages/NewAPIMapping/components/SelectResponseProperty";
 import SonataPropMapping from "@/pages/NewAPIMapping/components/SonataPropMapping";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
+import buildInitListMapping from '@/utils/helpers/buildInitListMapping';
 import { queryClient } from "@/utils/helpers/reactQuery";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render, renderHook } from "@testing-library/react";
