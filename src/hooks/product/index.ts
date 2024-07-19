@@ -21,6 +21,8 @@ import {
   updateTargetMapper,
   getMapperDetails,
   deployToEnv,
+  getRunningAPIMappingList,
+  getAPIMapperDeployments,
 } from "@/services/products";
 import { queryClient } from "@/utils/helpers/reactQuery";
 import {
@@ -71,6 +73,8 @@ export const PRODUCT_CACHE_KEYS = {
   update_target_mapper: "update_target_mapper",
   get_mapper_details: "get_mapper_details",
   deploy_to_env: "deploy_to_env",
+  get_running_api_list: "get_running_api_list",
+  get_list_api_deployments: "get_list_api_deployments",
 };
 
 export const useGetProductComponents = (
@@ -195,7 +199,11 @@ export const useGetComponentDetailMapping = (
   open = true
 ) => {
   return useQuery<any, Error, IMapperDetails>({
-    queryKey: [PRODUCT_CACHE_KEYS.get_component_detail_mapping, productId, componentId],
+    queryKey: [
+      PRODUCT_CACHE_KEYS.get_component_detail_mapping,
+      productId,
+      componentId,
+    ],
     queryFn: () => getComponentDetailMapping(productId, componentId),
     enabled: Boolean(productId && componentId && open),
     select: (data) => data.data,
@@ -378,5 +386,29 @@ export const useDeployToEnv = () => {
     mutationKey: [PRODUCT_CACHE_KEYS.deploy_to_env],
     mutationFn: ({ productId, componentId, mapperKeys, envId }: any) =>
       deployToEnv(productId, componentId, mapperKeys, envId),
+  });
+};
+
+export const useGetRunningAPIList = (
+  productId: string,
+  params: Record<string, any>
+) => {
+  return useQuery<any, Error>({
+    queryKey: [PRODUCT_CACHE_KEYS.get_running_api_list, productId, params],
+    queryFn: () => getRunningAPIMappingList(productId, params),
+    enabled: Boolean(productId) && Boolean(params.envId),
+    select: (data) => data?.data,
+  });
+};
+
+export const useGetAPIDeployments = (
+  productId: string,
+  params: Record<string, any>
+) => {
+  return useQuery<any, Error>({
+    queryKey: [PRODUCT_CACHE_KEYS.get_list_api_deployments, productId, params],
+    queryFn: () => getAPIMapperDeployments(productId, params),
+    enabled: Boolean(productId) && Boolean(params.envId),
+    select: (data) => data?.data,
   });
 };

@@ -36,51 +36,48 @@ export interface IActivityDetail {
 }
 
 export interface IApiKeyDetail {
-  id: string,
-  productId: string,
-  createdAt: string,
-  name: string,
-  envId: string,
-  expiresAt: number,
-  revoked: boolean
+  id: string;
+  productId: string;
+  createdAt: string;
+  name: string;
+  envId: string;
+  expiresAt: number;
+  revoked: boolean;
 }
 export interface IDataPlaneDetail {
-  id: string,
-  updatedAt: string,
-  createdAt: string,
-  clientIp: string,
-  envId: string,
-  status: string,
-
+  id: string;
+  updatedAt: string;
+  createdAt: string;
+  clientIp: string;
+  envId: string;
+  status: string;
 }
 
 export interface IRunningComponent {
-  id: string,
-  name: string,
-  version: string,
-  key: string,
-  componentName: string,
+  id: string;
+  name: string;
+  version: string;
+  key: string;
+  componentName: string;
 }
 
 export interface IRunningComponentItem {
-  id: string,
-  updatedAt?: string,
-  createdAt?: string,
-  name: string,
-  status: string,
-  components: IRunningComponent[],
-
-
+  id: string;
+  updatedAt?: string;
+  createdAt?: string;
+  name: string;
+  status: string;
+  components: IRunningComponent[];
 }
 export interface ICreateParameter {
-  productId: string,
-  envId: string,
-  name: string,
+  productId: string;
+  envId: string;
+  name: string;
 }
 export interface ICreateParameter {
-  productId: string,
-  envId: string,
-  name: string,
+  productId: string;
+  envId: string;
+  name: string;
 }
 
 export interface IMapperDetails {
@@ -95,11 +92,3 @@ export interface IMapperDetails {
   updatedAt: string;
   diffWithLastDeployed: boolean;
 }
-
-
-
-
-
-
-
-

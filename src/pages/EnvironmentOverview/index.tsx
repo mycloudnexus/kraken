@@ -1,55 +1,37 @@
 import Text from "@/components/Text";
 import dayjs from "dayjs";
 import {
-  useGetProductDeployments,
   useGetProductEnvs,
   useGetAllApiKeyList,
   useGetAllDataPlaneList,
   useGetRunningComponentList,
   useCreateApiKey,
 } from "@/hooks/product";
-import { useCommonListProps } from "@/hooks/useCommonListProps";
-import { toDateTime, toTime } from "@/libs/dayjs";
 import { useAppStore } from "@/stores/app.store";
 import { ROUTES } from "@/utils/constants/route";
-import { IEnvComponent } from "@/utils/types/envComponent.type";
 import { MoreOutlined } from "@ant-design/icons";
-import {
-  Button,
-  Dropdown,
-  Flex,
-  Form,
-  Input,
-  MenuProps,
-  Row,
-  Select,
-  Spin,
-  Table,
-  Tag,
-  Col,
-  notification,
-  Typography,
-} from "antd";
-import { ColumnsType } from "antd/es/table";
+import { Button, Dropdown, Flex, MenuProps, Spin, notification } from "antd";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import DeploymentStatus from "./components/DeploymentStatus";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import EnvStatus from "./components/EnvStatus";
 import { showModalConfirmRotate } from "./components/ModalConfirmRotateAPIKey";
 import ModalNewDeployment from "./components/ModalNewDeployment";
 import { showModalShowNew } from "./components/ModalShowAPIKey";
 import styles from "./index.module.scss";
+import { isEmpty } from "lodash";
+import clsx from "clsx";
+import RunningAPIMapping from "./components/RunningAPIMapping";
+import DeploymentHistory from "./components/DeploymentHistory";
+import { IEnv } from "@/utils/types/env.type";
 
-const initPagination = {
-  pageSize: 5,
-  current: 0,
-};
 const initPaginationParams = {
-  size: 20,
   page: 0,
+  size: 20,
 };
 
 const EnvironmentOverview = () => {
+  const [searchParams] = useSearchParams();
+  const envId = searchParams.get("envId") || "";
   const navigate = useNavigate();
   const { currentProduct } = useAppStore();
   const { data: envs, isLoading: loadingEnvs } =
@@ -71,6 +53,7 @@ const EnvironmentOverview = () => {
   const [open, setOpen] = useState(false);
   const [currentEnvId, setCurrentEnvId] = useState<string | undefined>();
   const modalConfirmRef = useRef<any>();
+  const [selectedEnv, setSelectedEnv] = useState<IEnv | undefined>();
 
   const generateApiKey = useCallback(
     async (envId: string, evName: string, closeConfirm = false) => {
@@ -99,7 +82,7 @@ const EnvironmentOverview = () => {
     envName: string,
     len: number
   ) => MenuProps["items"] = useCallback(
-    (envId, envName, len = 0) => [
+    (envId, envName) => [
       {
         key: "view-log",
         label: "API activity log",
@@ -118,15 +101,6 @@ const EnvironmentOverview = () => {
           );
         },
       },
-      {
-        key: "create",
-        label: "Create new deployment",
-        onClick: () => {
-          setCurrentEnvId(envId);
-          setOpen(true);
-        },
-        disabled: len === 0,
-      },
     ],
     []
   );
@@ -143,115 +117,20 @@ const EnvironmentOverview = () => {
     },
     [dataPlane]
   );
-  const getRunningList = useCallback(
-    (id: string) => {
-      if (!runningComponent?.data) return [];
-      const list = runningComponent.data.find((i) => i.id === id)?.components;
-
-      return list;
-    },
-    [runningComponent]
-  );
-
-  const getLastDeploymentTime = useCallback(
-    (id: any) => {
-      if (!runningComponent?.data) return [];
-      const target = runningComponent?.data.find((i) => i.id === id);
-
-      if (!target?.createdAt) return "-";
-      return `${toDateTime(target.createdAt, true)} | ${toTime(
-        target.createdAt
-      )}`;
-    },
-    [runningComponent?.data]
-  );
-
-  const {
-    tableData,
-    queryParams,
-    setQueryParams,
-    pagination,
-    setPagination,
-    setTableData,
-    handlePaginationChange,
-    handlePaginationShowSizeChange,
-  } = useCommonListProps(
-    {
-      history: true,
-    },
-    initPagination
-  );
-
-  const { data, isLoading } = useGetProductDeployments(
-    currentProduct,
-    queryParams
-  );
 
   useEffect(() => {
-    if (!isLoading) {
-      const updatedTableData = data?.data;
-      const updatedPagination = {
-        current: data?.page ?? initPagination.current,
-        pageSize: data?.size ?? initPagination.pageSize,
-        total: 1,
-      };
-      setPagination(updatedPagination);
-      setTableData(updatedTableData!);
+    if (envs && isEmpty(selectedEnv?.id) && !envId) {
+      setSelectedEnv(envs?.data[0]);
     }
-  }, [data, isLoading]);
+    if (!!envId && !isEmpty(envs)) {
+      const env = envs?.data.find((i) => i.id === envId);
+      setSelectedEnv(env);
+    }
+  }, [envs, envId]);
 
-  const handleFormValuesChange = (_: any, values: any) => {
-    setQueryParams(values);
-  };
-  const columns: ColumnsType<IEnvComponent> = [
-    {
-      key: "env",
-      title: "Environment",
-      render: (h) => h.name,
-    },
-    {
-      key: "components",
-      title: "Component",
-      render: (h) => (
-        <Flex vertical gap={20}>
-          {h.components.map((component: any) => (
-            <Flex gap={4} align="center" key={component.id}>
-              {component.componentName}
-            </Flex>
-          ))}
-        </Flex>
-      ),
-    },
-    {
-      key: "version",
-      title: "Version",
-      render: (h) => (
-        <Flex vertical gap={20} align="flex-start">
-          {h.components.map((component: any) => (
-            <Tag bordered={false} key={component.id}>
-              {component.version}
-            </Tag>
-          ))}
-        </Flex>
-      ),
-    },
-    {
-      key: "status",
-      title: "Status",
-      render: (h) => <DeploymentStatus status={h.status} />,
-    },
-    {
-      key: "createdAt",
-      title: "Deployed time",
-      render: (h) => toDateTime(h.createdAt),
-    },
-  ];
   return (
     <Flex vertical gap={12} className={styles.pageWrapper}>
-      <Flex vertical gap={14} className={styles.sectionWrapper}>
-        <Flex justify="space-between" align="center">
-          <Text.BoldLarge>Environment Overview</Text.BoldLarge>
-        </Flex>
+      <Flex vertical gap={14}>
         <Spin spinning={loadingEnvs}>
           <div className={styles.overviewContainer}>
             {envs?.data.map((env) => {
@@ -262,16 +141,29 @@ const EnvironmentOverview = () => {
                 len = 0,
               } = getDataPlaneInfo(env.id);
               return (
-                <Flex
-                  vertical
-                  gap={16}
+                <div
                   key={env.id}
-                  className={styles.overviewItem}
-                  justify="space-between"
+                  className={clsx(
+                    styles.overviewItem,
+                    selectedEnv?.id === env.id && styles.overviewItemActive
+                  )}
+                  role="none"
+                  onClick={() => setSelectedEnv(env)}
                 >
                   <div style={{ width: "100%" }}>
-                    <Flex justify="space-between" style={{ marginBottom: 16 }}>
-                      <Text.BoldMedium>{env.name}</Text.BoldMedium>
+                    <Flex justify="flex-start" gap={12} align="center">
+                      <Text.NormalLarge
+                        style={{ marginRight: 16, textTransform: "capitalize" }}
+                      >
+                        {env.name}
+                      </Text.NormalLarge>
+                      <EnvStatus
+                        apiKey={haveApiKey}
+                        status={getDataPlaneInfo(env.id)?.status}
+                        disConnect={disConnectNum}
+                        connect={connectNum}
+                        dataPlane={len}
+                      />
                       <Dropdown
                         disabled={!haveApiKey}
                         menu={{
@@ -285,57 +177,33 @@ const EnvironmentOverview = () => {
                         />
                       </Dropdown>
                     </Flex>
-                    <EnvStatus
-                      apiKey={haveApiKey}
-                      status={getDataPlaneInfo(env.id)?.status}
-                      disConnect={disConnectNum}
-                      connect={connectNum}
-                      dataPlane={len}
-                    />
-                    <div className={styles.runningContainer}>
-                      {getRunningList(env.id)?.map((r) => (
-                        <Row justify={"space-between"} key={r.id}>
-                          <Typography.Text
-                            className={styles.running}
-                            ellipsis={{ tooltip: true }}
-                          >
-                            {r.componentName}
-                          </Typography.Text>
-
-                          <Col>{r.version}</Col>
-                        </Row>
-                      ))}
-                    </div>
                   </div>
-
-                  {haveApiKey ? (
-                    <Flex
-                      justify="space-between"
-                      align="center"
-                      className={styles.lastDeloyed}
-                    >
-                      <Text.NormalSmall style={{ color: "#00000073" }}>
-                        Last Deployed at
-                      </Text.NormalSmall>
-                      <Text.NormalSmall style={{ color: "#00000073" }}>
-                        {getLastDeploymentTime(env.id)}
-                      </Text.NormalSmall>
-                    </Flex>
-                  ) : (
-                    <Button
-                      type="primary"
-                      onClick={() => {
-                        generateApiKey(env.id, env.name);
-                      }}
-                    >
-                      Create API Key
-                    </Button>
-                  )}
-                </Flex>
+                </div>
               );
             })}
           </div>
         </Spin>
+      </Flex>
+      <Flex vertical gap={12} className={styles.sectionWrapper}>
+        <Flex align="center" justify="space-between">
+          <Text.NormalLarge>
+            {selectedEnv?.name?.toLocaleLowerCase?.() === "production"
+              ? "Running Component Versions"
+              : "Running API Mappings"}
+          </Text.NormalLarge>
+          {selectedEnv?.name?.toLocaleLowerCase?.() === "production" && (
+            <Button
+              type="primary"
+              onClick={() => {
+                setCurrentEnvId(selectedEnv?.id);
+                setOpen(true);
+              }}
+            >
+              Create new deployment
+            </Button>
+          )}
+        </Flex>
+        <RunningAPIMapping env={selectedEnv} />
       </Flex>
       <Flex
         vertical
@@ -343,51 +211,12 @@ const EnvironmentOverview = () => {
         className={styles.sectionWrapper}
         style={{ flex: 1 }}
       >
-        <Text.BoldLarge>Deployment history</Text.BoldLarge>
-        <Flex align="center">
-          <Form
-            layout="inline"
-            colon={false}
-            onValuesChange={handleFormValuesChange}
-          >
-            <Form.Item>
-              <Input.Search />
-            </Form.Item>
-            <Form.Item label="Environment" name="envId">
-              <Select
-                options={[]}
-                popupMatchSelectWidth={false}
-                placeholder="All"
-              />
-            </Form.Item>
-            <Form.Item label="Status" name="status">
-              <Select
-                options={[]}
-                popupMatchSelectWidth={false}
-                placeholder="All"
-              />
-            </Form.Item>
-          </Form>
-        </Flex>
-        <Table
-          scroll={{ x: 600 }}
-          dataSource={tableData}
-          columns={columns}
-          rowKey="id"
-          loading={isLoading}
-          className={styles.table}
-          rowClassName={styles.hovering}
-          pagination={{
-            hideOnSinglePage: true,
-            pageSize: pagination.pageSize,
-            current: pagination.current + 1,
-            onChange: handlePaginationChange,
-            total: pagination.total,
-            showSizeChanger: true,
-            onShowSizeChange: handlePaginationShowSizeChange,
-            showTotal: (total) => `Total ${total} items`,
-          }}
-        />
+        <Text.NormalLarge>
+          {selectedEnv?.name?.toLocaleLowerCase?.() === "production"
+            ? "Running Component Versions"
+            : "API Mapping Deployment history"}
+        </Text.NormalLarge>
+        <DeploymentHistory env={selectedEnv} />
       </Flex>
 
       <ModalNewDeployment

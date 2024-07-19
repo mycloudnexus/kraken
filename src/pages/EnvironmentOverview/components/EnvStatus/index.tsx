@@ -2,13 +2,7 @@ import { Flex } from "antd";
 import styles from "./index.module.scss";
 import classes from "classnames";
 import Text from "@/components/Text";
-import {
-  ApiOutlined,
-  CheckCircleFilled,
-  InfoCircleOutlined,
-  CloseCircleOutlined,
-  ExclamationCircleOutlined,
-} from "@ant-design/icons";
+import { ApiOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { useMemo } from "react";
 
 interface Props {
@@ -71,25 +65,6 @@ const EnvStatus = ({
         <Text.LightMedium>In use data plane</Text.LightMedium>
         <Text.BoldMedium>{dataPlane}</Text.BoldMedium>
         <InfoCircleOutlined className={styles.dataPlaneInfoIcon} />
-      </Flex>
-      <Flex align="center" gap={8}>
-        {dataPlane == 0 ? (
-          <Text.LightSmall style={{ color: "transparent" }}>''</Text.LightSmall>
-        ) : (
-          <>
-            {isDisConnect ? (
-              <CloseCircleOutlined />
-            ) : connectStatus === "allConnect" ? (
-              <CheckCircleFilled />
-            ) : (
-              <ExclamationCircleOutlined />
-            )}
-            <Text.LightSmall>
-              {`${isDisConnect ? disConnect : connect} / ${dataPlane} `}
-              {isDisConnect ? "Disconnected" : "Connected"}
-            </Text.LightSmall>
-          </>
-        )}
       </Flex>
     </Flex>
   );

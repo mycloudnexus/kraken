@@ -48,8 +48,13 @@ export const getComponentDetail = (productId: string, componentId: string) => {
   return request(`${PRODUCT}/${productId}/components/${componentId}`);
 };
 
-export const getComponentDetailMapping = (productId: string, componentId: string) => {
-  return request(`${PRODUCT}/${productId}/components/${componentId}/mapper-details`);
+export const getComponentDetailMapping = (
+  productId: string,
+  componentId: string
+) => {
+  return request(
+    `${PRODUCT}/${productId}/components/${componentId}/mapper-details`
+  );
 };
 
 export const editComponentDetail = (
@@ -184,5 +189,25 @@ export const deployToEnv = (
       mapperKeys,
       envId,
     },
+  });
+};
+
+export const getRunningAPIMappingList = (
+  productId: string,
+  params: Record<string, any>
+) => {
+  return request(`/v2${PRODUCT}/${productId}/running-api-mapper-deployments`, {
+    method: "GET",
+    params,
+  });
+};
+
+export const getAPIMapperDeployments = (
+  productId: string,
+  params: Record<string, any>
+) => {
+  return request(`/v2${PRODUCT}/${productId}/api-mapper-deployments`, {
+    method: "GET",
+    params,
   });
 };

@@ -1,0 +1,18 @@
+.table {
+  :global {
+    .ant-pagination {
+      border-top: 1px solid #dde1e5;
+      margin: 0 -20px !important;
+      padding-top: 20px;
+      padding-right: 20px;
+    }
+    .ant-pagination-item-active {
+      border-color: #1677ff;
+      color: #1677ff;
+      border-radius: 4px;
+    }
+    .ant-pagination-item {
+      font-size: 14px;
+    }
+  }
+}

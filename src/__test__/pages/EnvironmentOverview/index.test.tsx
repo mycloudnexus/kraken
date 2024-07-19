@@ -30,26 +30,18 @@ describe(" EnvironmentOverview   component list", () => {
     },
     isLoading: false,
   } as any);
-  vi.spyOn(productHooks, "useGetRunningComponentList").mockReturnValue({
-    data: {
-      data: [
-        {
-          id: "32b4832f-fb2f-4c99-b89a-c5c995b18dfc",
-          createdAt: "2024-06-18T02:00:06.730627Z",
-          name: "dev",
-          status: "IN_PROCESS",
-          components: [
-            {
-              id: "0305642e-edaf-4aea-bfb0-f8d9bacf3e90",
-              name: "Version 2024-06-1703:21",
-              version: "1.0",
-              key: "mef.sonata.api.quote",
-              componentName: "testname",
-            },
-          ],
-        },
-      ],
-    } as any,
+  vi.spyOn(productHooks, "useGetRunningAPIList").mockReturnValue({
+    data: [
+      {
+        id: "32b4832f-fb2f-4c99-b89a-c5c995b18dfc",
+        createdAt: "2024-06-18T02:00:06.730627Z",
+        name: "dev",
+        status: "IN_PROCESS",
+        version: "1.0",
+        key: "mef.sonata.api.quote",
+        componentName: "testname",
+      },
+    ],
     isLoading: false,
   } as any);
   it("running components list", () => {
