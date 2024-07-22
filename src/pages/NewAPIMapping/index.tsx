@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import RollbackIcon from "@/assets/newAPIMapping/Rollback.svg";
 import { Button, Tabs, TabsProps, Tag, Tooltip, notification } from "antd";
@@ -37,13 +36,12 @@ import { toDateTime } from "@/libs/dayjs";
 import { queryClient } from "@/utils/helpers/reactQuery";
 import styles from "./index.module.scss";
 import buildInitListMapping from '@/utils/helpers/buildInitListMapping';
+import { useMappingUiStore } from '@/stores/mappingUi.store';
 
 const NewAPIMapping = () => {
-  const navigate = useNavigate();
   const { currentProduct } = useAppStore();
+  const { activeTab, activePath, setActiveTab } = useMappingUiStore();
   const {
-    activeTab,
-    activePath,
     query,
     rightSide,
     serverKey,
@@ -51,7 +49,6 @@ const NewAPIMapping = () => {
     responseMapping,
     rightSideInfo,
     sellerApi,
-    setActiveTab,
     setRequestMapping,
     setRightSide,
     setRightSideInfo,
@@ -275,9 +272,6 @@ const NewAPIMapping = () => {
         data,
       } as any);
       notification.success({ message: res.message });
-      if (isExit) {
-        navigate(-1);
-      }
       setStep(1);
       setActiveKey("1");
       return true;
@@ -341,9 +335,12 @@ const NewAPIMapping = () => {
               className={styles.bottomWrapper}
             >
               <DeployStandardAPI metadataKey={componentKey} />
-              <Button className={styles.revertButton} onClick={handleRevert}>
-                <RollbackIcon />
-              </Button>
+              <Tooltip title="Restore">
+                <Button className={styles.revertButton} onClick={handleRevert}>
+                  <RollbackIcon />
+                </Button>
+              </Tooltip>
+
               <Button
                 data-testid="btn-save"
                 type="primary"

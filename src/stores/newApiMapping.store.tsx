@@ -7,14 +7,10 @@ type NewApiMappingStore = {
   query?: string;
   sellerApi: any;
   rightSide?: EnumRightType;
-  activePath?: string;
-  activeTab?: string;
   serverKey?: string;
   requestMapping: any[];
   responseMapping: any[];
   rightSideInfo: any;
-  setActivePath: (activePath: string) => void;
-  setActiveTab: (activeTab: string) => void;
   setQuery: (q: string) => void;
   setSellerApi: (api: any) => void;
   setRightSide: (side?: EnumRightType) => void;
@@ -30,8 +26,6 @@ type NewApiMappingStore = {
 };
 
 const defaultData = {
-  activePath: undefined,
-  activeTab: 'request',
   query: undefined,
   sellerApi: undefined,
   rightSide: EnumRightType.SelectSellerAPI,
@@ -45,8 +39,6 @@ const defaultData = {
 
 export const useNewApiMappingStore = create<NewApiMappingStore>()((set) => ({
   ...defaultData,
-  setActivePath: (activePath: string) => set({ activePath }),
-  setActiveTab: (activeTab: string) => set({ activeTab }),
   setQuery: (query) => set({ query }),
   setSellerApi: (sellerApi) => set({ sellerApi }),
   setRightSide: (rightSide) => set({ rightSide }),
@@ -54,7 +46,7 @@ export const useNewApiMappingStore = create<NewApiMappingStore>()((set) => ({
   setRequestMapping: (requestMapping) => set({ requestMapping }),
   setResponseMapping: (responseMapping) => set({ responseMapping }),
   setRightSideInfo: (rightSideInfo) => set({ rightSideInfo }),
-  reset: () => set(omit(defaultData, ["query", "activePath"])),
+  reset: () => set(omit(defaultData, ["query"])),
   setActiveResponseName: (value?: string) => set({ activeResponseName: value }),
   setListMappingStateResponse: (value?: IMapping[]) =>
     set({ listMappingStateResponse: value }),
