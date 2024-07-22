@@ -54,7 +54,7 @@ export const useNewApiMappingStore = create<NewApiMappingStore>()((set) => ({
   setRequestMapping: (requestMapping) => set({ requestMapping }),
   setResponseMapping: (responseMapping) => set({ responseMapping }),
   setRightSideInfo: (rightSideInfo) => set({ rightSideInfo }),
-  reset: () => set(omit(defaultData, "query")),
+  reset: () => set(omit(defaultData, ["query", "activePath"])),
   setActiveResponseName: (value?: string) => set({ activeResponseName: value }),
   setListMappingStateResponse: (value?: IMapping[]) =>
     set({ listMappingStateResponse: value }),
