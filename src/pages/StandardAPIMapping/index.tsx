@@ -22,20 +22,18 @@ import { SUCCESS_CODE } from "@/utils/constants/api";
 import { useNewApiMappingStore } from '@/stores/newApiMapping.store';
 import ComponentSelect from './components/ComponentSelect';
 import MappingDetailsList from './components/MappingDetailsList';
-import { useState, useCallback, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { IMapperDetails } from '@/utils/types/env.type';
 import NewAPIMapping from '../NewAPIMapping';
 
 const StandardAPIMapping = () => {
   const { currentProduct } = useAppStore();
   const { componentId } = useParams();
-  const [activeSelected, setActiveSelected] = useState<string | undefined>();
-
+  const { setQuery, activePath, setActivePath, reset } = useNewApiMappingStore();
   const { data: componentDetail, isLoading } = useGetComponentDetail(currentProduct, componentId ?? "");
   const { data: detailDataMapping } = useGetComponentDetailMapping(currentProduct, componentId ?? "");
   const { data: componentList } = useGetProductComponents(currentProduct, { kind: "kraken.component.api" });
   const { mutateAsync: createNewVersion } = useCreateNewVersion();
-  const { setQuery } = useNewApiMappingStore();
 
   const handleCreateNewVersion = useCallback(async () => {
     try {
@@ -50,13 +48,11 @@ const StandardAPIMapping = () => {
     }
   }, [componentId, currentProduct, createNewVersion]);
 
-  const { reset } = useNewApiMappingStore();
-
-  const handleDisplay = ((mapItem: IMapperDetails) => {
-    setQuery(JSON.stringify(mapItem));
-    setActiveSelected(mapItem.path);
+  const handleDisplay = useCallback((mapItem: IMapperDetails) => {
     reset();
-  });
+    setActivePath(mapItem.path);
+    setQuery(JSON.stringify(mapItem));
+  }, [reset, setActivePath, setQuery]);
 
   const componentName = useMemo(() => get(componentDetail, "metadata.name", ""), [componentDetail]);
 
@@ -93,7 +89,7 @@ const StandardAPIMapping = () => {
           </Button>
         </Flex>
         <div className={styles.versionListWrapper}>
-          {activeSelected && <NewAPIMapping />}
+          {activePath && <NewAPIMapping />}
         </div>
       </Flex>
     </Flex>

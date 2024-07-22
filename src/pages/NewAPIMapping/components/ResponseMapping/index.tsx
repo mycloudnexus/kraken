@@ -53,7 +53,7 @@ const MappingCollapse = ({
   activeResponseName,
   setRightSide,
 }: Readonly<MappingCollapseProps>) => (
-  <div style={{ marginTop: 12 }}>
+  <div style={{ marginTop: 12 }} key={`main-${title}`}>
     <ExpandCard
       title={title}
       defaultValue
@@ -67,8 +67,8 @@ const MappingCollapse = ({
           justifyContent="flex-start"
           gap={4}
         >
-          {items.map((item) => (
-            <Fragment key={item.target}>
+          {items.map((item, index) => (
+            <Fragment key={item.target || index}>
               <div
                 className={clsx(!isEmpty(item?.targetValues) && styles.target)}
               >
@@ -143,18 +143,18 @@ const MappingCollapse = ({
           ).map((key) => (
             <MappingIcon key={`icon-${key}`} />
           ))}
-          {items.map((item) => (
-            <>
+          {items.map((item, index) => (
+            <Fragment key={`group-${item.target || index}`}>
               {listMapping?.filter((i) => i.name === item?.name).length > 0 ? (
                 <Flex flexDirection="column" gap={28} style={{ marginTop: 12 }}>
                   {listMapping
                     ?.filter((i) => i.name === item?.name)
-                    .map((key) => (
+                    .map(({ key }) => (
                       <MappingIcon key={`icon-${key}`} />
                     ))}
                 </Flex>
               ) : null}
-            </>
+            </Fragment>
           ))}
         </Flex>
         <Flex
@@ -164,8 +164,8 @@ const MappingCollapse = ({
           gap={4}
           justifyContent="flex-start"
         >
-          {items.map((item) => (
-            <Fragment key={item.target}>
+          {items.map((item, index) => (
+            <Fragment key={item.target || index}>
               <div
                 className={clsx(!isEmpty(item?.targetValues) && styles.target)}
                 style={{ width: "100%" }}
@@ -305,7 +305,7 @@ const ResponseMapping = () => {
     <div className={styles.root}>
       {Object.entries(responseMappingGroupedByTitle).map(([title, items]) => (
         <MappingCollapse
-          key={`main-${title}`}
+          key={title}
           title={title}
           items={items}
           listMapping={listMapping}

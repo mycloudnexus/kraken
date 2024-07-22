@@ -5,8 +5,9 @@ import {
   COMPONENT_KIND_API_TARGET,
   COMPONENT_KIND_API_TARGET_MAPPER,
 } from "@/utils/constants/product";
+import transformTarget from '@/utils/helpers/transformTarget';
 import jsYaml from "js-yaml";
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 
 const useGetApiSpec = (currentProduct: string, query: string) => {
   const { data: mapperResponse, isLoading } = useGetComponentList(
@@ -66,6 +67,13 @@ const useGetApiSpec = (currentProduct: string, query: string) => {
     path: endpoint?.path,
     serverKey: endpoint?.serverKey,
   };
+  const resetMapping = useCallback(() => {
+    return mappers?.request?.map((rm: any) => ({
+      ...rm,
+      target: transformTarget(rm.target, rm.targetLocation),
+      source: transformTarget(rm.source, rm.sourceLocation),
+    }));
+  }, [mappers?.request]);
 
   return {
     mapperResponse,
@@ -74,6 +82,7 @@ const useGetApiSpec = (currentProduct: string, query: string) => {
     jsonSpec,
     loadingMapper: isLoading,
     componentKey,
+    resetMapping
   };
 };
 

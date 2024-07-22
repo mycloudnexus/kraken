@@ -7,10 +7,14 @@ type NewApiMappingStore = {
   query?: string;
   sellerApi: any;
   rightSide?: EnumRightType;
+  activePath?: string;
+  activeTab?: string;
   serverKey?: string;
   requestMapping: any[];
   responseMapping: any[];
   rightSideInfo: any;
+  setActivePath: (activePath: string) => void;
+  setActiveTab: (activeTab: string) => void;
   setQuery: (q: string) => void;
   setSellerApi: (api: any) => void;
   setRightSide: (side?: EnumRightType) => void;
@@ -26,6 +30,8 @@ type NewApiMappingStore = {
 };
 
 const defaultData = {
+  activePath: undefined,
+  activeTab: 'request',
   query: undefined,
   sellerApi: undefined,
   rightSide: EnumRightType.SelectSellerAPI,
@@ -39,6 +45,8 @@ const defaultData = {
 
 export const useNewApiMappingStore = create<NewApiMappingStore>()((set) => ({
   ...defaultData,
+  setActivePath: (activePath: string) => set({ activePath }),
+  setActiveTab: (activeTab: string) => set({ activeTab }),
   setQuery: (query) => set({ query }),
   setSellerApi: (sellerApi) => set({ sellerApi }),
   setRightSide: (rightSide) => set({ rightSide }),

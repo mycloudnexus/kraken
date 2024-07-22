@@ -1,55 +1,11 @@
 import groupByPath from '@/utils/helpers/groupByPath';
 import { IMapperDetails } from '@/utils/types/env.type';
-import { Collapse, Flex, Spin, Tag, Tooltip } from 'antd';
-import { toUpper, get } from 'lodash';
-import { useMemo, useState, useCallback, memo } from 'react';
-import RequestMethod from '../../../../components/Method';
+import { Collapse, Spin } from 'antd';
+import { get } from 'lodash';
+import { useMemo, useState, useCallback } from 'react';
 import styles from './index.module.scss';
-import { InfoCircleFilled } from '@ant-design/icons';
+import { CollapseItem, CollapseLabel } from './components';
 
-const Dot = ({ vertical }: { vertical?: boolean }) => (
-  <div className={vertical ? styles.dottedLine : styles.dot} />
-);
-
-const CollapseItem = ({ data, selectedKey, setActiveSelected }: {
-  data: IMapperDetails[];
-  selectedKey: string;
-  setActiveSelected: (mapItem: IMapperDetails) => void;
-}) => (
-  <>
-    {data.map(el => (
-      <Flex
-        key={el.targetMapperKey}
-        justify='space-between'
-        className={`${styles.collapseItem} ${selectedKey === el.targetKey ? styles.collapseItemActive : ""}`}
-        onClick={() => setActiveSelected(el)}
-      >
-        <Flex>
-          <Dot vertical />
-          {el.productType && <Tag>{toUpper(el.productType)}</Tag>}
-          {el.actionType && <Tag>{toUpper(el.actionType)}</Tag>}
-        </Flex>
-        {el.mappingStatus === "incomplete" && (
-          <Tooltip title="Incomplete mapping">
-            <InfoCircleFilled style={{ color: "#FF3864" }} />
-          </Tooltip>
-        )}
-      </Flex>
-    ))}
-  </>
-);
-
-const CollapseLabel = ({ size, isActive, labelProps }: {
-  size: number;
-  isActive: boolean;
-  labelProps: { method: string; path: string };
-}) => (
-  <Flex className={styles.labelWrapper}>
-    {isActive && <Dot />}
-    <RequestMethod method={labelProps.method} />
-    .../{labelProps.path.split('/').slice(-3).join('/')} {`(${size})`}
-  </Flex>
-);
 
 type MappingDetailsListProps = {
   detailDataMapping: IMapperDetails | undefined;
@@ -79,7 +35,7 @@ const MappingDetailsList = ({ detailDataMapping, setActiveSelected }: MappingDet
         children: <CollapseItem data={groupedPaths[path]} setActiveSelected={handleSelection} selectedKey={selectedKey} />,
       };
     });
-  }, [detailDataMapping, setActiveSelected, selectedHeader]);
+  }, [detailDataMapping, selectedHeader, selectedKey, setActiveSelected]);
 
   const handleChange = useCallback((e: string | string[]) => {
     setSelectedHeader(e);
@@ -103,4 +59,4 @@ const MappingDetailsList = ({ detailDataMapping, setActiveSelected }: MappingDet
   );
 };
 
-export default memo(MappingDetailsList);
+export default MappingDetailsList;

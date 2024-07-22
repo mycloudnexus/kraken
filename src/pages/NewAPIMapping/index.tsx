@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import RollbackIcon from "@/assets/newAPIMapping/Rollback.svg";
 import { Button, Tabs, TabsProps, Tag, Tooltip, notification } from "antd";
@@ -37,13 +37,13 @@ import { toDateTime } from "@/libs/dayjs";
 import { queryClient } from "@/utils/helpers/reactQuery";
 import styles from "./index.module.scss";
 import buildInitListMapping from '@/utils/helpers/buildInitListMapping';
-import transformTarget from '@/utils/helpers/transformTarget';
 
 const NewAPIMapping = () => {
-  const location = useLocation();
   const navigate = useNavigate();
   const { currentProduct } = useAppStore();
   const {
+    activeTab,
+    activePath,
     query,
     rightSide,
     serverKey,
@@ -51,13 +51,13 @@ const NewAPIMapping = () => {
     responseMapping,
     rightSideInfo,
     sellerApi,
+    setActiveTab,
     setRequestMapping,
     setRightSide,
     setRightSideInfo,
     setResponseMapping,
     setSellerApi,
     setServerKey,
-    reset,
     setListMappingStateResponse,
     listMappingStateResponse,
   } = useNewApiMappingStore();
@@ -66,19 +66,10 @@ const NewAPIMapping = () => {
   const [firstTimeLoad, setFirstTimeLoad] = useState(true);
   const [activeKey, setActiveKey] = useState<string | string[]>("0");
   const [step, setStep] = useState(0);
-  const [tabActiveKey, setTabActiveKey] = useState("request");
 
   const { mutateAsync: updateTargetMapper, isPending } = useUpdateTargetMapper();
-  const { jsonSpec, serverKeyInfo, mappers, mapperResponse, loadingMapper, componentKey } = useGetApiSpec(currentProduct, query ?? "{}");
+  const { jsonSpec, serverKeyInfo, mappers, mapperResponse, loadingMapper, componentKey, resetMapping } = useGetApiSpec(currentProduct, query ?? "{}");
   const { sellerApi: defaultSellerApi, serverKey: defaultServerKey } = useGetDefaultSellerApi(currentProduct, serverKeyInfo);
-
-  const resetMapping = useCallback(() => {
-    return mappers?.request?.map((rm: any) => ({
-      ...rm,
-      target: transformTarget(rm.target, rm.targetLocation),
-      source: transformTarget(rm.source, rm.sourceLocation),
-    }));
-  }, [mappers?.request]);
 
   useEffect(() => {
     if (!sellerApi && defaultSellerApi) {
@@ -127,12 +118,6 @@ const NewAPIMapping = () => {
       setActiveKey("1");
     }
   }, [rightSide]);
-
-  useEffect(() => {
-    return () => {
-      reset();
-    };
-  }, [location, reset]);
 
   const items: TabsProps["items"] = [
     {
@@ -186,7 +171,7 @@ const NewAPIMapping = () => {
     setRightSide(undefined);
   }, [rightSideInfo, requestMapping, setRequestMapping]);
 
-  const handleSelectSellerProp = useCallback((selected: any) => { 
+  const handleSelectSellerProp = useCallback((selected: any) => {
     const updatedMapping = uniqBy(
       requestMapping.map((rm) => {
         if (
@@ -310,7 +295,19 @@ const NewAPIMapping = () => {
   const handleRevert = useCallback(() => {
     setRequestMapping(resetMapping() ?? []);
     setResponseMapping(mappers?.response);
-  }, [resetMapping, mappers?.response, setRequestMapping, setResponseMapping]);
+    setActiveTab('request');
+  }, [setRequestMapping, resetMapping, setResponseMapping, mappers?.response, setActiveTab]);
+
+  useEffect(() => {
+    handleRevert();
+  }, [activePath, handleRevert]);
+
+  const handleTabSwitch = useCallback((tabName: string) => {
+    if (tabName === "response" && !isEmpty(sellerApi)) {
+      setRightSide(EnumRightType.AddSellerResponse);
+    }
+    setActiveTab(tabName);
+  }, [sellerApi, setActiveTab, setRightSide]);
 
   return (
     <Flex className={styles.container}>
@@ -360,13 +357,8 @@ const NewAPIMapping = () => {
           <HeaderMapping />
           <Tabs
             items={items}
-            activeKey={tabActiveKey}
-            onChange={(ak) => {
-              if (ak === "response" && !isEmpty(sellerApi)) {
-                setRightSide(EnumRightType.AddSellerResponse);
-              }
-              setTabActiveKey(ak);
-            }}
+            activeKey={activeTab}
+            onChange={handleTabSwitch}
           />
         </div>
         <div className={styles.right}>
