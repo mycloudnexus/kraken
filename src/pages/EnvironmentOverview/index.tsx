@@ -11,14 +11,14 @@ import { useAppStore } from "@/stores/app.store";
 import { ROUTES } from "@/utils/constants/route";
 import { MoreOutlined } from "@ant-design/icons";
 import { Button, Dropdown, Flex, MenuProps, Spin, notification } from "antd";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import EnvStatus from "./components/EnvStatus";
 import { showModalConfirmRotate } from "./components/ModalConfirmRotateAPIKey";
 import ModalNewDeployment from "./components/ModalNewDeployment";
 import { showModalShowNew } from "./components/ModalShowAPIKey";
 import styles from "./index.module.scss";
-import { isEmpty } from "lodash";
+import { isEmpty, sortBy } from "lodash";
 import clsx from "clsx";
 import RunningAPIMapping from "./components/RunningAPIMapping";
 import DeploymentHistory from "./components/DeploymentHistory";
@@ -118,22 +118,26 @@ const EnvironmentOverview = () => {
     [dataPlane]
   );
 
+  const envList = useMemo(() => {
+    return sortBy(envs?.data, "name", []).reverse();
+  }, [envs]);
+
   useEffect(() => {
-    if (envs && isEmpty(selectedEnv?.id) && !envId) {
-      setSelectedEnv(envs?.data[0]);
+    if (envList && isEmpty(selectedEnv?.id) && !envId) {
+      setSelectedEnv(envList[0]);
     }
     if (!!envId && !isEmpty(envs)) {
-      const env = envs?.data.find((i) => i.id === envId);
+      const env = envList?.find((i) => i.id === envId);
       setSelectedEnv(env);
     }
-  }, [envs, envId]);
+  }, [envList, envId]);
 
   return (
     <Flex vertical gap={12} className={styles.pageWrapper}>
       <Flex vertical gap={14}>
         <Spin spinning={loadingEnvs}>
           <div className={styles.overviewContainer}>
-            {envs?.data.map((env) => {
+            {envList?.map((env) => {
               const haveApiKey = !!apiKey?.data.find((i) => i.envId === env.id);
               const {
                 disConnectNum,

@@ -1,5 +1,10 @@
 import "@testing-library/jest-dom/vitest";
 import { beforeAll } from "vitest";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+
+dayjs.extend(utc);
+
 Object.defineProperty(window, "matchMedia", {
   writable: true,
   value: vi.fn().mockImplementation((query) => ({

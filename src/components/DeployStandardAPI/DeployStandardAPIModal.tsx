@@ -64,7 +64,7 @@ const DeployStandardAPIModal = ({ open, onClose, defaultKey }: Props) => {
       } as any);
       notification.success({ message: get(res, "message", "Success!") });
       onClose?.();
-      navigate("/env");
+      navigate(`/env?envId=${stageId}`);
     } catch (error) {
       notification.error({
         message: get(error, "reason", "Error. Please try again"),

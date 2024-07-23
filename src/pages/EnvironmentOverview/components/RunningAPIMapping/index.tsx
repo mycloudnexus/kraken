@@ -6,6 +6,7 @@ import { IEnv } from "@/utils/types/env.type";
 import { Flex, Table, Typography } from "antd";
 import { useCallback, useMemo } from "react";
 import styles from "./index.module.scss";
+import dayjs from "dayjs";
 
 type Props = {
   env?: IEnv;
@@ -39,25 +40,25 @@ const RunningAPIMapping = ({ env }: Props) => {
       },
       env?.name?.toLocaleLowerCase?.() === "stage"
         ? {
-            title: "API mappings",
             dataIndex: "",
+            title: "API mappings",
             render: (item: any) => (
-              <Flex gap={10} align="center">
+              <Flex align="center" gap={10}>
                 {!!item.medthod && <RequestMethod method={item?.method} />}
                 <Typography.Text
-                  style={{ color: "#2962FF" }}
                   ellipsis={{ tooltip: item?.path }}
+                  style={{ color: "#2962FF" }}
                 >
                   {item?.path}
                 </Typography.Text>
-                <Flex align="center" gap={8}>
+                <Flex gap={8} align="center">
                   <div className={styles.tagInfo}>
                     {renderTextType(item.productType)}
                   </div>
                   {item.actionType ? (
                     <div
-                      className={styles.tagInfo}
                       style={{ textTransform: "capitalize" }}
+                      className={styles.tagInfo}
                     >
                       {item.actionType}
                     </div>
@@ -71,6 +72,8 @@ const RunningAPIMapping = ({ env }: Props) => {
         title: "Deployed time",
         dataIndex: "createAt",
         width: 300,
+        render: (time: string) =>
+          dayjs.utc(time).local().format("YYYY-MM-DD HH:mm:ss"),
       },
       {
         title: "Action",
