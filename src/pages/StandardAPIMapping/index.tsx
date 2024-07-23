@@ -1,14 +1,11 @@
-import Text from "@/components/Text";
 import {
   useGetComponentDetail,
   useCreateNewVersion,
   useGetComponentDetailMapping,
   useGetProductComponents,
 } from "@/hooks/product";
-import { DoubleLeftOutlined } from "@ant-design/icons";
 import {
   Button,
-  Divider,
   Flex,
   notification,
   Spin,
@@ -74,13 +71,6 @@ return (
         <Spin spinning={isLoading}>
           {!isGroupedPathsEmpty && <MappingDetailsList groupedPaths={groupedPaths} setActiveSelected={handleDisplay} />}
         </Spin>
-        <Flex vertical align="center" gap={8} className={styles.leftBottomWrapper}>
-          <Text.NormalSmall color="#bfbfbf">Version 1.0</Text.NormalSmall>
-          <Divider style={{ margin: 0 }} />
-          <Button className={styles.switcherBtn}>
-            <DoubleLeftOutlined />
-          </Button>
-        </Flex>
       </Flex>
     </Flex>
     <Flex vertical gap={20} className={styles.mainWrapper}>

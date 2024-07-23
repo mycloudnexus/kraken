@@ -31,15 +31,6 @@
   background-color: #f0f2f5;
   padding: 4px 8px;
 }
-.leftBottomWrapper {
-  padding: 7px 10px;
-  .switcherBtn {
-    align-self: flex-end;
-    border: 0;
-    background-color: #f5f5f5;
-    color: #98a1a8;
-  }
-}
 .list {
   width: 100%;
   :global(.ant-list-items) {

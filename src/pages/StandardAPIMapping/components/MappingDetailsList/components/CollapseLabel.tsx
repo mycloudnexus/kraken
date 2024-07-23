@@ -2,16 +2,23 @@ import RequestMethod from '@/components/Method';
 import { Flex } from 'antd';
 import styles from '../index.module.scss';
 import Dot from './Dot';
+import { IMapperDetails } from '@/utils/types/env.type';
 
-const CollapseLabel = ({ size, isActive, labelProps }: {
+
+
+const CollapseLabel = ({ handleSelection, size, isActive, labelProps, isOneChild, highlighted }: {
+  handleSelection: (mapItem: IMapperDetails) => void;
   size: number;
   isActive: boolean;
-  labelProps: { method: string; path: string };
-}) => (
-  <Flex className={styles.labelWrapper}>
-    {isActive && <Dot />}
+  labelProps: IMapperDetails;
+  isOneChild: boolean;
+  highlighted: boolean;
+}) => {
+
+  return <Flex className={`${styles.labelWrapper} ${highlighted && styles.highlighted}`} onClick={() => handleSelection(labelProps)}>
+    {isActive && !isOneChild && <Dot />}
     <RequestMethod method={labelProps.method} />
-    .../{labelProps.path.split('/').slice(-3).join('/')} {`(${size})`}
+    .../{labelProps.path.split('/').slice(-2).join('/')} {size > 1 && `(${size})`}
   </Flex>
-);
+}
 export default CollapseLabel;

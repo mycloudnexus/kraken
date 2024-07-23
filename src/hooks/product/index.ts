@@ -12,6 +12,7 @@ import {
   getEnvActivity,
   getListComponentVersions,
   getListComponents,
+  getListComponentsV2,
   getListDeployments,
   getListEnvActivities,
   getRunningComponentList,
@@ -54,6 +55,7 @@ export const PRODUCT_CACHE_KEYS = {
   get_component_api_doc: "get_component_api_doc",
   create_new_component: "create_new_component",
   get_component_list: "get_component_list",
+  get_component_list_v2: "get_component_list_v2",
   get_product_env_list: "get_product_env_list",
   get_product_env_activity_list: "get_product_env_activity_list",
   get_product_env_activity_detail: "get_product_env_activity_detail",
@@ -114,6 +116,19 @@ export const useCreateNewComponent = () => {
       createNewComponent(productId, data),
   });
 };
+
+export const useGetComponentListV2 = (
+  productId: string,
+  componentId: string
+) => {
+  return useQuery<any, Error>({
+    queryKey: [PRODUCT_CACHE_KEYS.get_component_list_v2, productId, componentId],
+    queryFn: () => getListComponentsV2(productId, componentId),
+    enabled: Boolean(productId),
+    select: (data) => data?.data,
+  });
+};
+
 
 export const useGetComponentList = (
   productId: string,

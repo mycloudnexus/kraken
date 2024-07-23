@@ -1,11 +1,10 @@
+import { useMemo, useEffect, useState, useCallback } from 'react';
+import { Collapse, Spin } from 'antd';
+import { useMappingUiStore } from '@/stores/mappingUi.store';
 import { GroupedByPath } from '@/utils/helpers/groupByPath';
 import { IMapperDetails } from '@/utils/types/env.type';
-import { Collapse, Spin } from 'antd';
-import { useMemo, useEffect, useState, useCallback } from 'react';
 import styles from './index.module.scss';
 import { CollapseItem, CollapseLabel } from './components';
-import { useMappingUiStore } from '@/stores/mappingUi.store';
-
 
 type MappingDetailsListProps = {
   groupedPaths: GroupedByPath;
@@ -13,59 +12,71 @@ type MappingDetailsListProps = {
 };
 
 const MappingDetailsList = ({ groupedPaths, setActiveSelected }: MappingDetailsListProps) => {
-  const [activeLabel, setActiveLabel] = useState<Array<string>>(Object.keys(groupedPaths));
-  const { selectedKey, setSelectedKey, setActivePath } = useMappingUiStore();
+  const [activeLabel, setActiveLabel] = useState<string[]>(Object.keys(groupedPaths));
+  const { activePath, selectedKey, setSelectedKey, setActivePath } = useMappingUiStore();
+
+  useEffect(() => {
+    const headersList = Object.keys(groupedPaths);
+    if (headersList.length > 0) {
+      const initialMapItem = groupedPaths[headersList[0]][0];
+      setSelectedKey(initialMapItem.targetKey);
+      setActivePath(initialMapItem.path);
+      setActiveSelected(initialMapItem);
+    }
+  }, [groupedPaths, setActivePath, setActiveSelected, setSelectedKey]);
+
+  const handleSelection = useCallback((mapItem: IMapperDetails) => {
+    setSelectedKey(mapItem.targetKey);
+    setActiveSelected(mapItem);
+  }, [setActiveSelected, setSelectedKey]);
 
   const listMapping = useMemo(() => {
     return Object.keys(groupedPaths).map(path => {
-      const method = groupedPaths[path][0].method;
-      const labelProps = { method, path };
+      const labelProps = groupedPaths[path][0];
       const isActiveLabel = activeLabel.includes(path);
-
-      const handleSelection = (mapItem: IMapperDetails) => {
-        setSelectedKey(mapItem.targetKey);
-        setActiveSelected(mapItem);
-      };
+      const isOneChild = groupedPaths[path].length <= 1;
+      const highlighted = groupedPaths[path].some(item => item.path === activePath);
 
       return {
         key: path,
-        label: <CollapseLabel labelProps={labelProps} size={groupedPaths[path].length} isActive={isActiveLabel} />,
-        children: <CollapseItem data={groupedPaths[path]} setActiveSelected={handleSelection} selectedKey={selectedKey} />,
+        showArrow: !isOneChild,
+        label: (
+          <CollapseLabel
+            labelProps={labelProps}
+            handleSelection={handleSelection}
+            size={groupedPaths[path].length}
+            isActive={isActiveLabel}
+            isOneChild={isOneChild}
+            highlighted={highlighted}
+          />
+        ),
+        children: isOneChild ? null : (
+          <CollapseItem
+            data={groupedPaths[path]}
+            setActiveSelected={handleSelection}
+            selectedKey={selectedKey}
+          />
+        ),
       };
     });
-  }, [activeLabel, groupedPaths, selectedKey, setActiveSelected, setSelectedKey]);
+  }, [activeLabel, activePath, groupedPaths, handleSelection, selectedKey]);
 
   const handleChange = useCallback((e: string[] | string) => {
-    setActiveLabel(typeof e === "string" ? [e] : e)
+    setActiveLabel(Array.isArray(e) ? e : [e]);
   }, []);
 
-  useEffect(() => {
-    const headersList = Object.keys(groupedPaths)
-    setActiveLabel(headersList)
-    if (headersList.length > 0) {
-      const mapItem = groupedPaths[headersList[0]][0];
-      setSelectedKey(mapItem.targetKey);
-      setActivePath(mapItem.path);
-      setActiveSelected(groupedPaths[headersList[0]][0])
-    }
-  }, [])
-
-
   return (
-    <>
-      <Spin spinning={!groupedPaths}>
-        <Collapse
-          defaultActiveKey={activeLabel}
-          onChange={handleChange}
-          className={styles.collapseBox}
-          bordered
-          ghost
-          expandIconPosition="end"
-          items={listMapping}
-        />
-      </Spin>
-    </>
-
+    <Spin spinning={!groupedPaths}>
+      <Collapse
+        defaultActiveKey={activeLabel}
+        onChange={handleChange}
+        className={styles.collapseBox}
+        bordered
+        ghost
+        expandIconPosition="end"
+        items={listMapping}
+      />
+    </Spin>
   );
 };
 

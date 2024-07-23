@@ -90,5 +90,6 @@ export interface IMapperDetails {
   actionType?: string;
   mappingStatus: string;
   updatedAt: string;
-  diffWithLastDeployed: boolean;
+  lastDeployedAt?: string;
+  diffWithStage?: boolean;
 }

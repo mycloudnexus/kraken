@@ -131,7 +131,6 @@ const NewAPIServer = () => {
       }
       const environments = get(componentDetail, "facets.environments");
       let newEnv = {};
-      debugger
       const keys = Object.keys(environments);
 
       for (const key of keys) {
