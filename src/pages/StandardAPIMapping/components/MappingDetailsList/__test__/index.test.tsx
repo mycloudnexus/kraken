@@ -15,6 +15,12 @@ test("test Mapping Details list", () => {
       "productType": "access_line",
       "actionType": "add",
       "mappingStatus": "incomplete",
+      "mappingMatrix": {
+        "quoteLevel": "firm",
+        "syncMode": false,
+        "productType": "access_e_line",
+        "actionType": "add"
+      },
       "updatedAt": "2021-07-22T08:21:00",
       "lastDeployedAt": "2021-07-22 07:47:33",
       "diffWithStage": true
@@ -27,6 +33,12 @@ test("test Mapping Details list", () => {
       "method": "get",
       "productType": "uni",
       "mappingStatus": "incomplete",
+      "mappingMatrix": {
+        "quoteLevel": "firm",
+        "syncMode": false,
+        "productType": "access_e_line",
+        "actionType": "add"
+      },
       "updatedAt": "2024-07-18T01:59:05.410355Z",
       "lastDeployedAt": "2024-07-22 07:53:50",
       "diffWithStage": false
@@ -39,6 +51,12 @@ test("test Mapping Details list", () => {
       "method": "get",
       "productType": "access_line",
       "mappingStatus": "incomplete",
+      "mappingMatrix": {
+        "quoteLevel": "firm",
+        "syncMode": false,
+        "productType": "access_e_line",
+        "actionType": "add"
+      },
       "updatedAt": "2024-07-18T01:59:05.714967Z",
       "diffWithStage": true
     },
@@ -51,6 +69,12 @@ test("test Mapping Details list", () => {
       "productType": "uni",
       "actionType": "add",
       "mappingStatus": "incomplete",
+      "mappingMatrix": {
+        "quoteLevel": "firm",
+        "syncMode": false,
+        "productType": "access_e_line",
+        "actionType": "add"
+      },
       "updatedAt": "2024-07-22T08:13:45.808911Z",
       "lastDeployedAt": "2024-07-22 07:26:09",
       "diffWithStage": false
@@ -59,7 +83,7 @@ test("test Mapping Details list", () => {
   const { container } = render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <MappingDetailsList groupedPaths={groupedPaths} setActiveSelected={() => {}} />
+        <MappingDetailsList groupedPaths={groupedPaths} setActiveSelected={() => { }} />
       </BrowserRouter>
     </QueryClientProvider>
   );

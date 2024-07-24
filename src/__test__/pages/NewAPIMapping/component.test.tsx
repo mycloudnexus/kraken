@@ -879,6 +879,12 @@ test("groupPath fnc", () => {
       "productType": "access_line",
       "actionType": "add",
       "mappingStatus": "incomplete",
+      "mappingMatrix": {
+        "quoteLevel": "firm",
+        "syncMode": false,
+        "productType": "access_e_line",
+        "actionType": "add"
+      },
       "updatedAt": "2021-07-22T08:21:00",
       "lastDeployedAt": "2021-07-22 07:47:33",
       "diffWithStage": true
@@ -891,6 +897,12 @@ test("groupPath fnc", () => {
       "method": "get",
       "productType": "uni",
       "mappingStatus": "incomplete",
+      "mappingMatrix": {
+        "quoteLevel": "firm",
+        "syncMode": false,
+        "productType": "access_e_line",
+        "actionType": "add"
+      },
       "updatedAt": "2024-07-18T01:59:05.410355Z",
       "lastDeployedAt": "2024-07-22 07:53:50",
       "diffWithStage": false
@@ -903,6 +915,12 @@ test("groupPath fnc", () => {
       "method": "get",
       "productType": "access_line",
       "mappingStatus": "incomplete",
+      "mappingMatrix": {
+        "quoteLevel": "firm",
+        "syncMode": false,
+        "productType": "access_e_line",
+        "actionType": "add"
+      },
       "updatedAt": "2024-07-18T01:59:05.714967Z",
       "diffWithStage": true
     },
@@ -915,6 +933,12 @@ test("groupPath fnc", () => {
       "productType": "uni",
       "actionType": "add",
       "mappingStatus": "incomplete",
+      "mappingMatrix": {
+        "quoteLevel": "firm",
+        "syncMode": false,
+        "productType": "access_e_line",
+        "actionType": "add"
+      },
       "updatedAt": "2024-07-22T08:13:45.808911Z",
       "lastDeployedAt": "2024-07-22 07:26:09",
       "diffWithStage": false
@@ -929,6 +953,12 @@ test("groupPath fnc", () => {
         "diffWithStage": true,
         "lastDeployedAt": "2021-07-22 07:47:33",
         "mappingStatus": "incomplete",
+        "mappingMatrix": {
+          "quoteLevel": "firm",
+          "syncMode": false,
+          "productType": "access_e_line",
+          "actionType": "add"
+        },
         "method": "post",
         "path": "/api/son/x/v8/quote",
         "productType": "access_line",
@@ -942,6 +972,12 @@ test("groupPath fnc", () => {
         "diffWithStage": false,
         "lastDeployedAt": "2024-07-22 07:26:09",
         "mappingStatus": "incomplete",
+        "mappingMatrix": {
+          "quoteLevel": "firm",
+          "syncMode": false,
+          "productType": "access_e_line",
+          "actionType": "add"
+        },
         "method": "post",
         "path": "/api/son/x/v8/quote",
         "productType": "uni",
@@ -956,6 +992,12 @@ test("groupPath fnc", () => {
         "diffWithStage": false,
         "lastDeployedAt": "2024-07-22 07:53:50",
         "mappingStatus": "incomplete",
+        "mappingMatrix": {
+          "quoteLevel": "firm",
+          "syncMode": false,
+          "productType": "access_e_line",
+          "actionType": "add"
+        },
         "method": "get",
         "path": "/api/son/x/v8/quote/{id}",
         "productType": "uni",
@@ -967,6 +1009,12 @@ test("groupPath fnc", () => {
         "description": "This operation retrieves a Quote entity. Attribute selection is enabled for all first level attributes.",
         "diffWithStage": true,
         "mappingStatus": "incomplete",
+        "mappingMatrix": {
+          "quoteLevel": "firm",
+          "syncMode": false,
+          "productType": "access_e_line",
+          "actionType": "add"
+        },
         "method": "get",
         "path": "/api/son/x/v8/quote/{id}",
         "productType": "access_line",

@@ -86,9 +86,10 @@ export interface IMapperDetails {
   description: string;
   path: string;
   method: string;
-  productType: string;
+  productType?: string;
   actionType?: string;
   mappingStatus: string;
+  mappingMatrix: Record<string, string | boolean>;
   updatedAt: string;
   lastDeployedAt?: string;
   diffWithStage?: boolean;
