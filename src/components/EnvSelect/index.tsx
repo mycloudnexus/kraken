@@ -86,8 +86,9 @@ const EnvSelect = ({ value, onChange }: Props) => {
             >
               {em}
             </Radio.Group>
-            <Flex align="center" justify="center" className={styles.footer}>
+            <Flex align="center" justify="flex-end" className={styles.footer}>
               <Button
+                size="small"
                 type="primary"
                 onClick={() => {
                   onChange(currentValue);

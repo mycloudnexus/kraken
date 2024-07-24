@@ -3,18 +3,26 @@ import styles from "./index.module.scss";
 import { useAppStore } from "@/stores/app.store";
 import { useCreateBuyer, useGetProductEnvs } from "@/hooks/product";
 import Text from "@/components/Text";
-import { get } from "lodash";
+import { get, sortBy } from "lodash";
+import { useEffect, useMemo } from "react";
 
 type Props = {
   open: boolean;
   onClose: () => void;
+  currentEnv: string;
 };
 
-const NewBuyerModal = ({ open, onClose }: Props) => {
+const NewBuyerModal = ({ open, onClose, currentEnv }: Props) => {
   const { currentProduct } = useAppStore();
   const { data } = useGetProductEnvs(currentProduct);
   const [form] = Form.useForm();
   const { mutateAsync: createBuyer } = useCreateBuyer();
+
+  useEffect(() => {
+    if (currentEnv) {
+      form.setFieldValue("envId", currentEnv);
+    }
+  }, [currentEnv]);
 
   const handleOk = async (values: any) => {
     try {
@@ -31,6 +39,18 @@ const NewBuyerModal = ({ open, onClose }: Props) => {
       });
     }
   };
+
+  const envOptions = useMemo(() => {
+    const envReverse = sortBy(get(data, "data", []), "name").reverse();
+    return envReverse.map((item) => ({
+      label: (
+        <Text.LightMedium style={{ textTransform: "capitalize" }}>
+          {item.name}
+        </Text.LightMedium>
+      ),
+      value: item.id,
+    }));
+  }, [data?.data]);
 
   return (
     <Modal
@@ -70,17 +90,7 @@ const NewBuyerModal = ({ open, onClose }: Props) => {
           }
           rules={[{ required: true, message: "Please select environment" }]}
         >
-          <Radio.Group
-            className={styles.radio}
-            options={data?.data?.map((item) => ({
-              label: (
-                <Text.LightMedium style={{ textTransform: "capitalize" }}>
-                  {item.name}
-                </Text.LightMedium>
-              ),
-              value: item.id,
-            }))}
-          />
+          <Radio.Group className={styles.radio} options={envOptions} />
         </Form.Item>
       </Form>
     </Modal>

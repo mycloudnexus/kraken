@@ -8,7 +8,7 @@ test("Buyer modal", () => {
   const { container } = render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <NewBuyerModal open={true} onClose={vi.fn()} />
+        <NewBuyerModal open={true} onClose={vi.fn()} currentEnv="abc" />
       </BrowserRouter>
     </QueryClientProvider>
   );

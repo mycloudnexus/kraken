@@ -22,7 +22,7 @@ const Buyer = () => {
     value: isModalVisible,
     setFalse: hideModal,
     setTrue: showModal,
-  } = useBoolean(true);
+  } = useBoolean(false);
 
   const columns = useMemo(
     () => [
@@ -79,7 +79,11 @@ const Buyer = () => {
   return (
     <div className={styles.root}>
       {isModalVisible && (
-        <NewBuyerModal open={isModalVisible} onClose={hideModal} />
+        <NewBuyerModal
+          open={isModalVisible}
+          onClose={hideModal}
+          currentEnv={params.envId ?? ""}
+        />
       )}
       <Flex
         gap={8}
@@ -116,14 +120,18 @@ const Buyer = () => {
         </Flex>
         <Table
           loading={isLoading}
-          pagination={{
-            current: dataList?.page + 1,
-            total: dataList?.total,
-            size: dataList?.size,
-            onChange: (page, pageSize) => {
-              setParams({ page: page - 1, size: pageSize });
-            },
-          }}
+          pagination={
+            dataList?.total < 50
+              ? false
+              : {
+                  current: dataList?.page + 1,
+                  total: dataList?.total,
+                  size: dataList?.size,
+                  onChange: (page, pageSize) => {
+                    setParams({ page: page - 1, size: pageSize });
+                  },
+                }
+          }
           dataSource={dataList?.data}
           columns={columns}
         />
