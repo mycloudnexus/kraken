@@ -121,22 +121,6 @@ export const useCreateNewComponent = () => {
   });
 };
 
-export const useGetComponentListV2 = (
-  productId: string,
-  componentId: string
-) => {
-  return useQuery<any, Error>({
-    queryKey: [
-      PRODUCT_CACHE_KEYS.get_component_list_v2,
-      productId,
-      componentId,
-    ],
-    queryFn: () => getListComponentsV2(productId, componentId),
-    enabled: Boolean(productId),
-    select: (data) => data?.data,
-  });
-};
-
 export const useGetComponentList = (
   productId: string,
   params: Record<string, any>
@@ -144,6 +128,18 @@ export const useGetComponentList = (
   return useQuery<any, Error>({
     queryKey: [PRODUCT_CACHE_KEYS.get_component_list, productId, params],
     queryFn: () => getListComponents(productId, params),
+    enabled: Boolean(productId),
+    select: (data) => data?.data,
+  });
+};
+
+export const useGetComponentListV2 = (
+  productId: string,
+  targetMapperKey: string
+) => {
+  return useQuery<any, Error>({
+    queryKey: [PRODUCT_CACHE_KEYS.get_component_list_v2, productId, targetMapperKey],
+    queryFn: () => getListComponentsV2(productId, targetMapperKey),
     enabled: Boolean(productId),
     select: (data) => data?.data,
   });

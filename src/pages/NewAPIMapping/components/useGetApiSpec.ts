@@ -1,38 +1,23 @@
-import { useGetComponentList } from "@/hooks/product";
+import { useGetComponentList, useGetComponentListV2 } from "@/hooks/product";
 import {
   COMPONENT_KIND_API,
   COMPONENT_KIND_API_SPEC,
-  COMPONENT_KIND_API_TARGET,
-  COMPONENT_KIND_API_TARGET_MAPPER,
 } from "@/utils/constants/product";
-import transformTarget from '@/utils/helpers/transformTarget';
+import transformTarget from "@/utils/helpers/transformTarget";
 import jsYaml from "js-yaml";
 import { useMemo, useCallback } from "react";
 
-const useGetApiSpec = (currentProduct: string, query: string) => {
-  const { data: mapperResponse, isLoading } = useGetComponentList(
+const useGetApiSpec = (
+  currentProduct: string,
+  targetMapperKey: string
+) => {
+  const { data: mapperResponse, isLoading } = useGetComponentListV2(
     currentProduct,
-    {
-      kind: COMPONENT_KIND_API_TARGET_MAPPER,
-      q: query,
-      facetIncluded: true,
-      page: 0,
-      size: 20,
-    }
+    targetMapperKey
   );
-  const endpoint = mapperResponse?.data?.[0]?.facets?.endpoints?.[0];
+  const endpoint = mapperResponse?.facets?.endpoints?.[0];
   const mappers = endpoint?.mappers;
-
-  const componentKey = mapperResponse?.data?.[0]?.metadata?.key;
-  const { data: targetResponse } = useGetComponentList(currentProduct, {
-    kind: COMPONENT_KIND_API_TARGET,
-    q: query,
-    facetIncluded: true,
-    page: 0,
-    size: 20,
-  });
-  const metadataKey = targetResponse?.data?.[0]?.metadata?.key;
-
+  const metadataKey = mapperResponse?.metadata?.key;
   const { data: apiComponentList } = useGetComponentList(currentProduct, {
     kind: COMPONENT_KIND_API,
   });
@@ -81,8 +66,8 @@ const useGetApiSpec = (currentProduct: string, query: string) => {
     mappers,
     jsonSpec,
     loadingMapper: isLoading,
-    componentKey,
-    resetMapping
+    metadataKey,
+    resetMapping,
   };
 };
 

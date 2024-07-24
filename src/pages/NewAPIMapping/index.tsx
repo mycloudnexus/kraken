@@ -65,7 +65,7 @@ const NewAPIMapping = () => {
   const [step, setStep] = useState(0);
 
   const { mutateAsync: updateTargetMapper, isPending } = useUpdateTargetMapper();
-  const { jsonSpec, serverKeyInfo, mappers, mapperResponse, loadingMapper, componentKey, resetMapping } = useGetApiSpec(currentProduct, query ?? "{}");
+  const { serverKeyInfo, mappers, mapperResponse, loadingMapper, metadataKey, resetMapping, jsonSpec } = useGetApiSpec(currentProduct, queryData.targetMapperKey ?? "");
   const { sellerApi: defaultSellerApi, serverKey: defaultServerKey } = useGetDefaultSellerApi(currentProduct, serverKeyInfo);
 
   useEffect(() => {
@@ -320,12 +320,17 @@ const NewAPIMapping = () => {
                   <Tag bordered={false} color="error">
                     Incomplete
                   </Tag>
-                  {toDateTime(queryData.updatedAt)}
-                  <Tooltip title="Last update">
-                    <InfoCircleOutlined
-                      style={{ color: "rgba(0, 0, 0, 0.45)" }}
-                    />
-                  </Tooltip>
+                  {queryData?.lastDeployedAt && (
+                    <>
+                      {toDateTime(queryData.lastDeployedAt)}
+                      <Tooltip title="Last update">
+                        <InfoCircleOutlined
+                          style={{ color: "rgba(0, 0, 0, 0.45)" }}
+                        />
+                      </Tooltip>
+                    </>
+
+                  )}
                 </Flex>
               )}
             </Flex>
@@ -334,7 +339,7 @@ const NewAPIMapping = () => {
               gap={8}
               className={styles.bottomWrapper}
             >
-              <DeployStandardAPI metadataKey={componentKey} />
+              <DeployStandardAPI metadataKey={metadataKey} />
               <Tooltip title="Restore">
                 <Button className={styles.revertButton} onClick={handleRevert}>
                   <RollbackIcon />

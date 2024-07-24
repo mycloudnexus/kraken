@@ -229,8 +229,9 @@ const SelectAPI = ({ save }: { save: () => Promise<true | undefined> }) => {
     kind: COMPONENT_KIND_API_TARGET_SPEC,
     size: 1000,
   });
+  const queryData = JSON.parse(query ?? "{}");
 
-  const { mappers } = useGetApiSpec(currentProduct, query ?? "{}");
+  const { mappers } = useGetApiSpec(currentProduct, queryData?.targetMapperKey ?? "");
 
   const handleMapSave = () => {
     setSellerApi(selectedAPI);
