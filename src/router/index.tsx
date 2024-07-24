@@ -2,6 +2,7 @@ import AuthLayout from "@/components/Layout/AuthLayout";
 import BasicLayout from "@/components/Layout/BasicLayout";
 import APIServerEditSelection from "@/pages/APIServerEditSelection";
 import APIServerList from "@/pages/APIServerList";
+import Buyer from "@/pages/Buyer";
 import EnvironmentActivityLog from "@/pages/EnvironmentActivityLog";
 import EnvironmentOverview from "@/pages/EnvironmentOverview";
 import HomePage from "@/pages/HomePage";
@@ -81,6 +82,10 @@ const router = createBrowserRouter([
             element: <NewAPIMapping />,
           },
         ],
+      },
+      {
+        path: "buyer",
+        element: <Buyer />,
       },
     ],
   },

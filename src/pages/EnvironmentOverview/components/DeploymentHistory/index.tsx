@@ -47,7 +47,7 @@ const DeploymentHistory = ({ env }: Props) => {
         width: 400,
         render: (item: any) => (
           <Flex gap={10} align="center">
-            {!!item.medthod && <RequestMethod method={item?.method} />}
+            <RequestMethod method={item?.method} />
             <Typography.Text
               style={{ color: "#2962FF" }}
               ellipsis={{ tooltip: item?.path }}

@@ -24,6 +24,8 @@ import {
   deployToEnv,
   getRunningAPIMappingList,
   getAPIMapperDeployments,
+  getBuyerList,
+  createBuyer,
 } from "@/services/products";
 import { queryClient } from "@/utils/helpers/reactQuery";
 import {
@@ -77,6 +79,8 @@ export const PRODUCT_CACHE_KEYS = {
   deploy_to_env: "deploy_to_env",
   get_running_api_list: "get_running_api_list",
   get_list_api_deployments: "get_list_api_deployments",
+  get_buyer_list: "get_buyer_list",
+  create_buyer: "create_buyer",
 };
 
 export const useGetProductComponents = (
@@ -122,13 +126,16 @@ export const useGetComponentListV2 = (
   componentId: string
 ) => {
   return useQuery<any, Error>({
-    queryKey: [PRODUCT_CACHE_KEYS.get_component_list_v2, productId, componentId],
+    queryKey: [
+      PRODUCT_CACHE_KEYS.get_component_list_v2,
+      productId,
+      componentId,
+    ],
     queryFn: () => getListComponentsV2(productId, componentId),
     enabled: Boolean(productId),
     select: (data) => data?.data,
   });
 };
-
 
 export const useGetComponentList = (
   productId: string,
@@ -425,5 +432,29 @@ export const useGetAPIDeployments = (
     queryFn: () => getAPIMapperDeployments(productId, params),
     enabled: Boolean(productId) && Boolean(params.envId),
     select: (data) => data?.data,
+  });
+};
+
+export const useGetBuyerList = (
+  productId: string,
+  params: Record<string, any>
+) => {
+  return useQuery<any, Error>({
+    queryKey: [PRODUCT_CACHE_KEYS.get_buyer_list, productId, params],
+    queryFn: () => getBuyerList(productId, params),
+    enabled: Boolean(productId) && Boolean(params.envId),
+    select: (data) => data?.data,
+  });
+};
+
+export const useCreateBuyer = () => {
+  return useMutation<any, Error>({
+    mutationKey: [PRODUCT_CACHE_KEYS.create_buyer],
+    mutationFn: ({ productId, data }: any) => createBuyer(productId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [PRODUCT_CACHE_KEYS.get_buyer_list],
+      });
+    },
   });
 };

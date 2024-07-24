@@ -20,7 +20,7 @@ const RunningAPIMapping = ({ env }: Props) => {
     direction: "DESC",
     page: 0,
     size: 100,
-  });
+});
   const renderTextType = useCallback((type: string) => {
     switch (type) {
       case "uni":
@@ -44,7 +44,7 @@ const RunningAPIMapping = ({ env }: Props) => {
             title: "API mappings",
             render: (item: any) => (
               <Flex align="center" gap={10}>
-                {!!item.medthod && <RequestMethod method={item?.method} />}
+                <RequestMethod method={item?.method} />
                 <Typography.Text
                   ellipsis={{ tooltip: item?.path }}
                   style={{ color: "#2962FF" }}

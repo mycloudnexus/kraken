@@ -1,5 +1,5 @@
 import styles from "./index.module.scss";
-import { Col, Flex, Row, Spin } from "antd";
+import { Button, Col, Flex, Row, Spin } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useAppStore } from "@/stores/app.store";
 import { MoreIcon } from "./components/Icon";
@@ -9,6 +9,7 @@ import ApiComponents from "./components/ApiComponents";
 import { useGetComponentList } from "@/hooks/product";
 import { useCallback } from "react";
 import { isEmpty } from "lodash";
+import { UsergroupAddOutlined } from "@ant-design/icons";
 
 const HomePage = () => {
   const { currentProduct } = useAppStore();
@@ -27,9 +28,25 @@ const HomePage = () => {
     navigate(`/component/${currentProduct}/list`);
   }, [apiList, currentProduct]);
 
+  const navigateBuy = useCallback(() => {
+    navigate("/buyer");
+  }, []);
+
   return (
     <div className={styles.homePage}>
-      <h1>MEF LSO Sonata Adapters</h1>
+      <Flex align="center" justify="space-between">
+        <h1>MEF LSO Sonata Adapters</h1>
+        <Flex align="center" justify="flex-end">
+          <UsergroupAddOutlined />
+          <Button
+            type="link"
+            style={{ padding: "4px 0px 4px 10px" }}
+            onClick={navigateBuy}
+          >
+            Buyer management
+          </Button>
+        </Flex>
+      </Flex>
       <StepCard navigateApi={navigateApi} />
       <ApiComponents />
       <Flex gap={36}>

@@ -5,10 +5,7 @@ import { ICreateParameter } from "@/utils/types/env.type";
 
 import type { IPagingParams } from "@/utils/types/common.type";
 
-export const getListComponentsV2 = (
-  productId: string,
-  componentId: string
-) => {
+export const getListComponentsV2 = (productId: string, componentId: string) => {
   return request(`${PRODUCT}/${productId}/components/${componentId}`);
 };
 
@@ -216,5 +213,22 @@ export const getAPIMapperDeployments = (
   return request(`/v2${PRODUCT}/${productId}/api-mapper-deployments`, {
     method: "GET",
     params,
+  });
+};
+
+export const getBuyerList = (
+  productId: string,
+  params: Record<string, any>
+) => {
+  return request(`${PRODUCT}/${productId}/buyers`, {
+    method: "GET",
+    params,
+  });
+};
+
+export const createBuyer = (productId: string, data: any) => {
+  return request(`${PRODUCT}/${productId}/buyers`, {
+    method: "POST",
+    data,
   });
 };
