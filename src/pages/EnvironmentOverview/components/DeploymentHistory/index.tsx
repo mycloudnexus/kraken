@@ -44,7 +44,7 @@ const DeploymentHistory = ({ env }: Props) => {
         title:
           env?.name?.toLowerCase() === "stage" ? "API mapping" : "Component",
         dataIndex: "",
-        width: 400,
+        width: '50%',
         render: (item: any) => (
           <Flex gap={10} align="center">
             <RequestMethod method={item?.method} />

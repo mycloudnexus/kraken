@@ -78,7 +78,7 @@ const RunningAPIMapping = ({ env }: Props) => {
       {
         title: "Action",
         dataIndex: "diffWithStage",
-        width: 340,
+        width: 300,
         render: (diffWithStage: boolean) =>
           !diffWithStage ? (
             <Text.LightMedium color="#00000073">
