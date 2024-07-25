@@ -5,6 +5,7 @@ import ContactIcon from "@/assets/standardAPIMapping/contact.svg";
 import { useNavigate } from "react-router-dom";
 import { IComponent } from "@/utils/types/product.type";
 import { isEmpty } from "lodash";
+import { useMappingUiStore } from '@/stores/mappingUi.store';
 
 type ComponentSelectProps = {
   componentList: any;
@@ -33,6 +34,8 @@ const ComponentSelect = ({
   componentName,
 }: ComponentSelectProps) => {
   const navigate = useNavigate();
+
+  const { resetUiStore } = useMappingUiStore();
   const parsedOptions = useMemo(() => {
     if (!componentList?.data?.length) return [];
     return componentList.data
@@ -51,6 +54,7 @@ const ComponentSelect = ({
   };
 
   const handleSelect = (e: { value: string }) => {
+    resetUiStore();
     navigate(`/api-mapping/${e.value}`);
   };
   return (

@@ -106,7 +106,7 @@ const StandardAPIMapping = () => {
           componentList={componentList}
           componentName={componentName}
         />
-        <Flex vertical justify="space-between" className={styles.leftWrapper}>
+        <Flex vertical justify={isLoading ? "center" : "space-between"} className={styles.leftWrapper}>
           <Spin spinning={isLoading}>
             {!isGroupedPathsEmpty && (
               <MappingDetailsList
@@ -132,13 +132,13 @@ const StandardAPIMapping = () => {
             Create new version
           </Button>
         </Flex>
-        <div className={styles.versionListWrapper}>
+        <Flex align="center" justify="center" className={styles.versionListWrapper}>
           {activePath && !isChangeMappingKey ? (
             <NewAPIMapping ref={newAPIMappingRef} />
           ) : (
             <Spin />
           )}
-        </div>
+        </Flex>
       </Flex>
     </Flex>
   );
