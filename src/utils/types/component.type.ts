@@ -1,3 +1,5 @@
+import { IComponent } from "./product.type";
+
 export interface IComponentVersion {
   id: string;
   createdAt: string;
@@ -21,4 +23,11 @@ export interface IRequestMapping {
   targetLocation: string;
   title: string;
   requiredMapping?: boolean;
+}
+
+export interface IBuyer extends IComponent {
+  buyerToken: {
+    accessToken: string;
+    expiredAt: string;
+  };
 }

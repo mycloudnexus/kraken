@@ -55,6 +55,14 @@ const Buyer = () => {
       },
       {
         title: "Token Expire At",
+        dataIndex: "buyerToken",
+        render: (r: Record<string, string>) => (
+          <Text.LightMedium>
+            {r?.expiredAt
+              ? dayjs.utc(r?.expiredAt).local().format("YYYY-MM-DD HH:mm:ss")
+              : "-"}
+          </Text.LightMedium>
+        ),
       },
       {
         title: "Action",
@@ -78,13 +86,11 @@ const Buyer = () => {
 
   return (
     <div className={styles.root}>
-      {isModalVisible && (
-        <NewBuyerModal
-          open={isModalVisible}
-          onClose={hideModal}
-          currentEnv={params.envId ?? ""}
-        />
-      )}
+      <NewBuyerModal
+        open={isModalVisible}
+        onClose={hideModal}
+        currentEnv={params.envId ?? ""}
+      />
       <Flex
         gap={8}
         justify="flex-start"
