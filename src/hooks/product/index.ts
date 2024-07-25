@@ -29,6 +29,7 @@ import {
 } from "@/services/products";
 import { queryClient } from "@/utils/helpers/reactQuery";
 import {
+  IDetailsData,
   IPagingData,
   IPagingParams,
   IUnifiedAsset,
@@ -216,7 +217,7 @@ export const useGetComponentDetailMapping = (
   componentId: string,
   open = true
 ) => {
-  return useQuery<any, Error, IMapperDetails>({
+  return useQuery<any, Error, IDetailsData<IMapperDetails>>({
     queryKey: [
       PRODUCT_CACHE_KEYS.get_component_detail_mapping,
       productId,

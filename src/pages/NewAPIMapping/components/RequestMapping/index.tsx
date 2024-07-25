@@ -9,7 +9,6 @@ import styles from "./index.module.scss";
 import { useEffect, useMemo, useState } from "react";
 import { IRequestMapping } from "@/utils/types/component.type";
 
-
 const MappingLabel = () => (
   <>
     <Text.NormalLarge>Property mapping</Text.NormalLarge>
@@ -19,6 +18,8 @@ const MappingLabel = () => (
 
 const RequestMapping = () => {
   const { requestMapping } = useNewApiMappingStore();
+  const [activeKey, setActiveKey] = useState<string[]>([]);
+
   const items: CollapseProps["items"] = useMemo(() => {
     if (requestMapping.length === 0) {
       return [
@@ -46,7 +47,6 @@ const RequestMapping = () => {
       })
     );
   }, [requestMapping]);
-  const [activeKey, setActiveKey] = useState<string[]>([]);
 
   const handleChangeKey = (key: string | string[]) => {
     if (typeof key === "string") {

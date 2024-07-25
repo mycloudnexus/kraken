@@ -4,6 +4,10 @@ export interface IPagingData<T> {
   page: number;
   size: number;
 }
+
+export interface IDetailsData<T> {
+  details: T[];
+}
 export interface IPagingParams {
   page: number;
   size: number;

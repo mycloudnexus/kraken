@@ -18,6 +18,7 @@ import {
 } from "lodash";
 import React, { Fragment, useEffect, useMemo } from "react";
 import styles from "./index.module.scss";
+import { useMappingUiStore } from '@/stores/mappingUi.store';
 
 export interface IMapping {
   key: number;
@@ -241,16 +242,22 @@ const ResponseMapping = () => {
     listMappingStateResponse: listMapping,
     setListMappingStateResponse: setListMapping,
   } = useNewApiMappingStore();
+  const { setMappingInProgress } = useMappingUiStore();
+
+  const handleSetListMapping = (array: Array<any>) => {
+    setMappingInProgress(true)
+    setListMapping(array)
+  }
 
   const handleSelect = (v: string, key: number) => {
     const cloneArr = cloneDeep(listMapping);
     const index = listMapping.findIndex((l) => l.key === key);
     set(cloneArr, `[${index}].from`, v);
-    setListMapping(cloneArr);
+    handleSetListMapping(cloneArr);
   };
 
   const handleAdd = (name: string) => {
-    setListMapping([
+    handleSetListMapping([
       ...listMapping,
       {
         key: get(listMapping, `[${listMapping.length - 1}].key`, 0) + 1,
@@ -261,19 +268,20 @@ const ResponseMapping = () => {
     ]);
   };
   const handleDelete = (key: number) => {
-    setListMapping(listMapping.filter((item) => item.key !== key));
+    handleSetListMapping(listMapping.filter((item) => item.key !== key));
   };
 
   const handleChangeInput = (v: string[], key: number) => {
     const cloneArr = cloneDeep(listMapping);
     const index = listMapping.findIndex((l) => l.key === key);
     set(cloneArr, `[${index}].to`, v);
-    setListMapping(cloneArr);
+    handleSetListMapping(cloneArr);
   };
 
   const openSelectorForProp = (name?: string, target?: string) => {
     setActiveResponseName(`${name}-${target}`);
     setRightSide(EnumRightType.AddSellerResponse);
+    setMappingInProgress(true)
   };
 
   const handleChangeResponse = (
@@ -289,6 +297,7 @@ const ResponseMapping = () => {
     set(cloneObj, `[${index}].sourceLocation`, `BODY`);
     setResponseMapping(cloneObj);
     setActiveResponseName(undefined);
+    setMappingInProgress(true)
   };
 
   useEffect(() => {

@@ -4,6 +4,7 @@ import clsx from "clsx";
 import { Dispatch, useCallback, useMemo } from "react";
 import styles from "./RightAddSellerProp/index.module.scss";
 import { get } from "lodash";
+import { useMappingUiStore } from '@/stores/mappingUi.store';
 
 interface Props {
   selectedProp: any;
@@ -24,12 +25,15 @@ export const useCommonAddProp = ({
   setSelectedProp,
   onSelect,
 }: Props) => {
+  const { setMappingInProgress } = useMappingUiStore();
+
   const handleAddProp = useCallback(() => {
     if (!selectedProp) {
       notification.error({ message: "Please select one property!" });
       return;
     }
     onSelect?.({ ...selectedProp, title: rightSideInfo?.title });
+    setMappingInProgress(true)
   }, [selectedProp, onSelect, rightSideInfo]);
 
   const selectedKey = useMemo(

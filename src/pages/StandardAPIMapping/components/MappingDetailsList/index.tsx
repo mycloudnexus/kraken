@@ -23,7 +23,7 @@ const MappingDetailsList = ({ groupedPaths, setActiveSelected }: MappingDetailsL
       setActivePath(initialMapItem.path);
       setActiveSelected(initialMapItem);
     }
-  }, [groupedPaths, setActivePath, setActiveSelected, setSelectedKey]);
+  }, []);
 
   const handleSelection = useCallback((mapItem: IMapperDetails) => {
     setSelectedKey(mapItem.targetKey);

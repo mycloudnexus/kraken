@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from "react";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import RollbackIcon from "@/assets/newAPIMapping/Rollback.svg";
 import { Button, Tabs, TabsProps, Tag, Tooltip, notification } from "antd";
@@ -38,9 +38,9 @@ import styles from "./index.module.scss";
 import buildInitListMapping from '@/utils/helpers/buildInitListMapping';
 import { useMappingUiStore } from '@/stores/mappingUi.store';
 
-const NewAPIMapping = () => {
+const NewAPIMapping = forwardRef((_, ref) => {
   const { currentProduct } = useAppStore();
-  const { activeTab, activePath, setActiveTab } = useMappingUiStore();
+  const { activeTab, setActiveTab, setMappingInProgress } = useMappingUiStore();
   const {
     query,
     rightSide,
@@ -290,11 +290,8 @@ const NewAPIMapping = () => {
     setRequestMapping(resetMapping() ?? []);
     setResponseMapping(mappers?.response);
     setActiveTab('request');
+    setMappingInProgress(false);
   }, [setRequestMapping, resetMapping, setResponseMapping, mappers?.response, setActiveTab]);
-
-  useEffect(() => {
-    handleRevert();
-  }, [activePath, handleRevert]);
 
   const handleTabSwitch = useCallback((tabName: string) => {
     if (tabName === "response" && !isEmpty(sellerApi)) {
@@ -302,6 +299,12 @@ const NewAPIMapping = () => {
     }
     setActiveTab(tabName);
   }, [sellerApi, setActiveTab, setRightSide]);
+
+
+  useImperativeHandle(ref, () => ({
+    handleSave,
+    handleRevert,
+  }));
 
   return (
     <Flex className={styles.container}>
@@ -384,6 +387,6 @@ const NewAPIMapping = () => {
       </Flex>
     </Flex>
   );
-};
+});
 
 export default NewAPIMapping;

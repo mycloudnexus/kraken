@@ -3,4 +3,4 @@ import CollapseLabel from './CollapseLabel';
 import Dot from './Dot';
 
 
-export { CollapseItem, CollapseLabel, Dot}
+export { CollapseItem, CollapseLabel, Dot }
