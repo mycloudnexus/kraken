@@ -23,7 +23,7 @@ import {
 import clsx from "clsx";
 import jsYaml from "js-yaml";
 import { cloneDeep, get, isEmpty } from "lodash";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import swaggerClient from "swagger-client";
 import { useBoolean } from "usehooks-ts";
@@ -169,11 +169,11 @@ export const APIItem = ({
             const [url, method] = key.split(" ");
             const active = selectedAPI
               ? item?.metadata?.name === selectedAPI?.name &&
-                url === selectedAPI?.url &&
-                method === selectedAPI?.method
+              url === selectedAPI?.url &&
+              method === selectedAPI?.method
               : item?.metadata?.name === sellerApi?.name &&
-                url === sellerApi?.url &&
-                method === sellerApi?.method;
+              url === sellerApi?.url &&
+              method === sellerApi?.method;
             return (
               <div
                 className={clsx(styles.card, {
@@ -219,7 +219,6 @@ const SelectAPI = ({ save }: { save: () => Promise<true | undefined> }) => {
     setSellerApi,
     setServerKey,
     sellerApi,
-    reset,
     query,
     setResponseMapping,
     setRequestMapping,
@@ -240,24 +239,25 @@ const SelectAPI = ({ save }: { save: () => Promise<true | undefined> }) => {
     setSelectedServer("");
   };
 
-  const resetMapping = () => {
-    reset();
-    const newApiRequest = cloneDeep(mappers?.request)
-      .filter((rm: any) => !!rm.requiredMapping)
-      .map((rm: any) => ({
+  const resetMapping = useCallback(() => {
+    if (mappers?.request) {
+      const newApiRequest = cloneDeep(mappers?.request)
+        .filter((rm: any) => !!rm.requiredMapping)
+        .map((rm: any) => ({
+          ...rm,
+          target: "",
+          targetLocation: "",
+        }));
+      const newApiResponse = cloneDeep(mappers?.response).map((rm: any) => ({
         ...rm,
-        target: "",
-        targetLocation: "",
+        sourceLocation: undefined,
+        source: undefined,
+        valueMapping: undefined,
       }));
-    const newApiResponse = cloneDeep(mappers?.response).map((rm: any) => ({
-      ...rm,
-      sourceLocation: undefined,
-      source: undefined,
-      valueMapping: undefined,
-    }));
-    setRequestMapping(newApiRequest);
-    setResponseMapping(newApiResponse);
-  };
+      setRequestMapping(newApiRequest);
+      setResponseMapping(newApiResponse);
+    }
+  }, [mappers?.request, mappers?.response, setRequestMapping, setResponseMapping]);
 
   const handleOK = () => {
     if (isEmpty(sellerApi)) {
