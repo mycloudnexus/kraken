@@ -251,7 +251,8 @@ const NewAPIMapping = forwardRef((_, ref) => {
           });
         });
       }
-      const data = cloneDeep(mapperResponse.data[0]);
+
+      const data = cloneDeep(mapperResponse);
       data.facets.endpoints[0] = {
         ...data.facets.endpoints[0],
         serverKey,

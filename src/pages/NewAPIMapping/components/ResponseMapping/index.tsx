@@ -10,7 +10,6 @@ import clsx from "clsx";
 import {
   cloneDeep,
   difference,
-  every,
   get,
   groupBy,
   isEmpty,
@@ -301,10 +300,10 @@ const ResponseMapping = () => {
   };
 
   useEffect(() => {
-    if (every(responseMapping, (it) => isEmpty(it.valueMapping))) {
+    if (isEmpty(responseMapping)) {
       setListMapping([]);
     }
-  }, [responseMapping]);
+  }, [responseMapping, setListMapping]);
 
   const responseMappingGroupedByTitle = useMemo(() => {
     return groupBy(responseMapping, "title");
