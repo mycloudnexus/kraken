@@ -31,3 +31,15 @@ export interface IBuyer extends IComponent {
     expiredAt: string;
   };
 }
+export interface IResponseMapping {
+  name: string;
+  title: string;
+  source: string;
+  target: string;
+  targetType: string;
+  description: string;
+  sourceLocation: string;
+  targetLocation: string;
+  requiredMapping: boolean;
+  targetValues: string[];
+}

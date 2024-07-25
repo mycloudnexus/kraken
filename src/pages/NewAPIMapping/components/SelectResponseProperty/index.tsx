@@ -8,7 +8,7 @@ import {
 } from "@/utils/helpers/schema";
 import { DownOutlined, RightOutlined } from "@ant-design/icons";
 import { Button, Input, Tree, notification } from "antd";
-import { clone, get, isEmpty, set } from "lodash";
+import { clone, get, isArray, isEmpty, set } from "lodash";
 import { Key, useCallback, useMemo, useState } from "react";
 import { useBoolean } from "usehooks-ts";
 import styles from "./index.module.scss";
@@ -58,7 +58,14 @@ const SelectResponseProperty = () => {
     if (!isEmpty(example)) {
       const exampleKeys = get(Object.keys(example), "[0]", "");
       const firstExample = get(example, `${exampleKeys}.value`);
-
+      if (isArray(firstExample) && !isEmpty(firstExample)) {
+        return exampleParse(
+          firstExample[0],
+          "",
+          styles.nodeTitle,
+          styles.nodeExample
+        );
+      }
       if (!isEmpty(firstExample)) {
         return exampleParse(
           firstExample,

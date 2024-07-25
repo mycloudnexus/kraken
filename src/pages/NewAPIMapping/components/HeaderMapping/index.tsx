@@ -7,9 +7,12 @@ import { Flex, Tag, Tooltip, Typography } from "antd";
 import clsx from "clsx";
 import { capitalize } from "lodash";
 import MappingIcon from "@/assets/newAPIMapping/mapping-icon.svg";
+import MappingReverseIcon from "@/assets/newAPIMapping/mapping-icon-reverse.svg";
 import styles from "./index.module.scss";
+import { useMappingUiStore } from "@/stores/mappingUi.store";
 const HeaderMapping = () => {
   const { query, sellerApi, rightSide, setRightSide } = useNewApiMappingStore();
+  const { activeTab } = useMappingUiStore();
   const queryData = JSON.parse(query ?? "{}");
   return (
     <>
@@ -61,8 +64,8 @@ const HeaderMapping = () => {
             {queryData?.path}
           </Typography.Text>
         </Flex>
-        <div style={{ flex: "0 0 42px", width: 42 }}>
-          <MappingIcon />
+        <div className={styles.mappingIcon}>
+          {activeTab === "request" ? <MappingIcon /> : <MappingReverseIcon />}
         </div>
         <Flex
           align="center"
