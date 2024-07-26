@@ -2,7 +2,7 @@ import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Modal, Flex, Button } from 'antd';
 import Text from "@/components/Text";
 
-export const showModalChangePath = (handleSave: (isExit: boolean) => void, handleRevert: () => void) => {
+export const showModalChangePath = (handleSave: () => void, handleRevert: () => void) => {
   Modal.confirm({
     width: 416,
     icon: <ExclamationCircleOutlined />,
@@ -36,7 +36,7 @@ export const showModalChangePath = (handleSave: (isExit: boolean) => void, handl
     okText: "Save",
     onOk: async () => {
       Modal.destroyAll();
-      handleSave(true);
+      handleSave();
     },
     cancelButtonProps: {
       type: "text",

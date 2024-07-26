@@ -11,7 +11,6 @@ import { Button, Tabs, TabsProps, Tag, Tooltip, notification } from "antd";
 import {
   chain,
   cloneDeep,
-  every,
   flatMap,
   get,
   isEmpty,
@@ -218,46 +217,8 @@ const NewAPIMapping = forwardRef(({ refetch }: { refetch?: () => void }, ref) =>
     [rightSideInfo, requestMapping, setRequestMapping]
   );
 
-  const validateData = useCallback(() => {
-    const requiredRequest = requestMapping.filter((rm) => rm.requiredMapping);
-    const isRequiredAllRequest = every(
-      requiredRequest,
-      (rm) => !isEmpty(get(rm, "target")) && !isEmpty(get(rm, "targetLocation"))
-    );
-    const requiredResponse = responseMapping.filter((rm) => rm.requiredMapping);
-    const isRequiredAllResponse = every(
-      requiredResponse,
-      (rm) => !isEmpty(get(rm, "source")) && !isEmpty(get(rm, "sourceLocation"))
-    );
-    if (!isRequiredAllRequest) {
-      notification.error({
-        message: "Please fill all required request mapping fields",
-        description: `Fields required: ${requiredRequest
-          .map((r) => r.source)
-          .join(", ")}`,
-      });
-      return true;
-    }
-    if (!isRequiredAllResponse) {
-      notification.error({
-        message: "Please fill all required response mapping fields",
-        description: `Fields required: ${requiredResponse
-          .map((r) => r.target)
-          .join(", ")}`,
-      });
-      return true;
-    }
-    return false;
-  }, [requestMapping, responseMapping]);
-
-  const handleSave = async (isExit?: boolean, callback?: () => void) => {
+  const handleSave = async (callback?: () => void) => {
     try {
-      if (isExit) {
-        const isErrorValidation = validateData();
-        if (isErrorValidation) {
-          return;
-        }
-      }
       const newData = chain(listMappingStateResponse)
         .groupBy("name")
         .map((items, name) => ({
@@ -397,7 +358,7 @@ const NewAPIMapping = forwardRef(({ refetch }: { refetch?: () => void }, ref) =>
               <Button
                 data-testid="btn-save"
                 type="primary"
-                onClick={() => handleSave(true, refetch)}
+                onClick={() => handleSave(refetch)}
                 loading={isPending}
               >
                 Save
@@ -420,7 +381,7 @@ const NewAPIMapping = forwardRef(({ refetch }: { refetch?: () => void }, ref) =>
             />
           )}
           {rightSide === EnumRightType.SelectSellerAPI && (
-            <SelectAPI save={() => handleSave(false)} />
+            <SelectAPI save={() => handleSave()} />
           )}
           {rightSide === EnumRightType.AddSellerProp && (
             <RightAddSellerProp onSelect={handleSelectSellerProp} />

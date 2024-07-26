@@ -78,7 +78,7 @@ const StandardAPIMapping = () => {
     if (mappingInProgress) {
       showModalChangePath(
         () => {
-          newAPIMappingRef.current.handleSave(true);
+          newAPIMappingRef.current.handleSave();
           refetch();
           resetState(mapItem);
           setSelectedKey(mapItem.targetKey)
