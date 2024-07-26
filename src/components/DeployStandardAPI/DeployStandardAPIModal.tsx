@@ -9,9 +9,10 @@ import {
 } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
 import { useNavigate, useParams } from "react-router-dom";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { get, isEmpty } from "lodash";
 import RequestMethod from "../Method";
+import ProductActionType from "../ProductActionType";
 
 type Props = {
   open: boolean;
@@ -36,17 +37,6 @@ const DeployStandardAPIModal = ({ open, onClose, defaultKey }: Props) => {
     );
     return stage?.id;
   }, [dataEnv]);
-
-  const renderTextType = useCallback((type: string) => {
-    switch (type) {
-      case "access_e_line":
-        return "Access E-line";
-      case "uni":
-        return "UNI";
-      default:
-        return type;
-    }
-  }, []);
 
   const handleOK = async () => {
     if (isEmpty(checkedList)) {
@@ -93,19 +83,10 @@ const DeployStandardAPIModal = ({ open, onClose, defaultKey }: Props) => {
               disabled={!item?.diffWithStage}
             />
             <Text.LightMedium>{item?.path}</Text.LightMedium>
-            <Flex align="center" gap={8}>
-              <div className={styles.tagInfo}>
-                {renderTextType(item.productType)}
-              </div>
-              {item.actionType ? (
-                <div
-                  className={styles.tagInfo}
-                  style={{ textTransform: "capitalize" }}
-                >
-                  {item.actionType}
-                </div>
-              ) : null}
-            </Flex>
+            <ProductActionType
+              actionType={item?.actionType}
+              productType={item?.productType}
+            />
             {item?.mappingStatus === "incomplete" && (
               <Tag color="red" bordered={false}>
                 Incomplete

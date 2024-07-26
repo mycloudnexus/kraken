@@ -2,11 +2,12 @@ import { useGetAPIDeployments } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
 import { IEnv } from "@/utils/types/env.type";
 import { Flex, Table, Typography } from "antd";
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import DeploymentStatus from "../DeploymentStatus";
 import styles from "./index.module.scss";
 import dayjs from "dayjs";
 import RequestMethod from "@/components/Method";
+import ProductActionType from "@/components/ProductActionType";
 
 type Props = {
   env?: IEnv;
@@ -27,24 +28,13 @@ const DeploymentHistory = ({ env }: Props) => {
     ...pageInfo,
   });
 
-  const renderTextType = useCallback((type: string) => {
-    switch (type) {
-      case "uni":
-        return "UNI";
-      case "access_e_line":
-        return "Access E-line";
-      default:
-        return type;
-    }
-  }, []);
-
   const columns = useMemo(
     () => [
       {
         title:
           env?.name?.toLowerCase() === "stage" ? "API mapping" : "Component",
         dataIndex: "",
-        width: '50%',
+        width: "50%",
         render: (item: any) => (
           <Flex gap={10} align="center">
             <RequestMethod method={item?.method} />
@@ -54,19 +44,10 @@ const DeploymentHistory = ({ env }: Props) => {
             >
               {item?.path}
             </Typography.Text>
-            <Flex align="center" gap={8}>
-              <div className={styles.tagInfo}>
-                {renderTextType(item.productType)}
-              </div>
-              {item.actionType ? (
-                <div
-                  className={styles.tagInfo}
-                  style={{ textTransform: "capitalize" }}
-                >
-                  {item.actionType}
-                </div>
-              ) : null}
-            </Flex>
+            <ProductActionType
+              actionType={item?.actionType}
+              productType={item?.productType}
+            />
           </Flex>
         ),
       },
@@ -82,7 +63,7 @@ const DeploymentHistory = ({ env }: Props) => {
           dayjs.utc(time).local().format("YYYY-MM-DD HH:mm:ss"),
       },
     ],
-    [env, renderTextType]
+    [env]
   );
   return (
     <div>

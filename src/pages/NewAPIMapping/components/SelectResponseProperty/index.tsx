@@ -108,10 +108,9 @@ const SelectResponseProperty = () => {
     const parts = input
       ?.replaceAll("0[*]", "[*]")
       ?.replaceAll("[*]", "[0]")
-      .split(".")
-      .reverse();
+      .split(".");
     const newString = parts.join(".")?.replace("[0]", "[*]");
-    return newString.split(".").reverse().join(".");
+    return newString;
   };
 
   const handleOK = () => {

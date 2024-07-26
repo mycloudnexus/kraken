@@ -20,7 +20,7 @@ const RunningAPIMapping = ({ env }: Props) => {
     direction: "DESC",
     page: 0,
     size: 100,
-});
+  });
   const renderTextType = useCallback((type: string) => {
     switch (type) {
       case "uni":
@@ -52,9 +52,11 @@ const RunningAPIMapping = ({ env }: Props) => {
                   {item?.path}
                 </Typography.Text>
                 <Flex gap={8} align="center">
-                  <div className={styles.tagInfo}>
-                    {renderTextType(item.productType)}
-                  </div>
+                  {item.productType ? (
+                    <div className={styles.tagInfo}>
+                      {renderTextType(item.productType)}
+                    </div>
+                  ) : null}
                   {item.actionType ? (
                     <div
                       style={{ textTransform: "capitalize" }}
