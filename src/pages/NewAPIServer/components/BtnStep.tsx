@@ -1,6 +1,6 @@
 import { Button, Modal } from "antd";
 import styles from "./index.module.scss";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { ExclamationCircleFilled } from "@ant-design/icons";
 
 type Props = {
@@ -12,8 +12,13 @@ type Props = {
 const { confirm } = Modal;
 
 const BtnStep = ({ onNext, disabled, loading }: Props) => {
+  const { componentId } = useParams();
   const navigate = useNavigate();
   const showConfirm = () => {
+    if (componentId) {
+      navigate(-1);
+      return;
+    }
     confirm({
       title: "Are you sure to cancel the seller API setup?",
       icon: <ExclamationCircleFilled />,
