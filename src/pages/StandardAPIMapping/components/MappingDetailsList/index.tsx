@@ -1,19 +1,31 @@
-import { useMemo, useEffect, useState, useCallback } from 'react';
-import { Collapse, Spin } from 'antd';
-import { useMappingUiStore } from '@/stores/mappingUi.store';
-import { GroupedByPath } from '@/utils/helpers/groupByPath';
-import { IMapperDetails } from '@/utils/types/env.type';
-import styles from './index.module.scss';
-import { CollapseItem, CollapseLabel } from './components';
+import { useMemo, useEffect, useState, useCallback } from "react";
+import { Collapse, Spin } from "antd";
+import { useMappingUiStore } from "@/stores/mappingUi.store";
+import { GroupedByPath } from "@/utils/helpers/groupByPath";
+import { IMapperDetails } from "@/utils/types/env.type";
+import styles from "./index.module.scss";
+import { CollapseItem, CollapseLabel } from "./components";
 
 type MappingDetailsListProps = {
   groupedPaths: GroupedByPath;
   setActiveSelected: (mapItem: IMapperDetails) => void;
 };
 
-const MappingDetailsList = ({ groupedPaths, setActiveSelected }: MappingDetailsListProps) => {
-  const [activeLabel, setActiveLabel] = useState<string[]>(Object.keys(groupedPaths));
-  const { activePath, selectedKey, setSelectedKey, setActivePath } = useMappingUiStore();
+const MappingDetailsList = ({
+  groupedPaths,
+  setActiveSelected,
+}: MappingDetailsListProps) => {
+  const [activeLabel, setActiveLabel] = useState<string[]>(
+    Object.keys(groupedPaths)
+  );
+
+  const {
+    activePath,
+    selectedKey,
+    setSelectedKey,
+    setActivePath,
+    setActiveTab,
+  } = useMappingUiStore();
 
   useEffect(() => {
     const headersList = Object.keys(groupedPaths);
@@ -25,17 +37,23 @@ const MappingDetailsList = ({ groupedPaths, setActiveSelected }: MappingDetailsL
     }
   }, []);
 
-  const handleSelection = useCallback((mapItem: IMapperDetails) => {
-    setSelectedKey(mapItem.targetKey);
-    setActiveSelected(mapItem);
-  }, [setActiveSelected, setSelectedKey]);
+  const handleSelection = useCallback(
+    (mapItem: IMapperDetails) => {
+      setSelectedKey(mapItem.targetKey);
+      setActiveSelected(mapItem);
+      setActiveTab("request");
+    },
+    [setActiveSelected, setSelectedKey]
+  );
 
   const listMapping = useMemo(() => {
-    return Object.keys(groupedPaths).map(path => {
+    return Object.keys(groupedPaths).map((path) => {
       const labelProps = groupedPaths[path][0];
       const isActiveLabel = activeLabel.includes(path);
       const isOneChild = groupedPaths[path].length <= 1;
-      const highlighted = groupedPaths[path].some(item => item.path === activePath);
+      const highlighted = groupedPaths[path].some(
+        (item) => item.path === activePath
+      );
 
       return {
         key: path,

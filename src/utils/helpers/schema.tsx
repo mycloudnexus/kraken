@@ -206,22 +206,29 @@ export const exampleParse = (
         <span className={nodeTitleClassName}>{key}</span>
 
         <span className={nodeExampleClassName}>
-          {renderExampleValue(example[key])}
+          {isArray(example) && !prefix
+            ? "array"
+            : renderExampleValue(example[key])}
         </span>
       </Flex>
     );
-    const isValueArray = isArray(example[key]) ? "[*]" : "";
+
+    const isFirstElementArray = isArray(example) && !prefix;
+    const isValueArray =
+      isArray(example[key]) || isFirstElementArray ? "[*]" : "";
+    const keyChildren = isArray(example[key]) ? example[key][0] : example[key];
     const children =
       !isEmpty(example[key]) && typeof example[key] === "object"
         ? exampleParse(
-            isArray(example[key]) ? example[key][0] : example[key],
+            keyChildren,
             buildPrefix(prefix, key, isValueArray),
             nodeTitleClassName,
             nodeExampleClassName
           )
         : undefined;
+
     return {
-      key: buildPrefix(prefix, key, isValueArray),
+      key: isFirstElementArray ? "[*]" : buildPrefix(prefix, key, isValueArray),
       title: nodeTitle,
       children,
     };

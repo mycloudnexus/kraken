@@ -6,10 +6,10 @@ import RightAddSonataProp, {
 import { APIItem } from "@/pages/NewAPIMapping/components/SelectAPI";
 import SelectResponseProperty from "@/pages/NewAPIMapping/components/SelectResponseProperty";
 import SonataPropMapping from "@/pages/NewAPIMapping/components/SonataPropMapping";
-import { useMappingUiStore } from '@/stores/mappingUi.store';
+import { useMappingUiStore } from "@/stores/mappingUi.store";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
-import buildInitListMapping from '@/utils/helpers/buildInitListMapping';
-import groupByPath from '@/utils/helpers/groupByPath';
+import buildInitListMapping from "@/utils/helpers/buildInitListMapping";
+import groupByPath from "@/utils/helpers/groupByPath";
 import { queryClient } from "@/utils/helpers/reactQuery";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render, renderHook } from "@testing-library/react";
@@ -17,11 +17,16 @@ import { BrowserRouter } from "react-router-dom";
 
 beforeAll(() => {
   const { result: resultUiMapping } = renderHook(() => useMappingUiStore());
-  resultUiMapping.current.setActivePath("http://localhost:5173/component/mef.sonata.api.poq/new")
-  resultUiMapping.current.setSelectedKey("1")
-  resultUiMapping.current.setActiveTab("/tab")
+  resultUiMapping.current.setActivePath(
+    "http://localhost:5173/component/mef.sonata.api.poq/new"
+  );
+  resultUiMapping.current.setSelectedKey("1");
+  resultUiMapping.current.setActiveTab("/tab");
 
   const { result } = renderHook(() => useNewApiMappingStore());
+  result.current.setActiveResponseName(
+    `mapper.quote.uni.add.state-@{{responseBody.id}}"`
+  );
   result.current.setResponseMapping([
     {
       name: "mapper.quote.uni.add.state",
@@ -135,7 +140,7 @@ beforeAll(() => {
               type: "object",
               properties: {
                 companyId: {
-                  type: "string",
+                  type: "",
                   description: "",
                 },
                 bandwidth: {
@@ -871,160 +876,164 @@ beforeAll(() => {
 test("groupPath fnc", () => {
   const result = groupByPath([
     {
-      "targetKey": "mef.sonata.api-target.quote.eline.add",
-      "targetMapperKey": "mef.sonata.api-target-mapper.quote.eline.add",
-      "description": "This operation creates a Quote entity",
-      "path": "/api/son/x/v8/quote",
-      "method": "post",
-      "productType": "access_line",
-      "actionType": "add",
-      "mappingStatus": "incomplete",
-      "mappingMatrix": {
-        "quoteLevel": "firm",
-        "syncMode": false,
-        "productType": "access_e_line",
-        "actionType": "add"
+      targetKey: "mef.sonata.api-target.quote.eline.add",
+      targetMapperKey: "mef.sonata.api-target-mapper.quote.eline.add",
+      description: "This operation creates a Quote entity",
+      path: "/api/son/x/v8/quote",
+      method: "post",
+      productType: "access_line",
+      actionType: "add",
+      mappingStatus: "incomplete",
+      mappingMatrix: {
+        quoteLevel: "firm",
+        syncMode: false,
+        productType: "access_e_line",
+        actionType: "add",
       },
-      "updatedAt": "2021-07-22T08:21:00",
-      "lastDeployedAt": "2021-07-22 07:47:33",
-      "diffWithStage": true
+      updatedAt: "2021-07-22T08:21:00",
+      lastDeployedAt: "2021-07-22 07:47:33",
+      diffWithStage: true,
     },
     {
-      "targetKey": "mef.son.api-target.quote.uni.read",
-      "targetMapperKey": "mef.sonata.api-target-mapper.quote.uni.read",
-      "description": "This operation retrieves a Quote entity. Attribute selection is enabled for all first level attributes.",
-      "path": "/api/son/x/v8/quote/{id}",
-      "method": "get",
-      "productType": "uni",
-      "mappingStatus": "incomplete",
-      "mappingMatrix": {
-        "quoteLevel": "firm",
-        "syncMode": false,
-        "productType": "access_e_line",
-        "actionType": "add"
+      targetKey: "mef.son.api-target.quote.uni.read",
+      targetMapperKey: "mef.sonata.api-target-mapper.quote.uni.read",
+      description:
+        "This operation retrieves a Quote entity. Attribute selection is enabled for all first level attributes.",
+      path: "/api/son/x/v8/quote/{id}",
+      method: "get",
+      productType: "uni",
+      mappingStatus: "incomplete",
+      mappingMatrix: {
+        quoteLevel: "firm",
+        syncMode: false,
+        productType: "access_e_line",
+        actionType: "add",
       },
-      "updatedAt": "2024-07-18T01:59:05.410355Z",
-      "lastDeployedAt": "2024-07-22 07:53:50",
-      "diffWithStage": false
+      updatedAt: "2024-07-18T01:59:05.410355Z",
+      lastDeployedAt: "2024-07-22 07:53:50",
+      diffWithStage: false,
     },
     {
-      "targetKey": "mef.sonata.api-target.quote.eline.read",
-      "targetMapperKey": "mef.sonata.api-target-mapper.quote.eline.read",
-      "description": "This operation retrieves a Quote entity. Attribute selection is enabled for all first level attributes.",
-      "path": "/api/son/x/v8/quote/{id}",
-      "method": "get",
-      "productType": "access_line",
-      "mappingStatus": "incomplete",
-      "mappingMatrix": {
-        "quoteLevel": "firm",
-        "syncMode": false,
-        "productType": "access_e_line",
-        "actionType": "add"
+      targetKey: "mef.sonata.api-target.quote.eline.read",
+      targetMapperKey: "mef.sonata.api-target-mapper.quote.eline.read",
+      description:
+        "This operation retrieves a Quote entity. Attribute selection is enabled for all first level attributes.",
+      path: "/api/son/x/v8/quote/{id}",
+      method: "get",
+      productType: "access_line",
+      mappingStatus: "incomplete",
+      mappingMatrix: {
+        quoteLevel: "firm",
+        syncMode: false,
+        productType: "access_e_line",
+        actionType: "add",
       },
-      "updatedAt": "2024-07-18T01:59:05.714967Z",
-      "diffWithStage": true
+      updatedAt: "2024-07-18T01:59:05.714967Z",
+      diffWithStage: true,
     },
     {
-      "targetKey": "mef.sonata.api-target.quote.uni.add",
-      "targetMapperKey": "mef.sonata.api-target-mapper.quote.uni.add",
-      "description": "This operation creates a Quote entity",
-      "path": "/api/son/x/v8/quote",
-      "method": "post",
-      "productType": "uni",
-      "actionType": "add",
-      "mappingStatus": "incomplete",
-      "mappingMatrix": {
-        "quoteLevel": "firm",
-        "syncMode": false,
-        "productType": "access_e_line",
-        "actionType": "add"
+      targetKey: "mef.sonata.api-target.quote.uni.add",
+      targetMapperKey: "mef.sonata.api-target-mapper.quote.uni.add",
+      description: "This operation creates a Quote entity",
+      path: "/api/son/x/v8/quote",
+      method: "post",
+      productType: "uni",
+      actionType: "add",
+      mappingStatus: "incomplete",
+      mappingMatrix: {
+        quoteLevel: "firm",
+        syncMode: false,
+        productType: "access_e_line",
+        actionType: "add",
       },
-      "updatedAt": "2024-07-22T08:13:45.808911Z",
-      "lastDeployedAt": "2024-07-22 07:26:09",
-      "diffWithStage": false
-    }
-  ])
+      updatedAt: "2024-07-22T08:13:45.808911Z",
+      lastDeployedAt: "2024-07-22 07:26:09",
+      diffWithStage: false,
+    },
+  ]);
 
   expect(result).toEqual({
     "/api/son/x/v8/quote": [
       {
-        "actionType": "add",
-        "description": "This operation creates a Quote entity",
-        "diffWithStage": true,
-        "lastDeployedAt": "2021-07-22 07:47:33",
-        "mappingStatus": "incomplete",
-        "mappingMatrix": {
-          "quoteLevel": "firm",
-          "syncMode": false,
-          "productType": "access_e_line",
-          "actionType": "add"
+        actionType: "add",
+        description: "This operation creates a Quote entity",
+        diffWithStage: true,
+        lastDeployedAt: "2021-07-22 07:47:33",
+        mappingStatus: "incomplete",
+        mappingMatrix: {
+          quoteLevel: "firm",
+          syncMode: false,
+          productType: "access_e_line",
+          actionType: "add",
         },
-        "method": "post",
-        "path": "/api/son/x/v8/quote",
-        "productType": "access_line",
-        "targetKey": "mef.sonata.api-target.quote.eline.add",
-        "targetMapperKey": "mef.sonata.api-target-mapper.quote.eline.add",
-        "updatedAt": "2021-07-22T08:21:00",
+        method: "post",
+        path: "/api/son/x/v8/quote",
+        productType: "access_line",
+        targetKey: "mef.sonata.api-target.quote.eline.add",
+        targetMapperKey: "mef.sonata.api-target-mapper.quote.eline.add",
+        updatedAt: "2021-07-22T08:21:00",
       },
       {
-        "actionType": "add",
-        "description": "This operation creates a Quote entity",
-        "diffWithStage": false,
-        "lastDeployedAt": "2024-07-22 07:26:09",
-        "mappingStatus": "incomplete",
-        "mappingMatrix": {
-          "quoteLevel": "firm",
-          "syncMode": false,
-          "productType": "access_e_line",
-          "actionType": "add"
+        actionType: "add",
+        description: "This operation creates a Quote entity",
+        diffWithStage: false,
+        lastDeployedAt: "2024-07-22 07:26:09",
+        mappingStatus: "incomplete",
+        mappingMatrix: {
+          quoteLevel: "firm",
+          syncMode: false,
+          productType: "access_e_line",
+          actionType: "add",
         },
-        "method": "post",
-        "path": "/api/son/x/v8/quote",
-        "productType": "uni",
-        "targetKey": "mef.sonata.api-target.quote.uni.add",
-        "targetMapperKey": "mef.sonata.api-target-mapper.quote.uni.add",
-        "updatedAt": "2024-07-22T08:13:45.808911Z",
+        method: "post",
+        path: "/api/son/x/v8/quote",
+        productType: "uni",
+        targetKey: "mef.sonata.api-target.quote.uni.add",
+        targetMapperKey: "mef.sonata.api-target-mapper.quote.uni.add",
+        updatedAt: "2024-07-22T08:13:45.808911Z",
       },
     ],
     "/api/son/x/v8/quote/{id}": [
       {
-        "description": "This operation retrieves a Quote entity. Attribute selection is enabled for all first level attributes.",
-        "diffWithStage": false,
-        "lastDeployedAt": "2024-07-22 07:53:50",
-        "mappingStatus": "incomplete",
-        "mappingMatrix": {
-          "quoteLevel": "firm",
-          "syncMode": false,
-          "productType": "access_e_line",
-          "actionType": "add"
+        description:
+          "This operation retrieves a Quote entity. Attribute selection is enabled for all first level attributes.",
+        diffWithStage: false,
+        lastDeployedAt: "2024-07-22 07:53:50",
+        mappingStatus: "incomplete",
+        mappingMatrix: {
+          quoteLevel: "firm",
+          syncMode: false,
+          productType: "access_e_line",
+          actionType: "add",
         },
-        "method": "get",
-        "path": "/api/son/x/v8/quote/{id}",
-        "productType": "uni",
-        "targetKey": "mef.son.api-target.quote.uni.read",
-        "targetMapperKey": "mef.sonata.api-target-mapper.quote.uni.read",
-        "updatedAt": "2024-07-18T01:59:05.410355Z",
+        method: "get",
+        path: "/api/son/x/v8/quote/{id}",
+        productType: "uni",
+        targetKey: "mef.son.api-target.quote.uni.read",
+        targetMapperKey: "mef.sonata.api-target-mapper.quote.uni.read",
+        updatedAt: "2024-07-18T01:59:05.410355Z",
       },
       {
-        "description": "This operation retrieves a Quote entity. Attribute selection is enabled for all first level attributes.",
-        "diffWithStage": true,
-        "mappingStatus": "incomplete",
-        "mappingMatrix": {
-          "quoteLevel": "firm",
-          "syncMode": false,
-          "productType": "access_e_line",
-          "actionType": "add"
+        description:
+          "This operation retrieves a Quote entity. Attribute selection is enabled for all first level attributes.",
+        diffWithStage: true,
+        mappingStatus: "incomplete",
+        mappingMatrix: {
+          quoteLevel: "firm",
+          syncMode: false,
+          productType: "access_e_line",
+          actionType: "add",
         },
-        "method": "get",
-        "path": "/api/son/x/v8/quote/{id}",
-        "productType": "access_line",
-        "targetKey": "mef.sonata.api-target.quote.eline.read",
-        "targetMapperKey": "mef.sonata.api-target-mapper.quote.eline.read",
-        "updatedAt": "2024-07-18T01:59:05.714967Z",
+        method: "get",
+        path: "/api/son/x/v8/quote/{id}",
+        productType: "access_line",
+        targetKey: "mef.sonata.api-target.quote.eline.read",
+        targetMapperKey: "mef.sonata.api-target-mapper.quote.eline.read",
+        updatedAt: "2024-07-18T01:59:05.714967Z",
       },
     ],
-  })
-})
+  });
+});
 
 test("parse fnc", () => {
   const result = buildInitListMapping([
@@ -1083,24 +1092,45 @@ test("parse fnc", () => {
   ]);
 });
 
-test("component new api map page", async () => {
-  const { container, getByTestId, getAllByTestId, getAllByPlaceholderText } =
-    render(
+describe("select prop", () => {
+  test("component new api map page", async () => {
+    const { container, getByTestId, getAllByTestId, getAllByPlaceholderText } =
+      render(
+        <QueryClientProvider client={queryClient}>
+          <BrowserRouter>
+            <ResponseMapping />
+            <SelectResponseProperty />
+          </BrowserRouter>
+        </QueryClientProvider>
+      );
+    expect(container).toBeInTheDocument();
+    const element = getByTestId("btn-add-state");
+    fireEvent.click(element);
+    const select = getAllByTestId("select-sonata-state");
+    expect(select.length).toBeGreaterThanOrEqual(1);
+    const input = getAllByPlaceholderText("Select or input property");
+    fireEvent.change(input[0], { target: { value: "a" } });
+    fireEvent.keyDown(input[0], { key: "Enter", code: "Enter" });
+  });
+  test("test ok btn", async () => {
+    const { result } = renderHook(() => useNewApiMappingStore());
+    result.current.setActiveResponseName(
+      `mapper.quote.uni.add.state-@{{responseBody.id}}`
+    );
+    const { getByTestId, getByText } = render(
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
-          <ResponseMapping />
           <SelectResponseProperty />
         </BrowserRouter>
       </QueryClientProvider>
     );
-  expect(container).toBeInTheDocument();
-  const element = getByTestId("btn-add-state");
-  fireEvent.click(element);
-  const select = getAllByTestId("select-sonata-state");
-  expect(select.length).toBeGreaterThanOrEqual(1);
-  const input = getAllByPlaceholderText("Select or input property");
-  fireEvent.change(input[0], { target: { value: "a" } });
-  fireEvent.keyDown(input[0], { key: "Enter", code: "Enter" });
+    const treeItem = getByTestId("tree-item");
+    expect(treeItem).toBeInTheDocument();
+    const item = getByText("totalContractCost");
+    fireEvent.click(item);
+    const okButton = getByTestId("ok-btn");
+    fireEvent.click(okButton);
+  });
 });
 
 test("component RightAddSellerProp", () => {

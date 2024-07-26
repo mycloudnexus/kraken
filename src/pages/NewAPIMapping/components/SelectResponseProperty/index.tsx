@@ -8,7 +8,7 @@ import {
 } from "@/utils/helpers/schema";
 import { DownOutlined, RightOutlined } from "@ant-design/icons";
 import { Button, Input, Tree, notification } from "antd";
-import { clone, get, isArray, isEmpty, set } from "lodash";
+import { clone, get, isEmpty, set } from "lodash";
 import { Key, useCallback, useMemo, useState } from "react";
 import { useBoolean } from "usehooks-ts";
 import styles from "./index.module.scss";
@@ -58,14 +58,6 @@ const SelectResponseProperty = () => {
     if (!isEmpty(example)) {
       const exampleKeys = get(Object.keys(example), "[0]", "");
       const firstExample = get(example, `${exampleKeys}.value`);
-      if (isArray(firstExample) && !isEmpty(firstExample)) {
-        return exampleParse(
-          firstExample[0],
-          "",
-          styles.nodeTitle,
-          styles.nodeExample
-        );
-      }
       if (!isEmpty(firstExample)) {
         return exampleParse(
           firstExample,
@@ -113,7 +105,11 @@ const SelectResponseProperty = () => {
     if (input.indexOf("[*]") === -1) {
       return input;
     }
-    const parts = input?.replaceAll("[*]", "[0]").split(".").reverse();
+    const parts = input
+      ?.replaceAll("0[*]", "[*]")
+      ?.replaceAll("[*]", "[0]")
+      .split(".")
+      .reverse();
     const newString = parts.join(".")?.replace("[0]", "[*]");
     return newString.split(".").reverse().join(".");
   };
@@ -130,7 +126,11 @@ const SelectResponseProperty = () => {
         }
         return i.name === name;
       });
-      set(cloneObj, `[${index}].source`, `@{{responseBody.${newKey}}}`);
+      const value =
+        newKey.startsWith("[*]") || newKey.startsWith("[0]")
+          ? `@{{responseBody${newKey}}}`
+          : `@{{responseBody.${newKey}}}`;
+      set(cloneObj, `[${index}].source`, value);
       set(cloneObj, `[${index}].sourceLocation`, `BODY`);
       setResponseMapping(cloneObj);
       setActiveResponseName(undefined);
@@ -179,6 +179,7 @@ const SelectResponseProperty = () => {
             <div style={{ marginTop: 4 }}>
               <div className={styles.tree}>
                 <Tree
+                  data-testid="tree-item"
                   selectedKeys={selectedKeys}
                   treeData={newTreeData}
                   selectable
@@ -201,6 +202,7 @@ const SelectResponseProperty = () => {
       </div>
       <Flex justifyContent="flex-end" className={styles.footer}>
         <Button
+          data-testid="ok-btn"
           onClick={handleOK}
           type="primary"
           disabled={isEmpty(selectedKeys)}

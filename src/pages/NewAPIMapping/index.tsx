@@ -294,8 +294,12 @@ const NewAPIMapping = forwardRef((_, ref) => {
             ...rm,
             target: rm.target?.replace?.("path.", "").replace?.("query.", ""),
             source: rm.source?.replace?.("path.", "").replace?.("query.", ""),
+            requiredMapping: Boolean(rm.requiredMapping),
           })),
-          response: newResponse,
+          response: newResponse.map((rm) => ({
+            ...rm,
+            requiredMapping: Boolean(rm.requiredMapping),
+          })),
         },
       };
       const res = await updateTargetMapper({

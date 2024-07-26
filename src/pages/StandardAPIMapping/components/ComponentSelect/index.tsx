@@ -1,11 +1,11 @@
-import { Flex, Select } from "antd";
+import { Flex, Select, Typography } from "antd";
 import styles from "./index.module.scss";
 import { useMemo } from "react";
 import ContactIcon from "@/assets/standardAPIMapping/contact.svg";
 import { useNavigate } from "react-router-dom";
 import { IComponent } from "@/utils/types/product.type";
 import { isEmpty } from "lodash";
-import { useMappingUiStore } from '@/stores/mappingUi.store';
+import { useMappingUiStore } from "@/stores/mappingUi.store";
 
 type ComponentSelectProps = {
   componentList: any;
@@ -18,6 +18,7 @@ const Label = ({ value }: { value: string }) => (
       textOverflow: "ellipsis",
       overflow: "hidden",
       whiteSpace: "nowrap",
+      flexWrap: "wrap",
     }}
     align="center"
     gap={10}
@@ -25,7 +26,9 @@ const Label = ({ value }: { value: string }) => (
     <div className={styles.componentIconWrapper}>
       <ContactIcon />
     </div>
-    {value}
+    <Typography.Text ellipsis={{ tooltip: value }} style={{ maxWidth: 253 }}>
+      {value}
+    </Typography.Text>
   </Flex>
 );
 
