@@ -34,7 +34,7 @@ const StandardAPIMapping = () => {
     currentProduct,
     componentId ?? ""
   );
-  const { data: detailDataMapping } = useGetComponentDetailMapping(
+  const { data: detailDataMapping, refetch } = useGetComponentDetailMapping(
     currentProduct,
     componentId ?? ""
   );
@@ -79,6 +79,7 @@ const StandardAPIMapping = () => {
       showModalChangePath(
         () => {
           newAPIMappingRef.current.handleSave(true);
+          refetch();
           resetState(mapItem);
           setSelectedKey(mapItem.targetKey)
         },
@@ -139,7 +140,7 @@ const StandardAPIMapping = () => {
         </Flex>
         <Flex align="center" justify="center" className={styles.versionListWrapper}>
           {activePath && !isChangeMappingKey ? (
-            <NewAPIMapping ref={newAPIMappingRef} />
+            <NewAPIMapping ref={newAPIMappingRef} refetch={refetch} />
           ) : (
             <Spin />
           )}

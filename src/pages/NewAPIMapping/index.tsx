@@ -41,7 +41,7 @@ import styles from "./index.module.scss";
 import buildInitListMapping from "@/utils/helpers/buildInitListMapping";
 import { useMappingUiStore } from "@/stores/mappingUi.store";
 
-const NewAPIMapping = forwardRef((_, ref) => {
+const NewAPIMapping = forwardRef(({ refetch }: { refetch?: () => void }, ref) => {
   const { currentProduct } = useAppStore();
   const { activeTab, setActiveTab, setMappingInProgress } = useMappingUiStore();
   const {
@@ -250,7 +250,7 @@ const NewAPIMapping = forwardRef((_, ref) => {
     return false;
   }, [requestMapping, responseMapping]);
 
-  const handleSave = async (isExit?: boolean) => {
+  const handleSave = async (isExit?: boolean, callback?: () => void) => {
     try {
       if (isExit) {
         const isErrorValidation = validateData();
@@ -310,6 +310,8 @@ const NewAPIMapping = forwardRef((_, ref) => {
       notification.success({ message: res.message });
       setStep(1);
       setActiveKey("1");
+      setMappingInProgress(false);
+      callback && callback()
       return true;
     } catch (error) {
       notification.error({
@@ -395,7 +397,7 @@ const NewAPIMapping = forwardRef((_, ref) => {
               <Button
                 data-testid="btn-save"
                 type="primary"
-                onClick={() => handleSave(true)}
+                onClick={() => handleSave(true, refetch)}
                 loading={isPending}
               >
                 Save

@@ -39,7 +39,6 @@ const MappingDetailsList = ({
 
   const handleSelection = useCallback(
     (mapItem: IMapperDetails) => {
-      setSelectedKey(mapItem.targetKey);
       setActiveSelected(mapItem);
       setActiveTab("request");
     },
