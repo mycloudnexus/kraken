@@ -25,7 +25,7 @@ import { useBoolean } from "usehooks-ts";
 const StandardAPIMapping = () => {
   const { currentProduct } = useAppStore();
   const { componentId } = useParams();
-  const { activePath, mappingInProgress, setActivePath, setMappingInProgress } =
+  const { activePath, mappingInProgress, setActivePath, setMappingInProgress, setSelectedKey } =
     useMappingUiStore();
   const newAPIMappingRef = useRef<any>(null);
 
@@ -80,11 +80,16 @@ const StandardAPIMapping = () => {
         () => {
           newAPIMappingRef.current.handleSave(true);
           resetState(mapItem);
+          setSelectedKey(mapItem.targetKey)
         },
-        () => resetState(mapItem)
+        () => {
+          resetState(mapItem)
+          setSelectedKey(mapItem.targetKey)
+        }
       );
     } else {
       resetState(mapItem);
+      setSelectedKey(mapItem.targetKey)
     }
     delay(() => setIsChangeMappingKey(false), 100);
   };

@@ -6,7 +6,7 @@ type MappingUiStore = {
   selectedKey: string;
   activeTab?: string;
   mappingInProgress: boolean;
-  setActivePath: (activePath: string) => void;
+  setActivePath: (activePath: string | undefined) => void;
   setSelectedKey: (selectedKey: string) => void;
   setActiveTab: (activeTab: string) => void;
   setMappingInProgress: (value: boolean) => void;
@@ -22,7 +22,7 @@ const defaultData = {
 
 export const useMappingUiStore = create<MappingUiStore>()((set) => ({
   ...defaultData,
-  setActivePath: (activePath: string) => set({ activePath }),
+  setActivePath: (activePath: string | undefined) => set({ activePath }),
   setSelectedKey: (selectedKey: string) => set({ selectedKey }),
   setActiveTab: (activeTab: string) => set({ activeTab }),
   setMappingInProgress: (mappingInProgress: boolean) => set({ mappingInProgress }),

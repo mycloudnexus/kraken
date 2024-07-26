@@ -31,7 +31,7 @@ const MappingDetailsList = ({
     const headersList = Object.keys(groupedPaths);
     if (headersList.length > 0) {
       const initialMapItem = groupedPaths[headersList[0]][0];
-      setSelectedKey(initialMapItem.targetKey);
+      setSelectedKey(initialMapItem.path);
       setActivePath(initialMapItem.path);
       setActiveSelected(initialMapItem);
     }
