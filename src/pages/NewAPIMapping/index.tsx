@@ -339,20 +339,18 @@ const NewAPIMapping = forwardRef(
             <Flex className={styles.breadcrumb} justifyContent="space-between">
               <Flex className={styles.infoBox}>
                 {queryData.mappingStatus === "incomplete" && (
-                  <Flex gap={8}>
-                    <Tag bordered={false} color="error">
-                      Incomplete
-                    </Tag>
-                    {queryData?.lastDeployedAt && (
-                      <>
-                        {toDateTime(queryData.lastDeployedAt)}
-                        <Tooltip title="Last update">
-                          <InfoCircleOutlined
-                            style={{ color: "rgba(0, 0, 0, 0.45)" }}
-                          />
-                        </Tooltip>
-                      </>
-                    )}
+                  <Tag bordered={false} color="error">
+                    Incomplete
+                  </Tag>
+                )}
+                {queryData?.lastDeployedAt && (
+                <Flex gap={8}>
+                    {toDateTime(queryData.lastDeployedAt)}
+                    <Tooltip title="Last deployed at">
+                      <InfoCircleOutlined
+                        style={{ color: "rgba(0, 0, 0, 0.45)" }}
+                      />
+                    </Tooltip>
                   </Flex>
                 )}
               </Flex>
