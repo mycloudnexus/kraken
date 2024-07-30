@@ -23,6 +23,11 @@ type NewApiMappingStore = {
   setActiveResponseName: (a?: string) => void;
   listMappingStateResponse: IMapping[];
   setListMappingStateResponse: (value?: IMapping[]) => void;
+  sellerAPIExampleProps: {
+    path: Record<string, string>;
+    param: Record<string, string>;
+  };
+  setSellerAPIExampleProps: (value: any) => void;
 };
 
 const defaultData = {
@@ -35,6 +40,10 @@ const defaultData = {
   rightSideInfo: undefined,
   activeResponseName: undefined,
   listMappingStateResponse: [],
+  sellerAPIExampleProps: {
+    path: {},
+    param: {},
+  },
 };
 
 export const useNewApiMappingStore = create<NewApiMappingStore>()((set) => ({
@@ -50,4 +59,6 @@ export const useNewApiMappingStore = create<NewApiMappingStore>()((set) => ({
   setActiveResponseName: (value?: string) => set({ activeResponseName: value }),
   setListMappingStateResponse: (value?: IMapping[]) =>
     set({ listMappingStateResponse: value }),
+  setSellerAPIExampleProps: (value: any) =>
+    set({ sellerAPIExampleProps: value }),
 }));

@@ -10,11 +10,18 @@ test("test example popup", () => {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <ExampleValueModal
-          method={"POST"}
           attribute={"ABC"}
           isOpen={true}
           onClose={vi.fn()}
           onOK={vi.fn()}
+          location={"PATH"}
+        />
+        <ExampleValueModal
+          attribute={"CDE"}
+          isOpen={true}
+          onClose={vi.fn()}
+          onOK={vi.fn()}
+          location={"QUERY"}
         />
       </BrowserRouter>
     </QueryClientProvider>

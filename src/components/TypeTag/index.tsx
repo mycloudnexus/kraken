@@ -14,7 +14,7 @@ const TypeTag = ({ type }: Readonly<Props>) => {
   }
   if (type?.toLowerCase() === "object") {
     return (
-      <Tag bordered={false} color="success" style={{ marginRight: 0 }}>
+      <Tag bordered={false} color="blue" style={{ marginRight: 0 }}>
         JSON
       </Tag>
     );

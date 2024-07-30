@@ -1,10 +1,20 @@
 import TypeTag from "@/components/TypeTag";
-import { CollapseProps, Flex, Tree, Typography, notification } from "antd";
+import {
+  Button,
+  CollapseProps,
+  Flex,
+  Tree,
+  Typography,
+  notification,
+} from "antd";
 import clsx from "clsx";
-import { Dispatch, useCallback, useMemo } from "react";
+import { Dispatch, useCallback, useMemo, useState } from "react";
 import styles from "./RightAddSellerProp/index.module.scss";
 import { get } from "lodash";
-import { useMappingUiStore } from '@/stores/mappingUi.store';
+import { useMappingUiStore } from "@/stores/mappingUi.store";
+import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
+import { useBoolean } from "usehooks-ts";
+import ExampleValueModal from "@/components/ExampleValueModal";
 
 interface Props {
   selectedProp: any;
@@ -25,7 +35,11 @@ export const useCommonAddProp = ({
   setSelectedProp,
   onSelect,
 }: Props) => {
+  const { sellerAPIExampleProps, setSellerAPIExampleProps } =
+    useNewApiMappingStore();
   const { setMappingInProgress } = useMappingUiStore();
+  const [currentProp, setCurrentProp] = useState<Record<string, string>>();
+  const { value: isOpen, setTrue: open, setFalse: close } = useBoolean(false);
 
   const handleAddProp = useCallback(() => {
     if (!selectedProp) {
@@ -33,7 +47,7 @@ export const useCommonAddProp = ({
       return;
     }
     onSelect?.({ ...selectedProp, title: rightSideInfo?.title });
-    setMappingInProgress(true)
+    setMappingInProgress(true);
   }, [selectedProp, onSelect, rightSideInfo]);
 
   const selectedKey = useMemo(
@@ -44,6 +58,14 @@ export const useCommonAddProp = ({
         .replace("requestBody.", ""),
     [selectedProp]
   );
+
+  const handleProp = (name: string, path: string) => {
+    setCurrentProp({
+      name,
+      path,
+    });
+    open();
+  };
 
   const collapseItems = useMemo(() => {
     const items: CollapseProps["items"] = [];
@@ -56,28 +78,89 @@ export const useCommonAddProp = ({
           </Typography.Text>
         ),
         children: (
-          <Flex vertical gap={8} className={styles.paramList}>
+          <>
+            {isOpen && currentProp?.path === "PATH" && (
+              <ExampleValueModal
+                location={currentProp?.path || ""}
+                attribute={currentProp?.name || ""}
+                isOpen={isOpen}
+                onClose={close}
+                onOK={(value: string) => {
+                  setSellerAPIExampleProps({
+                    ...sellerAPIExampleProps,
+                    path: {
+                      ...sellerAPIExampleProps?.path,
+                      [get(currentProp, "name", "")]: value,
+                    },
+                  });
+                  close();
+                }}
+              />
+            )}
             {pathParameters.map((parameter: any) => (
               <Flex
-                align="center"
-                justify="space-between"
-                className={clsx(styles.paramItem, {
-                  [styles.active]:
-                    selectedProp?.location === "PATH" &&
-                    selectedProp?.name === `@{{path.${parameter.name}}}`,
-                })}
+                vertical
+                gap={8}
+                className={styles.paramList}
                 key={parameter.name}
-                onClick={() =>
-                  setSelectedProp({
-                    location: "PATH",
-                    name: `@{{path.${parameter.name}}}`,
-                  })
-                }
               >
-                {parameter.name} <TypeTag type={parameter.schema.type} />
+                <Flex
+                  align="center"
+                  justify="space-between"
+                  className={clsx(styles.paramItem, {
+                    [styles.active]:
+                      (selectedProp?.location === "PATH" &&
+                        selectedProp?.name === `@{{path.${parameter.name}}}`) ||
+                      (selectedProp?.name ===
+                        `hybrid.${
+                          sellerAPIExampleProps?.path?.[parameter.name]
+                        }` &&
+                        selectedProp?.location === "HYBRID"),
+                  })}
+                  key={parameter.name}
+                  onClick={() => {
+                    if (sellerAPIExampleProps?.path?.[parameter.name]) {
+                      setSelectedProp({
+                        location: "HYBRID",
+                        name: `hybrid.${
+                          sellerAPIExampleProps?.path?.[parameter.name]
+                        }`,
+                      });
+                      return;
+                    }
+                    setSelectedProp({
+                      location: "PATH",
+                      name: `@{{path.${parameter.name}}}`,
+                    });
+                  }}
+                >
+                  {parameter.name}
+                  <Flex justify="flex-end" align="center">
+                    {parameter?.schema?.type?.toLowerCase?.() === "object" ? (
+                      <Button
+                        type="link"
+                        onClick={() => handleProp(parameter.name, "PATH")}
+                      >
+                        {sellerAPIExampleProps?.path?.[parameter.name]
+                          ? "Edit value with variable"
+                          : "Add value with variable"}
+                      </Button>
+                    ) : null}
+                    <TypeTag type={parameter.schema.type} />
+                  </Flex>
+                </Flex>
+                {sellerAPIExampleProps?.path?.[parameter.name] && (
+                  <Typography.Text
+                    ellipsis={{
+                      tooltip: sellerAPIExampleProps?.path?.[parameter.name],
+                    }}
+                  >
+                    {sellerAPIExampleProps?.path?.[parameter.name]}
+                  </Typography.Text>
+                )}
               </Flex>
             ))}
-          </Flex>
+          </>
         ),
       });
     }
@@ -91,25 +174,80 @@ export const useCommonAddProp = ({
         ),
         children: (
           <Flex vertical gap={8} className={styles.paramList}>
+            {isOpen && currentProp?.path === "QUERY" && (
+              <ExampleValueModal
+                location={currentProp?.path || ""}
+                attribute={currentProp?.name || ""}
+                isOpen={isOpen}
+                onClose={close}
+                onOK={(value: string) => {
+                  setSellerAPIExampleProps({
+                    ...sellerAPIExampleProps,
+                    param: {
+                      ...sellerAPIExampleProps.param,
+                      [get(currentProp, "name", "")]: value,
+                    },
+                  });
+                  close();
+                }}
+              />
+            )}
             {queryParameters.map((parameter: any) => (
-              <Flex
-                align="center"
-                justify="space-between"
-                className={clsx(styles.paramItem, {
-                  [styles.active]:
-                    selectedProp?.location === "QUERY" &&
-                    selectedProp?.name === `@{{query.${parameter.name}}}`,
-                })}
-                key={parameter.name}
-                onClick={() =>
-                  setSelectedProp({
-                    location: "QUERY",
-                    name: `@{{query.${parameter.name}}}`,
-                  })
-                }
-              >
-                {parameter.name}
-                <TypeTag type={parameter.schema.type} />
+              <Flex vertical gap={8} key={parameter.name}>
+                <Flex
+                  align="center"
+                  justify="space-between"
+                  className={clsx(styles.paramItem, {
+                    [styles.active]:
+                      (selectedProp?.location === "QUERY" &&
+                        selectedProp?.name ===
+                          `@{{query.${parameter.name}}}`) ||
+                      (selectedProp?.name ===
+                        `hybrid.${
+                          sellerAPIExampleProps?.param?.[parameter.name]
+                        }` &&
+                        selectedProp?.location === "HYBRID"),
+                  })}
+                  onClick={() => {
+                    if (sellerAPIExampleProps?.param?.[parameter.name]) {
+                      setSelectedProp({
+                        location: "HYBRID",
+                        name: `hybrid.${
+                          sellerAPIExampleProps?.param?.[parameter.name]
+                        }`,
+                      });
+                      return;
+                    }
+                    setSelectedProp({
+                      location: "QUERY",
+                      name: `@{{query.${parameter.name}}}`,
+                    });
+                  }}
+                >
+                  {parameter.name}
+                  <Flex justify="flex-end" align="center">
+                    {parameter?.schema?.type?.toLowerCase?.() === "object" ? (
+                      <Button
+                        type="link"
+                        onClick={() => handleProp(parameter.name, "QUERY")}
+                      >
+                        {sellerAPIExampleProps?.param?.[parameter.name]
+                          ? "Edit value with variable"
+                          : "Add value with variable"}
+                      </Button>
+                    ) : null}
+                    <TypeTag type={parameter.schema.type} />
+                  </Flex>
+                </Flex>
+                {sellerAPIExampleProps?.param?.[parameter.name] && (
+                  <Typography.Text
+                    ellipsis={{
+                      tooltip: sellerAPIExampleProps?.param?.[parameter.name],
+                    }}
+                  >
+                    {sellerAPIExampleProps?.param?.[parameter.name]}
+                  </Typography.Text>
+                )}
               </Flex>
             ))}
           </Flex>
@@ -150,6 +288,9 @@ export const useCommonAddProp = ({
     requestBodyTree,
     selectedProp,
     selectedKey,
+    currentProp,
+    isOpen,
+    sellerAPIExampleProps,
   ]);
 
   return {

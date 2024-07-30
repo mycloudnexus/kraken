@@ -215,6 +215,13 @@ const RequestItem = ({ item, index }: Props) => {
           placeholder="Select or input property"
           suffix={<RightOutlined style={{ fontSize: 12, color: "#C9CDD4" }} />}
           onChange={(e) => {
+            if (e.target?.value?.startsWith("hybrid.")) {
+              const newRequest = cloneDeep(requestMapping);
+              set(newRequest, `[${index}].target`, get(e, "target.value", ""));
+              set(newRequest, `[${index}].targetLocation`, "HYBRID");
+              setRequestMapping(newRequest);
+              return;
+            }
             const newValue = get(e, "target.value", "")
               .replace?.("@{{", "")
               .replace?.("}}", "");
