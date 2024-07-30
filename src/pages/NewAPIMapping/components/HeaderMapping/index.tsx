@@ -3,9 +3,8 @@ import Text from "@/components/Text";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { EnumRightType } from "@/utils/types/common.type";
 import { RightOutlined } from "@ant-design/icons";
-import { Flex, Tag, Tooltip, Typography } from "antd";
+import { Flex, Typography } from "antd";
 import clsx from "clsx";
-import { capitalize } from "lodash";
 import MappingIcon from "@/assets/newAPIMapping/mapping-icon.svg";
 import MappingReverseIcon from "@/assets/newAPIMapping/mapping-icon-reverse.svg";
 import styles from "./index.module.scss";
@@ -27,18 +26,6 @@ const HeaderMapping = () => {
           }}
         >
           <Text.NormalLarge>Sonata API</Text.NormalLarge>
-          <Flex>
-            {queryData?.productType && (
-              <Tooltip title="Product type">
-                <Tag>{queryData.productType.toUpperCase()}</Tag>
-              </Tooltip>
-            )}
-            {queryData?.actionType && (
-              <Tooltip title="Action type">
-                <Tag>{capitalize(queryData.actionType)}</Tag>
-              </Tooltip>
-            )}
-          </Flex>
         </Flex>
         <Text.NormalLarge
           style={{
