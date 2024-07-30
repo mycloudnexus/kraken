@@ -5,8 +5,8 @@ import { useAppStore } from "@/stores/app.store";
 import { IEnv } from "@/utils/types/env.type";
 import { Flex, Table, Typography } from "antd";
 import { useCallback, useMemo } from "react";
-import styles from "./index.module.scss";
 import dayjs from "dayjs";
+import MappingMatrix from '@/components/MappingMatrix';
 
 type Props = {
   env?: IEnv;
@@ -52,19 +52,7 @@ const RunningAPIMapping = ({ env }: Props) => {
                   {item?.path}
                 </Typography.Text>
                 <Flex gap={8} align="center">
-                  {item.productType ? (
-                    <div className={styles.tagInfo}>
-                      {renderTextType(item.productType)}
-                    </div>
-                  ) : null}
-                  {item.actionType ? (
-                    <div
-                      style={{ textTransform: "capitalize" }}
-                      className={styles.tagInfo}
-                    >
-                      {item.actionType}
-                    </div>
-                  ) : null}
+                  <MappingMatrix mappingMatrix={item.mappingMatrix} extraKey={'item.path'} isItemActive={false} />
                 </Flex>
               </Flex>
             ),

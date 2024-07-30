@@ -1,9 +1,9 @@
 import { IMapperDetails } from '@/utils/types/env.type';
 import { InfoCircleFilled } from '@ant-design/icons';
-import { Flex, Tag, Tooltip } from 'antd';
-import { toUpper } from 'lodash';
+import { Flex, Tooltip } from 'antd';
 import Dot from './Dot';
 import styles from '../index.module.scss';
+import MappingMatrix from '@/components/MappingMatrix';
 
 const CollapseItem = ({ data, selectedKey, setActiveSelected }: {
   data: IMapperDetails[];
@@ -13,10 +13,6 @@ const CollapseItem = ({ data, selectedKey, setActiveSelected }: {
   <>
     {data.map((el, elIndex) => {
       const isItemActive = selectedKey === el.targetKey;
-      const tagLabels = Object.entries(el.mappingMatrix).map(([label, value]) => {
-        return { label: label, value: value };
-      });
-
       return (
         <Flex
           key={`${el.targetMapperKey}-${elIndex}`}
@@ -26,40 +22,7 @@ const CollapseItem = ({ data, selectedKey, setActiveSelected }: {
         >
           <Flex>
             <Dot vertical />
-            {tagLabels.map(({ label, value }, index) => {
-              if (index < 2) {
-                return (
-                  <Tag key={`${el.path}-${label}-${value}-${index}`}>
-                    <Flex vertical className={`${styles.tagBadge} ${isItemActive && styles.tagActive}`}>
-                      <span>{label}</span>
-                      {toUpper(String(value))}
-                    </Flex>
-                  </Tag>
-                );
-
-              } else if (index === 2) {
-                return (
-                  <Flex vertical justify="center" className={`${styles.tagBadgeExtra}`} key={`${el.path}-extra-${index}`}>
-                    <Tooltip title={
-                      <Flex>
-                        <Flex className={styles.tagTooltipContainer}>
-                          {tagLabels.slice(index, tagLabels.length).map(({ label, value }, idx) => (
-                            <Flex key={`${el.path}2-${label}-${value}-${idx}`} className={styles.flexItem}>
-                              {label}
-                              <Tag>
-                                {String(value)}
-                              </Tag>
-                            </Flex>
-                          ))}
-                        </Flex>
-                      </Flex>
-                    }>
-                      +{tagLabels.length - 2}
-                    </Tooltip>
-                  </Flex>
-                )
-              }
-            })}
+            <MappingMatrix extraKey={el.path} mappingMatrix={el.mappingMatrix} isItemActive={isItemActive}/>
           </Flex>
           {el.mappingStatus === "incomplete" && (
             <Tooltip title="Incomplete mapping">

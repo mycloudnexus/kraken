@@ -12,7 +12,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { get, isEmpty } from "lodash";
 import RequestMethod from "../Method";
-import ProductActionType from "../ProductActionType";
+import MappingMatrix from '../MappingMatrix';
 
 type Props = {
   open: boolean;
@@ -83,10 +83,7 @@ const DeployStandardAPIModal = ({ open, onClose, defaultKey }: Props) => {
               disabled={!item?.diffWithStage}
             />
             <Text.LightMedium>{item?.path}</Text.LightMedium>
-            <ProductActionType
-              actionType={item?.actionType}
-              productType={item?.productType}
-            />
+            <MappingMatrix mappingMatrix={item.mappingMatrix} />
             {item?.mappingStatus === "incomplete" && (
               <Tag color="red" bordered={false}>
                 Incomplete

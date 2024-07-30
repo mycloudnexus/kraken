@@ -7,7 +7,7 @@ import DeploymentStatus from "../DeploymentStatus";
 import styles from "./index.module.scss";
 import dayjs from "dayjs";
 import RequestMethod from "@/components/Method";
-import ProductActionType from "@/components/ProductActionType";
+import MappingMatrix from '@/components/MappingMatrix';
 
 type Props = {
   env?: IEnv;
@@ -44,10 +44,7 @@ const DeploymentHistory = ({ env }: Props) => {
             >
               {item?.path}
             </Typography.Text>
-            <ProductActionType
-              actionType={item?.actionType}
-              productType={item?.productType}
-            />
+            <MappingMatrix mappingMatrix={item.mappingMatrix} />
           </Flex>
         ),
       },

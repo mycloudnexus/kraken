@@ -85,45 +85,6 @@
 .highlighted {
   color: #2962FF;
 }
-.tagBadge {
-  line-height: 12px;
-  margin-top: 1px;
-  font-size: 10px;
-  span {
-    font-size: 8px;
-    color: rgba(0, 0, 0, 0.45);
-    line-height: 12px;
-  }
-}
-.tagActive {
-  color:#2962FF !important;
-  font-weight: 500;
-}
-
-.tagBadgeExtra {
-  span {
-    padding: 3px 10px;
-    background: #fff;
-    border: 1px solid #DDE1E5;
-    border-radius: 15px;
-    color: rgba(0, 0, 0, 0.45);
-  }
-}
-
-.tagTooltipContainer {
-  display: flex;
-  flex-wrap: wrap;
-  max-width: 200px;
-}
-
-.tagTooltipContainer > .flexItem {
-  flex: 1 1 33.33%;
-  margin: 5px;
-  box-sizing: border-box;
-  justify-content: space-between;
-  gap: 20px;
-}
-
 .dot {
   width: 12px;
   height: 12px;
