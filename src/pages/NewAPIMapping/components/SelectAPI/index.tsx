@@ -8,13 +8,11 @@ import { COMPONENT_KIND_API_TARGET_SPEC } from "@/utils/constants/product";
 import { IComponent } from "@/utils/types/product.type";
 import {
   DownOutlined,
-  ExclamationCircleOutlined,
   RightOutlined,
 } from "@ant-design/icons";
 import {
   Button,
   Input,
-  Modal,
   Spin,
   Tooltip,
   Typography,
@@ -211,7 +209,7 @@ export const APIItem = ({
   );
 };
 
-const SelectAPI = ({ save }: { save: () => Promise<true | undefined> }) => {
+const SelectAPI = () => {
   const { currentProduct } = useAppStore();
   const [selectedAPI, setSelectedAPI] = useState<any>();
   const [selectedServer, setSelectedServer] = useState<string>("");
@@ -264,51 +262,8 @@ const SelectAPI = ({ save }: { save: () => Promise<true | undefined> }) => {
       handleMapSave();
       return;
     }
-    Modal.confirm({
-      width: 500,
-      icon: <ExclamationCircleOutlined />,
-      title:
-        "You are going to switch to another seller API, do you want to save the mappings of current selected API?",
-      content: (
-        <Text.LightMedium>
-          Select yes will save the mappings and switch to another API.
-          <br />
-          Select no will drop the mappings and switch.
-        </Text.LightMedium>
-      ),
-      footer: (_, { CancelBtn, OkBtn }) => (
-        <Flex gap={8} justifyContent="flex-end">
-          <CancelBtn />
-          <Button
-            type="default"
-            onClick={() => {
-              resetMapping();
-              handleMapSave();
-              Modal.destroyAll();
-            }}
-          >
-            Drop and switch
-          </Button>
-          <OkBtn />
-        </Flex>
-      ),
-      okButtonProps: {
-        type: "primary",
-      },
-      okText: "Save and switch",
-      onOk: async () => {
-        await save();
-        resetMapping();
-        handleMapSave();
-        Modal.destroyAll();
-      },
-      cancelButtonProps: {
-        type: "text",
-        style: {
-          color: "#1890FF",
-        },
-      },
-    });
+    resetMapping();
+    handleMapSave();
   };
   const itemLength = dataList?.data?.length ?? 0;
 

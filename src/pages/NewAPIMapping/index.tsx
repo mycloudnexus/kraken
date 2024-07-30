@@ -43,8 +43,7 @@ import { useMappingUiStore } from "@/stores/mappingUi.store";
 const NewAPIMapping = forwardRef(
   ({ refetch }: { refetch?: () => void }, ref) => {
     const { currentProduct } = useAppStore();
-    const { activeTab, setActiveTab, setMappingInProgress } =
-      useMappingUiStore();
+    const { activeTab, setActiveTab } = useMappingUiStore();
     const {
       query,
       rightSide,
@@ -172,7 +171,7 @@ const NewAPIMapping = forwardRef(
               if (
                 rm.source === rightSideInfo?.previousData?.source &&
                 rm.sourceLocation ===
-                  rightSideInfo?.previousData?.sourceLocation
+                rightSideInfo?.previousData?.sourceLocation
               ) {
                 return {
                   ...rm,
@@ -200,7 +199,7 @@ const NewAPIMapping = forwardRef(
             if (
               rm.source === rightSideInfo?.previousData?.source &&
               rm.sourceLocation ===
-                rightSideInfo?.previousData?.sourceLocation &&
+              rightSideInfo?.previousData?.sourceLocation &&
               rm.name === rightSideInfo?.previousData?.name
             ) {
               return {
@@ -287,7 +286,6 @@ const NewAPIMapping = forwardRef(
         notification.success({ message: res.message });
         setStep(1);
         setActiveKey("1");
-        setMappingInProgress(false);
         callback && callback();
         return true;
       } catch (error) {
@@ -305,7 +303,6 @@ const NewAPIMapping = forwardRef(
       setRequestMapping(resetMapping() ?? []);
       setResponseMapping(mappers?.response);
       setActiveTab("request");
-      setMappingInProgress(false);
     }, [
       setRequestMapping,
       resetMapping,
@@ -400,7 +397,7 @@ const NewAPIMapping = forwardRef(
               />
             )}
             {rightSide === EnumRightType.SelectSellerAPI && (
-              <SelectAPI save={() => handleSave()} />
+              <SelectAPI />
             )}
             {rightSide === EnumRightType.AddSellerProp && (
               <RightAddSellerProp onSelect={handleSelectSellerProp} />

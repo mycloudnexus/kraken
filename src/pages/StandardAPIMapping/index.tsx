@@ -19,13 +19,12 @@ import { useCallback, useMemo, useRef } from "react";
 import { IMapperDetails } from "@/utils/types/env.type";
 import NewAPIMapping from "../NewAPIMapping";
 import groupByPath from "@/utils/helpers/groupByPath";
-import { showModalChangePath } from "../NewAPIMapping/components/ModalChangePath";
 import { useBoolean } from "usehooks-ts";
 
 const StandardAPIMapping = () => {
   const { currentProduct } = useAppStore();
   const { componentId } = useParams();
-  const { activePath, mappingInProgress, setActivePath, setMappingInProgress, setSelectedKey } =
+  const { activePath, setActivePath, setSelectedKey } =
     useMappingUiStore();
   const newAPIMappingRef = useRef<any>(null);
 
@@ -70,28 +69,12 @@ const StandardAPIMapping = () => {
     reset();
     setActivePath(mapItem.path);
     setQuery(JSON.stringify(mapItem));
-    setMappingInProgress(false);
   };
 
   const handleDisplay = (mapItem: IMapperDetails) => {
     setIsChangeMappingKey(true);
-    if (mappingInProgress) {
-      showModalChangePath(
-        () => {
-          newAPIMappingRef.current.handleSave();
-          refetch();
-          resetState(mapItem);
-          setSelectedKey(mapItem.targetKey)
-        },
-        () => {
-          resetState(mapItem)
-          setSelectedKey(mapItem.targetKey)
-        }
-      );
-    } else {
-      resetState(mapItem);
-      setSelectedKey(mapItem.targetKey)
-    }
+    resetState(mapItem);
+    setSelectedKey(mapItem.targetKey)
     delay(() => setIsChangeMappingKey(false), 100);
   };
 

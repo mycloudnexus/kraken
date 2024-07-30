@@ -15,7 +15,6 @@ import {
 import { useBoolean } from "usehooks-ts";
 import { useEffect, useState } from "react";
 import { EnumRightType } from "@/utils/types/common.type";
-import { useMappingUiStore } from "@/stores/mappingUi.store";
 import clsx from "clsx";
 
 type Props = {
@@ -45,7 +44,6 @@ const ResponseItem = ({ item, index }: Props) => {
     setTrue: enableEditDescription,
     setFalse: disableEditDescription,
   } = useBoolean(false);
-  const { setMappingInProgress } = useMappingUiStore();
 
   const onChangeTitle = () => {
     const newResponse = cloneDeep(responseMapping);
@@ -73,7 +71,6 @@ const ResponseItem = ({ item, index }: Props) => {
   const openSelectorForProp = (name?: string, target?: string) => {
     setActiveResponseName(`${name}-${target}`);
     setRightSide(EnumRightType.AddSellerResponse);
-    setMappingInProgress(true);
   };
 
   const handleChangeResponse = (
@@ -89,11 +86,9 @@ const ResponseItem = ({ item, index }: Props) => {
     set(cloneObj, `[${index}].sourceLocation`, `BODY`);
     setResponseMapping(cloneObj);
     setActiveResponseName(undefined);
-    setMappingInProgress(true);
   };
 
   const handleSetListMapping = (array: Array<any>) => {
-    setMappingInProgress(true);
     setListMappingStateResponse(array);
   };
 

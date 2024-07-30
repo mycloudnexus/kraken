@@ -11,7 +11,6 @@ import clsx from "clsx";
 import { Dispatch, useCallback, useMemo, useState } from "react";
 import styles from "./RightAddSellerProp/index.module.scss";
 import { get } from "lodash";
-import { useMappingUiStore } from "@/stores/mappingUi.store";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { useBoolean } from "usehooks-ts";
 import ExampleValueModal from "@/components/ExampleValueModal";
@@ -37,7 +36,6 @@ export const useCommonAddProp = ({
 }: Props) => {
   const { sellerAPIExampleProps, setSellerAPIExampleProps } =
     useNewApiMappingStore();
-  const { setMappingInProgress } = useMappingUiStore();
   const [currentProp, setCurrentProp] = useState<Record<string, string>>();
   const { value: isOpen, setTrue: open, setFalse: close } = useBoolean(false);
 
@@ -47,7 +45,6 @@ export const useCommonAddProp = ({
       return;
     }
     onSelect?.({ ...selectedProp, title: rightSideInfo?.title });
-    setMappingInProgress(true);
   }, [selectedProp, onSelect, rightSideInfo]);
 
   const selectedKey = useMemo(
