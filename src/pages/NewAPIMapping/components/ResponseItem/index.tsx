@@ -1,6 +1,6 @@
 import { IResponseMapping } from "@/utils/types/component.type";
 import styles from "./index.module.scss";
-import { Button, Flex, Input, Select } from "antd";
+import { Button, Flex, Input, Select, Typography } from "antd";
 import Text from "@/components/Text";
 import MappingIcon from "@/assets/newAPIMapping/mapping-icon-response.svg";
 import { cloneDeep, difference, get, isEmpty, set } from "lodash";
@@ -208,11 +208,14 @@ const ResponseItem = ({ item, index }: Props) => {
       </Flex>
       <Flex className={styles.container} gap={8} wrap="wrap" align="center">
         <div className={styles.target}>
-          <Text.LightMedium lineHeight="32px">
+          <Typography.Text
+            ellipsis={{ tooltip: item.target }}
+            style={{ lineHeight: "32px", fontWeight: 400 }}
+          >
             {!isEmpty(item?.target)
               ? item?.target
               : "No mapping to Sonata API is required"}
-          </Text.LightMedium>
+          </Typography.Text>
         </div>
         <MappingIcon />
         <Input
@@ -292,7 +295,7 @@ const ResponseItem = ({ item, index }: Props) => {
               onClick={() => handleAdd(item?.name)}
               data-testid="btn-add-state"
             >
-              + {item.title}
+              + Add Value Mapping
             </Button>
           </Flex>
         </Flex>
