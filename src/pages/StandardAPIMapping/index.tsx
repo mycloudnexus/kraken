@@ -15,7 +15,7 @@ import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { useMappingUiStore } from "@/stores/mappingUi.store";
 import ComponentSelect from "./components/ComponentSelect";
 import MappingDetailsList from "./components/MappingDetailsList";
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { IMapperDetails } from "@/utils/types/env.type";
 import NewAPIMapping from "../NewAPIMapping";
 import groupByPath from "@/utils/helpers/groupByPath";
@@ -24,7 +24,7 @@ import { useBoolean } from "usehooks-ts";
 const StandardAPIMapping = () => {
   const { currentProduct } = useAppStore();
   const { componentId } = useParams();
-  const { activePath, setActivePath, setSelectedKey } =
+  const { activePath, selectedKey, setActivePath, setSelectedKey } =
     useMappingUiStore();
   const newAPIMappingRef = useRef<any>(null);
 
@@ -70,6 +70,13 @@ const StandardAPIMapping = () => {
     setActivePath(mapItem.path);
     setQuery(JSON.stringify(mapItem));
   };
+
+  useEffect(() => {
+    const mapItem = detailDataMapping?.details.find((item) => item.targetKey === selectedKey)
+    if(mapItem) {
+      setQuery(JSON.stringify(mapItem));
+    }
+  }, [detailDataMapping])
 
   const handleDisplay = (mapItem: IMapperDetails) => {
     setIsChangeMappingKey(true);
