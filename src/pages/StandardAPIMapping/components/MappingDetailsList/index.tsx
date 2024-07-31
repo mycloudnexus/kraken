@@ -27,7 +27,7 @@ const MappingDetailsList = ({
     setActiveTab,
   } = useMappingUiStore();
 
-  useEffect(() => {
+  const initList = useCallback(() => {
     const headersList = Object.keys(groupedPaths);
     if (headersList.length > 0) {
       const initialMapItem = groupedPaths[headersList[0]][0];
@@ -35,7 +35,11 @@ const MappingDetailsList = ({
       setActivePath(initialMapItem.path);
       setActiveSelected(initialMapItem);
     }
-  }, [groupedPaths]);
+  }, [activePath])
+
+  useEffect(() => {
+    initList()
+  }, [window.location.pathname]);
 
   const handleSelection = useCallback(
     (mapItem: IMapperDetails) => {
