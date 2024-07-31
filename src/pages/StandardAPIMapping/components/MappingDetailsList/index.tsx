@@ -35,7 +35,7 @@ const MappingDetailsList = ({
       setActivePath(initialMapItem.path);
       setActiveSelected(initialMapItem);
     }
-  }, []);
+  }, [groupedPaths]);
 
   const handleSelection = useCallback(
     (mapItem: IMapperDetails) => {
