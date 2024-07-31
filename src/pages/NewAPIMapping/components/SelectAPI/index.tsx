@@ -6,18 +6,8 @@ import { useAppStore } from "@/stores/app.store";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { COMPONENT_KIND_API_TARGET_SPEC } from "@/utils/constants/product";
 import { IComponent } from "@/utils/types/product.type";
-import {
-  DownOutlined,
-  RightOutlined,
-} from "@ant-design/icons";
-import {
-  Button,
-  Input,
-  Spin,
-  Tooltip,
-  Typography,
-  notification,
-} from "antd";
+import { DownOutlined, RightOutlined } from "@ant-design/icons";
+import { Button, Input, Spin, Tooltip, Typography, notification } from "antd";
 import clsx from "clsx";
 import jsYaml from "js-yaml";
 import { cloneDeep, get, isEmpty } from "lodash";
@@ -167,11 +157,11 @@ export const APIItem = ({
             const [url, method] = key.split(" ");
             const active = selectedAPI
               ? item?.metadata?.name === selectedAPI?.name &&
-              url === selectedAPI?.url &&
-              method === selectedAPI?.method
+                url === selectedAPI?.url &&
+                method === selectedAPI?.method
               : item?.metadata?.name === sellerApi?.name &&
-              url === sellerApi?.url &&
-              method === sellerApi?.method;
+                url === sellerApi?.url &&
+                method === sellerApi?.method;
             return (
               <div
                 className={clsx(styles.card, {
@@ -209,7 +199,11 @@ export const APIItem = ({
   );
 };
 
-const SelectAPI = () => {
+const SelectAPI = ({
+  isRequiredMapping = true,
+}: {
+  isRequiredMapping?: boolean;
+}) => {
   const { currentProduct } = useAppStore();
   const [selectedAPI, setSelectedAPI] = useState<any>();
   const [selectedServer, setSelectedServer] = useState<string>("");
@@ -228,7 +222,10 @@ const SelectAPI = () => {
   });
   const queryData = JSON.parse(query ?? "{}");
 
-  const { mappers } = useGetApiSpec(currentProduct, queryData?.targetMapperKey ?? "");
+  const { mappers } = useGetApiSpec(
+    currentProduct,
+    queryData?.targetMapperKey ?? ""
+  );
 
   const handleMapSave = () => {
     setSellerApi(selectedAPI);
@@ -255,9 +252,17 @@ const SelectAPI = () => {
       setRequestMapping(newApiRequest);
       setResponseMapping(newApiResponse);
     }
-  }, [mappers?.request, mappers?.response, setRequestMapping, setResponseMapping]);
+  }, [
+    mappers?.request,
+    mappers?.response,
+    setRequestMapping,
+    setResponseMapping,
+  ]);
 
   const handleOK = () => {
+    if (!isRequiredMapping) {
+      return;
+    }
     if (isEmpty(sellerApi)) {
       handleMapSave();
       return;
@@ -275,17 +280,21 @@ const SelectAPI = () => {
       <Spin spinning={isLoading} className={styles.loading}>
         <div className={styles.container}>
           <div className={styles.content}>
-            {dataList?.data?.map((item: IComponent, index: number) => (
-              <APIItem
-                item={item}
-                key={item.id}
-                isOneItem={itemLength === 1 && index === 0}
-                setSellerApi={setSelectedAPI}
-                selectedAPI={selectedAPI}
-                setSelectedServer={setSelectedServer}
-              />
-            ))}
-            {!isLoading && isEmpty(dataList?.data) && (
+            {!isRequiredMapping && (
+              <Text.LightMedium>Not required.</Text.LightMedium>
+            )}
+            {isRequiredMapping &&
+              dataList?.data?.map((item: IComponent, index: number) => (
+                <APIItem
+                  item={item}
+                  key={item.id}
+                  isOneItem={itemLength === 1 && index === 0}
+                  setSellerApi={setSelectedAPI}
+                  selectedAPI={selectedAPI}
+                  setSelectedServer={setSelectedServer}
+                />
+              ))}
+            {isRequiredMapping && !isLoading && isEmpty(dataList?.data) && (
               <div className={styles.empty}>
                 <Flex flexDirection="column" gap={24}>
                   <EmptyIcon />
@@ -320,9 +329,14 @@ const SelectAPI = () => {
         style={{ padding: 14, borderTop: "1px solid #F0F0F0 " }}
       >
         <Button
-          disabled={isEmpty(selectedAPI)}
+          disabled={isEmpty(selectedAPI) || !isRequiredMapping}
           type="primary"
           onClick={handleOK}
+          style={
+            isRequiredMapping
+              ? {}
+              : { background: "#2962FF", opacity: 0.4, color: "#fff" }
+          }
         >
           OK
         </Button>

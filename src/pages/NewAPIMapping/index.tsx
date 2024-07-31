@@ -39,9 +39,57 @@ import { queryClient } from "@/utils/helpers/reactQuery";
 import styles from "./index.module.scss";
 import buildInitListMapping from "@/utils/helpers/buildInitListMapping";
 import { useMappingUiStore } from "@/stores/mappingUi.store";
+import Text from "@/components/Text";
+
+type Props = {
+  rightSide: number;
+  jsonSpec: any;
+  method: string;
+  handleSelectSonataProp: (value: any) => void;
+  handleSelectSellerProp: (value: any) => void;
+  isRequiredMapping: boolean;
+};
+
+const RightSide = ({
+  rightSide,
+  jsonSpec,
+  method,
+  handleSelectSonataProp,
+  handleSelectSellerProp,
+  isRequiredMapping,
+}: Props) => {
+  if (!isRequiredMapping) {
+    return <SelectAPI isRequiredMapping={isRequiredMapping} />;
+  }
+  switch (rightSide) {
+    case EnumRightType.AddSonataProp:
+      return (
+        <RightAddSonataProp
+          spec={jsonSpec}
+          method={method}
+          onSelect={handleSelectSonataProp}
+        />
+      );
+    case EnumRightType.SelectSellerAPI:
+      return <SelectAPI />;
+
+    case EnumRightType.AddSellerProp:
+      return <RightAddSellerProp onSelect={handleSelectSellerProp} />;
+    case EnumRightType.AddSellerResponse:
+      return <SelectResponseProperty />;
+    default:
+      return <></>;
+  }
+};
 
 const NewAPIMapping = forwardRef(
-  ({ refetch }: { refetch?: () => void }, ref) => {
+  (
+    {
+      refetch,
+      isRequiredMapping,
+    }: { refetch?: () => void; isRequiredMapping: boolean },
+    ref
+  ) => {
     const { currentProduct } = useAppStore();
     const { activeTab, setActiveTab } = useMappingUiStore();
     const {
@@ -138,12 +186,20 @@ const NewAPIMapping = forwardRef(
       {
         key: "request",
         label: "Request mapping",
-        children: <RequestMapping />,
+        children: isRequiredMapping ? (
+          <RequestMapping />
+        ) : (
+          <Text.LightMedium>Not required.</Text.LightMedium>
+        ),
       },
       {
         key: "response",
         label: "Response mapping",
-        children: <ResponseMapping />,
+        children: isRequiredMapping ? (
+          <ResponseMapping />
+        ) : (
+          <Text.LightMedium>Not required.</Text.LightMedium>
+        ),
         disabled: loadingMapper,
       },
     ];
@@ -171,7 +227,7 @@ const NewAPIMapping = forwardRef(
               if (
                 rm.source === rightSideInfo?.previousData?.source &&
                 rm.sourceLocation ===
-                rightSideInfo?.previousData?.sourceLocation
+                  rightSideInfo?.previousData?.sourceLocation
               ) {
                 return {
                   ...rm,
@@ -199,7 +255,7 @@ const NewAPIMapping = forwardRef(
             if (
               rm.source === rightSideInfo?.previousData?.source &&
               rm.sourceLocation ===
-              rightSideInfo?.previousData?.sourceLocation &&
+                rightSideInfo?.previousData?.sourceLocation &&
               rm.name === rightSideInfo?.previousData?.name
             ) {
               return {
@@ -336,6 +392,20 @@ const NewAPIMapping = forwardRef(
         />
         <Flex gap={8} className={styles.mainWrapper}>
           <div className={styles.center}>
+            {!isRequiredMapping && (
+              <Flex
+                justifyContent="flex-start"
+                gap={10}
+                className={styles.isRequiredMapping}
+                alignItems="center"
+              >
+                <InfoCircleOutlined style={{ color: "#00000073" }} />
+                <Text.LightSmall color="#000000D9">
+                  This mapping is not needed, all the data will be queried from
+                  Adapter layer. This end point is able to deploy.
+                </Text.LightSmall>
+              </Flex>
+            )}
             <Flex className={styles.breadcrumb} justifyContent="space-between">
               <Flex className={styles.infoBox}>
                 {queryData.mappingStatus === "incomplete" && (
@@ -344,7 +414,7 @@ const NewAPIMapping = forwardRef(
                   </Tag>
                 )}
                 {queryData?.lastDeployedAt && (
-                <Flex gap={8}>
+                  <Flex gap={8}>
                     {toDateTime(queryData.lastDeployedAt)}
                     <Tooltip title="Last deployed at">
                       <InfoCircleOutlined
@@ -362,6 +432,7 @@ const NewAPIMapping = forwardRef(
                 <DeployStandardAPI metadataKey={metadataKey} />
                 <Tooltip title="Restore">
                   <Button
+                    disabled={!isRequiredMapping}
                     className={styles.revertButton}
                     onClick={handleRevert}
                   >
@@ -370,6 +441,7 @@ const NewAPIMapping = forwardRef(
                 </Tooltip>
 
                 <Button
+                  disabled={!isRequiredMapping}
                   data-testid="btn-save"
                   type="primary"
                   onClick={() => handleSave(refetch)}
@@ -379,7 +451,7 @@ const NewAPIMapping = forwardRef(
                 </Button>
               </Flex>
             </Flex>
-            <HeaderMapping />
+            <HeaderMapping disabled={!isRequiredMapping} />
             <Tabs
               items={items}
               activeKey={activeTab}
@@ -387,22 +459,14 @@ const NewAPIMapping = forwardRef(
             />
           </div>
           <div className={styles.right}>
-            {rightSide === EnumRightType.AddSonataProp && (
-              <RightAddSonataProp
-                spec={jsonSpec}
-                method={queryData?.method}
-                onSelect={handleSelectSonataProp}
-              />
-            )}
-            {rightSide === EnumRightType.SelectSellerAPI && (
-              <SelectAPI />
-            )}
-            {rightSide === EnumRightType.AddSellerProp && (
-              <RightAddSellerProp onSelect={handleSelectSellerProp} />
-            )}
-            {rightSide === EnumRightType.AddSellerResponse && (
-              <SelectResponseProperty />
-            )}
+            <RightSide
+              rightSide={Number(rightSide)}
+              isRequiredMapping={isRequiredMapping}
+              method={queryData?.method}
+              jsonSpec={jsonSpec}
+              handleSelectSellerProp={handleSelectSellerProp}
+              handleSelectSonataProp={handleSelectSonataProp}
+            />
           </div>
         </Flex>
       </Flex>

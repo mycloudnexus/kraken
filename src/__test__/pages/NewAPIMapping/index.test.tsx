@@ -112,7 +112,8 @@ test("NewAPIMapping page", () => {
   const { container } = render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <NewAPIMapping />
+        <NewAPIMapping isRequiredMapping={true} />
+        <NewAPIMapping isRequiredMapping={false} />
       </BrowserRouter>
     </QueryClientProvider>
   );

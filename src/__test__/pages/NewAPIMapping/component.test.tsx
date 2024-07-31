@@ -876,6 +876,7 @@ beforeAll(() => {
 test("groupPath fnc", () => {
   const result = groupByPath([
     {
+      requiredMapping: true,
       targetKey: "mef.sonata.api-target.quote.eline.add",
       targetMapperKey: "mef.sonata.api-target-mapper.quote.eline.add",
       description: "This operation creates a Quote entity",
@@ -895,6 +896,7 @@ test("groupPath fnc", () => {
       diffWithStage: true,
     },
     {
+      requiredMapping: false,
       targetKey: "mef.son.api-target.quote.uni.read",
       targetMapperKey: "mef.sonata.api-target-mapper.quote.uni.read",
       description:
@@ -914,6 +916,7 @@ test("groupPath fnc", () => {
       diffWithStage: false,
     },
     {
+      requiredMapping: true,
       targetKey: "mef.sonata.api-target.quote.eline.read",
       targetMapperKey: "mef.sonata.api-target-mapper.quote.eline.read",
       description:
@@ -932,6 +935,7 @@ test("groupPath fnc", () => {
       diffWithStage: true,
     },
     {
+      requiredMapping: false,
       targetKey: "mef.sonata.api-target.quote.uni.add",
       targetMapperKey: "mef.sonata.api-target-mapper.quote.uni.add",
       description: "This operation creates a Quote entity",
@@ -955,6 +959,7 @@ test("groupPath fnc", () => {
   expect(result).toEqual({
     "/api/son/x/v8/quote": [
       {
+        requiredMapping: true,
         actionType: "add",
         description: "This operation creates a Quote entity",
         diffWithStage: true,
@@ -974,6 +979,7 @@ test("groupPath fnc", () => {
         updatedAt: "2021-07-22T08:21:00",
       },
       {
+        requiredMapping: false,
         actionType: "add",
         description: "This operation creates a Quote entity",
         diffWithStage: false,
@@ -995,6 +1001,7 @@ test("groupPath fnc", () => {
     ],
     "/api/son/x/v8/quote/{id}": [
       {
+        requiredMapping: false,
         description:
           "This operation retrieves a Quote entity. Attribute selection is enabled for all first level attributes.",
         diffWithStage: false,
@@ -1014,6 +1021,7 @@ test("groupPath fnc", () => {
         updatedAt: "2024-07-18T01:59:05.410355Z",
       },
       {
+        requiredMapping: true,
         description:
           "This operation retrieves a Quote entity. Attribute selection is enabled for all first level attributes.",
         diffWithStage: true,

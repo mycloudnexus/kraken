@@ -91,6 +91,10 @@ export const useCommonAddProp = ({
                     },
                   });
                   close();
+                  setSelectedProp({
+                    location: "HYBRID",
+                    name: `hybrid.${value}`,
+                  });
                 }}
               />
             )}
@@ -186,6 +190,10 @@ export const useCommonAddProp = ({
                     },
                   });
                   close();
+                  setSelectedProp({
+                    location: "HYBRID",
+                    name: `hybrid.${value}`,
+                  });
                 }}
               />
             )}

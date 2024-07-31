@@ -217,7 +217,7 @@ const EnvironmentOverview = () => {
       >
         <Text.NormalLarge>
           {selectedEnv?.name?.toLocaleLowerCase?.() === "production"
-            ? "Running Component Versions"
+            ? "Component deployment history"
             : "API Mapping Deployment history"}
         </Text.NormalLarge>
         <DeploymentHistory env={selectedEnv} />

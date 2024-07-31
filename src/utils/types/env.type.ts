@@ -93,4 +93,5 @@ export interface IMapperDetails {
   updatedAt: string;
   lastDeployedAt?: string;
   diffWithStage?: boolean;
+  requiredMapping: boolean;
 }

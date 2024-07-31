@@ -9,7 +9,7 @@ import MappingIcon from "@/assets/newAPIMapping/mapping-icon.svg";
 import MappingReverseIcon from "@/assets/newAPIMapping/mapping-icon-reverse.svg";
 import styles from "./index.module.scss";
 import { useMappingUiStore } from "@/stores/mappingUi.store";
-const HeaderMapping = () => {
+const HeaderMapping = ({ disabled = false }) => {
   const { query, sellerApi, rightSide, setRightSide } = useNewApiMappingStore();
   const { activeTab } = useMappingUiStore();
   const queryData = JSON.parse(query ?? "{}");
@@ -61,6 +61,9 @@ const HeaderMapping = () => {
             [styles.highlight]: rightSide === EnumRightType.SelectSellerAPI,
           })}
           onClick={() => {
+            if (disabled) {
+              return;
+            }
             setRightSide(EnumRightType.SelectSellerAPI);
           }}
         >

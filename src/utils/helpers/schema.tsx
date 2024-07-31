@@ -203,7 +203,9 @@ export const exampleParse = (
         style={{ width: "100%", alignItems: "stretch" }}
         gap={3}
       >
-        <span className={nodeTitleClassName}>{key}</span>
+        <span className={nodeTitleClassName}>
+          {isArray(example) && !prefix ? "response" : key}
+        </span>
 
         <span className={nodeExampleClassName}>
           {isArray(example) && !prefix

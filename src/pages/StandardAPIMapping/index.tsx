@@ -7,7 +7,7 @@ import {
 import { Button, Flex, notification, Spin } from "antd";
 import { showModalConfirmCreateVersion } from "./components/ModalConfirmCreateVersion";
 import styles from "./index.module.scss";
-import { delay, get } from "lodash";
+import { delay, get, isEmpty } from "lodash";
 import { useParams } from "react-router";
 import { useAppStore } from "@/stores/app.store";
 import { SUCCESS_CODE } from "@/utils/constants/api";
@@ -24,7 +24,7 @@ import { useBoolean } from "usehooks-ts";
 const StandardAPIMapping = () => {
   const { currentProduct } = useAppStore();
   const { componentId } = useParams();
-  const { activePath, selectedKey, setActivePath, setSelectedKey } =
+  const { activePath, setActivePath, selectedKey, setSelectedKey } =
     useMappingUiStore();
   const newAPIMappingRef = useRef<any>(null);
 
@@ -72,18 +72,33 @@ const StandardAPIMapping = () => {
   };
 
   useEffect(() => {
-    const mapItem = detailDataMapping?.details.find((item) => item.targetKey === selectedKey)
-    if(mapItem) {
+    const mapItem = detailDataMapping?.details.find(
+      (item) => item.targetKey === selectedKey
+    );
+    if (mapItem) {
       setQuery(JSON.stringify(mapItem));
     }
-  }, [detailDataMapping])
+  }, [detailDataMapping]);
 
   const handleDisplay = (mapItem: IMapperDetails) => {
     setIsChangeMappingKey(true);
     resetState(mapItem);
-    setSelectedKey(mapItem.targetKey)
+    setSelectedKey(mapItem.targetKey);
     delay(() => setIsChangeMappingKey(false), 100);
   };
+
+  const isRequiredMapping = useMemo(() => {
+    if (activePath) {
+      const currentItem = detailDataMapping?.details?.find(
+        (i) => i.path === activePath
+      );
+      if (isEmpty(currentItem)) {
+        return true;
+      }
+      return currentItem.requiredMapping;
+    }
+    return true;
+  }, [activePath]);
 
   const componentName = useMemo(
     () => get(componentDetail, "metadata.name", ""),
@@ -102,7 +117,11 @@ const StandardAPIMapping = () => {
           componentList={componentList}
           componentName={componentName}
         />
-        <Flex vertical justify={isLoading ? "center" : "space-between"} className={styles.leftWrapper}>
+        <Flex
+          vertical
+          justify={isLoading ? "center" : "space-between"}
+          className={styles.leftWrapper}
+        >
           <Spin spinning={isLoading}>
             {!isGroupedPathsEmpty && (
               <MappingDetailsList
@@ -128,9 +147,17 @@ const StandardAPIMapping = () => {
             Create new version
           </Button>
         </Flex>
-        <Flex align="center" justify="center" className={styles.versionListWrapper}>
+        <Flex
+          align="center"
+          justify="center"
+          className={styles.versionListWrapper}
+        >
           {activePath && !isChangeMappingKey ? (
-            <NewAPIMapping ref={newAPIMappingRef} refetch={refetch} />
+            <NewAPIMapping
+              ref={newAPIMappingRef}
+              refetch={refetch}
+              isRequiredMapping={isRequiredMapping}
+            />
           ) : (
             <Spin />
           )}
