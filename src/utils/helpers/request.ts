@@ -5,7 +5,7 @@ import axios, {
   InternalAxiosRequestConfig,
 } from "axios";
 import qs from "qs";
-import { clearData, getData } from "./token";
+import { clearData, getData, storeData } from "./token";
 import { AXIOS_MESSAGE } from "../constants/message";
 import { ROUTES } from "../constants/route";
 import { get } from "lodash";
@@ -15,10 +15,10 @@ const DIRECT_LOGIN_MSG = [
   AXIOS_MESSAGE.TOKEN_INVALID,
 ];
 const onError = (error: AxiosError) => {
-  console.error("Request Failed:", error.config);
   if (error.response) {
     const errorMsg = (error.response.data as any)?.error;
-    if (DIRECT_LOGIN_MSG.includes(String(errorMsg))) {
+    if (DIRECT_LOGIN_MSG.includes(String(errorMsg)) || error.response.status === 401) {
+      storeData("lastVisitedPath", window.location.pathname)
       void message.error("Your session has expired. Please log in again.");
       clearData("token");
       window.location.href = ROUTES.LOGIN;

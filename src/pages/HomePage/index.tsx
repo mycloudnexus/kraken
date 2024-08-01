@@ -7,9 +7,10 @@ import { COMPONENT_KIND_API_TARGET_SPEC } from "@/utils/constants/product";
 import StepCard from "./components/StepCard";
 import ApiComponents from "./components/ApiComponents";
 import { useGetComponentList } from "@/hooks/product";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { isEmpty } from "lodash";
 import { UsergroupAddOutlined } from "@ant-design/icons";
+import { clearData, getData } from '@/utils/helpers/token';
 
 const HomePage = () => {
   const { currentProduct } = useAppStore();
@@ -31,6 +32,16 @@ const HomePage = () => {
   const navigateBuy = useCallback(() => {
     navigate("/buyer");
   }, []);
+
+  useEffect(() => {
+    if (isLoading) return;
+
+    const pathToRedirect = getData("lastVisitedPath");
+    if (pathToRedirect) {
+      navigate(pathToRedirect);
+      clearData("lastVisitedPath");
+    }
+  }, [isLoading]);
 
   return (
     <div className={styles.homePage}>
