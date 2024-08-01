@@ -19,6 +19,8 @@ import styles from "./index.module.scss";
 import useGetApiSpec from "../useGetApiSpec";
 import EmptyIcon from "@/assets/newAPIServer/empty.svg";
 import RequestMethod from "@/components/Method";
+import { extractOpenApiStrings } from "@/utils/helpers/schema";
+import { decode } from "js-base64";
 
 type ItemProps = {
   item: IComponent;
@@ -43,9 +45,7 @@ export const APIItem = ({
     try {
       const encoded = item?.facets?.baseSpec?.content;
       if (!encoded) return undefined;
-      const yamlContent = atob(encoded.slice(31))
-        .replace(/(â)/g, "")
-        .replace(/(â)/g, "");
+      const yamlContent = extractOpenApiStrings(decode(encoded));
       return jsYaml.load(yamlContent);
     } catch (error) {
       return "";
@@ -54,18 +54,21 @@ export const APIItem = ({
 
   const [resolvedSpec, setResolvedSpec] = useState<any>();
 
+  const load = async (spec: Record<string, any>) => {
+    try {
+      const result = await swaggerClient.resolve({ spec });
+
+      setResolvedSpec(result.spec);
+    } catch (error) {
+      notification.error({
+        message: "Can not load information from API seller",
+      });
+    }
+  };
+
   useEffect(() => {
     if (!baseSpec) return;
-    (async () => {
-      try {
-        const result = await swaggerClient.resolve({ spec: baseSpec });
-        setResolvedSpec(result.spec);
-      } catch (error) {
-        notification.error({
-          message: "Can not load information from API seller",
-        });
-      }
-    })();
+    load(baseSpec);
   }, [baseSpec]);
 
   useEffect(() => {
@@ -89,7 +92,7 @@ export const APIItem = ({
       setSelectedServer(serverKey);
     }
     const listSpec: any[] = [];
-    Object.entries(resolvedSpec.paths).forEach(
+    Object.entries(get(resolvedSpec, "paths", [])).forEach(
       ([path, methodObj]: [string, any]) => {
         Object.entries(methodObj).forEach(([method, spec]) => {
           listSpec.push({

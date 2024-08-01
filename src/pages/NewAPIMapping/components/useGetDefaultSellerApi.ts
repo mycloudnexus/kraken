@@ -1,6 +1,8 @@
 import { useGetComponentList } from "@/hooks/product";
 import { COMPONENT_KIND_API_TARGET_SPEC } from "@/utils/constants/product";
+import { extractOpenApiStrings } from "@/utils/helpers/schema";
 import { notification } from "antd";
+import { decode } from "js-base64";
 import jsYaml from "js-yaml";
 import { get } from "lodash";
 import { useEffect, useMemo, useState } from "react";
@@ -32,9 +34,7 @@ const useGetDefaultSellerApi = (
     try {
       const encoded = apiTargetSpecComponent?.facets?.baseSpec?.content;
       if (!encoded) return undefined;
-      const yamlContent = atob(encoded.slice(31))
-        .replace(/(â)/g, "")
-        .replace(/(â)/g, "");
+      const yamlContent = extractOpenApiStrings(decode(encoded));
       const result = jsYaml.load(yamlContent);
       return result;
     } catch (error) {
@@ -59,7 +59,7 @@ const useGetDefaultSellerApi = (
     if (isLoading || !resolvedSpec) return;
     const name = get(apiTargetSpecComponent, "metadata.name");
     const listSpec: any[] = [];
-    Object.entries(resolvedSpec.paths).forEach(
+    Object.entries(get(resolvedSpec, "paths", [])).forEach(
       ([path, methodObj]: [string, any]) => {
         Object.entries(methodObj).forEach(([method, spec]) => {
           listSpec.push({

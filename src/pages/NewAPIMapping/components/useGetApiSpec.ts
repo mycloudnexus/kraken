@@ -3,14 +3,13 @@ import {
   COMPONENT_KIND_API,
   COMPONENT_KIND_API_SPEC,
 } from "@/utils/constants/product";
+import { extractOpenApiStrings } from "@/utils/helpers/schema";
 import transformTarget from "@/utils/helpers/transformTarget";
+import { decode } from "js-base64";
 import jsYaml from "js-yaml";
 import { useMemo, useCallback } from "react";
 
-const useGetApiSpec = (
-  currentProduct: string,
-  targetMapperKey: string
-) => {
+const useGetApiSpec = (currentProduct: string, targetMapperKey: string) => {
   const { data: mapperResponse, isLoading } = useGetComponentListV2(
     currentProduct,
     targetMapperKey
@@ -43,7 +42,9 @@ const useGetApiSpec = (
 
   const jsonSpec = useMemo(() => {
     if (!apiSpec) return undefined;
-    const yamlContent = atob(apiSpec?.facets?.baseSpec?.content);
+    const yamlContent = extractOpenApiStrings(
+      decode(apiSpec?.facets?.baseSpec?.content)
+    );
     return jsYaml.load(yamlContent);
   }, [apiSpec]);
 

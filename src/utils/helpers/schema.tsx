@@ -236,3 +236,15 @@ export const exampleParse = (
     };
   });
 };
+
+export const extractOpenApiStrings = (inputString: string) => {
+  const idxOpenAPI = inputString?.indexOf("openapi:");
+  const idxSwagger = inputString?.indexOf("swagger:");
+  if (idxOpenAPI === -1 && idxSwagger === -1) {
+    return "";
+  }
+  if (idxSwagger !== -1) {
+    return inputString.substring(idxSwagger, inputString?.length);
+  }
+  return inputString.substring(idxOpenAPI, inputString?.length);
+};
