@@ -320,9 +320,10 @@ const NewAPIMapping = forwardRef(
                 ?.replace?.("path.", "")
                 .replace?.("query.", "")
                 .replace?.("hybrid.", ""),
-              targetLocation: !isEmpty(get(rm, "target", ""))
-                ? get(rm, "targetLocation", "")
-                : "",
+              targetLocation:
+                isEmpty(rm?.target) && rm?.targetLocation === "HYBRID"
+                  ? ""
+                  : get(rm, "targetLocation", ""),
               sourceLocation: get(rm, "sourceLocation", ""),
               requiredMapping: Boolean(rm.requiredMapping),
             })),
