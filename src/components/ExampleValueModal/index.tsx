@@ -44,12 +44,14 @@ const ExampleValueModal = ({
       onOk={handleOK}
       title="Add example value with variable"
       className={styles.modal}
+      okButtonProps={{ "data-testid": "example-btn" }}
     >
       <Flex justifyContent="flex-start" style={{ marginBottom: 4 }}>
         <Tag color="blue">JSON</Tag>
         <Text.LightMedium>{attribute}</Text.LightMedium>
       </Flex>
       <TextArea
+        data-testid="example-text-area"
         rows={2}
         value={value}
         onChange={(e) => setValue(e.target.value)}

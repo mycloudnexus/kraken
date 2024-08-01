@@ -3,27 +3,28 @@ import { Col, Row } from "antd";
 
 import { Step1Icon, RightArrow, Step2Icon, Step3Icon, Step4Icon } from "./Icon";
 import { Fragment } from "react/jsx-runtime";
+import Text from "@/components/Text";
 const step = [
   {
-    step: "step1",
+    step: "Step 1",
     title: "Get to know supported Sonata Functionality Matrix",
     icon: <Step1Icon />,
     desc: "Our current offering includes a focused set of business functionalities centered around supporting buyer to order UNI and Access E-line successfully from seller which covers 3 components : Address Validation, Quote Management and Order Management",
   },
   {
-    step: "step2",
+    step: "Step 2",
     title: "Investigate to know the seller Legacy API Platform",
     icon: <Step2Icon />,
     desc: "Since MEF LSO Sonata Adapter is built on top of Seller’s legacy API platform, you need to first get some basic information about it like open api spec, online documentation, sandbox url and account etc firstly and understand the API flow to fulfill Sonata Use Case.",
   },
   {
-    step: "step3",
+    step: "Step 3",
     title: "Register seller API Server in Kraken",
     icon: <Step3Icon />,
     desc: "Register seller API server by uploading all the information gathered in step 2 so that MEF LSO Sonata Adapter can trigger it in sonata API request by buyer side.",
   },
   {
-    step: "step4",
+    step: "Step 4",
     title: "Map standard APIs with seller APIs",
     icon: <Step4Icon />,
     desc: "Map each combination of (standard API, API action type, product type) by selecting one Seller API from Seller API Server and Complete Request Mapping and Response Mapping based on Kraken predefined mapping template.",
@@ -60,7 +61,15 @@ const StepCard = (props: { navigateApi: () => void }) => {
           return (
             <Fragment key={i.step}>
               <Col span={5} className={styles.stepDetail}>
-                <h5>{i.step}</h5>
+                <Text.Custom
+                  bold="500"
+                  size="20px"
+                  lineHeight="28px"
+                  className={styles.stepCount}
+                  color="#fff"
+                >
+                  {i.step}
+                </Text.Custom>
                 <span
                   className={styles.title}
                   style={{

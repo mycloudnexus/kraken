@@ -24,14 +24,14 @@
     flex-direction: column;
     align-items: center;
 
-    h5 {
+    .stepCount {
       width: fit-content;
       text-align: center;
       padding: 6px 16px;
       margin: 0;
       border-radius: 0px 0px 16px 16px;
-      background: var(--Accent-Accent_Purple, #9156e4);
-      color: var(--Page-container-bg, #fff);
+      background: #9156e4;
+      color: #fff;
       font-size: 20px;
       font-style: normal;
       font-weight: 500;

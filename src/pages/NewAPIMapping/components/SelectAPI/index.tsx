@@ -217,6 +217,7 @@ const SelectAPI = ({
     query,
     setResponseMapping,
     setRequestMapping,
+    setListMappingStateResponse,
   } = useNewApiMappingStore();
   const navigate = useNavigate();
   const { data: dataList, isLoading } = useGetComponentList(currentProduct, {
@@ -252,6 +253,7 @@ const SelectAPI = ({
         source: undefined,
         valueMapping: undefined,
       }));
+      setListMappingStateResponse([]);
       setRequestMapping(newApiRequest);
       setResponseMapping(newApiResponse);
     }

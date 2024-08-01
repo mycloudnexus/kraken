@@ -71,7 +71,11 @@ const RightAddSellerProp = ({ onSelect }: Readonly<Props>) => {
         />
       </div>
       <Flex justify="flex-end" className={styles.footer}>
-        <Button type="primary" onClick={handleAddProp}>
+        <Button
+          data-testid="seller-prop-ok"
+          type="primary"
+          onClick={handleAddProp}
+        >
           OK
         </Button>
       </Flex>

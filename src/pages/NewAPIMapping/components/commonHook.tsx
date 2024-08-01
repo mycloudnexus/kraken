@@ -10,7 +10,7 @@ import {
 import clsx from "clsx";
 import { Dispatch, useCallback, useMemo, useState } from "react";
 import styles from "./RightAddSellerProp/index.module.scss";
-import { get } from "lodash";
+import { get, isEmpty, omit } from "lodash";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { useBoolean } from "usehooks-ts";
 import ExampleValueModal from "@/components/ExampleValueModal";
@@ -64,6 +64,64 @@ export const useCommonAddProp = ({
     open();
   };
 
+  const handleAddPathHybrid = (value: string) => {
+    if (isEmpty(value)) {
+      setSellerAPIExampleProps({
+        ...sellerAPIExampleProps,
+        path: omit(sellerAPIExampleProps?.path, [
+          `${get(currentProp, "name", "")}`,
+        ]),
+      });
+      setSelectedProp({
+        location: "",
+        name: "",
+      });
+      close();
+      return;
+    }
+    setSellerAPIExampleProps({
+      ...sellerAPIExampleProps,
+      path: {
+        ...sellerAPIExampleProps?.path,
+        [get(currentProp, "name", "")]: value,
+      },
+    });
+    close();
+    setSelectedProp({
+      location: "HYBRID",
+      name: `hybrid.${value}`,
+    });
+  };
+
+  const handleAddParamHybrid = (value: string) => {
+    if (isEmpty(value)) {
+      setSellerAPIExampleProps({
+        ...sellerAPIExampleProps,
+        param: omit(sellerAPIExampleProps?.param, [
+          `${get(currentProp, "name", "")}`,
+        ]),
+      });
+      setSelectedProp({
+        location: "",
+        name: "",
+      });
+      close();
+      return;
+    }
+    setSellerAPIExampleProps({
+      ...sellerAPIExampleProps,
+      param: {
+        ...sellerAPIExampleProps.param,
+        [get(currentProp, "name", "")]: value,
+      },
+    });
+    close();
+    setSelectedProp({
+      location: "HYBRID",
+      name: `hybrid.${value}`,
+    });
+  };
+
   const collapseItems = useMemo(() => {
     const items: CollapseProps["items"] = [];
     if (pathParameters.length) {
@@ -82,20 +140,7 @@ export const useCommonAddProp = ({
                 attribute={currentProp?.name || ""}
                 isOpen={isOpen}
                 onClose={close}
-                onOK={(value: string) => {
-                  setSellerAPIExampleProps({
-                    ...sellerAPIExampleProps,
-                    path: {
-                      ...sellerAPIExampleProps?.path,
-                      [get(currentProp, "name", "")]: value,
-                    },
-                  });
-                  close();
-                  setSelectedProp({
-                    location: "HYBRID",
-                    name: `hybrid.${value}`,
-                  });
-                }}
+                onOK={handleAddPathHybrid}
               />
             )}
             {pathParameters.map((parameter: any) => (
@@ -181,20 +226,7 @@ export const useCommonAddProp = ({
                 attribute={currentProp?.name || ""}
                 isOpen={isOpen}
                 onClose={close}
-                onOK={(value: string) => {
-                  setSellerAPIExampleProps({
-                    ...sellerAPIExampleProps,
-                    param: {
-                      ...sellerAPIExampleProps.param,
-                      [get(currentProp, "name", "")]: value,
-                    },
-                  });
-                  close();
-                  setSelectedProp({
-                    location: "HYBRID",
-                    name: `hybrid.${value}`,
-                  });
-                }}
+                onOK={handleAddParamHybrid}
               />
             )}
             {queryParameters.map((parameter: any) => (
@@ -296,6 +328,8 @@ export const useCommonAddProp = ({
     currentProp,
     isOpen,
     sellerAPIExampleProps,
+    handleAddPathHybrid,
+    handleAddParamHybrid,
   ]);
 
   return {
