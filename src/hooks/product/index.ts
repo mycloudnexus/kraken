@@ -139,7 +139,11 @@ export const useGetComponentListV2 = (
   targetMapperKey: string
 ) => {
   return useQuery<any, Error>({
-    queryKey: [PRODUCT_CACHE_KEYS.get_component_list_v2, productId, targetMapperKey],
+    queryKey: [
+      PRODUCT_CACHE_KEYS.get_component_list_v2,
+      productId,
+      targetMapperKey,
+    ],
     queryFn: () => getListComponentsV2(productId, targetMapperKey),
     enabled: Boolean(productId),
     select: (data) => data?.data,
@@ -410,11 +414,12 @@ export const useDeployToEnv = () => {
 
 export const useGetRunningAPIList = (
   productId: string,
-  params: Record<string, any>
+  params: Record<string, any>,
+  envName?: string
 ) => {
   return useQuery<any, Error>({
     queryKey: [PRODUCT_CACHE_KEYS.get_running_api_list, productId, params],
-    queryFn: () => getRunningAPIMappingList(productId, params),
+    queryFn: () => getRunningAPIMappingList(productId, params, envName),
     enabled: Boolean(productId) && Boolean(params.envId),
     select: (data) => data?.data,
   });
@@ -422,11 +427,12 @@ export const useGetRunningAPIList = (
 
 export const useGetAPIDeployments = (
   productId: string,
-  params: Record<string, any>
+  params: Record<string, any>,
+  envName?: string
 ) => {
   return useQuery<any, Error>({
     queryKey: [PRODUCT_CACHE_KEYS.get_list_api_deployments, productId, params],
-    queryFn: () => getAPIMapperDeployments(productId, params),
+    queryFn: () => getAPIMapperDeployments(productId, params, envName),
     enabled: Boolean(productId) && Boolean(params.envId),
     select: (data) => data?.data,
   });

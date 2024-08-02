@@ -14,13 +14,17 @@ type Props = {
 
 const RunningAPIMapping = ({ env }: Props) => {
   const { currentProduct } = useAppStore();
+  const envName = env?.name?.toLocaleLowerCase?.()
   const { data, isLoading } = useGetRunningAPIList(currentProduct, {
     envId: env?.id,
     orderBy: "createdAt",
     direction: "DESC",
     page: 0,
     size: 100,
-  });
+  },
+    envName
+  );
+
   const renderTextType = useCallback((type: string) => {
     switch (type) {
       case "uni":
@@ -38,52 +42,56 @@ const RunningAPIMapping = ({ env }: Props) => {
         dataIndex: "componentName",
         width: 340,
       },
-      env?.name?.toLocaleLowerCase?.() === "stage"
+      envName === "stage"
         ? {
-            dataIndex: "",
-            title: "API mappings",
-            render: (item: any) => (
-              <Flex align="center" gap={10}>
-                <RequestMethod method={item?.method} />
-                <Typography.Text
-                  ellipsis={{ tooltip: item?.path }}
-                  style={{ color: "#2962FF" }}
-                >
-                  {item?.path}
-                </Typography.Text>
-                <Flex gap={8} align="center">
-                  <MappingMatrix mappingMatrix={item.mappingMatrix} extraKey={'item.path'} isItemActive={false} />
-                </Flex>
+          dataIndex: "",
+          title: "API mappings",
+          render: (item: any) => (
+            <Flex align="center" gap={10}>
+              <RequestMethod method={item?.method} />
+              <Typography.Text
+                ellipsis={{ tooltip: item?.path }}
+                style={{ color: "#2962FF" }}
+              >
+                {item?.path}
+              </Typography.Text>
+              <Flex gap={8} align="center">
+                <MappingMatrix mappingMatrix={item?.mappingMatrix} extraKey={'item.path'} isItemActive={false} />
               </Flex>
-            ),
-          }
-        : {},
+            </Flex>
+          ),
+        }
+        : {
+          title: "Version",
+          dataIndex: "version",
+        },
       {
         title: "Deployed time",
         dataIndex: "createAt",
-        width: 300,
+        width: 340,
         render: (time: string) =>
           dayjs.utc(time).local().format("YYYY-MM-DD HH:mm:ss"),
       },
-      {
-        title: "Action",
-        dataIndex: "diffWithStage",
-        width: 300,
-        render: (diffWithStage: boolean) =>
-          !diffWithStage ? (
-            <Text.LightMedium color="#00000073">
-              Same with running{" "}
-              {env?.name?.toLowerCase() === "stage"
-                ? "API mapping"
-                : "component"}
-            </Text.LightMedium>
-          ) : (
-            <Text.LightMedium color="#2962FF" style={{ cursor: "pointer" }}>
-              View difference
-            </Text.LightMedium>
-          ),
-      },
-    ],
+      envName === "stage"
+        ? {
+          title: "Action",
+          dataIndex: "diffWithStage",
+          width: 300,
+          render: (diffWithStage: boolean) =>
+            !diffWithStage ? (
+              <Text.LightMedium color="#00000073">
+                Same with running{" "}
+                {env?.name?.toLowerCase() === "stage"
+                  ? "API mapping"
+                  : "component"}
+              </Text.LightMedium>
+            ) : (
+              <Text.LightMedium color="#2962FF" style={{ cursor: "pointer" }}>
+                View difference
+              </Text.LightMedium>
+            ),
+        } : {},
+    ].filter(value => Object.keys(value).length !== 0),
     [env, renderTextType]
   );
   return (
@@ -91,7 +99,7 @@ const RunningAPIMapping = ({ env }: Props) => {
       <Table
         columns={columns}
         loading={isLoading}
-        dataSource={data}
+        dataSource={envName === 'production' ? data?.data[0].components : data}
         pagination={false}
         rowKey={(item) => JSON.stringify(item)}
       />

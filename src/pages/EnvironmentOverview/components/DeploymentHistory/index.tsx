@@ -21,33 +21,41 @@ const defaultPage = {
 const DeploymentHistory = ({ env }: Props) => {
   const [pageInfo, setPageInfo] = useState(defaultPage);
   const { currentProduct } = useAppStore();
+  const envName = env?.name?.toLocaleLowerCase?.();
+
   const { data, isLoading } = useGetAPIDeployments(currentProduct, {
     envId: env?.id,
     orderBy: "createdAt",
     direction: "DESC",
     ...pageInfo,
-  });
+  },
+    envName
+  );
 
   const columns = useMemo(
     () => [
-      {
-        title:
-          env?.name?.toLowerCase() === "stage" ? "API mapping" : "Component",
-        dataIndex: "",
-        width: "50%",
-        render: (item: any) => (
-          <Flex gap={10} align="center">
-            <RequestMethod method={item?.method} />
-            <Typography.Text
-              style={{ color: "#2962FF" }}
-              ellipsis={{ tooltip: item?.path }}
-            >
-              {item?.path}
-            </Typography.Text>
-            <MappingMatrix mappingMatrix={item.mappingMatrix} />
-          </Flex>
-        ),
-      },
+      envName === "stage"
+        ? {
+          title: "API mapping",
+          dataIndex: "",
+          width: 340,
+          render: (item: any) => (
+            <Flex gap={10} align="center">
+              <RequestMethod method={item?.method} />
+              <Typography.Text
+                style={{ color: "#2962FF" }}
+                ellipsis={{ tooltip: item?.path }}
+              >
+                {item?.path}
+              </Typography.Text>
+              <MappingMatrix mappingMatrix={item.mappingMatrix} />
+            </Flex>
+          ),
+        } : {
+          title: "Component",
+          dataIndex: "componentName",
+        width: 340,
+        },
       {
         title: "Status",
         dataIndex: "status",
@@ -56,19 +64,32 @@ const DeploymentHistory = ({ env }: Props) => {
       {
         title: "Deployed time",
         dataIndex: "createAt",
+        width: 340,
         render: (time: string) =>
           dayjs.utc(time).local().format("YYYY-MM-DD HH:mm:ss"),
       },
     ],
     [env]
   );
+
+  const tableData = useMemo(() => {
+    return envName === 'production'
+      ? data?.data?.map((item: any) => (
+        {
+          componentName: item.metadata.name,
+          status: item.metadata.status,
+          createdAt: item.createdAt
+        }))
+      : data?.data
+  }, [data?.data, envName])
+
   return (
     <div>
       <Table
         className={styles.table}
         columns={columns}
         loading={isLoading}
-        dataSource={data?.data}
+        dataSource={tableData}
         pagination={{
           current: data?.page + 1,
           pageSize: data?.size,
