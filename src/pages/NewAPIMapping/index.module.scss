@@ -9,6 +9,7 @@
 .mainWrapper {
   flex: 1;
   height: 100%;
+  max-width: calc(100vw - 370px);
   background-color: #f0f2f5;
   overflow-y: auto;
   > .center {
