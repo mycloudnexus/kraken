@@ -125,6 +125,7 @@ const NewAPIMapping = forwardRef(
       metadataKey,
       resetMapping,
       jsonSpec,
+      refreshMappingDetail,
     } = useGetApiSpec(currentProduct, queryData.targetMapperKey ?? "");
     const { sellerApi: defaultSellerApi, serverKey: defaultServerKey } =
       useGetDefaultSellerApi(currentProduct, serverKeyInfo);
@@ -343,6 +344,7 @@ const NewAPIMapping = forwardRef(
           data,
         } as any);
         notification.success({ message: res.message });
+        refreshMappingDetail();
         setStep(1);
         setActiveKey("1");
         callback && callback();

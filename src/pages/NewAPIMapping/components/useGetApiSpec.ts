@@ -10,10 +10,11 @@ import jsYaml from "js-yaml";
 import { useMemo, useCallback } from "react";
 
 const useGetApiSpec = (currentProduct: string, targetMapperKey: string) => {
-  const { data: mapperResponse, isLoading } = useGetComponentListV2(
-    currentProduct,
-    targetMapperKey
-  );
+  const {
+    data: mapperResponse,
+    isLoading,
+    refetch,
+  } = useGetComponentListV2(currentProduct, targetMapperKey);
   const endpoint = mapperResponse?.facets?.endpoints?.[0];
   const mappers = endpoint?.mappers;
   const metadataKey = mapperResponse?.metadata?.key;
@@ -69,6 +70,7 @@ const useGetApiSpec = (currentProduct: string, targetMapperKey: string) => {
     loadingMapper: isLoading,
     metadataKey,
     resetMapping,
+    refreshMappingDetail: refetch,
   };
 };
 
