@@ -219,10 +219,10 @@ export const getAPIMapperDeployments = (
   envName?: string
 ) => {
   const path = envName === 'production'
-  ? 'deployments'
-  : 'api-mapper-deployments';
+  ? `${PRODUCT}/${productId}/deployments`
+  : `/v2${PRODUCT}/${productId}/api-mapper-deployments`;
 
-  return request(`/v2${PRODUCT}/${productId}/${path}`, {
+  return request(path, {
     method: "GET",
     params,
   });

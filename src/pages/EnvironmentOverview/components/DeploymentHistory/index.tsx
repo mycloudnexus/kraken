@@ -53,9 +53,36 @@ const DeploymentHistory = ({ env }: Props) => {
           ),
         } : {
           title: "Component",
-          dataIndex: "componentName",
-        width: 340,
+          dataIndex: "",
+          width: 340,
+          render: (item: any) => (
+            <Flex gap={10} align="left" vertical>
+              {item.components.map((component: any, index: number) => (
+                <Typography.Text
+                  key={`${component.componentName}-${index}`}
+                  style={{ color: "#2962FF" }} >
+                  {component.componentName}
+                </Typography.Text>
+              ))}
+            </Flex>
+          ),
         },
+      envName === 'production' ? {
+        title: "Version",
+        dataIndex: "",
+        width: 340,
+        render: (item: any) => (
+          <Flex gap={10} align="left" vertical>
+            {item.components.map((component: any, index: number) => (
+              <Typography.Text
+                key={`${component.version}-${index}`}
+              >
+                {component.version}
+              </Typography.Text>
+            ))}
+          </Flex>
+        ),
+      } : {},
       {
         title: "Status",
         dataIndex: "status",
@@ -73,15 +100,16 @@ const DeploymentHistory = ({ env }: Props) => {
   );
 
   const tableData = useMemo(() => {
-    return envName === 'production'
-      ? data?.data?.map((item: any) => (
-        {
-          componentName: item.metadata.name,
-          status: item.metadata.status,
-          createdAt: item.createdAt
-        }))
-      : data?.data
-  }, [data?.data, envName])
+    if (envName === 'production') {
+      return data?.data?.map((item: any) => ({
+        name: item.name,
+        components: item.components,
+        status: item.status,
+        createdAt: item.createdAt
+      }));
+    }
+    return data?.data;
+  }, [data?.data, envName]);
 
   return (
     <div>

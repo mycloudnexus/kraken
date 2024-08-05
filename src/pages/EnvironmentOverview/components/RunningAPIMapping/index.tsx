@@ -94,17 +94,18 @@ const RunningAPIMapping = ({ env }: Props) => {
     ].filter(value => Object.keys(value).length !== 0),
     [env, renderTextType]
   );
-  return (
-    <div>
-      <Table
-        columns={columns}
-        loading={isLoading}
-        dataSource={envName === 'production' ? data?.data[0].components : data}
-        pagination={false}
-        rowKey={(item) => JSON.stringify(item)}
-      />
-    </div>
-  );
+
+return (
+  <div>
+    <Table
+      columns={columns}
+      loading={isLoading}
+      dataSource={data?.data?.[0]?.components || data}
+      pagination={false}
+      rowKey={(item) => JSON.stringify(item)}
+    />
+  </div>
+);
 };
 
 export default RunningAPIMapping;
