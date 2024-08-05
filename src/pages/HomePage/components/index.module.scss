@@ -1,4 +1,5 @@
 .stepContainer {
+  margin-top: 24px;
   padding: 20px 20px 24px 20px;
   border-radius: 8px;
   background: linear-gradient(236deg, #2962ff -89.03%, #9584ff 90.4%);
@@ -213,9 +214,19 @@
 }
 
 .tipsOverlay {
+  ::-webkit-scrollbar {
+    width: 18px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border: 6px solid rgba(0, 0, 0, 0);
+    background-clip: padding-box;
+    border-radius: 8px;
+    background-color: #dde1e5;
+  }
   :global(.ant-tooltip-content .ant-tooltip-inner) {
-    max-height: 298px;
-    overflow: scroll;
+    max-height: 250px;
+    overflow-y: auto;
     width: 150%;
   }
 }

@@ -10,7 +10,8 @@ import { useGetComponentList } from "@/hooks/product";
 import { useCallback, useEffect } from "react";
 import { isEmpty } from "lodash";
 import { UsergroupAddOutlined } from "@ant-design/icons";
-import { clearData, getData } from '@/utils/helpers/token';
+import { clearData, getData } from "@/utils/helpers/token";
+import Text from "@/components/Text";
 
 const HomePage = () => {
   const { currentProduct } = useAppStore();
@@ -33,6 +34,10 @@ const HomePage = () => {
     navigate("/buyer");
   }, []);
 
+  const navigateCreateAPI = useCallback(() => {
+    navigate(`/component/${currentProduct}/new`);
+  }, [currentProduct]);
+
   useEffect(() => {
     if (isLoading) return;
 
@@ -46,7 +51,9 @@ const HomePage = () => {
   return (
     <div className={styles.homePage}>
       <Flex align="center" justify="space-between">
-        <h1>MEF LSO Sonata Adapters</h1>
+        <Text.Custom size="20px" bold="500" lineHeight="28px">
+          MEF LSO Sonata Adapters
+        </Text.Custom>
         <Flex align="center" justify="flex-end">
           <UsergroupAddOutlined />
           <Button
@@ -58,7 +65,7 @@ const HomePage = () => {
           </Button>
         </Flex>
       </Flex>
-      <StepCard navigateApi={navigateApi} />
+      <StepCard navigateApi={navigateApi} navigateCreateAPI={navigateCreateAPI} />
       <ApiComponents />
       <Flex gap={36}>
         <Row

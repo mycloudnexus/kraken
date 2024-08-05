@@ -8,7 +8,7 @@ test("StepCard test", () => {
   const { container } = render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <StepCard navigateApi={() => {}} />
+        <StepCard navigateApi={vi.fn()} navigateCreateAPI={vi.fn()} />
       </BrowserRouter>
     </QueryClientProvider>
   );

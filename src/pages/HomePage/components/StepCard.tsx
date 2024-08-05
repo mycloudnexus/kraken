@@ -1,9 +1,10 @@
 import styles from "./index.module.scss";
-import { Col, Row } from "antd";
+import { Button, Col, Flex, Row } from "antd";
 
 import { Step1Icon, RightArrow, Step2Icon, Step3Icon, Step4Icon } from "./Icon";
 import { Fragment } from "react/jsx-runtime";
 import Text from "@/components/Text";
+import { useBoolean } from "usehooks-ts";
 const step = [
   {
     step: "Step 1",
@@ -31,8 +32,15 @@ const step = [
   },
 ];
 
-const StepCard = (props: { navigateApi: () => void }) => {
-  const { navigateApi } = props;
+const StepCard = (props: {
+  navigateApi: () => void;
+  navigateCreateAPI: () => void;
+}) => {
+  const { navigateApi, navigateCreateAPI } = props;
+  const { value: isShow, setFalse: hidden } = useBoolean(true);
+  if (!isShow) {
+    return <div />;
+  }
   return (
     <div className={styles.stepContainer}>
       <Row justify={"space-between"}>
@@ -43,6 +51,8 @@ const StepCard = (props: { navigateApi: () => void }) => {
           height="24"
           viewBox="0 0 24 24"
           fill="none"
+          onClick={hidden}
+          style={{ cursor: "pointer" }}
         >
           <path
             fillRule="evenodd"
@@ -61,29 +71,31 @@ const StepCard = (props: { navigateApi: () => void }) => {
           return (
             <Fragment key={i.step}>
               <Col span={5} className={styles.stepDetail}>
-                <Text.Custom
-                  bold="500"
-                  size="20px"
-                  lineHeight="28px"
-                  className={styles.stepCount}
-                  color="#fff"
-                >
-                  {i.step}
-                </Text.Custom>
-                <span
-                  className={styles.title}
-                  style={{
-                    color:
-                      n == 2
-                        ? "var(--Text-Text_accent, #2962FF)"
-                        : "var(--Text-primary, rgba(0, 0, 0, 0.85)",
-                  }}
-                  onClick={n == 2 ? navigateApi : undefined}
-                >
-                  {i.title}
-                </span>
+                <Flex vertical gap={9} align="center">
+                  <Text.Custom
+                    bold="500"
+                    size="20px"
+                    lineHeight="28px"
+                    className={styles.stepCount}
+                    color="#fff"
+                  >
+                    {i.step}
+                  </Text.Custom>
+                  <span
+                    className={styles.title}
+                    style={{
+                      color:
+                        n == 2
+                          ? "var(--Text-Text_accent, #2962FF)"
+                          : "var(--Text-primary, rgba(0, 0, 0, 0.85)",
+                      cursor: "pointer",
+                    }}
+                    onClick={n == 2 ? navigateApi : undefined}
+                  >
+                    {i.title}
+                  </span>
+                </Flex>
                 <div className={styles.iconContainer}> {i.icon}</div>
-
                 <p>{i.desc}</p>
               </Col>
               {n !== 3 && (
@@ -99,6 +111,18 @@ const StepCard = (props: { navigateApi: () => void }) => {
           );
         })}
       </Row>
+      <Flex
+        justify="flex-end"
+        align="center"
+        gap={12}
+        style={{ marginTop: 20 }}
+        onClick={navigateCreateAPI}
+      >
+        <Text.LightLarge color="#fff">
+          Start register seller API server now
+        </Text.LightLarge>
+        <Button type="primary">Create API server</Button>
+      </Flex>
     </div>
   );
 };
