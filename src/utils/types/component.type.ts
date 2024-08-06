@@ -23,6 +23,7 @@ export interface IRequestMapping {
   targetLocation: string;
   title: string;
   requiredMapping?: boolean;
+  customizedField?: boolean;
 }
 
 export interface IBuyer extends IComponent {
@@ -42,4 +43,5 @@ export interface IResponseMapping {
   targetLocation: string;
   requiredMapping: boolean;
   targetValues: string[];
+  customizedField?: boolean;
 }

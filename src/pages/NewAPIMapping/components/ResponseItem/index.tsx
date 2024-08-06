@@ -123,47 +123,57 @@ const ResponseItem = ({ item, index }: Props) => {
   };
 
   return (
-    <div className={styles.root}>
+    <div
+      className={clsx([
+        styles.root,
+        item.requiredMapping && styles.rootRequired,
+      ])}
+    >
       <Flex vertical gap={4} className={styles.header}>
-        {isEditTitle ? (
-          <Flex align="center" gap={10} style={{ flex: 1 }}>
-            <Input
-              value={titleInput}
-              onChange={(e) => setTitleInput(e.target.value)}
-              style={{ width: "calc(50% - 30px)" }}
-              allowClear
-            />
-            <CheckOutlined
-              style={{ color: "#1890FF" }}
-              onClick={onChangeTitle}
-            />
-            <CloseOutlined
-              style={{ color: "#CF1322" }}
-              onClick={() => {
-                setTitleInput(item.title);
-                disableEditTitle();
-              }}
-            />
-          </Flex>
-        ) : (
-          <Flex align="center" gap={10}>
-            <Text.NormalMedium>
-              {item.title}
-              {item?.requiredMapping && (
-                <span style={{ color: "#FF4D4F" }}> *</span>
-              )}
-            </Text.NormalMedium>
-            {!item?.requiredMapping && (
-              <EditOutlined
-                style={{ cursor: "pointer" }}
+        <Flex justify="space-between" align="center">
+          {isEditTitle ? (
+            <Flex align="center" gap={10} style={{ flex: 1 }}>
+              <Input
+                value={titleInput}
+                onChange={(e) => setTitleInput(e.target.value)}
+                style={{ width: "calc(50% - 30px)" }}
+                allowClear
+              />
+              <CheckOutlined
+                style={{ color: "#1890FF" }}
+                onClick={onChangeTitle}
+              />
+              <CloseOutlined
+                style={{ color: "#CF1322" }}
                 onClick={() => {
-                  enableEditTitle();
-                  disableEditDescription();
+                  setTitleInput(item.title);
+                  disableEditTitle();
                 }}
               />
-            )}
-          </Flex>
-        )}
+            </Flex>
+          ) : (
+            <Flex align="center" gap={10}>
+              <Text.NormalMedium>
+                {item.title}
+                {item?.requiredMapping && (
+                  <span style={{ color: "#FF4D4F" }}> *</span>
+                )}
+              </Text.NormalMedium>
+              {!item?.requiredMapping && (
+                <EditOutlined
+                  style={{ cursor: "pointer" }}
+                  onClick={() => {
+                    enableEditTitle();
+                    disableEditDescription();
+                  }}
+                />
+              )}
+            </Flex>
+          )}
+          {item.requiredMapping && (
+            <Text.LightSmall color="#FF9A2E">Required mapping</Text.LightSmall>
+          )}
+        </Flex>
         {isEditDescription ? (
           <Flex align="center" gap={10}>
             <Input
