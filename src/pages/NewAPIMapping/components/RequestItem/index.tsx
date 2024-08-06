@@ -73,7 +73,12 @@ const RequestItem = ({ item, index }: Props) => {
   };
 
   return (
-    <div className={styles.root}>
+    <div
+      className={clsx([
+        styles.root,
+        item.requiredMapping && styles.rootRequired,
+      ])}
+    >
       <Flex vertical gap={4} className={styles.header}>
         <Flex align="center" justify="space-between">
           {isEditTitle ? (
@@ -98,12 +103,7 @@ const RequestItem = ({ item, index }: Props) => {
             </Flex>
           ) : (
             <Flex gap={10} align="center">
-              <Text.NormalMedium>
-                {item.title}
-                {item?.requiredMapping && (
-                  <span style={{ color: "#FF4D4F" }}> *</span>
-                )}
-              </Text.NormalMedium>
+              <Text.NormalMedium>{item.title}</Text.NormalMedium>
               {!item?.requiredMapping && (
                 <EditOutlined
                   onClick={() => {
@@ -115,10 +115,12 @@ const RequestItem = ({ item, index }: Props) => {
               )}
             </Flex>
           )}
-          {!item.requiredMapping && (
+          {!item.requiredMapping ? (
             <Button type="link" onClick={handleDelete} danger>
               Delete
             </Button>
+          ) : (
+            <Text.LightSmall color="#FF9A2E">Required mapping</Text.LightSmall>
           )}
         </Flex>
         {isEditDescription ? (
