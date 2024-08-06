@@ -23,3 +23,22 @@
 .title {
   margin-bottom: 8px;
 }
+
+.root {
+  :global {
+    .ant-tree-node-content-wrapper {
+      padding-left: 0;
+      cursor: default;
+    }
+    .ant-tree-switcher {
+      background: #fff;
+      border-radius: 0;
+    }
+    .ant-tree-switcher-noop {
+      display: none;
+    }
+    .ant-tree-list {
+      padding-left: 20px;
+    }
+  }
+}

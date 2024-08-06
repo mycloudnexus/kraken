@@ -80,7 +80,7 @@ const APIViewerContent = ({ selectedAPI, content }: Props) => {
     };
   }, [viewData, selectedAPI]);
   return (
-    <div>
+    <div className={styles.root}>
       <div className={styles.basicInfo}>
         <Row gutter={[12, 20]}>
           <Col span={2}>
