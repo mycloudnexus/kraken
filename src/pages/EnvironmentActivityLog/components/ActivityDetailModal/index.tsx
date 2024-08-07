@@ -1,13 +1,11 @@
-import LogMethodTag from "@/components/LogMethodTag";
 
 import { useGetProductEnvActivityDetail } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
-import { parseObjectDescriptionToTreeData } from "@/utils/helpers/schema";
 import { IActivityLog } from "@/utils/types/env.type";
-import { Flex, Button, Spin, Table, Tree, Drawer, Typography } from "antd";
+import { Flex, Button, Spin, Drawer } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { useCallback, useMemo } from "react";
-import styles from "./index.module.scss";
+import ActivityDetailItem from './ActivityDetailItem';
 
 interface Props {
   envId: string;
@@ -27,6 +25,7 @@ const ActivityDetailModal = ({
     envId,
     activityId
   );
+
   const activityList = useMemo(
     () => (data ? [data.main, ...(data.branches ?? [])] : []),
     [data]
@@ -55,8 +54,8 @@ const ActivityDetailModal = ({
     },
     [data]
   );
-
   const handleOk = () => setOpen(false);
+
   return (
     <Drawer
       title="View Details"
@@ -78,50 +77,7 @@ const ActivityDetailModal = ({
           style={{ maxHeight: "calc(100vh - 108px)" }}
         >
           {activityList?.map((activity, n) => (
-            <div className={styles.activity} key={activity.requestId}>
-              <h1>{n === 0 ? "Sonota API" : "Seller API"}</h1>
-              <div
-                className={styles.activityWrapper}
-                key={`${activity.method}_${activity.path}`}
-              >
-                <Flex vertical gap={24} className={styles.activityHeader}>
-                  <Flex gap={8} align="center">
-                    <LogMethodTag method={activity.method} />
-                    <Typography.Text ellipsis={{ tooltip: true }}>
-                      {activity.path}
-                    </Typography.Text>
-                  </Flex>
-                </Flex>
-                <div className={styles.activityBody}>
-                  <h3>Parameters</h3>
-                  <Table
-                    columns={collapseItems(activity)?.parameterColumns}
-                    dataSource={collapseItems(activity)?.parameterList}
-                    pagination={false}
-                  />
-                  <h3>Request body</h3>
-                  <div className={styles.tree}>
-                    <Tree
-                      treeData={parseObjectDescriptionToTreeData(
-                        activity.request,
-                        styles.treeTitle,
-                        styles.treeExample
-                      )}
-                    />
-                  </div>
-                  <h3>Responses</h3>
-                  <div className={styles.tree}>
-                    <Tree
-                      treeData={parseObjectDescriptionToTreeData(
-                        activity.response,
-                        styles.treeTitle,
-                        styles.treeExample
-                      )}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
+            <ActivityDetailItem key={`${activity.path}-${n}`} activity={activity} title={n === 0 ? "Sonota API" : "Seller API"} collapseItems={collapseItems} />
           ))}
         </Flex>
       </Spin>
