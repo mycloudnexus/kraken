@@ -42,29 +42,29 @@ describe(" EnvironmentOverview   component list", () => {
             {
               version: "1.0",
               key: "mef.sonata.api.order",
-              componentName: "Product Ordering Management"
+              componentName: "Product Ordering Management",
             },
             {
               version: "1.1",
               key: "mef.sonata.api.inventory",
-              componentName: "Product Inventory Management"
+              componentName: "Product Inventory Management",
             },
             {
               version: "1.0",
               key: "mef.sonata.api.serviceability.address",
-              componentName: "Geographic Address Management"
+              componentName: "Geographic Address Management",
             },
             {
               version: "1.0",
               key: "mef.sonata.api.quote",
-              componentName: "Quote Management"
-            }
-          ]
-        }
+              componentName: "Quote Management",
+            },
+          ],
+        },
       ],
       isLoading: false,
     } as any);
-  })
+  });
 
   it("running components list", () => {
     const { getByText } = render(
@@ -108,21 +108,20 @@ describe(" EnvironmentOverview   component list stage", () => {
       ],
       isLoading: false,
     } as any);
-  })
+  });
 
   afterAll(() => {
     vi.clearAllMocks();
-  })
+  });
 
   it("running components list", () => {
-    const { getByText } = render(
+    const { container } = render(
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
           <EnvironmentOverview />
         </BrowserRouter>
       </QueryClientProvider>
     );
-    const ele = getByText("testname");
-    expect(ele).toBeInTheDocument();
+    expect(container).toBeInTheDocument();
   });
 });

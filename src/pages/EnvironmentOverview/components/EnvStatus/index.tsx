@@ -33,21 +33,7 @@ const EnvStatus = ({
   const isDisConnect = useMemo(() => {
     return connectStatus === "allDisConnect";
   }, [connectStatus]);
-  if (!apiKey) {
-    return (
-      <Flex
-        vertical
-        gap={6}
-        className={classes(styles.statusWrapper, styles.notice)}
-      >
-        <Text.BoldMedium>Connect to data plane</Text.BoldMedium>
-        <Text.LightMedium>
-          Click the button below to connect to data plane.
-          <br /> The latest deployment will show up here.
-        </Text.LightMedium>
-      </Flex>
-    );
-  }
+
   return (
     <Flex
       vertical
@@ -57,14 +43,23 @@ const EnvStatus = ({
         [styles.success]: status,
         [styles.error]: isDisConnect,
         [styles.warning]: connectStatus === "someConnect",
+        [styles.noAPI]: !apiKey,
       })}
       align="flex-start"
     >
-      <Flex align="center" gap={8} className={styles.dataPlaneInfo}>
-        <ApiOutlined />
+      <Flex
+        align="center"
+        gap={8}
+        className={styles.dataPlaneInfo}
+        style={{ whiteSpace: "nowrap" }}
+      >
+        <ApiOutlined style={{ width: 14, height: 14 }} />
         <Text.LightMedium>In use data plane</Text.LightMedium>
         <Text.BoldMedium>{dataPlane}</Text.BoldMedium>
-        <InfoCircleOutlined className={styles.dataPlaneInfoIcon} />
+        <InfoCircleOutlined
+          className={styles.dataPlaneInfoIcon}
+          style={{ width: 14, height: 14 }}
+        />
       </Flex>
     </Flex>
   );

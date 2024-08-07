@@ -23,6 +23,7 @@ import clsx from "clsx";
 import RunningAPIMapping from "./components/RunningAPIMapping";
 import DeploymentHistory from "./components/DeploymentHistory";
 import { IEnv } from "@/utils/types/env.type";
+import NoAPIKey from "./components/NoAPIKey";
 
 const initPaginationParams = {
   page: 0,
@@ -122,6 +123,11 @@ const EnvironmentOverview = () => {
     return sortBy(envs?.data, "name", []).reverse();
   }, [envs]);
 
+  const isHaveApiKey = useMemo(() => {
+    if (!selectedEnv) return false;
+    return !isEmpty(apiKey?.data.find((i) => i.envId === selectedEnv.id));
+  }, [selectedEnv, apiKey]);
+
   useEffect(() => {
     if (envList && isEmpty(selectedEnv?.id) && !envId) {
       setSelectedEnv(envList[0]);
@@ -134,7 +140,7 @@ const EnvironmentOverview = () => {
 
   return (
     <Flex vertical gap={12} className={styles.pageWrapper}>
-      <Flex vertical gap={14}>
+      <Flex vertical gap={14} className={styles.scroll}>
         <Spin spinning={loadingEnvs}>
           <div className={styles.overviewContainer}>
             {envList?.map((env) => {
@@ -154,74 +160,83 @@ const EnvironmentOverview = () => {
                   role="none"
                   onClick={() => setSelectedEnv(env)}
                 >
-                  <div style={{ width: "100%" }}>
-                    <Flex justify="flex-start" gap={12} align="center">
-                      <Text.NormalLarge
-                        style={{ marginRight: 16, textTransform: "capitalize" }}
-                      >
-                        {env.name}
-                      </Text.NormalLarge>
-                      <EnvStatus
-                        apiKey={haveApiKey}
-                        status={getDataPlaneInfo(env.id)?.status}
-                        disConnect={disConnectNum}
-                        connect={connectNum}
-                        dataPlane={len}
-                      />
-                      <Dropdown
-                        disabled={!haveApiKey}
-                        menu={{
-                          items: dropdownItems(env.id, env.name, len),
+                  <Flex
+                    justify="flex-start"
+                    gap={12}
+                    align="center"
+                    wrap="nowrap"
+                  >
+                    <Text.NormalLarge
+                      style={{ marginRight: 16, textTransform: "capitalize" }}
+                    >
+                      {env.name}
+                    </Text.NormalLarge>
+                    <EnvStatus
+                      apiKey={haveApiKey}
+                      status={getDataPlaneInfo(env.id)?.status}
+                      disConnect={disConnectNum}
+                      connect={connectNum}
+                      dataPlane={len}
+                    />
+                    <Dropdown
+                      disabled={!haveApiKey}
+                      menu={{
+                        items: dropdownItems(env.id, env.name, len),
+                      }}
+                    >
+                      <MoreOutlined
+                        style={{
+                          cursor: haveApiKey ? "default" : "not-allowed",
                         }}
-                      >
-                        <MoreOutlined
-                          style={{
-                            cursor: haveApiKey ? "default" : "not-allowed",
-                          }}
-                        />
-                      </Dropdown>
-                    </Flex>
-                  </div>
+                      />
+                    </Dropdown>
+                  </Flex>
                 </div>
               );
             })}
           </div>
         </Spin>
       </Flex>
-      <Flex vertical gap={12} className={styles.sectionWrapper}>
-        <Flex align="center" justify="space-between">
-          <Text.NormalLarge>
-            {selectedEnv?.name?.toLocaleLowerCase?.() === "production"
-              ? "Running Component Versions"
-              : "Running API Mappings"}
-          </Text.NormalLarge>
-          {selectedEnv?.name?.toLocaleLowerCase?.() === "production" && (
-            <Button
-              type="primary"
-              onClick={() => {
-                setCurrentEnvId(selectedEnv?.id);
-                setOpen(true);
-              }}
-            >
-              Create new deployment
-            </Button>
-          )}
-        </Flex>
-        <RunningAPIMapping env={selectedEnv} />
-      </Flex>
-      <Flex
-        vertical
-        gap={8}
-        className={styles.sectionWrapper}
-        style={{ flex: 1 }}
-      >
-        <Text.NormalLarge>
-          {selectedEnv?.name?.toLocaleLowerCase?.() === "production"
-            ? "Component deployment history"
-            : "API Mapping Deployment history"}
-        </Text.NormalLarge>
-        <DeploymentHistory env={selectedEnv} />
-      </Flex>
+      {isHaveApiKey ? (
+        <>
+          <Flex vertical gap={12} className={styles.sectionWrapper}>
+            <Flex align="center" justify="space-between">
+              <Text.NormalLarge>
+                {selectedEnv?.name?.toLocaleLowerCase?.() === "production"
+                  ? "Running Component Versions"
+                  : "Running API Mappings"}
+              </Text.NormalLarge>
+              {selectedEnv?.name?.toLocaleLowerCase?.() === "production" && (
+                <Button
+                  type="primary"
+                  onClick={() => {
+                    setCurrentEnvId(selectedEnv?.id);
+                    setOpen(true);
+                  }}
+                >
+                  Create new deployment
+                </Button>
+              )}
+            </Flex>
+            <RunningAPIMapping env={selectedEnv} />
+          </Flex>
+          <Flex
+            vertical
+            gap={8}
+            className={styles.sectionWrapper}
+            style={{ flex: 1 }}
+          >
+            <Text.NormalLarge>
+              {selectedEnv?.name?.toLocaleLowerCase?.() === "production"
+                ? "Component deployment history"
+                : "API Mapping Deployment history"}
+            </Text.NormalLarge>
+            <DeploymentHistory env={selectedEnv} />
+          </Flex>
+        </>
+      ) : (
+        <NoAPIKey env={selectedEnv} />
+      )}
 
       <ModalNewDeployment
         open={open}

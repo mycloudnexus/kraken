@@ -9,12 +9,12 @@
   max-height: 154px;
   overflow: scroll;
   color: var(--Text-primary, rgba(0, 0, 0, 0.85));
-
   font-size: 14px;
   font-style: normal;
   font-weight: 400;
   line-height: 22px;
   margin-top: 19px;
+
   :global(.ant-row) {
     margin-bottom: 12px;
     :global(.ant-col:nth-child(2)) {
@@ -54,7 +54,6 @@
   background: #fff;
   padding: 20px;
   cursor: pointer;
-  overflow: auto;
 
   &:not(:last-child) {
     margin-right: 10px;
@@ -77,4 +76,20 @@
 .overviewItemActive {
   background: #dbe4fb;
   border: 1px solid #2962ff;
+}
+
+.scroll {
+  ::-webkit-scrollbar {
+    height: 18px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border: 6px solid rgba(0, 0, 0, 0);
+    background-clip: padding-box;
+    border-radius: 8px;
+    background-color: #dde1e5;
+    &:hover {
+      background-color: #f7f7f7;
+    }
+  }
 }
