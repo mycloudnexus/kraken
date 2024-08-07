@@ -47,7 +47,7 @@
   background: #f0f0f0;
   border-radius: 50%;
   padding: 2px;
-  width: 68.45px; 
+  width: 68.45px;
   box-sizing: border-box;
 }
 
@@ -68,16 +68,16 @@
 
 .tooltipBlue {
   :global {
-    .ant-tooltip-arrow::before{
-      background-color: #3391FF !important;
+    .ant-tooltip-arrow::before {
+      background-color: #3391ff !important;
     }
-  
+
     .ant-tooltip-inner {
       width: 230px;
-      background: linear-gradient(180deg, #3391FF 33.85%, #466FFF 100%);
+      background: linear-gradient(180deg, #3391ff 33.85%, #466fff 100%);
       word-wrap: break-word;
     }
-  
+
     .ant-tooltip-content:before {
       content: url("../../../public/tooltip.png");
       position: absolute;

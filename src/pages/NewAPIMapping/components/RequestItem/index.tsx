@@ -104,7 +104,7 @@ const RequestItem = ({ item, index }: Props) => {
           ) : (
             <Flex gap={10} align="center">
               <Text.NormalMedium>{item.title}</Text.NormalMedium>
-              {!item?.requiredMapping && (
+              {Boolean(item?.customizedField) && (
                 <EditOutlined
                   onClick={() => {
                     enableEditTitle();
@@ -115,11 +115,12 @@ const RequestItem = ({ item, index }: Props) => {
               )}
             </Flex>
           )}
-          {!item.requiredMapping ? (
+          {Boolean(item.customizedField) && (
             <Button type="link" onClick={handleDelete} danger>
               Delete
             </Button>
-          ) : (
+          )}
+          {item.requiredMapping && (
             <Text.LightSmall color="#FF9A2E">Required mapping</Text.LightSmall>
           )}
         </Flex>
@@ -148,7 +149,7 @@ const RequestItem = ({ item, index }: Props) => {
             <Text.LightSmall color="#00000073">
               {item.description}
             </Text.LightSmall>
-            {!item?.requiredMapping && (
+            {Boolean(item?.customizedField) && (
               <EditOutlined
                 onClick={() => {
                   enableEditDescription();
@@ -163,7 +164,7 @@ const RequestItem = ({ item, index }: Props) => {
       <Flex className={styles.container} gap={8} wrap="wrap">
         <Input
           variant="filled"
-          disabled={item.requiredMapping}
+          disabled={!item.customizedField}
           placeholder="Select or input property"
           className={styles.requestMappingItemWrapper}
           value={item.source}

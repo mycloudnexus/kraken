@@ -10,6 +10,7 @@ const RequestMapping = () => {
       {
         title: "Title of Property Mapping",
         description: "description",
+        customizedField: true,
       },
     ]);
   };

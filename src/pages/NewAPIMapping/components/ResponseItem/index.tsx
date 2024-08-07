@@ -153,13 +153,8 @@ const ResponseItem = ({ item, index }: Props) => {
             </Flex>
           ) : (
             <Flex align="center" gap={10}>
-              <Text.NormalMedium>
-                {item.title}
-                {item?.requiredMapping && (
-                  <span style={{ color: "#FF4D4F" }}> *</span>
-                )}
-              </Text.NormalMedium>
-              {!item?.requiredMapping && (
+              <Text.NormalMedium>{item.title}</Text.NormalMedium>
+              {Boolean(item?.customizedField) && (
                 <EditOutlined
                   style={{ cursor: "pointer" }}
                   onClick={() => {
@@ -199,7 +194,7 @@ const ResponseItem = ({ item, index }: Props) => {
             <Text.LightSmall color="#00000073">
               {item.description}
             </Text.LightSmall>
-            {!item?.requiredMapping && (
+            {Boolean(item?.customizedField) && (
               <EditOutlined
                 style={{ cursor: "pointer" }}
                 onClick={() => {
