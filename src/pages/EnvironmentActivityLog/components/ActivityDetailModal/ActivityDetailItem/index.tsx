@@ -27,13 +27,14 @@ const ActivitySwitch = ({ value, handleChange, jsonValue }: ActivitySwitchProps)
   }
 
   return <Flex gap={4} align='center'>
-    <Button
+    {!!value && <Button
       type='link'
       className={styles.copyButton}
       onClick={handleCopy}
     >
       {copyButtonText}
     </Button>
+    }
     JSON <Switch checked={value} onChange={handleChange} />
   </Flex>
 };
