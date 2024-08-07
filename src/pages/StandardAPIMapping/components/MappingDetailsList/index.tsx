@@ -27,6 +27,10 @@ const MappingDetailsList = ({
     setActiveTab,
   } = useMappingUiStore();
 
+  useEffect(() => {
+    setActiveLabel(Object.keys(groupedPaths));
+  }, [groupedPaths])
+
   const initList = useCallback(() => {
     const headersList = Object.keys(groupedPaths);
     if (headersList.length > 0) {
@@ -89,7 +93,7 @@ const MappingDetailsList = ({
   return (
     <Spin spinning={!groupedPaths}>
       <Collapse
-        defaultActiveKey={activeLabel}
+        activeKey={activeLabel}
         onChange={handleChange}
         className={styles.collapseBox}
         bordered

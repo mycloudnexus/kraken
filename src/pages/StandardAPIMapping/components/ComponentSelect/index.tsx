@@ -1,18 +1,22 @@
 import { Flex, Select, Typography } from "antd";
-import styles from "./index.module.scss";
 import { useMemo } from "react";
-import ContactIcon from "@/assets/standardAPIMapping/contact.svg";
 import { useNavigate } from "react-router-dom";
-import { IComponent } from "@/utils/types/product.type";
 import { isEmpty } from "lodash";
 import { useMappingUiStore } from "@/stores/mappingUi.store";
+import ContactIcon from "@/assets/standardAPIMapping/contact.svg";
+import { IComponent } from "@/utils/types/product.type";
+import styles from "./index.module.scss";
 
 type ComponentSelectProps = {
   componentList: any;
   componentName: string;
 };
 
-const Label = ({ value }: { value: string }) => (
+type LabelProps = {
+  value: string;
+};
+
+const Label = ({ value }: LabelProps) => (
   <Flex
     style={{
       textOverflow: "ellipsis",
@@ -32,41 +36,38 @@ const Label = ({ value }: { value: string }) => (
   </Flex>
 );
 
-const ComponentSelect = ({
-  componentList,
-  componentName,
-}: ComponentSelectProps) => {
+const ComponentSelect = ({ componentList, componentName }: ComponentSelectProps) => {
   const navigate = useNavigate();
-
   const { resetUiStore } = useMappingUiStore();
+
   const parsedOptions = useMemo(() => {
     if (!componentList?.data?.length) return [];
     return componentList.data
-      .filter(
-        (i: IComponent) => !isEmpty(i?.facets?.supportedProductTypesAndActions)
-      )
-      .map((el: any) => ({
+      .filter((i: IComponent) => !isEmpty(i?.facets?.supportedProductTypesAndActions))
+      .filter((el: IComponent) => el.metadata.name !== componentName)
+      .map((el: IComponent) => ({
         value: el.metadata.key,
         label: <Label value={el.metadata.name} />,
       }));
-  }, [componentList]);
+  }, [componentList, componentName]);
 
-  const value = {
+  const value = useMemo(() => ({
     value: componentName,
     label: <Label value={componentName} />,
-  };
+  }), [componentName]);
 
   const handleSelect = (e: { value: string }) => {
     resetUiStore();
     navigate(`/api-mapping/${e.value}`);
   };
+
   return (
     <Select
       className={styles.selectStyle}
       onSelect={handleSelect}
       size="large"
       value={value}
-      labelInValue={true}
+      labelInValue
       options={parsedOptions}
     />
   );
