@@ -10,7 +10,15 @@ import {
 import { useAppStore } from "@/stores/app.store";
 import { ROUTES } from "@/utils/constants/route";
 import { MoreOutlined } from "@ant-design/icons";
-import { Button, Dropdown, Flex, MenuProps, Spin, notification } from "antd";
+import {
+  Button,
+  Dropdown,
+  Flex,
+  MenuProps,
+  Spin,
+  Typography,
+  notification,
+} from "antd";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import EnvStatus from "./components/EnvStatus";
@@ -18,7 +26,7 @@ import { showModalConfirmRotate } from "./components/ModalConfirmRotateAPIKey";
 import ModalNewDeployment from "./components/ModalNewDeployment";
 import { showModalShowNew } from "./components/ModalShowAPIKey";
 import styles from "./index.module.scss";
-import { isEmpty, sortBy } from "lodash";
+import { every, isEmpty, sortBy } from "lodash";
 import clsx from "clsx";
 import RunningAPIMapping from "./components/RunningAPIMapping";
 import DeploymentHistory from "./components/DeploymentHistory";
@@ -124,6 +132,9 @@ const EnvironmentOverview = () => {
   }, [envs]);
 
   const isHaveApiKey = useMemo(() => {
+    if (isEmpty(envs) || every(envs, (i) => isEmpty(i))) {
+      return true;
+    }
     if (!selectedEnv) return false;
     return !isEmpty(apiKey?.data.find((i) => i.envId === selectedEnv.id));
   }, [selectedEnv, apiKey]);
@@ -166,11 +177,19 @@ const EnvironmentOverview = () => {
                     align="center"
                     wrap="nowrap"
                   >
-                    <Text.NormalLarge
-                      style={{ marginRight: 16, textTransform: "capitalize" }}
+                    <Typography.Text
+                      ellipsis={{ tooltip: env.name }}
+                      style={{
+                        marginRight: 16,
+                        textTransform: "capitalize",
+                        maxWidth: 200,
+                        whiteSpace: "nowrap",
+                        fontSize: 16,
+                        fontWeight: 500,
+                      }}
                     >
                       {env.name}
-                    </Text.NormalLarge>
+                    </Typography.Text>
                     <EnvStatus
                       apiKey={haveApiKey}
                       status={getDataPlaneInfo(env.id)?.status}
@@ -197,7 +216,9 @@ const EnvironmentOverview = () => {
           </div>
         </Spin>
       </Flex>
-      {isHaveApiKey ? (
+      {!isHaveApiKey ? (
+        <NoAPIKey env={selectedEnv} />
+      ) : (
         <>
           <Flex vertical gap={12} className={styles.sectionWrapper}>
             <Flex align="center" justify="space-between">
@@ -234,8 +255,6 @@ const EnvironmentOverview = () => {
             <DeploymentHistory env={selectedEnv} />
           </Flex>
         </>
-      ) : (
-        <NoAPIKey env={selectedEnv} />
       )}
 
       <ModalNewDeployment

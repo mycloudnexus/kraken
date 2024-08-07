@@ -45,9 +45,7 @@ const NoAPIKey = ({ env }: Props) => {
       <Text.NormalLarge>Connect to data plane</Text.NormalLarge>
       <div className={styles.content}>
         <Text.LightMedium color="#00000073">
-          Click the button below to connect to data plane.
-          <br />
-          The latest deployment will show up here.
+          Please Create API Key for Data Plane to connect here!
         </Text.LightMedium>
       </div>
       <Button
