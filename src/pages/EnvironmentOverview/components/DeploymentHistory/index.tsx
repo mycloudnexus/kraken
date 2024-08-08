@@ -95,7 +95,7 @@ const DeploymentHistory = ({ env }: Props) => {
       },
       {
         title: "Deployed time",
-        dataIndex: "createAt",
+        dataIndex: envName === "stage" ? "createAt" : "createdAt",
         width: 340,
         render: (time: string) =>
           dayjs.utc(time).local().format("YYYY-MM-DD HH:mm:ss"),
