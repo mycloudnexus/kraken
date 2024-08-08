@@ -282,3 +282,11 @@
     }
   }
 }
+
+.hideError {
+  :global {
+    .ant-form-item-explain {
+      display: none;
+    }
+  }
+}

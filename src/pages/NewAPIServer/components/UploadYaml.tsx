@@ -9,6 +9,8 @@ import TitleIcon from "@/assets/title-icon.svg";
 import styles from "./index.module.scss";
 import SpecDrawer from "@/components/SpecDrawer";
 import { useEffect, useState } from "react";
+import { decode } from "js-base64";
+import clsx from "clsx";
 
 type Props = {
   form: FormInstance<any>;
@@ -62,7 +64,6 @@ const UploadYaml = ({ form }: Props) => {
         reader.onerror = reject;
         reader.readAsDataURL(file.file);
       });
-
       setContent(
         (swaggerData as string).replace(
           "data:application/octet-stream;base64",
@@ -71,7 +72,9 @@ const UploadYaml = ({ form }: Props) => {
       );
     } catch (error) {
       form.setFieldValue("file", undefined);
-      notification.error({ message: "Please select a valid swagger file" });
+      notification.error({
+        message: "Please upload valid  open api spec in yaml format.",
+      });
     }
   };
 
@@ -101,10 +104,34 @@ const UploadYaml = ({ form }: Props) => {
         <span style={{ color: "#FF4D4F" }}>*</span>
       </Flex>
       <Form.Item
-        className={styles.hideRequired}
+        className={clsx([styles.hideRequired, styles.hideError])}
         name="file"
         label="Upload API Spec in yaml format :"
-        rules={[{ required: true, message: "Please upload API spec." }]}
+        rules={[
+          { required: true, message: "Please upload API spec." },
+          () => ({
+            validator: async (_, value) => {
+              if (!file?.file) {
+                return Promise.resolve();
+              }
+              const swaggerData = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(value.file);
+              });
+              const swaggerText = decode(swaggerData as string);
+              const idxOpenAPI = swaggerText?.indexOf("openapi:");
+              const idxSwagger = swaggerText?.indexOf("swagger:");
+              if (idxOpenAPI === -1 && idxSwagger === -1) {
+                return Promise.reject(
+                  new Error("Please upload valid  open api spec in yaml format")
+                );
+              }
+              return Promise.resolve();
+            },
+          }),
+        ]}
         style={{ display: file?.file ? "none" : "block" }}
       >
         <Upload
@@ -123,6 +150,7 @@ const UploadYaml = ({ form }: Props) => {
           <Button icon={<UploadOutlined />}>Click to upload</Button>
         </Upload>
       </Form.Item>
+
       <Form.Item
         className={styles.hideRequired}
         label="Upload API Spec in yaml format :"
@@ -132,7 +160,6 @@ const UploadYaml = ({ form }: Props) => {
           Click to upload
         </Button>
       </Form.Item>
-
       {file ? (
         <Flex gap={9} justifyContent="flex-start">
           <PaperClipOutlined />
@@ -147,6 +174,18 @@ const UploadYaml = ({ form }: Props) => {
           </Text.LightMedium>
         </Flex>
       ) : null}
+      <Form.Item shouldUpdate>
+        {({ getFieldError }) => {
+          const errors = getFieldError("file");
+          return (
+            <div>
+              {errors?.map((e) => (
+                <div className="ant-form-item-explain-error">{e}</div>
+              ))}
+            </div>
+          );
+        }}
+      </Form.Item>
     </div>
   );
 };
