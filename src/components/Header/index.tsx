@@ -10,45 +10,44 @@ import {
   UpOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
-import { useCallback } from "react";
+import { Link } from "react-router-dom";
 import { DEFAULT_PRODUCT } from "@/utils/constants/product";
 import { useAppStore } from "@/stores/app.store";
-import { useTutorialStore } from '@/stores/tutorial.store';
+import { useTutorialStore } from "@/stores/tutorial.store";
 
 const TooltipBody = (setTutorialCompleted: (value: boolean) => void) => (
   <div className={styles.tooltip}>
-    <Flex justify='space-between'>
+    <Flex justify="space-between">
       <span>Open the guide here.</span>
       <CloseOutlined
         style={{ fontSize: 12 }}
         onClick={() => setTutorialCompleted(false)}
       />
     </Flex>
-    <Flex justify='end'>
-      <Button onClick={() => {
-        setTutorialCompleted(false)
-      }}>Got it</Button>
+    <Flex justify="end">
+      <Button
+        onClick={() => {
+          setTutorialCompleted(false);
+        }}
+      >
+        Got it
+      </Button>
     </Flex>
   </div>
 );
 
 const Header = () => {
-  const navigate = useNavigate();
   const { currentProduct } = useAppStore();
-  const goHome = useCallback(() => {
-    navigate("/");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  const { tutorialCompleted, setTutorialCompleted, setOpenTutorial } = useTutorialStore();
+  const { tutorialCompleted, setTutorialCompleted, setOpenTutorial } =
+    useTutorialStore();
 
   return (
     <div className={styles.header}>
       <Flex gap={48}>
-        <div className={styles.logo} onClick={goHome}>
+        <Link to={"/"} className={styles.logo}>
           <Logo />
           KRAKEN
-        </div>
+        </Link>
         <Select
           allowClear={false}
           value={currentProduct}
@@ -68,7 +67,6 @@ const Header = () => {
         />
       </Flex>
 
-
       <div className={styles.rightMenu}>
         <Input
           placeholder="Search"
@@ -78,7 +76,7 @@ const Header = () => {
         <Tooltip
           align={{ offset: [12, 15] }}
           overlayInnerStyle={{ zIndex: 1 }}
-          placement='bottomLeft'
+          placement="bottomLeft"
           open={tutorialCompleted || undefined}
           title={TooltipBody(setTutorialCompleted)}
           rootClassName={styles.tooltipBlue}
@@ -91,7 +89,7 @@ const Header = () => {
           <UserOutlined />
         </div>
       </div>
-    </div >
+    </div>
   );
 };
 

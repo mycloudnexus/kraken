@@ -28,6 +28,8 @@ type NewApiMappingStore = {
     param: Record<string, string>;
   };
   setSellerAPIExampleProps: (value: any) => void;
+  activeSonataResponse?: string;
+  setActiveSonataResponse: (value?: string) => void;
 };
 
 const defaultData = {
@@ -44,6 +46,7 @@ const defaultData = {
     path: {},
     param: {},
   },
+  activeSonataResponse: undefined,
 };
 
 export const useNewApiMappingStore = create<NewApiMappingStore>()((set) => ({
@@ -61,4 +64,6 @@ export const useNewApiMappingStore = create<NewApiMappingStore>()((set) => ({
     set({ listMappingStateResponse: value }),
   setSellerAPIExampleProps: (value: any) =>
     set({ sellerAPIExampleProps: value }),
+  setActiveSonataResponse: (value?: string) =>
+    set({ activeSonataResponse: value }),
 }));

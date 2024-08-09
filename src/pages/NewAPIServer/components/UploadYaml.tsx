@@ -180,7 +180,9 @@ const UploadYaml = ({ form }: Props) => {
           return (
             <div>
               {errors?.map((e) => (
-                <div className="ant-form-item-explain-error">{e}</div>
+                <div key={e} className="ant-form-item-explain-error">
+                  {e}
+                </div>
               ))}
             </div>
           );

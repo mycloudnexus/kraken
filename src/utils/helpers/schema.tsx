@@ -95,7 +95,8 @@ export const parseObjectDescriptionToTreeData = (
   titleClassName: string,
   exampleClassName: string,
   level = 0,
-  prefix = ""
+  prefix = "",
+  isSonataResponse = false
 ) => {
   if (!keys) return [];
   const result: any = Object.entries(keys).map(([key, value]) => {
@@ -122,7 +123,12 @@ export const parseObjectDescriptionToTreeData = (
     }
     return {
       title: (
-        <Flex justifyContent="flex-start" style={{ width: "100%" }} gap={4}>
+        <Flex
+          justifyContent="flex-start"
+          style={{ width: "100%" }}
+          gap={4}
+          className="tree-item-wrapper"
+        >
           <Text className={titleClassName} ellipsis={{ tooltip: true }}>
             "{key}"
           </Text>
@@ -136,7 +142,7 @@ export const parseObjectDescriptionToTreeData = (
         </Flex>
       ),
       key: buildPrefix(prefix, key, isArray(value) ? "[*]" : ""),
-      selectable: typeOfValue !== "object",
+      selectable: isSonataResponse ? true : typeOfValue !== "object",
       children,
     };
   });

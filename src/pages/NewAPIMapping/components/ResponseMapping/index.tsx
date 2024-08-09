@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import styles from "./index.module.scss";
 import { IResponseMapping } from "@/utils/types/component.type";
 import ResponseItem from "../ResponseItem";
-import { Flex } from "antd";
+import { Button, Flex } from "antd";
 
 export interface IMapping {
   key: number;
@@ -15,8 +15,26 @@ export interface IMapping {
 }
 
 const ResponseMapping = () => {
-  const { responseMapping, setListMappingStateResponse: setListMapping } =
-    useNewApiMappingStore();
+  const {
+    responseMapping,
+    setListMappingStateResponse: setListMapping,
+    setResponseMapping,
+  } = useNewApiMappingStore();
+
+  const handleAdd = () => {
+    setResponseMapping([
+      ...responseMapping,
+      {
+        title: "Title of Property Mapping",
+        description: "description",
+        customizedField: true,
+        source: "",
+        sourceLocation: "",
+        target: "",
+        targetLocation: "",
+      },
+    ]);
+  };
 
   useEffect(() => {
     if (isEmpty(responseMapping)) {
@@ -30,6 +48,13 @@ const ResponseMapping = () => {
         {responseMapping?.map((item: IResponseMapping, index: number) => (
           <ResponseItem item={item} index={index} />
         ))}
+        <Button
+          type="primary"
+          style={{ width: "fit-content" }}
+          onClick={handleAdd}
+        >
+          Add mapping property
+        </Button>
       </Flex>
     </div>
   );

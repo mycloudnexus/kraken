@@ -31,6 +31,7 @@ const ResponseItem = ({ item, index }: Props) => {
     setRightSide,
     setActiveResponseName,
     setListMappingStateResponse,
+    setActiveSonataResponse,
   } = useNewApiMappingStore();
   const [titleInput, setTitleInput] = useState("");
   const [descriptionInput, setDescriptionInput] = useState("");
@@ -68,8 +69,8 @@ const ResponseItem = ({ item, index }: Props) => {
     disableEditDescription();
   };
 
-  const openSelectorForProp = (name?: string, target?: string) => {
-    setActiveResponseName(`${name}-${target}`);
+  const openSelectorForProp = (index?: number, name?: string) => {
+    setActiveResponseName(`${index}-${name}`);
     setRightSide(EnumRightType.AddSellerResponse);
   };
 
@@ -122,6 +123,12 @@ const ResponseItem = ({ item, index }: Props) => {
     handleSetListMapping(cloneArr);
   };
 
+  const handleDeleteItemResponse = () => {
+    const newResponse = cloneDeep(responseMapping);
+    newResponse.splice(index, 1);
+    setResponseMapping(newResponse);
+  };
+
   return (
     <div
       className={clsx([
@@ -168,6 +175,11 @@ const ResponseItem = ({ item, index }: Props) => {
           {item.requiredMapping && (
             <Text.LightSmall color="#FF9A2E">Required mapping</Text.LightSmall>
           )}
+          {Boolean(item.customizedField) && (
+            <Button type="link" onClick={handleDeleteItemResponse} danger>
+              Delete
+            </Button>
+          )}
         </Flex>
         {isEditDescription ? (
           <Flex align="center" gap={10}>
@@ -207,16 +219,40 @@ const ResponseItem = ({ item, index }: Props) => {
         )}
       </Flex>
       <Flex className={styles.container} gap={8} wrap="wrap" align="center">
-        <div className={styles.target}>
-          <Typography.Text
-            ellipsis={{ tooltip: item.target }}
-            style={{ lineHeight: "32px", fontWeight: 400 }}
-          >
-            {!isEmpty(item?.target)
-              ? item?.target
-              : "No mapping to Sonata API is required"}
-          </Typography.Text>
-        </div>
+        {!item.customizedField ? (
+          <div className={styles.target}>
+            <Typography.Text
+              ellipsis={{ tooltip: item.target }}
+              style={{ lineHeight: "32px", fontWeight: 400 }}
+            >
+              {!isEmpty(item?.target)
+                ? item?.target
+                : "No mapping to Sonata API is required"}
+            </Typography.Text>
+          </div>
+        ) : (
+          <Input
+            placeholder="Select or input property"
+            style={{
+              width: "calc(50% - 30px)",
+            }}
+            variant="filled"
+            className={clsx(styles.input)}
+            value={isEmpty(item?.target) ? undefined : get(item, "target")}
+            onClick={() => {
+              setActiveSonataResponse(`${index}-${item.name}`);
+              setRightSide(EnumRightType.SonataResponse);
+            }}
+            onChange={(e) => {
+              const cloneObj = cloneDeep(responseMapping);
+              set(cloneObj, `[${index}].target`, e?.target?.value ?? "");
+              set(cloneObj, `[${index}].targetLocation`, `BODY`);
+              setResponseMapping(cloneObj);
+              setActiveResponseName(undefined);
+            }}
+          />
+        )}
+
         <MappingIcon />
         <Input
           variant="filled"
@@ -231,8 +267,7 @@ const ResponseItem = ({ item, index }: Props) => {
           )}
           value={isEmpty(item?.source) ? undefined : get(item, "source")}
           onClick={() => {
-            setRightSide(EnumRightType.AddSellerResponse);
-            openSelectorForProp(item?.name, get(item, "target"));
+            openSelectorForProp(index, get(item, "name"));
           }}
           onChange={(e) =>
             handleChangeResponse(e.target.value, item?.name, item?.target)

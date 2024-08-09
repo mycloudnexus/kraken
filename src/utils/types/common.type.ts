@@ -58,6 +58,7 @@ export enum EnumRightType {
   AddSonataProp,
   AddSellerProp,
   AddSellerResponse,
+  SonataResponse,
 }
 
 export type ActiveTabType = 'request' | 'response';

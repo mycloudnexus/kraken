@@ -117,20 +117,22 @@ const SelectResponseProperty = () => {
     const key = get(selectedKeys, "[0]");
     const newKey = transformString(key as unknown as string);
     if (activeResponseName && typeof key === "string") {
-      const [name, target] = activeResponseName.split("-");
+      const [responseIndex, name] = activeResponseName.split("-");
+      if (
+        !responseIndex ||
+        get(responseMapping, `[${[responseIndex]}].name`, "undefined") !== name
+      ) {
+        notification.error({ message: "Error. Please try again" });
+        return;
+      }
       const cloneObj = clone(responseMapping);
-      const index = cloneObj.findIndex((i: any) => {
-        if (target !== "undefined") {
-          return i.name === name && i.target === target;
-        }
-        return i.name === name;
-      });
+
       const value =
         newKey.startsWith("[*]") || newKey.startsWith("[0]")
           ? `@{{responseBody${newKey}}}`
           : `@{{responseBody.${newKey}}}`;
-      set(cloneObj, `[${index}].source`, value);
-      set(cloneObj, `[${index}].sourceLocation`, `BODY`);
+      set(cloneObj, `[${responseIndex}].source`, value);
+      set(cloneObj, `[${responseIndex}].sourceLocation`, `BODY`);
       setResponseMapping(cloneObj);
       setActiveResponseName(undefined);
       setSelectedKeys([]);

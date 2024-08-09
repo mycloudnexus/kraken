@@ -40,6 +40,7 @@ import styles from "./index.module.scss";
 import buildInitListMapping from "@/utils/helpers/buildInitListMapping";
 import { useMappingUiStore } from "@/stores/mappingUi.store";
 import Text from "@/components/Text";
+import SonataResponseMapping from "./components/SonataResponseMapping";
 
 type Props = {
   rightSide: number;
@@ -77,6 +78,8 @@ const RightSide = ({
       return <RightAddSellerProp onSelect={handleSelectSellerProp} />;
     case EnumRightType.AddSellerResponse:
       return <SelectResponseProperty />;
+    case EnumRightType.SonataResponse:
+      return <SonataResponseMapping spec={jsonSpec} method={method} />;
     default:
       return <></>;
   }

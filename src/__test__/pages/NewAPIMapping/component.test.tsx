@@ -6,6 +6,7 @@ import RightAddSonataProp, {
 import { APIItem } from "@/pages/NewAPIMapping/components/SelectAPI";
 import SelectResponseProperty from "@/pages/NewAPIMapping/components/SelectResponseProperty";
 import SonataPropMapping from "@/pages/NewAPIMapping/components/SonataPropMapping";
+import SonataResponseMapping from "@/pages/NewAPIMapping/components/SonataResponseMapping";
 import { useMappingUiStore } from "@/stores/mappingUi.store";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import buildInitListMapping from "@/utils/helpers/buildInitListMapping";
@@ -1233,6 +1234,17 @@ test("SonataPropMapping", () => {
           }
           title={"Property mapping"}
         />
+      </BrowserRouter>
+    </QueryClientProvider>
+  );
+  expect(container).toBeInTheDocument();
+});
+
+test("SonataResponseMapping", () => {
+  const { container } = render(
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <SonataResponseMapping spec={undefined} method={"GET"} />
       </BrowserRouter>
     </QueryClientProvider>
   );

@@ -28,6 +28,22 @@
       background: #bae7ff;
     }
   }
+  :global {
+    .ant-tree-node-content-wrapper {
+      padding-left: 0;
+      cursor: default;
+    }
+    .ant-tree-switcher {
+      background: #fff;
+      border-radius: 0;
+    }
+    .ant-tree-switcher-noop {
+      visibility: hidden;
+    }
+    .ant-tree-list {
+      padding-left: 20px;
+    }
+  }
 }
 
 .nodeTitle {
