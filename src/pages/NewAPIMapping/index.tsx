@@ -414,7 +414,7 @@ const NewAPIMapping = forwardRef(
             <Flex className={styles.breadcrumb} justifyContent="space-between">
               <Flex className={styles.infoBox}>
                 {queryData.mappingStatus === "incomplete" && (
-                  <Tag bordered={false} color="error">
+                  <Tag bordered={false} color="warning">
                     Incomplete
                   </Tag>
                 )}

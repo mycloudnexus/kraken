@@ -9,6 +9,10 @@
   background-color: #fff;
   padding: 16px 0px;
   width: 338px;
+  overflow-y: scroll;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 .envWrapper {
   padding: 0 10px 10px 10px;

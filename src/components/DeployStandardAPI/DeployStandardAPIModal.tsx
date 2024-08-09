@@ -85,7 +85,7 @@ const DeployStandardAPIModal = ({ open, onClose, defaultKey }: Props) => {
             <Text.LightMedium>{item?.path}</Text.LightMedium>
             <MappingMatrix mappingMatrix={item.mappingMatrix} />
             {item?.mappingStatus === "incomplete" && (
-              <Tag color="red" bordered={false}>
+              <Tag color="warning" bordered={false}>
                 Incomplete
               </Tag>
             )}

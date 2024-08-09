@@ -22,7 +22,7 @@
 }
 .collapseItem {
   position: relative;
-  padding: 15px;
+  padding: 15px 10px 15px 15px;
   cursor: pointer;
   &:hover {
     background-color: rgba(219, 228, 251, 1);
@@ -48,7 +48,7 @@
   &:after {
     content: '';
     width: 2px;
-    height: 70px;
+    height: 100%;
     background: repeating-linear-gradient(
       to bottom,
       rgba(152, 161, 168, 0.7),
@@ -71,6 +71,12 @@
     left: 27px;
   }
 }
+
+.collapseMappingMatrix {
+  flex-wrap: wrap;
+  width: calc(100% - 10px);
+}
+
 .collapseItemActive {
   background-color: rgba(41, 98, 255, 0.2);
   border-right: 3px solid #2962FF;

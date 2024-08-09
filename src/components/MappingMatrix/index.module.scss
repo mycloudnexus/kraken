@@ -1,13 +1,19 @@
+.tagContainer {
+  max-width: 100%;
+}
+
 .tagBadge {
   line-height: 12px;
   margin: 3px 0;
   font-size: 10px;
-  span {
-    font-size: 8px;
-    color: rgba(0, 0, 0, 0.45);
-    line-height: 12px;
-  }
 }
+
+.tagLabel {
+  font-size: 8px;
+  color: rgba(0, 0, 0, 0.45);
+  line-height: 12px;
+}
+
 .tagActive {
   color:#2962FF !important;
   font-weight: 500;

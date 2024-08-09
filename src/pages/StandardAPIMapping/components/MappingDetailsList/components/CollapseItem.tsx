@@ -1,7 +1,6 @@
 import { IMapperDetails } from "@/utils/types/env.type";
-import { InfoCircleFilled, InfoCircleOutlined } from "@ant-design/icons";
-import { Flex, Tooltip } from "antd";
-import Dot from "./Dot";
+import { InfoCircleOutlined } from "@ant-design/icons";
+import { Badge, Flex, Tooltip } from "antd";
 import styles from "../index.module.scss";
 import MappingMatrix from "@/components/MappingMatrix";
 
@@ -16,7 +15,6 @@ const CollapseItem = ({ data, selectedKey, setActiveSelected }: CollapseItemProp
     <>
       {data.map((el, elIndex) => {
         const isItemActive = selectedKey === el.targetKey;
-
         return (
           <Flex
             key={`${el.targetMapperKey}-${elIndex}`}
@@ -24,18 +22,17 @@ const CollapseItem = ({ data, selectedKey, setActiveSelected }: CollapseItemProp
             className={`${styles.collapseItem} ${isItemActive ? styles.collapseItemActive : ""}`}
             onClick={() => !isItemActive && setActiveSelected(el)}
           >
-            <Flex>
-              <Dot vertical />
+            <Flex className={styles.collapseMappingMatrix}>
               <MappingMatrix
                 extraKey={el.path}
                 mappingMatrix={el.mappingMatrix}
                 isItemActive={isItemActive}
               />
             </Flex>
-            <Flex justify="flex-end" gap={8}>
+            <Flex justify="flex-end" wrap="wrap" align="center">
               {el.mappingStatus === "incomplete" && (
                 <Tooltip title="Incomplete mapping">
-                  <InfoCircleFilled style={{ color: "#FFA940" }} />
+                  <Badge status='warning' />
                 </Tooltip>
               )}
               {!el.requiredMapping && (
