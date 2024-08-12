@@ -29,6 +29,8 @@
 
 .input {
   background: #f0f2f5;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .stateSelect {
@@ -49,4 +51,10 @@
 
 .rootRequired {
   border-color: #ff9a2e;
+}
+
+.activeInput {
+  border-radius: 2px;
+  border: 1px solid #165dff;
+  background-color: #fff;
 }

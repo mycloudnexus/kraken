@@ -1,6 +1,6 @@
 import { IRequestMapping } from "@/utils/types/component.type";
 import styles from "./index.module.scss";
-import { Button, Flex, Input } from "antd";
+import { Button, Flex, Input, Tooltip } from "antd";
 import Text from "@/components/Text";
 import MappingIcon from "@/assets/newAPIMapping/mapping-icon.svg";
 import clsx from "clsx";
@@ -162,41 +162,47 @@ const RequestItem = ({ item, index }: Props) => {
         )}
       </Flex>
       <Flex className={styles.container} gap={8} wrap="wrap">
-        <Input
-          variant="filled"
-          disabled={!item.customizedField}
-          placeholder="Select or input property"
-          className={styles.requestMappingItemWrapper}
-          value={item.source}
-          style={{ width: "calc(50% - 22px)" }}
-          onClick={() => {
-            if (item.requiredMapping) {
-              return;
-            }
-            setRightSide(EnumRightType.AddSonataProp);
-            setRightSideInfo({
-              method: "update",
-              title: item.title,
-              previousData: item,
-            });
-          }}
-          onChange={(e) => {
-            const newValue = get(e, "target.value", "")
-              .replace?.("@{{", "")
-              .replace?.("}}", "");
-            let sourceLocation = get(item, "sourceLocation", "");
-            if (newValue.includes(".")) {
-              const splited = newValue.split(".");
-              const pathValue = get(splited, "[0]", "").toLocaleUpperCase();
-              sourceLocation = pathValue === "REQUESTBODY" ? "BODY" : pathValue;
-            }
-            const newRequest = cloneDeep(requestMapping);
-            set(newRequest, `[${index}].source`, get(e, "target.value", ""));
-            set(newRequest, `[${index}].sourceLocation`, sourceLocation);
-            setRequestMapping(newRequest);
-          }}
-          suffix={<RightOutlined style={{ fontSize: 12, color: "#C9CDD4" }} />}
-        />
+        <Tooltip title={item.source}>
+          <Input
+            variant="filled"
+            disabled={!item.customizedField}
+            placeholder="Select or input property"
+            className={clsx(styles.requestMappingItemWrapper, {
+              [styles.active]:
+                rightSide === EnumRightType.AddSonataProp &&
+                isEqual(item, rightSideInfo?.previousData),
+            })}
+            value={item.source}
+            style={{ width: "calc(50% - 22px)" }}
+            onClick={() => {
+              if (item.requiredMapping) {
+                return;
+              }
+              setRightSide(EnumRightType.AddSonataProp);
+              setRightSideInfo({
+                method: "update",
+                title: item.title,
+                previousData: item,
+              });
+            }}
+            onChange={(e) => {
+              const newValue = get(e, "target.value", "")
+                .replace?.("@{{", "")
+                .replace?.("}}", "");
+              let sourceLocation = get(item, "sourceLocation", "");
+              if (newValue.includes(".")) {
+                const splited = newValue.split(".");
+                const pathValue = get(splited, "[0]", "").toLocaleUpperCase();
+                sourceLocation =
+                  pathValue === "REQUESTBODY" ? "BODY" : pathValue;
+              }
+              const newRequest = cloneDeep(requestMapping);
+              set(newRequest, `[${index}].source`, get(e, "target.value", ""));
+              set(newRequest, `[${index}].sourceLocation`, sourceLocation);
+              setRequestMapping(newRequest);
+            }}
+          />
+        </Tooltip>
         <MappingIcon />
         <Input
           variant="filled"

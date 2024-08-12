@@ -21,11 +21,6 @@
   width: calc(50% - 22px);
   background: #f2f3f5;
   cursor: pointer;
-  &.active {
-    border-radius: 2px;
-    border: 1px solid #165dff;
-    background-color: #fff;
-  }
 }
 
 .requestMappingItemWrapper {
@@ -34,16 +29,25 @@
   border-radius: 4px;
   box-sizing: border-box;
   user-select: none;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
   cursor: pointer;
 
-  input:disabled {
+  &:disabled {
     color: #000 !important;
-  }
-  &:has(input:disabled) {
+    background: #f0f2f5 !important;
     border: none !important;
+    cursor: default;
   }
 }
 
 .rootRequired {
   border-color: #ff9a2e;
+}
+
+.active {
+  border-radius: 2px;
+  border: 1px solid #165dff;
+  background-color: #fff;
 }

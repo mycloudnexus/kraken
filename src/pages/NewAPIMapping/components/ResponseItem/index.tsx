@@ -1,6 +1,6 @@
 import { IResponseMapping } from "@/utils/types/component.type";
 import styles from "./index.module.scss";
-import { Button, Flex, Input, Select, Typography } from "antd";
+import { Button, Flex, Input, Select, Tooltip, Typography } from "antd";
 import Text from "@/components/Text";
 import MappingIcon from "@/assets/newAPIMapping/mapping-icon-response.svg";
 import { cloneDeep, difference, get, isEmpty, set } from "lodash";
@@ -32,6 +32,8 @@ const ResponseItem = ({ item, index }: Props) => {
     setActiveResponseName,
     setListMappingStateResponse,
     setActiveSonataResponse,
+    activeSonataResponse,
+    rightSide,
   } = useNewApiMappingStore();
   const [titleInput, setTitleInput] = useState("");
   const [descriptionInput, setDescriptionInput] = useState("");
@@ -231,26 +233,32 @@ const ResponseItem = ({ item, index }: Props) => {
             </Typography.Text>
           </div>
         ) : (
-          <Input
-            placeholder="Select or input property"
-            style={{
-              width: "calc(50% - 30px)",
-            }}
-            variant="filled"
-            className={clsx(styles.input)}
-            value={isEmpty(item?.target) ? undefined : get(item, "target")}
-            onClick={() => {
-              setActiveSonataResponse(`${index}-${item.name}`);
-              setRightSide(EnumRightType.SonataResponse);
-            }}
-            onChange={(e) => {
-              const cloneObj = cloneDeep(responseMapping);
-              set(cloneObj, `[${index}].target`, e?.target?.value ?? "");
-              set(cloneObj, `[${index}].targetLocation`, `BODY`);
-              setResponseMapping(cloneObj);
-              setActiveResponseName(undefined);
-            }}
-          />
+          <Tooltip title={item?.target}>
+            <Input
+              placeholder="Select or input property"
+              style={{
+                width: "calc(50% - 30px)",
+              }}
+              variant="filled"
+              className={clsx(styles.input, {
+                [styles.activeInput]:
+                  rightSide === EnumRightType.SonataResponse &&
+                  activeSonataResponse === `${index}-${item?.name}`,
+              })}
+              value={isEmpty(item?.target) ? undefined : get(item, "target")}
+              onClick={() => {
+                setActiveSonataResponse(`${index}-${item.name}`);
+                setRightSide(EnumRightType.SonataResponse);
+              }}
+              onChange={(e) => {
+                const cloneObj = cloneDeep(responseMapping);
+                set(cloneObj, `[${index}].target`, e?.target?.value ?? "");
+                set(cloneObj, `[${index}].targetLocation`, `BODY`);
+                setResponseMapping(cloneObj);
+                setActiveResponseName(undefined);
+              }}
+            />
+          </Tooltip>
         )}
 
         <MappingIcon />
@@ -260,11 +268,11 @@ const ResponseItem = ({ item, index }: Props) => {
           style={{
             width: "calc(50% - 30px)",
           }}
-          className={clsx(
-            styles.input,
-            activeResponseName === `${item?.name}-${item?.target}` &&
-              styles.activeInput
-          )}
+          className={clsx(styles.input, {
+            [styles.activeInput]:
+              rightSide === EnumRightType.AddSellerResponse &&
+              activeResponseName === `${index}-${item?.name}`,
+          })}
           value={isEmpty(item?.source) ? undefined : get(item, "source")}
           onClick={() => {
             openSelectorForProp(index, get(item, "name"));
