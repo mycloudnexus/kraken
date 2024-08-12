@@ -118,3 +118,27 @@
   height: 12px;
   position: relative;
 }
+
+.lessContent {
+  position: relative;
+  max-height: 480px;
+  overflow: hidden;
+  box-shadow: #2962FF;
+  &:after {
+    content: '';
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    height: 10%;
+    bottom: 0px;
+    background: linear-gradient(180deg, rgba(139,167,32,0) 0%, rgba(255,255,255,1) 100%);
+    pointer-events: none;
+  }
+}
+
+.showMoreLess {
+  background: white;
+  color: rgba(22, 93, 255, 1) ;
+  cursor: pointer;
+  padding: 10px 20px;
+}

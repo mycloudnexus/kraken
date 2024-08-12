@@ -19,9 +19,9 @@ const MappingMatrix = ({ extraKey = '', mappingMatrix, isItemActive = false }: {
     return { label: label, value: renderTextType(value) };
   });
 
-  return (<Flex wrap style={{ marginLeft: '20px', maxWidth: "calc(100% - 35px)" }} gap={3}>
+  return (<Flex className={styles.wrapper}>
     {tagLabels.map(({ label, value }, index) => (
-      <Tag key={`${extraKey}-${label}-${value}-${index}`} style={{ maxWidth: "100%", marginRight: "3px" }}>
+      <Tag key={`${extraKey}-${label}-${value}-${index}`} className={styles.tag}>
         <Flex vertical className={styles.tagContainer}>
           <Typography.Text
             className={styles.tagLabel}

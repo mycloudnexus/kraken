@@ -1,3 +1,15 @@
+.wrapper {
+  margin-left: 20px;
+  max-width: calc(100% - 35px);
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.tag {
+  max-width: 100%;
+  margin-right: 3px;
+}
+
 .tagContainer {
   max-width: 100%;
 }

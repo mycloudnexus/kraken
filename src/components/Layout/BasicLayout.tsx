@@ -4,7 +4,7 @@ import styles from "./index.module.scss";
 
 const BasicLayout = () => {
   return (
-    <div>
+    <div className={styles.main}>
       <Header />
       <div className={styles.content}>
         <Outlet />

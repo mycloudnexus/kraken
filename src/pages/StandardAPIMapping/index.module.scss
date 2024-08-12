@@ -1,8 +1,9 @@
 .pageWrapper {
-  height: -webkit-fill-available;
+  height: 100%;
   padding: 10px 20px;
   background-color: #f0f2f5;
   overflow-x: auto;
+  overflow-y: hidden;
 }
 .leftWrapper {
   flex: 1;
@@ -14,6 +15,7 @@
     display: none;
   }
 }
+
 .envWrapper {
   padding: 0 10px 10px 10px;
   border-bottom: 1px solid #dde1e5;

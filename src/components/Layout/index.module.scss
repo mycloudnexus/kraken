@@ -1,4 +1,9 @@
 .content {
-  height: calc(100vh - 58px);
- 
+  height: calc(100vh - 78px);
+}
+
+.main {
+  ::-webkit-scrollbar {
+    display: none;
+  }
 }
