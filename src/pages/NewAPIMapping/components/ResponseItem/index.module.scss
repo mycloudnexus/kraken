@@ -29,8 +29,10 @@
 
 .input {
   background: #f0f2f5;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  input {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 
 .stateSelect {

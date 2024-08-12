@@ -204,48 +204,57 @@ const RequestItem = ({ item, index }: Props) => {
           />
         </Tooltip>
         <MappingIcon />
-        <Input
-          variant="filled"
-          style={{ width: "calc(50% - 30px)" }}
-          className={clsx(styles.sellerPropItemWrapper, {
-            [styles.active]:
-              rightSide === EnumRightType.AddSellerProp &&
-              isEqual(item, rightSideInfo?.previousData),
-          })}
-          onClick={() => {
-            setRightSide(EnumRightType.AddSellerProp);
-            setRightSideInfo({
-              method: "update",
-              previousData: item,
-              title: item.title,
-            });
-          }}
-          value={item.target}
-          placeholder="Select or input property"
-          suffix={<RightOutlined style={{ fontSize: 12, color: "#C9CDD4" }} />}
-          onChange={(e) => {
-            if (e.target?.value?.startsWith("hybrid.")) {
+        <Tooltip title={item.target}>
+          <Input
+            variant="filled"
+            style={{ width: "calc(50% - 30px)" }}
+            className={clsx(styles.sellerPropItemWrapper, {
+              [styles.active]:
+                rightSide === EnumRightType.AddSellerProp &&
+                isEqual(item, rightSideInfo?.previousData),
+            })}
+            onClick={() => {
+              setRightSide(EnumRightType.AddSellerProp);
+              setRightSideInfo({
+                method: "update",
+                previousData: item,
+                title: item.title,
+              });
+            }}
+            value={item.target}
+            placeholder="Select or input property"
+            suffix={
+              <RightOutlined style={{ fontSize: 12, color: "#C9CDD4" }} />
+            }
+            onChange={(e) => {
+              if (e.target?.value?.startsWith("hybrid.")) {
+                const newRequest = cloneDeep(requestMapping);
+                set(
+                  newRequest,
+                  `[${index}].target`,
+                  get(e, "target.value", "")
+                );
+                set(newRequest, `[${index}].targetLocation`, "HYBRID");
+                setRequestMapping(newRequest);
+                return;
+              }
+              const newValue = get(e, "target.value", "")
+                .replace?.("@{{", "")
+                .replace?.("}}", "");
+              let targetLocation = get(item, "targetLocation", "");
+              if (newValue.includes(".")) {
+                const splited = newValue.split(".");
+                const pathValue = get(splited, "[0]", "").toLocaleUpperCase();
+                targetLocation =
+                  pathValue === "REQUESTBODY" ? "BODY" : pathValue;
+              }
               const newRequest = cloneDeep(requestMapping);
               set(newRequest, `[${index}].target`, get(e, "target.value", ""));
-              set(newRequest, `[${index}].targetLocation`, "HYBRID");
+              set(newRequest, `[${index}].targetLocation`, targetLocation);
               setRequestMapping(newRequest);
-              return;
-            }
-            const newValue = get(e, "target.value", "")
-              .replace?.("@{{", "")
-              .replace?.("}}", "");
-            let targetLocation = get(item, "targetLocation", "");
-            if (newValue.includes(".")) {
-              const splited = newValue.split(".");
-              const pathValue = get(splited, "[0]", "").toLocaleUpperCase();
-              targetLocation = pathValue === "REQUESTBODY" ? "BODY" : pathValue;
-            }
-            const newRequest = cloneDeep(requestMapping);
-            set(newRequest, `[${index}].target`, get(e, "target.value", ""));
-            set(newRequest, `[${index}].targetLocation`, targetLocation);
-            setRequestMapping(newRequest);
-          }}
-        />
+            }}
+          />
+        </Tooltip>
       </Flex>
     </div>
   );

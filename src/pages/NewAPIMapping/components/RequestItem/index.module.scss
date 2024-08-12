@@ -21,6 +21,10 @@
   width: calc(50% - 22px);
   background: #f2f3f5;
   cursor: pointer;
+  input {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 
 .requestMappingItemWrapper {

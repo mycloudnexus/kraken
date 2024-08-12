@@ -58,7 +58,6 @@ const useGetApiSpec = (currentProduct: string, targetMapperKey: string) => {
     return mappers?.request?.map((rm: any) => ({
       ...rm,
       target: transformTarget(rm.target, rm.targetLocation),
-      source: transformTarget(rm.source, rm.sourceLocation),
     }));
   }, [mappers?.request]);
 

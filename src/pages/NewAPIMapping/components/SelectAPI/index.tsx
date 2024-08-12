@@ -241,7 +241,7 @@ const SelectAPI = ({
   const resetMapping = useCallback(() => {
     if (mappers?.request) {
       const newApiRequest = cloneDeep(mappers?.request)
-        .filter((rm: any) => !!rm.requiredMapping)
+        .filter((rm: any) => !rm.customizedField)
         .map((rm: any) => ({
           ...rm,
           target: "",

@@ -262,26 +262,30 @@ const ResponseItem = ({ item, index }: Props) => {
         )}
 
         <MappingIcon />
-        <Input
-          variant="filled"
-          placeholder="Select or input property"
-          style={{
-            width: "calc(50% - 30px)",
-          }}
-          className={clsx(styles.input, {
-            [styles.activeInput]:
-              rightSide === EnumRightType.AddSellerResponse &&
-              activeResponseName === `${index}-${item?.name}`,
-          })}
-          value={isEmpty(item?.source) ? undefined : get(item, "source")}
-          onClick={() => {
-            openSelectorForProp(index, get(item, "name"));
-          }}
-          onChange={(e) =>
-            handleChangeResponse(e.target.value, item?.name, item?.target)
-          }
-          suffix={<RightOutlined style={{ fontSize: 12, color: "#C9CDD4" }} />}
-        />
+        <Tooltip title={item?.source}>
+          <Input
+            variant="filled"
+            placeholder="Select or input property"
+            style={{
+              width: "calc(50% - 30px)",
+            }}
+            className={clsx(styles.input, {
+              [styles.activeInput]:
+                rightSide === EnumRightType.AddSellerResponse &&
+                activeResponseName === `${index}-${item?.name}`,
+            })}
+            value={isEmpty(item?.source) ? undefined : get(item, "source")}
+            onClick={() => {
+              openSelectorForProp(index, get(item, "name"));
+            }}
+            onChange={(e) =>
+              handleChangeResponse(e.target.value, item?.name, item?.target)
+            }
+            suffix={
+              <RightOutlined style={{ fontSize: 12, color: "#C9CDD4" }} />
+            }
+          />
+        </Tooltip>
       </Flex>
       {!isEmpty(item?.targetValues) && (
         <Flex vertical gap={20} style={{ width: "100%", marginTop: 8 }}>
