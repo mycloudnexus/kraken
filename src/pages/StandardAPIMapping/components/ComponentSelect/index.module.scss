@@ -1,6 +1,16 @@
 .selectStyle {
   display: flex;
   width: 338px;
+  :global {
+    .ant-select:not(.ant-select-customize-input) .ant-select-selector, .ant-select-focused {
+      background-color: transparent;
+      border: 0;
+      box-shadow: none !important;
+    }
+    .ant-select-arrow {
+      color: black;
+    }
+  }
 }
 
 .componentIconWrapper {

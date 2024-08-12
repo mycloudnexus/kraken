@@ -5,6 +5,10 @@
   overflow-x: auto;
   overflow-y: hidden;
 }
+.pageBody {
+  max-height: calc(100vh - 128px);
+}
+
 .leftWrapper {
   flex: 1;
   background-color: #fff;

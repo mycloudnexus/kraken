@@ -30,7 +30,7 @@ const Label = ({ value }: LabelProps) => (
     <div className={styles.componentIconWrapper}>
       <ContactIcon />
     </div>
-    <Typography.Text ellipsis={{ tooltip: value }} style={{ maxWidth: 253 }}>
+    <Typography.Text ellipsis={{ tooltip: value }} style={{ fontSize: 16, maxWidth: 253 }}>
       {value}
     </Typography.Text>
   </Flex>
@@ -62,14 +62,17 @@ const ComponentSelect = ({ componentList, componentName }: ComponentSelectProps)
   };
 
   return (
-    <Select
-      className={styles.selectStyle}
-      onSelect={handleSelect}
-      size="large"
-      value={value}
-      labelInValue
-      options={parsedOptions}
-    />
+    <div className={styles.selectStyle}>
+      <Select
+        onSelect={handleSelect}
+        dropdownStyle={{ width: "338px" }}
+        size="large"
+        value={value}
+        labelInValue
+        options={parsedOptions}
+      />
+    </div>
+
   );
 };
 

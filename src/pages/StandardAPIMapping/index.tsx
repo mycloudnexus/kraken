@@ -111,59 +111,61 @@ const StandardAPIMapping = () => {
   }, [detailDataMapping]);
 
   return (
-    <Flex align="stretch" className={styles.pageWrapper}>
-      <Flex vertical gap={12}>
-        <ComponentSelect
-          componentList={componentList}
-          componentName={componentName}
-        />
-        <Flex
-          vertical
-          justify={isLoading ? "center" : "space-between"}
-          className={styles.leftWrapper}
-        >
-          <Spin spinning={isLoading}>
-            {!isGroupedPathsEmpty && (
-              <MappingDetailsList
-                groupedPaths={groupedPaths}
-                setActiveSelected={handleDisplay}
-              />
-            )}
-          </Spin>
+    <Spin spinning={isLoading}>
+      <Flex align="stretch" vertical className={styles.pageWrapper}>
+        <Flex align="center" justify="space-between" style={{ padding: "5px 0" }}>
+          <ComponentSelect
+            componentList={componentList}
+            componentName={componentName}
+          />
+          <Flex justify="end">
+            <Button
+              data-testid="btn-create-version"
+              type="primary"
+              onClick={() => {
+                showModalConfirmCreateVersion({
+                  className: styles.modalCreate,
+                  onOk: handleCreateNewVersion,
+                });
+              }}
+            >
+              Create new version
+            </Button>
+          </Flex>
+        </Flex>
+        <Flex className={styles.pageBody}>
+          <Flex vertical gap={12}>
+            <Flex
+              vertical
+              justify={isLoading ? "center" : "space-between"}
+              className={styles.leftWrapper}
+            >
+              {!isGroupedPathsEmpty && (
+                <MappingDetailsList
+                  groupedPaths={groupedPaths}
+                  setActiveSelected={handleDisplay}
+                />
+              )}
+            </Flex>
+          </Flex>
+          <Flex vertical gap={20} className={styles.mainWrapper}>
+            <Flex
+              align="center"
+              justify="center"
+              className={styles.versionListWrapper}
+            >
+              {activePath && !isChangeMappingKey && (
+                <NewAPIMapping
+                  ref={newAPIMappingRef}
+                  refetch={refetch}
+                  isRequiredMapping={isRequiredMapping}
+                />
+              )}
+            </Flex>
+          </Flex>
         </Flex>
       </Flex>
-      <Flex vertical gap={20} className={styles.mainWrapper}>
-        <Flex justify="end">
-          <Button
-            data-testid="btn-create-version"
-            type="primary"
-            onClick={() => {
-              showModalConfirmCreateVersion({
-                className: styles.modalCreate,
-                onOk: handleCreateNewVersion,
-              });
-            }}
-          >
-            Create new version
-          </Button>
-        </Flex>
-        <Flex
-          align="center"
-          justify="center"
-          className={styles.versionListWrapper}
-        >
-          {activePath && !isChangeMappingKey ? (
-            <NewAPIMapping
-              ref={newAPIMappingRef}
-              refetch={refetch}
-              isRequiredMapping={isRequiredMapping}
-            />
-          ) : (
-            <Spin />
-          )}
-        </Flex>
-      </Flex>
-    </Flex>
+    </Spin>
   );
 };
 
