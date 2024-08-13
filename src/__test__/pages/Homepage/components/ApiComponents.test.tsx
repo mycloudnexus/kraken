@@ -28,12 +28,8 @@ test("ApiComponent test", () => {
             },
           }}
           supportInfo={[["ADD", "DELETE"]]}
-          componentList={{
-            data: [],
-          }}
           apis={0}
           title={"abc"}
-          index={0}
           item={
             {
               metadata: {

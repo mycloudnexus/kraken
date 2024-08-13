@@ -4,14 +4,14 @@ import { useAppStore } from "@/stores/app.store";
 import yaml from "js-yaml";
 import { decode } from "js-base64";
 
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 
 import { useGetProductComponents } from "@/hooks/product";
 import type { IUnifiedAsset } from "@/utils/types/common.type";
 import { SPEC_VALUE } from "@/utils/constants/product";
 import Text from "@/components/Text";
 import ApiComponent from "./ApiComponent";
-import { get, isEmpty } from "lodash";
+import { get, isEmpty, isUndefined, min } from "lodash";
 
 const ApiComponents = () => {
   const { currentProduct } = useAppStore();
@@ -64,21 +64,32 @@ const ApiComponents = () => {
     [componentList, componentWithSpec]
   );
 
+  const countComponent = useMemo(() => {
+    if (
+      !isUndefined(componentList?.data?.length) &&
+      !isUndefined(componentWithSpec?.data?.length)
+    ) {
+      return `(${min([
+        componentList?.data?.length,
+        componentWithSpec?.data?.length,
+      ])})`;
+    }
+    if (specLoading || isLoading) {
+      return "";
+    }
+    return "(0)";
+  }, [componentList?.data, componentWithSpec?.data, specLoading, isLoading]);
+
   return (
     <>
       <div style={{ margin: "24px 0 16px" }}>
         <Text.Custom size="20px" bold="500">
-          Standard API components (
-          {Math.min(
-            componentList?.data?.length,
-            componentWithSpec?.data?.length
-          ) ?? 0}
-          )
+          Standard API components {countComponent}
         </Text.Custom>
       </div>
       <Spin spinning={specLoading || isLoading}>
         <Row gutter={[24, 24]} style={{ marginBottom: 24 }}>
-          {componentList?.data?.map((i: IUnifiedAsset, n: number) => {
+          {componentList?.data?.map((i: IUnifiedAsset) => {
             const { targetSpec = {}, targetYaml = {} } = getTargetSpecItem(i);
             const supportInfo = getSupportInfo(i);
             const title = targetYaml.info?.title;
@@ -91,13 +102,11 @@ const ApiComponents = () => {
               <Col lg={12} xl={8} sm={24} key={i.id}>
                 <ApiComponent
                   item={i}
-                  index={n}
                   title={title}
                   apis={apis}
                   targetSpec={targetSpec}
                   targetYaml={targetYaml}
                   supportInfo={supportInfo}
-                  componentList={componentList}
                 />
               </Col>
             );

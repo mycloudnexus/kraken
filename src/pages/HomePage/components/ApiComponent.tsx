@@ -1,53 +1,29 @@
-import { Col, Row, Tooltip, Divider, Flex, Typography } from "antd";
+import { Col, Tooltip, Divider, Flex, Typography } from "antd";
 import { MoreIcon } from "./Icon";
 import styles from "./index.module.scss";
-import { ReactNode, useCallback, useMemo } from "react";
+import { ReactNode, useCallback } from "react";
 import { IUnifiedAsset } from "@/utils/types/common.type";
-import { useGetRunningVersionList } from "@/hooks/product";
 import { useNavigate } from "react-router-dom";
-import { useAppStore } from "@/stores/app.store";
-import clsx from "clsx";
 import Text from "@/components/Text";
 
 type Props = {
   targetSpec: Record<string, any>;
   targetYaml: Record<string, any>;
   supportInfo: any;
-  componentList: {
-    data: any[];
-  };
   apis: number;
   title: string;
-  index: number;
   item: IUnifiedAsset;
 };
 
 const ApiComponent = ({
   targetSpec,
   supportInfo,
-  componentList,
   apis,
   title,
   targetYaml,
-  index,
   item,
 }: Props) => {
-  const { currentProduct } = useAppStore();
   const navigate = useNavigate();
-  const componentIdList = useMemo(() => {
-    return (
-      componentList?.data?.map((m: IUnifiedAsset) => m?.metadata?.key) ?? []
-    );
-  }, [componentList]);
-
-  const runningVersionsRes = useGetRunningVersionList({
-    componentIds: componentIdList,
-    productId: currentProduct,
-  });
-
-  const runningList = useMemo(() => {
-    return runningVersionsRes?.map((r) => r.data ?? []) ?? [];
-  }, [runningVersionsRes]);
 
   const getTextDom = useCallback(
     (dom: ReactNode, needTips = false, title: ReactNode = <></>) => {
@@ -135,22 +111,6 @@ const ApiComponent = ({
           <Col>NA</Col>
         )}
       </Flex>
-
-      <Divider />
-      <Row>
-        {runningList[index] &&
-          (runningList[index] as any)?.map((r: any) => {
-            return (
-              <Col
-                className={clsx(styles.tags, styles.envTag)}
-                style={{ padding: "4px 8px" }}
-                key={r.id}
-              >
-                {r.env?.name} <span>{r?.version ?? "N/A"}</span>
-              </Col>
-            );
-          })}
-      </Row>
     </div>
   );
 };
