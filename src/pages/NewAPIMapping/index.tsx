@@ -363,17 +363,12 @@ const NewAPIMapping = forwardRef(
       }
     };
 
-    const handleRevert = useCallback(() => {
+    const handleRevert = () => {
       setRequestMapping(resetMapping() ?? []);
       setResponseMapping(mappers?.response);
+      setListMappingStateResponse(buildInitListMapping(mappers?.response));
       setActiveTab("request");
-    }, [
-      setRequestMapping,
-      resetMapping,
-      setResponseMapping,
-      mappers?.response,
-      setActiveTab,
-    ]);
+    };
 
     const handleTabSwitch = useCallback(
       (tabName: string) => {
