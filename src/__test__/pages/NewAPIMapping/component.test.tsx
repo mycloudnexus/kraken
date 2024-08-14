@@ -1,3 +1,4 @@
+import DeployHistory from "@/pages/NewAPIMapping/components/DeployHistory";
 import ResponseMapping from "@/pages/NewAPIMapping/components/ResponseMapping";
 import RightAddSellerProp from "@/pages/NewAPIMapping/components/RightAddSellerProp";
 import RightAddSonataProp, {
@@ -1248,5 +1249,10 @@ test("SonataResponseMapping", () => {
       </BrowserRouter>
     </QueryClientProvider>
   );
+  expect(container).toBeInTheDocument();
+});
+
+test("DeployHistory", () => {
+  const { container } = render(<DeployHistory />);
   expect(container).toBeInTheDocument();
 });

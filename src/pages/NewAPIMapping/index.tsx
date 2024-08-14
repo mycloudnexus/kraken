@@ -5,7 +5,7 @@ import {
   useImperativeHandle,
   useState,
 } from "react";
-import { InfoCircleOutlined } from "@ant-design/icons";
+import { CheckCircleFilled, InfoCircleOutlined } from "@ant-design/icons";
 import RollbackIcon from "@/assets/newAPIMapping/Rollback.svg";
 import { Button, Tabs, TabsProps, Tag, Tooltip, notification } from "antd";
 import {
@@ -28,7 +28,6 @@ import SelectResponseProperty from "./components/SelectResponseProperty";
 import useGetApiSpec from "./components/useGetApiSpec";
 import useGetDefaultSellerApi from "./components/useGetDefaultSellerApi";
 import HeaderMapping from "./components/HeaderMapping";
-import DeployStandardAPI from "@/components/DeployStandardAPI";
 import { PRODUCT_CACHE_KEYS, useUpdateTargetMapper } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
@@ -41,6 +40,9 @@ import buildInitListMapping from "@/utils/helpers/buildInitListMapping";
 import { useMappingUiStore } from "@/stores/mappingUi.store";
 import Text from "@/components/Text";
 import SonataResponseMapping from "./components/SonataResponseMapping";
+import DeployHistory from "./components/DeployHistory";
+import DeployStage from "@/components/DeployStage";
+import dayjs from "dayjs";
 
 type Props = {
   rightSide: number;
@@ -50,6 +52,11 @@ type Props = {
   handleSelectSellerProp: (value: any) => void;
   isRequiredMapping: boolean;
 };
+
+enum EMainTab {
+  mapping = "mapping",
+  deploy = "deploy",
+}
 
 const RightSide = ({
   rightSide,
@@ -132,6 +139,8 @@ const NewAPIMapping = forwardRef(
     } = useGetApiSpec(currentProduct, queryData.targetMapperKey ?? "");
     const { sellerApi: defaultSellerApi, serverKey: defaultServerKey } =
       useGetDefaultSellerApi(currentProduct, serverKeyInfo);
+
+    const [mainTabKey, setMainTabKey] = useState<string>(EMainTab.mapping);
 
     useEffect(() => {
       if (!sellerApi && defaultSellerApi) {
@@ -395,82 +404,143 @@ const NewAPIMapping = forwardRef(
         />
         <Flex gap={8} className={styles.mainWrapper}>
           <div className={styles.center}>
-            {!isRequiredMapping && (
-              <Flex
-                justifyContent="flex-start"
-                gap={10}
-                className={styles.isRequiredMapping}
-                alignItems="center"
-              >
-                <InfoCircleOutlined style={{ color: "#00000073" }} />
-                <Text.LightSmall color="#000000D9">
-                  This mapping is not needed, all the data will be queried from
-                  Adapter layer. This end point is able to deploy.
-                </Text.LightSmall>
-              </Flex>
-            )}
-            <Flex className={styles.breadcrumb} justifyContent="space-between">
-              <Flex className={styles.infoBox}>
-                {queryData.mappingStatus === "incomplete" && (
-                  <Tag bordered={false} color="warning">
-                    Incomplete
-                  </Tag>
-                )}
-                {queryData?.lastDeployedAt && (
-                  <Flex gap={8}>
-                    {toDateTime(queryData.lastDeployedAt)}
-                    <Tooltip title="Last deployed at">
-                      <InfoCircleOutlined
-                        style={{ color: "rgba(0, 0, 0, 0.45)" }}
-                      />
-                    </Tooltip>
+            <Tabs
+              id="tab-mapping"
+              activeKey={mainTabKey}
+              onChange={setMainTabKey}
+              items={[
+                {
+                  label: (
+                    <Flex gap={4} alignItems="center">
+                      Mapping
+                      {queryData.mappingStatus === "incomplete" && (
+                        <InfoCircleOutlined style={{ color: "#FAAD14" }} />
+                      )}
+                    </Flex>
+                  ),
+                  key: EMainTab.mapping,
+                },
+                { label: "Deploy history", key: EMainTab.deploy },
+              ]}
+            />
+            {mainTabKey === EMainTab.mapping ? (
+              <>
+                {!isRequiredMapping && (
+                  <Flex
+                    justifyContent="flex-start"
+                    gap={10}
+                    className={styles.isRequiredMapping}
+                    alignItems="center"
+                  >
+                    <InfoCircleOutlined style={{ color: "#00000073" }} />
+                    <Text.LightSmall color="#000000D9">
+                      This mapping is not needed, all the data will be queried
+                      from Adapter layer. This end point is able to deploy.
+                    </Text.LightSmall>
                   </Flex>
                 )}
-              </Flex>
-              <Flex
-                justifyContent="flex-end"
-                gap={8}
-                className={styles.bottomWrapper}
-              >
-                <DeployStandardAPI metadataKey={metadataKey} />
-                <Tooltip title="Restore">
-                  <Button
-                    disabled={!isRequiredMapping}
-                    className={styles.revertButton}
-                    onClick={handleRevert}
-                  >
-                    <RollbackIcon />
-                  </Button>
-                </Tooltip>
-
-                <Button
-                  disabled={!isRequiredMapping}
-                  data-testid="btn-save"
-                  type="primary"
-                  onClick={() => handleSave(refetch)}
-                  loading={isPending}
+                <Flex
+                  className={styles.breadcrumb}
+                  justifyContent="space-between"
                 >
-                  Save
-                </Button>
-              </Flex>
-            </Flex>
-            <HeaderMapping disabled={!isRequiredMapping} />
-            <Tabs
-              items={items}
-              activeKey={activeTab}
-              onChange={handleTabSwitch}
-            />
+                  <Flex className={styles.infoBox}>
+                    {queryData?.lastDeployedAt && (
+                      <Flex
+                        flexDirection="column"
+                        gap={4}
+                        alignItems="flex-start"
+                      >
+                        <Tag
+                          bordered={false}
+                          color="success"
+                          style={{ color: "#389E0D" }}
+                          icon={
+                            <CheckCircleFilled style={{ color: "#389E0D" }} />
+                          }
+                        >
+                          Success
+                        </Tag>
+                        <Flex justifyContent="flex-start" gap={8}>
+                          <Tooltip title="Last deployed at">
+                            <InfoCircleOutlined
+                              style={{ fontSize: 12, color: "#00000040" }}
+                            />
+                          </Tooltip>
+                          <Text.LightSmall color="#00000073">
+                            {toDateTime(queryData.lastDeployedAt)}
+                          </Text.LightSmall>
+                        </Flex>
+                      </Flex>
+                    )}
+                  </Flex>
+                  <Flex
+                    justifyContent="flex-end"
+                    gap={8}
+                    className={styles.bottomWrapper}
+                  >
+                    <Tooltip title="Restore">
+                      <Button
+                        disabled={!isRequiredMapping}
+                        className={styles.revertButton}
+                        onClick={handleRevert}
+                      >
+                        <RollbackIcon />
+                      </Button>
+                    </Tooltip>
+                    <Tooltip
+                      title={
+                        queryData?.updatedAt
+                          ? dayjs
+                              .utc(queryData?.updatedAt)
+                              .local()
+                              .format("YYYY-MM-DD HH:mm:ss")
+                          : undefined
+                      }
+                    >
+                      <Button
+                        disabled={!isRequiredMapping}
+                        data-testid="btn-save"
+                        type="default"
+                        onClick={() => handleSave(refetch)}
+                        loading={isPending}
+                        className={styles.btnSave}
+                      >
+                        Save
+                        <InfoCircleOutlined style={{ fontSize: 14 }} />
+                      </Button>
+                    </Tooltip>
+                    <Button type="default">Compare</Button>
+                    <DeployStage
+                      inComplete={queryData.mappingStatus === "incomplete"}
+                      diffWithStage={queryData.diffWithStage}
+                      metadataKey={metadataKey}
+                      componentId={queryData.targetMapperKey}
+                    />
+                  </Flex>
+                </Flex>
+                <HeaderMapping disabled={!isRequiredMapping} />
+                <Tabs
+                  items={items}
+                  activeKey={activeTab}
+                  onChange={handleTabSwitch}
+                />
+              </>
+            ) : (
+              <DeployHistory />
+            )}
           </div>
-          <div className={styles.right}>
-            <RightSide
-              rightSide={Number(rightSide)}
-              isRequiredMapping={isRequiredMapping}
-              method={queryData?.method}
-              jsonSpec={jsonSpec}
-              handleSelectSellerProp={handleSelectSellerProp}
-              handleSelectSonataProp={handleSelectSonataProp}
-            />
-          </div>
+          {mainTabKey !== EMainTab.deploy && (
+            <div className={styles.right}>
+              <RightSide
+                rightSide={Number(rightSide)}
+                isRequiredMapping={isRequiredMapping}
+                method={queryData?.method}
+                jsonSpec={jsonSpec}
+                handleSelectSellerProp={handleSelectSellerProp}
+                handleSelectSonataProp={handleSelectSonataProp}
+              />
+            </div>
+          )}
         </Flex>
       </Flex>
     );

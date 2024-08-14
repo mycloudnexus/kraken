@@ -4,6 +4,11 @@
 .container {
   width: 100%;
   height: calc(100vh - 130px);
+  :global {
+    #tab-mapping > .ant-tabs-nav {
+      margin-bottom: 2px;
+    }
+  }
 }
 
 .mainWrapper {
@@ -59,4 +64,15 @@
   padding: 19px 16px;
   border-radius: 4px;
   background: #f2f5fe;
+}
+
+.btnSave {
+  svg {
+    color: #8c8c8c;
+  }
+  &:hover {
+    svg {
+      color: #4096ff;
+    }
+  }
 }
