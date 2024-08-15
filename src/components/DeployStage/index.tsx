@@ -10,20 +10,16 @@ import {
 import { useAppStore } from "@/stores/app.store";
 import { get } from "lodash";
 import { queryClient } from "@/utils/helpers/reactQuery";
+import { useParams } from "react-router-dom";
 
 type Props = {
   inComplete: boolean;
   diffWithStage: boolean;
   metadataKey: string;
-  componentId: string;
 };
 
-const DeployStage = ({
-  inComplete,
-  diffWithStage,
-  metadataKey,
-  componentId,
-}: Props) => {
+const DeployStage = ({ inComplete, diffWithStage, metadataKey }: Props) => {
+  const { componentId } = useParams();
   const { currentProduct } = useAppStore();
   const { value: isOpen, setTrue: open, setFalse: close } = useBoolean(false);
   const { mutateAsync: runDeploy, isPending } = useDeployToEnv();
@@ -36,6 +32,12 @@ const DeployStage = ({
     return stage?.id;
   }, [dataEnv]);
   const handleClick = async () => {
+    if (!metadataKey || !stageId || !componentId) {
+      notification.warning({
+        message: "Please try again.",
+      });
+      return;
+    }
     if (inComplete) {
       setModalText("Mapping is incomplete.");
       open();

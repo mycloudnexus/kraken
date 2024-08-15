@@ -19,7 +19,7 @@
     "@tanstack/react-query": "^5.40.0",
     "@types/node": "^20.14.0",
     "antd": "5.17.4",
-    "axios": "^1.7.2",
+    "axios": "^1.7.4",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.11",
     "js-base64": "^3.7.7",

@@ -1,8 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
+import { useCallback, useEffect, useState } from "react";
 import { CheckCircleFilled, InfoCircleOutlined } from "@ant-design/icons";
 import RollbackIcon from "@/assets/newAPIMapping/Rollback.svg";
 import { Button, Tabs, TabsProps, Tag, Tooltip, notification } from "antd";
@@ -90,12 +86,13 @@ const RightSide = ({
   }
 };
 
-const NewAPIMapping = (
-  {
-    refetch,
-    isRequiredMapping,
-  }: { refetch?: () => void; isRequiredMapping: boolean },
-) => {
+const NewAPIMapping = ({
+  refetch,
+  isRequiredMapping,
+}: {
+  refetch?: () => void;
+  isRequiredMapping: boolean;
+}) => {
   const { currentProduct } = useAppStore();
   const { activeTab, setActiveTab } = useMappingUiStore();
   const {
@@ -232,8 +229,7 @@ const NewAPIMapping = (
           requestMapping.map((rm) => {
             if (
               rm.source === rightSideInfo?.previousData?.source &&
-              rm.sourceLocation ===
-              rightSideInfo?.previousData?.sourceLocation
+              rm.sourceLocation === rightSideInfo?.previousData?.sourceLocation
             ) {
               return {
                 ...rm,
@@ -260,8 +256,7 @@ const NewAPIMapping = (
         requestMapping.map((rm) => {
           if (
             rm.source === rightSideInfo?.previousData?.source &&
-            rm.sourceLocation ===
-            rightSideInfo?.previousData?.sourceLocation &&
+            rm.sourceLocation === rightSideInfo?.previousData?.sourceLocation &&
             rm.name === rightSideInfo?.previousData?.name
           ) {
             return {
@@ -367,7 +362,6 @@ const NewAPIMapping = (
 
   const handleRevert = () => {
     setRequestMapping(resetMapping() ?? []);
-    console.log('handleRevert')
     setResponseMapping(mappers?.response);
     setListMappingStateResponse(buildInitListMapping(mappers?.response));
     setActiveTab("request");
@@ -480,9 +474,9 @@ const NewAPIMapping = (
                     title={
                       queryData?.updatedAt
                         ? dayjs
-                          .utc(queryData?.updatedAt)
-                          .local()
-                          .format("YYYY-MM-DD HH:mm:ss")
+                            .utc(queryData?.updatedAt)
+                            .local()
+                            .format("YYYY-MM-DD HH:mm:ss")
                         : undefined
                     }
                   >
@@ -503,7 +497,6 @@ const NewAPIMapping = (
                     inComplete={queryData.mappingStatus === "incomplete"}
                     diffWithStage={queryData.diffWithStage}
                     metadataKey={metadataKey}
-                    componentId={queryData.targetMapperKey}
                   />
                 </Flex>
               </Flex>
@@ -533,7 +526,6 @@ const NewAPIMapping = (
       </Flex>
     </Flex>
   );
-}
-
+};
 
 export default NewAPIMapping;

@@ -8,12 +8,7 @@ test(`DeployStage component`, async () => {
   const { container, getByTestId } = render(
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
-        <DeployStage
-          inComplete={false}
-          diffWithStage={false}
-          metadataKey="a"
-          componentId="b"
-        />
+        <DeployStage inComplete={false} diffWithStage={false} metadataKey="a" />
       </QueryClientProvider>
     </BrowserRouter>
   );
