@@ -160,11 +160,11 @@ export const APIItem = ({
             const [url, method] = key.split(" ");
             const active = selectedAPI
               ? item?.metadata?.name === selectedAPI?.name &&
-                url === selectedAPI?.url &&
-                method === selectedAPI?.method
+              url === selectedAPI?.url &&
+              method === selectedAPI?.method
               : item?.metadata?.name === sellerApi?.name &&
-                url === sellerApi?.url &&
-                method === sellerApi?.method;
+              url === sellerApi?.url &&
+              method === sellerApi?.method;
             return (
               <div
                 className={clsx(styles.card, {
@@ -255,13 +255,12 @@ const SelectAPI = ({
       }));
       setListMappingStateResponse([]);
       setRequestMapping(newApiRequest);
+      console.log('resetMapping useCallback')
       setResponseMapping(newApiResponse);
     }
   }, [
     mappers?.request,
     mappers?.response,
-    setRequestMapping,
-    setResponseMapping,
   ]);
 
   const handleOK = () => {

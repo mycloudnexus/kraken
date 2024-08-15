@@ -35,40 +35,47 @@ const ResponseItem = ({ item, index }: Props) => {
     activeSonataResponse,
     rightSide,
   } = useNewApiMappingStore();
-  const [titleInput, setTitleInput] = useState("");
-  const [descriptionInput, setDescriptionInput] = useState("");
+
+  const [titleInput, setTitleInput] = useState(item.title || "");
+  const [descriptionInput, setDescriptionInput] = useState(item.description || "");
+
   const {
     value: isEditTitle,
     setTrue: enableEditTitle,
     setFalse: disableEditTitle,
   } = useBoolean(false);
+
   const {
     value: isEditDescription,
     setTrue: enableEditDescription,
     setFalse: disableEditDescription,
   } = useBoolean(false);
 
-  const onChangeTitle = () => {
+  useEffect(() => {
+    setTitleInput(item.title || "");
+    setDescriptionInput(item.description || "");
+  }, [item.title, item.description]);
+
+  const updateResponseMapping = (key: string, value: any) => {
     const newResponse = cloneDeep(responseMapping);
-    set(newResponse, `[${index}].title`, titleInput);
+    set(newResponse, `[${index}].${key}`, value);
     setResponseMapping(newResponse);
+  };
+
+  const onChangeTitle = () => {
+    updateResponseMapping("title", titleInput);
     disableEditTitle();
   };
 
-  useEffect(() => {
-    if (!titleInput) {
-      setTitleInput(item.title);
-    }
-    if (!descriptionInput) {
-      setDescriptionInput(item.description);
-    }
-  }, [item.title]);
-
   const onChangeDescription = () => {
-    const newResponse = cloneDeep(responseMapping);
-    set(newResponse, `[${index}].description`, descriptionInput);
-    setResponseMapping(newResponse);
+    updateResponseMapping("description", descriptionInput);
     disableEditDescription();
+  };
+
+  const handleDeleteItemResponse = () => {
+    const newResponse = cloneDeep(responseMapping);
+    newResponse.splice(index, 1);
+    setResponseMapping(newResponse);
   };
 
   const openSelectorForProp = (index?: number, name?: string) => {
@@ -76,30 +83,12 @@ const ResponseItem = ({ item, index }: Props) => {
     setRightSide(EnumRightType.AddSellerResponse);
   };
 
-  const handleChangeResponse = (
-    value: string,
-    name: string,
-    target: string
-  ) => {
-    const cloneObj = cloneDeep(responseMapping);
-    const index = cloneObj?.findIndex(
-      (i) => i.name === name && i.target === target
-    );
-    set(cloneObj, `[${index}].source`, value);
-    set(cloneObj, `[${index}].sourceLocation`, `BODY`);
-    setResponseMapping(cloneObj);
-    setActiveResponseName(undefined);
-  };
-
-  const handleSetListMapping = (array: Array<any>) => {
-    setListMappingStateResponse(array);
-  };
-
   const handleAdd = (name: string) => {
-    handleSetListMapping([
+    const newKey = get(listMapping, `[${listMapping.length - 1}].key`, 0) + 1;
+    setListMappingStateResponse([
       ...listMapping,
       {
-        key: get(listMapping, `[${listMapping.length - 1}].key`, 0) + 1,
+        key: newKey,
         from: undefined,
         to: undefined,
         name,
@@ -107,28 +96,40 @@ const ResponseItem = ({ item, index }: Props) => {
     ]);
   };
 
-  const handleDelete = (key: number) => {
-    handleSetListMapping(listMapping.filter((item) => item.key !== key));
+  const handleDeleteMapping = (key: number) => {
+    setListMappingStateResponse(listMapping.filter((item) => item.key !== key));
   };
 
-  const handleSelect = (v: string, key: number) => {
+  const handleSelect = (value: string, key: number) => {
+
     const cloneArr = cloneDeep(listMapping);
-    const index = listMapping.findIndex((l) => l.key === key);
-    set(cloneArr, `[${index}].from`, v);
-    handleSetListMapping(cloneArr);
+    const itemIndex = listMapping.findIndex((l) => l.key === key);
+    set(cloneArr, `[${itemIndex}].from`, value);
+    setListMappingStateResponse(cloneArr);
   };
 
-  const handleChangeInput = (v: string[], key: number) => {
+  const handleChangeInput = (value: string[], key: number) => {
+
     const cloneArr = cloneDeep(listMapping);
-    const index = listMapping.findIndex((l) => l.key === key);
-    set(cloneArr, `[${index}].to`, v);
-    handleSetListMapping(cloneArr);
+    const itemIndex = listMapping.findIndex((l) => l.key === key);
+    set(cloneArr, `[${itemIndex}].to`, value);
+    setListMappingStateResponse(cloneArr);
   };
 
-  const handleDeleteItemResponse = () => {
-    const newResponse = cloneDeep(responseMapping);
-    newResponse.splice(index, 1);
-    setResponseMapping(newResponse);
+  const handleChangeResponse = (
+    value: string,
+    name: string,
+    target: string
+  ) => {
+
+    const cloneObj = cloneDeep(responseMapping);
+    const itemIndex = cloneObj?.findIndex(
+      (i) => i.name === name && i.target === target
+    );
+    set(cloneObj, `[${itemIndex}].source`, value);
+    set(cloneObj, `[${itemIndex}].sourceLocation`, `BODY`);
+    setResponseMapping(cloneObj);
+    setActiveResponseName(undefined);
   };
 
   return (
@@ -251,11 +252,7 @@ const ResponseItem = ({ item, index }: Props) => {
                 setRightSide(EnumRightType.SonataResponse);
               }}
               onChange={(e) => {
-                const cloneObj = cloneDeep(responseMapping);
-                set(cloneObj, `[${index}].target`, e?.target?.value ?? "");
-                set(cloneObj, `[${index}].targetLocation`, `BODY`);
-                setResponseMapping(cloneObj);
-                setActiveResponseName(undefined);
+                updateResponseMapping("target", e?.target?.value ?? "");
               }}
             />
           </Tooltip>
@@ -321,7 +318,7 @@ const ResponseItem = ({ item, index }: Props) => {
                       value: item,
                     }))}
                   />
-                  <DeleteOutlined onClick={() => handleDelete(key)} />
+                  <DeleteOutlined onClick={() => handleDeleteMapping(key)} />
                 </Flex>
                 <MappingIcon />
                 <Select

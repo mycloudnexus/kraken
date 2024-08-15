@@ -15,7 +15,7 @@ import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { useMappingUiStore } from "@/stores/mappingUi.store";
 import ComponentSelect from "./components/ComponentSelect";
 import MappingDetailsList from "./components/MappingDetailsList";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { IMapperDetails } from "@/utils/types/env.type";
 import NewAPIMapping from "../NewAPIMapping";
 import groupByPath from "@/utils/helpers/groupByPath";
@@ -26,7 +26,6 @@ const StandardAPIMapping = () => {
   const { componentId } = useParams();
   const { activePath, setActivePath, selectedKey, setSelectedKey } =
     useMappingUiStore();
-  const newAPIMappingRef = useRef<any>(null);
 
   const { setQuery, reset } = useNewApiMappingStore();
   const { data: componentDetail, isLoading } = useGetComponentDetail(
@@ -80,7 +79,7 @@ const StandardAPIMapping = () => {
     }
   }, [detailDataMapping]);
 
-  const handleDisplay = (mapItem: IMapperDetails) => {
+  const handleDisplay = async (mapItem: IMapperDetails) => {
     setIsChangeMappingKey(true);
     resetState(mapItem);
     setSelectedKey(mapItem.targetKey);
@@ -156,7 +155,6 @@ const StandardAPIMapping = () => {
             >
               {activePath && !isChangeMappingKey && (
                 <NewAPIMapping
-                  ref={newAPIMappingRef}
                   refetch={refetch}
                   isRequiredMapping={isRequiredMapping}
                 />
