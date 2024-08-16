@@ -13,6 +13,7 @@ test("test Mapping Details list", () => {
       description: "This operation creates a Quote entity",
       path: "/api/son/x/v8/quote",
       method: "post",
+      orderBy: "<1,1>",
       productType: "access_line",
       actionType: "add",
       mappingStatus: "incomplete",
@@ -34,6 +35,7 @@ test("test Mapping Details list", () => {
         "This operation retrieves a Quote entity. Attribute selection is enabled for all first level attributes.",
       path: "/api/son/x/v8/quote/{id}",
       method: "get",
+      orderBy: "<2,1>",
       productType: "uni",
       mappingStatus: "incomplete",
       mappingMatrix: {
@@ -54,6 +56,7 @@ test("test Mapping Details list", () => {
         "This operation retrieves a Quote entity. Attribute selection is enabled for all first level attributes.",
       path: "/api/son/x/v8/quote/{id}",
       method: "get",
+      orderBy: "<2,2>",
       productType: "access_line",
       mappingStatus: "incomplete",
       mappingMatrix: {
@@ -72,6 +75,7 @@ test("test Mapping Details list", () => {
       description: "This operation creates a Quote entity",
       path: "/api/son/x/v8/quote",
       method: "post",
+      orderBy: "<1,2>",
       productType: "uni",
       actionType: "add",
       mappingStatus: "incomplete",
