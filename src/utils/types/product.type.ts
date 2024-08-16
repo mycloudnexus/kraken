@@ -25,3 +25,32 @@ export interface INewVersionParams {
   versionName?: string;
   version?: string;
 }
+
+export interface IDeploymentHistory {
+  targetMapperKey: string;
+  path: string;
+  method: string;
+  requiredMapping: boolean;
+  diffWithStage: boolean;
+  mappingMatrix: IMappingMatrix;
+  componentName: string;
+  componentKey: string;
+  envId: string;
+  envName: string;
+  createAt: string;
+  createBy: string;
+  userName: string;
+  releaseKey: string;
+  releaseId: string;
+  tagId: string;
+  version: string;
+  status: string;
+  verifiedBy: string;
+  verifiedAt: string;
+  verifiedStatus: boolean;
+}
+
+export interface IMappingMatrix {
+  provideAlternative: boolean;
+  addressType: string;
+}

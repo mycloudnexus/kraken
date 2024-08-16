@@ -26,6 +26,8 @@
     padding: 12px 20px;
     background-color: #fff;
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
   }
   > .right {
     box-sizing: border-box;

@@ -203,9 +203,10 @@ export const getRunningAPIMappingList = (
   params: Record<string, any>,
   envName?: string
 ) => {
-  const path = envName === 'production'
-    ? `${PRODUCT}/${productId}/running-components`
-    : `/v2${PRODUCT}/${productId}/running-api-mapper-deployments`;
+  const path =
+    envName === "production"
+      ? `${PRODUCT}/${productId}/running-components`
+      : `/v2${PRODUCT}/${productId}/running-api-mapper-deployments`;
 
   return request(path, {
     method: "GET",
@@ -218,9 +219,10 @@ export const getAPIMapperDeployments = (
   params: Record<string, any>,
   envName?: string
 ) => {
-  const path = envName === 'production'
-  ? `${PRODUCT}/${productId}/deployments`
-  : `/v2${PRODUCT}/${productId}/api-mapper-deployments`;
+  const path =
+    envName === "production"
+      ? `${PRODUCT}/${productId}/deployments`
+      : `/v2${PRODUCT}/${productId}/api-mapper-deployments`;
 
   return request(path, {
     method: "GET",
@@ -240,6 +242,20 @@ export const getBuyerList = (
 
 export const createBuyer = (productId: string, data: any) => {
   return request(`${PRODUCT}/${productId}/buyers`, {
+    method: "POST",
+    data,
+  });
+};
+
+export const verifyProduct = (productId: string, data: any) => {
+  return request(`/v2${PRODUCT}/${productId}/verify-api-mapper-in-labels`, {
+    method: "PATCH",
+    data,
+  });
+};
+
+export const deployProduction = (productId: string, data: any) => {
+  return request(`/v2${PRODUCT}/${productId}/verify-api-mapper-in-labels`, {
     method: "POST",
     data,
   });

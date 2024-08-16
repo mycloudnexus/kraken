@@ -26,6 +26,8 @@ import {
   getAPIMapperDeployments,
   getBuyerList,
   createBuyer,
+  verifyProduct,
+  deployProduction,
 } from "@/services/products";
 import { queryClient } from "@/utils/helpers/reactQuery";
 import {
@@ -82,6 +84,8 @@ export const PRODUCT_CACHE_KEYS = {
   get_list_api_deployments: "get_list_api_deployments",
   get_buyer_list: "get_buyer_list",
   create_buyer: "create_buyer",
+  verify_product: "verify_product",
+  deploy_stage_to_production: "deploy_stage_to_production",
 };
 
 export const useGetProductComponents = (
@@ -433,7 +437,7 @@ export const useGetAPIDeployments = (
   return useQuery<any, Error>({
     queryKey: [PRODUCT_CACHE_KEYS.get_list_api_deployments, productId, params],
     queryFn: () => getAPIMapperDeployments(productId, params, envName),
-    enabled: Boolean(productId) && Boolean(params.envId),
+    enabled: Boolean(productId),
     select: (data) => data?.data,
   });
 };
@@ -457,6 +461,30 @@ export const useCreateBuyer = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [PRODUCT_CACHE_KEYS.get_buyer_list],
+      });
+    },
+  });
+};
+
+export const useVerifyProduct = () => {
+  return useMutation<any, Error>({
+    mutationKey: [PRODUCT_CACHE_KEYS.verify_product],
+    mutationFn: ({ productId, data }: any) => verifyProduct(productId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [PRODUCT_CACHE_KEYS.get_list_api_deployments],
+      });
+    },
+  });
+};
+
+export const useDeployProduction = () => {
+  return useMutation<any, Error>({
+    mutationKey: [PRODUCT_CACHE_KEYS.deploy_stage_to_production],
+    mutationFn: ({ productId, data }: any) => deployProduction(productId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [PRODUCT_CACHE_KEYS.get_list_api_deployments],
       });
     },
   });

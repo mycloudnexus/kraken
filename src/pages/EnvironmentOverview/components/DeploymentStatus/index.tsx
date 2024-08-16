@@ -6,25 +6,13 @@ interface Props {
 
 const DeploymentStatus = ({ status }: Readonly<Props>) => {
   if (status === "SUCCESS") {
-    return (
-      <Tag bordered={false} color="success">
-        Success
-      </Tag>
-    );
+    return <Tag color="success">Success</Tag>;
   }
   if (status === "IN_PROCESS") {
-    return (
-      <Tag bordered={false} color="blue">
-        In process
-      </Tag>
-    );
+    return <Tag color="purple">In process</Tag>;
   }
   if (status === "FAILED") {
-    return (
-      <Tag bordered={false} color="error">
-        Failed
-      </Tag>
-    );
+    return <Tag color="error">Failed</Tag>;
   }
   return null;
 };
