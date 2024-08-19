@@ -7,6 +7,7 @@ import {
   TableColumnsType,
   TableProps,
   Tooltip,
+  Typography,
   notification,
 } from "antd";
 import styles from "./index.module.scss";
@@ -31,6 +32,8 @@ import useUser from "@/hooks/user/useUser";
 import InformationModal from "@/components/DeployStage/InformationModal";
 import { useBoolean } from "usehooks-ts";
 import { IEnv } from "@/utils/types/env.type";
+import MappingMatrix from '@/components/MappingMatrix';
+import RequestMethod from '@/components/Method';
 
 export const ContentTime = ({ content = "", time = "" }) => {
   const { findUserName } = useUser();
@@ -95,7 +98,7 @@ export const DeploymentBtn = ({
   );
 };
 
-const DeployHistory = () => {
+const DeployHistory = ({ selectedEnvId }: { selectedEnvId?: string }) => {
   const { currentProduct } = useAppStore();
   const { data: dataEnv } = useGetProductEnvs(currentProduct);
   const { params, setParams, resetParams } = useDeploymentStore();
@@ -136,6 +139,23 @@ const DeployHistory = () => {
 
   const columns: TableColumnsType<any> = useMemo(
     () => [
+      selectedEnvId ? {
+          title: "API mapping",
+          dataIndex: "",
+          width: 340,
+          render: (item: any) => (
+            <Flex gap={10} align="center">
+              <RequestMethod method={item?.method} />
+              <Typography.Text
+                style={{ color: "#2962FF" }}
+                ellipsis={{ tooltip: item?.path }}
+              >
+                {item?.path.split('/').slice(-2).join('/')}
+              </Typography.Text>
+              <MappingMatrix mappingMatrix={item.mappingMatrix} />
+            </Flex>
+          ),
+      } : {},
       {
         title: "Version",
         dataIndex: "version",
@@ -151,7 +171,7 @@ const DeployHistory = () => {
         render: (record: IDeploymentHistory) => (
           <div className={styles.capitalize}>{record?.envName}</div>
         ),
-        filters: dataEnv?.data?.map((i) => ({ text: i.name, value: i.id })),
+        filters: selectedEnvId ? undefined : dataEnv?.data?.map((i) => ({ text: i.name, value: i.id })),
       },
       {
         title: "Deployed by",
@@ -203,7 +223,7 @@ const DeployHistory = () => {
           </Flex>
         ),
       },
-    ],
+    ].filter(value => Object.keys(value).length !== 0),
     [envItems]
   );
   const onChange: TableProps<any>["onChange"] = (_, filters, __, ___) => {
@@ -214,6 +234,12 @@ const DeployHistory = () => {
     }
     setParams({ envId: undefined });
   };
+
+  useEffect(() => {
+    if(selectedEnvId) {
+      setParams({ envId: selectedEnvId });
+    }
+  }, [selectedEnvId])
 
   useEffect(() => {
     return () => {

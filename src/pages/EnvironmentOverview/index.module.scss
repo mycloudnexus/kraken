@@ -6,6 +6,10 @@
   overflow-y: hidden;
 }
 
+.fullWidth {
+  width: 100%;
+}
+
 .runningContainer {
   max-height: 154px;
   overflow: scroll;
@@ -51,6 +55,9 @@
   overflow-x: auto;
 }
 .overviewItem {
+  width: 100%;
+  display: flex;
+  flex: 1;
   border-radius: 4px;
   background: #fff;
   padding: 20px;
@@ -69,14 +76,9 @@
   padding: 12px 24px 9px;
   background-color: #fafafa;
 }
-.deploymentHistoryTableWrapper {
-  padding: 24px;
-  background-color: #fff;
-}
 
 .overviewItemActive {
   background: #dbe4fb;
-  border: 1px solid #2962ff;
 }
 
 .scroll {

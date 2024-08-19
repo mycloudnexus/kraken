@@ -419,11 +419,10 @@ export const useDeployToEnv = () => {
 export const useGetRunningAPIList = (
   productId: string,
   params: Record<string, any>,
-  envName?: string
 ) => {
   return useQuery<any, Error>({
     queryKey: [PRODUCT_CACHE_KEYS.get_running_api_list, productId, params],
-    queryFn: () => getRunningAPIMappingList(productId, params, envName),
+    queryFn: () => getRunningAPIMappingList(productId, params),
     enabled: Boolean(productId) && Boolean(params.envId),
     select: (data) => data?.data,
   });
@@ -432,11 +431,10 @@ export const useGetRunningAPIList = (
 export const useGetAPIDeployments = (
   productId: string,
   params: Record<string, any>,
-  envName?: string
 ) => {
   return useQuery<any, Error>({
     queryKey: [PRODUCT_CACHE_KEYS.get_list_api_deployments, productId, params],
-    queryFn: () => getAPIMapperDeployments(productId, params, envName),
+    queryFn: () => getAPIMapperDeployments(productId, params),
     enabled: Boolean(productId),
     select: (data) => data?.data,
   });

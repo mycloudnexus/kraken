@@ -8,3 +8,21 @@
   align-items: center;
   color: #00000073 !important;
 }
+
+.rowBorder {
+  padding: 20px 0;
+  height: 32px;
+  &:not(:last-child) {
+    position: relative;
+    &::after {
+      content: '';
+      position: absolute;
+      left: -16px;
+      right: 0;
+      bottom: 0;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      pointer-events: none;
+      width: calc(100% + 32px);
+    }
+  }
+}

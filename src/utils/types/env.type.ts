@@ -61,6 +61,25 @@ export interface IRunningComponent {
   componentName: string;
 }
 
+type MappingMatrix = Record<string, string | boolean>;
+
+export interface IRunningMapping {
+  targetMapperKey: string;
+  path: string;
+  method: string;
+  requiredMapping: boolean;
+  diffWithStage: boolean;
+  productType?: string;
+  actionType?: string;
+  mappingMatrix: MappingMatrix;
+  componentName: string;
+  componentKey: string;
+  createAt: string;
+  createBy?: string;
+  version: string;
+  status: string;
+}
+
 export interface IRunningComponentItem {
   id: string;
   updatedAt?: string;
@@ -89,7 +108,7 @@ export interface IMapperDetails {
   productType?: string;
   actionType?: string;
   mappingStatus: string;
-  mappingMatrix: Record<string, string | boolean>;
+  mappingMatrix: MappingMatrix;
   updatedAt: string;
   lastDeployedAt?: string;
   diffWithStage?: boolean;

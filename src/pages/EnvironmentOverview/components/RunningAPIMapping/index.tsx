@@ -1,123 +1,115 @@
 import RequestMethod from "@/components/Method";
-import Text from "@/components/Text";
 import { useGetRunningAPIList } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
-import { IEnv } from "@/utils/types/env.type";
-import { Flex, Table, Typography } from "antd";
-import { useCallback, useMemo } from "react";
-import dayjs from "dayjs";
+import { IEnv, IRunningMapping } from "@/utils/types/env.type";
+import { Flex, Table, Tag, Tooltip, Typography } from "antd";
+import { useMemo, useState } from "react";
 import MappingMatrix from "@/components/MappingMatrix";
-import { get } from "lodash";
-
+import styles from "./index.module.scss"
+import Text from '@/components/Text';
 type Props = {
   env?: IEnv;
 };
 
+interface GroupedItem {
+  componentName?: string;
+  items: IRunningMapping[];
+}
+
+const defaultPage = {
+  size: 20,
+  page: 0,
+};
+
 const RunningAPIMapping = ({ env }: Props) => {
   const { currentProduct } = useAppStore();
-  const envName = env?.name?.toLocaleLowerCase?.();
+  const [pageInfo] = useState(defaultPage);
   const { data, isLoading } = useGetRunningAPIList(
     currentProduct,
     {
       envId: env?.id,
       orderBy: "createdAt",
       direction: "DESC",
-      page: 0,
-      size: 100,
+      ...pageInfo
+    }
+  );
+
+  const columnData = useMemo((): GroupedItem[] => {
+    const result = data as IRunningMapping[]
+    if (!data) return [{
+      componentName: '',
+      items: []
+    }]
+    const grouped = result.reduce((acc, item) => {
+      const { componentName } = item;
+      const group = acc.find(g => g.componentName === componentName);
+
+      if (group) {
+        group?.items?.push(item);
+      } else {
+        acc.push({
+          componentName,
+          items: [item]
+        });
+      }
+
+      return acc;
+    }, [] as GroupedItem[]);
+
+    return grouped;
+  }, [data]);
+
+
+  const columns = [
+    {
+      title: "Component",
+      dataIndex: "",
+      width: 340,
+      render: (item: GroupedItem) => (
+        <Flex gap={10}><Typography.Text>
+          {item.componentName}
+        </Typography.Text>
+          {item.items.length > 0 && <Tag>
+            <Text.LightMedium style={{ color: 'rgba(145, 86, 228, 1)' }}>
+              {item?.items?.length}
+            </Text.LightMedium>
+          </Tag>}
+        </Flex>)
     },
-    envName
-  );
-
-  const renderTextType = useCallback((type: string) => {
-    switch (type) {
-      case "uni":
-        return "UNI";
-      case "access_e_line":
-        return "Access E-line";
-      default:
-        return type;
-    }
-  }, []);
-
-  const columns = useMemo(
-    () =>
-      [
-        {
-          title: "Component",
-          dataIndex: "componentName",
-          width: 340,
-        },
-        envName === "stage"
-          ? {
-              dataIndex: "",
-              title: "API mappings",
-              render: (item: any) => (
-                <Flex align="center" gap={10}>
-                  <RequestMethod method={item?.method} />
-                  <Typography.Text
-                    ellipsis={{ tooltip: item?.path }}
-                    style={{ color: "#2962FF" }}
-                  >
-                    {item?.path}
-                  </Typography.Text>
-                  <Flex gap={8} align="center">
-                    <MappingMatrix
-                      mappingMatrix={item?.mappingMatrix}
-                      extraKey={"item.path"}
-                      isItemActive={false}
-                    />
-                  </Flex>
-                </Flex>
-              ),
-            }
-          : {
-              title: "Version",
-              dataIndex: "version",
-            },
-        {
-          title: "Deployed time",
-          dataIndex: "createAt",
-          width: 340,
-          render: (time: string) =>
-            dayjs.utc(time).local().format("YYYY-MM-DD HH:mm:ss"),
-        },
-        envName === "stage"
-          ? {
-              title: "Action",
-              dataIndex: "diffWithStage",
-              width: 300,
-              render: (diffWithStage: boolean) =>
-                !diffWithStage ? (
-                  <Text.LightMedium color="#00000073">
-                    Same with running{" "}
-                    {envName === "stage" ? "API mapping" : "component"}
-                  </Text.LightMedium>
-                ) : (
-                  <Text.LightMedium
-                    color="#2962FF"
-                    style={{ cursor: "pointer" }}
-                  >
-                    View difference
-                  </Text.LightMedium>
-                ),
-            }
-          : {},
-      ].filter((value) => Object.keys(value).length !== 0),
-    [env, renderTextType]
-  );
-
-  const columnData = useMemo(() => {
-    if (envName !== "production") {
-      return data;
-    }
-
-    return get(data, "data", []).flatMap((item: any) =>
-      item?.components?.map((component: any) => ({
-        createAt: item?.createdAt,
-        ...component,
-      }))
-    );
-  }, [envName, data]);
+    {
+      dataIndex: "items",
+      title: "API mappings",
+      render: (items: Array<IRunningMapping>) => (
+        <Flex vertical>
+          {items.map((item: IRunningMapping, index: number) => (
+            <Flex key={`${item.componentName}-${index}`} align="center" gap={10} className={styles.rowBorder}>
+              <RequestMethod method={item?.method} />
+              <Tooltip title={item?.path}>
+                <span style={{ color: "#2962FF" }}>/{item?.path.split('/').slice(-2).join('/')}</span>
+              </Tooltip>
+              <Flex gap={8} align="center" flex={1}>
+                <MappingMatrix
+                  mappingMatrix={item?.mappingMatrix}
+                  extraKey={"item.path"}
+                  isItemActive={false}
+                />
+              </Flex>
+            </Flex>
+          ))}
+        </Flex>
+      ),
+    }, {
+      title: "Create By",
+      dataIndex: "items",
+      width: 340,
+      render: (items: Array<IRunningMapping>) => (
+        <Flex vertical>
+          {items.map((item: IRunningMapping, index: number) => (
+            <Flex key={`${item.componentName}-${index}`} className={styles.rowBorder} justify='center' align='center'>{item?.createBy ?? "----"}</Flex>
+          ))}
+        </Flex>)
+    },
+  ]
 
   return (
     <div>

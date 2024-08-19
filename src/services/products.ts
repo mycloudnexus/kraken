@@ -201,14 +201,8 @@ export const deployToEnv = (
 export const getRunningAPIMappingList = (
   productId: string,
   params: Record<string, any>,
-  envName?: string
 ) => {
-  const path =
-    envName === "production"
-      ? `${PRODUCT}/${productId}/running-components`
-      : `/v2${PRODUCT}/${productId}/running-api-mapper-deployments`;
-
-  return request(path, {
+  return request(`/v2${PRODUCT}/${productId}/running-api-mapper-deployments`, {
     method: "GET",
     params,
   });
@@ -217,14 +211,8 @@ export const getRunningAPIMappingList = (
 export const getAPIMapperDeployments = (
   productId: string,
   params: Record<string, any>,
-  envName?: string
 ) => {
-  const path =
-    envName === "production"
-      ? `${PRODUCT}/${productId}/deployments`
-      : `/v2${PRODUCT}/${productId}/api-mapper-deployments`;
-
-  return request(path, {
+  return request(`/v2${PRODUCT}/${productId}/api-mapper-deployments`, {
     method: "GET",
     params,
   });

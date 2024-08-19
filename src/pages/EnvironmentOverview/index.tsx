@@ -1,5 +1,18 @@
-import Text from "@/components/Text";
+import { useState, useCallback, useMemo, useEffect, useRef } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import dayjs from "dayjs";
+import clsx from "clsx";
+import {
+  Button,
+  Dropdown,
+  Flex,
+  Radio,
+  Spin,
+  Typography,
+  notification,
+} from "antd";
+import { MoreOutlined } from "@ant-design/icons";
+import { every, isEmpty, sortBy } from "lodash";
 import {
   useGetProductEnvs,
   useGetAllApiKeyList,
@@ -9,29 +22,15 @@ import {
 } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
 import { ROUTES } from "@/utils/constants/route";
-import { MoreOutlined } from "@ant-design/icons";
-import {
-  Button,
-  Dropdown,
-  Flex,
-  MenuProps,
-  Spin,
-  Typography,
-  notification,
-} from "antd";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
 import EnvStatus from "./components/EnvStatus";
 import { showModalConfirmRotate } from "./components/ModalConfirmRotateAPIKey";
 import ModalNewDeployment from "./components/ModalNewDeployment";
 import { showModalShowNew } from "./components/ModalShowAPIKey";
-import styles from "./index.module.scss";
-import { every, isEmpty, sortBy } from "lodash";
-import clsx from "clsx";
 import RunningAPIMapping from "./components/RunningAPIMapping";
-import DeploymentHistory from "./components/DeploymentHistory";
-import { IEnv } from "@/utils/types/env.type";
 import NoAPIKey from "./components/NoAPIKey";
+import styles from "./index.module.scss";
+import { IEnv } from "@/utils/types/env.type";
+import DeployHistory from '../NewAPIMapping/components/DeployHistory';
 
 const initPaginationParams = {
   page: 0,
@@ -40,114 +39,92 @@ const initPaginationParams = {
 
 const EnvironmentOverview = () => {
   const [searchParams] = useSearchParams();
-  const envId = searchParams.get("envId") || "";
   const navigate = useNavigate();
   const { currentProduct } = useAppStore();
-  const { data: envs, isLoading: loadingEnvs } =
-    useGetProductEnvs(currentProduct);
 
-  const { data: apiKey } = useGetAllApiKeyList(
-    currentProduct,
-    initPaginationParams
-  );
+  const envId = searchParams.get("envId") || "";
 
-  const { data: dataPlane } = useGetAllDataPlaneList(
-    currentProduct,
-    initPaginationParams
-  );
-
+  const { data: envs, isLoading: loadingEnvs } = useGetProductEnvs(currentProduct);
+  const { data: apiKey } = useGetAllApiKeyList(currentProduct, initPaginationParams);
+  const { data: dataPlane } = useGetAllDataPlaneList(currentProduct, initPaginationParams);
   const { data: runningComponent } = useGetRunningComponentList(currentProduct);
-
   const { mutateAsync: createApiKeyMutate } = useCreateApiKey();
+
   const [open, setOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("running_api")
   const [currentEnvId, setCurrentEnvId] = useState<string | undefined>();
-  const modalConfirmRef = useRef<any>();
   const [selectedEnv, setSelectedEnv] = useState<IEnv | undefined>();
+  const modalConfirmRef = useRef<any>();
 
   const generateApiKey = useCallback(
     async (envId: string, evName: string, closeConfirm = false) => {
       const name = `${evName}_${dayjs.utc().format("YYYY-MM-DD HH:mm:ss")}`;
       try {
-        const res = await createApiKeyMutate({
-          productId: currentProduct,
-          envId,
-          name,
-        } as any);
-
+        const res = await createApiKeyMutate({ productId: currentProduct, envId, name } as any);
         closeConfirm && modalConfirmRef?.current?.destroy();
         showModalShowNew(res?.data?.token);
       } catch (e: any) {
-        notification.error({ message: e?.data?.error || "generate failed" });
+        notification.error({ message: e?.data?.error || "Generate failed" });
       }
     },
-    [currentProduct]
+    [currentProduct, createApiKeyMutate]
   );
-  const onConfirmRotate = (id: string, name: string) => () => {
-    return generateApiKey(id, name, true);
-  };
 
-  const dropdownItems: (
-    envId: string,
-    envName: string,
-    len: number
-  ) => MenuProps["items"] = useCallback(
-    (envId, envName) => [
+  const onConfirmRotate = useCallback(
+    (id: string, name: string) => () => generateApiKey(id, name, true),
+    [generateApiKey]
+  );
+
+  const dropdownItems = useCallback(
+    (envId: string, envName: string) => [
       {
         key: "view-log",
-        label: "API activity log",
-        onClick: () => {
-          navigate(ROUTES.ENV_ACTIVITY_LOG(envId));
-        },
+        label: "API Activity Log",
+        onClick: () => navigate(ROUTES.ENV_ACTIVITY_LOG(envId)),
       },
-
       {
         key: "refresh-key",
-        label: "Rotate API key",
+        label: "Rotate API Key",
         onClick: () => {
-          modalConfirmRef.current = showModalConfirmRotate(
-            envName,
-            onConfirmRotate(envId, envName)
-          );
+          modalConfirmRef.current = showModalConfirmRotate(envName, onConfirmRotate(envId, envName));
         },
       },
     ],
-    []
+    [navigate, onConfirmRotate]
   );
 
   const getDataPlaneInfo = useCallback(
     (id: string) => {
-      if (!dataPlane?.data) return {};
-      const list = dataPlane.data.filter((i) => i.envId === id);
+      const list = dataPlane?.data?.filter((i) => i.envId === id) || [];
       const status = list.every((n) => n.status === "OK");
       const len = list.length;
-      const disConnectNum = list.filter((n) => n.status !== "OK")?.length;
-      const connectNum = list.filter((n) => n.status === "OK")?.length;
+      const disConnectNum = list.filter((n) => n.status !== "OK").length;
+      const connectNum = list.filter((n) => n.status === "OK").length;
       return { len, status, disConnectNum, connectNum };
     },
     [dataPlane]
   );
 
-  const envList = useMemo(() => {
-    return sortBy(envs?.data, "name", []).reverse();
-  }, [envs]);
+  const envList = useMemo(() =>
+    sortBy(
+      envs?.data
+        .filter((env) => env.name === "production" || env.name === "stage"),
+      "name").reverse()
+    , [envs]);
 
   const isHaveApiKey = useMemo(() => {
-    if (isEmpty(envs) || every(envs, (i) => isEmpty(i))) {
-      return true;
-    }
-    if (!selectedEnv) return false;
-    return !isEmpty(apiKey?.data.find((i) => i.envId === selectedEnv.id));
-  }, [selectedEnv, apiKey]);
+    if (isEmpty(envs) || every(envs, (i) => isEmpty(i))) return true;
+    return selectedEnv && !isEmpty(apiKey?.data?.find((i) => i.envId === selectedEnv.id));
+  }, [envs, apiKey, selectedEnv]);
 
   useEffect(() => {
-    if (envList && isEmpty(selectedEnv?.id) && !envId) {
+    if (envList && !envId && isEmpty(selectedEnv?.id)) {
       setSelectedEnv(envList[0]);
     }
-    if (!!envId && !isEmpty(envs)) {
-      const env = envList?.find((i) => i.id === envId);
-      setSelectedEnv(env);
+    if (envId && envList) {
+      setSelectedEnv(envList.find((i) => i.id === envId));
     }
-  }, [envList, envId]);
+  }, [envList, envId, selectedEnv]);
 
   return (
     <Flex vertical gap={12} className={styles.pageWrapper}>
@@ -155,60 +132,51 @@ const EnvironmentOverview = () => {
         <Spin spinning={loadingEnvs}>
           <div className={styles.overviewContainer}>
             {envList?.map((env) => {
-              const haveApiKey = !!apiKey?.data.find((i) => i.envId === env.id);
-              const {
-                disConnectNum,
-                connectNum,
-                len = 0,
-              } = getDataPlaneInfo(env.id);
+              const haveApiKey = !!apiKey?.data?.find((i) => i.envId === env.id);
+              const { disConnectNum, connectNum, len } = getDataPlaneInfo(env.id);
               return (
                 <div
                   key={env.id}
-                  className={clsx(
-                    styles.overviewItem,
-                    selectedEnv?.id === env.id && styles.overviewItemActive
-                  )}
+                  className={clsx(styles.overviewItem, selectedEnv?.id === env.id && styles.overviewItemActive)}
                   role="none"
                   onClick={() => setSelectedEnv(env)}
                 >
                   <Flex
-                    justify="flex-start"
+                    vertical
                     gap={12}
-                    align="center"
-                    wrap="nowrap"
+                    align="start"
+                    className={styles.fullWidth}
                   >
-                    <Typography.Text
-                      ellipsis={{ tooltip: env.name }}
-                      style={{
-                        marginRight: 16,
-                        textTransform: "capitalize",
-                        maxWidth: 200,
-                        whiteSpace: "nowrap",
-                        fontSize: 16,
-                        fontWeight: 500,
-                      }}
-                    >
-                      {env.name}
-                    </Typography.Text>
+                    <Flex align="center" justify="space-between" className={styles.fullWidth}>
+                      <Typography.Text
+                        ellipsis={{ tooltip: env.name }}
+                        style={{
+                          marginRight: 16,
+                          textTransform: "capitalize",
+                          maxWidth: 200,
+                          fontSize: 16,
+                          fontWeight: 500,
+                        }}
+                      >
+                        {env.name} Environment
+                      </Typography.Text>
+                      <Dropdown
+                        disabled={!haveApiKey}
+                        menu={{ items: dropdownItems(env.id, env.name) }}
+                      >
+                        <MoreOutlined
+                          style={{ cursor: haveApiKey ? "default" : "not-allowed" }}
+                        />
+                      </Dropdown>
+                    </Flex>
                     <EnvStatus
+                      env={env}
                       apiKey={haveApiKey}
                       status={getDataPlaneInfo(env.id)?.status}
                       disConnect={disConnectNum}
                       connect={connectNum}
                       dataPlane={len}
                     />
-                    <Dropdown
-                      disabled={!haveApiKey}
-                      menu={{
-                        items: dropdownItems(env.id, env.name, len),
-                      }}
-                    >
-                      <MoreOutlined
-                        style={{
-                          cursor: haveApiKey ? "default" : "not-allowed",
-                        }}
-                      />
-                    </Dropdown>
                   </Flex>
                 </div>
               );
@@ -219,44 +187,35 @@ const EnvironmentOverview = () => {
       {!isHaveApiKey ? (
         <NoAPIKey env={selectedEnv} />
       ) : (
-        <>
-          <Flex vertical gap={12} className={styles.sectionWrapper}>
-            <Flex align="center" justify="space-between">
-              <Text.NormalLarge>
-                {selectedEnv?.name?.toLocaleLowerCase?.() === "production"
-                  ? "Running Component Versions"
-                  : "Running API Mappings"}
-              </Text.NormalLarge>
-              {selectedEnv?.name?.toLocaleLowerCase?.() === "production" && (
-                <Button
-                  type="primary"
-                  onClick={() => {
-                    setCurrentEnvId(selectedEnv?.id);
-                    setOpen(true);
-                  }}
-                >
-                  Create new deployment
-                </Button>
-              )}
-            </Flex>
-            <RunningAPIMapping env={selectedEnv} />
+        <Flex vertical gap={12} className={styles.sectionWrapper}>
+          <Flex align="center" justify="space-between">
+            <Radio.Group
+              onChange={(e) => { setActiveTab(e.target.value) }}
+              value={activeTab}
+              style={{
+                marginBottom: 8,
+              }}
+            >
+              <Radio.Button value="running_api">Running API mappings</Radio.Button>
+              <Radio.Button value="deployment_history">Deployment history</Radio.Button>
+            </Radio.Group>
+            {selectedEnv?.name?.toLocaleLowerCase?.() === "production" && (
+              <Button
+                type="primary"
+                onClick={() => {
+                  setCurrentEnvId(selectedEnv?.id);
+                  setOpen(true);
+                }}
+              >
+                Create new deployment
+              </Button>
+            )}
           </Flex>
-          <Flex
-            vertical
-            gap={8}
-            className={styles.sectionWrapper}
-            style={{ flex: 1 }}
-          >
-            <Text.NormalLarge>
-              {selectedEnv?.name?.toLocaleLowerCase?.() === "production"
-                ? "Component deployment history"
-                : "API Mapping Deployment history"}
-            </Text.NormalLarge>
-            <DeploymentHistory env={selectedEnv} />
-          </Flex>
-        </>
+          {activeTab === "running_api" && <RunningAPIMapping env={selectedEnv} />}
+          {activeTab === "deployment_history" && <DeployHistory selectedEnvId={selectedEnv?.id} />
+          }
+        </Flex>
       )}
-
       <ModalNewDeployment
         open={open}
         setOpen={setOpen}

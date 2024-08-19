@@ -21,9 +21,6 @@ const ActivitySwitch = ({ value, handleChange, jsonValue }: ActivitySwitchProps)
         setCopyButtonText("Copy all");
       }, 3000);
     })
-      .catch((err) => {
-        console.log(err.message);
-      });
   }
 
   return <Flex gap={4} align='center'>

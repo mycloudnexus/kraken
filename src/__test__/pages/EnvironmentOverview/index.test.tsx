@@ -74,7 +74,7 @@ describe(" EnvironmentOverview   component list", () => {
         </BrowserRouter>
       </QueryClientProvider>
     );
-    const ele = getByText("production");
+    const ele = getByText("production Environment");
     expect(ele).toBeInTheDocument();
   });
 });
