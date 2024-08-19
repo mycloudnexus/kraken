@@ -66,7 +66,6 @@ export const DeploymentBtn = ({
           tagInfos: [
             {
               tagId: record?.tagId,
-              tagKey: "",
             },
           ],
           sourceEnvId: env?.stageId,

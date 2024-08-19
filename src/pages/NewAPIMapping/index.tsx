@@ -397,7 +397,9 @@ const NewAPIMapping = ({
                   <Flex gap={4} alignItems="center">
                     Mapping
                     {queryData.mappingStatus === "incomplete" && (
-                      <InfoCircleOutlined style={{ color: "#FAAD14" }} />
+                      <Tooltip title="Incomplete mapping">
+                        <InfoCircleOutlined style={{ color: "#FAAD14" }} />
+                      </Tooltip>
                     )}
                   </Flex>
                 ),

@@ -255,7 +255,7 @@ export const verifyProduct = (productId: string, data: any) => {
 };
 
 export const deployProduction = (productId: string, data: any) => {
-  return request(`/v2${PRODUCT}/${productId}/verify-api-mapper-in-labels`, {
+  return request(`/v2${PRODUCT}/${productId}/deploy-stage-to-production`, {
     method: "POST",
     data,
   });
