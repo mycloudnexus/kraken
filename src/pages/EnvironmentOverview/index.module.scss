@@ -1,6 +1,7 @@
 .pageWrapper {
   box-sizing: border-box;
   min-height: 100%;
+  width: 100%;
   padding: 16px 20px;
   background-color: #f4f4f4;
   overflow-y: hidden;
@@ -48,6 +49,9 @@
   border-radius: 4px;
   padding: 16px 20px;
   background-color: #fff;
+  display: flex;
+  overflow-y: scroll;
+  height: 100%;
 }
 .overviewContainer {
   display: flex;

@@ -1,3 +1,13 @@
+.componentsWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  background: var(--Page-bg, #f0f2f5);
+  padding: 32px 20px 20px 20px;
+  overflow-y: scroll;
+  height: calc(100% - 54px);
+}
+
 .stepContainer {
   margin-top: 24px;
   padding: 20px 20px 24px 20px;

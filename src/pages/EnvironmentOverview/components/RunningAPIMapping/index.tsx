@@ -112,15 +112,13 @@ const RunningAPIMapping = ({ env }: Props) => {
   ]
 
   return (
-    <div>
-      <Table
-        columns={columns}
-        loading={isLoading}
-        dataSource={columnData}
-        pagination={false}
-        rowKey={(item) => JSON.stringify(item)}
-      />
-    </div>
+    <Table
+      columns={columns}
+      loading={isLoading}
+      dataSource={columnData}
+      pagination={false}
+      rowKey={(item) => JSON.stringify(item)}
+    />
   );
 };
 

@@ -1,0 +1,38 @@
+.innerMenu {
+  overflow: auto;
+  border-inline-end: 0 !important;
+
+  &:global(> .ant-menu) {
+    border-right: unset !important;
+    background: unset;
+    &:global(> .ant-menu-item) {
+      border-radius: 0;
+
+      &:global(.ant-menu-item-selected) {
+        background-color: rgba(41, 98, 255, 0.2);
+        border-right: 3px solid #2962FF;
+      }
+    }
+  }
+}
+
+.sideBar {
+  height: 100%;
+  overflow: auto;
+  background: #fff !important;
+}
+
+.siderBottom {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}
+
+.siderBottomVersion {
+  padding-bottom: 12px;
+}
+
+.siderBottomCollapseWrapper {
+  border-top: 1px solid var(--a-border);
+  padding: 12px 24px;
+}

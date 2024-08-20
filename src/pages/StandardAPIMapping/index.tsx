@@ -110,8 +110,8 @@ const StandardAPIMapping = () => {
   }, [detailDataMapping]);
 
   return (
-    <Spin spinning={isLoading}>
-      <Flex align="stretch" vertical className={styles.pageWrapper}>
+    <Flex align="stretch" vertical className={styles.pageWrapper}>
+      <Spin spinning={isLoading}>
         <Flex align="center" justify="space-between" style={{ padding: "5px 0" }}>
           <ComponentSelect
             componentList={componentList}
@@ -162,8 +162,9 @@ const StandardAPIMapping = () => {
             </Flex>
           </Flex>
         </Flex>
-      </Flex>
-    </Spin>
+      </Spin>
+
+    </Flex>
   );
 };
 

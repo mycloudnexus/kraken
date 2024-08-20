@@ -1,7 +1,5 @@
 import Text from "@/components/Text";
-import { LeftOutlined } from "@ant-design/icons";
 import { Button, Flex, Input, Table, Tooltip } from "antd";
-import { useNavigate } from "react-router-dom";
 import styles from "./index.module.scss";
 import EnvSelect from "@/components/EnvSelect";
 import { useBuyerStore } from "@/stores/buyer.store";
@@ -15,7 +13,6 @@ import dayjs from "dayjs";
 
 const Buyer = () => {
   const { currentProduct } = useAppStore();
-  const navigate = useNavigate();
   const { params, setParams, resetParams } = useBuyerStore();
   const { data: dataList, isLoading } = useGetBuyerList(currentProduct, params);
   const {
@@ -91,19 +88,6 @@ const Buyer = () => {
         onClose={hideModal}
         currentEnv={params.envId ?? ""}
       />
-      <Flex
-        gap={8}
-        justify="flex-start"
-        style={{ cursor: "pointer", marginBottom: 4 }}
-        role="none"
-        onClick={() => navigate("/")}
-      >
-        <LeftOutlined style={{ fontSize: 8 }} />
-        <Text.LightLarge color="#434343">
-          <span>Home</span>
-          <span style={{ color: "#848587" }}>/ Buyer management</span>
-        </Text.LightLarge>
-      </Flex>
       <Flex vertical className={styles.paper} gap={16}>
         <Flex justify="space-between" align="center">
           <Text.NormalLarge>

@@ -6,6 +6,7 @@ import Buyer from "@/pages/Buyer";
 import EnvironmentActivityLog from "@/pages/EnvironmentActivityLog";
 import EnvironmentOverview from "@/pages/EnvironmentOverview";
 import HomePage from "@/pages/HomePage";
+import ApiComponents from '@/pages/HomePage/components/ApiComponents';
 import Login from "@/pages/Login";
 import NewAPIServer from "@/pages/NewAPIServer";
 import StandardAPIMapping from "@/pages/StandardAPIMapping";
@@ -55,6 +56,10 @@ const router = createBrowserRouter([
             ],
           },
         ],
+      },
+      {
+        path: "components",
+        element: <ApiComponents />
       },
       {
         path: "env",
