@@ -15,14 +15,12 @@ import {
   Input,
   Select,
   Table,
-  Breadcrumb,
   Space,
 } from "antd";
 import { ColumnsType } from "antd/es/table";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useNavigate } from "react-router";
 import ActivityDetailModal from "./components/ActivityDetailModal";
 import styles from "./index.module.scss";
 import _ from "lodash";
@@ -52,7 +50,6 @@ const statusCodeOptions = [
 
 const EnvironmentActivityLog = () => {
   const { envId } = useParams();
-  const navigate = useNavigate();
   const { currentProduct } = useAppStore();
   const { data: envData } = useGetProductEnvs(currentProduct);
   const [form] = Form.useForm();
@@ -174,43 +171,6 @@ const EnvironmentActivityLog = () => {
   ];
   return (
     <div className={styles.wrapper}>
-      <Breadcrumb
-        items={[
-          {
-            title: (
-              <span
-                onClick={() => navigate("/env")}
-                className={styles.breadHeader}
-                role="none"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                >
-                  <path
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                    d="M7.35912 8.49976L9.94461 11.0852C10.3351 11.4758 10.4143 12.0298 10.1214 12.3227C9.82849 12.6156 9.27448 12.5364 8.88395 12.1459L6.05552 9.31748C5.81223 9.07419 5.68979 8.76744 5.70287 8.49991C5.68969 8.23231 5.81213 7.92543 6.05551 7.68205L8.88394 4.85363C9.27446 4.4631 9.82848 4.38396 10.1214 4.67685C10.4143 4.96974 10.3351 5.52376 9.9446 5.91429L7.35912 8.49976Z"
-                    fill="black"
-                    fillOpacity="0.85"
-                  />
-                </svg>
-                Environment overview
-              </span>
-            ),
-          },
-          {
-            title: (
-              <span className={styles.breadItem}>
-                Development API activity log
-              </span>
-            ),
-          },
-        ]}
-      />
       <div className={styles.contentWrapper}>
         <Flex align="center" className={styles.filterWrapper}>
           <Form
@@ -292,7 +252,7 @@ const EnvironmentActivityLog = () => {
               onShowSizeChange: handlePaginationShowSizeChange,
               showTotal: (total) => `Total ${total} items`,
             }}
-            scroll={{ y: `calc(100vh - 260px)` }}
+            scroll={{ y: `calc(100vh - 310px)` }}
           />
         </div>
       </div>

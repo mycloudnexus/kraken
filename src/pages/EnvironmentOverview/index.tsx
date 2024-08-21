@@ -38,6 +38,9 @@ const initPaginationParams = {
 };
 
 const EnvironmentOverview = () => {
+  const observedDiv = useRef<HTMLDivElement>(null);
+  const [height, setHeight] = useState<number | undefined>(undefined);
+
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { currentProduct } = useAppStore();
@@ -126,6 +129,23 @@ const EnvironmentOverview = () => {
     }
   }, [envList, envId, selectedEnv]);
 
+  useEffect(() => {
+    if (!observedDiv?.current) {
+      return;
+    }
+    const resizeObserver = new ResizeObserver(() => {
+      if(observedDiv.current?.offsetHeight !== height) {
+        setHeight(observedDiv?.current?.offsetHeight ?? 0);
+      }
+    });
+    resizeObserver.observe(observedDiv.current);
+
+    return function cleanup() {
+      resizeObserver.disconnect();
+    }
+  },
+  [observedDiv.current])
+
   return (
     <Flex vertical gap={12} className={styles.pageWrapper}>
       <Flex vertical gap={14} className={styles.scroll}>
@@ -187,7 +207,7 @@ const EnvironmentOverview = () => {
       {!isHaveApiKey ? (
         <NoAPIKey env={selectedEnv} />
       ) : (
-        <Flex vertical gap={12} className={styles.sectionWrapper}>
+        <Flex vertical gap={12} className={styles.sectionWrapper} ref={observedDiv}>
           <Flex align="center" justify="space-between">
             <Radio.Group
               onChange={(e) => { setActiveTab(e.target.value) }}
@@ -211,8 +231,8 @@ const EnvironmentOverview = () => {
               </Button>
             )}
           </Flex>
-          {activeTab === "running_api" && <RunningAPIMapping env={selectedEnv} />}
-          {activeTab === "deployment_history" && <DeployHistory selectedEnvId={selectedEnv?.id} />
+          {activeTab === "running_api" && <RunningAPIMapping scrollHeight={height} env={selectedEnv} />}
+          {activeTab === "deployment_history" && <DeployHistory scrollHeight={height} selectedEnvId={selectedEnv?.id} />
           }
         </Flex>
       )}

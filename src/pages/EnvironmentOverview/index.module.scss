@@ -50,8 +50,7 @@
   padding: 16px 20px;
   background-color: #fff;
   display: flex;
-  overflow-y: scroll;
-  height: 100%;
+  height: calc(100% - 215px);
 }
 .overviewContainer {
   display: flex;

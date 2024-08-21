@@ -98,7 +98,7 @@ export const DeploymentBtn = ({
   );
 };
 
-const DeployHistory = ({ selectedEnvId }: { selectedEnvId?: string }) => {
+const DeployHistory = ({ scrollHeight, selectedEnvId }: { scrollHeight?: number, selectedEnvId?: string }) => {
   const { currentProduct } = useAppStore();
   const { data: dataEnv } = useGetProductEnvs(currentProduct);
   const { params, setParams, resetParams } = useDeploymentStore();
@@ -247,9 +247,12 @@ const DeployHistory = ({ selectedEnvId }: { selectedEnvId?: string }) => {
     };
   }, []);
 
+  const scroll = scrollHeight ? { y: scrollHeight - 215, x: "max-content" } : undefined
+
   return (
     <div className={styles.root} id="deploy-history">
       <Table
+        scroll={scroll}
         loading={isLoading || isLoadingVerify}
         locale={{
           emptyText: (

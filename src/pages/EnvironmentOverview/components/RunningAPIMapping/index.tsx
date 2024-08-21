@@ -8,6 +8,7 @@ import MappingMatrix from "@/components/MappingMatrix";
 import styles from "./index.module.scss"
 import Text from '@/components/Text';
 type Props = {
+  scrollHeight?: number;
   env?: IEnv;
 };
 
@@ -21,7 +22,7 @@ const defaultPage = {
   page: 0,
 };
 
-const RunningAPIMapping = ({ env }: Props) => {
+const RunningAPIMapping = ({ scrollHeight, env }: Props) => {
   const { currentProduct } = useAppStore();
   const [pageInfo] = useState(defaultPage);
   const { data, isLoading } = useGetRunningAPIList(
@@ -111,8 +112,10 @@ const RunningAPIMapping = ({ env }: Props) => {
     },
   ]
 
+  const scroll = scrollHeight ? { y: scrollHeight - 152, x: "max-content" } : undefined
   return (
     <Table
+      scroll={scroll}
       columns={columns}
       loading={isLoading}
       dataSource={columnData}

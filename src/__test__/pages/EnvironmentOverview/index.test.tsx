@@ -5,6 +5,17 @@ import { BrowserRouter } from "react-router-dom";
 import EnvironmentOverview from "@/pages/EnvironmentOverview";
 import * as productHooks from "@/hooks/product";
 
+const ResizeObserverMock = vi.fn(() => ({
+  observe: vi.fn(),
+  unobserve: vi.fn(),
+  disconnect: vi.fn(),
+}));
+
+// Stub the global ResizeObserver
+vi.stubGlobal('ResizeObserver', ResizeObserverMock);
+
+
+
 test("EnvironmentOverview page", () => {
   const { container } = render(
     <QueryClientProvider client={queryClient}>
