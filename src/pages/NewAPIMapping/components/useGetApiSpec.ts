@@ -1,8 +1,8 @@
-import { useGetComponentList, useGetComponentListV2 } from "@/hooks/product";
 import {
-  COMPONENT_KIND_API,
-  COMPONENT_KIND_API_SPEC,
-} from "@/utils/constants/product";
+  useGetComponentListAPI,
+  useGetComponentListSpec,
+  useGetComponentListV2,
+} from "@/hooks/product";
 import { extractOpenApiStrings } from "@/utils/helpers/schema";
 import transformTarget from "@/utils/helpers/transformTarget";
 import { decode } from "js-base64";
@@ -10,20 +10,17 @@ import jsYaml from "js-yaml";
 import { useMemo, useCallback } from "react";
 
 const useGetApiSpec = (currentProduct: string, targetMapperKey: string) => {
-  const { data: mapperResponse, isLoading, refetch } = useGetComponentListV2(
-    currentProduct,
-    targetMapperKey
-  );
+  const {
+    data: mapperResponse,
+    isLoading,
+    refetch,
+  } = useGetComponentListV2(currentProduct, targetMapperKey);
 
   const endpoint = mapperResponse?.facets?.endpoints?.[0];
   const mappers = endpoint?.mappers;
   const metadataKey = mapperResponse?.metadata?.key;
-  const { data: apiComponentList } = useGetComponentList(currentProduct, {
-    kind: COMPONENT_KIND_API,
-  });
-  const { data: apiSpecList } = useGetComponentList(currentProduct, {
-    kind: COMPONENT_KIND_API_SPEC,
-  });
+  const { data: apiComponentList } = useGetComponentListAPI(currentProduct);
+  const { data: apiSpecList } = useGetComponentListSpec(currentProduct);
 
   const apiSpecMetadataKey = useMemo(() => {
     if (!apiComponentList || !metadataKey) return undefined;

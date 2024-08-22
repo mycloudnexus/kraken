@@ -2,7 +2,7 @@ import {
   useGetComponentDetail,
   useCreateNewVersion,
   useGetComponentDetailMapping,
-  useGetProductComponents,
+  useGetComponentListAPI,
 } from "@/hooks/product";
 import { Button, Flex, notification, Spin } from "antd";
 import { showModalConfirmCreateVersion } from "./components/ModalConfirmCreateVersion";
@@ -36,9 +36,7 @@ const StandardAPIMapping = () => {
     currentProduct,
     componentId ?? ""
   );
-  const { data: componentList } = useGetProductComponents(currentProduct, {
-    kind: "kraken.component.api",
-  });
+  const { data: componentList } = useGetComponentListAPI(currentProduct);
   const { mutateAsync: createNewVersion } = useCreateNewVersion();
   const { value: isChangeMappingKey, setValue: setIsChangeMappingKey } =
     useBoolean(false);
@@ -112,7 +110,11 @@ const StandardAPIMapping = () => {
   return (
     <Flex align="stretch" vertical className={styles.pageWrapper}>
       <Spin spinning={isLoading}>
-        <Flex align="center" justify="space-between" style={{ padding: "5px 0" }}>
+        <Flex
+          align="center"
+          justify="space-between"
+          style={{ padding: "5px 0" }}
+        >
           <ComponentSelect
             componentList={componentList}
             componentName={componentName}
@@ -163,7 +165,6 @@ const StandardAPIMapping = () => {
           </Flex>
         </Flex>
       </Spin>
-
     </Flex>
   );
 };

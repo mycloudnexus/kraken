@@ -1,10 +1,9 @@
 import ServerIcon from "@/assets/server-icon.svg";
 import Flex from "@/components/Flex";
 import Text from "@/components/Text";
-import { useGetComponentList } from "@/hooks/product";
+import { useGetComponentListAPISpec } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
-import { COMPONENT_KIND_API_TARGET_SPEC } from "@/utils/constants/product";
 import { IComponent } from "@/utils/types/product.type";
 import { DownOutlined, RightOutlined } from "@ant-design/icons";
 import { Button, Input, Spin, Tooltip, Typography, notification } from "antd";
@@ -160,11 +159,11 @@ export const APIItem = ({
             const [url, method] = key.split(" ");
             const active = selectedAPI
               ? item?.metadata?.name === selectedAPI?.name &&
-              url === selectedAPI?.url &&
-              method === selectedAPI?.method
+                url === selectedAPI?.url &&
+                method === selectedAPI?.method
               : item?.metadata?.name === sellerApi?.name &&
-              url === sellerApi?.url &&
-              method === sellerApi?.method;
+                url === sellerApi?.url &&
+                method === sellerApi?.method;
             return (
               <div
                 className={clsx(styles.card, {
@@ -220,10 +219,9 @@ const SelectAPI = ({
     setListMappingStateResponse,
   } = useNewApiMappingStore();
   const navigate = useNavigate();
-  const { data: dataList, isLoading } = useGetComponentList(currentProduct, {
-    kind: COMPONENT_KIND_API_TARGET_SPEC,
-    size: 1000,
-  });
+  const { data: dataList, isLoading } =
+    useGetComponentListAPISpec(currentProduct);
+  console.log("🚀 ~ dataList:", dataList);
   const queryData = JSON.parse(query ?? "{}");
 
   const { mappers } = useGetApiSpec(
@@ -255,13 +253,10 @@ const SelectAPI = ({
       }));
       setListMappingStateResponse([]);
       setRequestMapping(newApiRequest);
-      console.log('resetMapping useCallback')
+      console.log("resetMapping useCallback");
       setResponseMapping(newApiResponse);
     }
-  }, [
-    mappers?.request,
-    mappers?.response,
-  ]);
+  }, [mappers?.request, mappers?.response]);
 
   const handleOK = () => {
     if (!isRequiredMapping) {

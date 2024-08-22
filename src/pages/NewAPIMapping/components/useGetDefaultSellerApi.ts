@@ -1,5 +1,4 @@
-import { useGetComponentList } from "@/hooks/product";
-import { COMPONENT_KIND_API_TARGET_SPEC } from "@/utils/constants/product";
+import { useGetComponentListAPISpec } from "@/hooks/product";
 import { extractOpenApiStrings } from "@/utils/helpers/schema";
 import { notification } from "antd";
 import { decode } from "js-base64";
@@ -17,10 +16,8 @@ const useGetDefaultSellerApi = (
   currentProduct: string,
   serverKeyInfo: IServerKeyInfo
 ) => {
-  const { data: dataList, isLoading } = useGetComponentList(currentProduct, {
-    kind: COMPONENT_KIND_API_TARGET_SPEC,
-    size: 1000,
-  });
+  const { data: dataList, isLoading } =
+    useGetComponentListAPISpec(currentProduct);
 
   const apiTargetSpecComponent = useMemo(() => {
     if (isLoading) return;

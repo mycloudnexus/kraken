@@ -6,7 +6,6 @@ import {
   editComponentDetail,
   getAllApiKeyList,
   getAllDataPlaneList,
-  getComponentAPIDoc,
   getComponentDetail,
   getComponentDetailMapping,
   getEnvActivity,
@@ -29,6 +28,11 @@ import {
   verifyProduct,
   deployProduction,
 } from "@/services/products";
+import {
+  COMPONENT_KIND_API,
+  COMPONENT_KIND_API_SPEC,
+  COMPONENT_KIND_API_TARGET_SPEC,
+} from "@/utils/constants/product";
 import { queryClient } from "@/utils/helpers/reactQuery";
 import {
   IDetailsData,
@@ -56,7 +60,6 @@ import { AxiosResponse } from "axios";
 import { get } from "lodash";
 
 export const PRODUCT_CACHE_KEYS = {
-  get_product_component_list: "get_product_component_list",
   get_component_api_doc: "get_component_api_doc",
   create_new_component: "create_new_component",
   get_component_list: "get_component_list",
@@ -86,36 +89,9 @@ export const PRODUCT_CACHE_KEYS = {
   create_buyer: "create_buyer",
   verify_product: "verify_product",
   deploy_stage_to_production: "deploy_stage_to_production",
-};
-
-export const useGetProductComponents = (
-  productId: string,
-  params: Record<string, any>
-) => {
-  const { data, ...result } = useQuery<any, Error>({
-    queryKey: [PRODUCT_CACHE_KEYS.get_product_component_list, params],
-    queryFn: () => getListComponents(productId, params),
-    enabled: Boolean(productId),
-  });
-  return {
-    data: get(data, "data"),
-    ...result,
-  };
-};
-
-export const useGetComponentAPIDocs = (
-  productId: string,
-  componentId: string
-) => {
-  return useQuery<any, Error>({
-    queryKey: [
-      PRODUCT_CACHE_KEYS.get_component_api_doc,
-      productId,
-      componentId,
-    ],
-    queryFn: () => getComponentAPIDoc(productId, componentId),
-    enabled: Boolean(productId && componentId),
-  });
+  get_component_list_spec: "get_component_list_spec",
+  get_component_list_api_spec: "get_component_list_api_spec",
+  get_component_list_api: "get_component_list_api",
 };
 
 export const useCreateNewComponent = () => {
@@ -133,6 +109,45 @@ export const useGetComponentList = (
   return useQuery<any, Error>({
     queryKey: [PRODUCT_CACHE_KEYS.get_component_list, productId, params],
     queryFn: () => getListComponents(productId, params),
+    enabled: Boolean(productId),
+    select: (data) => data?.data,
+  });
+};
+
+export const useGetComponentListAPI = (productId: string) => {
+  return useQuery<any, Error>({
+    queryKey: [PRODUCT_CACHE_KEYS.get_component_list_api, productId],
+    queryFn: () =>
+      getListComponents(productId, {
+        kind: COMPONENT_KIND_API,
+        size: 500,
+      }),
+    enabled: Boolean(productId),
+    select: (data) => data?.data,
+  });
+};
+
+export const useGetComponentListSpec = (productId: string) => {
+  return useQuery<any, Error>({
+    queryKey: [PRODUCT_CACHE_KEYS.get_component_list_spec, productId],
+    queryFn: () =>
+      getListComponents(productId, {
+        kind: COMPONENT_KIND_API_SPEC,
+        size: 500,
+      }),
+    enabled: Boolean(productId),
+    select: (data) => data?.data,
+  });
+};
+
+export const useGetComponentListAPISpec = (productId: string) => {
+  return useQuery<any, Error>({
+    queryKey: [PRODUCT_CACHE_KEYS.get_component_list_api_spec, productId],
+    queryFn: () =>
+      getListComponents(productId, {
+        kind: COMPONENT_KIND_API_TARGET_SPEC,
+        size: 500,
+      }),
     enabled: Boolean(productId),
     select: (data) => data?.data,
   });
@@ -418,7 +433,7 @@ export const useDeployToEnv = () => {
 
 export const useGetRunningAPIList = (
   productId: string,
-  params: Record<string, any>,
+  params: Record<string, any>
 ) => {
   return useQuery<any, Error>({
     queryKey: [PRODUCT_CACHE_KEYS.get_running_api_list, productId, params],
@@ -430,7 +445,7 @@ export const useGetRunningAPIList = (
 
 export const useGetAPIDeployments = (
   productId: string,
-  params: Record<string, any>,
+  params: Record<string, any>
 ) => {
   return useQuery<any, Error>({
     queryKey: [PRODUCT_CACHE_KEYS.get_list_api_deployments, productId, params],

@@ -166,7 +166,7 @@ const NewAPIMapping = ({
   useEffect(() => {
     return () => {
       queryClient.removeQueries({
-        queryKey: [PRODUCT_CACHE_KEYS.get_component_list],
+        queryKey: [PRODUCT_CACHE_KEYS.get_component_list_v2],
       });
     };
   }, []);
@@ -510,7 +510,7 @@ const NewAPIMapping = ({
               />
             </>
           ) : (
-            <DeployHistory />
+            <DeployHistory targetMapperKey={queryData.targetMapperKey} />
           )}
         </div>
         {mainTabKey !== EMainTab.deploy && (

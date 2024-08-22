@@ -1,8 +1,7 @@
 import Flex from "@/components/Flex";
 import Text from "@/components/Text";
-import { useGetComponentList } from "@/hooks/product";
+import { useGetComponentListAPISpec } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
-import { COMPONENT_KIND_API_TARGET_SPEC } from "@/utils/constants/product";
 import { Button, ConfigProvider, Empty, Spin } from "antd";
 import { isEmpty } from "lodash";
 import { useNavigate } from "react-router";
@@ -14,10 +13,8 @@ import APIServerCard from "./components/APIServerCard";
 
 const APIServerList = () => {
   const { currentProduct } = useAppStore();
-  const { data: dataList, isLoading } = useGetComponentList(currentProduct, {
-    kind: COMPONENT_KIND_API_TARGET_SPEC,
-    size: 1000,
-  });
+  const { data: dataList, isLoading } =
+    useGetComponentListAPISpec(currentProduct);
   const navigate = useNavigate();
 
   return (

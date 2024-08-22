@@ -32,8 +32,8 @@ import useUser from "@/hooks/user/useUser";
 import InformationModal from "@/components/DeployStage/InformationModal";
 import { useBoolean } from "usehooks-ts";
 import { IEnv } from "@/utils/types/env.type";
-import MappingMatrix from '@/components/MappingMatrix';
-import RequestMethod from '@/components/Method';
+import MappingMatrix from "@/components/MappingMatrix";
+import RequestMethod from "@/components/Method";
 
 export const ContentTime = ({ content = "", time = "" }) => {
   const { findUserName } = useUser();
@@ -98,11 +98,22 @@ export const DeploymentBtn = ({
   );
 };
 
-const DeployHistory = ({ scrollHeight, selectedEnvId }: { scrollHeight?: number, selectedEnvId?: string }) => {
+const DeployHistory = ({
+  scrollHeight,
+  selectedEnvId,
+  targetMapperKey,
+}: {
+  scrollHeight?: number;
+  selectedEnvId?: string;
+  targetMapperKey?: string;
+}) => {
   const { currentProduct } = useAppStore();
   const { data: dataEnv } = useGetProductEnvs(currentProduct);
   const { params, setParams, resetParams } = useDeploymentStore();
-  const { data, isLoading } = useGetAPIDeployments(currentProduct, params);
+  const { data, isLoading } = useGetAPIDeployments(currentProduct, {
+    targetMapperKey,
+    ...params,
+  });
   const { mutateAsync: verify, isPending: isLoadingVerify } =
     useVerifyProduct();
 
@@ -138,92 +149,97 @@ const DeployHistory = ({ scrollHeight, selectedEnvId }: { scrollHeight?: number,
   };
 
   const columns: TableColumnsType<any> = useMemo(
-    () => [
-      selectedEnvId ? {
-          title: "API mapping",
-          dataIndex: "",
-          width: 340,
-          render: (item: any) => (
-            <Flex gap={10} align="center">
-              <RequestMethod method={item?.method} />
-              <Typography.Text
-                style={{ color: "#2962FF" }}
-                ellipsis={{ tooltip: item?.path }}
-              >
-                {item?.path.split('/').slice(-2).join('/')}
-              </Typography.Text>
-              <MappingMatrix mappingMatrix={item.mappingMatrix} />
+    () =>
+      [
+        selectedEnvId
+          ? {
+              title: "API mapping",
+              dataIndex: "",
+              width: 340,
+              render: (item: any) => (
+                <Flex gap={10} align="center">
+                  <RequestMethod method={item?.method} />
+                  <Typography.Text
+                    style={{ color: "#2962FF" }}
+                    ellipsis={{ tooltip: item?.path }}
+                  >
+                    {item?.path.split("/").slice(-2).join("/")}
+                  </Typography.Text>
+                  <MappingMatrix mappingMatrix={item.mappingMatrix} />
+                </Flex>
+              ),
+            }
+          : {},
+        {
+          title: "Version",
+          dataIndex: "version",
+          render: (text: string) => (
+            <Flex align="center" gap={8}>
+              {text}
             </Flex>
           ),
-      } : {},
-      {
-        title: "Version",
-        dataIndex: "version",
-        render: (text: string) => (
-          <Flex align="center" gap={8}>
-            {text}
-          </Flex>
-        ),
-      },
-      {
-        title: "Environment",
-        dataIndex: "",
-        render: (record: IDeploymentHistory) => (
-          <div className={styles.capitalize}>{record?.envName}</div>
-        ),
-        filters: selectedEnvId ? undefined : dataEnv?.data?.map((i) => ({ text: i.name, value: i.id })),
-      },
-      {
-        title: "Deployed by",
-        dataIndex: "",
-        render: (record: IDeploymentHistory) => (
-          <ContentTime content={record?.createBy} time={record?.createAt} />
-        ),
-      },
-      {
-        title: "Deploy status",
-        dataIndex: "status",
-        render: (status: string) => <DeploymentStatus status={status} />,
-      },
-      {
-        title: "Verified for Production",
-        dataIndex: "verifiedStatus",
-        render: (verifiedStatus: boolean, record: IDeploymentHistory) =>
-          record?.envName?.toLowerCase?.() === "stage" && (
-            <Switch
-              value={verifiedStatus}
-              onChange={() => handleVerify(record)}
-            />
+        },
+        {
+          title: "Environment",
+          dataIndex: "",
+          render: (record: IDeploymentHistory) => (
+            <div className={styles.capitalize}>{record?.envName}</div>
           ),
-      },
-      {
-        title: "Verified by",
-        dataIndex: "",
-        render: (record: IDeploymentHistory) =>
-          record?.envName?.toLowerCase?.() === "stage" && (
-            <ContentTime
-              content={record?.verifiedBy}
-              time={record?.verifiedAt}
-            />
+          filters: selectedEnvId
+            ? undefined
+            : dataEnv?.data?.map((i) => ({ text: i.name, value: i.id })),
+        },
+        {
+          title: "Deployed by",
+          dataIndex: "",
+          render: (record: IDeploymentHistory) => (
+            <ContentTime content={record?.createBy} time={record?.createAt} />
           ),
-      },
-      {
-        title: "Actions",
-        dataIndex: "",
-        render: (record: IDeploymentHistory) => (
-          <Flex gap={12} align="center">
-            <Tooltip title="Check details and difference">
-              <Button type="text" className={styles.defaultBtn}>
-                <DetailIcon />
-              </Button>
-            </Tooltip>
-            <Tooltip title="Deploy to Production">
-              <DeploymentBtn record={record} env={envItems} />
-            </Tooltip>
-          </Flex>
-        ),
-      },
-    ].filter(value => Object.keys(value).length !== 0),
+        },
+        {
+          title: "Deploy status",
+          dataIndex: "status",
+          render: (status: string) => <DeploymentStatus status={status} />,
+        },
+        {
+          title: "Verified for Production",
+          dataIndex: "verifiedStatus",
+          render: (verifiedStatus: boolean, record: IDeploymentHistory) =>
+            record?.envName?.toLowerCase?.() === "stage" && (
+              <Switch
+                value={verifiedStatus}
+                onChange={() => handleVerify(record)}
+              />
+            ),
+        },
+        {
+          title: "Verified by",
+          dataIndex: "",
+          render: (record: IDeploymentHistory) =>
+            record?.envName?.toLowerCase?.() === "stage" && (
+              <ContentTime
+                content={record?.verifiedBy}
+                time={record?.verifiedAt}
+              />
+            ),
+        },
+        {
+          title: "Actions",
+          dataIndex: "",
+          render: (record: IDeploymentHistory) => (
+            <Flex gap={12} align="center">
+              <Tooltip title="Check details and difference">
+                <Button type="text" className={styles.defaultBtn}>
+                  <DetailIcon />
+                </Button>
+              </Tooltip>
+              <Tooltip title="Deploy to Production">
+                <DeploymentBtn record={record} env={envItems} />
+              </Tooltip>
+            </Flex>
+          ),
+        },
+      ].filter((value) => Object.keys(value).length !== 0),
     [envItems]
   );
   const onChange: TableProps<any>["onChange"] = (_, filters, __, ___) => {
@@ -236,10 +252,10 @@ const DeployHistory = ({ scrollHeight, selectedEnvId }: { scrollHeight?: number,
   };
 
   useEffect(() => {
-    if(selectedEnvId) {
+    if (selectedEnvId) {
       setParams({ envId: selectedEnvId });
     }
-  }, [selectedEnvId])
+  }, [selectedEnvId]);
 
   useEffect(() => {
     return () => {
@@ -247,7 +263,9 @@ const DeployHistory = ({ scrollHeight, selectedEnvId }: { scrollHeight?: number,
     };
   }, []);
 
-  const scroll = scrollHeight ? { y: scrollHeight - 215, x: "max-content" } : undefined
+  const scroll = scrollHeight
+    ? { y: scrollHeight - 215, x: "max-content" }
+    : undefined;
 
   return (
     <div className={styles.root} id="deploy-history">

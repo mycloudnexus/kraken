@@ -3,28 +3,25 @@ import { useAppStore } from "@/stores/app.store";
 import yaml from "js-yaml";
 import { decode } from "js-base64";
 import { useCallback, useMemo } from "react";
-import { useGetProductComponents } from "@/hooks/product";
+import {
+  useGetComponentListAPI,
+  useGetComponentListSpec,
+} from "@/hooks/product";
 import type { IUnifiedAsset } from "@/utils/types/common.type";
 import { SPEC_VALUE } from "@/utils/constants/product";
 import Text from "@/components/Text";
 import ApiComponent from "./ApiComponent";
 import { get, isEmpty, isUndefined, min } from "lodash";
-import styles from './index.module.scss'
+import styles from "./index.module.scss";
 
 const ApiComponents = () => {
   const { currentProduct } = useAppStore();
 
-  const { data: componentList, isLoading } = useGetProductComponents(
-    currentProduct,
-    {
-      kind: "kraken.component.api",
-    }
-  );
+  const { data: componentList, isLoading } =
+    useGetComponentListAPI(currentProduct);
 
   const { data: componentWithSpec, isLoading: specLoading } =
-    useGetProductComponents(currentProduct, {
-      kind: "kraken.component.api-spec",
-    });
+    useGetComponentListSpec(currentProduct);
 
   const getTargetSpecItem = useCallback(
     (i: IUnifiedAsset) => {
@@ -110,7 +107,6 @@ const ApiComponents = () => {
         </Row>
       </Spin>
     </div>
-
   );
 };
 

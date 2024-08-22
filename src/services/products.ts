@@ -20,10 +20,6 @@ export const getListComponentsV2 = (
   return request(`${PRODUCT}/${productId}/components/${targetMapperKey}`);
 };
 
-export const getComponentAPIDoc = (productId: string, componentId: string) => {
-  return request(`${PRODUCT}/${productId}/components/${componentId}/api-docs`);
-};
-
 export const createNewComponent = (productId: string, data: any) => {
   return request(`${PRODUCT}/${productId}/components`, {
     method: "POST",
@@ -200,7 +196,7 @@ export const deployToEnv = (
 
 export const getRunningAPIMappingList = (
   productId: string,
-  params: Record<string, any>,
+  params: Record<string, any>
 ) => {
   return request(`/v2${PRODUCT}/${productId}/running-api-mapper-deployments`, {
     method: "GET",
@@ -210,7 +206,7 @@ export const getRunningAPIMappingList = (
 
 export const getAPIMapperDeployments = (
   productId: string,
-  params: Record<string, any>,
+  params: Record<string, any>
 ) => {
   return request(`/v2${PRODUCT}/${productId}/api-mapper-deployments`, {
     method: "GET",
