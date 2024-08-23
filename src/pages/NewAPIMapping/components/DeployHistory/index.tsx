@@ -112,7 +112,7 @@ const DeployHistory = ({
   const { data: dataEnv } = useGetProductEnvs(currentProduct);
   const { params, setParams, resetParams } = useDeploymentStore();
   const { data, isLoading } = useGetAPIDeployments(currentProduct, {
-    targetMapperKey,
+    mapperKey: targetMapperKey,
     ...params,
   });
   const { mutateAsync: verify, isPending: isLoadingVerify } =
@@ -209,6 +209,7 @@ const DeployHistory = ({
             record?.envName?.toLowerCase?.() === "stage" && (
               <Switch
                 value={verifiedStatus}
+                disabled={record?.status?.toLowerCase?.() === "failed"  || record.status === "in progress"}
                 onChange={() => handleVerify(record)}
               />
             ),
@@ -228,15 +229,16 @@ const DeployHistory = ({
           title: "Actions",
           dataIndex: "",
           render: (record: IDeploymentHistory) => (
-            <Flex gap={12} align="center">
+            <Flex gap={12} align="center" justify="center">
               <Tooltip title="Check details and difference">
                 <Button type="text" className={styles.defaultBtn}>
                   <DetailIcon />
                 </Button>
               </Tooltip>
-              <Tooltip title="Deploy to Production">
+              {record.envName !== "production" && <Tooltip title="Deploy to Production">
                 <DeploymentBtn record={record} env={envItems} />
               </Tooltip>
+              }
             </Flex>
           ),
         },

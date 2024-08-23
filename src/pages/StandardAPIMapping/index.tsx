@@ -1,21 +1,18 @@
 import {
   useGetComponentDetail,
-  useCreateNewVersion,
   useGetComponentDetailMapping,
   useGetComponentListAPI,
 } from "@/hooks/product";
-import { Button, Flex, notification, Spin } from "antd";
-import { showModalConfirmCreateVersion } from "./components/ModalConfirmCreateVersion";
+import { Flex, Spin } from "antd";
 import styles from "./index.module.scss";
 import { delay, get, isEmpty } from "lodash";
 import { useParams } from "react-router";
 import { useAppStore } from "@/stores/app.store";
-import { SUCCESS_CODE } from "@/utils/constants/api";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { useMappingUiStore } from "@/stores/mappingUi.store";
 import ComponentSelect from "./components/ComponentSelect";
 import MappingDetailsList from "./components/MappingDetailsList";
-import { useCallback, useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { IMapperDetails } from "@/utils/types/env.type";
 import NewAPIMapping from "../NewAPIMapping";
 import groupByPath from "@/utils/helpers/groupByPath";
@@ -37,30 +34,8 @@ const StandardAPIMapping = () => {
     componentId ?? ""
   );
   const { data: componentList } = useGetComponentListAPI(currentProduct);
-  const { mutateAsync: createNewVersion } = useCreateNewVersion();
   const { value: isChangeMappingKey, setValue: setIsChangeMappingKey } =
     useBoolean(false);
-
-  const handleCreateNewVersion = useCallback(async () => {
-    try {
-      const data = {
-        componentKey: componentId,
-        productId: currentProduct,
-        componentId,
-      };
-      const result = await createNewVersion(data as any);
-      if (+result.code !== SUCCESS_CODE) throw new Error(result.message);
-      notification.success({ message: "Create new version success" });
-    } catch (error) {
-      notification.error({
-        message: get(
-          error,
-          "reason",
-          get(error, "message", "Error. Please try again")
-        ),
-      });
-    }
-  }, [componentId, currentProduct, createNewVersion]);
 
   const resetState = (mapItem: IMapperDetails) => {
     reset();
@@ -119,20 +94,6 @@ const StandardAPIMapping = () => {
             componentList={componentList}
             componentName={componentName}
           />
-          <Flex justify="end">
-            <Button
-              data-testid="btn-create-version"
-              type="primary"
-              onClick={() => {
-                showModalConfirmCreateVersion({
-                  className: styles.modalCreate,
-                  onOk: handleCreateNewVersion,
-                });
-              }}
-            >
-              Create new version
-            </Button>
-          </Flex>
         </Flex>
         <Flex className={styles.pageBody}>
           <Flex vertical gap={12}>

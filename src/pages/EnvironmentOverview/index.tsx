@@ -3,7 +3,6 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import dayjs from "dayjs";
 import clsx from "clsx";
 import {
-  Button,
   Dropdown,
   Flex,
   Radio,
@@ -55,7 +54,7 @@ const EnvironmentOverview = () => {
 
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("running_api")
-  const [currentEnvId, setCurrentEnvId] = useState<string | undefined>();
+  const [currentEnvId] = useState<string | undefined>();
   const [selectedEnv, setSelectedEnv] = useState<IEnv | undefined>();
   const modalConfirmRef = useRef<any>();
 
@@ -219,17 +218,6 @@ const EnvironmentOverview = () => {
               <Radio.Button value="running_api">Running API mappings</Radio.Button>
               <Radio.Button value="deployment_history">Deployment history</Radio.Button>
             </Radio.Group>
-            {selectedEnv?.name?.toLocaleLowerCase?.() === "production" && (
-              <Button
-                type="primary"
-                onClick={() => {
-                  setCurrentEnvId(selectedEnv?.id);
-                  setOpen(true);
-                }}
-              >
-                Create new deployment
-              </Button>
-            )}
           </Flex>
           {activeTab === "running_api" && <RunningAPIMapping scrollHeight={height} env={selectedEnv} />}
           {activeTab === "deployment_history" && <DeployHistory scrollHeight={height} selectedEnvId={selectedEnv?.id} />

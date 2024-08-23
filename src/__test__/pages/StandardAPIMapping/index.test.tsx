@@ -35,9 +35,6 @@ test("StandardAPIMapping btn-create-version", () => {
       </BrowserRouter>
     </QueryClientProvider>
   );
-  const btn = getByTestId("btn-create-version");
-  expect(btn).toBeInTheDocument();
-  fireEvent.click(btn);
   waitFor(() => {
     const btnOk = getByTestId("btn-ok");
     expect(btnOk).toBeInTheDocument();
