@@ -76,6 +76,7 @@ export interface IRunningMapping {
   componentKey: string;
   createAt: string;
   createBy?: string;
+  userName?: string;
   version: string;
   status: string;
 }

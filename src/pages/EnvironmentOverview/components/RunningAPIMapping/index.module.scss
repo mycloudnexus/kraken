@@ -10,8 +10,7 @@
 }
 
 .rowBorder {
-  padding: 20px 0;
-  height: 32px;
+  height: 64px;
   &:not(:last-child) {
     position: relative;
     &::after {

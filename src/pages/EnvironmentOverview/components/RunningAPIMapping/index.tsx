@@ -106,7 +106,7 @@ const RunningAPIMapping = ({ scrollHeight, env }: Props) => {
       render: (items: Array<IRunningMapping>) => (
         <Flex vertical>
           {items.map((item: IRunningMapping, index: number) => (
-            <Flex key={`${item.componentName}-${index}`} className={styles.rowBorder} justify='center' align='center'>{item?.createBy ?? "----"}</Flex>
+            <Flex key={`${item.componentName}-${index}`} className={styles.rowBorder} justify='center' align='center'>{item?.userName ?? "----"}</Flex>
           ))}
         </Flex>)
     },
