@@ -5,12 +5,10 @@
     border-radius: 4px;
     padding: 20px;
     overflow-x: auto;
-    max-width: 40vw;
   }
   :global {
     .ant-modal-content {
       padding: 0;
-      width: 30vw;
     }
     .ant-modal-header {
       padding: 16px 24px;

@@ -30,7 +30,7 @@ const AuditLogDetailsModal = ({ open, onClose, item }: Props) => {
       open={open}
       onCancel={onClose}
       footer={false}
-      centered
+      width={"60vw"}
       title="View details"
     >
       <Flex vertical gap={8}>

@@ -44,7 +44,7 @@ const AuditLog = () => {
     setTableData,
     handlePaginationChange,
     handlePaginationShowSizeChange,
-  } = useCommonListProps({ action: "UPDATE" }, initPagination);
+  } = useCommonListProps({}, initPagination);
   const { data, isLoading } = useGetAuditLogs(queryParams);
 
   const handleFormValues = useCallback(
