@@ -224,6 +224,15 @@ export const getBuyerList = (
   });
 };
 
+export const getAuditLogs = (
+  params: Record<string, any>
+) => {
+  return request(`/audit/logs`, {
+    method: "GET",
+    params,
+  }); 
+}
+
 export const createBuyer = (productId: string, data: any) => {
   return request(`${PRODUCT}/${productId}/buyers`, {
     method: "POST",

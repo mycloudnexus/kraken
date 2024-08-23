@@ -1,0 +1,36 @@
+.modal {
+  pre {
+    color: rgba(0, 0, 0, 0.45);
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 4px;
+    padding: 20px;
+    overflow-x: auto;
+    max-width: 40vw;
+  }
+  :global {
+    .ant-modal-content {
+      padding: 0;
+      width: 30vw;
+    }
+    .ant-modal-header {
+      padding: 16px 24px;
+      box-shadow: 0px -1px 0px 0px #f0f0f0 inset;
+    }
+    .ant-modal-body {
+      padding: 8px 40px 12px;
+    }
+    .ant-modal-footer {
+      box-shadow: 0px 1px 0px 0px #f0f0f0 inset;
+      padding: 10px 16px;
+    }
+    .ant-form-item-required::before {
+      display: none !important;
+    }
+  }
+}
+
+.radio {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}

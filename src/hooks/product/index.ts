@@ -27,6 +27,7 @@ import {
   createBuyer,
   verifyProduct,
   deployProduction,
+  getAuditLogs,
 } from "@/services/products";
 import {
   COMPONENT_KIND_API,
@@ -60,6 +61,8 @@ import { AxiosResponse } from "axios";
 import { get } from "lodash";
 
 export const PRODUCT_CACHE_KEYS = {
+  get_audit_logs: "get_audit_logs",
+  get_product_component_list: "get_product_component_list",
   get_component_api_doc: "get_component_api_doc",
   create_new_component: "create_new_component",
   get_component_list: "get_component_list",
@@ -451,6 +454,17 @@ export const useGetAPIDeployments = (
     queryKey: [PRODUCT_CACHE_KEYS.get_list_api_deployments, productId, params],
     queryFn: () => getAPIMapperDeployments(productId, params),
     enabled: Boolean(productId),
+    select: (data) => data?.data,
+  });
+};
+
+export const useGetAuditLogs = (
+  params: Record<string, any>,
+) => {
+  return useQuery<any, Error>({
+    queryKey: [PRODUCT_CACHE_KEYS.get_audit_logs, params],
+    queryFn: () => getAuditLogs(params),
+    enabled: Boolean(params),
     select: (data) => data?.data,
   });
 };

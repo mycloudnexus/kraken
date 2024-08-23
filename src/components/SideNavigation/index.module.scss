@@ -2,15 +2,17 @@
   overflow: auto;
   border-inline-end: 0 !important;
 
-  &:global(> .ant-menu) {
-    border-right: unset !important;
-    background: unset;
-    &:global(> .ant-menu-item) {
+  :global {
+    .ant-menu {
+      border-right: unset !important;
+      background: unset !important;
+    }
+    .ant-menu-item-selected {
       border-radius: 0;
-
-      &:global(.ant-menu-item-selected) {
-        background-color: rgba(41, 98, 255, 0.2);
-        border-right: 3px solid #2962FF;
+      background-color: rgba(41, 98, 255, 0.2);
+      border-right: 3px solid #2962FF !important;
+      .ant-menu-item-only-child {
+        border-right: 3px solid #2962FF !important;
       }
     }
   }

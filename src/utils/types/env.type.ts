@@ -116,3 +116,26 @@ export interface IMapperDetails {
   orderBy: string;
   order?: number
 }
+
+
+export interface ILogActivity {
+  id: string;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+  userId: string;
+  email: string;
+  name: string;
+  path: string;
+  method: string;
+  pathVariables: Record<string, any>;
+  action: string;
+  description: string;
+  resource: string;
+  resourceId: string;
+  remoteAddress: string;
+  statusCode: number;
+  ignoreRequestParams: any[];
+  request: Record<string, any>;
+  response: Record<string, any>;
+}

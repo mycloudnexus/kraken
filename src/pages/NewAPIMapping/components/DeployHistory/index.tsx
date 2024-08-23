@@ -34,6 +34,7 @@ import { useBoolean } from "usehooks-ts";
 import { IEnv } from "@/utils/types/env.type";
 import MappingMatrix from "@/components/MappingMatrix";
 import RequestMethod from "@/components/Method";
+import TrimmedPath from '@/components/TrimmedPath';
 
 export const ContentTime = ({ content = "", time = "" }) => {
   const { findUserName } = useUser();
@@ -163,7 +164,7 @@ const DeployHistory = ({
                     style={{ color: "#2962FF" }}
                     ellipsis={{ tooltip: item?.path }}
                   >
-                    {item?.path.split("/").slice(-2).join("/")}
+                  <TrimmedPath trimLevel={2} path={item?.path} color='#2962FF' />
                   </Typography.Text>
                   <MappingMatrix mappingMatrix={item.mappingMatrix} />
                 </Flex>

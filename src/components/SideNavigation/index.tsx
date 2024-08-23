@@ -17,7 +17,7 @@ const SideNavigation = () => {
   const { data: envs, isLoading } = useGetProductEnvs(currentProduct);
 
   useEffect(() => {
-    if(envs?.data?.length) {
+    if (envs?.data?.length) {
       setCurrentEnvId(envs.data.filter((env: IEnv) => env?.name === 'stage')[0].id)
     }
   }, [isLoading])
@@ -31,7 +31,7 @@ const SideNavigation = () => {
   >
     <div className={styles.innerMenu} >
       <Menu
-        mode='vertical'
+        mode='inline'
         disabledOverflow={true}
         activeKey={activeKey}
         defaultSelectedKeys={[activeKey]}
@@ -69,11 +69,17 @@ const SideNavigation = () => {
             icon: <UsergroupAddOutlined />
           },
           {
-            key: '/settings',
-            label: <Link to='/'>Settings</Link>,
-            icon: <SettingOutlined />
-          }
-        ]}
+            label: 'Settings',
+            key: 'settings',
+            icon: <SettingOutlined />,
+            children: [
+              {
+                label: <Link to='/audit-log'>Audit log</Link>,
+                key: 'audit-log',
+              },
+            ]
+          }]
+        }
       >
 
       </Menu>

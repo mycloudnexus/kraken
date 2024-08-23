@@ -253,7 +253,6 @@ const SelectAPI = ({
       }));
       setListMappingStateResponse([]);
       setRequestMapping(newApiRequest);
-      console.log("resetMapping useCallback");
       setResponseMapping(newApiResponse);
     }
   }, [mappers?.request, mappers?.response]);
