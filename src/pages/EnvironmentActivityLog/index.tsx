@@ -76,7 +76,7 @@ const EnvironmentActivityLog = () => {
       const updatedPagination = {
         current: data?.page ?? initPagination.current,
         pageSize: data?.size ?? initPagination.pageSize,
-        total: 1,
+        total: data?.total,
       };
       setPagination(updatedPagination);
       setTableData(updatedTableData!);
@@ -94,7 +94,7 @@ const EnvironmentActivityLog = () => {
         ? dayjs(requestTime[1]).valueOf()
         : undefined;
 
-      if (!Boolean(params.path)) {
+      if (!params.path) {
         delete params.path;
       }
 
@@ -243,7 +243,6 @@ const EnvironmentActivityLog = () => {
             className={styles.table}
             rowClassName={styles.hovering}
             pagination={{
-              hideOnSinglePage: true,
               pageSize: pagination.pageSize,
               current: pagination.current + 1,
               onChange: handlePaginationChange,
