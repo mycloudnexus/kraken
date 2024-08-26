@@ -3,7 +3,7 @@
 }
 .container {
   width: 100%;
-  height: calc(100vh - 130px);
+  height: calc(100vh - 156px);
   :global {
     #tab-mapping > .ant-tabs-nav {
       margin-bottom: 2px;
@@ -15,7 +15,7 @@
   min-width: 800px;
   flex: 1;
   height: 100%;
-  max-width: calc(100vw - 370px);
+  max-width: calc(100vw - 620px);
   background-color: #f0f2f5;
   overflow-y: auto;
   > .center {
@@ -33,7 +33,6 @@
     box-sizing: border-box;
     flex: 0 0 370px;
     border: 1px solid #2962ff;
-    width: 370px;
     height: 100%;
     border-radius: 4px;
     background-color: #fff;
