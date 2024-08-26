@@ -26,7 +26,6 @@ import Text from "@/components/Text";
 import dayjs from "dayjs";
 import { get, isEmpty } from "lodash";
 import DeploymentStatus from "@/pages/EnvironmentOverview/components/DeploymentStatus";
-import { useDeploymentStore } from "@/stores/deployment.store";
 import { IDeploymentHistory } from "@/utils/types/product.type";
 import useUser from "@/hooks/user/useUser";
 import InformationModal from "@/components/DeployStage/InformationModal";
@@ -35,6 +34,13 @@ import { IEnv } from "@/utils/types/env.type";
 import MappingMatrix from "@/components/MappingMatrix";
 import RequestMethod from "@/components/Method";
 import TrimmedPath from '@/components/TrimmedPath';
+import { useCommonListProps } from '@/hooks/useCommonListProps';
+import { DEFAULT_PAGING } from '@/utils/constants/common';
+
+const initPagination = {
+  pageSize: DEFAULT_PAGING.size,
+  current: DEFAULT_PAGING.page,
+};
 
 export const ContentTime = ({ content = "", time = "" }) => {
   const { findUserName } = useUser();
@@ -108,12 +114,24 @@ const DeployHistory = ({
   selectedEnvId?: string;
   targetMapperKey?: string;
 }) => {
+
+  const {
+    tableData,
+    queryParams,
+    setQueryParams,
+    pagination,
+    setPagination,
+    setTableData,
+    handlePaginationChange,
+    handlePaginationShowSizeChange,
+  } = useCommonListProps({}, initPagination);
+
+
   const { currentProduct } = useAppStore();
   const { data: dataEnv } = useGetProductEnvs(currentProduct);
-  const { params, setParams, resetParams } = useDeploymentStore();
   const { data, isLoading } = useGetAPIDeployments(currentProduct, {
     mapperKey: targetMapperKey,
-    ...params,
+    ...queryParams,
   });
   const { mutateAsync: verify, isPending: isLoadingVerify } =
     useVerifyProduct();
@@ -154,22 +172,22 @@ const DeployHistory = ({
       [
         selectedEnvId
           ? {
-              title: "API mapping",
-              dataIndex: "",
-              width: 340,
-              render: (item: any) => (
-                <Flex gap={10} align="center">
-                  <RequestMethod method={item?.method} />
-                  <Typography.Text
-                    style={{ color: "#2962FF" }}
-                    ellipsis={{ tooltip: item?.path }}
-                  >
+            title: "API mapping",
+            dataIndex: "",
+            width: 340,
+            render: (item: any) => (
+              <Flex gap={10} align="center">
+                <RequestMethod method={item?.method} />
+                <Typography.Text
+                  style={{ color: "#2962FF" }}
+                  ellipsis={{ tooltip: item?.path }}
+                >
                   <TrimmedPath trimLevel={2} path={item?.path} color='#2962FF' />
-                  </Typography.Text>
-                  <MappingMatrix mappingMatrix={item.mappingMatrix} />
-                </Flex>
-              ),
-            }
+                </Typography.Text>
+                <MappingMatrix mappingMatrix={item.mappingMatrix} />
+              </Flex>
+            ),
+          }
           : {},
         {
           title: "Version",
@@ -209,7 +227,7 @@ const DeployHistory = ({
             record?.envName?.toLowerCase?.() === "stage" && (
               <Switch
                 value={verifiedStatus}
-                disabled={record?.status?.toLowerCase?.() === "failed"  || record.status === "in progress"}
+                disabled={record?.status?.toLowerCase?.() === "failed" || record.status === "in progress"}
                 onChange={() => handleVerify(record)}
               />
             ),
@@ -245,24 +263,38 @@ const DeployHistory = ({
       ].filter((value) => Object.keys(value).length !== 0),
     [envItems]
   );
-  const onChange: TableProps<any>["onChange"] = (_, filters, __, ___) => {
+
+  const onChange: TableProps<any>["onChange"] = (pagination, filters, __, ___) => {
     const envId: any = get(filters, "1.[0]");
     if (filters[1]?.length === 1) {
-      setParams({ envId: envId });
+      setQueryParams({ envId: envId });
       return;
     }
-    setParams({ envId: undefined });
+    setQueryParams({ envId: undefined, page: Number(pagination?.current) - 1, size: pagination.pageSize });
   };
 
   useEffect(() => {
+    if (!isLoading) {
+      const updatedTableData = data?.data;
+      const updatedPagination = {
+        current: data?.page ?? initPagination.current,
+        pageSize: data?.size ?? initPagination.pageSize,
+        total: data?.total ?? 0,
+      };
+      setPagination(updatedPagination);
+      setTableData(updatedTableData);
+    }
+  }, [data, isLoading]);
+
+  useEffect(() => {
     if (selectedEnvId) {
-      setParams({ envId: selectedEnvId });
+      setQueryParams({ envId: selectedEnvId });
     }
   }, [selectedEnvId]);
 
   useEffect(() => {
     return () => {
-      resetParams();
+      setQueryParams({...initPagination});
     };
   }, []);
 
@@ -281,18 +313,19 @@ const DeployHistory = ({
           ),
         }}
         columns={columns}
-        dataSource={get(data, "data", [])?.slice(0, 10)}
+        dataSource={tableData}
         getPopupContainer={() =>
           document.getElementById("deploy-history") as HTMLDivElement
         }
         rowKey="id"
         pagination={{
-          onChange: (page, size) => setParams({ page: page - 1, size }),
-          pageSize: params.size ?? 10,
-          current: (params.page ?? 1) + 1,
-          total: get(data, "total", 0),
-          showQuickJumper: true,
-          showTotal: () => `Total ${get(data, "total", 0)} items`,
+          pageSize: pagination.pageSize,
+          current: pagination.current + 1,
+          onChange: handlePaginationChange,
+          total: pagination?.total || 0,
+          showSizeChanger: true,
+          onShowSizeChange: handlePaginationShowSizeChange,
+          showTotal: (total) => `Total ${total} items`,
         }}
         onChange={onChange}
       />
