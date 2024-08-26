@@ -1,8 +1,9 @@
 .root {
   display: flex;
   background: #f0f2f5;
-  height: calc(100vh - 58px);
-
+  height: calc(100vh - 78px);
+  width: calc(100vw - 240px);
+  min-width: 800px;
   :global {
     .ant-form-item {
       margin-bottom: 18px;

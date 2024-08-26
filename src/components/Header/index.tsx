@@ -10,7 +10,6 @@ import {
   UpOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { Link } from "react-router-dom";
 import { DEFAULT_PRODUCT } from "@/utils/constants/product";
 import { useAppStore } from "@/stores/app.store";
 import { useTutorialStore } from "@/stores/tutorial.store";
@@ -44,10 +43,10 @@ const Header = () => {
   return (
     <div className={styles.header}>
       <Flex gap={48}>
-        <Link to={"/"} className={styles.logo}>
+        <div className={styles.logo}>
           <Logo />
           KRAKEN
-        </Link>
+        </div>
         <Select
           allowClear={false}
           value={currentProduct}

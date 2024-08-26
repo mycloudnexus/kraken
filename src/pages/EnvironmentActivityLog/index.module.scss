@@ -82,7 +82,10 @@
   padding: 10px 20px 20px 20px;
   background: var(--Page-bg, #F0F2F5);
   height: calc(100vh - 78px);
+  overflow: auto;
+  min-width: 800px;
 }
+
 .breadHeader{
   display: flex;
   align-items: center;
