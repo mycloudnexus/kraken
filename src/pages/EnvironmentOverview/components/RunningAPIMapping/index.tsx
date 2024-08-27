@@ -7,6 +7,7 @@ import { useMemo, useState } from "react";
 import MappingMatrix from "@/components/MappingMatrix";
 import styles from "./index.module.scss"
 import Text from '@/components/Text';
+import { toDateTime } from '@/libs/dayjs';
 type Props = {
   scrollHeight?: number;
   env?: IEnv;
@@ -15,6 +16,7 @@ type Props = {
 interface GroupedItem {
   componentName?: string;
   items: IRunningMapping[];
+  version: string;
 }
 
 const defaultPage = {
@@ -39,7 +41,8 @@ const RunningAPIMapping = ({ scrollHeight, env }: Props) => {
     const result = data as IRunningMapping[]
     if (!data) return [{
       componentName: '',
-      items: []
+      items: [],
+      version: ''
     }]
     const grouped = result.reduce((acc, item) => {
       const { componentName } = item;
@@ -50,7 +53,8 @@ const RunningAPIMapping = ({ scrollHeight, env }: Props) => {
       } else {
         acc.push({
           componentName,
-          items: [item]
+          items: [item],
+          version: item.version
         });
       }
 
@@ -65,7 +69,6 @@ const RunningAPIMapping = ({ scrollHeight, env }: Props) => {
     {
       title: "Component",
       dataIndex: "",
-      width: 340,
       render: (item: GroupedItem) => (
         <Flex gap={10}><Typography.Text>
           {item.componentName}
@@ -76,6 +79,11 @@ const RunningAPIMapping = ({ scrollHeight, env }: Props) => {
             </Text.LightMedium>
           </Tag>}
         </Flex>)
+    },
+    {
+      title: "Version",
+      dataIndex: "version",
+      width: 80
     },
     {
       dataIndex: "items",
@@ -99,14 +107,21 @@ const RunningAPIMapping = ({ scrollHeight, env }: Props) => {
           ))}
         </Flex>
       ),
-    }, {
+    }, 
+    {
       title: "Create By",
       dataIndex: "items",
-      width: 340,
       render: (items: Array<IRunningMapping>) => (
         <Flex vertical>
           {items.map((item: IRunningMapping, index: number) => (
-            <Flex key={`${item.componentName}-${index}`} className={styles.rowBorder} justify='center' align='center'>{item?.userName ?? "----"}</Flex>
+            <Flex key={`${item.componentName}-${index}`} className={styles.rowBorder} justify='center' align='start' vertical>
+              <Flex>
+                {item?.userName ?? "-"}
+              </Flex>
+              <Flex>
+                {toDateTime(item?.createAt)}
+              </Flex>
+            </Flex>
           ))}
         </Flex>)
     },
