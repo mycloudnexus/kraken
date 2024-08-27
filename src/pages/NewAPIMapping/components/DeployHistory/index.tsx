@@ -174,7 +174,6 @@ const DeployHistory = ({
           ? {
             title: "API mapping",
             dataIndex: "",
-            width: 340,
             render: (item: any) => (
               <Flex gap={10} align="center">
                 <RequestMethod method={item?.method} />
@@ -192,6 +191,7 @@ const DeployHistory = ({
         {
           title: "Version",
           dataIndex: "version",
+          width: selectedEnvId ? 80 : undefined,
           render: (text: string) => (
             <Flex align="center" gap={8}>
               {text}
@@ -201,6 +201,7 @@ const DeployHistory = ({
         {
           title: "Environment",
           dataIndex: "",
+          width: selectedEnvId ? 120 : undefined,
           render: (record: IDeploymentHistory) => (
             <div className={styles.capitalize}>{record?.envName}</div>
           ),
@@ -210,6 +211,7 @@ const DeployHistory = ({
         },
         {
           title: "Deployed by",
+          width: selectedEnvId ? 150 : undefined,
           dataIndex: "",
           render: (record: IDeploymentHistory) => (
             <ContentTime content={record?.createBy} time={record?.createAt} />
@@ -218,11 +220,13 @@ const DeployHistory = ({
         {
           title: "Deploy status",
           dataIndex: "status",
+          width: selectedEnvId ? 120 : undefined,
           render: (status: string) => <DeploymentStatus status={status} />,
         },
         {
           title: "Verified for Production",
           dataIndex: "verifiedStatus",
+          width: selectedEnvId ? 180 : undefined,
           render: (verifiedStatus: boolean, record: IDeploymentHistory) =>
             record?.envName?.toLowerCase?.() === "stage" && (
               <Switch
@@ -235,6 +239,7 @@ const DeployHistory = ({
         {
           title: "Verified by",
           dataIndex: "",
+          width: selectedEnvId ? 130 : undefined,
           render: (record: IDeploymentHistory) =>
             record?.envName?.toLowerCase?.() === "stage" && (
               <ContentTime
@@ -247,7 +252,7 @@ const DeployHistory = ({
           title: "Actions",
           dataIndex: "",
           render: (record: IDeploymentHistory) => (
-            <Flex gap={12} align="center" justify="center">
+            <Flex gap={12} align="center">
               <Tooltip title="Check details and difference">
                 <Button type="text" className={styles.defaultBtn}>
                   <DetailIcon />
