@@ -3,17 +3,19 @@ import { Button, Flex, Input, Table, Tooltip } from "antd";
 import styles from "./index.module.scss";
 import EnvSelect from "@/components/EnvSelect";
 import { useBuyerStore } from "@/stores/buyer.store";
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useGetBuyerList } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
 import NewBuyerModal from "./components/NewBuyerModal";
 import { useBoolean } from "usehooks-ts";
 import { get } from "lodash";
 import dayjs from "dayjs";
+import useDebouncedCallback from '@/hooks/useDebouncedCallback';
 
 const Buyer = () => {
   const { currentProduct } = useAppStore();
   const { params, setParams, resetParams } = useBuyerStore();
+  const [search, setSearch] = useState<string | undefined>()
   const { data: dataList, isLoading } = useGetBuyerList(currentProduct, params);
   const {
     value: isModalVisible,
@@ -75,11 +77,22 @@ const Buyer = () => {
     []
   );
 
+
+
+  const debouncedFn = useDebouncedCallback(setParams, 500);
+
+  const handleParams = useCallback((e: any) => {
+    const { value } = e.target;
+    setSearch(value)
+    debouncedFn({ search: value })
+  }, [setParams]);
+
   useEffect(() => {
     return () => {
       resetParams();
+      debouncedFn.cancel();
     };
-  }, []);
+  }, [resetParams, debouncedFn]);
 
   return (
     <div className={styles.root}>
@@ -100,8 +113,8 @@ const Buyer = () => {
             />
             <Input.Search
               placeholder="Search"
-              value={params.search}
-              onChange={(e) => setParams({ search: e.target.value })}
+              value={search}
+              onChange={handleParams}
             />
             <Button type="primary" onClick={showModal}>
               + Add new buyer
