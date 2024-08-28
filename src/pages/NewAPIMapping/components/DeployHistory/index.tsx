@@ -107,11 +107,11 @@ export const DeploymentBtn = ({
 
 const DeployHistory = ({
   scrollHeight,
-  selectedEnvId,
+  selectedEnv,
   targetMapperKey,
 }: {
   scrollHeight?: number;
-  selectedEnvId?: string;
+  selectedEnv?: IEnv;
   targetMapperKey?: string;
 }) => {
 
@@ -170,7 +170,7 @@ const DeployHistory = ({
   const columns: TableColumnsType<any> = useMemo(
     () =>
       [
-        selectedEnvId
+        selectedEnv
           ? {
             title: "API mapping",
             dataIndex: "",
@@ -191,7 +191,7 @@ const DeployHistory = ({
         {
           title: "Version",
           dataIndex: "version",
-          width: selectedEnvId ? 80 : undefined,
+          width: selectedEnv ? 80 : undefined,
           render: (text: string) => (
             <Flex align="center" gap={8}>
               {text}
@@ -201,17 +201,17 @@ const DeployHistory = ({
         {
           title: "Environment",
           dataIndex: "",
-          width: selectedEnvId ? 120 : undefined,
+          width: selectedEnv ? 120 : undefined,
           render: (record: IDeploymentHistory) => (
             <div className={styles.capitalize}>{record?.envName}</div>
           ),
-          filters: selectedEnvId
+          filters: selectedEnv
             ? undefined
             : dataEnv?.data?.map((i) => ({ text: i.name, value: i.id })),
         },
         {
           title: "Deployed by",
-          width: selectedEnvId ? 150 : undefined,
+          width: selectedEnv ? 150 : undefined,
           dataIndex: "",
           render: (record: IDeploymentHistory) => (
             <ContentTime content={record?.createBy} time={record?.createAt} />
@@ -220,34 +220,36 @@ const DeployHistory = ({
         {
           title: "Deploy status",
           dataIndex: "status",
-          width: selectedEnvId ? 120 : undefined,
+          width: selectedEnv ? 120 : undefined,
           render: (status: string) => <DeploymentStatus status={status} />,
         },
-        {
-          title: "Verified for Production",
-          dataIndex: "verifiedStatus",
-          width: selectedEnvId ? 180 : undefined,
-          render: (verifiedStatus: boolean, record: IDeploymentHistory) =>
-            record?.envName?.toLowerCase?.() === "stage" && (
-              <Switch
-                value={verifiedStatus}
-                disabled={record?.status?.toLowerCase?.() === "failed" || record.status === "in progress"}
-                onChange={() => handleVerify(record)}
-              />
-            ),
-        },
-        {
-          title: "Verified by",
-          dataIndex: "",
-          width: selectedEnvId ? 130 : undefined,
-          render: (record: IDeploymentHistory) =>
-            record?.envName?.toLowerCase?.() === "stage" && (
-              <ContentTime
-                content={record?.verifiedBy}
-                time={record?.verifiedAt}
-              />
-            ),
-        },
+        selectedEnv?.name?.toLowerCase() !== 'production' ?
+          {
+            title: "Verified for Production",
+            dataIndex: "verifiedStatus",
+            width: selectedEnv ? 180 : undefined,
+            render: (verifiedStatus: boolean, record: IDeploymentHistory) =>
+              record?.envName?.toLowerCase?.() === "stage" && (
+                <Switch
+                  value={verifiedStatus}
+                  disabled={record?.status?.toLowerCase?.() === "failed" || record.status === "in progress"}
+                  onChange={() => handleVerify(record)}
+                />
+              ),
+          } : {},
+        selectedEnv?.name?.toLowerCase() !== 'production' ?
+          {
+            title: "Verified by",
+            dataIndex: "",
+            width: selectedEnv ? 130 : undefined,
+            render: (record: IDeploymentHistory) =>
+              record?.envName?.toLowerCase?.() === "stage" && (
+                <ContentTime
+                  content={record?.verifiedBy}
+                  time={record?.verifiedAt}
+                />
+              ),
+          } : {},
         {
           title: "Actions",
           dataIndex: "",
@@ -266,7 +268,7 @@ const DeployHistory = ({
           ),
         },
       ].filter((value) => Object.keys(value).length !== 0),
-    [envItems]
+    [envItems, selectedEnv]
   );
 
   const onChange: TableProps<any>["onChange"] = (pagination, filters, __, ___) => {
@@ -292,14 +294,14 @@ const DeployHistory = ({
   }, [data, isLoading]);
 
   useEffect(() => {
-    if (selectedEnvId) {
-      setQueryParams({ envId: selectedEnvId });
+    if (selectedEnv) {
+      setQueryParams({ envId: selectedEnv });
     }
-  }, [selectedEnvId]);
+  }, [selectedEnv]);
 
   useEffect(() => {
     return () => {
-      setQueryParams({...initPagination});
+      setQueryParams({ ...initPagination });
     };
   }, []);
 

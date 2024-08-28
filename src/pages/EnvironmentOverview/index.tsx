@@ -220,7 +220,7 @@ const EnvironmentOverview = () => {
             </Radio.Group>
           </Flex>
           {activeTab === "running_api" && <RunningAPIMapping scrollHeight={height} env={selectedEnv} />}
-          {activeTab === "deployment_history" && <DeployHistory scrollHeight={height} selectedEnvId={selectedEnv?.id} />
+          {activeTab === "deployment_history" && <DeployHistory scrollHeight={height} selectedEnv={selectedEnv} />
           }
         </Flex>
       )}
