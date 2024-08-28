@@ -16,7 +16,6 @@ type Props = {
 interface GroupedItem {
   componentName?: string;
   items: IRunningMapping[];
-  version: string;
 }
 
 const defaultPage = {
@@ -42,7 +41,6 @@ const RunningAPIMapping = ({ scrollHeight, env }: Props) => {
     if (!data) return [{
       componentName: '',
       items: [],
-      version: ''
     }]
     const grouped = result.reduce((acc, item) => {
       const { componentName } = item;
@@ -54,7 +52,6 @@ const RunningAPIMapping = ({ scrollHeight, env }: Props) => {
         acc.push({
           componentName,
           items: [item],
-          version: item.version
         });
       }
 
@@ -81,11 +78,6 @@ const RunningAPIMapping = ({ scrollHeight, env }: Props) => {
         </Flex>)
     },
     {
-      title: "Version",
-      dataIndex: "version",
-      width: 80
-    },
-    {
       dataIndex: "items",
       title: "API mappings",
       render: (items: Array<IRunningMapping>) => (
@@ -107,7 +99,21 @@ const RunningAPIMapping = ({ scrollHeight, env }: Props) => {
           ))}
         </Flex>
       ),
-    }, 
+    },
+    {
+      title: "Version",
+      dataIndex: "items",
+      width: 80,
+      render: (items: Array<IRunningMapping>) => (
+        <Flex vertical>
+          {items.map((item: IRunningMapping, index: number) => (
+            <Flex key={`${item.version}-${index}`} justify="center" align="center" className={styles.rowBorder}>
+              {item.version}
+            </Flex>
+          ))}
+        </Flex>
+      ),
+    },
     {
       title: "Create By",
       dataIndex: "items",
