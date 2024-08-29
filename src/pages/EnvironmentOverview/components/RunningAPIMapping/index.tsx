@@ -5,9 +5,9 @@ import { IEnv, IRunningMapping } from "@/utils/types/env.type";
 import { Flex, Table, Tag, Tooltip, Typography } from "antd";
 import { useMemo, useState } from "react";
 import MappingMatrix from "@/components/MappingMatrix";
-import styles from "./index.module.scss"
-import Text from '@/components/Text';
-import { toDateTime } from '@/libs/dayjs';
+import styles from "./index.module.scss";
+import Text from "@/components/Text";
+import { toDateTime } from "@/libs/dayjs";
 type Props = {
   scrollHeight?: number;
   env?: IEnv;
@@ -26,25 +26,25 @@ const defaultPage = {
 const RunningAPIMapping = ({ scrollHeight, env }: Props) => {
   const { currentProduct } = useAppStore();
   const [pageInfo] = useState(defaultPage);
-  const { data, isLoading } = useGetRunningAPIList(
-    currentProduct,
-    {
-      envId: env?.id,
-      orderBy: "createdAt",
-      direction: "DESC",
-      ...pageInfo
-    }
-  );
+  const { data, isLoading } = useGetRunningAPIList(currentProduct, {
+    envId: env?.id,
+    orderBy: "createdAt",
+    direction: "DESC",
+    ...pageInfo,
+  });
 
   const columnData = useMemo((): GroupedItem[] => {
-    const result = data as IRunningMapping[]
-    if (!data) return [{
-      componentName: '',
-      items: [],
-    }]
+    const result = data as IRunningMapping[];
+    if (!data)
+      return [
+        {
+          componentName: "",
+          items: [],
+        },
+      ];
     const grouped = result.reduce((acc, item) => {
       const { componentName } = item;
-      const group = acc.find(g => g.componentName === componentName);
+      const group = acc.find((g) => g.componentName === componentName);
 
       if (group) {
         group?.items?.push(item);
@@ -61,21 +61,22 @@ const RunningAPIMapping = ({ scrollHeight, env }: Props) => {
     return grouped;
   }, [data]);
 
-
   const columns = [
     {
       title: "Component",
       dataIndex: "",
       render: (item: GroupedItem) => (
-        <Flex gap={10}><Typography.Text>
-          {item.componentName}
-        </Typography.Text>
-          {item.items.length > 0 && <Tag>
-            <Text.LightMedium style={{ color: 'rgba(145, 86, 228, 1)' }}>
-              {item?.items?.length}
-            </Text.LightMedium>
-          </Tag>}
-        </Flex>)
+        <Flex gap={10}>
+          <Typography.Text>{item.componentName}</Typography.Text>
+          {item.items.length > 0 && (
+            <Tag>
+              <Text.LightMedium style={{ color: "rgba(145, 86, 228, 1)" }}>
+                {item?.items?.length}
+              </Text.LightMedium>
+            </Tag>
+          )}
+        </Flex>
+      ),
     },
     {
       dataIndex: "items",
@@ -83,10 +84,17 @@ const RunningAPIMapping = ({ scrollHeight, env }: Props) => {
       render: (items: Array<IRunningMapping>) => (
         <Flex vertical>
           {items.map((item: IRunningMapping, index: number) => (
-            <Flex key={`${item.componentName}-${index}`} align="center" gap={10} className={styles.rowBorder}>
+            <Flex
+              key={`${item.componentName}-${index}`}
+              align="center"
+              gap={10}
+              className={styles.rowBorder}
+            >
               <RequestMethod method={item?.method} />
               <Tooltip title={item?.path}>
-                <span style={{ color: "#2962FF" }}>/{item?.path.split('/').slice(-2).join('/')}</span>
+                <span style={{ color: "#2962FF" }}>
+                  /{item?.path.split("/").slice(-2).join("/")}
+                </span>
               </Tooltip>
               <Flex gap={8} align="center" flex={1}>
                 <MappingMatrix
@@ -103,11 +111,16 @@ const RunningAPIMapping = ({ scrollHeight, env }: Props) => {
     {
       title: "Version",
       dataIndex: "items",
-      width: 80,
+      width: 90,
       render: (items: Array<IRunningMapping>) => (
         <Flex vertical>
           {items.map((item: IRunningMapping, index: number) => (
-            <Flex key={`${item.version}-${index}`} justify="center" align="center" className={styles.rowBorder}>
+            <Flex
+              key={`${item.version}-${index}`}
+              justify="center"
+              align="center"
+              className={styles.rowBorder}
+            >
               {item.version}
             </Flex>
           ))}
@@ -120,20 +133,25 @@ const RunningAPIMapping = ({ scrollHeight, env }: Props) => {
       render: (items: Array<IRunningMapping>) => (
         <Flex vertical>
           {items.map((item: IRunningMapping, index: number) => (
-            <Flex key={`${item.componentName}-${index}`} className={styles.rowBorder} justify='center' align='start' vertical>
-              <Flex>
-                {item?.userName ?? "-"}
-              </Flex>
-              <Flex>
-                {toDateTime(item?.createAt)}
-              </Flex>
+            <Flex
+              key={`${item.componentName}-${index}`}
+              className={styles.rowBorder}
+              justify="center"
+              align="start"
+              vertical
+            >
+              <Flex>{item?.userName ?? "-"}</Flex>
+              <Flex>{toDateTime(item?.createAt)}</Flex>
             </Flex>
           ))}
-        </Flex>)
+        </Flex>
+      ),
     },
-  ]
+  ];
 
-  const scroll = scrollHeight ? { y: scrollHeight - 152, x: "max-content" } : undefined
+  const scroll = scrollHeight
+    ? { y: scrollHeight - 152, x: "max-content" }
+    : undefined;
   return (
     <Table
       scroll={scroll}

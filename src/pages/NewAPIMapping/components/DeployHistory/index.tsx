@@ -194,7 +194,7 @@ const DeployHistory = ({
         {
           title: "Version",
           dataIndex: "version",
-          width: selectedEnv ? 80 : undefined,
+          width: selectedEnv ? 90 : undefined,
           render: (text: string) => (
             <Flex align="center" gap={8}>
               {text}
