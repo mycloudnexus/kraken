@@ -51,7 +51,7 @@ const ApiComponent = ({
           >
             <Typography.Text
               style={{
-                fontSize: 20,
+                fontSize: 16,
                 fontWeight: 500,
               }}
               ellipsis={{

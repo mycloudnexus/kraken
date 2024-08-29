@@ -23,7 +23,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import ActivityDetailModal from "./components/ActivityDetailModal";
 import styles from "./index.module.scss";
-import _ from "lodash";
+import { debounce, omit } from "lodash";
 
 import dayjs from "dayjs";
 const { RangePicker } = DatePicker;
@@ -51,7 +51,8 @@ const statusCodeOptions = [
 const EnvironmentActivityLog = () => {
   const { envId } = useParams();
   const { currentProduct } = useAppStore();
-  const { data: envData } = useGetProductEnvs(currentProduct);
+  const { data: envData, isLoading: loadingEnv } =
+    useGetProductEnvs(currentProduct);
   const [form] = Form.useForm();
 
   const {
@@ -66,8 +67,8 @@ const EnvironmentActivityLog = () => {
   } = useCommonListProps({}, initPagination);
   const { data, isLoading } = useGetProductEnvActivities(
     currentProduct,
-    String(envId),
-    queryParams
+    queryParams?.envId || String(envId),
+    omit(queryParams, ["envId"])
   );
 
   useEffect(() => {
@@ -86,7 +87,7 @@ const EnvironmentActivityLog = () => {
   const handleFormValues = useCallback(
     (values: any) => {
       const { requestTime = [] } = values ?? {};
-      const params = _.omit(values, ["requestTime"]);
+      const params = omit(values, ["requestTime"]);
       params.requestStartTime = requestTime?.[0]
         ? dayjs(requestTime[0]).valueOf()
         : undefined;
@@ -104,7 +105,7 @@ const EnvironmentActivityLog = () => {
   );
 
   const debounceFn = useCallback(
-    _.debounce(() => {
+    debounce(() => {
       const formValue = form.getFieldsValue();
       handleFormValues(formValue);
     }, 2000),
@@ -174,6 +175,7 @@ const EnvironmentActivityLog = () => {
       <div className={styles.contentWrapper}>
         <Flex align="center" className={styles.filterWrapper}>
           <Form
+            initialValues={{ envId }}
             form={form}
             layout="inline"
             colon={false}
@@ -181,9 +183,10 @@ const EnvironmentActivityLog = () => {
           >
             <Form.Item label="Environment" name="envId">
               <Select
+                loading={loadingEnv}
                 options={envOptions}
                 popupMatchSelectWidth={false}
-                style={{ minWidth: 100 }}
+                style={{ minWidth: 100, maxWidth: 120 }}
                 size="small"
                 placeholder="All"
                 allowClear
