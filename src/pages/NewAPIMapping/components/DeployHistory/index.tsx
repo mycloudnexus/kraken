@@ -24,7 +24,7 @@ import DeployIcon from "@/assets/icon/deploy.svg";
 import DetailIcon from "@/assets/icon/detail.svg";
 import Text from "@/components/Text";
 import dayjs from "dayjs";
-import { get, isEmpty } from "lodash";
+import { get, isEmpty, omit } from "lodash";
 import DeploymentStatus from "@/pages/EnvironmentOverview/components/DeploymentStatus";
 import { IDeploymentHistory } from "@/utils/types/product.type";
 import useUser from "@/hooks/user/useUser";
@@ -33,9 +33,9 @@ import { useBoolean } from "usehooks-ts";
 import { IEnv } from "@/utils/types/env.type";
 import MappingMatrix from "@/components/MappingMatrix";
 import RequestMethod from "@/components/Method";
-import TrimmedPath from '@/components/TrimmedPath';
-import { useCommonListProps } from '@/hooks/useCommonListProps';
-import { DEFAULT_PAGING } from '@/utils/constants/common';
+import TrimmedPath from "@/components/TrimmedPath";
+import { useCommonListProps } from "@/hooks/useCommonListProps";
+import { DEFAULT_PAGING } from "@/utils/constants/common";
 
 const initPagination = {
   pageSize: DEFAULT_PAGING.size,
@@ -114,7 +114,6 @@ const DeployHistory = ({
   selectedEnv?: IEnv;
   targetMapperKey?: string;
 }) => {
-
   const {
     tableData,
     queryParams,
@@ -126,12 +125,12 @@ const DeployHistory = ({
     handlePaginationShowSizeChange,
   } = useCommonListProps({}, initPagination);
 
-
   const { currentProduct } = useAppStore();
   const { data: dataEnv } = useGetProductEnvs(currentProduct);
   const { data, isLoading } = useGetAPIDeployments(currentProduct, {
     mapperKey: targetMapperKey,
-    ...queryParams,
+    ...omit(queryParams, ["envId"]),
+    envId: selectedEnv?.id,
   });
   const { mutateAsync: verify, isPending: isLoadingVerify } =
     useVerifyProduct();
@@ -172,21 +171,25 @@ const DeployHistory = ({
       [
         selectedEnv
           ? {
-            title: "API mapping",
-            dataIndex: "",
-            render: (item: any) => (
-              <Flex gap={10} align="center">
-                <RequestMethod method={item?.method} />
-                <Typography.Text
-                  style={{ color: "#2962FF" }}
-                  ellipsis={{ tooltip: item?.path }}
-                >
-                  <TrimmedPath trimLevel={2} path={item?.path} color='#2962FF' />
-                </Typography.Text>
-                <MappingMatrix mappingMatrix={item.mappingMatrix} />
-              </Flex>
-            ),
-          }
+              title: "API mapping",
+              dataIndex: "",
+              render: (item: any) => (
+                <Flex gap={10} align="center">
+                  <RequestMethod method={item?.method} />
+                  <Typography.Text
+                    style={{ color: "#2962FF" }}
+                    ellipsis={{ tooltip: item?.path }}
+                  >
+                    <TrimmedPath
+                      trimLevel={2}
+                      path={item?.path}
+                      color="#2962FF"
+                    />
+                  </Typography.Text>
+                  <MappingMatrix mappingMatrix={item.mappingMatrix} />
+                </Flex>
+              ),
+            }
           : {},
         {
           title: "Version",
@@ -223,33 +226,38 @@ const DeployHistory = ({
           width: selectedEnv ? 120 : undefined,
           render: (status: string) => <DeploymentStatus status={status} />,
         },
-        selectedEnv?.name?.toLowerCase() !== 'production' ?
-          {
-            title: "Verified for Production",
-            dataIndex: "verifiedStatus",
-            width: selectedEnv ? 180 : undefined,
-            render: (verifiedStatus: boolean, record: IDeploymentHistory) =>
-              record?.envName?.toLowerCase?.() === "stage" && (
-                <Switch
-                  value={verifiedStatus}
-                  disabled={record?.status?.toLowerCase?.() === "failed" || record.status === "in progress"}
-                  onChange={() => handleVerify(record)}
-                />
-              ),
-          } : {},
-        selectedEnv?.name?.toLowerCase() !== 'production' ?
-          {
-            title: "Verified by",
-            dataIndex: "",
-            width: selectedEnv ? 130 : undefined,
-            render: (record: IDeploymentHistory) =>
-              record?.envName?.toLowerCase?.() === "stage" && (
-                <ContentTime
-                  content={record?.verifiedBy}
-                  time={record?.verifiedAt}
-                />
-              ),
-          } : {},
+        selectedEnv?.name?.toLowerCase() !== "production"
+          ? {
+              title: "Verified for Production",
+              dataIndex: "verifiedStatus",
+              width: selectedEnv ? 180 : undefined,
+              render: (verifiedStatus: boolean, record: IDeploymentHistory) =>
+                record?.envName?.toLowerCase?.() === "stage" && (
+                  <Switch
+                    value={verifiedStatus}
+                    disabled={
+                      record?.status?.toLowerCase?.() === "failed" ||
+                      record.status === "in progress"
+                    }
+                    onChange={() => handleVerify(record)}
+                  />
+                ),
+            }
+          : {},
+        selectedEnv?.name?.toLowerCase() !== "production"
+          ? {
+              title: "Verified by",
+              dataIndex: "",
+              width: selectedEnv ? 130 : undefined,
+              render: (record: IDeploymentHistory) =>
+                record?.envName?.toLowerCase?.() === "stage" && (
+                  <ContentTime
+                    content={record?.verifiedBy}
+                    time={record?.verifiedAt}
+                  />
+                ),
+            }
+          : {},
         {
           title: "Actions",
           dataIndex: "",
@@ -260,10 +268,11 @@ const DeployHistory = ({
                   <DetailIcon />
                 </Button>
               </Tooltip>
-              {record.envName !== "production" && <Tooltip title="Deploy to Production">
-                <DeploymentBtn record={record} env={envItems} />
-              </Tooltip>
-              }
+              {record.envName !== "production" && (
+                <Tooltip title="Deploy to Production">
+                  <DeploymentBtn record={record} env={envItems} />
+                </Tooltip>
+              )}
             </Flex>
           ),
         },
@@ -271,13 +280,22 @@ const DeployHistory = ({
     [envItems, selectedEnv]
   );
 
-  const onChange: TableProps<any>["onChange"] = (pagination, filters, __, ___) => {
+  const onChange: TableProps<any>["onChange"] = (
+    pagination,
+    filters,
+    __,
+    ___
+  ) => {
     const envId: any = get(filters, "1.[0]");
     if (filters[1]?.length === 1) {
       setQueryParams({ envId: envId });
       return;
     }
-    setQueryParams({ envId: undefined, page: Number(pagination?.current) - 1, size: pagination.pageSize });
+    setQueryParams({
+      envId: undefined,
+      page: Number(pagination?.current) - 1,
+      size: pagination.pageSize,
+    });
   };
 
   useEffect(() => {

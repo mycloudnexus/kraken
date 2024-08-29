@@ -20,10 +20,10 @@ import styles from "./index.module.scss";
 import { debounce, omit } from "lodash";
 
 import dayjs from "dayjs";
-import { SearchOutlined } from '@ant-design/icons';
-import DeploymentStatus from '../EnvironmentOverview/components/DeploymentStatus';
-import useUser from '@/hooks/user/useUser';
-import { useCommonListProps } from '@/hooks/useCommonListProps';
+import { SearchOutlined } from "@ant-design/icons";
+import DeploymentStatus from "../EnvironmentOverview/components/DeploymentStatus";
+import useUser from "@/hooks/user/useUser";
+import { useCommonListProps } from "@/hooks/useCommonListProps";
 const { RangePicker } = DatePicker;
 
 const initPagination = {
@@ -52,10 +52,10 @@ const AuditLog = () => {
       const { requestTime = [] } = values ?? {};
       const params = omit(values, ["requestTime"]);
       params.requestStartTime = requestTime?.[0]
-        ? dayjs(requestTime[0]).valueOf()
+        ? dayjs(requestTime[0]).startOf("day").valueOf()
         : undefined;
       params.requestEndTime = requestTime?.[1]
-        ? dayjs(requestTime[1]).valueOf()
+        ? dayjs(requestTime[1]).endOf("day").valueOf()
         : undefined;
 
       if (!params.userId) {
@@ -63,7 +63,7 @@ const AuditLog = () => {
       }
 
       if (params.userEmail) {
-        params.userId = findUserIdByEmail(params.userEmail) || ""
+        params.userId = findUserIdByEmail(params.userEmail) || "";
       }
       delete params.userEmail;
       setQueryParams(params);
@@ -84,11 +84,10 @@ const AuditLog = () => {
     }
   }, [data, isLoading]);
 
-  const debounceFn =
-    debounce(() => {
-      const formValue = form.getFieldsValue();
-      handleFormValues(formValue);
-    }, 2000)
+  const debounceFn = debounce(() => {
+    const formValue = form.getFieldsValue();
+    handleFormValues(formValue);
+  }, 2000);
 
   const handleFormValuesChange = useCallback(
     (t: any, values: any) => {
@@ -98,7 +97,6 @@ const AuditLog = () => {
     },
     [handleFormValues]
   );
-
 
   const [modalActivity, setModalActivity] = useState<any>(undefined);
   const [modalOpen, setModalOpen] = useState(false);
@@ -127,7 +125,9 @@ const AuditLog = () => {
     {
       key: "status",
       title: "Status",
-      render: (log: ILogActivity) => <DeploymentStatus status={log.statusCode} />,
+      render: (log: ILogActivity) => (
+        <DeploymentStatus status={log.statusCode} />
+      ),
     },
     {
       key: "action",
@@ -147,11 +147,9 @@ const AuditLog = () => {
   ];
   return (
     <div className={styles.root}>
-      <Typography.Text style={{ fontSize: 16 }}>
-        Audit log
-      </Typography.Text>
+      <Typography.Text style={{ fontSize: 16 }}>Audit log</Typography.Text>
       <div className={styles.tableWrapper}>
-        <Flex align="center" className={styles.filterWrapper} >
+        <Flex align="center" className={styles.filterWrapper}>
           <Form
             form={form}
             layout="inline"
@@ -175,7 +173,6 @@ const AuditLog = () => {
                 />
               </Form.Item>
             </Flex>
-
           </Form>
         </Flex>
         <Table
@@ -197,7 +194,13 @@ const AuditLog = () => {
             showTotal: (total) => `Total ${total} items`,
           }}
           scroll={{ y: `calc(100vh - 310px)` }}
-          locale={{ emptyText: (typeof queryParams.userId === "string" || !!queryParams.requestStartTime) ? (<Result subTitle="No matched audit log" icon={<EmptyIcon />}/>) : undefined }}
+          locale={{
+            emptyText:
+              typeof queryParams.userId === "string" ||
+              !!queryParams.requestStartTime ? (
+                <Result subTitle="No matched audit log" icon={<EmptyIcon />} />
+              ) : undefined,
+          }}
         />
       </div>
 

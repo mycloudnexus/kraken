@@ -189,7 +189,6 @@ const EnvironmentActivityLog = () => {
                 style={{ minWidth: 100, maxWidth: 120 }}
                 size="small"
                 placeholder="All"
-                allowClear
               />
             </Form.Item>
             <Form.Item label="Status code" name="statusCode">
