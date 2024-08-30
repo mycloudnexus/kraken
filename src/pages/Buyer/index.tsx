@@ -8,15 +8,18 @@ import { useGetBuyerList } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
 import NewBuyerModal from "./components/NewBuyerModal";
 import { useBoolean } from "usehooks-ts";
-import { get } from "lodash";
+import { get, isEmpty, omitBy } from "lodash";
 import dayjs from "dayjs";
-import useDebouncedCallback from '@/hooks/useDebouncedCallback';
+import useDebouncedCallback from "@/hooks/useDebouncedCallback";
 
 const Buyer = () => {
   const { currentProduct } = useAppStore();
   const { params, setParams, resetParams } = useBuyerStore();
-  const [search, setSearch] = useState<string | undefined>()
-  const { data: dataList, isLoading } = useGetBuyerList(currentProduct, params);
+  const [search, setSearch] = useState<string | undefined>();
+  const { data: dataList, isLoading } = useGetBuyerList(
+    currentProduct,
+    omitBy(params, isEmpty)
+  );
   const {
     value: isModalVisible,
     setFalse: hideModal,
@@ -77,15 +80,16 @@ const Buyer = () => {
     []
   );
 
-
-
   const debouncedFn = useDebouncedCallback(setParams, 500);
 
-  const handleParams = useCallback((e: any) => {
-    const { value } = e.target;
-    setSearch(value)
-    debouncedFn({ search: value })
-  }, [setParams]);
+  const handleParams = useCallback(
+    (e: any) => {
+      const { value } = e.target;
+      setSearch(value);
+      debouncedFn({ buyerId: value });
+    },
+    [setParams]
+  );
 
   useEffect(() => {
     return () => {
