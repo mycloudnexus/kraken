@@ -86,7 +86,10 @@ const APIEditor = ({
             ? undefined
             : new File(
                 [fileDecode],
-                `${get(swaggerData, "info.title", "file")}.yaml`
+                `${get(swaggerData, "info.title", "file")}.yaml`,
+                {
+                  type: "application/x-yaml",
+                }
               ),
         },
         environments,
