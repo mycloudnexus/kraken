@@ -13,13 +13,12 @@ import AddEnv from "./components/AddEnv";
 import BtnStep from "./components/BtnStep";
 import SelectAPIServer from "./components/SelectAPIServer";
 import styles from "./index.module.scss";
-import Text from "@/components/Text";
 import UploadYaml from "./components/UploadYaml";
 import { useEffect } from "react";
 import { decode } from "js-base64";
 import jsYaml from "js-yaml";
 import { transformApiData } from "@/utils/helpers/swagger";
-import { LeftOutlined } from "@ant-design/icons";
+import BreadCrumb from "@/components/Breadcrumb";
 
 const NewAPIServer = () => {
   const { componentId } = useParams();
@@ -187,24 +186,12 @@ const NewAPIServer = () => {
                 flexDirection: "column",
               }}
             >
-              {isEmpty(componentId) ? (
-                <Text.LightLarge>Create API server</Text.LightLarge>
-              ) : (
-                <Flex
-                  gap={8}
-                  align="center"
-                  style={{ cursor: "pointer" }}
-                  onClick={() => navigate(`/component/${id}/list`)}
-                >
-                  <LeftOutlined style={{ fontSize: 8 }} />
-                  <Text.LightLarge>
-                    Seller API setup/
-                    <span style={{ color: "#434343" }}>
-                      Basic information of API server
-                    </span>
-                  </Text.LightLarge>
-                </Flex>
-              )}
+              <BreadCrumb
+                mainUrl={`/component/${id}/list`}
+                lastItem={
+                  isEmpty(componentId) ? "Create API server" : "Edit API server"
+                }
+              />
               <div className={styles.paper} style={{ flex: 1, marginTop: 8 }}>
                 <div style={{ maxWidth: "60%", minWidth: 600 }}>
                   <SelectAPIServer />

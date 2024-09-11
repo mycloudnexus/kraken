@@ -6,25 +6,27 @@
   display: flex;
   align-items: center;
   margin-bottom: 16px;
-  :global(.ant-form-item label){
+  :global(.ant-form-item label) {
     color: var(--Texts-Secondary, var(--Text-secondary, rgba(0, 0, 0, 0.45)));
     font-size: 14px;
     font-style: normal;
     font-weight: 400;
-    line-height: 22px; 
+    line-height: 22px;
   }
-  :global(.ant-form-item input::placeholder){
-    color: var(--character-disabled-placeholder-25, var(--text-disabled-placeholder, rgba(0, 0, 0, 0.25)))
+  :global(.ant-form-item input::placeholder) {
+    color: var(
+      --character-disabled-placeholder-25,
+      var(--text-disabled-placeholder, rgba(0, 0, 0, 0.25))
+    );
   }
-  :global(.ant-form-item .ant-select-selection-placeholder){
-    color: var(--Texts-Primary, var(--Text-primary, rgba(0, 0, 0, 0.85)))
-   }
+  :global(.ant-form-item .ant-select-selection-placeholder) {
+    color: var(--Texts-Primary, var(--Text-primary, rgba(0, 0, 0, 0.85)));
+  }
 }
-
 
 .table {
   max-width: 100%;
- 
+
   &:global(.ant-table-wrapper) {
     .expandedRowWrapper {
       :global(.ant-table-cell) {
@@ -34,9 +36,6 @@
     :global(.ant-table-cell-fix-left-last::after) {
       content: unset;
     }
-  }
-  &:global(.ant-table-wrapper .ant-table-container) {
-    border: 1px solid var(--Border-Regular, #DDE1E5);
   }
 }
 
@@ -78,34 +77,38 @@
     }
   }
 }
-.wrapper{
+.wrapper {
   padding: 10px 20px 20px 20px;
-  background: var(--Page-bg, #F0F2F5);
+  background: var(--Page-bg, #f0f2f5);
   height: calc(100vh - 78px);
   overflow: auto;
   min-width: 800px;
 }
 
-.breadHeader{
+.breadHeader {
   display: flex;
   align-items: center;
   color: var(--Texts-Secondary, var(--Text-secondary, rgba(0, 0, 0, 0.85)));
-font-size: 16px;
-font-style: normal;
-font-weight: 400;
-line-height: 24px;
-cursor: pointer;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px;
+  cursor: pointer;
 }
-.breadItem{
+.breadItem {
   color: var(--Texts-Secondary, var(--Text-secondary, rgba(0, 0, 0, 0.45)));
   font-size: 16px;
   cursor: default;
 }
-.contentWrapper{
+.contentWrapper {
   margin-top: 10px;
   height: 100%;
   border-radius: 4px;
-  background: var(--Page-container-bg, #FFF);
+  background: var(--Page-container-bg, #fff);
   padding: 16px 20px;
+}
 
+.inputPath {
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
 }

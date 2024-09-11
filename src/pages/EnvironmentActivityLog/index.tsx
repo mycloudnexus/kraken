@@ -136,8 +136,9 @@ const EnvironmentActivityLog = () => {
   const columns: ColumnsType<IActivityLog> = [
     {
       key: "name",
-      title: "API",
+      title: "Method",
       render: (log: IActivityLog) => <LogMethodTag method={log.method} />,
+      width: 120,
     },
     {
       key: "name",
@@ -147,6 +148,7 @@ const EnvironmentActivityLog = () => {
     {
       key: "status",
       title: "Status code",
+      width: 160,
       render: (log: IActivityLog) => log.httpStatusCode,
     },
     {
@@ -222,6 +224,7 @@ const EnvironmentActivityLog = () => {
                 </Form.Item>
                 <Form.Item name={"path"} noStyle>
                   <Input
+                    className={styles.inputPath}
                     placeholder="Input path"
                     size="small"
                     onChange={debounceFn}

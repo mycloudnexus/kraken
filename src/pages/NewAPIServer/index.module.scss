@@ -23,4 +23,23 @@
   margin-top: 4px;
   background: #fff;
   padding: 16px 20px;
+  overflow-y: auto;
+  box-sizing: border-box;
+  max-height: calc(100vh - 195px);
+
+  
+  &::-webkit-scrollbar {
+    display: block !important;
+    height: 18px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border: 6px solid rgba(0, 0, 0, 0);
+    background-clip: padding-box;
+    border-radius: 8px;
+    background-color: #dde1e5;
+    &:hover {
+      background-color: #f7f7f7;
+    }
+  }
 }

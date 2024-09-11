@@ -1,9 +1,10 @@
-import LogMethodTag from '@/components/LogMethodTag';
-import { parseObjectDescriptionToTreeData } from '@/utils/helpers/schema';
-import { Flex, Typography, Table, Switch, Tree, Button } from 'antd';
-import styles from '../index.module.scss';
-import { IActivityLog } from '@/utils/types/env.type';
-import { Dispatch, SetStateAction, useState } from 'react';
+import LogMethodTag from "@/components/LogMethodTag";
+import { parseObjectDescriptionToTreeData } from "@/utils/helpers/schema";
+import { Flex, Typography, Table, Switch, Tree, Button } from "antd";
+import styles from "../index.module.scss";
+import { IActivityLog } from "@/utils/types/env.type";
+import { Dispatch, SetStateAction, useState } from "react";
+import Text from "@/components/Text";
 
 interface ActivitySwitchProps {
   value: boolean;
@@ -11,8 +12,12 @@ interface ActivitySwitchProps {
   jsonValue: string;
 }
 
-const ActivitySwitch = ({ value, handleChange, jsonValue }: ActivitySwitchProps) => {
-  const [copyButtonText, setCopyButtonText] = useState<string>("Copy all")
+const ActivitySwitch = ({
+  value,
+  handleChange,
+  jsonValue,
+}: ActivitySwitchProps) => {
+  const [copyButtonText, setCopyButtonText] = useState<string>("Copy all");
 
   const handleCopy = () => {
     navigator.clipboard.writeText(jsonValue).then(() => {
@@ -20,20 +25,19 @@ const ActivitySwitch = ({ value, handleChange, jsonValue }: ActivitySwitchProps)
       setTimeout(function () {
         setCopyButtonText("Copy all");
       }, 3000);
-    })
-  }
+    });
+  };
 
-  return <Flex gap={4} align='center'>
-    {!!value && <Button
-      type='link'
-      className={styles.copyButton}
-      onClick={handleCopy}
-    >
-      {copyButtonText}
-    </Button>
-    }
-    JSON <Switch checked={value} onChange={handleChange} />
-  </Flex>
+  return (
+    <Flex gap={4} align="center">
+      {!!value && (
+        <Button type="link" className={styles.copyButton} onClick={handleCopy}>
+          {copyButtonText}
+        </Button>
+      )}
+      JSON <Switch checked={value} onChange={handleChange} />
+    </Flex>
+  );
 };
 
 interface ActivityDetailItemProps {
@@ -42,14 +46,23 @@ interface ActivityDetailItemProps {
   collapseItems: (activity: IActivityLog) => any;
 }
 
-const ActivityDetailItem = ({ title, activity, collapseItems }: ActivityDetailItemProps) => {
+const ActivityDetailItem = ({
+  title,
+  activity,
+  collapseItems,
+}: ActivityDetailItemProps) => {
   const [requestJsonEnabled, setRequestJsonEnabled] = useState<boolean>(true);
   const [responseJsonEnabled, setResponseJsonEnabled] = useState<boolean>(true);
 
   return (
     <div className={styles.activity} key={activity.requestId}>
-      <h1>{title}</h1>
-      <div className={styles.activityWrapper} key={`${activity.method}_${activity.path}`}>
+      <Text.NormalLarge lineHeight="24px" style={{ marginLeft: 10 }}>
+        {title}
+      </Text.NormalLarge>
+      <div
+        className={styles.activityWrapper}
+        key={`${activity.method}_${activity.path}`}
+      >
         <Flex vertical gap={24} className={styles.activityHeader}>
           <Flex gap={8} align="center">
             <LogMethodTag method={activity.method} />
@@ -65,37 +78,51 @@ const ActivityDetailItem = ({ title, activity, collapseItems }: ActivityDetailIt
             dataSource={collapseItems(activity)?.parameterList}
             pagination={false}
           />
-          {activity?.request && <>
-            <Flex align="center" justify="space-between">
-              <h3>Request body</h3>
-              <ActivitySwitch value={requestJsonEnabled} handleChange={setRequestJsonEnabled} jsonValue={JSON.stringify(activity?.request)} />
-            </Flex>
-            <div className={styles.tree}>
-              {requestJsonEnabled ? (
-                <pre>
-                  <Typography.Text>{JSON.stringify(activity?.request, undefined, 2)}</Typography.Text>
-                </pre>
-              ) : (
-                <Tree
-                  treeData={parseObjectDescriptionToTreeData(
-                    activity.request,
-                    styles.treeTitle,
-                    styles.treeExample
-                  )}
+          {activity?.request && (
+            <>
+              <Flex align="center" justify="space-between">
+                <h3>Request body</h3>
+                <ActivitySwitch
+                  value={requestJsonEnabled}
+                  handleChange={setRequestJsonEnabled}
+                  jsonValue={JSON.stringify(activity?.request)}
                 />
-              )}
-            </div>
-          </>}
-          {activity?.response &&
+              </Flex>
+              <div className={styles.tree}>
+                {requestJsonEnabled ? (
+                  <pre>
+                    <Typography.Text>
+                      {JSON.stringify(activity?.request, undefined, 2)}
+                    </Typography.Text>
+                  </pre>
+                ) : (
+                  <Tree
+                    treeData={parseObjectDescriptionToTreeData(
+                      activity.request,
+                      styles.treeTitle,
+                      styles.treeExample
+                    )}
+                  />
+                )}
+              </div>
+            </>
+          )}
+          {activity?.response && (
             <>
               <Flex align="center" justify="space-between">
                 <h3>Response</h3>
-                <ActivitySwitch value={responseJsonEnabled} handleChange={setResponseJsonEnabled} jsonValue={JSON.stringify(activity?.response)} />
+                <ActivitySwitch
+                  value={responseJsonEnabled}
+                  handleChange={setResponseJsonEnabled}
+                  jsonValue={JSON.stringify(activity?.response)}
+                />
               </Flex>
               <div className={styles.tree}>
                 {responseJsonEnabled ? (
                   <pre>
-                    <Typography.Text>{JSON.stringify(activity?.response, undefined, 2)}</Typography.Text>
+                    <Typography.Text>
+                      {JSON.stringify(activity?.response, undefined, 2)}
+                    </Typography.Text>
                   </pre>
                 ) : (
                   <Tree
@@ -108,7 +135,7 @@ const ActivityDetailItem = ({ title, activity, collapseItems }: ActivityDetailIt
                 )}
               </div>
             </>
-          }
+          )}
         </div>
       </div>
     </div>
