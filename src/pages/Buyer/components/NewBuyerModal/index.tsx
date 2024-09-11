@@ -107,7 +107,7 @@ const NewBuyerModal = ({ open, onClose, currentEnv }: Props) => {
             <Input placeholder="Please input buyer’s company ID in Seller’s legacy API platform" />
           </Form.Item>
           <Form.Item name="companyName" label="Company name">
-            <Input placeholder="Please input buyer’s company ID in Seller’s legacy API platform" />
+            <Input placeholder="Please input buyer’s company name in Seller’s legacy API platform" />
           </Form.Item>
           <Form.Item
             name="envId"

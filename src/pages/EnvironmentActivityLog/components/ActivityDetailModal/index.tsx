@@ -1,11 +1,10 @@
-
 import { useGetProductEnvActivityDetail } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
 import { IActivityLog } from "@/utils/types/env.type";
 import { Flex, Button, Spin, Drawer } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { useCallback, useMemo } from "react";
-import ActivityDetailItem from './ActivityDetailItem';
+import ActivityDetailItem from "./ActivityDetailItem";
 
 interface Props {
   envId: string;
@@ -77,7 +76,12 @@ const ActivityDetailModal = ({
           style={{ maxHeight: "calc(100vh - 108px)" }}
         >
           {activityList?.map((activity, n) => (
-            <ActivityDetailItem key={`${activity.path}-${n}`} activity={activity} title={n === 0 ? "Sonota API" : "Seller API"} collapseItems={collapseItems} />
+            <ActivityDetailItem
+              key={`${activity.path}-${n}`}
+              activity={activity}
+              title={n === 0 ? "Sonota" : "Seller API"}
+              collapseItems={collapseItems}
+            />
           ))}
         </Flex>
       </Spin>
