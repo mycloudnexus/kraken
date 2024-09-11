@@ -79,7 +79,7 @@ const ActivityDetailModal = ({
             <ActivityDetailItem
               key={`${activity.path}-${n}`}
               activity={activity}
-              title={n === 0 ? "Sonota API" : "Seller API"}
+              title={n === 0 ? "Sonata API" : "Seller API"}
               collapseItems={collapseItems}
             />
           ))}
