@@ -19,13 +19,15 @@ import {
 } from "antd";
 import { ColumnsType } from "antd/es/table";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import ActivityDetailModal from "./components/ActivityDetailModal";
 import styles from "./index.module.scss";
 import { debounce, omit } from "lodash";
 
 import dayjs from "dayjs";
+import Text from "@/components/Text";
+import useSize from "@/hooks/useSize";
 const { RangePicker } = DatePicker;
 
 const initPagination = {
@@ -54,6 +56,10 @@ const EnvironmentActivityLog = () => {
   const { data: envData, isLoading: loadingEnv } =
     useGetProductEnvs(currentProduct);
   const [form] = Form.useForm();
+  const ref = useRef<any>();
+  const size = useSize(ref);
+  const refWrapper = useRef<any>();
+  const sizeWrapper = useSize(refWrapper);
 
   const {
     tableData,
@@ -174,8 +180,9 @@ const EnvironmentActivityLog = () => {
   ];
   return (
     <div className={styles.wrapper}>
-      <div className={styles.contentWrapper}>
-        <Flex align="center" className={styles.filterWrapper}>
+      <Text.LightLarge>Seller API setup</Text.LightLarge>
+      <div className={styles.contentWrapper} ref={refWrapper}>
+        <Flex align="center" className={styles.filterWrapper} ref={ref}>
           <Form
             initialValues={{ envId }}
             form={form}
@@ -256,7 +263,9 @@ const EnvironmentActivityLog = () => {
               onShowSizeChange: handlePaginationShowSizeChange,
               showTotal: (total) => `Total ${total} items`,
             }}
-            scroll={{ y: `calc(100vh - 310px)` }}
+            scroll={{
+              y: (sizeWrapper?.height ?? 0) - (size?.height ?? 0) - 120,
+            }}
           />
         </div>
       </div>

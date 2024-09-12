@@ -83,6 +83,7 @@
   height: calc(100vh - 78px);
   overflow: auto;
   min-width: 800px;
+  box-sizing: border-box;
 }
 
 .breadHeader {
@@ -102,7 +103,7 @@
 }
 .contentWrapper {
   margin-top: 10px;
-  height: 100%;
+  height: calc(100% - 28px);
   border-radius: 4px;
   background: var(--Page-container-bg, #fff);
   padding: 16px 20px;
@@ -111,4 +112,8 @@
 .inputPath {
   border-top-left-radius: 0 !important;
   border-bottom-left-radius: 0 !important;
+}
+
+.tableWrapper {
+  height: 100%;
 }
