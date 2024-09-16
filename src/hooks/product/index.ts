@@ -28,6 +28,7 @@ import {
   verifyProduct,
   deployProduction,
   getAuditLogs,
+  getLatestRunningAPI,
 } from "@/services/products";
 import {
   COMPONENT_KIND_API,
@@ -95,6 +96,7 @@ export const PRODUCT_CACHE_KEYS = {
   get_component_list_spec: "get_component_list_spec",
   get_component_list_api_spec: "get_component_list_api_spec",
   get_component_list_api: "get_component_list_api",
+  get_running_list_api: "get_running_list_api",
 };
 
 export const useCreateNewComponent = () => {
@@ -458,9 +460,7 @@ export const useGetAPIDeployments = (
   });
 };
 
-export const useGetAuditLogs = (
-  params: Record<string, any>,
-) => {
+export const useGetAuditLogs = (params: Record<string, any>) => {
   return useQuery<any, Error>({
     queryKey: [PRODUCT_CACHE_KEYS.get_audit_logs, params],
     queryFn: () => getAuditLogs(params),
@@ -514,5 +514,17 @@ export const useDeployProduction = () => {
         queryKey: [PRODUCT_CACHE_KEYS.get_list_api_deployments],
       });
     },
+  });
+};
+
+export const useGetLatestRunningList = (
+  productId: string,
+  mapperKey: string
+) => {
+  return useQuery<any, Error>({
+    queryKey: [PRODUCT_CACHE_KEYS.get_running_api_list, productId, mapperKey],
+    queryFn: () => getLatestRunningAPI(productId, mapperKey),
+    enabled: Boolean(productId) && Boolean(mapperKey),
+    select: (data) => data?.data,
   });
 };

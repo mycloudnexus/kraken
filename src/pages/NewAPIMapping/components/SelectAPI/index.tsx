@@ -221,7 +221,6 @@ const SelectAPI = ({
   const navigate = useNavigate();
   const { data: dataList, isLoading } =
     useGetComponentListAPISpec(currentProduct);
-  console.log("🚀 ~ dataList:", dataList);
   const queryData = JSON.parse(query ?? "{}");
 
   const { mappers } = useGetApiSpec(

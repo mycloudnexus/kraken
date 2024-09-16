@@ -224,14 +224,12 @@ export const getBuyerList = (
   });
 };
 
-export const getAuditLogs = (
-  params: Record<string, any>
-) => {
+export const getAuditLogs = (params: Record<string, any>) => {
   return request(`/audit/logs`, {
     method: "GET",
     params,
-  }); 
-}
+  });
+};
 
 export const createBuyer = (productId: string, data: any) => {
   return request(`${PRODUCT}/${productId}/buyers`, {
@@ -252,4 +250,10 @@ export const deployProduction = (productId: string, data: any) => {
     method: "POST",
     data,
   });
+};
+
+export const getLatestRunningAPI = (productId: string, mapperKey: string) => {
+  return request(
+    `/v2${PRODUCT}/${productId}/latest-running-api-mapper-deployments?mapperKey=${mapperKey}`
+  );
 };

@@ -1,7 +1,11 @@
-import { useCallback, useEffect, useState } from "react";
-import { CheckCircleFilled, InfoCircleOutlined } from "@ant-design/icons";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  CheckCircleFilled,
+  CloseCircleFilled,
+  InfoCircleOutlined,
+} from "@ant-design/icons";
 import RollbackIcon from "@/assets/newAPIMapping/Rollback.svg";
-import { Button, Tabs, TabsProps, Tag, Tooltip, notification } from "antd";
+import { Button, Tabs, TabsProps, Tooltip, notification } from "antd";
 import {
   chain,
   cloneDeep,
@@ -22,12 +26,15 @@ import SelectResponseProperty from "./components/SelectResponseProperty";
 import useGetApiSpec from "./components/useGetApiSpec";
 import useGetDefaultSellerApi from "./components/useGetDefaultSellerApi";
 import HeaderMapping from "./components/HeaderMapping";
-import { PRODUCT_CACHE_KEYS, useUpdateTargetMapper } from "@/hooks/product";
+import {
+  PRODUCT_CACHE_KEYS,
+  useGetLatestRunningList,
+  useUpdateTargetMapper,
+} from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { EStep } from "@/utils/constants/common";
 import { EnumRightType } from "@/utils/types/common.type";
-import { toDateTime } from "@/libs/dayjs";
 import { queryClient } from "@/utils/helpers/reactQuery";
 import styles from "./index.module.scss";
 import buildInitListMapping from "@/utils/helpers/buildInitListMapping";
@@ -37,6 +44,9 @@ import SonataResponseMapping from "./components/SonataResponseMapping";
 import DeployHistory from "./components/DeployHistory";
 import DeployStage from "@/components/DeployStage";
 import dayjs from "dayjs";
+import useSize from "@/hooks/useSize";
+import useUser from "@/hooks/user/useUser";
+import DeploymentInfo from "./components/DeploymentInfo";
 
 type Props = {
   rightSide: number;
@@ -113,6 +123,7 @@ const NewAPIMapping = ({
     listMappingStateResponse,
   } = useNewApiMappingStore();
   const queryData = JSON.parse(query ?? "{}");
+  console.log("🚀 ~ queryData:", queryData);
 
   const [firstTimeLoad, setFirstTimeLoad] = useState(true);
   const [activeKey, setActiveKey] = useState<string | string[]>("0");
@@ -136,6 +147,24 @@ const NewAPIMapping = ({
     useGetDefaultSellerApi(currentProduct, serverKeyInfo);
 
   const [mainTabKey, setMainTabKey] = useState<string>(EMainTab.mapping);
+
+  const ref = useRef<any>();
+  const size = useSize(ref);
+  const { data: runningData } = useGetLatestRunningList(
+    currentProduct,
+    queryData?.targetMapperKey
+  );
+  const { findUserName } = useUser();
+
+  const latestRunning = useMemo(() => {
+    const stage = runningData?.find(
+      (item: any) => item?.envName?.toLowerCase?.() === "stage"
+    );
+    const production = runningData?.find(
+      (item: any) => item?.envName?.toLowerCase?.() === "production"
+    );
+    return { stage, production };
+  }, [runningData]);
 
   useEffect(() => {
     if (!sellerApi && defaultSellerApi) {
@@ -385,8 +414,16 @@ const NewAPIMapping = ({
         activeKey={activeKey}
         setActiveKey={setActiveKey}
       />
-      <Flex gap={8} className={styles.mainWrapper}>
-        <div className={styles.center}>
+
+      <Flex
+        flexDirection="column"
+        justifyContent="flex-start"
+        className={styles.newMainWrapper}
+      >
+        <Flex
+          justifyContent="space-between"
+          style={{ width: "100%", paddingBottom: 16 }}
+        >
           <Tabs
             id="tab-mapping"
             activeKey={mainTabKey}
@@ -408,123 +445,162 @@ const NewAPIMapping = ({
               { label: "Deploy history", key: EMainTab.deploy },
             ]}
           />
-          {mainTabKey === EMainTab.mapping ? (
-            <>
-              {!isRequiredMapping && (
-                <Flex
-                  justifyContent="flex-start"
-                  gap={10}
-                  className={styles.isRequiredMapping}
-                  alignItems="center"
-                >
-                  <InfoCircleOutlined style={{ color: "#00000073" }} />
-                  <Text.LightSmall color="#000000D9">
-                    This mapping is not needed, all the data will be queried
-                    from Adapter layer. This end point is able to deploy.
+          <DeploymentInfo mapperKey={queryData?.targetMapperKey} />
+        </Flex>
+        {isRequiredMapping && (
+          <Flex className={styles.breadcrumb} justifyContent="space-between">
+            <Flex className={styles.infoBox}>
+              {queryData?.lastDeployedAt && (
+                <Flex justifyContent="flex-start" gap={12}>
+                  <Text.LightSmall color="#00000073">
+                    Last deployment
                   </Text.LightSmall>
+                  <Flex gap={4}>
+                    {queryData?.lastDeployedStatus === "SUCCESS" ? (
+                      <CheckCircleFilled style={{ color: "#389E0D" }} />
+                    ) : (
+                      <CloseCircleFilled style={{ color: "#CF1322" }} />
+                    )}
+
+                    <Text.LightSmall lineHeight="20px">Stage</Text.LightSmall>
+                    <Tooltip
+                      title={
+                        <>
+                          Deploy{" "}
+                          {queryData?.lastDeployedStatus === "SUCCESS"
+                            ? "success."
+                            : "failed."}
+                          <br />
+                          <>
+                            By {findUserName(queryData?.lastDeployedBy)}{" "}
+                            {dayjs(queryData?.lastDeployedAt).format(
+                              "YYYY-MM-DD HH:mm:ss"
+                            )}
+                          </>
+                        </>
+                      }
+                    >
+                      <InfoCircleOutlined />
+                    </Tooltip>
+                  </Flex>
+                  <Flex gap={4}>
+                    <CheckCircleFilled style={{ color: "#389E0D" }} />
+                    <Text.LightSmall lineHeight="20px">
+                      Production
+                    </Text.LightSmall>
+                    <Tooltip
+                      title={
+                        <>
+                          Deploy success.
+                          <br />
+                          <>
+                            By{" "}
+                            {findUserName(latestRunning?.production?.createBy)}{" "}
+                            {dayjs(latestRunning?.production?.createAt).format(
+                              "YYYY-MM-DD HH:mm:ss"
+                            )}
+                          </>
+                        </>
+                      }
+                    >
+                      <InfoCircleOutlined />
+                    </Tooltip>
+                  </Flex>
                 </Flex>
               )}
-              <Flex
-                className={styles.breadcrumb}
-                justifyContent="space-between"
-              >
-                <Flex className={styles.infoBox}>
-                  {queryData?.lastDeployedAt && (
-                    <Flex
-                      flexDirection="column"
-                      gap={4}
-                      alignItems="flex-start"
-                    >
-                      <Tag
-                        bordered={false}
-                        color="success"
-                        style={{ color: "#389E0D" }}
-                        icon={
-                          <CheckCircleFilled style={{ color: "#389E0D" }} />
-                        }
-                      >
-                        Success
-                      </Tag>
-                      <Flex justifyContent="flex-start" gap={8}>
-                        <Tooltip title="Last deployed at">
-                          <InfoCircleOutlined
-                            style={{ fontSize: 12, color: "#00000040" }}
-                          />
-                        </Tooltip>
-                        <Text.LightSmall color="#00000073">
-                          {toDateTime(queryData.lastDeployedAt)}
-                        </Text.LightSmall>
-                      </Flex>
-                    </Flex>
-                  )}
-                </Flex>
-                <Flex
-                  justifyContent="flex-end"
-                  gap={8}
-                  className={styles.bottomWrapper}
+            </Flex>
+            <Flex
+              justifyContent="flex-end"
+              gap={8}
+              className={styles.bottomWrapper}
+            >
+              <Tooltip title="Restore">
+                <Button
+                  disabled={!isRequiredMapping}
+                  className={styles.revertButton}
+                  onClick={handleRevert}
                 >
-                  <Tooltip title="Restore">
-                    <Button
-                      disabled={!isRequiredMapping}
-                      className={styles.revertButton}
-                      onClick={handleRevert}
-                    >
-                      <RollbackIcon />
-                    </Button>
-                  </Tooltip>
-                  <Tooltip
-                    title={
-                      queryData?.updatedAt
-                        ? dayjs
-                            .utc(queryData?.updatedAt)
-                            .local()
-                            .format("YYYY-MM-DD HH:mm:ss")
-                        : undefined
-                    }
-                  >
-                    <Button
-                      disabled={!isRequiredMapping}
-                      data-testid="btn-save"
-                      type="default"
-                      onClick={() => handleSave(refetch)}
-                      loading={isPending}
-                      className={styles.btnSave}
-                    >
-                      Save
-                      <InfoCircleOutlined style={{ fontSize: 14 }} />
-                    </Button>
-                  </Tooltip>
-                  <Button type="default">Compare</Button>
-                  <DeployStage
-                    inComplete={queryData.mappingStatus === "incomplete"}
-                    diffWithStage={queryData.diffWithStage}
-                    metadataKey={metadataKey}
-                  />
-                </Flex>
-              </Flex>
-              <HeaderMapping disabled={!isRequiredMapping} />
-              <Tabs
-                items={items}
-                activeKey={activeTab}
-                onChange={handleTabSwitch}
+                  <RollbackIcon />
+                </Button>
+              </Tooltip>
+              <Tooltip
+                title={
+                  queryData?.updatedAt
+                    ? dayjs
+                        .utc(queryData?.updatedAt)
+                        .local()
+                        .format("YYYY-MM-DD HH:mm:ss")
+                    : undefined
+                }
+              >
+                <Button
+                  disabled={!isRequiredMapping}
+                  data-testid="btn-save"
+                  type="default"
+                  onClick={() => handleSave(refetch)}
+                  loading={isPending}
+                  className={styles.btnSave}
+                >
+                  Save
+                  <InfoCircleOutlined style={{ fontSize: 14 }} />
+                </Button>
+              </Tooltip>
+              <Button type="default">Compare</Button>
+              <DeployStage
+                inComplete={queryData.mappingStatus === "incomplete"}
+                diffWithStage={queryData.diffWithStage}
+                metadataKey={metadataKey}
               />
-            </>
+            </Flex>
+          </Flex>
+        )}
+        <div ref={ref} className={styles.newContent}>
+          {mainTabKey === EMainTab.mapping ? (
+            <Flex gap={8} className={styles.mainWrapper}>
+              <div className={styles.center}>
+                {!isRequiredMapping && (
+                  <Flex
+                    justifyContent="flex-start"
+                    gap={10}
+                    className={styles.isRequiredMapping}
+                    alignItems="center"
+                  >
+                    <InfoCircleOutlined style={{ color: "#00000073" }} />
+                    <Text.LightSmall color="#000000D9">
+                      This mapping is not needed, all the data will be queried
+                      from Adapter layer. This end point is able to deploy.
+                    </Text.LightSmall>
+                  </Flex>
+                )}
+
+                <HeaderMapping disabled={!isRequiredMapping} />
+                <Tabs
+                  items={items}
+                  activeKey={activeTab}
+                  onChange={handleTabSwitch}
+                />
+              </div>
+
+              <div className={styles.right}>
+                <RightSide
+                  rightSide={Number(rightSide)}
+                  isRequiredMapping={isRequiredMapping}
+                  method={queryData?.method}
+                  jsonSpec={jsonSpec}
+                  handleSelectSellerProp={handleSelectSellerProp}
+                  handleSelectSonataProp={handleSelectSonataProp}
+                />
+              </div>
+            </Flex>
           ) : (
-            <DeployHistory targetMapperKey={queryData.targetMapperKey} />
+            <div className={styles.history}>
+              <DeployHistory
+                targetMapperKey={queryData.targetMapperKey}
+                scrollHeight={get(size, "height", 0)}
+              />
+            </div>
           )}
         </div>
-        {mainTabKey !== EMainTab.deploy && (
-          <div className={styles.right}>
-            <RightSide
-              rightSide={Number(rightSide)}
-              isRequiredMapping={isRequiredMapping}
-              method={queryData?.method}
-              jsonSpec={jsonSpec}
-              handleSelectSellerProp={handleSelectSellerProp}
-              handleSelectSonataProp={handleSelectSonataProp}
-            />
-          </div>
-        )}
       </Flex>
     </Flex>
   );
