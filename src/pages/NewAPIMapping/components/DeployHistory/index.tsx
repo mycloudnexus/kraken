@@ -194,7 +194,7 @@ const DeployHistory = ({
         {
           title: "Version",
           dataIndex: "version",
-          width: selectedEnv ? 90 : undefined,
+          width: 90,
           render: (text: string) => (
             <Flex align="center" gap={8}>
               {text}
@@ -230,7 +230,7 @@ const DeployHistory = ({
           ? {
               title: "Verified for Production",
               dataIndex: "verifiedStatus",
-              width: selectedEnv ? 180 : undefined,
+              width: selectedEnv ? 180 : 140,
               render: (verifiedStatus: boolean, record: IDeploymentHistory) =>
                 record?.envName?.toLowerCase?.() === "stage" && (
                   <Switch

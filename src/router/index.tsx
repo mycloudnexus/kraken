@@ -7,11 +7,12 @@ import AuditLog from "@/pages/AuditLog";
 import EnvironmentActivityLog from "@/pages/EnvironmentActivityLog";
 import EnvironmentOverview from "@/pages/EnvironmentOverview";
 import HomePage from "@/pages/HomePage";
-import ApiComponents from '@/pages/HomePage/components/ApiComponents';
+import ApiComponents from "@/pages/HomePage/components/ApiComponents";
 import Login from "@/pages/Login";
 import NewAPIServer from "@/pages/NewAPIServer";
 import StandardAPIMapping from "@/pages/StandardAPIMapping";
 import { createBrowserRouter } from "react-router-dom";
+import MappingTemplate from "@/pages/MappingTemplate";
 
 const router = createBrowserRouter([
   {
@@ -60,7 +61,7 @@ const router = createBrowserRouter([
       },
       {
         path: "components",
-        element: <ApiComponents />
+        element: <ApiComponents />,
       },
       {
         path: "env",
@@ -90,8 +91,12 @@ const router = createBrowserRouter([
       },
       {
         path: "audit-log",
-        element: <AuditLog />
-      }
+        element: <AuditLog />,
+      },
+      {
+        path: "mapping-template",
+        element: <MappingTemplate />,
+      },
     ],
   },
 ]);

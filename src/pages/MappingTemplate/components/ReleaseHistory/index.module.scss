@@ -1,0 +1,39 @@
+.info {
+  border-radius: 8px;
+  width: 100%;
+  padding: 32px 36px 36px;
+  position: relative;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.basicTag {
+  background: linear-gradient(
+    82.45deg,
+    rgba(72, 22, 236, 0.5) -15.65%,
+    rgba(24, 144, 255, 0.5) 130.32%
+  );
+  color: #fff;
+  margin-right: 0;
+}
+
+.specialTag {
+  background: linear-gradient(90deg, #d3adf7 0%, #adc6ff 100%);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.content {
+  margin-top: 12px;
+  flex: 1;
+  box-sizing: border-box;
+}
+
+.root {
+  flex: 1;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}

@@ -54,3 +54,23 @@ export interface IMappingMatrix {
   provideAlternative: boolean;
   addressType: string;
 }
+
+export interface IReleaseHistory {
+  templateUpgradeId: string;
+  name: string;
+  productVersion: string;
+  publishDate: string;
+  description: string;
+  deployments: Deployment[];
+  showUpgradeButton: boolean;
+}
+
+export interface Deployment {
+  deploymentId: string;
+  templateUpgradeId: string;
+  envName: string;
+  releaseVersion: string;
+  upgradeBy: string;
+  status: string;
+  createdAt: string;
+}

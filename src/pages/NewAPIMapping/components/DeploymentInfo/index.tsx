@@ -1,8 +1,6 @@
 import Flex from "@/components/Flex";
 import Text from "@/components/Text";
-import { useGetLatestRunningList } from "@/hooks/product";
 import useUser from "@/hooks/user/useUser";
-import { useAppStore } from "@/stores/app.store";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import { Tooltip } from "antd";
 import dayjs from "dayjs";
@@ -11,15 +9,10 @@ import { useCallback, useMemo } from "react";
 import styles from "../../index.module.scss";
 
 type Props = {
-  mapperKey: string;
+  runningData: any[];
 };
 
-const DeploymentInfo = ({ mapperKey }: Props) => {
-  const { currentProduct } = useAppStore();
-  const { data: runningData } = useGetLatestRunningList(
-    currentProduct,
-    mapperKey
-  );
+const DeploymentInfo = ({ runningData }: Props) => {
   const { findUserName } = useUser();
 
   const latestRunning = useMemo(() => {

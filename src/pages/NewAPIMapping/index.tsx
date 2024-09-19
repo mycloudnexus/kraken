@@ -1,9 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import {
-  CheckCircleFilled,
-  CloseCircleFilled,
-  InfoCircleOutlined,
-} from "@ant-design/icons";
+import { InfoCircleOutlined } from "@ant-design/icons";
 import RollbackIcon from "@/assets/newAPIMapping/Rollback.svg";
 import { Button, Tabs, TabsProps, Tooltip, notification } from "antd";
 import {
@@ -47,6 +43,7 @@ import dayjs from "dayjs";
 import useSize from "@/hooks/useSize";
 import useUser from "@/hooks/user/useUser";
 import DeploymentInfo from "./components/DeploymentInfo";
+import StatusIcon from "./components/StatusIcon";
 
 type Props = {
   rightSide: number;
@@ -123,7 +120,6 @@ const NewAPIMapping = ({
     listMappingStateResponse,
   } = useNewApiMappingStore();
   const queryData = JSON.parse(query ?? "{}");
-  console.log("🚀 ~ queryData:", queryData);
 
   const [firstTimeLoad, setFirstTimeLoad] = useState(true);
   const [activeKey, setActiveKey] = useState<string | string[]>("0");
@@ -150,21 +146,20 @@ const NewAPIMapping = ({
 
   const ref = useRef<any>();
   const size = useSize(ref);
-  const { data: runningData } = useGetLatestRunningList(
+  const { findUserName } = useUser();
+  const { data: runningDeploymentData } = useGetLatestRunningList(
     currentProduct,
     queryData?.targetMapperKey
   );
-  const { findUserName } = useUser();
-
-  const latestRunning = useMemo(() => {
-    const stage = runningData?.find(
+  const deploymentInfo = useMemo(() => {
+    const stage = runningDeploymentData?.find(
       (item: any) => item?.envName?.toLowerCase?.() === "stage"
     );
-    const production = runningData?.find(
+    const production = runningDeploymentData?.find(
       (item: any) => item?.envName?.toLowerCase?.() === "production"
     );
     return { stage, production };
-  }, [runningData]);
+  }, [runningDeploymentData]);
 
   useEffect(() => {
     if (!sellerApi && defaultSellerApi) {
@@ -406,6 +401,19 @@ const NewAPIMapping = ({
     [sellerApi, setActiveTab, setRightSide]
   );
 
+  const renderDeployText = useCallback((status: string) => {
+    switch (status) {
+      case "SUCCESS":
+        return "success.";
+      case "IN_PROCESS":
+        return "in process.";
+      case "FAILED":
+        return "failed.";
+      default:
+        return "";
+    }
+  }, []);
+
   return (
     <Flex className={styles.container}>
       <StepBar
@@ -445,9 +453,9 @@ const NewAPIMapping = ({
               { label: "Deploy history", key: EMainTab.deploy },
             ]}
           />
-          <DeploymentInfo mapperKey={queryData?.targetMapperKey} />
+          <DeploymentInfo runningData={runningDeploymentData} />
         </Flex>
-        {isRequiredMapping && (
+        {isRequiredMapping && mainTabKey === EMainTab.mapping && (
           <Flex className={styles.breadcrumb} justifyContent="space-between">
             <Flex className={styles.infoBox}>
               {queryData?.lastDeployedAt && (
@@ -456,24 +464,17 @@ const NewAPIMapping = ({
                     Last deployment
                   </Text.LightSmall>
                   <Flex gap={4}>
-                    {queryData?.lastDeployedStatus === "SUCCESS" ? (
-                      <CheckCircleFilled style={{ color: "#389E0D" }} />
-                    ) : (
-                      <CloseCircleFilled style={{ color: "#CF1322" }} />
-                    )}
-
+                    <StatusIcon status={deploymentInfo?.stage?.status} />
                     <Text.LightSmall lineHeight="20px">Stage</Text.LightSmall>
                     <Tooltip
                       title={
                         <>
                           Deploy{" "}
-                          {queryData?.lastDeployedStatus === "SUCCESS"
-                            ? "success."
-                            : "failed."}
+                          {renderDeployText(deploymentInfo?.stage?.status)}
                           <br />
                           <>
-                            By {findUserName(queryData?.lastDeployedBy)}{" "}
-                            {dayjs(queryData?.lastDeployedAt).format(
+                            By {findUserName(deploymentInfo?.stage?.createBy)}{" "}
+                            {dayjs(deploymentInfo?.stage?.createAt).format(
                               "YYYY-MM-DD HH:mm:ss"
                             )}
                           </>
@@ -484,19 +485,20 @@ const NewAPIMapping = ({
                     </Tooltip>
                   </Flex>
                   <Flex gap={4}>
-                    <CheckCircleFilled style={{ color: "#389E0D" }} />
+                    <StatusIcon status={deploymentInfo?.production?.status} />
                     <Text.LightSmall lineHeight="20px">
                       Production
                     </Text.LightSmall>
                     <Tooltip
                       title={
                         <>
-                          Deploy success.
+                          Deploy{" "}
+                          {renderDeployText(deploymentInfo?.production?.status)}
                           <br />
                           <>
                             By{" "}
-                            {findUserName(latestRunning?.production?.createBy)}{" "}
-                            {dayjs(latestRunning?.production?.createAt).format(
+                            {findUserName(deploymentInfo?.production?.createBy)}{" "}
+                            {dayjs(deploymentInfo?.production?.createAt).format(
                               "YYYY-MM-DD HH:mm:ss"
                             )}
                           </>
@@ -556,7 +558,7 @@ const NewAPIMapping = ({
         )}
         <div ref={ref} className={styles.newContent}>
           {mainTabKey === EMainTab.mapping ? (
-            <Flex gap={8} className={styles.mainWrapper}>
+            <Flex gap={12} className={styles.mainWrapper}>
               <div className={styles.center}>
                 {!isRequiredMapping && (
                   <Flex

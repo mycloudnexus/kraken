@@ -29,6 +29,9 @@ import {
   deployProduction,
   getAuditLogs,
   getLatestRunningAPI,
+  getMappingTemplateReleaseHistory,
+  getMappingTemplateCurrentVersion,
+  getMappingTemplateUpgradeList,
 } from "@/services/products";
 import {
   COMPONENT_KIND_API,
@@ -97,6 +100,9 @@ export const PRODUCT_CACHE_KEYS = {
   get_component_list_api_spec: "get_component_list_api_spec",
   get_component_list_api: "get_component_list_api",
   get_running_list_api: "get_running_list_api",
+  get_release_list: "get_release_list",
+  get_current_version: "get_current_version",
+  get_upgrade_list: "get_upgrade_list",
 };
 
 export const useCreateNewComponent = () => {
@@ -525,6 +531,39 @@ export const useGetLatestRunningList = (
     queryKey: [PRODUCT_CACHE_KEYS.get_running_api_list, productId, mapperKey],
     queryFn: () => getLatestRunningAPI(productId, mapperKey),
     enabled: Boolean(productId) && Boolean(mapperKey),
+    select: (data) => data?.data,
+  });
+};
+
+export const useGetMappingTemplateReleaseHistoryList = (
+  productId: string,
+  params: Record<string, any>
+) => {
+  return useQuery<any, Error>({
+    queryKey: [PRODUCT_CACHE_KEYS.get_release_list, productId, params],
+    queryFn: () => getMappingTemplateReleaseHistory(productId, params),
+    enabled: Boolean(productId),
+    select: (data) => data?.data,
+  });
+};
+
+export const useGetMappingTemplateCurrentVersion = (productId: string) => {
+  return useQuery<any, Error>({
+    queryKey: [PRODUCT_CACHE_KEYS.get_current_version, productId],
+    queryFn: () => getMappingTemplateCurrentVersion(productId),
+    enabled: Boolean(productId),
+    select: (data) => data?.data,
+  });
+};
+
+export const useGetMappingTemplateUpgradeList = (
+  productId: string,
+  params: Record<string, any>
+) => {
+  return useQuery<any, Error>({
+    queryKey: [PRODUCT_CACHE_KEYS.get_upgrade_list, productId, params],
+    queryFn: () => getMappingTemplateUpgradeList(productId, params),
+    enabled: Boolean(productId),
     select: (data) => data?.data,
   });
 };

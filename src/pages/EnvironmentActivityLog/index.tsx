@@ -161,10 +161,12 @@ const EnvironmentActivityLog = () => {
       key: "date",
       title: "Time",
       render: (log: IActivityLog) => toDateTime(log.createdAt),
+      width: 200,
     },
     {
       key: "action",
-      title: "",
+      title: "Action",
+      width: 200,
       render: (log: IActivityLog) => (
         <Button
           type="link"
@@ -180,7 +182,7 @@ const EnvironmentActivityLog = () => {
   ];
   return (
     <div className={styles.wrapper}>
-      <Text.LightLarge>Seller API setup</Text.LightLarge>
+      <Text.LightLarge>API activity log</Text.LightLarge>
       <div className={styles.contentWrapper} ref={refWrapper}>
         <Flex align="center" className={styles.filterWrapper} ref={ref}>
           <Form

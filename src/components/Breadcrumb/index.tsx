@@ -2,6 +2,7 @@ import { LeftOutlined } from "@ant-design/icons";
 import { Flex } from "antd";
 import { useNavigate } from "react-router-dom";
 import Text from "../Text";
+import styles from "./index.module.scss";
 
 type Props = {
   mainUrl: string;
@@ -21,6 +22,7 @@ const BreadCrumb = ({ mainUrl, lastItem, items }: Props) => {
         align="center"
         style={{ cursor: "pointer" }}
         onClick={() => navigate(mainUrl)}
+        className={styles.canClick}
       >
         <LeftOutlined style={{ fontSize: 8 }} />
         <Text.LightLarge>Seller API setup</Text.LightLarge>
@@ -31,6 +33,7 @@ const BreadCrumb = ({ mainUrl, lastItem, items }: Props) => {
           align="center"
           style={{ cursor: "pointer" }}
           onClick={() => navigate(i.url)}
+          className={styles.canClick}
         >
           <Text.LightLarge>/</Text.LightLarge>
           <Text.LightLarge>{i.title}</Text.LightLarge>

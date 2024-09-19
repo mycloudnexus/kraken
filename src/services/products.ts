@@ -257,3 +257,35 @@ export const getLatestRunningAPI = (productId: string, mapperKey: string) => {
     `/v2${PRODUCT}/${productId}/latest-running-api-mapper-deployments?mapperKey=${mapperKey}`
   );
 };
+
+export const getMappingTemplateReleaseHistory = (
+  productId: string,
+  data: any
+) => {
+  return request(`/v2${PRODUCT}/${productId}/template-upgrade/releases`, {
+    method: "GET",
+    data,
+  });
+};
+
+export const getMappingTemplateCurrentVersion = (productId: string) => {
+  return request(
+    `/v2${PRODUCT}/${productId}/template-upgrade/current-versions`,
+    {
+      method: "GET",
+    }
+  );
+};
+
+export const getMappingTemplateUpgradeList = (
+  productId: string,
+  params: any
+) => {
+  return request(
+    `/v2${PRODUCT}/${productId}/template-upgrade/template-deployments`,
+    {
+      method: "GET",
+      params,
+    }
+  );
+};
