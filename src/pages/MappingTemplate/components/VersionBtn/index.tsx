@@ -60,14 +60,17 @@ const VersionBtn = ({ item }: Props) => {
     const currentStage = item.deployments?.find(
       (d) => d.envName?.toUpperCase?.() === "STAGE"
     );
-    if (isEmpty(item.deployments)) {
+    if (
+      isEmpty(item.deployments) ||
+      (currentStage && currentStage.status === "FAILED")
+    ) {
       return (
         <Button type="default" disabled>
           Deploy to Production
         </Button>
       );
     }
-    if (!isEmpty(currentStage) && item.deployments?.length > 1) {
+    if (!isEmpty(currentStage) && item.deployments?.length === 1) {
       return <Button type="default">Deploy to Production</Button>;
     }
     const currentProd = item.deployments?.find(

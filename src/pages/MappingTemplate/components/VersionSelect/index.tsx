@@ -1,6 +1,6 @@
 import Text from "@/components/Text";
 import styles from "./index.module.scss";
-import { Flex } from "antd";
+import { Flex, Tag } from "antd";
 import { IReleaseHistory } from "@/utils/types/product.type";
 import clsx from "clsx";
 import { isEmpty } from "lodash";
@@ -39,7 +39,9 @@ const VersionSelect = ({
           >
             <Flex align="center" gap={4}>
               <Text.LightMedium>{d.productVersion}</Text.LightMedium>
-              {/* <Tag>{}</Tag> */}
+              <Tag color="#F0F2F5" className={styles.prodTag}>
+                {d.productSpec}
+              </Tag>
             </Flex>
             <Text.LightSmall color="#00000073">{d.publishDate}</Text.LightSmall>
           </Flex>

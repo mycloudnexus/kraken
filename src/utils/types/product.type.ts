@@ -63,6 +63,7 @@ export interface IReleaseHistory {
   description: string;
   deployments: Deployment[];
   showUpgradeButton: boolean;
+  productSpec?: string;
 }
 
 export interface Deployment {
@@ -70,6 +71,16 @@ export interface Deployment {
   templateUpgradeId: string;
   envName: string;
   releaseVersion: string;
+  upgradeBy: string;
+  status: string;
+  createdAt: string;
+}
+
+export interface IUpgrade {
+  deploymentId: string;
+  templateUpgradeId: string;
+  envName: string;
+  productVersion: string;
   upgradeBy: string;
   status: string;
   createdAt: string;

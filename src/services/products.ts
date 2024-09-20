@@ -260,11 +260,11 @@ export const getLatestRunningAPI = (productId: string, mapperKey: string) => {
 
 export const getMappingTemplateReleaseHistory = (
   productId: string,
-  data: any
+  params: any
 ) => {
   return request(`/v2${PRODUCT}/${productId}/template-upgrade/releases`, {
     method: "GET",
-    data,
+    params,
   });
 };
 
@@ -286,6 +286,18 @@ export const getMappingTemplateUpgradeList = (
     {
       method: "GET",
       params,
+    }
+  );
+};
+
+export const getMappingTemplateUpgradeDetail = (
+  productId: string,
+  id: string
+) => {
+  return request(
+    `/v2${PRODUCT}/${productId}/template-upgrade/template-deployments/${id}`,
+    {
+      method: "GET",
     }
   );
 };

@@ -18,6 +18,7 @@ import { useAppStore } from "@/stores/app.store";
 import { useGetProductEnvs } from "@/hooks/product";
 import { IEnv } from "@/utils/types/env.type";
 import { last } from "lodash";
+import { useSessionStorage } from "usehooks-ts";
 
 const flattenMenu = (
   menuArr: any[],
@@ -46,7 +47,7 @@ const flattenMenu = (
 };
 
 const SideNavigation = () => {
-  const [collapsed, setCollapsed] = useState<boolean>(false);
+  const [collapsed, setCollapsed] = useSessionStorage("collapsed", false);
   const [currentEnvId, setCurrentEnvId] = useState<string | null>(null);
   const [activeKey, setActiveKey] = useState<string>(window.location.pathname);
   const { currentProduct } = useAppStore();
@@ -101,15 +102,17 @@ const SideNavigation = () => {
         children: [
           {
             label: <Link to="/audit-log">Audit log</Link>,
-            key: "audit-log/",
+            key: "audit-log",
+          },
+          {
+            key: "mapping-template",
+            label: (
+              <Link to="/mapping-template">
+                Mapping template release & Upgrade
+              </Link>
+            ),
           },
         ],
-      },
-      {
-        key: "Release",
-        label: (
-          <Link to="/mapping-template">Mapping template release & Upgrade</Link>
-        ),
       },
     ],
     [currentEnvId]

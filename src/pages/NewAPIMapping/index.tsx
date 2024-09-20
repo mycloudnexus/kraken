@@ -44,6 +44,7 @@ import useSize from "@/hooks/useSize";
 import useUser from "@/hooks/user/useUser";
 import DeploymentInfo from "./components/DeploymentInfo";
 import StatusIcon from "./components/StatusIcon";
+import { useSessionStorage } from "usehooks-ts";
 
 type Props = {
   rightSide: number;
@@ -93,6 +94,8 @@ const RightSide = ({
   }
 };
 
+const collapsedStyle = { maxWidth: `calc(100vw - 462px)` };
+
 const NewAPIMapping = ({
   refetch,
   isRequiredMapping,
@@ -100,6 +103,7 @@ const NewAPIMapping = ({
   refetch?: () => void;
   isRequiredMapping: boolean;
 }) => {
+  const [collapsed] = useSessionStorage("collapsed", false);
   const { currentProduct } = useAppStore();
   const { activeTab, setActiveTab } = useMappingUiStore();
   const {
@@ -556,9 +560,17 @@ const NewAPIMapping = ({
             </Flex>
           </Flex>
         )}
-        <div ref={ref} className={styles.newContent}>
+        <div
+          ref={ref}
+          className={styles.newContent}
+          style={collapsed ? collapsedStyle : {}}
+        >
           {mainTabKey === EMainTab.mapping ? (
-            <Flex gap={12} className={styles.mainWrapper}>
+            <Flex
+              gap={12}
+              className={styles.mainWrapper}
+              style={collapsed ? collapsedStyle : {}}
+            >
               <div className={styles.center}>
                 {!isRequiredMapping && (
                   <Flex
