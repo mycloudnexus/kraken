@@ -1,6 +1,6 @@
 import Text from "@/components/Text";
 import { CloseOutlined, InfoCircleFilled } from "@ant-design/icons";
-import { Drawer, Flex, Radio, Spin, Table } from "antd";
+import { Drawer, Flex, Radio, Spin, Table, Typography } from "antd";
 import { useMemo, useState } from "react";
 import styles from "./index.module.scss";
 import { useGetMappingTemplateUpgradeDetail } from "@/hooks/product";
@@ -30,12 +30,16 @@ const UpgradeHistoryDetail = ({ onClose, open, id, noteId }: Props) => {
       {
         title: "Mapping use case",
         dataIndex: "",
-        width: "60%",
         render: (record: any) => (
           <Flex align="center" gap={12}>
             <Flex align="center">
               <RequestMethod method={record?.method} />
-              <Text.LightMedium>{record?.path}</Text.LightMedium>
+              <Typography.Text
+                style={{ maxWidth: 140 }}
+                ellipsis={{ tooltip: record?.path }}
+              >
+                {record?.path}
+              </Typography.Text>
             </Flex>
             <MappingMatrix mappingMatrix={record?.mappingMatrix} />
           </Flex>
@@ -44,11 +48,11 @@ const UpgradeHistoryDetail = ({ onClose, open, id, noteId }: Props) => {
       {
         title: "Upgrade to",
         dataIndex: "version",
-        width: "15%",
+        width: 150,
       },
       {
         title: "Upgrade status",
-        width: "25%",
+        width: 150,
         dataIndex: "status",
         render: (status: string) => <DeploymentStatus status={status} />,
       },

@@ -29,11 +29,11 @@ const CurrentVersion = () => {
       <Flex align="center" gap={8}>
         <Text.LightMedium lineHeight="20px">Stage</Text.LightMedium>
         <Tag bordered={false} color="#DBE4FB" style={{ color: "#2962FF" }}>
-          {get(currentData, "stage.releaseVersion")}
+          {get(currentData, "stage.productVersion")}
         </Tag>
         <Text.LightMedium lineHeight="20px">Production</Text.LightMedium>
         <Tag bordered={false} color="#DBE4FB" style={{ color: "#2962FF" }}>
-          {get(currentData, "production.releaseVersion")}
+          {get(currentData, "production.productVersion")}
         </Tag>
       </Flex>
     </Flex>

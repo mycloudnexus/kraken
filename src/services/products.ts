@@ -301,3 +301,17 @@ export const getMappingTemplateUpgradeDetail = (
     }
   );
 };
+
+export const productUpgradeStage = (productId: string, data: any) => {
+  return request(`/v2${PRODUCT}/${productId}/template-upgrade/stage`, {
+    method: "POST",
+    data,
+  });
+};
+
+export const productUpgradeProd = (productId: string, data: any) => {
+  return request(`/v2${PRODUCT}/${productId}/template-upgrade/production`, {
+    method: "POST",
+    data,
+  });
+};

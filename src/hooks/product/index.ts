@@ -33,6 +33,8 @@ import {
   getMappingTemplateCurrentVersion,
   getMappingTemplateUpgradeList,
   getMappingTemplateUpgradeDetail,
+  productUpgradeStage,
+  productUpgradeProd,
 } from "@/services/products";
 import {
   COMPONENT_KIND_API,
@@ -105,6 +107,8 @@ export const PRODUCT_CACHE_KEYS = {
   get_current_version: "get_current_version",
   get_upgrade_list: "get_upgrade_list",
   get_upgrade_detail: "get_upgrade_detail",
+  upgrade_mapping_template_stage: "upgrade_mapping_template_stage",
+  upgrade_mapping_template_production: "upgrade_mapping_template_production",
 };
 
 export const useCreateNewComponent = () => {
@@ -584,5 +588,31 @@ export const useGetMappingTemplateUpgradeDetail = (
     queryFn: () => getMappingTemplateUpgradeDetail(productId, id),
     enabled: Boolean(productId) && Boolean(id),
     select: (data) => data?.data,
+  });
+};
+
+export const useDeployMappingTemplateStage = () => {
+  return useMutation<any, Error>({
+    mutationKey: [PRODUCT_CACHE_KEYS.upgrade_mapping_template_stage],
+    mutationFn: ({ productId, data }: any) =>
+      productUpgradeStage(productId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [PRODUCT_CACHE_KEYS.get_upgrade_list],
+      });
+    },
+  });
+};
+
+export const useDeployMappingTemplateProduction = () => {
+  return useMutation<any, Error>({
+    mutationKey: [PRODUCT_CACHE_KEYS.upgrade_mapping_template_production],
+    mutationFn: ({ productId, data }: any) =>
+      productUpgradeProd(productId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [PRODUCT_CACHE_KEYS.get_upgrade_list],
+      });
+    },
   });
 };

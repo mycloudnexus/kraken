@@ -1,14 +1,20 @@
 import Text from "@/components/Text";
+import {
+  useDeployMappingTemplateProduction,
+  useDeployMappingTemplateStage,
+  useGetProductEnvs,
+} from "@/hooks/product";
 import useUser from "@/hooks/user/useUser";
+import { useAppStore } from "@/stores/app.store";
 import { IReleaseHistory } from "@/utils/types/product.type";
 import {
   CheckCircleFilled,
   CloseCircleFilled,
   InfoCircleOutlined,
 } from "@ant-design/icons";
-import { Button, Flex, Tooltip } from "antd";
+import { Button, Flex, Modal, Tooltip, notification } from "antd";
 import dayjs from "dayjs";
-import { isEmpty } from "lodash";
+import { get, isEmpty } from "lodash";
 import { useMemo } from "react";
 
 type Props = {
@@ -16,10 +22,103 @@ type Props = {
 };
 
 const VersionBtn = ({ item }: Props) => {
+  const { currentProduct } = useAppStore();
   const { findUserName } = useUser();
+  const { mutateAsync: deployStage, isPending: pendingStage } =
+    useDeployMappingTemplateStage();
+  const { mutateAsync: deployProd, isPending: pendingProd } =
+    useDeployMappingTemplateProduction();
+  const { data: dataEnv } = useGetProductEnvs(currentProduct);
+  const stageEnv = dataEnv?.data?.find(
+    (d) => d?.name?.toLowerCase?.() === "stage"
+  );
+  const productionEnv = dataEnv?.data?.find(
+    (d) => d?.name?.toLowerCase?.() === "production"
+  );
+
+  const handleUpgradeStage = async () => {
+    Modal.confirm({
+      icon: <></>,
+      title: `Are you sure to upgrade now?`,
+      content: (
+        <Text.NormalMedium>
+          Upgrade may take a few minutes??. You will not be able to change the
+          API mapping configurations or perform new deployment during the
+          process. Continue?
+        </Text.NormalMedium>
+      ),
+
+      okText: "Upgrade",
+      okType: "primary",
+      closable: false,
+      onOk: async () => {
+        try {
+          const res = await deployStage({
+            productId: currentProduct,
+            data: {
+              templateUpgradeId: item.templateUpgradeId,
+              productEnvId: stageEnv?.id,
+            },
+          } as any);
+          if (res) {
+            notification.success({ message: get(res, "message", "Success!") });
+          }
+        } catch (error) {
+          notification.error({
+            message: get(error, "reason", "Error. Please try again"),
+          });
+        }
+      },
+    });
+  };
+
+  const handleUpgradeProd = async () => {
+    Modal.confirm({
+      icon: <></>,
+      title: `Are you sure to upgrade now?`,
+      content: (
+        <Text.NormalMedium>
+          Upgrade may take a few minutes??. You will not be able to change the
+          API mapping configurations or perform new deployment during the
+          process. Continue?
+        </Text.NormalMedium>
+      ),
+
+      okText: "Upgrade",
+      okType: "primary",
+      closable: false,
+      onOk: async () => {
+        try {
+          const res = await deployProd({
+            productId: currentProduct,
+            data: {
+              templateUpgradeId: item.templateUpgradeId,
+              productEnvId: productionEnv?.id,
+            },
+          } as any);
+          if (res) {
+            notification.success({ message: get(res, "message", "Success!") });
+          }
+        } catch (error) {
+          notification.error({
+            message: get(error, "reason", "Error. Please try again"),
+          });
+        }
+      },
+    });
+  };
+
   const BtnStage = useMemo(() => {
-    if (isEmpty(item.deployments)) {
-      return <Button type="default">Deploy to Stage</Button>;
+    if (item.showStageUpgradeButton && isEmpty(item.deployments)) {
+      return (
+        <Button
+          type="default"
+          onClick={handleUpgradeStage}
+          loading={pendingStage}
+        >
+          {pendingStage ? "Deploying" : "Deploy to Stage"}
+        </Button>
+      );
     }
     const currentStage = item.deployments?.find(
       (d) => d.envName?.toUpperCase?.() === "STAGE"
@@ -54,15 +153,17 @@ const VersionBtn = ({ item }: Props) => {
       );
     }
     return <></>;
-  }, [item]);
+  }, [item, pendingStage, handleUpgradeStage]);
 
   const BtnProd = useMemo(() => {
     const currentStage = item.deployments?.find(
       (d) => d.envName?.toUpperCase?.() === "STAGE"
     );
     if (
-      isEmpty(item.deployments) ||
-      (currentStage && currentStage.status === "FAILED")
+      (isEmpty(item.deployments) && item.showStageUpgradeButton) ||
+      (currentStage &&
+        item.deployments?.length === 1 &&
+        !item.showProductionUpgradeButton)
     ) {
       return (
         <Button type="default" disabled>
@@ -70,8 +171,20 @@ const VersionBtn = ({ item }: Props) => {
         </Button>
       );
     }
-    if (!isEmpty(currentStage) && item.deployments?.length === 1) {
-      return <Button type="default">Deploy to Production</Button>;
+    if (
+      !isEmpty(currentStage) &&
+      item.deployments?.length === 1 &&
+      item.showProductionUpgradeButton
+    ) {
+      return (
+        <Button
+          type="default"
+          onClick={handleUpgradeStage}
+          loading={pendingProd}
+        >
+          {pendingProd ? "Deploying" : "Deploy to Production"}
+        </Button>
+      );
     }
     const currentProd = item.deployments?.find(
       (d) => d.envName?.toUpperCase?.() === "PRODUCTION"
@@ -106,11 +219,23 @@ const VersionBtn = ({ item }: Props) => {
       );
     }
     return <></>;
-  }, [item]);
+  }, [item, pendingProd, handleUpgradeProd]);
+
   return (
-    <Flex align="center" justify="flex-end" gap={16}>
-      {BtnStage}
-      {BtnProd}
+    <Flex align="center" justify="flex-end" gap={16} style={{ minHeight: 32 }}>
+      {isEmpty(item.deployments) && !item.showStageUpgradeButton ? (
+        <Flex gap={4} align="center">
+          <InfoCircleOutlined style={{ color: "#FF9A2E" }} />
+          <Text.LightMedium color="#FF9A2E" lineHeight="22px">
+            Deprecated
+          </Text.LightMedium>
+        </Flex>
+      ) : (
+        <>
+          {BtnStage}
+          {BtnProd}
+        </>
+      )}
     </Flex>
   );
 };

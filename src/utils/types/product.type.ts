@@ -62,7 +62,8 @@ export interface IReleaseHistory {
   publishDate: string;
   description: string;
   deployments: Deployment[];
-  showUpgradeButton: boolean;
+  showStageUpgradeButton: boolean;
+  showProductionUpgradeButton: boolean;
   productSpec?: string;
 }
 
@@ -70,7 +71,7 @@ export interface Deployment {
   deploymentId: string;
   templateUpgradeId: string;
   envName: string;
-  releaseVersion: string;
+  productVersion: string;
   upgradeBy: string;
   status: string;
   createdAt: string;
