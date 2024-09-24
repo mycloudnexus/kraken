@@ -8,6 +8,7 @@ import { Button, Collapse, Flex } from "antd";
 import { useMemo, useState } from "react";
 import { useCommonAddProp } from "../commonHook";
 import styles from "./index.module.scss";
+import { isEmpty } from "lodash";
 
 interface Props {
   onSelect?: (prop: any) => void;
@@ -75,6 +76,7 @@ const RightAddSellerProp = ({ onSelect }: Readonly<Props>) => {
           data-testid="seller-prop-ok"
           type="primary"
           onClick={handleAddProp}
+          disabled={isEmpty(rightSideInfo)}
         >
           OK
         </Button>

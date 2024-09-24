@@ -17,6 +17,7 @@ import { IMapperDetails } from "@/utils/types/env.type";
 import NewAPIMapping from "../NewAPIMapping";
 import groupByPath from "@/utils/helpers/groupByPath";
 import { useBoolean } from "usehooks-ts";
+import BreadCrumb from "@/components/Breadcrumb";
 
 const StandardAPIMapping = () => {
   const { currentProduct } = useAppStore();
@@ -90,9 +91,15 @@ const StandardAPIMapping = () => {
           justify="space-between"
           style={{ padding: "5px 0" }}
         >
-          <ComponentSelect
-            componentList={componentList}
-            componentName={componentName}
+          <BreadCrumb
+            mainTitle="Standard API mapping"
+            mainUrl="/components"
+            lastItem={
+              <ComponentSelect
+                componentList={componentList}
+                componentName={componentName}
+              />
+            }
           />
         </Flex>
         <Flex className={styles.pageBody}>
@@ -116,11 +123,15 @@ const StandardAPIMapping = () => {
               justify="center"
               className={styles.versionListWrapper}
             >
-              {activePath && !isChangeMappingKey && (
+              {activePath && !isChangeMappingKey ? (
                 <NewAPIMapping
                   refetch={refetch}
                   isRequiredMapping={isRequiredMapping}
                 />
+              ) : (
+                <div className={styles.empty}>
+                  <Spin size="large" />
+                </div>
               )}
             </Flex>
           </Flex>

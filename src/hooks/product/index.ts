@@ -598,7 +598,7 @@ export const useDeployMappingTemplateStage = () => {
       productUpgradeStage(productId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [PRODUCT_CACHE_KEYS.get_upgrade_list],
+        queryKey: [PRODUCT_CACHE_KEYS.get_release_list],
       });
     },
   });
@@ -611,7 +611,7 @@ export const useDeployMappingTemplateProduction = () => {
       productUpgradeProd(productId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [PRODUCT_CACHE_KEYS.get_upgrade_list],
+        queryKey: [PRODUCT_CACHE_KEYS.get_release_list],
       });
     },
   });

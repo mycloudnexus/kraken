@@ -2,7 +2,8 @@
   display: flex;
   width: 338px;
   :global {
-    .ant-select:not(.ant-select-customize-input) .ant-select-selector, .ant-select-focused {
+    .ant-select:not(.ant-select-customize-input) .ant-select-selector,
+    .ant-select-focused {
       background-color: transparent;
       border: 0;
       box-shadow: none !important;
@@ -14,14 +15,21 @@
 }
 
 .componentIconWrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 25px;
-  height: 25px;
-  border-radius: 5px;
-  background-color: #91d5ff;
   > svg {
     display: block;
+  }
+}
+
+.componentSelect {
+  :global {
+    .ant-select-selector {
+      padding: 0 11px 0 0 !important;
+    }
+    .ant-typography {
+      color: #00000073;
+    }
+    .ant-select-arrow {
+      color: #00000073;
+    }
   }
 }

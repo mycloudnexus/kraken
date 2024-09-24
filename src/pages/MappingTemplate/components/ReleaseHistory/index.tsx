@@ -1,5 +1,5 @@
 import Text from "@/components/Text";
-import { Flex, Spin, Tag } from "antd";
+import { Empty, Flex, Spin, Tag } from "antd";
 import { RightOutlined } from "@ant-design/icons";
 
 import styles from "./index.module.scss";
@@ -66,6 +66,9 @@ const ReleaseHistory = () => {
         </Flex>
       </Flex>
       <Flex className={styles.content}>
+        {!isLoading && isEmpty(currentData?.data) && (
+          <Empty description="No release history" className={styles.empty} />
+        )}
         {isLoading ? (
           <Spin style={{ width: "100%" }} />
         ) : (

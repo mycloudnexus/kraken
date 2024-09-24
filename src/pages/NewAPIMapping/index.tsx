@@ -300,7 +300,6 @@ const NewAPIMapping = ({
       );
       setRequestMapping(updatedMapping);
       setRightSideInfo(undefined);
-      setRightSide(undefined);
     },
     [rightSideInfo, requestMapping, setRequestMapping]
   );

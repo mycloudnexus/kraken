@@ -16,7 +16,7 @@
   flex: 1;
   background-color: #fff;
   padding: 16px 0px;
-  width: 338px;
+  width: 300px;
   overflow-y: scroll;
   &::-webkit-scrollbar {
     display: none;
@@ -83,4 +83,13 @@
 }
 .versionListWrapper {
   flex: 1;
+}
+
+.empty {
+  height: calc(100vh - 156px);
+  background: #fff;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

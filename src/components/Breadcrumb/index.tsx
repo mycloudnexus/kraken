@@ -6,14 +6,20 @@ import styles from "./index.module.scss";
 
 type Props = {
   mainUrl: string;
-  lastItem: string;
+  lastItem: string | React.ReactElement;
   items?: {
     title: string;
     url: string;
   }[];
+  mainTitle?: string;
 };
 
-const BreadCrumb = ({ mainUrl, lastItem, items }: Props) => {
+const BreadCrumb = ({
+  mainUrl,
+  lastItem,
+  items,
+  mainTitle = "Seller API setup",
+}: Props) => {
   const navigate = useNavigate();
   return (
     <Flex gap={8} align="center">
@@ -25,7 +31,7 @@ const BreadCrumb = ({ mainUrl, lastItem, items }: Props) => {
         className={styles.canClick}
       >
         <LeftOutlined style={{ fontSize: 8 }} />
-        <Text.LightLarge>Seller API setup</Text.LightLarge>
+        <Text.LightLarge>{mainTitle}</Text.LightLarge>
       </Flex>
       {items?.map((i) => (
         <Flex

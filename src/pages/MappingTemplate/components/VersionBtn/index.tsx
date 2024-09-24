@@ -11,6 +11,7 @@ import {
   CheckCircleFilled,
   CloseCircleFilled,
   InfoCircleOutlined,
+  RedoOutlined,
 } from "@ant-design/icons";
 import { Button, Flex, Modal, Tooltip, notification } from "antd";
 import dayjs from "dayjs";
@@ -57,7 +58,7 @@ const VersionBtn = ({ item }: Props) => {
             productId: currentProduct,
             data: {
               templateUpgradeId: item.templateUpgradeId,
-              productEnvId: stageEnv?.id,
+              stageEnvId: stageEnv?.id,
             },
           } as any);
           if (res) {
@@ -93,6 +94,7 @@ const VersionBtn = ({ item }: Props) => {
             productId: currentProduct,
             data: {
               templateUpgradeId: item.templateUpgradeId,
+              stageEnvId: stageEnv?.id,
               productEnvId: productionEnv?.id,
             },
           } as any);
@@ -124,6 +126,13 @@ const VersionBtn = ({ item }: Props) => {
       (d) => d.envName?.toUpperCase?.() === "STAGE"
     );
     if (!isEmpty(currentStage)) {
+      if (currentStage.status === "IN_PROCESS" || !currentStage.status) {
+        return (
+          <Button type="default" icon={<RedoOutlined rotate={-90} />}>
+            Deploying
+          </Button>
+        );
+      }
       return (
         <Flex align="center" gap={8}>
           {currentStage?.status?.toUpperCase?.() === "SUCCESS" ? (
@@ -179,7 +188,7 @@ const VersionBtn = ({ item }: Props) => {
       return (
         <Button
           type="default"
-          onClick={handleUpgradeStage}
+          onClick={handleUpgradeProd}
           loading={pendingProd}
         >
           {pendingProd ? "Deploying" : "Deploy to Production"}
@@ -190,6 +199,13 @@ const VersionBtn = ({ item }: Props) => {
       (d) => d.envName?.toUpperCase?.() === "PRODUCTION"
     );
     if (!isEmpty(currentProd)) {
+      if (currentProd.status === "IN_PROCESS" || !currentProd.status) {
+        return (
+          <Button type="default" icon={<RedoOutlined rotate={-90} />}>
+            Deploying
+          </Button>
+        );
+      }
       return (
         <Flex align="center" gap={8}>
           {currentProd?.status?.toUpperCase?.() === "SUCCESS" ? (
