@@ -9,6 +9,7 @@ import DeploymentStatus from "@/pages/EnvironmentOverview/components/DeploymentS
 import MappingMatrix from "@/components/MappingMatrix";
 import { useGetAsset } from "@/hooks/asset";
 import RequestMethod from "@/components/Method";
+import RichTextViewer from "@/components/RichTextViewer";
 
 type Props = {
   open?: boolean;
@@ -86,11 +87,9 @@ const UpgradeHistoryDetail = ({ onClose, open, id, noteId }: Props) => {
       </Radio.Group>
       {activeTab === "1" ? (
         <Spin spinning={loadingNote}>
-          <div
+          <RichTextViewer
             className={styles.releaseNote}
-            dangerouslySetInnerHTML={{
-              __html: dataAsset?.metadata?.description,
-            }}
+            text={dataAsset?.metadata?.description}
           />
         </Spin>
       ) : (

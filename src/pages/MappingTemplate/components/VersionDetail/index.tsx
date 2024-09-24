@@ -4,6 +4,7 @@ import { Flex, Input } from "antd";
 import Text from "@/components/Text";
 import { isEmpty } from "lodash";
 import VersionBtn from "../VersionBtn";
+import RichTextViewer from "@/components/RichTextViewer";
 
 type Props = {
   data: IReleaseHistory;
@@ -34,9 +35,9 @@ const VersionDetail = ({ data }: Props) => {
               </Text.NormalLarge>
               <Input.Search style={{ width: 264 }} placeholder="Search" />
             </Flex>
-            <div
+            <RichTextViewer
               className={styles.content}
-              dangerouslySetInnerHTML={{ __html: data?.description }}
+              text={data?.description}
             />
           </div>
         </>

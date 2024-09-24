@@ -6,7 +6,7 @@ import styles from "./index.module.scss";
 
 type Props = {
   mainUrl: string;
-  lastItem: string | React.ReactElement;
+  lastItem: React.ReactElement | string;
   items?: {
     title: string;
     url: string;

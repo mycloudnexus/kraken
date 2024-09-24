@@ -20,14 +20,15 @@ type LabelProps = {
 };
 
 const ComponentIcon = ({ name = "" }) => {
+  const text = name?.toLowerCase();
   switch (true) {
-    case name?.toLowerCase().includes("address"):
+    case text.includes("address"):
       return <ContactIcon />;
-    case name?.toLowerCase().includes("order"):
+    case text.includes("order"):
       return <OrderIcon />;
-    case name?.toLowerCase().includes("inventory"):
+    case text.includes("inventory"):
       return <InventoryIcon />;
-    case name?.toLowerCase().includes("quote"):
+    case text.includes("quote"):
       return <QuoteIcon />;
     default:
       return <ContactIcon />;
