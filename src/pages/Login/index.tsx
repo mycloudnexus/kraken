@@ -17,9 +17,16 @@ const Login = () => {
       const res = await login(values);
       const accessToken = get(res, "data.accessToken");
       const expiresIn = get(res, "data.expiresIn");
+      const refreshToken = get(res, "data.refreshToken");
+      const refreshTokenExpiresIn = get(res, "data.refreshTokenExpiresIn");
       if (accessToken && expiresIn) {
         storeData("token", accessToken);
         storeData("tokenExpired", String(Date.now() + expiresIn * 1000));
+        storeData("refreshToken", refreshToken);
+        storeData(
+          "refreshTokenExpiresIn",
+          String(Date.now() + refreshTokenExpiresIn * 1000)
+        );
         navigate("/", { replace: true });
       } else {
         notification.error({ message: "Token not found!" });
