@@ -92,15 +92,17 @@ export const DeploymentBtn = ({
   return (
     <>
       <InformationModal modalText={modalText} open={isOpen} onClose={close} />
-      <Button
-        loading={isPending}
-        disabled={!record?.verifiedStatus}
-        type="text"
-        className={styles.defaultBtn}
-        onClick={handleClick}
-      >
-        <DeployIcon />
-      </Button>
+      <Tooltip title="Deploy to Production">
+        <Button
+          loading={isPending}
+          disabled={!record?.verifiedStatus}
+          type="text"
+          className={styles.defaultBtn}
+          onClick={handleClick}
+        >
+          <DeployIcon />
+        </Button>
+      </Tooltip>
     </>
   );
 };
@@ -269,9 +271,7 @@ const DeployHistory = ({
                 </Button>
               </Tooltip>
               {record.envName !== "production" && (
-                <Tooltip title="Deploy to Production">
-                  <DeploymentBtn record={record} env={envItems} />
-                </Tooltip>
+                <DeploymentBtn record={record} env={envItems} />
               )}
             </Flex>
           ),

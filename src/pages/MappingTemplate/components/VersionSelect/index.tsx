@@ -4,6 +4,7 @@ import { Flex, Tag } from "antd";
 import { IReleaseHistory } from "@/utils/types/product.type";
 import clsx from "clsx";
 import { isEmpty } from "lodash";
+import dayjs from "dayjs";
 type Props = {
   data: {
     data: IReleaseHistory[];
@@ -43,7 +44,9 @@ const VersionSelect = ({
                 {d.productSpec}
               </Tag>
             </Flex>
-            <Text.LightSmall color="#00000073">{d.publishDate}</Text.LightSmall>
+            <Text.LightSmall color="#00000073">
+              {dayjs(d.publishDate).format("YYYY-MM-DD")}
+            </Text.LightSmall>
           </Flex>
         ))}
       </Flex>

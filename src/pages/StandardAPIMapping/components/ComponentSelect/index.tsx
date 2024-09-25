@@ -96,8 +96,8 @@ const ComponentSelect = ({
       <Select
         className={styles.componentSelect}
         onSelect={handleSelect}
-        dropdownStyle={{ width: "338px" }}
-        size="large"
+        dropdownStyle={{ width: "fit-content" }}
+        size="small"
         value={value}
         labelInValue
         options={parsedOptions}

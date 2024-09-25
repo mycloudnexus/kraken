@@ -29,7 +29,7 @@ const MappingDetailsList = ({
 
   useEffect(() => {
     setActiveLabel(Object.keys(groupedPaths));
-  }, [groupedPaths])
+  }, [groupedPaths]);
 
   const initList = useCallback(() => {
     const headersList = Object.keys(groupedPaths);
@@ -39,10 +39,10 @@ const MappingDetailsList = ({
       setActivePath(initialMapItem.path);
       setActiveSelected(initialMapItem);
     }
-  }, [activePath])
+  }, [activePath]);
 
   useEffect(() => {
-    initList()
+    initList();
   }, [window.location.pathname]);
 
   const handleSelection = useCallback(
