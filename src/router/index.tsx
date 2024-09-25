@@ -13,6 +13,7 @@ import NewAPIServer from "@/pages/NewAPIServer";
 import StandardAPIMapping from "@/pages/StandardAPIMapping";
 import { createBrowserRouter } from "react-router-dom";
 import MappingTemplate from "@/pages/MappingTemplate";
+import UserManagement from "@/pages/UserManagement";
 
 const router = createBrowserRouter([
   {
@@ -96,6 +97,10 @@ const router = createBrowserRouter([
       {
         path: "mapping-template",
         element: <MappingTemplate />,
+      },
+      {
+        path: "user-management",
+        element: <UserManagement />,
       },
     ],
   },

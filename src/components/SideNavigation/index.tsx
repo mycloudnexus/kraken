@@ -112,6 +112,10 @@ const SideNavigation = () => {
               </Link>
             ),
           },
+          {
+            key: "user-management",
+            label: <Link to="/user-management">User management</Link>,
+          },
         ],
       },
     ],

@@ -13,11 +13,12 @@ export const DIRECT_LOGIN_MSG = [
 ];
 
 export const refreshTokenFnc = async () => {
+  const token = getData("token");
   const refreshToken = getData("refreshToken");
-  if (!refreshToken || isRefreshTokenExpired()) {
+  if (!refreshToken || isRefreshTokenExpired() || !token) {
     clearData("token");
     clearData("tokenExpired");
-    window.location.href = `${window.location.origin}/${ROUTES.LOGIN}`;
+    window.location.href = `${window.location.origin}${ROUTES.LOGIN}`;
     return;
   }
   try {
