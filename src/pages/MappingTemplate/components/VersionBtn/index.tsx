@@ -13,9 +13,9 @@ import {
   InfoCircleOutlined,
   RedoOutlined,
 } from "@ant-design/icons";
-import { Button, Flex, Modal, Tooltip, notification } from "antd";
+import { Button, Flex, Modal, Tooltip } from "antd";
 import dayjs from "dayjs";
-import { get, isEmpty } from "lodash";
+import { isEmpty } from "lodash";
 import { useMemo } from "react";
 
 type Props = {
@@ -25,9 +25,9 @@ type Props = {
 const VersionBtn = ({ item }: Props) => {
   const { currentProduct } = useAppStore();
   const { findUserName } = useUser();
-  const { mutateAsync: deployStage, isPending: pendingStage } =
+  const { mutate: deployStage, isPending: pendingStage } =
     useDeployMappingTemplateStage();
-  const { mutateAsync: deployProd, isPending: pendingProd } =
+  const { mutate: deployProd, isPending: pendingProd } =
     useDeployMappingTemplateProduction();
   const { data: dataEnv } = useGetProductEnvs(currentProduct);
   const stageEnv = dataEnv?.data?.find(
@@ -40,85 +40,65 @@ const VersionBtn = ({ item }: Props) => {
   const handleUpgradeStage = async () => {
     Modal.confirm({
       icon: <></>,
-      title: `Are you sure to upgrade now?`,
+      title: `Are you sure to deploy now?`,
       content: (
         <Text.NormalMedium>
-          Upgrade may take a few minutes??. You will not be able to change the
-          API mapping configurations or perform new deployment during the
-          process. Continue?
+          Deploy may take a few minutes. You will not be able to change the API
+          mapping configurations or perform new deployment during the process.
+          Continue?
         </Text.NormalMedium>
       ),
 
-      okText: "Upgrade",
+      okText: "Deploy",
       okType: "primary",
       closable: false,
-      onOk: async () => {
-        try {
-          const res = await deployStage({
-            productId: currentProduct,
-            data: {
-              templateUpgradeId: item.templateUpgradeId,
-              stageEnvId: stageEnv?.id,
-            },
-          } as any);
-          if (res) {
-            notification.success({ message: get(res, "message", "Success!") });
-          }
-        } catch (error) {
-          notification.error({
-            message: get(error, "reason", "Error. Please try again"),
-          });
-        }
-      },
+      onOk: () =>
+        deployStage({
+          productId: currentProduct,
+          data: {
+            templateUpgradeId: item.templateUpgradeId,
+            stageEnvId: stageEnv?.id,
+          },
+        } as any),
     });
   };
 
   const handleUpgradeProd = async () => {
     Modal.confirm({
       icon: <></>,
-      title: `Are you sure to upgrade now?`,
+      title: `Are you sure to deploy now?`,
       content: (
         <Text.NormalMedium>
-          Upgrade may take a few minutes??. You will not be able to change the
-          API mapping configurations or perform new deployment during the
-          process. Continue?
+          Deploy may take a few minutes. You will not be able to change the API
+          mapping configurations or perform new deployment during the process.
+          Continue?
         </Text.NormalMedium>
       ),
 
-      okText: "Upgrade",
+      okText: "Deploy",
       okType: "primary",
       closable: false,
-      onOk: async () => {
-        try {
-          const res = await deployProd({
-            productId: currentProduct,
-            data: {
-              templateUpgradeId: item.templateUpgradeId,
-              stageEnvId: stageEnv?.id,
-              productEnvId: productionEnv?.id,
-            },
-          } as any);
-          if (res) {
-            notification.success({ message: get(res, "message", "Success!") });
-          }
-        } catch (error) {
-          notification.error({
-            message: get(error, "reason", "Error. Please try again"),
-          });
-        }
-      },
+      onOk: () =>
+        deployProd({
+          productId: currentProduct,
+          data: {
+            templateUpgradeId: item.templateUpgradeId,
+            stageEnvId: stageEnv?.id,
+            productEnvId: productionEnv?.id,
+          },
+        } as any),
     });
   };
 
   const BtnStage = useMemo(() => {
-    if (item.showStageUpgradeButton && isEmpty(item.deployments)) {
+    if (
+      item.showStageUpgradeButton &&
+      isEmpty(item.deployments) &&
+      !pendingStage
+    ) {
       return (
-        <Button
-          type="default"
-          onClick={handleUpgradeStage}
-          loading={pendingStage}
-        >
-          {pendingStage ? "Deploying" : "Deploy to Stage"}
+        <Button type="default" onClick={handleUpgradeStage}>
+          Deploy to Stage
         </Button>
       );
     }
@@ -126,7 +106,11 @@ const VersionBtn = ({ item }: Props) => {
       (d) => d.envName?.toUpperCase?.() === "STAGE"
     );
     if (!isEmpty(currentStage)) {
-      if (currentStage.status === "IN_PROCESS" || !currentStage.status) {
+      if (
+        currentStage.status === "IN_PROCESS" ||
+        !currentStage.status ||
+        pendingStage
+      ) {
         return (
           <Button type="default" icon={<RedoOutlined rotate={-90} />}>
             Deploying
@@ -183,15 +167,12 @@ const VersionBtn = ({ item }: Props) => {
     if (
       !isEmpty(currentStage) &&
       item.deployments?.length === 1 &&
-      item.showProductionUpgradeButton
+      item.showProductionUpgradeButton &&
+      !pendingProd
     ) {
       return (
-        <Button
-          type="default"
-          onClick={handleUpgradeProd}
-          loading={pendingProd}
-        >
-          {pendingProd ? "Deploying" : "Deploy to Production"}
+        <Button type="default" onClick={handleUpgradeProd}>
+          "Deploy to Production
         </Button>
       );
     }
@@ -199,7 +180,11 @@ const VersionBtn = ({ item }: Props) => {
       (d) => d.envName?.toUpperCase?.() === "PRODUCTION"
     );
     if (!isEmpty(currentProd)) {
-      if (currentProd.status === "IN_PROCESS" || !currentProd.status) {
+      if (
+        currentProd.status === "IN_PROCESS" ||
+        !currentProd.status ||
+        pendingProd
+      ) {
         return (
           <Button type="default" icon={<RedoOutlined rotate={-90} />}>
             Deploying

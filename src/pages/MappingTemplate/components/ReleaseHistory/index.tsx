@@ -23,13 +23,13 @@ const ReleaseHistory = () => {
 
   const currentData = useMemo(() => {
     if (isEmpty(releaseData)) return [];
-    setSelectedVersion(releaseData?.data?.[0]?.productVersion);
+    setSelectedVersion(releaseData?.data?.[0]?.templateUpgradeId);
     return releaseData;
   }, [releaseData]);
 
   const currentDetailInfo = useMemo(() => {
     return releaseData?.data?.find(
-      (d: IReleaseHistory) => d.productVersion === selectedVersion
+      (d: IReleaseHistory) => d.templateUpgradeId === selectedVersion
     );
   }, [releaseData, selectedVersion]);
   return (

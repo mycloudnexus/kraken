@@ -32,10 +32,10 @@ const VersionSelect = ({
             className={clsx([
               styles.item,
               !isEmpty(selectedVersion) &&
-                d.productVersion === selectedVersion &&
+                d.templateUpgradeId === selectedVersion &&
                 styles.selected,
             ])}
-            onClick={() => setSelectedVersion(d.productVersion)}
+            onClick={() => setSelectedVersion(d.templateUpgradeId)}
             role="none"
           >
             <Flex align="center" gap={4}>

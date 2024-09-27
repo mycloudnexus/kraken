@@ -45,7 +45,7 @@ const DeploymentInfo = ({ runningData }: Props) => {
           <Tooltip
             title={
               <>
-                Running version in Production
+                Running version in Stage
                 <br />
                 {latestRunning?.stage?.runningVersion ? (
                   <>
