@@ -1,0 +1,20 @@
+Copyright 2024 [Console Connect](https://www.consoleconnect.com/)
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+This software include:
+- @ant-design/icons@5.3.7,@apidevtools/swagger-parser@10.1.0, @tanstack/react-query@5.45.1,@types/node@20.14.5,antd@5.17.4, axios@1.7.4, axios-auth-refresh@3.3.6, clsx@2.1.1, dayjs@1.11.11, js-yaml@3.14.1, lodash@4.17.21, path@0.12.7, react@18.3.1, react-dom@18.3.1, react-draggable@4.4.6, react-router-dom@6.23.1, rollup-plugin-node-polyfills@0.2.1, stream-browserify@3.0.0, usehooks-ts@3.1.0, zustand@4.5.2, @testing-library/jest-dom@6.4.6, @testing-library/react@16.0.0, @types/dompurify@3.0.5, @types/js-yaml@4.0.9, @types/lodash@4.17.5, @types/qs@6.9.15, @types/ramda@0.30.0, @types/react@18.3.3, @types/react-dom@18.3.0, @typescript-eslint/eslint-plugin@7.13.1, @vitejs/plugin-react@4.3.1, @vitest/coverage-v8@1.6.0, @vitest/ui@1.6.0,  eslint@8.57.0, eslint-plugin-react-hooks@4.6.2, eslint-plugin-react-refresh@0.4.7, jsdom@24.1.0, sass@1.77.6, vite@5.3.6, vite-plugin-svgr@4.2.0, vitest@1.6.0, rollup@4.22.4, ws@8.17.1 under a MIT license,  see License
+- @esbuild-plugins/node-globals-polyfill@0.2.3,@esbuild-plugins/node-modules-polyfill@0.2.2 under a ISC license, see License
+- dompurify@3.1.6 is under a MPL-2.0 or Apache 2.0 license see License
+- js-base64@3.7.7, qs@6.12.1 is under a BSD-3-Clause, see License
+- @typescript-eslint/parser@7.13.1 is under a BSE-2-Clause, See License
