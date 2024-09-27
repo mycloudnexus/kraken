@@ -98,16 +98,21 @@ request.interceptors.request.use((config: any) => {
   return config;
 });
 
-request.interceptors.response.use((response: AxiosResponse<any>) => {
-  const code = response.data.code || 200;
-  const message = response.data.error || "";
-  if (
-    (code === 401 || code === 403) &&
-    process.env.NODE_ENV !== "development"
-  ) {
-    notification.error({ message });
+request.interceptors.response.use(
+  (response: AxiosResponse<any>) => {
+    const code = response.data.code || 200;
+    const message = response.data.error || "";
+    if (
+      (code === 401 || code === 403) &&
+      process.env.NODE_ENV !== "development"
+    ) {
+      notification.error({ message });
+    }
+    return response.data;
+  },
+  (err) => {
+    return Promise.reject(new Error(get(err, "response.data", err)));
   }
-  return response.data;
-});
+);
 
 export default request;

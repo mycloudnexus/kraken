@@ -9,6 +9,7 @@ export interface IUserParams {
 type UserStore = {
   userParams: IUserParams;
   setUserParams: (userParams: Partial<IUserParams>) => void;
+  resetParams: () => void;
 };
 
 export const defaultData = {
@@ -23,4 +24,5 @@ export const useUserStore = create<UserStore>((set) => ({
   ...defaultData,
   setUserParams: (data) =>
     set((state) => ({ userParams: { ...state.userParams, ...data } })),
+  resetParams: () => set(() => ({ userParams: defaultData.userParams })),
 }));

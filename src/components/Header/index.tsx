@@ -1,10 +1,21 @@
-import { Button, Flex, Input, Select, Tooltip } from "antd";
+import {
+  Avatar,
+  Button,
+  Card,
+  Dropdown,
+  Flex,
+  Input,
+  Select,
+  Tooltip,
+} from "antd";
 import styles from "./index.module.scss";
 import Logo from "@/assets/logo.svg";
 import {
   BellOutlined,
   CloseOutlined,
   DownOutlined,
+  EditTwoTone,
+  LogoutOutlined,
   QuestionCircleOutlined,
   SearchOutlined,
   UpOutlined,
@@ -13,6 +24,9 @@ import {
 import { DEFAULT_PRODUCT } from "@/utils/constants/product";
 import { useAppStore } from "@/stores/app.store";
 import { useTutorialStore } from "@/stores/tutorial.store";
+import useUser from "@/hooks/user/useUser";
+import Text from "../Text";
+import { useNavigate } from "react-router-dom";
 
 const TooltipBody = (setTutorialCompleted: (value: boolean) => void) => (
   <div className={styles.tooltip}>
@@ -36,9 +50,53 @@ const TooltipBody = (setTutorialCompleted: (value: boolean) => void) => (
 );
 
 const Header = () => {
+  const { currentUser } = useUser();
   const { currentProduct } = useAppStore();
   const { tutorialCompleted, setTutorialCompleted, setOpenTutorial } =
     useTutorialStore();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate("/login");
+  };
+
+  const dropdownRender = () => {
+    return (
+      <Card
+        className={styles.root}
+        actions={[
+          <Flex
+            key="log-out"
+            align="center"
+            gap={10}
+            justify="center"
+            onClick={handleLogout}
+          >
+            <LogoutOutlined style={{ color: "#FF3864" }} />
+            <Text.LightMedium color="#FF3864">Log Out</Text.LightMedium>
+          </Flex>,
+        ]}
+      >
+        <Flex justify="center" align="center" vertical gap={8}>
+          <div style={{ position: "relative" }}>
+            <Avatar size={64}>
+              <UserOutlined />
+            </Avatar>
+            <div className={styles.edit}>
+              <EditTwoTone style={{ fontSize: 12 }} />
+            </div>
+          </div>
+          <Text.Custom size="20px" lineHeight="28px" bold="500">
+            {currentUser?.name}
+          </Text.Custom>
+          <Text.LightMedium lineHeight="22px" color="rgba(0, 0, 0, 0.45)">
+            {currentUser?.email}
+          </Text.LightMedium>
+        </Flex>
+      </Card>
+    );
+  };
 
   return (
     <div className={styles.header}>
@@ -84,9 +142,14 @@ const Header = () => {
         </Tooltip>
 
         <BellOutlined />
-        <div className={styles.avatar}>
+        <Dropdown
+          placement="bottomRight"
+          className={styles.avatar}
+          menu={{ items: [] }}
+          dropdownRender={dropdownRender}
+        >
           <UserOutlined />
-        </div>
+        </Dropdown>
       </div>
     </div>
   );

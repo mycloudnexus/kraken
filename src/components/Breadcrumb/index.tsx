@@ -30,7 +30,7 @@ const BreadCrumb = ({
         onClick={() => navigate(mainUrl)}
         className={styles.canClick}
       >
-        <LeftOutlined style={{ fontSize: 8 }} />
+        <LeftOutlined style={{ fontSize: 10 }} />
         <Text.LightLarge>{mainTitle}</Text.LightLarge>
       </Flex>
       {items?.map((i) => (

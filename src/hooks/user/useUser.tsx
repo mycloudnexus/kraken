@@ -1,5 +1,5 @@
 import { IUser } from "@/utils/types/user.type";
-import { useGetUserList } from ".";
+import { useGetCurrentUser, useGetUserList } from ".";
 import { isEmpty } from "lodash";
 
 const useUser = () => {
@@ -7,6 +7,7 @@ const useUser = () => {
     { size: 200, page: 0 },
     { staleTime: 999999 }
   );
+  const { data: currentUser } = useGetCurrentUser();
   const runUser = () => {
     return true;
   };
@@ -31,6 +32,7 @@ const useUser = () => {
     findUserName,
     findUserIdByEmail,
     dataUser: dataUser?.data || [],
+    currentUser,
   };
 };
 

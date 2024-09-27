@@ -25,4 +25,10 @@
   box-sizing: border-box;
   flex: 1;
   margin-top: 12px;
+
+  :global {
+    .ant-table-cell:has(.role-edit) {
+      padding: 0;
+    }
+  }
 }
