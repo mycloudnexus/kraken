@@ -53,7 +53,7 @@ const UserModal = ({ open, onClose }: Props) => {
       }
       footer={
         <Flex gap={12} justify="flex-end" align="center">
-          <Button>Cancel</Button>
+          <Button onClick={onClose}>Cancel</Button>
           <Button
             loading={isCreatePending}
             type="primary"

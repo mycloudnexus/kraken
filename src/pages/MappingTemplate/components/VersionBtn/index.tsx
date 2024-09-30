@@ -11,9 +11,9 @@ import {
   CheckCircleFilled,
   CloseCircleFilled,
   InfoCircleOutlined,
-  RedoOutlined,
+  LoadingOutlined,
 } from "@ant-design/icons";
-import { Button, Flex, Modal, Tooltip } from "antd";
+import { Button, Flex, Modal, Spin, Tooltip } from "antd";
 import dayjs from "dayjs";
 import { isEmpty } from "lodash";
 import { useMemo } from "react";
@@ -112,7 +112,15 @@ const VersionBtn = ({ item }: Props) => {
         pendingStage
       ) {
         return (
-          <Button type="default" icon={<RedoOutlined rotate={-90} />}>
+          <Button
+            type="default"
+            icon={
+              <Spin
+                indicator={<LoadingOutlined style={{ color: "#000" }} spin />}
+                size="small"
+              />
+            }
+          >
             Deploying
           </Button>
         );
@@ -172,7 +180,7 @@ const VersionBtn = ({ item }: Props) => {
     ) {
       return (
         <Button type="default" onClick={handleUpgradeProd}>
-          "Deploy to Production
+          Deploy to Production
         </Button>
       );
     }
@@ -186,7 +194,15 @@ const VersionBtn = ({ item }: Props) => {
         pendingProd
       ) {
         return (
-          <Button type="default" icon={<RedoOutlined rotate={-90} />}>
+          <Button
+            type="default"
+            icon={
+              <Spin
+                indicator={<LoadingOutlined style={{ color: "#000" }} spin />}
+                size="small"
+              />
+            }
+          >
             Deploying
           </Button>
         );

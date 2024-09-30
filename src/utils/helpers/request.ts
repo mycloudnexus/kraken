@@ -111,7 +111,7 @@ request.interceptors.response.use(
     return response.data;
   },
   (err) => {
-    return Promise.reject(new Error(get(err, "response.data", err)));
+    return Promise.reject(get(err, "response.data", err));
   }
 );
 

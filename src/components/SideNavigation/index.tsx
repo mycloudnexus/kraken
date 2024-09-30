@@ -69,10 +69,10 @@ const SideNavigation = () => {
         icon: <HomeOutlined />,
       },
       {
-        key: "components/",
+        key: "components",
         label: <Link to="/components">Standard API mapping</Link>,
         icon: <ApiOutlined />,
-        matching: ["components/", "api-mapping/[a-z0-9-]+"],
+        matching: ["components", "api-mapping/[a-z0-9-]+"],
       },
       {
         key: "component/",
@@ -80,7 +80,7 @@ const SideNavigation = () => {
         icon: <AlertOutlined />,
       },
       {
-        key: "env/",
+        key: "env",
         label: <Link to="/env">Deployment</Link>,
         icon: <FolderAddOutlined />,
       },
@@ -91,7 +91,7 @@ const SideNavigation = () => {
         matching: ["env/[a-z0-9-]+"],
       },
       {
-        key: "buyer/",
+        key: "buyer",
         label: <Link to="/buyer">Buyer management</Link>,
         icon: <UsergroupAddOutlined />,
       },
@@ -99,6 +99,12 @@ const SideNavigation = () => {
         label: "Settings",
         key: "settings",
         icon: <SettingOutlined />,
+        matching: [
+          "settings",
+          "audit-log",
+          "mapping-template",
+          "user-management",
+        ],
         children: [
           {
             label: <Link to="/audit-log">Audit log</Link>,
@@ -143,6 +149,20 @@ const SideNavigation = () => {
     setActiveKey(key);
   };
 
+  const openKeys = useMemo(() => {
+    if (collapsed) {
+      return [];
+    }
+    if (
+      ["settings", "audit-log", "mapping-template", "user-management"].some(
+        (match: string) => new RegExp(match).test(activeKey)
+      )
+    ) {
+      return ["settings"];
+    }
+    return [activeKey];
+  }, [activeKey]);
+
   return (
     <Sider
       width={240}
@@ -157,7 +177,7 @@ const SideNavigation = () => {
           disabledOverflow={true}
           activeKey={activeKey}
           defaultSelectedKeys={[activeKey]}
-          defaultOpenKeys={collapsed ? [] : [activeKey]}
+          defaultOpenKeys={openKeys}
           onSelect={(e) => handleNavigationSet(e.key)}
           items={items}
           selectedKeys={selectedKeys}
