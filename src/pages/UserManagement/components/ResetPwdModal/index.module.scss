@@ -1,0 +1,40 @@
+.root {
+  :global {
+    .ant-modal-content {
+      border-radius: 0;
+      padding: 0;
+    }
+    .ant-modal-header {
+      padding: 16px 24px;
+      box-shadow: 0px -1px 0px 0px #f0f0f0 inset;
+    }
+    .ant-modal-body {
+      padding: 8px 40px 0 39px;
+    }
+    .ant-modal-footer {
+      margin-top: 0;
+      box-shadow: 0px 1px 0px 0px #f0f0f0 inset;
+      padding: 10px 16px;
+    }
+  }
+}
+
+.form {
+  :global {
+    .ant-form-item-required {
+      &::after {
+        display: inline-block;
+        margin-inline-start: 4px !important;
+        color: #ff4d4f;
+        font-size: 14px;
+        font-family: SimSun, sans-serif;
+        line-height: 1;
+        content: "*" !important;
+        visibility: visible !important;
+      }
+      &::before {
+        display: none !important;
+      }
+    }
+  }
+}

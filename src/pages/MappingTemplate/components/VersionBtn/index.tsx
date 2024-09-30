@@ -1,11 +1,14 @@
 import Text from "@/components/Text";
 import {
+  PRODUCT_CACHE_KEYS,
   useDeployMappingTemplateProduction,
   useDeployMappingTemplateStage,
   useGetProductEnvs,
 } from "@/hooks/product";
 import useUser from "@/hooks/user/useUser";
 import { useAppStore } from "@/stores/app.store";
+import { useMappingTemplateStore } from "@/stores/mappingTemplate";
+import { queryClient } from "@/utils/helpers/reactQuery";
 import { IReleaseHistory } from "@/utils/types/product.type";
 import {
   CheckCircleFilled,
@@ -23,6 +26,7 @@ type Props = {
 };
 
 const VersionBtn = ({ item }: Props) => {
+  const { releaseParams } = useMappingTemplateStore();
   const { currentProduct } = useAppStore();
   const { findUserName } = useUser();
   const { mutate: deployStage, isPending: pendingStage } =
@@ -36,6 +40,24 @@ const VersionBtn = ({ item }: Props) => {
   const productionEnv = dataEnv?.data?.find(
     (d) => d?.name?.toLowerCase?.() === "production"
   );
+
+  const updateStatus = (array: any, id: string) => {
+    return {
+      ...array,
+      data: {
+        ...array?.data,
+        data: array?.data?.data?.map((d: any) => {
+          if (d?.templateUpgradeId === id) {
+            return {
+              ...d,
+              status: "IN_PROCESS",
+            };
+          }
+          return d;
+        }),
+      },
+    };
+  };
 
   const handleUpgradeStage = async () => {
     Modal.confirm({
@@ -52,14 +74,22 @@ const VersionBtn = ({ item }: Props) => {
       okText: "Deploy",
       okType: "primary",
       closable: false,
-      onOk: () =>
+      onOk: () => {
         deployStage({
           productId: currentProduct,
           data: {
             templateUpgradeId: item.templateUpgradeId,
             stageEnvId: stageEnv?.id,
           },
-        } as any),
+        } as any);
+        queryClient.setQueryData(
+          [PRODUCT_CACHE_KEYS.get_release_list, currentProduct, releaseParams],
+          (oldData: any) => {
+            const newData = updateStatus(oldData, item.templateUpgradeId);
+            return { ...newData };
+          }
+        );
+      },
     });
   };
 
@@ -78,7 +108,7 @@ const VersionBtn = ({ item }: Props) => {
       okText: "Deploy",
       okType: "primary",
       closable: false,
-      onOk: () =>
+      onOk: () => {
         deployProd({
           productId: currentProduct,
           data: {
@@ -86,7 +116,15 @@ const VersionBtn = ({ item }: Props) => {
             stageEnvId: stageEnv?.id,
             productEnvId: productionEnv?.id,
           },
-        } as any),
+        } as any);
+        queryClient.setQueryData(
+          [PRODUCT_CACHE_KEYS.get_release_list, currentProduct, releaseParams],
+          (oldData: any) => {
+            const newData = updateStatus(oldData, item.templateUpgradeId);
+            return { ...newData };
+          }
+        );
+      },
     });
   };
 

@@ -14,7 +14,7 @@ import { isEmpty } from "lodash";
 import ReleaseBg from "@/assets/release-bg.svg?url";
 import DoneIcon from "@/assets/icon/upgrade-done.svg";
 
-const ReleaseHistory = () => {
+const ReleaseHistory = ({ maxHeight = 0 }) => {
   const { currentProduct } = useAppStore();
   const { releaseParams } = useMappingTemplateStore();
   const { data: releaseData, isLoading } =
@@ -33,7 +33,7 @@ const ReleaseHistory = () => {
     );
   }, [releaseData, selectedVersion]);
   return (
-    <div className={styles.root}>
+    <div className={styles.root} style={{ maxHeight }}>
       <Flex
         vertical
         className={styles.info}
@@ -65,7 +65,7 @@ const ReleaseHistory = () => {
           </Tag>
         </Flex>
       </Flex>
-      <Flex className={styles.content}>
+      <Flex className={styles.content} style={{ maxHeight: maxHeight - 188 }}>
         {!isLoading && isEmpty(currentData?.data) && (
           <Empty description="No release history" className={styles.empty} />
         )}

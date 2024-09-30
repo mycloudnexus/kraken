@@ -4,7 +4,7 @@ import { Button, Flex, Input, Switch, Table, notification } from "antd";
 import { useEffect, useMemo, useRef } from "react";
 import { useDisableUser, useEnableUser, useGetUserList } from "@/hooks/user";
 import { useUserStore } from "@/stores/user.store";
-import { debounce, get, head, isNil, omitBy } from "lodash";
+import { debounce, get } from "lodash";
 import { ERole } from "@/components/Role";
 import dayjs from "dayjs";
 import useSize from "@/hooks/useSize";
@@ -13,6 +13,7 @@ import UserModal from "./components/UserModal";
 import { useBoolean } from "usehooks-ts";
 import { IUser } from "@/utils/types/user.type";
 import UserRoleEdit from "./components/UserRoleEdit";
+import ResetPwd from "./components/ResetPwd";
 
 const UserManagement = () => {
   const { currentUser } = useUser();
@@ -47,7 +48,7 @@ const UserManagement = () => {
       });
     }
   };
-  const columns = useMemo(
+  const columns: any = useMemo(
     () => [
       {
         title: "User name",
@@ -75,6 +76,9 @@ const UserManagement = () => {
           <UserRoleEdit user={record} isAdmin={isAdmin} />
         ),
         filterMultiple: false,
+        onFilter: () => {
+          return true;
+        },
       },
       {
         title: "Enable State",
@@ -100,6 +104,9 @@ const UserManagement = () => {
             style={!isAdmin ? { opacity: 0.4 } : {}}
           />
         ),
+        onFilter: () => {
+          return true;
+        },
       },
       {
         title: "Created at",
@@ -107,6 +114,21 @@ const UserManagement = () => {
         width: 205,
         render: (createdAt: string) =>
           dayjs(createdAt).format("YYYY-MM-DD HH:mm:ss"),
+      },
+      {
+        title: "Created at",
+        dataIndex: "createdAt",
+        width: 205,
+        render: (createdAt: string) =>
+          dayjs(createdAt).format("YYYY-MM-DD HH:mm:ss"),
+      },
+      {
+        title: "Actions",
+        dataIndex: "",
+        width: 90,
+        align: "center",
+        render: (record: IUser) => <ResetPwd user={record} />,
+        hidden: !isAdmin,
       },
     ],
     [isAdmin, handleSwitch, pendingEnable, pendingDisable]
@@ -153,22 +175,12 @@ const UserManagement = () => {
             total: get(dataUser, "total", 0),
             showSizeChanger: true,
             showTotal: (total) => `Total ${total} items`,
-            onChange: (page, pageSize) =>
-              setUserParams({ page: page - 1, size: pageSize }),
+            onChange: (page, pageSize) => {
+              setUserParams({ page: page - 1, size: pageSize });
+            },
           }}
           scroll={{
             y: get(size, "height", 0) - 164,
-          }}
-          onChange={(_, filter) => {
-            const output = {
-              role: head(filter.role),
-              state: head(filter.state),
-            };
-            const currentFilter = omitBy(output, isNil);
-            console.log("====> Current Filter ====>", currentFilter);
-            setUserParams({
-              page: 0,
-            });
           }}
         />
       </div>

@@ -37,3 +37,12 @@ export const disableUser = (id: string) => {
     method: "PATCH",
   });
 };
+
+export const resetPwdUser = (id: string, password: string) => {
+  return request(`${USER}/${id}/resetPassword`, {
+    method: "POST",
+    data: {
+      password,
+    },
+  });
+};

@@ -2,6 +2,22 @@
   width: 240px;
   border-right: 1px solid #f0f0f0;
   padding-right: 12px;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    height: 18px;
+    display: block !important;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border: 6px solid rgba(0, 0, 0, 0);
+    background-clip: padding-box;
+    border-radius: 8px;
+    background-color: #dde1e5;
+    &:hover {
+      background-color: #f7f7f7;
+    }
+  }
 }
 
 .item {

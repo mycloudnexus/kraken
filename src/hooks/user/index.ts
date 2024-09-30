@@ -5,6 +5,7 @@ import {
   enableUser,
   getCurrentUser,
   getListUser,
+  resetPwdUser,
 } from "@/services/user";
 import { queryClient } from "@/utils/helpers/reactQuery";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -16,6 +17,7 @@ export const USER_CACHE_KEYS = {
   edit_user: "edit_user",
   enable_user: "enable_user",
   disable_user: "disable_user",
+  reset_password: "reset_password",
 };
 export const useGetUserList = (params: Record<string, any>, options?: any) => {
   return useQuery<any, Error>({
@@ -46,6 +48,7 @@ export const useCreateUser = () => {
     },
   });
 };
+
 export const useEditUser = () => {
   return useMutation<any, Error>({
     mutationKey: [USER_CACHE_KEYS.edit_user],
@@ -77,5 +80,12 @@ export const useDisableUser = () => {
         queryKey: [USER_CACHE_KEYS.get_user],
       });
     },
+  });
+};
+
+export const useResetPassword = () => {
+  return useMutation<any, Error>({
+    mutationKey: [USER_CACHE_KEYS.reset_password],
+    mutationFn: (data: any) => resetPwdUser(data.id, data.password),
   });
 };
