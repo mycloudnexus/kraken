@@ -27,7 +27,7 @@ const DeploymentInfo = ({ runningData }: Props) => {
 
   const renderVersionText = useCallback((version: string) => {
     if (isEmpty(version)) {
-      return "";
+      return "n/a";
     }
     return `v${version}`;
   }, []);
@@ -42,26 +42,30 @@ const DeploymentInfo = ({ runningData }: Props) => {
           <Text.LightMedium lineHeight="22px" color="#00000073">
             Stage
           </Text.LightMedium>
-          <Tooltip
-            title={
-              <>
-                Running version in Stage
-                <br />
-                {latestRunning?.stage?.runningVersion ? (
-                  <>
-                    Deployed by {findUserName(latestRunning?.stage?.createBy)}{" "}
-                    {dayjs(latestRunning?.stage?.createAt).format(
-                      "YYYY-MM-DD HH:mm:ss"
-                    )}
-                  </>
-                ) : (
-                  ""
-                )}
-              </>
-            }
-          >
-            <InfoCircleOutlined style={{ color: "#00000073" }} />
-          </Tooltip>
+          {latestRunning?.stage?.runningVersion ? (
+            <Tooltip
+              title={
+                <>
+                  Running version in Stage
+                  <br />
+                  {latestRunning?.stage?.runningVersion ? (
+                    <>
+                      Deployed by {findUserName(latestRunning?.stage?.createBy)}{" "}
+                      {dayjs(latestRunning?.stage?.createAt).format(
+                        "YYYY-MM-DD HH:mm:ss"
+                      )}
+                    </>
+                  ) : (
+                    ""
+                  )}
+                </>
+              }
+            >
+              <InfoCircleOutlined style={{ color: "#00000073" }} />
+            </Tooltip>
+          ) : (
+            <></>
+          )}
         </Flex>
       </Flex>
       <Flex gap={8}>
@@ -72,27 +76,25 @@ const DeploymentInfo = ({ runningData }: Props) => {
           <Text.LightMedium lineHeight="22px" color="#00000073">
             Production
           </Text.LightMedium>
-          <Tooltip
-            title={
-              <>
-                Running version in Production
-                <br />
-                {latestRunning?.stage?.runningVersion ? (
-                  <>
-                    Deployed by{" "}
-                    {findUserName(latestRunning?.production?.createBy)}{" "}
-                    {dayjs(latestRunning?.production?.createAt).format(
-                      "YYYY-MM-DD HH:mm:ss"
-                    )}
-                  </>
-                ) : (
-                  ""
-                )}
-              </>
-            }
-          >
-            <InfoCircleOutlined style={{ color: "#00000073" }} />
-          </Tooltip>
+          {latestRunning?.production?.runningVersion ? (
+            <Tooltip
+              title={
+                <>
+                  Running version in Production
+                  <br />
+                  Deployed by{" "}
+                  {findUserName(latestRunning?.production?.createBy)}{" "}
+                  {dayjs(latestRunning?.production?.createAt).format(
+                    "YYYY-MM-DD HH:mm:ss"
+                  )}
+                </>
+              }
+            >
+              <InfoCircleOutlined style={{ color: "#00000073" }} />
+            </Tooltip>
+          ) : (
+            <></>
+          )}
         </Flex>
       </Flex>
     </Flex>

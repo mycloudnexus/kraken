@@ -33,7 +33,6 @@ const ResetPwdModal = ({ user, open, onClose }: Props) => {
   return (
     <Modal
       open={open}
-      onClose={onClose}
       title="Reset Password"
       className={styles.root}
       okButtonProps={{
@@ -41,6 +40,7 @@ const ResetPwdModal = ({ user, open, onClose }: Props) => {
         htmlType: "submit",
       }}
       onOk={form.submit}
+      onCancel={onClose}
     >
       <Form
         form={form}
