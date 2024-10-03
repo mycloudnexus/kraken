@@ -2,17 +2,76 @@ import LogMethodTag from "@/components/LogMethodTag";
 import Text from "@/components/Text";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { EnumRightType } from "@/utils/types/common.type";
-import { RightOutlined } from "@ant-design/icons";
-import { Flex, Typography } from "antd";
+import { CloseCircleFilled, RightOutlined } from "@ant-design/icons";
+import { Flex, Modal, Typography } from "antd";
 import clsx from "clsx";
 import MappingIcon from "@/assets/newAPIMapping/mapping-icon.svg";
 import MappingReverseIcon from "@/assets/newAPIMapping/mapping-icon-reverse.svg";
 import styles from "./index.module.scss";
 import { useMappingUiStore } from "@/stores/mappingUi.store";
+import { get, isEmpty } from "lodash";
+import { useBoolean } from "usehooks-ts";
+
+type Props = {
+  disabled: boolean;
+  isFocus: boolean;
+  handleClick: () => void;
+};
+const SellerAPI = ({ disabled, isFocus, handleClick }: Props) => {
+  const { sellerApi } = useNewApiMappingStore();
+  if (disabled) {
+    return (
+      <Typography.Text style={{ color: "#00000040" }}>
+        Not required
+      </Typography.Text>
+    );
+  }
+  if (!isEmpty(sellerApi)) {
+    return (
+      <>
+        <LogMethodTag method={sellerApi.method} />
+        <Typography.Text style={{ flex: 1 }} ellipsis={{ tooltip: true }}>
+          {sellerApi.url}
+        </Typography.Text>
+        {isFocus && (
+          <CloseCircleFilled
+            style={{
+              color: "#00000040",
+              marginLeft: -4,
+              marginRight: 4,
+            }}
+            onClick={(e) => {
+              e.preventDefault();
+              handleClick();
+            }}
+          />
+        )}
+      </>
+    );
+  }
+  return (
+    <Typography.Text style={{ color: "#00000040" }}>
+      Please select API
+    </Typography.Text>
+  );
+};
 const HeaderMapping = ({ disabled = false }) => {
   const { query, sellerApi, rightSide, setRightSide } = useNewApiMappingStore();
   const { activeTab } = useMappingUiStore();
   const queryData = JSON.parse(query ?? "{}");
+  const { value: isFocus, setTrue, setFalse } = useBoolean(false);
+  const handleClick = () => {
+    Modal.confirm({
+      title: `Are you sure to remove selected API?`,
+
+      okButtonProps: {
+        type: "primary",
+      },
+      okText: "OK",
+      okType: "danger",
+      onOk: () => {},
+    });
+  };
   return (
     <>
       <Flex gap={60}>
@@ -25,16 +84,30 @@ const HeaderMapping = ({ disabled = false }) => {
             padding: 10,
           }}
         >
-          <Text.NormalLarge>Sonata API</Text.NormalLarge>
+          <Text.NormalLarge lineHeight="24px">Sonata API</Text.NormalLarge>
         </Flex>
         <Text.NormalLarge
           style={{
             boxSizing: "border-box",
             flex: "0 0 calc(50% - 30px)",
             padding: "10px 5.5px",
+            display: "flex",
+            gap: 8,
           }}
+          lineHeight="24px"
         >
           Seller API
+          <Typography.Text
+            style={{
+              color: "#00000073",
+              fontSize: 12,
+              maxWidth: `calc(100% - 80px)`,
+              lineHeight: "24px",
+            }}
+            ellipsis={{ tooltip: true }}
+          >
+            {get(sellerApi, "name", "")}
+          </Typography.Text>
         </Text.NormalLarge>
       </Flex>
       <Flex align="center" gap={9} style={{ marginBottom: 26 }}>
@@ -66,23 +139,19 @@ const HeaderMapping = ({ disabled = false }) => {
             }
             setRightSide(EnumRightType.SelectSellerAPI);
           }}
+          onMouseEnter={() => {
+            setTrue();
+          }}
+          onMouseLeave={() => {
+            setFalse();
+          }}
         >
-          <Flex align="center" gap={12} style={{ width: "100%" }}>
-            {sellerApi ? (
-              <>
-                <LogMethodTag method={sellerApi.method} />
-                <Typography.Text
-                  style={{ flex: 1 }}
-                  ellipsis={{ tooltip: true }}
-                >
-                  {sellerApi.url}
-                </Typography.Text>
-              </>
-            ) : (
-              <Typography.Text>
-                Please select API from the side bar
-              </Typography.Text>
-            )}
+          <Flex align="center" gap={8} style={{ width: "100%" }}>
+            <SellerAPI
+              isFocus={isFocus}
+              disabled={disabled}
+              handleClick={handleClick}
+            />
           </Flex>
           <RightOutlined style={{ color: "rgba(0, 0, 0, 0.45)" }} />
         </Flex>

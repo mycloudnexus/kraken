@@ -160,7 +160,9 @@ const SonataResponseMapping = ({ method, spec }: Props) => {
   return (
     <Flex vertical gap={16} style={{ width: "100%", height: "100%" }}>
       <div className={styles.header}>
-        <Text.BoldLarge>Add mapping property from Sonata API</Text.BoldLarge>
+        <Text.Custom size="15px" bold="500">
+          Select Sonata API mapping property
+        </Text.Custom>
       </div>
       <div className={styles.container}>
         <div>
@@ -172,15 +174,22 @@ const SonataResponseMapping = ({ method, spec }: Props) => {
           />
         </div>
         <div style={{ marginTop: 16 }}>
-          <Flex justify="space-between" gap={8} align="center">
+          <Flex
+            style={{ cursor: "pointer" }}
+            justify="space-between"
+            gap={8}
+            align="center"
+            onClick={toggleOpen}
+            role="none"
+          >
             <Flex justify="flex-start" gap={8} align="center">
               <TitleIcon />
               <Text.NormalMedium>Response body</Text.NormalMedium>
             </Flex>
             {isOpen ? (
-              <DownOutlined onClick={toggleOpen} style={{ fontSize: 10 }} />
+              <DownOutlined style={{ fontSize: 10 }} />
             ) : (
-              <RightOutlined onClick={toggleOpen} style={{ fontSize: 10 }} />
+              <RightOutlined style={{ fontSize: 10 }} />
             )}
           </Flex>
         </div>

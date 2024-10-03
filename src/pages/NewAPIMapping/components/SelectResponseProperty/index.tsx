@@ -144,9 +144,7 @@ const SelectResponseProperty = () => {
   return (
     <div className={styles.root}>
       <div className={styles.header}>
-        <Text.BoldLarge>
-          Select response property from seller API
-        </Text.BoldLarge>
+        <Text.NormalLarge>Select Seller API response property</Text.NormalLarge>
       </div>
       <div className={styles.container}>
         <div>
@@ -158,15 +156,21 @@ const SelectResponseProperty = () => {
           />
         </div>
         <div style={{ marginTop: 16 }}>
-          <Flex justifyContent="space-between" gap={8}>
+          <Flex
+            justifyContent="space-between"
+            gap={8}
+            onClick={toggleOpen}
+            role="none"
+            style={{ cursor: "pointer" }}
+          >
             <Flex justifyContent="flex-start" gap={8}>
               <TitleIcon />
               <Text.NormalMedium>Response body</Text.NormalMedium>
             </Flex>
             {isOpen ? (
-              <DownOutlined onClick={toggleOpen} style={{ fontSize: 10 }} />
+              <DownOutlined style={{ fontSize: 10 }} />
             ) : (
-              <RightOutlined onClick={toggleOpen} style={{ fontSize: 10 }} />
+              <RightOutlined style={{ fontSize: 10 }} />
             )}
           </Flex>
         </div>

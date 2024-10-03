@@ -4,7 +4,7 @@ import {
   convertSchemaToTypeOnly,
   parseObjectDescriptionToTreeData,
 } from "@/utils/helpers/schema";
-import { Button, Collapse, Flex } from "antd";
+import { Button, Collapse, Empty, Flex } from "antd";
 import { useMemo, useState } from "react";
 import { useCommonAddProp } from "../commonHook";
 import styles from "./index.module.scss";
@@ -60,16 +60,31 @@ const RightAddSellerProp = ({ onSelect }: Readonly<Props>) => {
   return (
     <Flex vertical gap={16} style={{ width: "100%", height: "100%" }}>
       <div className={styles.header}>
-        <Text.BoldLarge>Add mapping property from seller API</Text.BoldLarge>
+        <Text.NormalLarge lineHeight="24px">
+          Select Seller API mapping property
+        </Text.NormalLarge>
       </div>
       <div className={styles.container}>
-        <Collapse
-          ghost
-          items={collapseItems}
-          defaultActiveKey={["path", "query", "request"]}
-          className={styles.collapse}
-          expandIconPosition="end"
-        />
+        {!isEmpty(collapseItems) ? (
+          <Collapse
+            items={collapseItems}
+            defaultActiveKey={["path", "query", "request"]}
+            ghost
+            className={styles.collapse}
+            expandIconPosition="end"
+          />
+        ) : (
+          <Empty
+            description="No request property"
+            style={{
+              alignItems: "center",
+              flexDirection: "column",
+              display: "flex",
+              justifyContent: "center",
+              height: "100%",
+            }}
+          />
+        )}
       </div>
       <Flex justify="flex-end" className={styles.footer}>
         <Button

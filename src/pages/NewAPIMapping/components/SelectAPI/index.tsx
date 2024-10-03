@@ -1,4 +1,3 @@
-import ServerIcon from "@/assets/server-icon.svg";
 import Flex from "@/components/Flex";
 import Text from "@/components/Text";
 import { useGetComponentListAPISpec } from "@/hooks/product";
@@ -9,7 +8,7 @@ import { DownOutlined, RightOutlined } from "@ant-design/icons";
 import { Button, Input, Spin, Tooltip, Typography, notification } from "antd";
 import clsx from "clsx";
 import jsYaml from "js-yaml";
-import { cloneDeep, get, isEmpty } from "lodash";
+import { cloneDeep, delay, get, isEmpty } from "lodash";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import swaggerClient from "swagger-client";
@@ -39,6 +38,19 @@ export const APIItem = ({
   const { sellerApi } = useNewApiMappingStore();
   const { value: isOpen, toggle: toggleOpen, setTrue } = useBoolean(false);
   const [searchValue, setSearchValue] = useState("");
+  const { value: firstOpen, setFalse } = useBoolean(true);
+
+  useEffect(() => {
+    if (isEmpty(sellerApi)) return;
+    if (item?.metadata?.name === sellerApi?.name && firstOpen) {
+      setTrue();
+      setFalse();
+      delay(() => {
+        const current = document.getElementById("active-server");
+        current?.scrollIntoView({ behavior: "smooth", block: "end" });
+      }, 1000);
+    }
+  }, [sellerApi]);
 
   const baseSpec = useMemo(() => {
     try {
@@ -56,7 +68,6 @@ export const APIItem = ({
   const load = async (spec: Record<string, any>) => {
     try {
       const result = await swaggerClient.resolve({ spec });
-
       setResolvedSpec(result.spec);
     } catch (error) {
       notification.error({
@@ -119,6 +130,16 @@ export const APIItem = ({
     );
   }, [searchValue]);
 
+  const getDescription = useCallback(
+    (path: string, method: string) => {
+      const item = get(resolvedSpec, `paths.${path}.${method}`, {
+        summary: "",
+      });
+      return item.summary;
+    },
+    [resolvedSpec]
+  );
+
   return (
     <>
       <Flex justifyContent="space-between">
@@ -166,6 +187,7 @@ export const APIItem = ({
                 method === sellerApi?.method;
             return (
               <div
+                id={active ? "active-server" : ""}
                 className={clsx(styles.card, {
                   [styles.active]: active,
                 })}
@@ -173,18 +195,10 @@ export const APIItem = ({
                 role="none"
                 key={key}
               >
-                <Flex justifyContent="flex-start" gap={8} alignItems="center">
-                  <div style={{ flex: "0 0 16px", width: "16px" }}>
-                    <ServerIcon />
-                  </div>
-                  <Typography.Text ellipsis={{ tooltip: true }}>
-                    {url?.replace("/", "")}
-                  </Typography.Text>
-                </Flex>
                 <Flex
                   justifyContent="flex-start"
                   gap={12}
-                  style={{ marginTop: 12 }}
+                  style={{ marginBottom: 10 }}
                 >
                   <RequestMethod method={method} noSpace />
                   <Tooltip title={url}>
@@ -193,6 +207,12 @@ export const APIItem = ({
                     </Typography.Text>
                   </Tooltip>
                 </Flex>
+                <Typography.Text
+                  style={{ fontSize: 14, color: "#00000073" }}
+                  ellipsis={{ tooltip: true }}
+                >
+                  {getDescription(url, method)}
+                </Typography.Text>
               </div>
             );
           })}

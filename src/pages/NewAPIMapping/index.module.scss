@@ -9,6 +9,12 @@
     #tab-mapping > .ant-tabs-nav {
       margin-bottom: 2px;
     }
+    .ant-tabs,
+    .ant-tabs-content,
+    .ant-tabs-tabpane-active {
+      flex: 1;
+      height: 100%;
+    }
   }
 }
 

@@ -4,11 +4,12 @@ import {
   convertSchemaToTypeOnly,
   parseObjectDescriptionToTreeData,
 } from "@/utils/helpers/schema";
-import { Button, Collapse, Flex } from "antd";
+import { Button, Collapse, Empty, Flex } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import swaggerClient from "swagger-client";
 import { useCommonAddProp } from "../commonHook";
 import styles from "./index.module.scss";
+import { isEmpty } from "lodash";
 
 export const getCorrectSpec = (spec: any, method: string) => {
   if (!spec) return;
@@ -106,16 +107,31 @@ const RightAddSonataProp = ({
       className={styles.root}
     >
       <div className={styles.header}>
-        <Text.BoldLarge>Add mapping property from Sonata API</Text.BoldLarge>
+        <Text.Custom size="15px" bold="500">
+          Select Sonata API mapping property
+        </Text.Custom>
       </div>
       <div className={styles.container}>
-        <Collapse
-          ghost
-          items={collapseItems}
-          defaultActiveKey={["path", "query", "request"]}
-          className={styles.collapse}
-          expandIconPosition="end"
-        />
+        {isEmpty(collapseItems) ? (
+          <Empty
+            description="No request property"
+            style={{
+              height: "100%",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              flexDirection: "column",
+            }}
+          />
+        ) : (
+          <Collapse
+            ghost
+            items={collapseItems}
+            defaultActiveKey={["path", "query", "request"]}
+            className={styles.collapse}
+            expandIconPosition="end"
+          />
+        )}
       </div>
       <Flex justify="flex-end" className={styles.footer}>
         <Button type="primary" onClick={handleAddProp} disabled={!selectedProp}>

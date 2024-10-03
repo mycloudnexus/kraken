@@ -5,6 +5,7 @@ import { Button, Tabs, TabsProps, Tooltip, notification } from "antd";
 import {
   chain,
   cloneDeep,
+  delay,
   flatMap,
   get,
   isEmpty,
@@ -45,6 +46,8 @@ import useUser from "@/hooks/user/useUser";
 import DeploymentInfo from "./components/DeploymentInfo";
 import StatusIcon from "./components/StatusIcon";
 import { useSessionStorage } from "usehooks-ts";
+import NotRequired from "./components/NotRequired";
+import { IRequestMapping } from "@/utils/types/component.type";
 
 type Props = {
   rightSide: number;
@@ -179,6 +182,18 @@ const NewAPIMapping = ({
 
   useEffect(() => {
     if (firstTimeLoad && !isEmpty(mappers?.request)) {
+      const firstItem = mappers?.request?.find((r: IRequestMapping) =>
+        isEmpty(r.target)
+      );
+      if (firstItem) {
+        setRightSide(EnumRightType.AddSellerProp);
+        delay(() => {
+          const dom = document.getElementById(JSON.stringify(firstItem));
+          if (dom) {
+            dom?.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        }, 1000);
+      }
       setRequestMapping(resetMapping() ?? []);
     }
   }, [mappers?.request, firstTimeLoad]);
@@ -217,20 +232,12 @@ const NewAPIMapping = ({
     {
       key: "request",
       label: "Request mapping",
-      children: isRequiredMapping ? (
-        <RequestMapping />
-      ) : (
-        <Text.LightMedium>Not required.</Text.LightMedium>
-      ),
+      children: isRequiredMapping ? <RequestMapping /> : <NotRequired />,
     },
     {
       key: "response",
       label: "Response mapping",
-      children: isRequiredMapping ? (
-        <ResponseMapping />
-      ) : (
-        <Text.LightMedium>Not required.</Text.LightMedium>
-      ),
+      children: isRequiredMapping ? <ResponseMapping /> : <NotRequired />,
       disabled: loadingMapper,
     },
   ];
@@ -458,7 +465,7 @@ const NewAPIMapping = ({
           />
           <DeploymentInfo runningData={runningDeploymentData} />
         </Flex>
-        {isRequiredMapping && mainTabKey === EMainTab.mapping && (
+        {mainTabKey === EMainTab.mapping && (
           <Flex className={styles.breadcrumb} justifyContent="space-between">
             <Flex className={styles.infoBox}>
               {queryData?.lastDeployedAt && (
@@ -519,38 +526,42 @@ const NewAPIMapping = ({
               gap={8}
               className={styles.bottomWrapper}
             >
-              <Tooltip title="Restore">
-                <Button
-                  disabled={!isRequiredMapping}
-                  className={styles.revertButton}
-                  onClick={handleRevert}
-                >
-                  <RollbackIcon />
-                </Button>
-              </Tooltip>
-              <Tooltip
-                title={
-                  queryData?.updatedAt
-                    ? dayjs
-                        .utc(queryData?.updatedAt)
-                        .local()
-                        .format("YYYY-MM-DD HH:mm:ss")
-                    : undefined
-                }
-              >
-                <Button
-                  disabled={!isRequiredMapping}
-                  data-testid="btn-save"
-                  type="default"
-                  onClick={() => handleSave(refetch)}
-                  loading={isPending}
-                  className={styles.btnSave}
-                >
-                  Save
-                  <InfoCircleOutlined style={{ fontSize: 14 }} />
-                </Button>
-              </Tooltip>
-              <Button type="default">Compare</Button>
+              {isRequiredMapping && (
+                <>
+                  <Tooltip title="Restore">
+                    <Button
+                      disabled={!isRequiredMapping}
+                      className={styles.revertButton}
+                      onClick={handleRevert}
+                    >
+                      <RollbackIcon />
+                    </Button>
+                  </Tooltip>
+                  <Tooltip
+                    title={
+                      queryData?.updatedAt
+                        ? dayjs
+                            .utc(queryData?.updatedAt)
+                            .local()
+                            .format("YYYY-MM-DD HH:mm:ss")
+                        : undefined
+                    }
+                  >
+                    <Button
+                      disabled={!isRequiredMapping}
+                      data-testid="btn-save"
+                      type="default"
+                      onClick={() => handleSave(refetch)}
+                      loading={isPending}
+                      className={styles.btnSave}
+                    >
+                      Save
+                      <InfoCircleOutlined style={{ fontSize: 14 }} />
+                    </Button>
+                  </Tooltip>
+                  <Button type="default">Compare</Button>
+                </>
+              )}
               <DeployStage
                 inComplete={queryData.mappingStatus === "incomplete"}
                 diffWithStage={queryData.diffWithStage}
@@ -594,16 +605,18 @@ const NewAPIMapping = ({
                 />
               </div>
 
-              <div className={styles.right}>
-                <RightSide
-                  rightSide={Number(rightSide)}
-                  isRequiredMapping={isRequiredMapping}
-                  method={queryData?.method}
-                  jsonSpec={jsonSpec}
-                  handleSelectSellerProp={handleSelectSellerProp}
-                  handleSelectSonataProp={handleSelectSonataProp}
-                />
-              </div>
+              {isRequiredMapping && (
+                <div className={styles.right}>
+                  <RightSide
+                    rightSide={Number(rightSide)}
+                    isRequiredMapping={isRequiredMapping}
+                    method={queryData?.method}
+                    jsonSpec={jsonSpec}
+                    handleSelectSellerProp={handleSelectSellerProp}
+                    handleSelectSonataProp={handleSelectSonataProp}
+                  />
+                </div>
+              )}
             </Flex>
           ) : (
             <div className={styles.history}>

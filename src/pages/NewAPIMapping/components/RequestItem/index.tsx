@@ -78,6 +78,7 @@ const RequestItem = ({ item, index }: Props) => {
         styles.root,
         item.requiredMapping && styles.rootRequired,
       ])}
+      id={JSON.stringify(item)}
     >
       <Flex vertical gap={4} className={styles.header}>
         <Flex align="center" justify="space-between">
