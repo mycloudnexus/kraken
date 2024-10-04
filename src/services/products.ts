@@ -315,3 +315,21 @@ export const productUpgradeProd = (productId: string, data: any) => {
     data,
   });
 };
+
+export const activateBuyer = (productId: string, id: string) => {
+  return request(`${PRODUCT}/${productId}/buyers/${id}/activate`, {
+    method: "POST",
+  });
+};
+
+export const deactivateBuyer = (productId: string, id: string) => {
+  return request(`${PRODUCT}/${productId}/buyers/${id}/deactivate`, {
+    method: "POST",
+  });
+};
+
+export const regenerateBuyerAccessToken = (productId: string, id: string) => {
+  return request(`${PRODUCT}/${productId}/buyers/${id}/access-tokens`, {
+    method: "POST",
+  });
+};

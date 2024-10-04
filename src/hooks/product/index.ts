@@ -35,6 +35,9 @@ import {
   getMappingTemplateUpgradeDetail,
   productUpgradeStage,
   productUpgradeProd,
+  activateBuyer,
+  deactivateBuyer,
+  regenerateBuyerAccessToken,
 } from "@/services/products";
 import {
   COMPONENT_KIND_API,
@@ -109,6 +112,9 @@ export const PRODUCT_CACHE_KEYS = {
   get_upgrade_detail: "get_upgrade_detail",
   upgrade_mapping_template_stage: "upgrade_mapping_template_stage",
   upgrade_mapping_template_production: "upgrade_mapping_template_production",
+  active_buyer: "active_buyer",
+  deactive_buyer: "deactive_buyer",
+  regenerate_token: "regenerate_token",
 };
 
 export const useCreateNewComponent = () => {
@@ -612,6 +618,43 @@ export const useDeployMappingTemplateProduction = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [PRODUCT_CACHE_KEYS.get_release_list],
+      });
+    },
+  });
+};
+
+export const useActiveBuyer = () => {
+  return useMutation<any, Error>({
+    mutationKey: [PRODUCT_CACHE_KEYS.active_buyer],
+    mutationFn: ({ productId, id }: any) => activateBuyer(productId, id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [PRODUCT_CACHE_KEYS.get_buyer_list],
+      });
+    },
+  });
+};
+
+export const useDeactiveBuyer = () => {
+  return useMutation<any, Error>({
+    mutationKey: [PRODUCT_CACHE_KEYS.deactive_buyer],
+    mutationFn: ({ productId, id }: any) => deactivateBuyer(productId, id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [PRODUCT_CACHE_KEYS.get_buyer_list],
+      });
+    },
+  });
+};
+
+export const useRegenToken = () => {
+  return useMutation<any, Error>({
+    mutationKey: [PRODUCT_CACHE_KEYS.regenerate_token],
+    mutationFn: ({ productId, id }: any) =>
+      regenerateBuyerAccessToken(productId, id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [PRODUCT_CACHE_KEYS.get_buyer_list],
       });
     },
   });

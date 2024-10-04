@@ -116,13 +116,6 @@ const UserManagement = () => {
           dayjs(createdAt).format("YYYY-MM-DD HH:mm:ss"),
       },
       {
-        title: "Created at",
-        dataIndex: "createdAt",
-        width: 205,
-        render: (createdAt: string) =>
-          dayjs(createdAt).format("YYYY-MM-DD HH:mm:ss"),
-      },
-      {
         title: "Actions",
         dataIndex: "",
         width: 90,

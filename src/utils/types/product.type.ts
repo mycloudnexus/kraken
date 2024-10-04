@@ -7,6 +7,7 @@ export interface IComponent {
   parentId: string;
   createdAt: string;
   updatedAt: string;
+  createdBy: string;
   facets: Record<string, any>;
 }
 
@@ -16,6 +17,7 @@ export interface IMetadata {
   version: number;
   key: string;
   description?: string;
+  status?: string;
 }
 
 export interface INewVersionParams {

@@ -2,12 +2,29 @@
   width: 100%;
   padding: 10px 20px;
   background: #f0f2f5;
-  min-height: calc(100% - 24px);
+  height: calc(100vh - 78px);
 }
 
 .paper {
   padding: 16px 20px;
   border-radius: 4px;
-  background: #FFFFFF;
-  margin-top: 8px;
+  background: #ffffff;
+  margin-top: 10px;
+  height: calc(100% - 28px);
+  max-height: calc(100% - 28px);
+}
+
+.btn {
+  padding: 0;
+}
+
+.popconfirm {
+  :global {
+    .ant-popconfirm-description {
+      margin-top: 0 !important;
+    }
+    .ant-popover-inner {
+      width: 20vw;
+    }
+  }
 }
