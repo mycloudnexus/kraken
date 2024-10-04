@@ -23,7 +23,7 @@ export const refreshTokenFnc = async () => {
   }
   try {
     const res = await axios.post(
-      import.meta.env.VITE_PCCW_BASE_API + "/auth/token",
+      import.meta.env.VITE_BASE_API + "/auth/token",
       {
         refreshToken,
         grantType: "REFRESH_TOKEN",
@@ -59,7 +59,7 @@ export const refreshTokenFnc = async () => {
 
 const request = axios.create({
   timeout: 50000,
-  baseURL: import.meta.env.VITE_PCCW_BASE_API,
+  baseURL: import.meta.env.VITE_BASE_API,
 });
 
 createAuthRefreshInterceptor(request, refreshTokenFnc, {
