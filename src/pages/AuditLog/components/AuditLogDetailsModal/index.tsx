@@ -1,9 +1,11 @@
-import { Flex, Modal, Table, Typography } from "antd";
+import { Flex, Drawer, Table, Typography } from "antd";
 import Text from "@/components/Text";
 import styles from "./index.module.scss";
 import { ILogActivity } from "@/utils/types/env.type";
 import LogMethodTag from "@/components/LogMethodTag";
 import TrimmedPath from "@/components/TrimmedPath";
+import { CloseOutlined } from "@ant-design/icons";
+import { get } from "lodash";
 
 type Props = {
   open: boolean;
@@ -12,6 +14,7 @@ type Props = {
 };
 
 const AuditLogDetailsModal = ({ open, onClose, item }: Props) => {
+  console.log("🚀 ~ AuditLogDetailsModal ~ item:", item);
   if (!item) return null;
 
   const paramsTableData = () => {
@@ -23,21 +26,29 @@ const AuditLogDetailsModal = ({ open, onClose, item }: Props) => {
   };
 
   return (
-    <Modal
+    <Drawer
       className={styles.modal}
       open={open}
-      onCancel={onClose}
+      onClose={onClose}
       footer={false}
-      width={"60vw"}
-      title="View details"
+      width="40vw"
+      title={
+        <Flex justify="space-between">
+          <span>View details</span>
+          <CloseOutlined onClick={onClose} />
+        </Flex>
+      }
     >
       <Flex vertical gap={8}>
         <Flex gap={12}>
           <LogMethodTag method={item?.method} />
           <TrimmedPath trimLevel={3} path={item?.path} />
         </Flex>
+        <Text.LightSmall color="#00000073">
+          {get(item, "description", "")}
+        </Text.LightSmall>
 
-        <Text.BoldMedium>Parameters</Text.BoldMedium>
+        <Text.BoldMedium style={{ marginTop: 4 }}>Parameters</Text.BoldMedium>
 
         <Table
           style={{ marginTop: 12 }}
@@ -68,7 +79,7 @@ const AuditLogDetailsModal = ({ open, onClose, item }: Props) => {
           </Typography.Text>
         </pre>
       </Flex>
-    </Modal>
+    </Drawer>
   );
 };
 
