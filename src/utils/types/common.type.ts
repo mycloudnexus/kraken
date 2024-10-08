@@ -61,4 +61,4 @@ export enum EnumRightType {
   SonataResponse,
 }
 
-export type ActiveTabType = 'request' | 'response';
+export type ActiveTabType = "request" | "response";

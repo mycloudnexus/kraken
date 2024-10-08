@@ -182,11 +182,7 @@ const DeployHistory = ({
                     style={{ color: "#2962FF" }}
                     ellipsis={{ tooltip: item?.path }}
                   >
-                    <TrimmedPath
-                      trimLevel={2}
-                      path={item?.path}
-                      color="#2962FF"
-                    />
+                    <TrimmedPath trimLevel={2} path={item?.path} />
                   </Typography.Text>
                   <MappingMatrix mappingMatrix={item.mappingMatrix} />
                 </Flex>

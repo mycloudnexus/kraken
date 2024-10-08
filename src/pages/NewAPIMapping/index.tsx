@@ -622,7 +622,7 @@ const NewAPIMapping = ({
             <div className={styles.history}>
               <DeployHistory
                 targetMapperKey={queryData.targetMapperKey}
-                scrollHeight={get(size, "height", 0)}
+                scrollHeight={get(size, "height", 0) + 70}
               />
             </div>
           )}

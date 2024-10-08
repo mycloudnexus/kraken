@@ -8,6 +8,7 @@ import MappingMatrix from "@/components/MappingMatrix";
 import styles from "./index.module.scss";
 import Text from "@/components/Text";
 import { toDateTime } from "@/libs/dayjs";
+import { get, join, slice, split } from "lodash";
 type Props = {
   scrollHeight?: number;
   env?: IEnv;
@@ -92,8 +93,8 @@ const RunningAPIMapping = ({ scrollHeight, env }: Props) => {
             >
               <RequestMethod method={item?.method} />
               <Tooltip title={item?.path}>
-                <span style={{ color: "#2962FF" }}>
-                  /{item?.path.split("/").slice(-2).join("/")}
+                <span>
+                  /{join(slice(split(get(item, "path", ""), "/"), -2), "/")}
                 </span>
               </Tooltip>
               <Flex gap={8} align="center" flex={1}>
@@ -150,7 +151,7 @@ const RunningAPIMapping = ({ scrollHeight, env }: Props) => {
   ];
 
   const scroll = scrollHeight
-    ? { y: scrollHeight - 152, x: "max-content" }
+    ? { y: scrollHeight - 144, x: "max-content" }
     : undefined;
   return (
     <Table

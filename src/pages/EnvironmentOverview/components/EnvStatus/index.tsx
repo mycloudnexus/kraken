@@ -1,14 +1,18 @@
-import { Flex, Typography } from "antd";
+import { Flex, Spin, Typography } from "antd";
 import styles from "./index.module.scss";
 import classes from "classnames";
 import Text from "@/components/Text";
-import { ApiOutlined, CheckCircleFilled, InfoCircleOutlined } from "@ant-design/icons";
+import {
+  ApiOutlined,
+  CheckCircleFilled,
+  InfoCircleOutlined,
+} from "@ant-design/icons";
 import { useMemo } from "react";
-import { useAppStore } from '@/stores/app.store';
-import { useGetAPIDeployments, useGetRunningAPIList } from '@/hooks/product';
-import { IEnv } from '@/utils/types/env.type';
-import { upperFirst } from 'lodash';
-import dayjs from 'dayjs';
+import { useAppStore } from "@/stores/app.store";
+import { useGetAPIDeployments, useGetRunningAPIList } from "@/hooks/product";
+import { IEnv } from "@/utils/types/env.type";
+import { upperFirst } from "lodash";
+import dayjs from "dayjs";
 
 interface Props {
   env: IEnv;
@@ -18,18 +22,19 @@ interface Props {
   disConnect?: number;
   runningApi?: number;
   connect?: number;
+  loading?: boolean;
 }
 
 const parseColors = (status: string) => {
   switch (status) {
     case "SUCCESS":
-      return "#389E0D"
+      return "#389E0D";
     case "WARNING":
-      return "yellow"
+      return "yellow";
     default:
       return "red";
   }
-}
+};
 
 const EnvStatus = ({
   env,
@@ -38,6 +43,7 @@ const EnvStatus = ({
   dataPlane = 0,
   disConnect = 0,
   connect = 0,
+  loading = false,
 }: Readonly<Props>) => {
   const { currentProduct } = useAppStore();
   const connectStatus = useMemo(() => {
@@ -54,9 +60,8 @@ const EnvStatus = ({
     return connectStatus === "allDisConnect";
   }, [connectStatus]);
 
-
   const envName = env?.name?.toLocaleLowerCase?.();
-  const { data } = useGetRunningAPIList(
+  const { data, isLoading: loadingRunningData } = useGetRunningAPIList(
     currentProduct,
     {
       envId: env?.id,
@@ -79,16 +84,19 @@ const EnvStatus = ({
   );
 
   const runningComponents = useMemo(() => {
-    return (data?.data?.[0]?.components ?? null) || (Array.isArray(data) ? data : null)
-  }, [data])
+    return (
+      (data?.data?.[0]?.components ?? null) ||
+      (Array.isArray(data) ? data : null)
+    );
+  }, [data]);
 
   const lastElement = useMemo(() => {
-    if(!isLoading) {
-      return deploymentsData.data[0]
+    if (!isLoading) {
+      return deploymentsData.data[0];
     } else {
-      return null
+      return null;
     }
-  }, [deploymentsData, isLoading])
+  }, [deploymentsData, isLoading]);
 
   return (
     <Flex vertical gap={20} className={styles.container}>
@@ -101,9 +109,12 @@ const EnvStatus = ({
           align="center"
           justify="center"
         >
-          <Text.BoldMedium>{runningComponents?.length || 0}</Text.BoldMedium>
+          {loading || loadingRunningData ? (
+            <Spin size="small" />
+          ) : (
+            <Text.BoldMedium>{runningComponents?.length || 0}</Text.BoldMedium>
+          )}
           <Text.LightMedium>Total running API mapping</Text.LightMedium>
-
         </Flex>
         <Flex
           vertical
@@ -127,7 +138,11 @@ const EnvStatus = ({
             className={styles.dataPlaneInfo}
             style={{ whiteSpace: "nowrap" }}
           >
-            <Text.BoldMedium>{dataPlane}</Text.BoldMedium>
+            {loading ? (
+              <Spin size="small" />
+            ) : (
+              <Text.BoldMedium>{dataPlane}</Text.BoldMedium>
+            )}
             <Flex className={styles.dataPlaneInfo} gap={8} align="center">
               <ApiOutlined style={{ width: 14, height: 14 }} />
               <Text.LightMedium>In use data plane</Text.LightMedium>
@@ -140,19 +155,29 @@ const EnvStatus = ({
         </Flex>
       </Flex>
       <Flex gap={4} wrap="wrap">
-        {lastElement?.status &&
-          (<><CheckCircleFilled style={{ color: parseColors(lastElement.status) }} />
+        {lastElement?.status && (
+          <>
+            <CheckCircleFilled
+              style={{ color: parseColors(lastElement.status) }}
+            />
             <Typography.Text style={{ color: parseColors(lastElement.status) }}>
               {upperFirst(lastElement.status.toLowerCase())}
             </Typography.Text>
           </>
-          )}
+        )}
         <Typography.Text style={{ color: "rgba(0, 0, 0, 0.45)" }}>
-          <Flex gap={4}>
-            Last deployed to {upperFirst(envName)} {" "}
-            {dayjs.utc(lastElement?.createAt).local().format("YYYY-MM-DD HH:mm:ss")}
-          </Flex>
-        </Typography.Text >
+          {loading ? (
+            <Spin size="small" />
+          ) : (
+            <Flex gap={4}>
+              Last deployed to {upperFirst(envName)}{" "}
+              {dayjs
+                .utc(lastElement?.createAt)
+                .local()
+                .format("YYYY-MM-DD HH:mm:ss")}
+            </Flex>
+          )}
+        </Typography.Text>
       </Flex>
     </Flex>
   );

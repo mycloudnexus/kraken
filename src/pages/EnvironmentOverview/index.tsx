@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import dayjs from "dayjs";
 import clsx from "clsx";
 import { Dropdown, Flex, Radio, Spin, Typography, notification } from "antd";
@@ -13,7 +13,6 @@ import {
   useCreateApiKey,
 } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
-import { ROUTES } from "@/utils/constants/route";
 import EnvStatus from "./components/EnvStatus";
 import { showModalConfirmRotate } from "./components/ModalConfirmRotateAPIKey";
 import ModalNewDeployment from "./components/ModalNewDeployment";
@@ -34,21 +33,18 @@ const EnvironmentOverview = () => {
   const [height, setHeight] = useState<number | undefined>(undefined);
 
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
   const { currentProduct } = useAppStore();
 
   const envId = searchParams.get("envId") || "";
 
   const { data: envs, isLoading: loadingEnvs } =
     useGetProductEnvs(currentProduct);
-  const { data: apiKey } = useGetAllApiKeyList(
+  const { data: apiKey, isLoading: loadingApiKey } = useGetAllApiKeyList(
     currentProduct,
     initPaginationParams
   );
-  const { data: dataPlane } = useGetAllDataPlaneList(
-    currentProduct,
-    initPaginationParams
-  );
+  const { data: dataPlane, isLoading: loadingDataPlane } =
+    useGetAllDataPlaneList(currentProduct, initPaginationParams);
   const { data: runningComponent } = useGetRunningComponentList(currentProduct);
   const { mutateAsync: createApiKeyMutate } = useCreateApiKey();
 
@@ -84,11 +80,6 @@ const EnvironmentOverview = () => {
   const dropdownItems = useCallback(
     (envId: string, envName: string) => [
       {
-        key: "view-log",
-        label: "API Activity Log",
-        onClick: () => navigate(ROUTES.ENV_ACTIVITY_LOG(envId)),
-      },
-      {
         key: "refresh-key",
         label: "Rotate API Key",
         onClick: () => {
@@ -99,7 +90,7 @@ const EnvironmentOverview = () => {
         },
       },
     ],
-    [navigate, onConfirmRotate]
+    [onConfirmRotate]
   );
 
   const getDataPlaneInfo = useCallback(
@@ -221,6 +212,7 @@ const EnvironmentOverview = () => {
                       disConnect={disConnectNum}
                       connect={connectNum}
                       dataPlane={len}
+                      loading={loadingDataPlane}
                     />
                   </Flex>
                 </div>
@@ -229,7 +221,7 @@ const EnvironmentOverview = () => {
           </div>
         </Spin>
       </Flex>
-      {!isHaveApiKey ? (
+      {!isHaveApiKey && !loadingApiKey ? (
         <NoAPIKey env={selectedEnv} />
       ) : (
         <Flex
@@ -244,9 +236,6 @@ const EnvironmentOverview = () => {
                 setActiveTab(e.target.value);
               }}
               value={activeTab}
-              style={{
-                marginBottom: 8,
-              }}
             >
               <Radio.Button value="running_api">
                 Running API mappings
@@ -256,11 +245,13 @@ const EnvironmentOverview = () => {
               </Radio.Button>
             </Radio.Group>
           </Flex>
-          {activeTab === "running_api" && (
+          {activeTab === "running_api" && selectedEnv && (
             <RunningAPIMapping scrollHeight={height} env={selectedEnv} />
           )}
           {activeTab === "deployment_history" && (
-            <DeployHistory scrollHeight={height} selectedEnv={selectedEnv} />
+            <div style={{ marginTop: -12 }}>
+              <DeployHistory scrollHeight={height} selectedEnv={selectedEnv} />
+            </div>
           )}
         </Flex>
       )}

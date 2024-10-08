@@ -1,9 +1,9 @@
 import Text from "@/components/Text";
 import { IBuyer } from "@/utils/types/component.type";
-import { Flex, Modal, Typography } from "antd";
+import { Flex, Modal, Typography, notification } from "antd";
 import styles from "./index.module.scss";
 import { get } from "lodash";
-import { CopyOutlined } from "@ant-design/icons";
+import { CopyIcon } from "@/components/Icon";
 
 type Props = {
   open: boolean;
@@ -28,23 +28,35 @@ const TokenModal = ({ open, onClose, item }: Props) => {
           corresponding environment.
         </Text.LightMedium>
       </Flex>
-      <Flex style={{ marginTop: 24 }} className={styles.token}>
-        <Typography.Text
+      <Flex
+        style={{ marginTop: 24 }}
+        className={styles.token}
+        align="flex-start"
+        gap={12}
+      >
+        <Typography.Paragraph
           className={styles.tokenText}
           ellipsis={{
+            rows: 4,
             tooltip: get(item, "buyerToken.accessToken", ""),
-          }}
-          copyable={{
-            icon: (
-              <Flex align="center" justify="flex-end" gap={2}>
-                <CopyOutlined />
-                <Text.LightMedium>Copy</Text.LightMedium>
-              </Flex>
-            ),
           }}
         >
           {get(item, "buyerToken.accessToken", "")}
-        </Typography.Text>
+        </Typography.Paragraph>
+        <CopyIcon
+          style={{ marginTop: 4 }}
+          role="none"
+          onClick={() => {
+            if (!navigator) {
+              return;
+            }
+            navigator.clipboard
+              .writeText(get(item, "buyerToken.accessToken", ""))
+              .then(() => {
+                notification.success({ message: "Copied!" });
+              });
+          }}
+        />
       </Flex>
     </Modal>
   );

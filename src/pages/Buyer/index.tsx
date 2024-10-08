@@ -36,7 +36,6 @@ const Buyer = () => {
   const { mutateAsync: runDeactive } = useDeactiveBuyer();
   const ref = useRef<any>();
   const size = useSize(ref);
-  console.log("🚀 ~ Buyer ~ size:", size);
 
   const handleActive = async (id: string) => {
     try {
@@ -171,7 +170,7 @@ const Buyer = () => {
         currentEnv={params.envId ?? ""}
       />
       <Text.LightLarge>Buyer management</Text.LightLarge>
-      <Flex vertical className={styles.paper} gap={16}>
+      <Flex vertical className={styles.paper} gap={12}>
         <Flex justify="space-between" align="center">
           <EnvTabs
             value={params.envId}
