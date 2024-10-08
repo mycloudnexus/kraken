@@ -192,7 +192,7 @@ const AuditLog = () => {
             onShowSizeChange: handlePaginationShowSizeChange,
             showTotal: (total) => `Total ${total} items`,
           }}
-          scroll={{ y: `calc(100vh - 340px)` }}
+          scroll={{ y: `calc(100vh - 320px)` }}
           locale={{
             emptyText:
               typeof queryParams.userId === "string" ||

@@ -34,13 +34,7 @@ const TokenModal = ({ open, onClose, item }: Props) => {
         align="flex-start"
         gap={12}
       >
-        <Typography.Paragraph
-          className={styles.tokenText}
-          ellipsis={{
-            rows: 4,
-            tooltip: get(item, "buyerToken.accessToken", ""),
-          }}
-        >
+        <Typography.Paragraph className={styles.tokenText}>
           {get(item, "buyerToken.accessToken", "")}
         </Typography.Paragraph>
         <CopyIcon

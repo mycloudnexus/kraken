@@ -100,7 +100,7 @@ const UpgradeHistory = () => {
           onChange: (page, pageSize) =>
             setUpgradeParams({ page: page - 1, size: pageSize }),
         }}
-        scroll={{ y: get(size, "height", 0) - 120 }}
+        scroll={{ y: get(size, "height", 0) - 110 }}
       />
     </div>
   );

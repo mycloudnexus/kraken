@@ -174,6 +174,7 @@ const UserManagement = () => {
           }}
           scroll={{
             y: get(size, "height", 0) - 164,
+            x: "auto",
           }}
         />
       </div>

@@ -11,14 +11,14 @@ import {
 import { Button, Flex, Menu, Typography } from "antd";
 import { Link } from "react-router-dom";
 import styles from "./index.module.scss";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Sider from "antd/es/layout/Sider";
 import ETIcon from "../../assets/et.svg";
 import { useAppStore } from "@/stores/app.store";
 import { useGetProductEnvs } from "@/hooks/product";
-import { IEnv } from "@/utils/types/env.type";
 import { last } from "lodash";
 import { useSessionStorage } from "usehooks-ts";
+import { IEnv } from "@/utils/types/env.type";
 
 const flattenMenu = (
   menuArr: any[],
@@ -48,18 +48,16 @@ const flattenMenu = (
 
 const SideNavigation = () => {
   const [collapsed, setCollapsed] = useSessionStorage("collapsed", false);
-  const [currentEnvId, setCurrentEnvId] = useState<string | null>(null);
   const [activeKey, setActiveKey] = useState<string>(window.location.pathname);
   const { currentProduct } = useAppStore();
-  const { data: envs, isLoading } = useGetProductEnvs(currentProduct);
+  const { data: envs } = useGetProductEnvs(currentProduct);
 
-  useEffect(() => {
-    if (envs?.data?.length) {
-      setCurrentEnvId(
-        envs.data.filter((env: IEnv) => env?.name === "stage")[0].id
-      );
-    }
-  }, [envs?.data, isLoading]);
+  const stageId = useMemo(() => {
+    const stage = envs?.data?.find(
+      (env: IEnv) => env.name?.toLowerCase() === "stage"
+    );
+    return stage?.id;
+  }, [envs]);
 
   const items = useMemo(
     () => [
@@ -85,8 +83,8 @@ const SideNavigation = () => {
         icon: <FolderAddOutlined />,
       },
       {
-        key: `env/${currentEnvId}`,
-        label: <Link to={`/env/${currentEnvId}`}>API activity log</Link>,
+        key: `env/${stageId}`,
+        label: <Link to={`/env/${stageId}`}>API activity log</Link>,
         icon: <CloudServerOutlined />,
         matching: ["env/[a-z0-9-]+"],
       },
@@ -125,7 +123,7 @@ const SideNavigation = () => {
         ],
       },
     ],
-    [currentEnvId]
+    [stageId]
   );
 
   const selectedKeys = useMemo(() => {

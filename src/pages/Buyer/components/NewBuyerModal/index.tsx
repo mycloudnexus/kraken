@@ -1,4 +1,4 @@
-import { Flex, Form, Input, Modal, notification } from "antd";
+import { Flex, Form, Input, Modal, Tooltip, notification } from "antd";
 import styles from "./index.module.scss";
 import { useAppStore } from "@/stores/app.store";
 import { useCreateBuyer } from "@/hooks/product";
@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import TokenModal from "../TokenModal";
 import { useBoolean } from "usehooks-ts";
 import { IBuyer } from "@/utils/types/component.type";
+import { InfoCircleOutlined } from "@ant-design/icons";
 
 type Props = {
   open: boolean;
@@ -82,7 +83,11 @@ const NewBuyerModal = ({ open, onClose, currentEnv }: Props) => {
             name="buyerId"
             label={
               <Flex gap={4}>
-                Company ID<span style={{ color: "#FF4D4F" }}> *</span>
+                Company ID
+                <Tooltip title="Please input buyer’s company ID in Seller’s legacy API platform">
+                  <InfoCircleOutlined style={{ color: "#8C8C8C" }} />
+                </Tooltip>
+                <span style={{ color: "#FF4D4F" }}>*</span>
               </Flex>
             }
             rules={[
@@ -95,7 +100,17 @@ const NewBuyerModal = ({ open, onClose, currentEnv }: Props) => {
           >
             <Input placeholder="Please input buyer’s company ID in Seller’s legacy API platform" />
           </Form.Item>
-          <Form.Item name="companyName" label="Company name">
+          <Form.Item
+            name="companyName"
+            label={
+              <Flex gap={4}>
+                Company name
+                <Tooltip title="Please input buyer’s company name in Seller’s legacy API platform">
+                  <InfoCircleOutlined style={{ color: "#8C8C8C" }} />
+                </Tooltip>
+              </Flex>
+            }
+          >
             <Input placeholder="Please input buyer’s company name in Seller’s legacy API platform" />
           </Form.Item>
         </Form>

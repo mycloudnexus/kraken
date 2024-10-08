@@ -199,7 +199,7 @@ const Buyer = () => {
             }
             dataSource={dataList?.data}
             columns={columns}
-            scroll={{ y: get(size, "height", 0) - 80, x: "auto" }}
+            scroll={{ y: get(size, "height", 0) - 60, x: "auto" }}
           />
         </div>
       </Flex>
