@@ -68,14 +68,14 @@
     &:global(.ant-tree-node-selected) {
       .treeTitle,
       .treeValue {
-        background-color: #bae7ff;
+        background-color: #dbe4fb !important;
       }
     }
   }
   :global(.ant-tree-node-selected) {
     .nodeTitle,
     .nodeExample {
-      background: #bae7ff;
+      background: #dbe4fb !important;
     }
   }
 }

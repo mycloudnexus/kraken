@@ -1,15 +1,16 @@
 import { IRequestMapping } from "@/utils/types/component.type";
 import styles from "./index.module.scss";
-import { Button, Flex, Input, Tooltip } from "antd";
+import { Button, Flex, Input, Select, Tooltip } from "antd";
 import Text from "@/components/Text";
 import MappingIcon from "@/assets/newAPIMapping/mapping-icon.svg";
 import clsx from "clsx";
-import { cloneDeep, get, isEqual, set } from "lodash";
+import { cloneDeep, difference, get, isEmpty, isEqual, set } from "lodash";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { EnumRightType } from "@/utils/types/common.type";
 import {
   CheckOutlined,
   CloseOutlined,
+  DeleteOutlined,
   EditOutlined,
   RightOutlined,
 } from "@ant-design/icons";
@@ -29,6 +30,8 @@ const RequestItem = ({ item, index }: Props) => {
     setRequestMapping,
     rightSideInfo,
     rightSide,
+    listMappingStateRequest: listMapping,
+    setListMappingStateRequest,
   } = useNewApiMappingStore();
   const [titleInput, setTitleInput] = useState("");
   const [descriptionInput, setDescriptionInput] = useState("");
@@ -72,6 +75,37 @@ const RequestItem = ({ item, index }: Props) => {
     setRequestMapping(newRequest);
   };
 
+  const handleAdd = (name: string) => {
+    const newKey = get(listMapping, `[${listMapping.length - 1}].key`, 0) + 1;
+    setListMappingStateRequest([
+      ...listMapping,
+      {
+        key: newKey,
+        from: undefined,
+        to: undefined,
+        name,
+      },
+    ]);
+  };
+
+  const handleDeleteMapping = (key: number) => {
+    setListMappingStateRequest(listMapping.filter((item) => item.key !== key));
+  };
+
+  const handleSelect = (value: string, key: number) => {
+    const cloneArr = cloneDeep(listMapping);
+    const itemIndex = listMapping.findIndex((l) => l.key === key);
+    set(cloneArr, `[${itemIndex}].from`, value);
+    setListMappingStateRequest(cloneArr);
+  };
+
+  const handleChangeInput = (value: string[], key: number) => {
+    const cloneArr = cloneDeep(listMapping);
+    const itemIndex = listMapping.findIndex((l) => l.key === key);
+    set(cloneArr, `[${itemIndex}].to`, value);
+    setListMappingStateRequest(cloneArr);
+  };
+
   return (
     <div
       className={clsx([
@@ -107,6 +141,7 @@ const RequestItem = ({ item, index }: Props) => {
               <Text.NormalMedium>{item.title}</Text.NormalMedium>
               {Boolean(item?.customizedField) && (
                 <EditOutlined
+                  data-testid="edit-title"
                   onClick={() => {
                     enableEditTitle();
                     disableEditDescription();
@@ -207,6 +242,7 @@ const RequestItem = ({ item, index }: Props) => {
         <MappingIcon />
         <Tooltip title={item.target}>
           <Input
+            id={JSON.stringify(item)}
             variant="filled"
             style={{ width: "calc(50% - 30px)" }}
             className={clsx(styles.sellerPropItemWrapper, {
@@ -257,6 +293,67 @@ const RequestItem = ({ item, index }: Props) => {
           />
         </Tooltip>
       </Flex>
+      {!isEmpty(item?.sourceValues) && (
+        <Flex vertical gap={20} style={{ marginTop: 8, width: "100%" }}>
+          {listMapping
+            ?.filter((i) => i.name === item?.name)
+            ?.map(({ key, from, to }) => (
+              <Flex
+                className={styles.itemContainer}
+                align="center"
+                key={`${item.title}-${item.name}-${key}`}
+                wrap="wrap"
+                gap={8}
+              >
+                <Flex
+                  align="center"
+                  gap={8}
+                  style={{ width: "calc(50% - 30px)" }}
+                >
+                  <Select
+                    data-testid="select-sonata-state"
+                    className={styles.stateSelect}
+                    placeholder="State"
+                    onSelect={(v) => handleSelect(v, key)}
+                    value={from}
+                    style={{ flex: 1 }}
+                    options={difference(
+                      item?.sourceValues,
+                      listMapping
+                        ?.filter((l) => l.name === item.name)
+                        .map((item) => item.from)
+                    ).map((item) => ({
+                      value: item,
+                      title: item,
+                    }))}
+                  />
+                  <DeleteOutlined onClick={() => handleDeleteMapping(key)} />
+                </Flex>
+                <MappingIcon />
+                <Select
+                  popupClassName={styles.selectPopup}
+                  mode="tags"
+                  placeholder="Input seller order state, Enter for multiple states"
+                  key={`enum-${key}`}
+                  value={to}
+                  style={{ width: "calc(50% - 30px)" }}
+                  onChange={(e) => handleChangeInput(e, key)}
+                  className={styles.stateSelect}
+                />
+              </Flex>
+            ))}
+          <Flex className={styles.itemContainer}>
+            <Button
+              style={{ marginBottom: 12 }}
+              onClick={() => handleAdd(item?.name)}
+              data-testid="btn-add-state"
+              type="primary"
+            >
+              + Add Value Mapping
+            </Button>
+          </Flex>
+        </Flex>
+      )}
     </div>
   );
 };

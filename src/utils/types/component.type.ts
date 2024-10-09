@@ -24,6 +24,8 @@ export interface IRequestMapping {
   title: string;
   requiredMapping?: boolean;
   customizedField?: boolean;
+  sourceValues?: string[];
+  valueMapping?: Record<string, any>;
 }
 
 export interface IBuyer extends IComponent {

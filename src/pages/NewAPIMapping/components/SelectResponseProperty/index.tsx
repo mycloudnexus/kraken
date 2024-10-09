@@ -13,17 +13,13 @@ import { Key, useCallback, useMemo, useState } from "react";
 import { useBoolean } from "usehooks-ts";
 import styles from "./index.module.scss";
 import TitleIcon from "@/assets/title-icon.svg";
+import { isElementInViewport } from "@/utils/helpers/html";
 
 const Search = Input.Search;
 
 const SelectResponseProperty = () => {
-  const {
-    sellerApi,
-    activeResponseName,
-    responseMapping,
-    setResponseMapping,
-    setActiveResponseName,
-  } = useNewApiMappingStore();
+  const { sellerApi, activeResponseName, responseMapping, setResponseMapping } =
+    useNewApiMappingStore();
   const { value: isOpen, toggle: toggleOpen } = useBoolean(true);
   const [searchValue, setSearchValue] = useState("");
   const [selectedKeys, setSelectedKeys] = useState<Key[]>([]);
@@ -134,8 +130,11 @@ const SelectResponseProperty = () => {
       set(cloneObj, `[${responseIndex}].source`, value);
       set(cloneObj, `[${responseIndex}].sourceLocation`, `BODY`);
       setResponseMapping(cloneObj);
-      setActiveResponseName(undefined);
       setSelectedKeys([]);
+      const currentDom = document.getElementById(activeResponseName);
+      if (currentDom && !isElementInViewport(currentDom, 210)) {
+        currentDom?.scrollIntoView({ block: "center" });
+      }
     }
   };
 

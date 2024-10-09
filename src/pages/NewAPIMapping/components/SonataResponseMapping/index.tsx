@@ -14,6 +14,7 @@ import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { useBoolean } from "usehooks-ts";
 import { DownOutlined, RightOutlined } from "@ant-design/icons";
 import TitleIcon from "@/assets/title-icon.svg";
+import { isElementInViewport } from "@/utils/helpers/html";
 
 interface Props {
   spec: any;
@@ -26,12 +27,8 @@ const SonataResponseMapping = ({ method, spec }: Props) => {
   const [searchValue, setSearchValue] = useState("");
   const [resolvedSpec, setResolvedSpec] = useState<any>();
   const [selectedKeys, setSelectedKeys] = useState<Key[]>([]);
-  const {
-    setResponseMapping,
-    activeSonataResponse,
-    responseMapping,
-    setActiveSonataResponse,
-  } = useNewApiMappingStore();
+  const { setResponseMapping, activeSonataResponse, responseMapping } =
+    useNewApiMappingStore();
 
   const { value: isOpen, toggle: toggleOpen } = useBoolean(true);
 
@@ -65,8 +62,11 @@ const SonataResponseMapping = ({ method, spec }: Props) => {
       set(cloneObj, `[${index}].target`, value);
       set(cloneObj, `[${index}].targetLocation`, `BODY`);
       setResponseMapping(cloneObj);
-      setActiveSonataResponse(undefined);
       setSelectedKeys([]);
+      const currentDom = document.getElementById(activeSonataResponse);
+      if (currentDom && !isElementInViewport(currentDom, 210)) {
+        currentDom?.scrollIntoView({ block: "center" });
+      }
     }
   };
 

@@ -1,3 +1,4 @@
+import RequestItem from "@/pages/NewAPIMapping/components/RequestItem";
 import ResponseMapping from "@/pages/NewAPIMapping/components/ResponseMapping";
 import RightAddSellerProp from "@/pages/NewAPIMapping/components/RightAddSellerProp";
 import RightAddSonataProp, {
@@ -13,7 +14,7 @@ import buildInitListMapping from "@/utils/helpers/buildInitListMapping";
 import groupByPath from "@/utils/helpers/groupByPath";
 import { queryClient } from "@/utils/helpers/reactQuery";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { fireEvent, render, renderHook } from "@testing-library/react";
+import { fireEvent, render, renderHook, waitFor } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 
 beforeAll(() => {
@@ -1257,4 +1258,46 @@ test("SonataResponseMapping", () => {
     </QueryClientProvider>
   );
   expect(container).toBeInTheDocument();
+});
+
+test("requestItem render", () => {
+  const { container, getByTestId } = render(
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <RequestItem
+          index={2}
+          item={{
+            description: "",
+            name: "mapper.order.eline.add.duration.unit",
+            title: "order item Term unit",
+            source: "@{{productOrderItem[0].requestedItemTerm.duration.units}}",
+            target: "@{{requestBody.durationUnit}}",
+            sourceValues: [
+              "calendarMonths",
+              "calendarDays",
+              "calendarHours",
+              "calendarMinutes",
+              "businessDays",
+              "businessHours",
+            ],
+            valueMapping: {
+              calendarMonths: "calendarMonths",
+              calendarDays: "calendarDays",
+            },
+            sourceLocation: "BODY",
+            targetLocation: "BODY",
+            customizedField: false,
+            requiredMapping: true,
+          }}
+        />
+      </BrowserRouter>
+    </QueryClientProvider>
+  );
+  expect(container).toBeInTheDocument();
+  const btnAdd = getByTestId("btn-add-state");
+  fireEvent.click(btnAdd);
+  waitFor(() => {
+    const editBtn = getByTestId("edit-title");
+    expect(editBtn).toBeInTheDocument();
+  });
 });

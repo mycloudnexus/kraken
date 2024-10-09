@@ -14,7 +14,6 @@ type Props = {
 };
 
 const AuditLogDetailsModal = ({ open, onClose, item }: Props) => {
-  console.log("🚀 ~ AuditLogDetailsModal ~ item:", item);
   if (!item) return null;
 
   const paramsTableData = () => {

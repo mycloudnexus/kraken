@@ -5,7 +5,6 @@ import { Button, Tabs, TabsProps, Tooltip, notification } from "antd";
 import {
   chain,
   cloneDeep,
-  delay,
   flatMap,
   get,
   isEmpty,
@@ -15,7 +14,7 @@ import {
 import Flex from "@/components/Flex";
 import StepBar from "@/components/StepBar";
 import RequestMapping from "./components/RequestMapping";
-import ResponseMapping from "./components/ResponseMapping";
+import ResponseMapping, { IMapping } from "./components/ResponseMapping";
 import RightAddSellerProp from "./components/RightAddSellerProp";
 import RightAddSonataProp from "./components/RightAddSonataProp";
 import SelectAPI from "./components/SelectAPI";
@@ -47,7 +46,7 @@ import DeploymentInfo from "./components/DeploymentInfo";
 import StatusIcon from "./components/StatusIcon";
 import { useSessionStorage } from "usehooks-ts";
 import NotRequired from "./components/NotRequired";
-import { IRequestMapping } from "@/utils/types/component.type";
+import { isElementInViewport } from "@/utils/helpers/html";
 
 type Props = {
   rightSide: number;
@@ -119,12 +118,14 @@ const NewAPIMapping = ({
     sellerApi,
     setRequestMapping,
     setRightSide,
-    setRightSideInfo,
     setResponseMapping,
     setSellerApi,
     setServerKey,
     setListMappingStateResponse,
     listMappingStateResponse,
+    setListMappingStateRequest,
+    listMappingStateRequest,
+    setRightSideInfo,
   } = useNewApiMappingStore();
   const queryData = JSON.parse(query ?? "{}");
 
@@ -184,18 +185,7 @@ const NewAPIMapping = ({
 
   useEffect(() => {
     if (firstTimeLoad && !isEmpty(mappers?.request)) {
-      const firstItem = mappers?.request?.find((r: IRequestMapping) =>
-        isEmpty(r.target)
-      );
-      if (firstItem) {
-        setRightSide(EnumRightType.AddSellerProp);
-        delay(() => {
-          const dom = document.getElementById(JSON.stringify(firstItem));
-          if (dom) {
-            dom?.scrollIntoView({ behavior: "smooth", block: "start" });
-          }
-        }, 1000);
-      }
+      setListMappingStateRequest(buildInitListMapping(mappers?.request));
       setRequestMapping(resetMapping() ?? []);
     }
   }, [mappers?.request, firstTimeLoad]);
@@ -280,9 +270,21 @@ const NewAPIMapping = ({
             `${rm.source}_${rm.sourceLocation}_${rm.target}_${rm.targetLocation}`
         );
         setRequestMapping(updatedMapping);
+        setRightSideInfo({
+          ...rightSideInfo,
+          previousData: {
+            ...rightSideInfo.previousData,
+            source: selected.name,
+            sourceLocation: selected.location,
+          },
+        });
+        const currentDom = document.getElementById(
+          JSON.stringify(rightSideInfo.previousData)
+        );
+        if (currentDom && !isElementInViewport(currentDom, 130)) {
+          currentDom?.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
       }
-      setRightSideInfo(undefined);
-      setRightSide(undefined);
     },
     [rightSideInfo, requestMapping, setRequestMapping]
   );
@@ -308,26 +310,59 @@ const NewAPIMapping = ({
           `${rm.source}_${rm.sourceLocation}_${rm.target}_${rm.targetLocation}`
       );
       setRequestMapping(updatedMapping);
-      setRightSideInfo(undefined);
+      setRightSideInfo({
+        ...rightSideInfo,
+        previousData: {
+          ...rightSideInfo.previousData,
+          target: selected.name,
+          targetLocation: selected.location,
+        },
+      });
+      const currentDom = document.getElementById(
+        JSON.stringify(rightSideInfo.previousData)
+      );
+      if (currentDom && !isElementInViewport(currentDom, 130)) {
+        currentDom?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
     },
     [rightSideInfo, requestMapping, setRequestMapping]
   );
 
+  const transformListMappingItem = (item: IMapping[]) => {
+    return chain(item)
+      .groupBy("name")
+      .map((items, name) => ({
+        name,
+        valueMapping: flatMap(items, (item) =>
+          item?.to?.map((to) => ({ [to]: item.from }))
+        ),
+      }))
+      .value();
+  };
+
   const handleSave = async (callback?: () => void) => {
     try {
-      const newData = chain(listMappingStateResponse)
-        .groupBy("name")
-        .map((items, name) => ({
-          name,
-          valueMapping: flatMap(items, (item) =>
-            item?.to?.map((to) => ({ [to]: item.from }))
-          ),
-        }))
-        .value();
+      const newData = transformListMappingItem(listMappingStateResponse);
+      const newDataRequest = transformListMappingItem(listMappingStateRequest);
       let newResponse = cloneDeep(responseMapping);
       if (!isEmpty(newData)) {
         newData.forEach((it) => {
           newResponse = newResponse.map((rm) => {
+            if (rm.name === it.name) {
+              rm.valueMapping = reduce(
+                it.valueMapping,
+                (acc, obj) => ({ ...acc, ...obj }),
+                {}
+              );
+            }
+            return rm;
+          });
+        });
+      }
+      let newRequest = cloneDeep(requestMapping);
+      if (!isEmpty(newDataRequest)) {
+        newDataRequest.forEach((it) => {
+          newRequest = newRequest.map((rm) => {
             if (rm.name === it.name) {
               rm.valueMapping = reduce(
                 it.valueMapping,
@@ -347,7 +382,7 @@ const NewAPIMapping = ({
         method: sellerApi.method,
         path: sellerApi.url,
         mappers: {
-          request: requestMapping.map((rm) => ({
+          request: newRequest.map((rm) => ({
             ...rm,
             target: get(rm, "target", "")
               ?.replace?.("path.", "")
@@ -407,6 +442,8 @@ const NewAPIMapping = ({
     (tabName: string) => {
       if (tabName === "response" && !isEmpty(sellerApi)) {
         setRightSide(EnumRightType.AddSellerResponse);
+      } else {
+        setRightSide(EnumRightType.AddSonataProp);
       }
       setActiveTab(tabName);
     },

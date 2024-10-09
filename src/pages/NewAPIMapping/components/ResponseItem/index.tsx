@@ -37,7 +37,9 @@ const ResponseItem = ({ item, index }: Props) => {
   } = useNewApiMappingStore();
 
   const [titleInput, setTitleInput] = useState(item.title || "");
-  const [descriptionInput, setDescriptionInput] = useState(item.description || "");
+  const [descriptionInput, setDescriptionInput] = useState(
+    item.description || ""
+  );
 
   const {
     value: isEditTitle,
@@ -101,7 +103,6 @@ const ResponseItem = ({ item, index }: Props) => {
   };
 
   const handleSelect = (value: string, key: number) => {
-
     const cloneArr = cloneDeep(listMapping);
     const itemIndex = listMapping.findIndex((l) => l.key === key);
     set(cloneArr, `[${itemIndex}].from`, value);
@@ -109,7 +110,6 @@ const ResponseItem = ({ item, index }: Props) => {
   };
 
   const handleChangeInput = (value: string[], key: number) => {
-
     const cloneArr = cloneDeep(listMapping);
     const itemIndex = listMapping.findIndex((l) => l.key === key);
     set(cloneArr, `[${itemIndex}].to`, value);
@@ -121,7 +121,6 @@ const ResponseItem = ({ item, index }: Props) => {
     name: string,
     target: string
   ) => {
-
     const cloneObj = cloneDeep(responseMapping);
     const itemIndex = cloneObj?.findIndex(
       (i) => i.name === name && i.target === target
@@ -261,6 +260,7 @@ const ResponseItem = ({ item, index }: Props) => {
         <MappingIcon />
         <Tooltip title={item?.source}>
           <Input
+            id={`${index}-${item?.name}`}
             variant="filled"
             placeholder="Select or input property"
             style={{
