@@ -9,7 +9,7 @@ import useUser from "@/hooks/user/useUser";
 import { useAppStore } from "@/stores/app.store";
 import { useMappingTemplateStore } from "@/stores/mappingTemplate";
 import { queryClient } from "@/utils/helpers/reactQuery";
-import { IReleaseHistory } from "@/utils/types/product.type";
+import { Deployment, IReleaseHistory } from "@/utils/types/product.type";
 import {
   CheckCircleFilled,
   CloseCircleFilled,
@@ -18,7 +18,7 @@ import {
 } from "@ant-design/icons";
 import { Button, Flex, Modal, Spin, Tooltip } from "antd";
 import dayjs from "dayjs";
-import { isEmpty } from "lodash";
+import { find, isEmpty } from "lodash";
 import { useMemo } from "react";
 
 type Props = {
@@ -41,16 +41,32 @@ const VersionBtn = ({ item }: Props) => {
     (d) => d?.name?.toLowerCase?.() === "production"
   );
 
-  const updateStatus = (array: any, id: string) => {
+  const updateOrAddEnvName = (array: Deployment[], envNameToUpdate: string) => {
+    const newArray = [...array];
+    const existingItem = find(newArray, { envName: envNameToUpdate });
+
+    if (existingItem) {
+      existingItem.status = "IN_PROCESS";
+    } else {
+      newArray.push({
+        envName: envNameToUpdate,
+        status: "IN_PROCESS",
+      } as Deployment);
+    }
+    return newArray;
+  };
+
+  const updateStatus = (type: string, array: any, id: string) => {
     return {
       ...array,
       data: {
         ...array?.data,
-        data: array?.data?.data?.map((d: any) => {
+        data: array?.data?.data?.map((d: IReleaseHistory) => {
           if (d?.templateUpgradeId === id) {
+            const deployments = updateOrAddEnvName(d.deployments, type);
             return {
               ...d,
-              status: "IN_PROCESS",
+              deployments,
             };
           }
           return d;
@@ -75,6 +91,17 @@ const VersionBtn = ({ item }: Props) => {
       okType: "primary",
       closable: false,
       onOk: () => {
+        queryClient.setQueryData(
+          [PRODUCT_CACHE_KEYS.get_release_list, currentProduct, releaseParams],
+          (oldData: any) => {
+            const newData = updateStatus(
+              "stage",
+              oldData,
+              item.templateUpgradeId
+            );
+            return { ...newData };
+          }
+        );
         deployStage({
           productId: currentProduct,
           data: {
@@ -82,13 +109,6 @@ const VersionBtn = ({ item }: Props) => {
             stageEnvId: stageEnv?.id,
           },
         } as any);
-        queryClient.setQueryData(
-          [PRODUCT_CACHE_KEYS.get_release_list, currentProduct, releaseParams],
-          (oldData: any) => {
-            const newData = updateStatus(oldData, item.templateUpgradeId);
-            return { ...newData };
-          }
-        );
       },
     });
   };
@@ -109,6 +129,18 @@ const VersionBtn = ({ item }: Props) => {
       okType: "primary",
       closable: false,
       onOk: () => {
+        queryClient.setQueryData(
+          [PRODUCT_CACHE_KEYS.get_release_list, currentProduct, releaseParams],
+          (oldData: any) => {
+            const newData = updateStatus(
+              "production",
+              oldData,
+              item.templateUpgradeId
+            );
+            console.log(newData);
+            return { ...newData };
+          }
+        );
         deployProd({
           productId: currentProduct,
           data: {
@@ -117,13 +149,6 @@ const VersionBtn = ({ item }: Props) => {
             productEnvId: productionEnv?.id,
           },
         } as any);
-        queryClient.setQueryData(
-          [PRODUCT_CACHE_KEYS.get_release_list, currentProduct, releaseParams],
-          (oldData: any) => {
-            const newData = updateStatus(oldData, item.templateUpgradeId);
-            return { ...newData };
-          }
-        );
       },
     });
   };

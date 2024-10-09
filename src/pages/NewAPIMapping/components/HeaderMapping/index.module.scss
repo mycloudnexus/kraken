@@ -23,3 +23,11 @@
 .mappingIcon {
   width: 42px;
 }
+
+.confirm {
+  :global {
+    .anticon.anticon-exclamation-circle {
+      margin-top: 2px;
+    }
+  }
+}

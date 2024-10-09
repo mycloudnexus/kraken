@@ -150,6 +150,7 @@ const NewAPIMapping = ({
     useGetDefaultSellerApi(currentProduct, serverKeyInfo);
 
   const [mainTabKey, setMainTabKey] = useState<string>(EMainTab.mapping);
+  const [firstTimeLoadSellerAPI, setFirstTimeLoadSellerAPI] = useState(true);
 
   const ref = useRef<any>();
   const size = useSize(ref);
@@ -169,10 +170,11 @@ const NewAPIMapping = ({
   }, [runningDeploymentData]);
 
   useEffect(() => {
-    if (!sellerApi && defaultSellerApi) {
+    if (!sellerApi && defaultSellerApi && firstTimeLoadSellerAPI) {
       setSellerApi(defaultSellerApi);
+      setFirstTimeLoadSellerAPI(false);
     }
-  }, [sellerApi, setSellerApi, defaultSellerApi]);
+  }, [sellerApi, setSellerApi, defaultSellerApi, firstTimeLoadSellerAPI]);
 
   useEffect(() => {
     if (!serverKey && defaultServerKey) {
@@ -597,7 +599,10 @@ const NewAPIMapping = ({
                   </Flex>
                 )}
 
-                <HeaderMapping disabled={!isRequiredMapping} />
+                <HeaderMapping
+                  disabled={!isRequiredMapping}
+                  mappers={mappers}
+                />
                 <Tabs
                   items={items}
                   activeKey={activeTab}

@@ -11,6 +11,10 @@ import styles from "./index.module.scss";
 import { useMappingUiStore } from "@/stores/mappingUi.store";
 import { get, isEmpty } from "lodash";
 import { useBoolean } from "usehooks-ts";
+import {
+  IRequestMapping,
+  IResponseMapping,
+} from "@/utils/types/component.type";
 
 type Props = {
   disabled: boolean;
@@ -55,21 +59,64 @@ const SellerAPI = ({ disabled, isFocus, handleClick }: Props) => {
     </Typography.Text>
   );
 };
-const HeaderMapping = ({ disabled = false }) => {
+const HeaderMapping = ({
+  disabled = false,
+  mappers,
+}: {
+  disabled?: boolean;
+  mappers: any;
+}) => {
   const { query, sellerApi, rightSide, setRightSide } = useNewApiMappingStore();
   const { activeTab } = useMappingUiStore();
   const queryData = JSON.parse(query ?? "{}");
   const { value: isFocus, setTrue, setFalse } = useBoolean(false);
+  const {
+    setRequestMapping,
+    setResponseMapping,
+    setSellerApi,
+    setServerKey,
+    setListMappingStateResponse,
+  } = useNewApiMappingStore();
+  const resetMappingFnc = () => {
+    setRequestMapping(
+      mappers.request
+        ?.filter((rm: IRequestMapping) => !rm.customizedField)
+        ?.map((rm: IRequestMapping) => ({
+          ...rm,
+          target: "",
+          targetLocation: "",
+          targetType: "",
+          targetValues: [],
+        }))
+    );
+    setResponseMapping(
+      mappers.response
+        ?.filter((rm: IResponseMapping) => !rm.customizedField)
+        ?.map((rm: IResponseMapping) => ({
+          ...rm,
+          source: "",
+          sourceLocation: "",
+          valueMapping: {},
+        }))
+    );
+    setListMappingStateResponse(undefined);
+    setSellerApi(undefined);
+    setServerKey("");
+  };
   const handleClick = () => {
     Modal.confirm({
-      title: `Are you sure to remove selected API?`,
-
+      className: styles.confirm,
+      content:
+        "Are you sure to remove this API? All the related properties will be removed as well. Continue?",
       okButtonProps: {
         type: "primary",
       },
-      okText: "OK",
+      cancelText: "Cancel",
+      okText: "Yes, continue",
       okType: "danger",
-      onOk: () => {},
+      onOk: () => {
+        resetMappingFnc();
+      },
     });
   };
   return (
@@ -131,7 +178,8 @@ const HeaderMapping = ({ disabled = false }) => {
           align="center"
           justify="space-between"
           className={clsx(styles.sellerAPIBasicInfoWrapper, {
-            [styles.highlight]: rightSide === EnumRightType.SelectSellerAPI,
+            [styles.highlight]:
+              rightSide === EnumRightType.SelectSellerAPI && !disabled,
           })}
           onClick={() => {
             if (disabled) {

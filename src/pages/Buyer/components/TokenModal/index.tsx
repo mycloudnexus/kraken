@@ -17,9 +17,11 @@ const TokenModal = ({ open, onClose, item }: Props) => {
       open={open}
       closable={false}
       className={styles.modal}
-      okText="Done"
+      okText="OK"
       onOk={onClose}
-      onCancel={onClose}
+      cancelButtonProps={{
+        style: { display: "none" },
+      }}
     >
       <Flex vertical gap={4}>
         <Text.NormalLarge>Here’s your generated token</Text.NormalLarge>

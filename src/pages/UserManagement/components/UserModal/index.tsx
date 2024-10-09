@@ -104,7 +104,7 @@ const UserModal = ({ open, onClose }: Props) => {
             rules={[{ required: true, message: "Please select user role" }]}
           >
             <Select
-              placeholder="Please enter"
+              placeholder="Please select"
               options={roleOptions}
               labelRender={renderRole}
             />

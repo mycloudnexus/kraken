@@ -8,7 +8,7 @@ import MappingMatrix from "@/components/MappingMatrix";
 import styles from "./index.module.scss";
 import Text from "@/components/Text";
 import { toDateTime } from "@/libs/dayjs";
-import { get, join, slice, split } from "lodash";
+import { get, isEmpty, join, slice, split } from "lodash";
 type Props = {
   scrollHeight?: number;
   env?: IEnv;
@@ -22,6 +22,16 @@ interface GroupedItem {
 const defaultPage = {
   size: 20,
   page: 0,
+};
+export const ContentTime = ({ content = "", time = "" }) => {
+  return (
+    <Flex vertical gap={2}>
+      <Text.LightMedium>{content}</Text.LightMedium>
+      {!isEmpty(time) && (
+        <Text.LightSmall color="#00000073">{time}</Text.LightSmall>
+      )}
+    </Flex>
+  );
 };
 
 const RunningAPIMapping = ({ scrollHeight, env }: Props) => {
@@ -141,8 +151,11 @@ const RunningAPIMapping = ({ scrollHeight, env }: Props) => {
               align="start"
               vertical
             >
-              <Flex>{item?.userName ?? "-"}</Flex>
-              <Flex>{toDateTime(item?.createAt)}</Flex>
+              <ContentTime
+                key={`${item.componentName}-${index}`}
+                content={item?.userName}
+                time={toDateTime(item?.createAt)}
+              />
             </Flex>
           ))}
         </Flex>

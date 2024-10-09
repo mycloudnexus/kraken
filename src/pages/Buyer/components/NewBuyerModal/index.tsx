@@ -98,7 +98,7 @@ const NewBuyerModal = ({ open, onClose, currentEnv }: Props) => {
               },
             ]}
           >
-            <Input placeholder="Please input buyer’s company ID in Seller’s legacy API platform" />
+            <Input placeholder="Please enter" />
           </Form.Item>
           <Form.Item
             name="companyName"
@@ -111,7 +111,7 @@ const NewBuyerModal = ({ open, onClose, currentEnv }: Props) => {
               </Flex>
             }
           >
-            <Input placeholder="Please input buyer’s company name in Seller’s legacy API platform" />
+            <Input placeholder="Please enter" />
           </Form.Item>
         </Form>
       </Modal>
