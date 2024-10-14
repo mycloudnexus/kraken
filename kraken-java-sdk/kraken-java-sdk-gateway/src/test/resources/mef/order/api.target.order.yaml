@@ -1,0 +1,60 @@
+---
+kind: kraken.component.api-target
+apiVersion: v1
+metadata:
+  key: api.target.order
+  name: ConsoleConnect API
+spec:
+  server:
+    uri: ${env.targetAPIServer}
+  inputs:
+    - mefQuery
+    - mefRequestBody
+    - previousTaskResponse
+  endpoints:
+    - key: api.target.order.add.uni
+      path: /api/company/${mefQuery.buyerId}/ports/orders
+      method: put
+      requestBody: |
+        {
+          "portName": "${mefRequestBody.productOrderItem[0].requestedItemTerm.name}",
+          "speed": "${mefRequestBody.productOrderItem[0].product.productConfiguration.uni.bandwidth}",
+          "bundleCrossConnect": "${mefRequestBody.productOrderItem[0].product.productConfiguration.uni.bundleCrossConnect}",
+          "paymentType": "${mefRequestBody.productOrderItem[0].product.productConfiguration.uni.paymentType}",
+          "dataCenterFacility": "${mefRequestBody.productOrderItem[0].product.place[0].id}",
+          "durationUnit": "${(mefRequestBody.productOrderItem[0].requestedItemTerm.duration.units == 'calendarMonths' && mefRequestBody.productOrderItem[0].requestedItemTerm.duration.amount == 12) ? 'y':'m'}"
+        }
+      responseBody: |
+        {
+          "code": "${(response.status < 300) ? 201 : response.status}",
+          "data": "${ response.body}",
+          "reason": "${ response.body.error.message}",
+          "message": "${ response.body.error.message}"
+        }
+    - key: api.target.order.add.access_e_line
+      path: /api/v2/company/${mefQuery.buyerId}/connections/layer2
+      method: put
+      requestBody: |
+        {
+          "speed": "${mefRequestBody.productOrderItem[0].product.productConfiguration.access_e_line.bandwidthUnit == 'Gbps'? mefRequestBody.productOrderItem[0].product.productConfiguration.access_e_line.bandwidth * 1000:mefRequestBody.productOrderItem[0].product.productConfiguration.access_e_line.bandwidth}",
+          "portId": "${mefRequestBody.productOrderItem[0].product.productConfiguration.access_e_line.srcPortId}",
+          "destPortId": "${mefRequestBody.productOrderItem[0].product.productConfiguration.access_e_line.destPortId}",
+          "paymentType": "${mefRequestBody.productOrderItem[0].product.productConfiguration.access_e_line.paymentType}",
+          "name": "${mefRequestBody.productOrderItem[0].requestedItemTerm.name}",
+          "durationUnit": "${mefRequestBody.productOrderItem[0].requestedItemTerm.duration.units == 'calendarMonths'? 'm':'d'}",
+          "duration": "${mefRequestBody.productOrderItem[0].requestedItemTerm.duration.amount}",
+          "destRegionId": "${mefRequestBody.productOrderItem[0].product.productConfiguration.access_e_line.destRegionId}",
+          "region": "${mefRequestBody.productOrderItem[0].product.productConfiguration.access_e_line.srcRegionId}",
+          "destMetroId": "${mefRequestBody.productOrderItem[0].product.productConfiguration.access_e_line.destMetroId}",
+          "classOfService": "${mefRequestBody.productOrderItem[0].product.productConfiguration.access_e_line.classOfService}",
+          "type": "LAYER2",
+          "destCompany": "${mefRequestBody.productOrderItem[0].product.productConfiguration.access_e_line.destCompanyName}",
+          "evergreen": "${mefRequestBody.productOrderItem[0].product.productConfiguration.access_e_line.evergreen}"
+        }
+      responseBody: |
+        {
+          "code": "${(response.status < 300) ? 201 : response.status}",
+          "data": "${response.body}",
+          "reason": "${response.body.error.message}",
+          "message": "${response.body.error.message}"
+        }

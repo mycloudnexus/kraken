@@ -1,0 +1,9 @@
+---
+kind: kraken.product
+apiVersion: v1
+metadata:
+  key: mef.sonata
+  name: MEF Sonata API
+spec:
+  componentPaths:
+    - classpath:no-such.yaml

@@ -1,0 +1,11 @@
+.content {
+  display: flex;
+  height: calc(100vh - 78px);
+  overflow: hidden;
+}
+
+.main {
+  ::-webkit-scrollbar {
+    display: none;
+  }
+}

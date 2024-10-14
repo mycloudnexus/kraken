@@ -1,0 +1,56 @@
+---
+kind: kraken.component.api-target-mapper
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target-mapper.address.retrieve
+  name: Mapper Of Retrieving Geographic Address
+  description: This operation retrieves a GeographicAddress entity
+  version: 10
+spec:
+  trigger:
+    path: /mefApi/sonata/geographicAddressManagement/v7/geographicAddress/{id}
+    method: get
+  endpoints:
+    - id: retrieve address
+      path: /v2/data-center-facility/{id}
+      method: get
+      serverKey: mef.sonata.api-target-spec.con1718940696857
+      mappers:
+        request:
+          - name: mapper.address.retrieve.id
+            description: address retrieve id mapping
+            source: "@{{id}}"
+            sourceLocation: PATH
+            target: "@{{id}}"
+            targetType: string
+            targetLocation: PATH
+        response:
+          - name: mapper.address.validation.id
+            description: address validation id mapping
+            source: "@{{responseBody.id}}"
+            sourceLocation: BODY
+            target: "@{{id}}"
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.address.validation.country
+            description: address validation country mapping
+            source: "@{{responseBody.company.addresses[0].country}}"
+            sourceLocation: BODY
+            target: "@{{associatedGeographicAddress.country}}"
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.address.validation.city
+            description: address validation city mapping
+            source: "@{{responseBody.company.addresses[0].city}}"
+            sourceLocation: BODY
+            target: "@{{associatedGeographicAddress.city}}"
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.address.validation.streetName
+            description: address validation streetName mapping
+            source: "@{{responseBody.company.addresses[0].address}}"
+            sourceLocation: BODY
+            target: "@{{associatedGeographicAddress.streetName}}"
+            targetLocation: BODY
+            requiredMapping: true
+

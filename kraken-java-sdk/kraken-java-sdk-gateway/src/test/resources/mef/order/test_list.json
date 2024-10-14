@@ -1,0 +1,3 @@
+{
+  "relatedContactInformation": "${T(com.consoleconnect.kraken.operator.gateway.func.SpelFunc).appendSellerInformation('sellerOrderContact', 'buyer-001', '123445', 'buyer@cc.com', relatedContactInformation)}"
+}

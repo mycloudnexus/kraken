@@ -1,0 +1,32 @@
+
+---
+kind: kraken.component.api-target
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target.order.uni.add
+  name: Order Port API
+  mapperKey: mef.sonata.api-target-mapper.order.uni.add
+  version: 2
+spec:
+  inputs:
+    - mefQuery
+    - mefRequestBody
+  trigger:
+    path: /mefApi/sonata/productOrderingManagement/v10/productOrder
+    method: post
+    productType: uni
+    actionType: add
+  endpoints:
+    - id: create port order
+      path: ""
+      method: ""
+      requestBody: ${mefRequestBody.productOrderItem[0].product.productConfiguration.uni}
+      responseBody: |
+        {
+         "relatedContactInformation": "${mefRequestBody.relatedContactInformation}", 
+         "id": "${entity.id}",
+         "orderDate":"function.now()",
+         "productOrderItem": "${mefRequestBody.productOrderItem}",
+         "state": "@{{state}}"
+        }
+   

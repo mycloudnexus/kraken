@@ -1,0 +1,44 @@
+---
+kind: kraken.component.api-target
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target.quote.uni.read
+  name: Quote Management API
+  mapperKey: mef.sonata.api-target-mapper.quote.uni.read
+  version: 2
+spec:
+  inputs:
+    - mefQuery
+    - mefRequestBody
+    - entity
+  trigger:
+    path: /mefApi/sonata/quoteManagement/v8/quote/{id}
+    method: get
+    productType: uni
+  endpoints:
+    - id: retrieve quote for port
+      path: /api/pricing/calculate
+      method: post
+      requestBody: ${entity.request.quoteItem[0].product.productConfiguration.uni}
+      responseBody: |
+        {
+          "id": "${entity.id}",
+          "buyerRequestedQuoteLevel": "${entity.request.buyerRequestedQuoteLevel}",
+          "quoteItem": [{
+             "product": "${entity.request.quoteItem[0].product}",
+             "state": "@{{quoteItem.state}}",
+             "quoteItemPrice": {
+               "price": {
+                 "dutyFreeAmount": {
+                   "unit": "@{{quoteItem.quoteItemPrice.price.dutyFreeAmount.unit}}",
+                   "value": "@{{quoteItem.quoteItemPrice.price.dutyFreeAmount.value}}"
+                 }
+               }
+             }
+           }
+          ],
+          "quoteDate": "function.now()",
+          "externalId":"${entity.request[externalId]?:''}",
+          "instantSyncQuote":"${entity.request[instantSyncQuote]?:''}",
+          "requestedQuoteCompletionDate": "${entity.request[requestedQuoteCompletionDate]?:''}"
+        }

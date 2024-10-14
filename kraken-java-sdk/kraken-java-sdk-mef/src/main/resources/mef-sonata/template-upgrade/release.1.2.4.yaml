@@ -1,0 +1,15 @@
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.1.2.4
+  name: V1.2.4
+  labels:
+    release-version: V1.2.4
+    release-date: 2024-09-10
+  description: |
+    change field:
+      change type to @type in address validation
+    new feature:
+
+  version: 1

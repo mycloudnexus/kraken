@@ -1,0 +1,65 @@
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: calc(100% - 35px);
+  overflow-y: auto;
+}
+
+.loading {
+  min-height: 500px;
+}
+
+.card {
+  border: 1px solid #dde1e5;
+  border-radius: 6px;
+  width: 100%;
+  padding: 18px 20px;
+  box-sizing: border-box;
+  cursor: pointer;
+
+  &:hover,
+  &.active {
+    background: #dbe4fb;
+  }
+}
+
+.header {
+  padding: 16px 20px;
+  box-shadow: 0px -1px 0px 0px #f0f0f0 inset;
+}
+
+.container {
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.search {
+  margin-top: 12px;
+  width: 100%;
+
+  input {
+    border-radius: 2px;
+  }
+}
+
+.root {
+  height: 100%;
+  :global {
+    .ant-spin-nested-loading {
+      height: calc(100% - 112px);
+      overflow-y: auto;
+      &::-webkit-scrollbar {
+        display: none;
+      }
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+  }
+}
+
+.empty {
+  svg {
+    width: 100%;
+  }
+}

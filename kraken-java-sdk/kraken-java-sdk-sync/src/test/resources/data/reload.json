@@ -1,0 +1,242 @@
+ [
+    {
+      "kind": "kraken.component.api-target",
+      "apiVersion": "v1",
+      "metadata": {
+        "id": "6a6a2ab6-aa7b-495f-acc5-231d578b7922",
+        "name": "Order Connection API",
+        "version": 0,
+        "key": "api.target.order.add.eLine"
+      },
+      "facets": {
+        "inputs": [
+          "mefQuery",
+          "mefRequestBody"
+        ],
+        "endpoints": [
+          {
+            "id": "create a connection",
+            "path": "/anything?buyerId=${mefQuery.buyerId}",
+            "method": "put",
+            "requestBody": "{\n  \"speed\":${mefRequestBody.productOrderItem[0].product.productConfiguration.access_e_line.bandwidthUnit == 'Gbps'? mefRequestBody.productOrderItem[0].product.productConfiguration.access_e_line.bandwidth * 1000:mefRequestBody.productOrderItem[0].product.productConfiguration.access_e_line.bandwidth}\n  \"portId\":${mefRequestBody.productOrderItem[0].product.productConfiguration.access_e_line.srcPortId}\n  \"destPortId\":${mefRequestBody.productOrderItem[0].product.productConfiguration.access_e_line.destPortId}\n  \"paymentType\":${mefRequestBody.productOrderItem[0].product.productConfiguration.access_e_line.paymentType}\n  \"name\":${mefRequestBody.productOrderItem[0].requestedItemTerm.name}\n  \"durationUnit\":${mefRequestBody.productOrderItem[0].requestedItemTerm.duration.units == 'calendarMonths'? 'm':'d'}\n  \"duration\":${mefRequestBody.productOrderItem[0].requestedItemTerm.duration.amount}\n  \"destRegionId\":${mefRequestBody.productOrderItem[0].product.productConfiguration.access_e_line.destRegionId}\n  \"region\":${mefRequestBody.productOrderItem[0].product.productConfiguration.access_e_line.srcRegionId}\n  \"destMetroId\":${mefRequestBody.productOrderItem[0].product.productConfiguration.access_e_line.destMetroId}\n  \"classOfService\":${mefRequestBody.productOrderItem[0].product.productConfiguration.access_e_line.classOfService}\n  \"type\":\"LAYER2\"\n  \"destCompany\":${mefRequestBody.productOrderItem[0].product.productConfiguration.access_e_line.destCompanyName}\n  \"evergreen\":${mefRequestBody.productOrderItem[0].product.productConfiguration.access_e_line.evergreen}\n}\n",
+            "responseBody": "{\n  \"id\":\"${entity.response.id}\",\n  \"status\":\"acknowledged\",\n  \"relatedContactInformation\":\"${entity.request.relatedContactInformation}\"\n}\n"
+          }
+        ]
+      },
+      "id": "6a6a2ab6-aa7b-495f-acc5-231d578b7922",
+      "organizationId": "ef90f7e7-dc7d-4538-aa5b-a4a7d8432da2",
+      "parentId": "d2531590-f3ed-4081-861a-fb95ed8297e0",
+      "createdAt": "2024-05-29T14:15:18.328711Z",
+      "updatedAt": "2024-05-29T14:15:18.33123Z",
+      "syncMetadata": {
+        "fullPath": "classpath:deployment-config/components/api-targets/mef.sonata.api.order.eline.add.yaml",
+        "syncedSha": "2295E60BB64F96A1551694F3B545DD37",
+        "syncedAt": "2024-05-29T14:15:18.324314225Z"
+      }
+    },
+    {
+      "kind": "kraken.component.api",
+      "apiVersion": "v1",
+      "metadata": {
+        "id": "d1c6ac65-3021-4b27-ace7-a9df545b82ce",
+        "name": "Product Ordering Management",
+        "version": 0,
+        "key": "mef.sonata.api.order",
+        "labels": {
+          "mef-api-release": "grace",
+          "order-api-version": "v10"
+        }
+      },
+      "facets": {
+        "mappings": [
+          {
+            "uri": "${env.target.url}",
+            "actions": [
+              {
+                "id": "calculate_order_type_and_action_via_javascript",
+                "env": {
+                  "productOrderItem": "${body['productOrderItem'][0]}"
+                },
+                "with": {
+                  "code": "(jsonStr) => {\n  console.log(\"input: \" + jsonStr);\n  let input = JSON.parse(jsonStr);\n  let targetAPIConfigKey = '';\n  if(input.productOrderItem['product']['productConfiguration']['@type'] == 'UNI' && input.productOrderItem['action'] == 'add') {\n    targetAPIConfigKey = 'mef.sonata.api-target.order.uni.add';\n  } else if(input.productOrderItem['product']['productConfiguration']['@type'] == 'ACCESS_E_LINE' && input.productOrderItem['action'] == 'add') {\n    targetAPIConfigKey = 'mef.sonata.api-target.order.eline.add';\n  } else if(input.productOrderItem['product']['productConfiguration']['@type'] == 'UNI' && input.productOrderItem['action'] == 'delete') {\n    targetAPIConfigKey = 'mef.sonata.api-target.order.uni.delete';\n  } else if(input.productOrderItem['product']['productConfiguration']['@type'] == 'ACCESS_E_LINE' && input.productOrderItem['action'] == 'delete') {\n    targetAPIConfigKey = 'mef.sonata.api-target.order.eline.delete';\n  }\n  let ret = {\n    orderType: input.productOrderItem['product']['productConfiguration']['@type'],\n    orderAction: input.productOrderItem['action'],\n    targetAPIConfigKey: targetAPIConfigKey\n  };\n  return JSON.stringify(ret);\n}\n"
+                },
+                "outputKey": "order",
+                "actionType": "engine@javascript"
+              },
+              {
+                "id": "persist_http_request",
+                "env": {
+                  "bizType": "${order.orderType}"
+                },
+                "with": {
+                  "action": "create",
+                  "properties": [
+                    "headers",
+                    "queryParameters",
+                    "requestBody"
+                  ]
+                },
+                "actionType": "buildin@db",
+                "preRequest": true
+              },
+              {
+                "id": "load-downstream-api-config",
+                "env": {
+                  "entity": "${entity}",
+                  "mefQuery": "${query}",
+                  "configKey": "${order.targetAPIConfigKey}",
+                  "mefRequestBody": "${body}"
+                },
+                "with": {
+                  "render": true
+                },
+                "outputKey": "targetApiConfig",
+                "actionType": "buildin@load-target-api-config"
+              },
+              {
+                "id": "rewrite-path",
+                "env": {
+                  "path": "${targetApiConfig.endpoints[0].path}",
+                  "method": "${targetApiConfig.endpoints[0].method}"
+                },
+                "actionType": "buildin@rewrite-path"
+              },
+              {
+                "id": "modify-request-body",
+                "env": {
+                  "code": "${targetApiConfig.endpoints[0].requestBody}"
+                },
+                "actionType": "buildin@modify-request-body"
+              },
+              {
+                "id": "modify-response-body-for-add",
+                "env": {
+                  "code": "${targetApiConfig.endpoints[0].responseBody}",
+                  "inputs": "${targetApiConfig.inputs}"
+                },
+                "with": {
+                  "engine": "spel"
+                },
+                "actionType": "buildin@modify-response-body"
+              },
+              {
+                "with": {
+                  "action": "update",
+                  "properties": [
+                    "responseBody",
+                    "responseStatusCode"
+                  ]
+                },
+                "order": -4,
+                "actionType": "buildin@db",
+                "preRequest": false,
+                "postRequest": true
+              }
+            ],
+            "trigger": {
+              "path": "/mefApi/sonata/productOrderingManagement/v10/productOrder",
+              "method": "post",
+              "queryParams": [
+                "buyerId"
+              ]
+            },
+            "metadata": {
+              "cacheRequestBody": true
+            }
+          },
+          {
+            "uri": "${env.target.url}",
+            "actions": [
+              {
+                "env": {
+                  "input": "${path}",
+                  "pattern": "/mefApi/sonata/productOrderingManagement/v10/productOrder/(?<segment>.*)"
+                },
+                "name": "retrieve orderId from path",
+                "actionType": "buildin@pattern"
+              },
+              {
+                "id": "read request payload by id",
+                "env": {
+                  "id": "${segment}"
+                },
+                "with": {
+                  "action": "read"
+                },
+                "actionType": "buildin@db",
+                "preRequest": true
+              },
+              {
+                "id": "calculate_order_type_for_read_via_javascript",
+                "env": {
+                  "bizType": "${entity.bizType}"
+                },
+                "with": {
+                  "code": "(jsonStr) => {\n  console.log(\"input: \" + jsonStr);\n  let input = JSON.parse(jsonStr);\n  let targetAPIConfigKey = '';\n  if(input.bizType == 'UNI') {\n    targetAPIConfigKey = 'mef.sonata.api-target.order.uni.read';\n  } else if(input.bizType == 'ACCESS_E_LINE') {\n    targetAPIConfigKey = 'mef.sonata.api-target.order.eline.read';\n  }\n  let ret = {\n    orderType: input.bizType,\n    targetAPIConfigKey: targetAPIConfigKey\n  };\n  return JSON.stringify(ret);\n}\n"
+                },
+                "outputKey": "order",
+                "actionType": "engine@javascript"
+              },
+              {
+                "id": "load-downstream-api-config",
+                "env": {
+                  "entity": "${entity}",
+                  "mefQuery": "${query}",
+                  "configKey": "${order.targetAPIConfigKey}"
+                },
+                "with": {
+                  "render": true
+                },
+                "outputKey": "targetApiConfig",
+                "actionType": "buildin@load-target-api-config"
+              },
+              {
+                "id": "rewrite-path",
+                "env": {
+                  "path": "${targetApiConfig.endpoints[0].path}",
+                  "method": "${targetApiConfig.endpoints[0].method}"
+                },
+                "with": {
+                  "method": "get"
+                },
+                "actionType": "buildin@rewrite-path"
+              },
+              {
+                "id": "modify-response-body",
+                "env": {
+                  "code": "${targetApiConfig.endpoints[0].responseBody}",
+                  "inputs": "${targetApiConfig.inputs}"
+                },
+                "with": {
+                  "engine": "spel"
+                },
+                "actionType": "buildin@modify-response-body"
+              }
+            ],
+            "trigger": {
+              "path": "/mefApi/sonata/productOrderingManagement/v10/productOrder/**",
+              "method": "get"
+            },
+            "metadata": {
+              "cacheRequestBody": false
+            }
+          }
+        ],
+        "apiTargetMapping": {
+          "keys": [
+            "api.target.order.add.eLine"
+          ]
+        }
+      },
+      "id": "d1c6ac65-3021-4b27-ace7-a9df545b82ce",
+      "organizationId": "ef90f7e7-dc7d-4538-aa5b-a4a7d8432da2",
+      "parentId": "d2531590-f3ed-4081-861a-fb95ed8297e0",
+      "createdAt": "2024-05-29T14:15:18.303613Z",
+      "updatedAt": "2024-05-29T14:15:18.305913Z",
+      "syncMetadata": {
+        "fullPath": "classpath:deployment-config/components/apis/mef.sonata.api.order.yaml",
+        "syncedSha": "7DB9201B382EDE50692AE349C6315E47",
+        "syncedAt": "2024-05-29T14:15:18.298819234Z"
+      }
+    }
+  ]

@@ -1,0 +1,13 @@
+---
+kind: kraken.workspace
+apiVersion: v1
+metadata:
+  id: ef90f7e7-dc7d-4538-aa5b-a4a7d8432da2
+  name: Console Connect
+  key: consoleconnect
+  description: Console Connect 123
+  icon: https://storage.googleapis.com/console-connect-static-assets/catacomb/bigquery.png
+spec:
+  productPaths:
+    - classpath:deployment-config/kraken-mef-sonata.yaml
+    - classpath:deployment-config/product.yaml

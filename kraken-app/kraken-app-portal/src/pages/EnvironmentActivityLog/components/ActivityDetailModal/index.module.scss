@@ -1,0 +1,85 @@
+.activityWrapper {
+  margin-top: 22px;
+  flex: 1;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  overflow-y: auto;
+  h3 {
+    color: var(--Texts-Primary, var(--Text-primary, rgba(0, 0, 0, 0.85)));
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 22px;
+    margin: 12px 0;
+  }
+}
+
+.copyButton {
+  cursor: pointer;
+  padding: 0 15px;
+  color: #2962ff;
+}
+
+.activityHeader {
+  padding: 24px;
+  background-color: #fafafa;
+  border-bottom: 1px solid #f0f0f0;
+  border-radius: 4px 4px 0 0;
+}
+
+.collapseWrapper:global(.ant-collapse-borderless) {
+  background-color: transparent;
+  &:global(> .ant-collapse-item) {
+    border-bottom: 0;
+  }
+}
+
+.activityBody {
+  padding: 0 20px 20px;
+}
+
+.tree {
+  padding: 16px;
+  border: 1px solid #ddd;
+  background-color: #f5f5f5;
+  max-height: 183px;
+  overflow-y: auto;
+  :global {
+    .ant-tree-list {
+      background-color: #f5f5f5;
+    }
+    .ant-tree-treenode,
+    .ant-tree-node-content-wrapper {
+      width: 100%;
+      &:hover {
+        background-color: #f5f5f5;
+      }
+    }
+  }
+}
+
+.treeTitle {
+  flex: 1;
+  padding: 2px 4px;
+  background: #fff;
+}
+
+.treeExample {
+  padding: 2px 4px;
+  background: #fff;
+}
+:global(.ant-drawer-header-title .ant-drawer-close) {
+  display: none;
+}
+.activity {
+  width: 50%;
+  h1 {
+    color: var(--Texts-Primary, var(--Text-primary, rgba(0, 0, 0, 0.85)));
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 24px;
+    margin: 0;
+    margin-bottom: 22px;
+  }
+}

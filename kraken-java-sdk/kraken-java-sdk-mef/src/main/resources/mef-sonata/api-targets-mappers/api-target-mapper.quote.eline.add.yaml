@@ -1,0 +1,63 @@
+---
+kind: kraken.component.api-target-mapper
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target-mapper.quote.eline.add
+  name: Mapper Of Creating Quote Eline
+  description: This operation creates a Quote entity
+  version: 4
+spec:
+  trigger:
+    path: /mefApi/sonata/quoteManagement/v8/quote
+    method: post
+    productType: access_e_line
+    actionType: add
+    quoteLevel: firm
+    syncMode: false
+  endpoints:
+    - id: create quote for connection
+      path: ""
+      method: ""
+      serverKey: ""
+      mappers:
+        request:
+        response:
+          - name: quote.eline.add.state.mapper
+            title: Quote State Mapping
+            description: quote state mapping
+            source: ""
+            sourceLocation: ""
+            target: "@{{quoteItem[*].state}}"
+            targetType: enum
+            targetLocation: BODY
+            requiredMapping: true
+            targetValues:
+              - accepted
+              - acknowledged
+              - answered
+              - approved.orderable
+              - approved.orderableAlternate
+              - cancelled
+              - unableToProvide
+              - declined
+              - expired
+              - inProgress
+              - inProgress.draft
+              - rejected
+            valueMapping: {}
+          - name: quote.eline.add.price.value.mapper
+            title: Quote Price Value Mapping
+            description: quote price value mapping
+            source: ""
+            sourceLocation: ""
+            target: "@{{quoteItem.quoteItemPrice.price.dutyFreeAmount.value}}"
+            targetLocation: BODY
+            requiredMapping: true
+          - name: quote.eline.add.price.unit.mapper
+            title: Quote Price Unit Mapping
+            description: quote price unit mapping
+            source: ""
+            sourceLocation: ""
+            target: "@{{quoteItem.quoteItemPrice.price.dutyFreeAmount.unit}}"
+            targetLocation: BODY
+            requiredMapping: true

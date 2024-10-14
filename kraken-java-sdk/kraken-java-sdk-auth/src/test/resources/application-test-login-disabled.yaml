@@ -1,0 +1,4 @@
+app:
+  security:
+    login:
+      enabled: false

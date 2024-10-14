@@ -1,0 +1,18 @@
+---
+app:
+  security:
+    login:
+      enabled: false
+    auth-server:
+      enabled: true
+      jwks-uri-enabled: false
+      jwt:
+        issuer: https://kraken.consoleconnect.com/issuer
+        key-id: kraken
+        secret: MjRhMjNhNGYtMWUzMS00ZTY4LTlhYzgtMzY5NDcwYzNjNDE4
+    resource-server:
+      enabled: false
+      jwt:
+        - issuer: https://kraken.consoleconnect.com/issuer
+          key-id: kraken
+          secret: MjRhMjNhNGYtMWUzMS00ZTY4LTlhYzgtMzY5NDcwYzNjNDE4

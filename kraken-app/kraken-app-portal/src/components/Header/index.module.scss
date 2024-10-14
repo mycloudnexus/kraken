@@ -1,0 +1,87 @@
+.header {
+  height: 57px;
+  background: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 24px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.tooltip {
+  div {
+    z-index: 1;
+  }
+  display: flex;
+  margin: 5px 5px 25px 5px;
+  flex-direction: column;
+  justify-content: center;
+  row-gap: 10px;
+  button {
+    height: 0%;
+    padding: 0 10px 0 10px;
+  }
+}
+
+.logo {
+  color: #000 !important;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 28px;
+  font-family: "Inter", sans-serif;
+}
+
+.rightMenu {
+  display: flex;
+  justify-content: flex-end;
+  gap: 14px;
+}
+
+.avatar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f0f0f0;
+  border-radius: 50%;
+  padding: 2px;
+  width: 68.45px;
+  box-sizing: border-box;
+}
+
+.select {
+  width: fit-content;
+  :global {
+    .ant-select-selector {
+      border: none !important;
+      box-shadow: none !important;
+    }
+  }
+}
+
+.selectIcon {
+  display: flex;
+  flex-direction: column;
+}
+
+.tooltipBlue {
+  :global {
+    .ant-tooltip-arrow::before {
+      background-color: #3391ff !important;
+    }
+
+    .ant-tooltip-inner {
+      width: 230px;
+      background: linear-gradient(180deg, #3391ff 33.85%, #466fff 100%);
+      word-wrap: break-word;
+    }
+
+    .ant-tooltip-content:before {
+      content: url("../../../public/tooltip.png");
+      position: absolute;
+      right: -3px;
+    }
+  }
+}

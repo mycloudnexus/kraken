@@ -1,0 +1,25 @@
+{
+          "id": "id",
+          "buyerRequestedQuoteLevel": "firm",
+          "quoteItem": "${results.![{
+              product: {
+                productConfiguration: {
+                            '@type': 'ACCESS_E_LINE',
+                            access_e_line: {
+                              bandwidth: entity.bandwidth,
+                              srcDcf: entity.srcDcf.id,
+                              destDcf: entity.destDcf.id,
+                              classOfService: entity.classOfService
+                  }
+              }},
+              requestedQuoteItemTerm: {duration: {amount: entity.duration.value, units: entity.duration.value}},
+              state: 'answered',
+              quoteItemPrice: {
+                      price: {
+                        dutyFreeAmount: {
+                          unit: 'USD',
+                          value: price
+                        }}}
+          }]}",
+          "state": "${results.size > 0 ? 'approved.orderable' : 'unableToProvide'}"
+}

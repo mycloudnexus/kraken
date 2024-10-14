@@ -1,0 +1,40 @@
+---
+kind: kraken.component.api-target
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target.address.validate
+  name: Geographic Address Management
+  mapperKey: mef.sonata.api-target-mapper.address.validate
+  version: 0
+spec:
+  inputs:
+    - mefQuery
+    - mefRequestBody
+  trigger:
+    path: /mefApi/sonata/geographicAddressManagement/v7/geographicAddressValidation
+    method: post
+  endpoints:
+    - id: validate address
+      requestBody:
+      responseBody: |
+        {
+            "validationResult": "((mefResponseBody.bestMatchGeographicAddress.id == '' ? (mefResponseBody.alternateGeographicAddress.size() == 0 ?'fail':'partial'): 'success'))",
+            "alternateGeographicAddress": [
+                {
+
+                    "id": "@{{alternateGeographicAddress[*].id}}",
+                    "@type": "FieldedAddress",
+                    "country": "@{{alternateGeographicAddress[*].country}}",
+                    "city": "@{{alternateGeographicAddress[*].city}}",
+                    "streetName": "@{{alternateGeographicAddress[*].streetName}}"
+                }
+            ],
+            "provideAlternative": "${mefRequestBody.provideAlternative}",
+            "submittedGeographicAddress": "${mefRequestBody.submittedGeographicAddress}",
+            "bestMatchGeographicAddress": {
+                "id": "@{{bestMatchGeographicAddress.id}}",
+                "type": "FieldedAddress",
+                "city": "@{{bestMatchGeographicAddress.city}}",
+                "country": "@{{bestMatchGeographicAddress.country}}"
+            }
+        }

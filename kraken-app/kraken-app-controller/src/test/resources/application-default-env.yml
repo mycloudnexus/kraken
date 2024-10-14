@@ -1,0 +1,7 @@
+---
+app:
+  products:
+    - key: mef.sonata
+      environments:
+        - stage
+        - production

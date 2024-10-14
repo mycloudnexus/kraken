@@ -1,0 +1,10 @@
+---
+kind: kraken.component.transformer
+apiVersion: v1
+metadata:
+  key: component.transformer.response.echo
+  name: echo
+spec:
+  script:
+    path: classpath:/deployment-config/components/js/response_echo.js
+    engine: javascript

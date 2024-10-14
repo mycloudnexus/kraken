@@ -1,0 +1,120 @@
+---
+kind: kraken.component.api-target-mapper
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target-mapper.quote.eline.add.sync
+  name: Mapper Of Creating Quote Eline
+  description: This operation creates a Quote entity
+  version: 2
+spec:
+  trigger:
+    path: /mefApi/sonata/quoteManagement/v8/quote
+    method: post
+    productType: access_e_line
+    actionType: add
+    quoteLevel: firm
+    syncMode: true
+  endpoints:
+    - id: create quote for connection
+      path: /api/pricing/calculate
+      method: post
+      serverKey: mef.sonata.api-target-spec.con1718940696857
+      mappers:
+        request:
+        response:
+          - name: mapper.quote.eline.add.sync.unitOfMeasure
+            title: "Unit of Measure if price depending on it"
+            description: ""
+            source: ""
+            sourceLocation: BODY
+            target: "@{{quoteItem.quoteItemPrice.unitOfMeasure}}"
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.quote.eline.add.sync.price.unit
+            title: "Currency (ISO4217 norm uses 3 letters to define the currency)"
+            description: ""
+            source: ""
+            sourceLocation: BODY
+            target: "@{{quoteItem.quoteItemPrice.price.dutyFreeAmount.unit}}"
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.quote.eline.add.sync.price.value
+            title: "Duty free price value"
+            description: ""
+            source: ""
+            sourceLocation: ""
+            target: "@{{quoteItem.quoteItemPrice.price.dutyFreeAmount.value}}"
+            targetLocation: BODY
+            requiredMapping: true
+            checkPath: "$['quoteItem'][0]['quoteItemPrice'][0]['price']['dutyFreeAmount']['unit']"
+            deletePath: "$['quoteItem'][0]['quoteItemPrice']"
+          - name: mapper.quote.eline.add.sync.taxRate
+            title: "Price Tax Rate. Unit: [%]. E.g. value 16 stand for 16% tax"
+            description: ""
+            source: ""
+            sourceLocation: BODY
+            target: "@{{quoteItem.quoteItemPrice.price.taxRate}}"
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.quote.eline.add.sync.taxIncludedAmount.unit
+            title: "Currency (ISO4217 norm uses 3 letters to define the currency)"
+            description: ""
+            source: ""
+            sourceLocation: BODY
+            target: "@{{quoteItem.quoteItemPrice.price.taxIncludedAmount.unit}}"
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.quote.eline.add.sync.taxIncludedAmount.value
+            title: "Tax included price value"
+            description: ""
+            source: ""
+            sourceLocation: BODY
+            target: "@{{quoteItem.quoteItemPrice.price.taxIncludedAmount.value}}"
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.quote.eline.add.sync.quoteItemPrice.name
+            title: "Name of the quote item price"
+            description: ""
+            source: ""
+            sourceLocation: BODY
+            target: "@{{quoteItem.quoteItemPrice.name}}"
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.quote.eline.add.sync.quoteItemPrice.priceType
+            title: "Indicates if the price is for recurring or non-recurring charges"
+            description: ""
+            source: ""
+            sourceLocation: BODY
+            target: "@{{quoteItem.quoteItemPrice.priceType}}"
+            targetType: enum
+            targetLocation: BODY
+            requiredMapping: false
+            targetValues:
+              - recurring
+              - nonRecurring
+              - usageBased
+            valueMapping: {}
+          - name: mapper.quote.eline.add.sync.quoteItemPrice.description
+            title: "Description of the quote item price"
+            description: ""
+            source: ""
+            sourceLocation: BODY
+            target: "@{{quoteItem.quoteItemPrice.description}}"
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.quote.eline.add.sync.quoteItemPrice.recurringChargePeriod
+            title: "Used for a recurring charge to indicate period"
+            description: ""
+            source: ""
+            sourceLocation: BODY
+            target: "@{{quoteItem.quoteItemPrice.recurringChargePeriod}}"
+            targetType: enum
+            targetLocation: BODY
+            requiredMapping: false
+            targetValues:
+              - hour
+              - day
+              - week
+              - month
+              - year
+            valueMapping: {}

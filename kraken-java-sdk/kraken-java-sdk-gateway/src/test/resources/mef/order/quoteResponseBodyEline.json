@@ -1,0 +1,123 @@
+{
+  "results": [
+    {
+      "type": "CONNECTION",
+      "entity": {
+        "srcDcf": {
+          "id": "5fdc2dce8ef25a00148b0700",
+          "name": "123Chief Telecom - Taipei - UAT",
+          "popId": null,
+          "regionIds": null,
+          "metroIds": null,
+          "tags": null
+        },
+        "destDcf": {
+          "id": "5fdc2dce8ef25a00148b0700",
+          "name": "123Chief Telecom - Taipei - UAT",
+          "popId": null,
+          "regionIds": null,
+          "metroIds": null,
+          "tags": null
+        },
+        "duration": {
+          "from": null,
+          "to": null,
+          "unit": "m",
+          "value": 12
+        },
+        "bandwidth": 1,
+        "classOfService": "BRONZE",
+        "discountId": ""
+      },
+      "price": 931.2,
+      "preAuthAmount": 77.6,
+      "amountSaved": null,
+      "amountSavedTotal": null,
+      "basicTotalAmount": 931.2,
+      "basicMonthlyAmount": 77.6,
+      "formula": "(bandwidthCost*multiplier)*duration/(1-margin)+portFee",
+      "factors": [
+        {
+          "name": "margin",
+          "number": 0,
+          "ref": null
+        },
+        {
+          "name": "portFee",
+          "number": 0,
+          "ref": null
+        },
+        {
+          "name": "nniFee",
+          "number": 0,
+          "ref": null
+        },
+        {
+          "name": "bandwidthCost",
+          "number": 80,
+          "ref": {
+            "from": {
+              "id": "5ce379fc628923000a4fbe3a",
+              "name": "ASIA-1",
+              "regionIds": [
+                "5a370b348f220300127f834e"
+              ]
+            },
+            "to": {
+              "id": "5ce379fc628923000a4fbe3a",
+              "name": "ASIA-1",
+              "regionIds": [
+                "5a370b348f220300127f834e"
+              ]
+            },
+            "price": {
+              "price": 2.81,
+              "bandwidth": {
+                "from": 1,
+                "to": 100
+              },
+              "cos": "BRONZE"
+            }
+          }
+        },
+        {
+          "name": "multiplier",
+          "number": 0.97,
+          "ref": null
+        },
+        {
+          "name": "duration",
+          "number": 12,
+          "ref": null
+        }
+      ],
+      "priceCalculatorAttributes": {
+        "discountIds": [
+          "6010c307d89d87001508528c"
+        ],
+        "discounts": [
+          {
+            "discountType": "percentage",
+            "marketingCode": "IOD 50",
+            "duration": "recurring",
+            "applicableProducts": [
+              "IO-D"
+            ],
+            "redemptions": null,
+            "value": 50,
+            "tierType": "none",
+            "id": "6010c307d89d87001508528c",
+            "deletedAt": null,
+            "createdAt": "2021-01-27T01:33:59.604Z",
+            "updatedAt": "2021-06-22T07:10:51.383Z",
+            "name": "E2E_DONT TOUCH_Discount_IoD_50OFF",
+            "description": "50OFF for IOD, LongLongLongLong discount code description to be displayed in Console Frontend",
+            "tags": [],
+            "visibleStartDateTimezone": "Australia/Brisbane",
+            "visibleEndDateTimezone": "Australia/Brisbane"
+          }
+        ]
+      }
+    }
+  ]
+}

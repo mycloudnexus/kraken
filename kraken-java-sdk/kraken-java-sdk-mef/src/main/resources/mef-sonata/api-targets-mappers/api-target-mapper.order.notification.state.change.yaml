@@ -1,0 +1,30 @@
+---
+kind: kraken.component.api-target
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target-mapper.order.notification.state.change
+  name: Order Notification API
+  version: 1
+spec:
+  inputs:
+    - mefQuery
+    - mefRequestBody
+    - entity
+  trigger:
+    path: /mefApi/sonata/productOrderingNotification/v10/listener/productOrderStateChangeEvent
+    method: post
+  endpoints:
+    - id: notify order state change
+      mappers:
+        serverKey: NONE
+        path: NONE
+        method: NONE
+        request:
+          - name: order_id
+            title: order id
+            description: Please specify the field that represent the order Id from Seller API request
+            source: ""
+            function: "@spelFunc.renderId(source)"
+            sourceLocation: ""
+            targetLocation: "BODY"
+            target: "@{{event.id}}"

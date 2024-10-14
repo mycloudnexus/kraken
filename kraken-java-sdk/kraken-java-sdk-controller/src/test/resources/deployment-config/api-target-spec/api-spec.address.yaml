@@ -1,0 +1,23 @@
+---
+kind: kraken.component.api-target-spec
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-spec.serviceability.address
+  name: Geographic Address Management
+  icon: https://storage.googleapis.com/console-connect-static-assets/krakenUI/address-validation.png
+  labels:
+    mef-api-release: grace
+    order-api-version: v10
+  version: 1
+spec:
+  baseSpec:
+    path: classpath:/deployment-config/openapi/geographicAddressManagement.api.yaml
+  customizedSpec:
+    path: classpath:/deployment-config/openapi/geographicAddressManagement.api.customized.yaml
+links:
+  - targetAssetKey: mef.sonata.api.serviceability.address
+    relationship: implementation.workflow
+  - targetAssetKey: mef.sonata.api-target.address.retrieve
+    relationship: implementation.target
+  - targetAssetKey: mef.sonata.api-target.address.validate
+    relationship: implementation.target

@@ -1,0 +1,22 @@
+---
+kind: kraken.component.api-target
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target.hub.add
+  name: Order Connection API
+  mapperKey: mef.sonata.api-target-mapper.hub.add
+  version: 5
+spec:
+  inputs:
+    - mefQuery
+    - mefRequestBody
+    - eventEntity
+  endpoints:
+    - id: register event
+      url: "no://op"
+      responseBody: |
+        {
+          "id": "${eventEntity.id}",
+          "callback": "${mefRequestBody.callback}",
+          "query": "${mefRequestBody.query}"
+        }

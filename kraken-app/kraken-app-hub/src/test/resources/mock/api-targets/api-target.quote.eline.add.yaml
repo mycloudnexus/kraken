@@ -1,0 +1,44 @@
+
+---
+kind: kraken.component.api-target
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target.quote.eline.add
+  name: Quote Connection API
+  mapperKey: mef.sonata.api-target-mapper.quote.eline.add
+  version: 4
+spec:
+  inputs:
+    - mefQuery
+    - mefRequestBody
+  trigger:
+    path: /mefApi/sonata/quoteManagement/v8/quote
+    method: post
+    productType: access_e_line
+    actionType: add
+  endpoints:
+    - id: create quote for connection
+      path: /api/pricing/calculate
+      method: post
+      requestBody: ${mefRequestBody.quoteItem[0].product.productConfiguration.access_e_line}
+      responseBody: |
+        {
+          "id": "${entity.id}",
+          "buyerRequestedQuoteLevel": "${mefRequestBody.buyerRequestedQuoteLevel}",
+          "quoteItem": [{
+             "product": "${mefRequestBody.quoteItem[0].product}",
+             "state": "@{{quoteItem[*].state}}",
+             "quoteItemPrice": {
+               "price": {
+                 "dutyFreeAmount": {
+                   "unit": "@{{quoteItem.quoteItemPrice.price.dutyFreeAmount.unit}}",
+                   "value": "@{{quoteItem.quoteItemPrice.price.dutyFreeAmount.value}}"
+                 }
+               }
+             }
+          }],
+          "quoteDate": "function.now()",
+          "externalId":"${mefRequestBody[externalId]?:''}",
+          "instantSyncQuote":"${mefRequestBody[instantSyncQuote]?:''}",
+          "requestedQuoteCompletionDate": "${mefRequestBody[requestedQuoteCompletionDate]?:''}"
+        }

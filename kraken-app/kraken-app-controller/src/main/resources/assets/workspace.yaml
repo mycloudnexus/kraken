@@ -1,0 +1,10 @@
+---
+kind: kraken.workspace
+apiVersion: v1
+metadata:
+  name: default
+  key: default
+  description: Default Workspace
+spec:
+  productPaths:
+    - classpath:/mef-sonata/product.yaml

@@ -1,0 +1,126 @@
+---
+server:
+  port: ${port:8000}
+
+spring:
+  main:
+    web-application-type: reactive
+  task:
+    scheduling:
+      pool:
+        size: 2
+  codec:
+    max-in-memory-size: 500KB
+  cloud:
+    gateway:
+      httpclient:
+        connect-timeout: 20000
+        pool:
+          max-connections: 1500
+          type: FIXED
+  application:
+    name: "@project.artifactId@"
+    description: "@project.name@"
+  build:
+    version: "@project.version@"
+  jackson:
+    default-property-inclusion: NON_NULL
+    deserialization:
+      fail-on-unknown-properties: false
+  datasource:
+    driverClassName: org.postgresql.Driver
+    password: password
+    url: jdbc:postgresql://localhost:5432/kraken
+    username: postgresql
+    hikari:
+      pool-name: hikari-platform-service-platform
+      connection-test-query: SELECT 1
+      maximum-pool-size: 50
+      max-lifetime: 600000
+      connection-timeout: 60000
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    database: POSTGRESQL
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          time_zone: UTC
+  flyway:
+    baseline-on-migrate: true
+    enabled: false
+management:
+  endpoint:
+    health:
+      show-details: ALWAYS
+    gateway:
+      enabled: false
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure:
+        include: health,info,prometheus,gateway
+info:
+  app:
+    encoding: "@project.build.sourceEncoding@"
+    java:
+      source: "@java.version@"
+      target: "@java.version@"
+
+springdoc:
+  show-actuator: true
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    supported-submit-methods: ["get", "post", "patch", "delete"]
+    config-url: /v3/api-docs/swagger-config
+    urls:
+      - url: /v3/api-docs
+        name: Kraken Hub
+  servers:
+    - url: http://localhost:8000
+      description: localhost
+logging:
+  level:
+    com.consoleconnect.kraken: DEBUG
+    # reactor.netty: DEBUG
+    # org.springframework.cloud.gateway: DEBUG
+    org.springframework.security: DEBUG
+app:
+  tenant:
+    workspacePath: classpath:/mock/kraken.yaml
+    componentOperation:
+      updatableAssetKinds: kraken.component.api-target-mapper
+      enabled: false
+  env:
+    seller:
+      name: seller-01
+      number: 123456
+      role: sellerContact
+      emailAddress: seller@cc.com
+  filter-headers:
+    - token
+    - Authorization
+  filter-paths:
+    - /mefApi
+  cron-job:
+    push-heartbeat: 0/20 * * * * *
+    check-release: 0 0/1 * * * *
+  security:
+    resource-server:
+      enabled: true
+      jwt:
+        - issuer: https://kraken.consoleconnect.com/issuer
+          key-id: kraken
+          # jwks-uri: http://localhost:8001/.well-known/jwks.json
+          secret: MjRhMjNhNGYtMWUzMS00ZTY4LTlhYzgtMzY5NDcwYzNjNDE4
+      bearer-token-header-name: x-kraken-key
+  unified-asset:
+    endpoints:
+      exposure:
+        include:

@@ -1,0 +1,27 @@
+---
+kind: kraken.component.api-spec
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-spec.quote
+  name: Product Quote Management
+  icon: https://storage.googleapis.com/console-connect-static-assets/krakenUI/quote.png
+  labels:
+    mef-api-release: grace
+    order-api-version: v10
+  version: 1
+spec:
+  baseSpec:
+    path: classpath:/mock/openapi/quoteManagement.api.yaml
+  customizedSpec:
+    path: classpath:/mock/openapi/quoteManagement.api.customized.yaml
+links:
+  - targetAssetKey: mef.sonata.api.quote
+    relationship: implementation.workflow
+  - targetAssetKey: mef.sonata.api-target.quote.eline.add
+    relationship: implementation.target
+  - targetAssetKey: mef.sonata.api-target.quote.eline.read
+    relationship: implementation.target
+  - targetAssetKey: mef.sonata.api-target.quote.uni.add
+    relationship: implementation.target
+  - targetAssetKey: mef.sonata.api-target.quote.uni.read
+    relationship: implementation.target

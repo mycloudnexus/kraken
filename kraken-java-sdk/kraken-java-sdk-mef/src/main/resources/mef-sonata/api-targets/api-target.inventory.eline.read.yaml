@@ -1,0 +1,25 @@
+---
+kind: kraken.component.api-target
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target.inventory.eline.read
+  mapperKey: mef.sonata.api-target-mapper.inventory.eline.read
+  name: Product Inventory eline
+  version: 7
+spec:
+  inputs:
+    - mefQuery
+  trigger:
+    path: /mefApi/sonata/productInventory/v7/product/{id}
+    method: get
+    productType: access_e_line
+  endpoints:
+    - id: Retrieves a product by ID
+      path: ""
+      method: ""
+      responseBody: |
+        { 
+          "id": "${segment}",
+          "startDate": "@{{startDate}}",
+           "status": "@{{status}}"
+        }

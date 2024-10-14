@@ -1,0 +1,114 @@
+[{
+  "name": "Testing",
+  "company": {
+    "addresses": [
+      {
+        "address": "",
+        "city": "Sydney",
+        "country": "AU"
+      }
+    ]
+  },
+  "dataCenterFacility": {
+    "ready": true,
+    "speeds": [
+      {
+        "name": "1000 Mbps",
+        "value": 1000
+      },
+      {
+        "name": "10000 Mbps",
+        "value": 10000
+      }
+    ]
+  },
+  "tags": []
+},{
+  "name": "test xc charge",
+  "company": {
+    "addresses": [
+      {
+        "address": null,
+        "city": "Sydney",
+        "country": "AU"
+      }
+    ]
+  },
+  "dataCenterFacility": {
+    "ready": false,
+    "speeds": []
+  },
+  "tags": []
+},
+  {
+    "name": "test cross connect",
+    "company": {
+      "addresses": [
+        {
+          "address": null,
+          "city": "Sydney",
+          "country": "AU"
+        }
+      ]
+    },
+    "dataCenterFacility": {
+      "ready": false,
+      "speeds": []
+    },
+    "tags": [
+      "offnet",
+      "free"
+    ]
+  },
+  {
+    "name": "Katy Test DCF",
+    "company": {
+      "addresses": [
+        {
+          "city": "Sydney",
+          "country": "AU"
+        }
+      ]
+    },
+    "tags": []
+  },
+  {
+    "name": "Katy Test DCF",
+    "company": {
+      "addresses": [
+        {
+          "city": "Sydney",
+          "country": "AU"
+        }
+      ]
+    },
+    "tags": []
+  },
+  {
+    "name": "Katy Test DCF",
+    "company": {
+      "addresses": [
+        {
+          "address": "",
+          "city": "Sydney",
+          "country": "AU"
+        }
+      ]
+    },
+    "tags": []
+  },
+  {
+    "name": "test_without_SLL",
+    "company": {
+      "addresses": [
+        {
+          "city": "Sydney",
+          "country": "AU"
+        }
+      ]
+    },
+    "tags": [
+      "offnet"
+    ]
+  }
+]

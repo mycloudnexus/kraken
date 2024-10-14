@@ -1,0 +1,54 @@
+# Compiled class file
+*.class
+target/
+
+.DS_Store
+
+# eclipse projects
+*.project
+*.classpath
+*.settings/
+
+# idea intellij
+*.iml
+# Log file
+*.log
+
+# BlueJ files
+*.ctxt
+
+# Package Files #
+#*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+*.versionsBackup
+*.factorypath
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+
+# MariaDB continer volume
+MariaDB/
+postgres_db_data/
+.vscode/
+.idea/
+
+node_modules
+dist
+dist-ssr
+*.local
+coverage
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

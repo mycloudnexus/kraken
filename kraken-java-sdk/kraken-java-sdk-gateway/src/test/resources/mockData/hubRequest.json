@@ -1,0 +1,4 @@
+{
+  "callback": "https://httpbin.org",
+  "query": "eventType=productOrderStateChangeEvent"
+}

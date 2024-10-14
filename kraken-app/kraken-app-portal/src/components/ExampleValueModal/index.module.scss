@@ -1,0 +1,18 @@
+.modal {
+  :global {
+    .ant-modal-content {
+      padding: 0;
+    }
+    .ant-modal-header {
+      padding: 16px 24px;
+      box-shadow: 0px -1px 0px 0px #f0f0f0 inset;
+    }
+    .ant-modal-body {
+      padding: 8px 40px 24px;
+    }
+    .ant-modal-footer {
+      box-shadow: 0px 1px 0px 0px #f0f0f0 inset;
+      padding: 10px 16px;
+    }
+  }
+}

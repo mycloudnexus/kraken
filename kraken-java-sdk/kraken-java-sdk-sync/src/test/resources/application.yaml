@@ -1,0 +1,91 @@
+server:
+  port: ${port:8000}
+
+spring:
+  application:
+    name: "@project.artifactId@"
+    description: "@project.name@"
+  build:
+    version: "@project.version@"
+  jackson:
+    default-property-inclusion: NON_NULL
+    deserialization:
+      fail-on-unknown-properties: false
+  data:
+    rest:
+      detection-strategy: ANNOTATED
+  datasource:
+    driverClassName: org.postgresql.Driver
+    #    password: ${DB_PASSWORD}
+    #    url: ${DB_URL}
+    #    username: ${DB_USERNAME}
+    hikari:
+      pool-name: hikari-platform-service-platform
+      connection-test-query: SELECT 1
+      maximum-pool-size: 2
+      max-lifetime: 600000
+      connection-timeout: 60000
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    database: POSTGRESQL
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          time_zone: UTC
+  flyway:
+    # clean-on-validation-error: true
+    baseline-on-migrate: true
+    ignore-missing-migrations: true
+    # enabled: false
+  codec:
+    max-in-memory-size: 10MB
+management:
+  endpoint:
+    health:
+      show-details: ALWAYS
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure:
+        include: health,info,prometheus
+info:
+  app:
+    encoding: "@project.build.sourceEncoding@"
+    java:
+      source: "@java.version@"
+      target: "@java.version@"
+
+springdoc:
+  show-actuator: true
+  api-docs:
+    enabled: true
+    path: /api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    supported-submit-methods: [ "get", "post", "patch", "delete" ]
+    config-url: /v3/api-docs/swagger-config
+    urls:
+      - url: /v3/api-docs
+        name: Kraken Operator
+      - url: /organizations/ef90f7e7-dc7d-4538-aa5b-a4a7d8432da2/products/product.mef.sonata.api/components/mef.sonata.api.site/api-docs
+        name: Order Management Service
+
+  servers:
+    - url: http://localhost:8000
+      description: localhost
+
+logging:
+  level:
+    com.consoleconnect.kraken.operator: INFO
+app:
+  controlPlane:
+    url: http://localhost:4567
+    token: 123456
+  accept-asset-kinds:
+    - kraken.component.api-target
+  task:
+    enabled: false

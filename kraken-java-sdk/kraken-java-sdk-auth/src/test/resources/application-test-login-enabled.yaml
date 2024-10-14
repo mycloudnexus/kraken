@@ -1,0 +1,25 @@
+---
+app:
+  security:
+    login:
+      enabled: true
+    resource-server:
+      enabled: true
+      pathPermissions:
+        - path: /users/**
+          http-methods:
+            - GET
+          roles:
+            - ADMIN
+        - path: /users
+          http-methods:
+            - POST
+          roles:
+            - ADMIN
+        - path: /users/**
+          http-methods:
+            - PATCH
+            - POST
+            - DELETE
+          roles:
+            - ADMIN

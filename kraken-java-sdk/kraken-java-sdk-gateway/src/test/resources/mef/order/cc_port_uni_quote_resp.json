@@ -1,0 +1,55 @@
+{
+  "results": [
+    {
+      "type": "PORT",
+      "entity": {
+        "dcf": {
+          "id": "5a8ba9118195000012e9f141",
+          "name": "iAdvantage MEGA-i",
+          "popId": null,
+          "regionIds": null,
+          "metroIds": null,
+          "tags": null
+        },
+        "speed": 1000,
+        "discountId": "",
+        "durationUnit": "y"
+      },
+      "price": 300,
+      "preAuthAmount": 300,
+      "amountSaved": null,
+      "amountSavedTotal": null,
+      "basicTotalAmount": null,
+      "basicMonthlyAmount": null,
+      "formula": null,
+      "factors": null,
+      "priceCalculatorAttributes": {
+        "discountIds": [
+          "6010c307d89d87001508528c"
+        ],
+        "discounts": [
+          {
+            "discountType": "percentage",
+            "marketingCode": "IOD 50",
+            "duration": "recurring",
+            "applicableProducts": [
+              "IO-D"
+            ],
+            "redemptions": null,
+            "value": 50,
+            "tierType": "none",
+            "id": "6010c307d89d87001508528c",
+            "deletedAt": null,
+            "createdAt": "2021-01-27T01:33:59.604Z",
+            "updatedAt": "2021-06-22T07:10:51.383Z",
+            "name": "E2E_DONT TOUCH_Discount_IoD_50OFF",
+            "description": "50OFF for IOD, LongLongLongLong discount code description to be displayed in Console Frontend",
+            "tags": [],
+            "visibleStartDateTimezone": "Australia/Brisbane",
+            "visibleEndDateTimezone": "Australia/Brisbane"
+          }
+        ]
+      }
+    }
+  ]
+}

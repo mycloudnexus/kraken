@@ -1,0 +1,61 @@
+---
+kind: kraken.component.api-target-mapper
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target-mapper.quote.eline.read
+  name: Mapper Of Reading Quote Eline
+  description: This operation retrieves a Quote entity. Attribute selection is enabled for all first level attributes.
+  version: 4
+spec:
+  trigger:
+    path: /mefApi/sonata/quoteManagement/v8/quote/{id}
+    method: get
+    productType: access_e_line
+    quoteLevel: firm
+    syncMode: false
+  endpoints:
+    - id: retrieve quote for connection
+      path: ""
+      method: ""
+      serverKey: ""
+      mappers:
+        request:
+        response:
+          - name: mapper.quote.eline.read.state
+            title: Quote State Mapping
+            description: quote state mapping
+            source: ""
+            sourceLocation: ""
+            target: "@{{quoteItem[*].state}}"
+            targetType: enum
+            targetLocation: BODY
+            requiredMapping: true
+            targetValues:
+              - accepted
+              - acknowledged
+              - answered
+              - approved.orderable
+              - approved.orderableAlternate
+              - inProgress
+              - inProgress.draft
+              - abandoned
+              - rejected
+              - unableToProvide
+            valueMapping: {}
+          - name: mapper.eline.read.price.value
+            title: Quote Price Value Mapping
+            description: quote price value mapping
+            source: ""
+            sourceLocation: ""
+            target: "@{{quoteItem.quoteItemPrice.price.dutyFreeAmount.value}}"
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.quote.eline.read.price.unit
+            title: Quote Price Unit Mapping
+            description: quote price unit mapping
+            source: ""
+            sourceLocation: ""
+            target: "@{{quoteItem.quoteItemPrice.price.dutyFreeAmount.unit}}"
+            targetLocation: BODY
+            requiredMapping: true
+

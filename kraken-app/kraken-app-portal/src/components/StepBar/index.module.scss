@@ -1,0 +1,58 @@
+.draggableModal {
+  cursor: move;
+  position: absolute;
+  z-index: 1000;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.2);
+  border: 1px solid #f4f4f4;
+
+  background-color: #fff;
+  bottom: 60px;
+  right: 60px;
+}
+
+.hiddenModal {
+  display: none;
+}
+
+.barHeader {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #f0f0f0;
+  padding: 16px 32px;
+  width: 350px;
+}
+
+.barContent {
+  padding: 32px;
+  width: 350px;
+}
+
+.collapseTitle {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.active {
+  font-weight: 700;
+  color: #595959;
+}
+
+.stepIndicator {
+  height: 10px;
+  width: 56px;
+  border-radius: 5px;
+  background-color: #dde1e5;
+  margin-right: 8px;
+}
+
+.stepIndicatorActive {
+  background-color: #2962ff;
+}
+
+.ulList {
+  list-style-type: disc;
+  ul {
+    list-style-type: disc;
+  }
+}

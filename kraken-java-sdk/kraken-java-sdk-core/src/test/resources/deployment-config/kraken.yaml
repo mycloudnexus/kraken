@@ -1,0 +1,12 @@
+---
+kind: kraken.workspace
+apiVersion: v1
+metadata:
+  name: Console Connect
+  version: 1
+  key: consoleconnect
+  description: Console Connect UT
+  icon: https://storage.googleapis.com/console-connect-static-assets/catacomb/bigquery.png
+spec:
+  productPaths:
+    - classpath:deployment-config/kraken-product-sonata.yaml

@@ -1,0 +1,53 @@
+.container {
+  width: 100%;
+}
+
+.apiRunning {
+  border-radius: 4px;
+  border: 1px solid rgba(83, 128, 254, 1);
+}
+
+.statusWrapper {
+  --color-border: inherit;
+  --color-background: inherit;
+  border-radius: 4px;
+  padding: 4px 8px;
+  background-color: var(--color-background);
+  color: var(--color-border);
+
+  &.success {
+    --color-border: #fff;
+    --color-background: var(--Polar-Green-6, #52c41a);
+  }
+  &.error {
+    --color-border: #fff;
+    --color-background: var(--Accent-Accent_Red, #ff3864);
+  }
+  &.warning {
+    --color-background: var(--Accent-Accent_Orange, #ff9a2e);
+    --color-border: #fff;
+  }
+  &.notice {
+    border: 10px;
+    --color-background: var(--DayBreak-Blue-1, #e6f7ff);
+    --color-border: var(--Text-secondary, rgba(0, 0, 0, 0.85));
+    border-radius: 8px;
+  }
+  &.nothing {
+    --color-background: var(--Accent-Accent_Purple, #9156e4);
+    --color-border: #fff;
+  }
+}
+
+.dataPlaneInfo {
+  border-radius: 4px;
+  padding: 8px 0;
+  color: #fff;
+  .dataPlaneInfoIcon {
+    color: #fff;
+  }
+}
+
+.noAPI {
+  background: #00000073;
+}

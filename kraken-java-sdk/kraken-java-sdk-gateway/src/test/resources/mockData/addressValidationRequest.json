@@ -1,0 +1,11 @@
+{
+  "provideAlternative": true,
+  "submittedGeographicAddress": {
+    "@type": "FieldedAddress",
+    "city": "Cracow",
+    "streetName": "Wasilewskiego",
+    "streetNr": "20",
+    "postcode": "30-305",
+    "streetNrSuffix": "20"
+  }
+}

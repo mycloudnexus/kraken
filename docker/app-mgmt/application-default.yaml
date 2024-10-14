@@ -1,0 +1,9 @@
+---
+server:
+  port: 8080
+spring:
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://db-control-plane:5432/kraken
+    username: postgresql
+    password: password

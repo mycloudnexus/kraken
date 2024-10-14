@@ -1,0 +1,75 @@
+.sonataPropMappingWrapper {
+  box-sizing: border-box;
+  flex: 0 0 calc(50% - 30px);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: calc(50% - 30px);
+  border-radius: 6px;
+  padding: 18px;
+  background-color: #f0f2f5;
+}
+
+.sellerPropMappingWrapper {
+  box-sizing: border-box;
+  flex: 0 0 calc(50% - 30px);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: calc(50% - 30px);
+  border: 1px solid #dde1e5;
+  border-radius: 6px;
+  padding: 17px;
+  .sellerPropItemWrapper {
+    background: #f2f3f5;
+    cursor: pointer;
+    &.active {
+      border-radius: 2px;
+      border: 1px solid #165dff;
+      background-color: #fff;
+    }
+  }
+}
+.addMappingDiv {
+  border: 1px solid #165dff;
+  border-radius: 2px;
+  padding: 4px 12px;
+  background-color: #fff;
+  cursor: pointer;
+}
+.sonataAPIPropItem {
+  border-radius: 4px;
+  padding: 5px 8px;
+  background-color: #fff;
+}
+.alignArrowList {
+  flex: 0 0 28px;
+  display: flex;
+  flex-direction: column;
+  row-gap: 12px;
+  width: 28px;
+  padding-top: 55px;
+}
+.alignArrowWrapper {
+  display: flex;
+  margin-block: 10.672px;
+}
+.requestMappingList,
+.responseMappingList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.requestMappingItemInfo {
+  flex: 1;
+  max-width: 100%;
+  overflow: hidden;
+  border-radius: 4px;
+  padding: 5px 8px;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+.label{
+  margin: 0;
+}

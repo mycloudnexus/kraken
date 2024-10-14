@@ -1,0 +1,255 @@
+---
+kind: kraken.component.api
+apiVersion: v1
+metadata:
+  key: mef.sonata.api.quote
+  name: Quote Management
+  labels:
+    mef-api-release: grace
+    order-api-version: v10
+  version: 1
+spec:
+  supportedProductTypesAndActions:
+    - path: /mefApi/sonata/quoteManagement/v8/quote
+      method: post
+      actionTypes:
+        - add
+      productTypes:
+        - UNI
+        - ACCESS_E_LINE
+    - path: /mefApi/sonata/quoteManagement/v8/quote/{id}
+      method: get
+      productTypes:
+        - UNI
+        - ACCESS_E_LINE
+  mappings:
+    - uri: ${env.target.url}
+      trigger:
+        path: /mefApi/sonata/quoteManagement/v8/quote
+        method: post
+      metadata:
+        cacheRequestBody: true
+      actions:
+        - id: calculate_quote_type_and_action_via_javascript
+          actionType: engine@javascript
+          env:
+            quoteItem: ${body['quoteItem'][0]}
+            instantSyncQuote: ${body.instantSyncQuote}
+          with:
+            code: |
+              (jsonStr) => {
+                console.log("input: " + jsonStr);
+                let input = JSON.parse(jsonStr);
+                let targetAPIConfigKey = '';
+                let forwardDownstream = true;
+                if(input.quoteItem['product']['productConfiguration']['@type'] == 'UNI') {
+                  if(input.instantSyncQuote === true) {
+                    targetAPIConfigKey = 'mef.sonata.api-target.quote.uni.add.sync';
+                  } else {
+                    targetAPIConfigKey = 'mef.sonata.api-target.quote.uni.add';
+                  }
+                } else if(input.quoteItem['product']['productConfiguration']['@type'] == 'ACCESS_E_LINE') {
+                  if(input.instantSyncQuote === true) {
+                    targetAPIConfigKey = 'mef.sonata.api-target.quote.eline.add.sync';
+                  } else {
+                    targetAPIConfigKey = 'mef.sonata.api-target.quote.eline.add';
+                  }
+                } else {
+                  targetAPIConfigKey = 'targetKey:notFound';
+                }
+                let ret = {
+                  quoteType: input.quoteItem['product']['productConfiguration']['@type'],
+                  instantSyncQuote: input.instantSyncQuote,
+                  forwardDownstream: forwardDownstream,
+                  targetAPIConfigKey: targetAPIConfigKey
+                };
+                return JSON.stringify(ret);
+              }
+          outputKey: quote
+
+        - id: persist_http_request
+          actionType: buildin@db
+          env:
+            bizType: ${quote.quoteType}
+          with:
+            action: create
+            properties:
+              - headers
+              - queryParameters
+              - requestBody
+          preRequest: true
+
+        - id: load-downstream-api-config
+          actionType: buildin@load-target-api-config
+          env:
+            configKey: ${quote.targetAPIConfigKey}
+            mefQuery: ${query}
+            mefRequestBody: ${body}
+            entity: ${entity}
+          with:
+            render: true
+            replaceStar: true
+          outputKey: targetApiConfig
+
+        - id: rewrite-path
+          actionType: buildin@rewrite-path
+          env:
+            path: ${targetApiConfig.endpoints[0].path}
+            method: ${targetApiConfig.endpoints[0].method}
+
+        - id: modify-request-body-for-quote-add
+          actionType: buildin@modify-request-body
+          env:
+            code: ${targetApiConfig.endpoints[0].requestBody}
+
+        - id: modify-response-body-for-quote-add
+          actionType: buildin@modify-response-body
+          with:
+            engine: spel
+            successStatus: 201
+          env:
+            code: ${targetApiConfig.endpoints[0].responseBody}
+            inputs: ${targetApiConfig.inputs}
+            mefRequestBody: ${body}
+          postResultRender: true
+
+        - actionType: buildin@db
+          with:
+            action: update
+            properties:
+              - responseBody
+              - responseStatusCode
+              - renderedResponseBody
+          preRequest: false
+          postRequest: true
+          order: -4
+
+    - uri: ${env.target.url}
+      trigger:
+        path: /mefApi/sonata/quoteManagement/v8/quote/**
+        method: get
+      metadata:
+        cacheRequestBody: false
+      actions:
+        - name: retrieve quoteId from path
+          actionType: buildin@pattern
+          env:
+            input: ${path}
+            pattern: /mefApi/sonata/quoteManagement/v8/quote/(?<segment>.*)
+
+        - id: read request payload by id
+          actionType: buildin@db
+          env:
+            id: ${segment}
+          with:
+            action: read
+          preRequest: true
+
+        - id: calculate_quote_type_for_read_via_javascript
+          actionType: engine@javascript
+          env:
+            bizType: ${entity.bizType}
+            instantSyncQuote: ${entity.request.instantSyncQuote}
+          with:
+            code: |
+              (jsonStr) => {
+                console.log("input: " + jsonStr);
+                let input = JSON.parse(jsonStr);
+                let targetAPIConfigKey = '';
+                let forwardDownstream = true;
+                if(input.bizType == 'UNI') {
+                  if(input.instantSyncQuote === true) {
+                    targetAPIConfigKey = 'mef.sonata.api-target.quote.uni.read.sync';
+                    forwardDownstream = false;
+                  } else {
+                    targetAPIConfigKey = 'mef.sonata.api-target.quote.uni.read';
+                  }
+                } else if(input.bizType == 'ACCESS_E_LINE') {
+                  if(input.instantSyncQuote === true) {
+                    targetAPIConfigKey = 'mef.sonata.api-target.quote.eline.read.sync';
+                    forwardDownstream = false;
+                  } else {
+                    targetAPIConfigKey = 'mef.sonata.api-target.quote.eline.read';
+                  }
+                } else {
+                  targetAPIConfigKey = 'targetKey:notFound';
+                }
+                let ret = {
+                  quoteType: input.bizType,
+                  instantSyncQuote: input.instantSyncQuote,
+                  forwardDownstream: forwardDownstream,
+                  targetAPIConfigKey: targetAPIConfigKey
+                };
+                return JSON.stringify(ret);
+              }
+          outputKey: quote
+
+        - id: load-downstream-api-config-quote-read
+          actionType: buildin@load-target-api-config
+          env:
+            configKey: ${quote.targetAPIConfigKey}
+            mefQuery: ${query}
+            entity: ${entity}
+          with:
+            render: true
+          outputKey: targetApiConfig
+
+        - id: rewrite-path
+          actionType: buildin@rewrite-path
+          env:
+            path: ${targetApiConfig.endpoints[0].path}
+            method: ${targetApiConfig.endpoints[0].method}
+
+        - id: mock-response
+          actionType: buildin@mock-response
+          env:
+            forwardDownstream: ${quote.forwardDownstream}
+
+        - id: modify-request-body
+          actionType: buildin@modify-request-body
+          env:
+            code: ${targetApiConfig.endpoints[0].requestBody}
+
+        - id: modify-response-body
+          actionType: buildin@modify-response-body
+          with:
+            engine: spel
+          env:
+            code: ${targetApiConfig.endpoints[0].responseBody}
+            inputs: ${targetApiConfig.inputs}
+links:
+  - targetAssetKey: mef.sonata.api-target.quote.eline.add
+    relationship: implementation.target
+  - targetAssetKey: mef.sonata.api-target.quote.eline.read
+    relationship: implementation.target
+  - targetAssetKey: mef.sonata.api-target.quote.uni.add
+    relationship: implementation.target
+  - targetAssetKey: mef.sonata.api-target.quote.uni.read
+    relationship: implementation.target
+  - targetAssetKey: mef.sonata.api-target.quote.eline.add.sync
+    relationship: implementation.target
+  - targetAssetKey: mef.sonata.api-target.quote.eline.read.sync
+    relationship: implementation.target
+  - targetAssetKey: mef.sonata.api-target.quote.uni.add.sync
+    relationship: implementation.target
+  - targetAssetKey: mef.sonata.api-target.quote.uni.read.sync
+    relationship: implementation.target
+  - targetAssetKey: mef.sonata.api-spec.quote
+    relationship: implementation.standard.api-spec
+
+  - targetAssetKey: mef.sonata.api-target-mapper.quote.eline.add
+    relationship: implementation.target-mapper
+  - targetAssetKey: mef.sonata.api-target-mapper.quote.uni.add
+    relationship: implementation.target-mapper
+  - targetAssetKey: mef.sonata.api-target-mapper.quote.uni.read
+    relationship: implementation.target-mapper
+  - targetAssetKey: mef.sonata.api-target-mapper.quote.eline.read
+    relationship: implementation.target-mapper
+  - targetAssetKey: mef.sonata.api-target-mapper.quote.eline.add.sync
+    relationship: implementation.target-mapper
+  - targetAssetKey: mef.sonata.api-target-mapper.quote.uni.add.sync
+    relationship: implementation.target-mapper
+  - targetAssetKey: mef.sonata.api-target-mapper.quote.uni.read.sync
+    relationship: implementation.target-mapper
+  - targetAssetKey: mef.sonata.api-target-mapper.quote.eline.read.sync
+    relationship: implementation.target-mapper

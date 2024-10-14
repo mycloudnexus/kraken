@@ -1,0 +1,104 @@
+---
+$schema: "http://json-schema.org/draft-07/schema#"
+type: object
+properties:
+  kind:
+    type: string
+    const: kraken.component.api
+  apiVersion:
+    type: string
+    const: v1
+  metadata:
+    type: object
+    properties:
+      key:
+        type: string
+      name:
+        type: string
+      labels:
+        type: object
+        properties:
+          mef-api-release:
+            type: string
+        required:
+          - mef-api-release
+    required:
+      - key
+      - name
+      - labels
+  spec:
+    type: object
+    properties:
+      apiDoc:
+        type: object
+        properties:
+          path:
+            type: string
+      mappings:
+        type: array
+        items:
+          type: object
+          properties:
+            uri:
+              type: string
+            trigger:
+              type: object
+              properties:
+                path:
+                  type: string
+                method:
+                  type: string
+                queryParams:
+                  type: array
+                  items:
+                    type: string
+              required:
+                - path
+                - method
+            metadata:
+              type: object
+              properties:
+                cacheRequestBody:
+                  type: boolean
+            actions:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: unique inside a trigger
+                  actionType:
+                    type: string
+                  env:
+                    type: object
+                  with:
+                    type: object
+                  outputKey:
+                    type: string
+                  expression:
+                    type: string
+                  script:
+                    type: string
+                  preRequest:
+                    type: boolean
+                    default: true
+                  postRequest:
+                    type: boolean
+                    default: false
+                required:
+                  - id
+                  - actionType
+          required:
+            - uri
+            - trigger
+            - metadata
+            - actions
+    required:
+      - apiDoc
+      - mappings
+required:
+  - kind
+  - apiVersion
+  - metadata
+  - spec

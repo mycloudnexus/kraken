@@ -1,0 +1,32 @@
+---
+kind: kraken.component.api-target
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target.order.uni.delete
+  name: Order Port API
+  mapperKey: mef.sonata.api-target-mapper.order.uni.delete
+  version: 0
+spec:
+  inputs:
+    - mefQuery
+    - mefRequestBody
+  trigger:
+    path: /mefApi/sonata/productOrderingManagement/v10/productOrder
+    method: post
+    productType: uni
+    actionType: delete
+  endpoints:
+    - id: delete port
+      path: ""
+      pathReferId: "mef.sonata.api-target.order.uni.delete#order.uni.delete.instanceId.mapper"
+      method: ""
+      responseBody: |
+        {
+          "relatedContactInformation": "${mefRequestBody.relatedContactInformation}" 
+          "productOrderItem": [{
+            "action": "delete",
+            "id": "${mefRequestBody.productItem[0].id}",
+            "product": "${mefRequestBody.productItem[0].product}"
+          }],
+           "state": "@{{state}}"
+        }

@@ -1,0 +1,69 @@
+---
+kind: kraken.product.mapping.matrix
+apiVersion: v1
+metadata:
+  key: mef.sonata.api.matrix.quote
+  name: MEF Sonata API
+  labels:
+    mef-api-release: grace
+  version: 12
+spec:
+  matrix:
+    mef.sonata.api-target.quote.uni.add:
+      - name: enabled
+        expected: false
+      - name: product_type_UNI
+        path: "$.body.quoteItem[*].product.productConfiguration.['@type']"
+        expected: UNI
+      - name: action_add
+        path: "$.body.quoteItem[*].['action']"
+        expected: add
+      - name: syn_mode_false
+        path: "$.body.instantSyncQuote"
+        expected: false
+      - name: buyer.requested.quote.level.firm
+        path: "$.body.buyerRequestedQuoteLevel"
+        expected: firm
+    mef.sonata.api-target.quote.eline.add:
+      - name: enabled
+        expected: false
+      - name: product_type_eline
+        path: "$.body.quoteItem[*].product.productConfiguration.['@type']"
+        expected: ACCESS_E_LINE
+      - name: action_add
+        path: "$.body.quoteItem[*].['action']"
+        expected: add
+      - name: syn_mode_false
+        path: "$.body.instantSyncQuote"
+        expected: false
+      - name: buyer.requested.quote.level.firm
+        path: "$.body.buyerRequestedQuoteLevel"
+        expected: firm
+    mef.sonata.api-target.quote.uni.add.sync:
+      - name: product_type_UNI
+        path: "$.body.quoteItem[*].product.productConfiguration.['@type']"
+        expected: UNI
+      - name: action_add
+        path: "$.body.quoteItem[*].['action']"
+        expected: add
+      - name: syn_mode_true
+        path: "$.body.instantSyncQuote"
+        expected: true
+      - name: buyer.requested.quote.level.firm
+        path: "$.body.buyerRequestedQuoteLevel"
+        expected: firm
+    mef.sonata.api-target.quote.eline.add.sync:
+      - name: product_type_eline
+        path: "$.body.quoteItem[*].product.productConfiguration.['@type']"
+        expected: ACCESS_E_LINE
+      - name: action_add
+        path: "$.body.quoteItem[*].['action']"
+        expected: add
+      - name: syn_mode_true
+        path: "$.body.instantSyncQuote"
+        expected: true
+      - name: buyer.requested.quote.level.firm
+        path: "$.body.buyerRequestedQuoteLevel"
+        expected: firm
+
+

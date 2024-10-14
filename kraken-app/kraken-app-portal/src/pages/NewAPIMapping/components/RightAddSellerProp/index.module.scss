@@ -1,0 +1,94 @@
+.collapse {
+  flex: 1;
+  > :global(.ant-collapse-item) {
+    margin-bottom: 16px;
+    > :global(.ant-collapse-header) {
+      padding: 0;
+    }
+    > :global(.ant-collapse-content) {
+      > :global(.ant-collapse-content-box) {
+        padding: 8px 0 0;
+      }
+    }
+  }
+}
+.title {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px !important;
+  gap: 8px;
+  &:before {
+    content: "";
+    display: block;
+    width: 4px;
+    height: 14px;
+    border-radius: 80px;
+    background-color: #2962ff;
+  }
+}
+.paramList {
+  padding: 18px 20px;
+  border-radius: 4px;
+  background-color: #f0f2f5;
+  .paramItem {
+    user-select: none;
+    padding: 2px 4px;
+    background-color: #fff;
+    cursor: pointer;
+    &:hover,
+    &.active {
+      background-color: #dbe4fb;
+    }
+  }
+}
+.tree {
+  padding: 16px;
+  border: 1px solid #ddd;
+  background-color: #f5f5f5;
+  max-width: 100%;
+  max-height: 300px;
+  overflow: auto;
+
+  :global(.ant-tree-list) {
+    background-color: #f5f5f5;
+  }
+  :global(.ant-tree-treenode),
+  :global(.ant-tree-node-content-wrapper) {
+    width: 100%;
+    &:hover {
+      background-color: #f5f5f5;
+    }
+    &:global(.ant-tree-node-selected) {
+      span > div > span {
+        background-color: #dbe4fb !important;
+      }
+    }
+  }
+}
+
+.treeTitle {
+  flex: 1;
+  padding: 2px 4px;
+  background: #fff;
+}
+
+.treeValue {
+  padding: 2px 4px;
+  background: #fff;
+}
+
+.header {
+  padding: 16px 20px;
+  box-shadow: 0px -1px 0px 0px #f0f0f0 inset;
+}
+
+.container {
+  padding: 16px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.footer {
+  border-top: 1px solid #f0f0f0;
+  padding: 14px 24px;
+}

@@ -1,0 +1,76 @@
+---
+kind: kraken.component.api
+apiVersion: v1
+metadata:
+  key: mef.sonata.api.serviceability.address
+  name: Geographic Address Management
+  labels:
+    mef-api-release: grace
+    address-api-version: v10
+spec:
+  mappings:
+    - uri: ${env.target.url}
+      trigger:
+        path: /mefApi/sonata/geographicAddressManagement/v7/geographicAddressValidation
+        method: post
+      metadata:
+        cacheRequestBody: true
+      actions:
+        - id: persist_http_request_address_validate
+          actionType: buildin@db
+          env:
+            bizType: "address.validate"
+          with:
+            action: create
+            properties:
+              - headers
+              - queryParameters
+              - requestBody
+          preRequest: true
+
+        - id: load-downstream-api-config
+          actionType: buildin@load-target-api-config
+          env:
+            configKey: "mef.sonata.api-target.address.validate"
+            mefQuery: ${query}
+            mefRequestBody: ${body}
+            entity: ${entity}
+          with:
+            render: true
+          outputKey: targetApiConfig
+        - id: mapping_matrix_check_address
+          actionType: buildin@mapping-matrix-checker
+          env:
+            mappingMatrixKey: mef.sonata.api.matrix.address.validation
+            targetKey: mef.sonata.api-target.address.validate
+        - id: rewrite-path
+          actionType: buildin@rewrite-path
+          with:
+            engine: spel
+          env:
+            path: ${targetApiConfig.endpoints[0].path}
+            method: ${targetApiConfig.endpoints[0].method}
+
+        - id: modify-request-body
+          actionType: buildin@modify-request-body
+          env:
+            code: ${targetApiConfig.endpoints[0].requestBody}
+
+        - id: modify-response-body
+          actionType: buildin@modify-response-body
+          with:
+            engine: spel
+            listLoop: true
+          env:
+            code: ${targetApiConfig.endpoints[0].responseBody}
+            inputs: ${targetApiConfig.inputs}
+        - id: update-response-body
+          actionType: buildin@db
+          with:
+            action: update
+            properties:
+              - responseBody
+              - responseStatusCode
+          preRequest: false
+          postRequest: true
+          order: -4

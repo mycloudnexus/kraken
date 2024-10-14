@@ -1,0 +1,94 @@
+
+---
+kind: kraken.component.api-target-mapper
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target-mapper.order.eline.add
+  name:  Mapper Of Creating Order Connection
+  description: This operation creates a ProductOrder entity
+spec:
+  trigger:
+    path: /mefApi/sonata/productOrderingManagement/v10/productOrder
+    method: post
+    productType: access_e_line
+    actionType: add
+  endpoints:
+    - id: create connection order
+      path: /api/v2/company/{companyName}/connections/layer2
+      method: put
+      serverKey: mef.sonata.api-target-spec.con1718940696857
+      mappers:
+        request:
+          - name: order.eline.add.buyerId.mapper
+            title: ""
+            description: ""
+            source: "@{{buyerId}}"
+            sourceLocation: QUERY
+            target: "@{{companyName}}"
+            targetLocation: PATH
+          - title: Title of Property Mapping
+            source: "@{{externalId}}"
+            target: "@{{requestBody.orderId}}"
+            description: description
+            replaceStar: true
+            sourceLocation: QUERY
+            targetLocation: BODY
+            customizedField: true
+            requiredMapping: false
+          - title: Title of Property Mapping
+            source: "@{{externalId}}"
+            target: "@{{requestBody.orderId}}"
+            description: description
+            replaceStar: true
+            sourceLocation: QUERY
+            targetLocation: BODY
+            customizedField: true
+            requiredMapping: false
+        response:
+          - name: mapper.order.eline.add.state
+            title: Order State Mapping
+            description: order state mapping
+            target: "@{{state}}"
+            targetType: enum
+            targetLocation: BODY
+            targetValues:
+              - acknowledged
+              - assessingCancellation
+              - held.assessingCharge
+              - pending.assessingModification
+              - cancelled
+              - pendingCancellation
+              - completed
+              - failed
+              - inProgress
+              - partial
+              - rejected
+            valueMapping:
+              CREATING: acknowledged,
+              ACTIVATING: inProgress,
+              ACCEPTED: inProgress,
+              MANUAL: inProgress,
+              DELETING: inProgress,
+              DISABLING: inProgress,
+              DENIED: rejected,
+              ERROR: failed,
+              ACTIVE: completed,
+              DISABLED: disabled,
+              CANCELLED: disabled,
+              PENDING: pending,
+              PENDING_ACCEPTANCE: pending,
+              DELETED: completed
+            source: "@{{responseBody.status}}"
+            sourceLocation: BODY
+            requiredMapping: true
+          - name: mapper.order.eline.add.orderId
+            title: Order Id location
+            description: orderId mapping
+            source: ""
+            sourceLocation: ""
+          - name: mapper.order.eline.add.instanceId
+            title: Instance Id location
+            description: order instanceId mapping
+            source: ""
+            sourceLocation: ""
+

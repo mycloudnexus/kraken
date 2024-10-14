@@ -1,0 +1,49 @@
+{
+  "relatedContactInformation": [
+    {
+      "emailAddress": "buyer@ccc.com",
+      "name": "buyer-01",
+      "number": "100-1112234",
+      "role": "BuyerOrderContact"
+    }
+  ],
+  "productOrderItem": [
+    {
+      "action": "add",
+      "id": "item-UNI-01",
+      "product": {
+        "place": [
+          {
+            "@type": "FieldedAddress",
+            "id": "dc-CN-SHANGHAI-EQUINIXSH5",
+            "role": "INSTALL_LOCATION"
+          }
+        ],
+        "productConfiguration": {
+          "@type": "UNI",
+          "uni": {
+            "bandwidth": 1000,
+            "bandwidthUnit": "Mbps",
+            "bundleCrossConnect": false,
+            "paymentType": "invoice"
+          }
+        },
+        "productOffering": {
+          "id": "product-offering-001"
+        }
+      },
+      "requestedItemTerm": {
+        "duration": {
+          "amount": 12,
+          "units": "calendarMonths"
+        },
+        "endOfTermAction": "roll",
+        "name": "test-mef-port-16-48",
+        "rollInterval": {
+          "amount": 1,
+          "units": "calendarMonths"
+        }
+      }
+    }
+  ]
+}

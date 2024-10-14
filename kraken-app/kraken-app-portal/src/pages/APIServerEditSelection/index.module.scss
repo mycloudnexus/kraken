@@ -1,0 +1,91 @@
+.root {
+  height: calc(100vh - 58px);
+  max-height: calc(100vh - 58px);
+  background: #f0f2f5;
+}
+
+.container {
+  padding: 2px 0 0;
+  box-sizing: border-box;
+  padding-left: 8px;
+}
+
+.transferSection {
+  flex: 3;
+  box-sizing: border-box;
+  padding: 12px 0;
+}
+
+.paper {
+  background: #fff;
+  padding: 14px 20px;
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 4px;
+}
+
+.transfer {
+  :global {
+    .ant-transfer-list-content-item {
+      padding: 0;
+    }
+    .ant-checkbox-wrapper,
+    .ant-transfer-list-content-item-text {
+      padding: 5px 0 5px 12px;
+    }
+    .ant-transfer-list {
+      height: calc(100vh - 230px);
+      flex: 1;
+    }
+    .ant-transfer-operation {
+      .ant-btn-primary {
+        border-radius: 50% !important;
+        background: #c9cdd4;
+        color: #000;
+        &:disabled {
+          background: #f7f8fa;
+          color: #c9cdd4;
+        }
+      }
+    }
+    .ant-input-affix-wrapper {
+      background: #f7f8fa;
+      input {
+        order: 1;
+      }
+      .ant-input-prefix {
+        order: 2;
+      }
+      .ant-input-suffix:not(:has(.ant-input-clear-icon-hidden)) {
+        order: 3;
+      }
+      .ant-input-suffix:has(.ant-input-clear-icon-hidden) {
+        display: none;
+      }
+    }
+    .ant-transfer-list-header {
+      background: #f7f8fa;
+      label {
+        order: 1;
+      }
+      .ant-transfer-list-header-title {
+        text-align: left;
+        order: 2;
+      }
+      .ant-transfer-list-header-selected {
+        text-align: right;
+        order: 3;
+        color: #86909c;
+        font-size: 12px;
+      }
+    }
+  }
+}
+
+.appTitle {
+  margin-bottom: 12px;
+}
+
+.info {
+  height: calc(100vh - 194px);
+}

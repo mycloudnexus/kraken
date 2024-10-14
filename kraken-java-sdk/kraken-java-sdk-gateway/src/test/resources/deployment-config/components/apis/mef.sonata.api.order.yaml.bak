@@ -1,0 +1,191 @@
+---
+kind: kraken.component.api
+apiVersion: v1
+metadata:
+  key: mef.sonata.api.order
+  name: Product Ordering Management
+  labels:
+    mef-api-release: grace
+    order-api-version: v10
+spec:
+  mappings:
+    - uri: ${env.targetApiUri}
+      trigger:
+        path: /mefApi/sonata/productOrderingManagement/v10/productOrder
+        method: post
+        queryParams:
+          - buyerId
+      metadata:
+        cacheRequestBody: true
+      actions:
+        - id: caclulate_order_type_and_action_via_javascript
+          actionType: engine@javascript
+          env:
+            productOrderItem: ${body['productOrderItem'][0]}
+          with:
+            code: |
+              (jsonStr) => {
+                console.log("input: " + jsonStr);
+                let input = JSON.parse(jsonStr);
+                let ret = {
+                  orderType: input.productOrderItem['product']['productConfiguration']['@type'],
+                  orderAction: input.productOrderItem['action']
+                };
+                return JSON.stringify(ret);
+              }
+          outputKey: javascript
+        - id: caclulate_order_type_and_action_via_spel
+          actionType: engine@SpEL
+          with:
+            code: |
+              {
+                "orderType": "${body['productOrderItem'][0]['product']['productConfiguration']['@type']}",
+                "orderAction": "${body['productOrderItem'][0]['action']}"
+              }
+          outputKey: order
+        - id: persist_http_request
+          actionType: buildin@db
+          env:
+            bizType: ${order.orderType}
+          with:
+            action: create
+            properties:
+              - headers
+              - queryParameters
+              - requestBody
+          preRequest: true
+
+        - id: rewrite-path-to-order-port
+          actionType: buildin@rewrite-path
+          if: ${order.orderType == 'UNI' && order.orderAction == 'add'}
+          env:
+            path: /anything/port_${query.buyerId}
+          with:
+            method: put
+        - id: rewrite-path-to-order-connection
+          actionType: buildin@rewrite-path
+          if: ${order.orderType == 'ACCESS_E_LINE' && order.orderAction == 'add'}
+          env:
+            path: /anything/connection_${query.buyerId}
+          with:
+            method: post
+        - id: generate-order-port-request-body
+          actionType: buildin@modify-request-body
+          if: ${order.orderType == 'UNI' && order.orderAction == 'add'}
+          with:
+            engine: spel
+            code: |
+              {
+                "speed": ${body.productOrderItem[0].product.productConfiguration.uni.bandwidth},
+                "bundleCrossConnect": "${body.productOrderItem[0].product.productConfiguration.uni.bundleCrossConnect}",
+                "paymentType": "${body.productOrderItem[0].product.productConfiguration.uni.paymentType}",
+                "dataCenterFacility": "${body.productOrderItem[0].product.place[0].id}",
+                "portName": "${body.productOrderItem[0].requestedItemTerm.name}",
+                "durationUnit": "${(body.productOrderItem[0].requestedItemTerm.duration.units == 'calendarMonths' && body.productOrderItem[0].requestedItemTerm.duration.amount == 12) ? 'y':'m'}"
+              }
+        - id: generate-order-connection-request-body
+          actionType: buildin@modify-request-body
+          if: ${order.orderType == 'ACCESS_E_LINE' && order.orderAction == 'add'}
+          with:
+            engine: spel
+            code: |
+              {
+                "speed": ${body.productOrderItem[0].product.productConfiguration.access_e_line.bandwidthUnit == 'Gbps'? body.productOrderItem[0].product.productConfiguration.access_e_line.bandwidth * 1000:body.productOrderItem[0].product.productConfiguration.access_e_line.bandwidth},
+                "portId": "${body.productOrderItem[0].product.productConfiguration.access_e_line.srcPortId}",
+                "destPortId": "${body.productOrderItem[0].product.productConfiguration.access_e_line.destPortId}",
+                "paymentType": "${body.productOrderItem[0].product.productConfiguration.access_e_line.paymentType}",
+                "name": "${body.productOrderItem[0].requestedItemTerm.name}",
+                "durationUnit": "${body.productOrderItem[0].requestedItemTerm.duration.units == 'calendarMonths'? 'm':'d'}",
+                "duration": "${body.productOrderItem[0].requestedItemTerm.duration.amount}",
+                "destRegionId": "${body.productOrderItem[0].product.productConfiguration.access_e_line.destRegionId}",
+                "region": "${body.productOrderItem[0].product.productConfiguration.access_e_line.srcRegionId}",
+                "destMetroId": "${body.productOrderItem[0].product.productConfiguration.access_e_line.destMetroId}",
+                "classOfService": "${body.productOrderItem[0].product.productConfiguration.access_e_line.classOfService}",
+                "type": "LAYER2",
+                "destCompany": "${body.productOrderItem[0].product.productConfiguration.access_e_line.destCompanyName}",
+                "evergreen": "${body.productOrderItem[0].product.productConfiguration.access_e_line.evergreen}"
+              }
+
+        - id: modify-response-body-via-spel
+          actionType: buildin@modify-response-body
+          if: ${order.orderType == 'UNI' && order.orderAction == 'add'}
+          with:
+            engine: javascript
+            code: |
+              (jsonStr) => {
+                console.log("input: " + jsonStr);
+                let input = JSON.parse(jsonStr);
+                let ret = {
+                  echo_response: input,
+                };
+                return JSON.stringify(ret);
+              };
+        - id: modify-response-body-via-javascript
+          actionType: buildin@modify-response-body
+          if: ${order.orderType == 'ACCESS_E_LINE' && order.orderAction == 'add'}
+          with:
+            engine: javascript
+            code: |
+              (jsonStr) => {
+                console.log("input: " + jsonStr);
+                let input = JSON.parse(jsonStr);
+                let ret = {
+                  echo_response: input,
+                };
+
+                return JSON.stringify(ret);
+              };
+        # - id: modify-response-status-code
+        #   actionType: buildin@modify-response-status
+        #   with:
+        #     engine: javascript
+        #     script: |
+        #       (jsonStr) => {
+        #         console.log("input: " + jsonStr);
+        #         let input = JSON.parse(jsonStr);
+        #         let ret = {
+        #           code: 500,
+        #         };
+        #         return JSON.stringify(ret);
+        #       };
+        - actionType: buildin@db
+          with:
+            action: update
+            properties:
+              - responseBody
+              - responseStatusCode
+          preRequest: false
+          postRequest: true
+          order: -4
+    - uri: https://httpbin.org/
+      trigger:
+        path: /mefApi/sonata/productOrderingManagement/v10/productOrder/**
+        method: get
+      metadata:
+        cacheRequestBody: false
+      actions:
+        - name: retrieve orderId from path
+          actionType: buildin@pattern
+          env:
+            input: ${path}
+          with:
+            pattern: /mefApi/sonata/productOrderingManagement/v10/productOrder/(?<segment>.*)
+        - id: rewrite-path
+          actionType: buildin@rewrite-path
+          env:
+            path: /anything/${segment}
+          with:
+            method: get
+        - id: generate-request-body
+          actionType: buildin@modify-request-body
+          with:
+            engine: javascript
+            code: |
+              (jsonStr) => {
+                console.log("input: " + jsonStr);
+                let input = JSON.parse(jsonStr);
+                let ret = {
+                  body: input,
+                };
+                return JSON.stringify(ret);
+              };

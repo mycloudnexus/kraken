@@ -1,0 +1,87 @@
+---
+kind: kraken.component.api-target
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target.address.validate
+  name: Geographic Address Management
+  version: 1
+spec:
+  inputs:
+    - mefQuery
+    - mefRequestBody
+  trigger:
+    path: /mefApi/sonata/geographicAddressManagement/v7/geographicAddressValidation
+    method: post
+  endpoints:
+    - id: validate address
+      path: "/v2/data-center-facility/search"
+      method: "get"
+      requestBody:
+      responseBody: |
+        {
+          "validationResult": "partial",
+          "alternateGeographicAddress": "${"@{{responseBody}}.![{
+                        id: id,
+                        '@type': 'FieldedAddress',
+                        country: company.addresses[0].country,
+                        city: company.addresses[0].city,
+                        streetName: company.addresses[0].address
+                     }]}",
+          "provideAlternative": "${mefRequestBody.provideAlternative}",
+          "submittedGeographicAddress": "${mefRequestBody.submittedGeographicAddress}"
+        }
+      mappers:
+        request:
+          - name: address.validation.city
+            source: "@{{submittedGeographicAddress.associatedGeographicAddress.city}}"
+            description: "city mapping"
+            sourceLocation: BODY
+            target: "criteria={\"locations\":[\"@{{submittedGeographicAddress.associatedGeographicAddress.city}},@{{submittedGeographicAddress.associatedGeographicAddress.country}}\"]}}"
+            targetLocation: HYBRID
+          - name: address.validation.country
+            description: "country mapping"
+            source: "@{{submittedGeographicAddress.associatedGeographicAddress.country}}"
+            sourceLocation: BODY
+            target: "criteria={\"locations\":[\"@{{submittedGeographicAddress.associatedGeographicAddress.city}},@{{submittedGeographicAddress.associatedGeographicAddress.country}}\"]}}"
+            targetLocation: HYBRID
+          - name: address.validation.streetName
+            source: "@{{submittedGeographicAddress.associatedGeographicAddress.streetName}}"
+            sourceLocation: BODY
+            target: ""
+            targetLocation: ""
+        response:
+          - name: address.validation.validationResult
+            description: address validation validationResult mapping
+            source: ""
+            sourceLocation: ""
+            target: "@{{validationResult}}"
+            targetType: enum
+            targetLocation: BODY
+          - name: address.validation.id.mapper
+            description: address validation id mapping
+            source: ""
+            sourceLocation: ""
+            target: "@{{alternateGeographicAddress.id}}"
+            targetType: string
+            targetLocation: BODY
+          - name: address.validation.country.mapper
+            description: address validation country mapping
+            source: ""
+            sourceLocation: ""
+            target: "@{{alternateGeographicAddress.country}}"
+            targetType: string
+            targetLocation: BODY
+          - name: address.validation.id.mapper
+            description: address validation city mapping
+            source: ""
+            sourceLocation: ""
+            target: "@{{alternateGeographicAddress.city}}"
+            targetType: string
+            targetLocation: BODY
+          - name: address.validation.id.mapper
+            description: address validation streetName mapping
+            source: ""
+            sourceLocation: ""
+            target: "@{{alternateGeographicAddress.streetName}}"
+            targetType: string
+            targetLocation: BODY

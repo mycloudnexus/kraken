@@ -1,0 +1,15 @@
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.1.2.3
+  name: V1.2.3
+  labels:
+    release-version: V1.2.3
+    release-date: 2024-09-04
+  description: |
+    add field mapping:
+      add metroId for address validation and address retrieve
+    new feature:
+
+  version: 1

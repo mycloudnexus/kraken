@@ -1,0 +1,48 @@
+{
+  "requestedQuoteCompletionDate": "2024-05-22T06:09:03.801Z",
+  "externalId": "quoteId",
+  "buyerRequestedQuoteLevel": "budgetary",
+  "instantSyncQuote": true,
+  "quoteItem": [
+    {
+      "requestedQuoteItemTerm": {
+        "duration": {
+          "amount": 1,
+          "units": "calendarMonths"
+        },
+        "endOfTermAction": "roll",
+        "rollInterval": {
+          "amount": 12,
+          "units": "calendarMonths"
+        }
+      },
+      "product": {
+        "id": "string",
+        "href": "string",
+        "place": [
+          {
+            "role": "string",
+            "@type": "FieldedAddress",
+            "@schemaLocation": "string"
+          }
+        ],
+        "productConfiguration": {
+          "@type": "ACCESS_E_LINE",
+          "access_e_line": {
+            "bandwidth": 1,
+            "classOfService": "BRONZE",
+            "paymentMethod": "invoice",
+            "destCompany": "65a4f18aec61ae42ae9606df",
+            "srcDcf": "5fdc2dce8ef25a00148b0700",
+            "destDcf": "5fdc2dce8ef25a00148b0700"
+          }
+        }
+      },
+      "action": "add",
+      "requestedQuoteItemInstallationInterval": {
+        "amount": 0,
+        "units": "calendarMonths"
+      }
+    }
+  ]
+}

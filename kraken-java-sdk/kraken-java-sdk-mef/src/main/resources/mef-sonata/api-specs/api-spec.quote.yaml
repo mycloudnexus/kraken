@@ -1,0 +1,16 @@
+---
+kind: kraken.component.api-spec
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-spec.quote
+  name: Product Quote Management
+  icon: https://storage.googleapis.com/console-connect-static-assets/krakenUI/quote.png
+  labels:
+    mef-api-release: grace
+    quote-api-version: v8
+  version: 1
+spec:
+  baseSpec:
+    path: classpath:/mef-sonata/openapi/quoteManagement.api.yaml
+  customizedSpec:
+    path: classpath:/mef-sonata/openapi/quoteManagement.api.customized.yaml

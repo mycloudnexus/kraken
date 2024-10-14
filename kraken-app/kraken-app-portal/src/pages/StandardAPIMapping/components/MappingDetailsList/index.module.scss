@@ -1,0 +1,144 @@
+.collapseBox {
+  flex: 1;
+  &:global(> .ant-collapse-item) {
+    &:global(> .ant-collapse-header) {
+      padding-left: 15px;
+      overflow-wrap: anywhere;
+      border-radius: 0px !important;
+      &:hover {
+        background-color: rgba(41, 98, 255, 0.2);
+        border-right: 3px solid #2962FF;
+      }
+    }
+    &:global(> .ant-collapse-content) {
+      &:global(> .ant-collapse-content-box) {
+        padding: 0;
+        padding-block: 0;
+        background-color: #F4F4F4;
+        
+      }
+    }
+  }
+}
+.collapseItem {
+  position: relative;
+  padding: 15px 10px 15px 15px;
+  cursor: pointer;
+  &:hover {
+    background-color: rgba(219, 228, 251, 1);
+  }
+
+  &:last-child {
+    &:after {
+      content: '';
+      width: 2px;
+      height: 30px;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(152, 161, 168, 0.7),
+        rgba(152, 161, 168, 0.7) 2px,
+        transparent 2px,
+        transparent 6px
+      );
+      position: absolute;
+      top: 2px;
+      left: 18px;
+    }
+  }
+  &:after {
+    content: '';
+    width: 2px;
+    height: 100%;
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(152, 161, 168, 0.7),
+      rgba(152, 161, 168, 0.7) 2px,
+      transparent 2px,
+      transparent 6px
+    );
+    position: absolute;
+    top: 3px;
+    left: 18px;
+  }
+  &:before {
+    content: "";
+    width: 2px;
+    height: 12px;
+    transform: rotateZ(90deg);
+    background: repeating-linear-gradient(to bottom, rgba(152, 161, 168, 0.7), rgba(152, 161, 168, 0.7) 2px, transparent 2px, transparent 6px);
+    position: absolute;
+    top: 25px;
+    left: 25px;
+  }
+}
+
+.collapseMappingMatrix {
+  flex-wrap: wrap;
+  width: calc(100% - 10px);
+}
+
+.collapseItemActive {
+  background-color: rgba(41, 98, 255, 0.2);
+  border-right: 3px solid #2962FF;
+}
+
+.labelWrapper {
+  font-weight: 500;
+  align-items: center;
+  gap: 5px;
+}
+.highlighted {
+  color: #2962FF;
+}
+.dot {
+  width: 8px;
+  height: 8px;
+  background-color: rgba(152, 161, 168, 0.7);
+  border-radius: 50%;
+  position: relative;
+  &:after {
+    content: '';
+    width: 2px;
+    height: 15px;
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(152, 161, 168, 0.7),
+      rgba(152, 161, 168, 0.7) 2px,
+      transparent 2px,
+      transparent 6px
+    );
+    position: absolute;
+    top: 13px;
+    left: 3px;
+  }
+}
+
+.dottedLine {
+  width: 20px;
+  height: 12px;
+  position: relative;
+}
+
+.lessContent {
+  position: relative;
+  max-height: 480px;
+  overflow: hidden;
+  box-shadow: #2962FF;
+  &:after {
+    content: '';
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    height: 10%;
+    bottom: 0px;
+    background: linear-gradient(180deg, rgba(139,167,32,0) 0%, rgba(255,255,255,1) 100%);
+    pointer-events: none;
+  }
+}
+
+.showMoreLess {
+  background: white;
+  color: rgba(22, 93, 255, 1) ;
+  cursor: pointer;
+  padding: 10px 20px;
+}

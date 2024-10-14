@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>kraken-java-sdk</artifactId>
+    <name>kraken-java-sdk</name>
+    <version>1.0.0</version>
+
+    <packaging>pom</packaging>
+    <parent>
+        <groupId>com.consoleconnect.kraken</groupId>
+        <artifactId>kraken-platform</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+
+    <modules>
+        <module>kraken-java-sdk-core</module>
+        <module>kraken-java-sdk-gateway</module>
+        <module>kraken-java-sdk-mef</module>
+        <module>kraken-java-sdk-test</module>
+        <module>kraken-java-sdk-controller</module>
+        <module>kraken-java-sdk-data</module>
+        <module>kraken-java-sdk-sync</module>
+        <module>kraken-java-sdk-auth</module>
+    </modules>
+
+
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>3.14.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-collections4</artifactId>
+                <version>4.5.0-M1</version>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-annotations</artifactId>
+                <version>2.2.21</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.cloud</groupId>
+                <artifactId>libraries-bom</artifactId>
+                <version>26.39.0</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+</project>

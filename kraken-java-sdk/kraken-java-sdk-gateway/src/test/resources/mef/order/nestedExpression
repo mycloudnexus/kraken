@@ -1,0 +1,6 @@
+{
+          "requestedQuoteItemInstallationInterval" : {
+            "amount": "${quoteItem[0].requestedQuoteItemInstallationInterval.amount}",
+            "units": "${quoteItem[0].requestedQuoteItemInstallationInterval.amount}"
+          }
+}

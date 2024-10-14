@@ -1,0 +1,23 @@
+---
+kind: kraken.component.api-target-mapper
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target-mapper.quote.eline.read.sync
+  name: Mapper Of Reading Quote Eline
+  description: This operation retrieves a Quote entity. Attribute selection is enabled for all first level attributes.
+  version: 1
+spec:
+  trigger:
+    path: /mefApi/sonata/quoteManagement/v8/quote/{id}
+    method: get
+    productType: access_e_line
+    quoteLevel: firm
+    syncMode: true
+  endpoints:
+    - id: retrieve quote for connection
+      path: ""
+      method: ""
+      serverKey: ""
+      mappers:
+        request:
+        response:

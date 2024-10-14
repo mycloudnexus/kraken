@@ -1,0 +1,250 @@
+---
+server:
+  port: ${port:8001}
+
+spring:
+  main:
+    web-application-type: reactive
+  codec:
+    max-in-memory-size: 500KB
+  cloud:
+    gateway:
+      httpclient:
+        connect-timeout: 20000
+        pool:
+          max-connections: 1500
+          type: FIXED
+  application:
+    name: "@project.artifactId@"
+    description: "@project.name@"
+  build:
+    version: "@project.version@"
+  jackson:
+    default-property-inclusion: NON_NULL
+    deserialization:
+      fail-on-unknown-properties: false
+  datasource:
+    driverClassName: org.postgresql.Driver
+    password: password
+    url: jdbc:postgresql://localhost:5432/kraken-mgmt
+    username: postgresql
+    hikari:
+      pool-name: hikari-platform-service-platform
+      connection-test-query: SELECT 1
+      maximum-pool-size: 50
+      max-lifetime: 600000
+      connection-timeout: 60000
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    database: POSTGRESQL
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          time_zone: UTC
+  flyway:
+    baseline-on-migrate: true
+    enabled: false
+management:
+  endpoint:
+    health:
+      show-details: ALWAYS
+    gateway:
+      enabled: false
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure:
+        include: health,info,prometheus,gateway
+info:
+  app:
+    encoding: "@project.build.sourceEncoding@"
+    java:
+      source: "@java.version@"
+      target: "@java.version@"
+
+springdoc:
+  show-actuator: true
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    supported-submit-methods: ["get", "post", "patch", "delete"]
+    config-url: /v3/api-docs/swagger-config
+    urls:
+      - url: /v3/api-docs
+        name: Kraken Controller
+  servers:
+    - url: http://localhost:8001
+      description: localhost
+logging:
+  level:
+    com.consoleconnect.kraken: DEBUG
+    org.springframework.security: DEBUG
+app:
+  products:
+    - key: mef.sonata
+      environments:
+        - stage
+        - production
+  mgmt:
+    enabled: true
+    apiToken:
+      secretKey: persist_secret_key_in_vault
+      enabled: true
+    use-version-v2: true
+    buyerTokenExpiredSeconds: 157680000
+    template-upgrade:
+      exclude-kinds:
+        - kraken.workspace
+        - kraken.product
+        - kraken.component.api-spec
+      exclude-keys:
+        - mef.sonata.api-target.order.notification.state.change
+  tenant:
+    workspacePath: classpath:/assets/workspace.yaml
+    componentOperation:
+      enabled: true
+  security:
+    login:
+      enabled: true
+      hmac-secret: OWUxMjFhNmEtZmY5My00MTNkLWIzNTctZTczY2ZjNWM5ODMy
+      user-list:
+        - name: admin
+          id: fc5f6165-aa20-4798-a9ee-78afbe3cf06d
+          email: admin
+          role: ADMIN
+          password: 182cf072dc112634996cf4abccf2915273ff1a0b53d4436388fe9c55a9531277c6d86a23b7a9addc1c2642a6b62f17cfd18f70c2d98501d520fe4886727b97d1
+      jwt:
+        issuer: https://kraken.consoleconnect.com/issuer
+        key-id: kraken
+        secret: MjRhMjNhNGYtMWUzMS00ZTY4LTlhYzgtMzY5NDcwYzNjNDE4
+      refresh-token:
+        enabled: true
+        token-expired-in-seconds: 86400
+    auth-server:
+      enabled: true
+      jwt:
+        issuer: https://kraken.consoleconnect.com/issuer
+        key-id: kraken
+        secret: MjRhMjNhNGYtMWUzMS00ZTY4LTlhYzgtMzY5NDcwYzNjNDE4
+    resource-server:
+      enabled: true
+      pathPermissions:
+        - path: /auth/resetPassword
+          http-methods:
+            - POST
+          roles:
+            - USER
+            - ADMIN
+        - path: /auth/revokeTokens
+          http-methods:
+            - POST
+          roles:
+            - USER
+            - ADMIN
+        - path: /v2/callback/audits/**
+          http-methods:
+            - POST
+            - GET
+          roles:
+            - ADMIN
+            - API_CLIENT
+        - path: /client/events/**
+          http-methods:
+            - POST
+            - GET
+          roles:
+            - ADMIN
+            - API_CLIENT
+        - path: /v2/callback/event
+          http-methods:
+            - PATCH
+            - GET
+          roles:
+            - ADMIN
+            - API_CLIENT
+        - path: /**
+          http-methods:
+            - POST
+            - PATCH
+            - DELETE
+          roles:
+            - ADMIN
+      jwt:
+        - issuer: https://kraken.consoleconnect.com/issuer
+          key-id: kraken
+          secret: MjRhMjNhNGYtMWUzMS00ZTY4LTlhYzgtMzY5NDcwYzNjNDE4
+      allowed-paths:
+        - /assets/mef.sonata.api-spec.order/api-docs
+        - /assets/mef.sonata.api-spec.serviceability.address/api-docs
+        - /assets/mef.sonata.api-spec.quote/api-docs
+  task:
+    enabled: false
+  unified-asset:
+    endpoints:
+      exposure:
+        include: asset, component, product, ingestion, component-operation, component-mapper
+
+  initialize-exclude-assets:
+    - classpath:/mef-sonata/apis/api.product.offering.yaml
+    - classpath:/mef-sonata/api-targets/api-target.quote.eline.add.yaml
+    - classpath:/mef-sonata/api-targets/api-target.quote.eline.read.yaml
+    - classpath:/mef-sonata/api-targets/api-target.quote.uni.add.yaml
+    - classpath:/mef-sonata/api-targets/api-target.quote.uni.read.yaml
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.eline.add.yaml
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.uni.add.yaml
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.uni.read.yaml
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.eline.read.yaml
+
+  query-exclude-asset-kinds:
+    - kraken.component.api
+    - kraken.component.api-spec
+  query-exclude-asset-keys:
+    - mef.sonata.api.poq
+    - mef.sonata.api-spec.product.offering.qualification
+    - mef.sonata.api-target-mapper.quote.eline.add
+    - mef.sonata.api-target-mapper.quote.uni.add
+    - mef.sonata.api-target-mapper.quote.uni.read
+    - mef.sonata.api-target-mapper.quote.eline.read
+  api-spec-order-by:
+    mef.sonata.api-spec.serviceability.address: 1
+    mef.sonata.api-spec.quote: 2
+    mef.sonata.api-spec.product.offering.qualification: 3
+    mef.sonata.api-spec.order: 4
+    mef.sonata.api-spec.inventory: 5
+  api-order-by:
+    mef.sonata.api.serviceability.address: 1
+    mef.sonata.api.quote: 2
+    mef.sonata.api.poq: 3
+    mef.sonata.api.order: 4
+    mef.sonata.api.inventory: 5
+  api-target-mapper-order-by:
+    mef.sonata.api-target-mapper.address.validate: <1,1>
+    mef.sonata.api-target-mapper.address.retrieve: <2,1>
+    mef.sonata.api-target-mapper.poq.uni.add: <1,1>
+    mef.sonata.api-target-mapper.poq.eline.add: <1,2>
+    mef.sonata.api-target-mapper.poq.uni.read: <2,1>
+    mef.sonata.api-target-mapper.poq.eline.read: <2,2>
+    mef.sonata.api-target-mapper.quote.uni.add.sync: <1,1>
+    mef.sonata.api-target-mapper.quote.eline.add.sync: <1,2>
+    mef.sonata.api-target-mapper.quote.uni.read.sync: <2,1>
+    mef.sonata.api-target-mapper.quote.eline.read.sync: <2,2>
+    mef.sonata.api-target-mapper.quote.uni.add: <1,1>
+    mef.sonata.api-target-mapper.quote.eline.add: <1,2>
+    mef.sonata.api-target-mapper.quote.uni.read: <2,1>
+    mef.sonata.api-target-mapper.quote.eline.read: <2,2>
+    mef.sonata.api-target-mapper.order.uni.add: <1,1>
+    mef.sonata.api-target-mapper.order.eline.add: <1,2>
+    mef.sonata.api-target-mapper.order.uni.delete: <1,3>
+    mef.sonata.api-target-mapper.order.eline.delete: <1,4>
+    mef.sonata.api-target-mapper.order.uni.read: <2,1>
+    mef.sonata.api-target-mapper.order.eline.read: <2,2>
+    mef.sonata.api-target-mapper.inventory.uni.list: <1,1>
+    mef.sonata.api-target-mapper.inventory.eline.list: <1,2>
+    mef.sonata.api-target-mapper.inventory.uni.read: <2,1>
+    mef.sonata.api-target-mapper.inventory.eline.read: <2,2>

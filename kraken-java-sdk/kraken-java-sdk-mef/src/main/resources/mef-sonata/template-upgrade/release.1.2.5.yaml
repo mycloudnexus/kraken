@@ -1,0 +1,15 @@
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.1.2.5
+  name: V1.2.5
+  labels:
+    release-version: V1.2.5
+    release-date: 2024-09-11
+  description: |
+    Add matrix validation:
+      add validation in address validation
+    new feature:
+
+  version: 1

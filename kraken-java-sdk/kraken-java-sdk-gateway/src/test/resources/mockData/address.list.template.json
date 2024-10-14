@@ -1,0 +1,31 @@
+{
+  "validationResult":"((mefResponseBody.bestMatchGeographicAddress.id==''?(mefResponseBody.alternateGeographicAddress.size()==0?'fail':'partial'):'success'))",
+  "alternateGeographicAddress":[
+    {
+      "country":"${responseBody[*].company.addresses[0].country}",
+      "streetName":"${responseBody[*].company.addresses[0]?.address}",
+      "city":"${responseBody[*].company.addresses[0].country}",
+      "@type":"FieldedAddress",
+      "id":"${responseBody[*].id}",
+      "cityList":[
+        {
+          "country":"${responseBody[*].company.addresses[0].country}",
+          "city":"${responseBody[*].company.addresses[0].country}"
+        }
+      ]
+    }
+  ],
+  "provideAlternative":true,
+  "submittedGeographicAddress":{
+    "@type":"FieldedAddress",
+    "country":"AU",
+    "city":"Sydney",
+    "streetName":""
+  },
+  "bestMatchGeographicAddress":{
+    "country":"",
+    "city":"",
+    "id":"${responseBody[0].id}",
+    "type":"FieldedAddress"
+  }
+}

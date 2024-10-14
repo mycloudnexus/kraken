@@ -1,0 +1,42 @@
+---
+kind: kraken.component.api
+apiVersion: v1
+metadata:
+  key: test.action.mock-response
+  name: Product Ordering Management
+  labels:
+    mef-api-release: grace
+    order-api-version: v10
+spec:
+  mappings:
+    - uri: ${env.target.url}
+      trigger:
+        path: /actions/mock-response
+        method: get
+      metadata:
+        cacheRequestBody: true
+        requestHeaders:
+          add:
+            x-kraken-tenant-id: demo-1
+          delete:
+            - access-token
+        responseHeaders:
+          add:
+            x-kraken-tenant-id: demo-2
+          delete:
+            - access-token
+        connection-timeout: 1000
+        response-timeout: 2000
+      actions:
+        - id: mock-response
+          actionType: buildin@mock-response
+          with:
+            statusCode: 201
+            forwardDownstream: false
+            headers:
+              Content-Type: application/json
+              x-kraken-tenant-id: demo-3
+            body: |
+              {
+                "data": "mocked"
+              }

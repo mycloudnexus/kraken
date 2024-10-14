@@ -1,0 +1,16 @@
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.1.2.2
+  name: V1.2.2
+  labels:
+    release-version: V1.2.2
+    release-date: 2024-09-03
+  description: |
+    fix issues:
+      added target location in mef.sonata.api-target-mapper.quote.eline.add.sync
+      for target item @{{quoteItem.quoteItemPrice.price.dutyFreeAmount.value}}
+    new feature:
+
+  version: 1

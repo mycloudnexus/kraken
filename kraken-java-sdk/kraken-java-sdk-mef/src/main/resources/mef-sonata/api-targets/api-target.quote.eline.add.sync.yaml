@@ -1,0 +1,56 @@
+---
+kind: kraken.component.api-target
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target.quote.eline.add.sync
+  name: Quote Connection API
+  mapperKey: mef.sonata.api-target-mapper.quote.eline.add.sync
+  version: 1
+spec:
+  inputs:
+    - mefQuery
+    - mefRequestBody
+  trigger:
+    path: /mefApi/sonata/quoteManagement/v8/quote
+    method: post
+    productType: access_e_line
+    actionType: add
+  endpoints:
+    - id: create quote for connection
+      path:
+      method:
+      requestBody: ${mefRequestBody.quoteItem[0].product.productConfiguration.access_e_line}
+      responseBody: |
+        {
+          "id": "${entity.id}",
+          "relatedContactInformation": "${T(com.consoleconnect.kraken.operator.gateway.func.SpelFunc).appendSellerInformation(env.seller.role, env.seller.name, env.seller.emailAddress, env.seller.number, mefRequestBody.relatedContactInformation)}",
+          "buyerRequestedQuoteLevel": "${mefRequestBody.buyerRequestedQuoteLevel}",
+          "quoteItem": [{
+             "product": "${mefRequestBody.quoteItem[0].product}",
+             "action": "add",
+             "id": "${mefRequestBody.quoteItem[0].id}",
+             "state": "((mefResponseBody.quoteItem[0].quoteItemPrice[0].price.dutyFreeAmount.value == '' ? 'unableToProvide': 'approved.orderable'))",
+             "quoteItemPrice": [{
+               "unitOfMeasure":"@{{quoteItem.quoteItemPrice.unitOfMeasure}}",
+               "price": {
+                 "dutyFreeAmount": {
+                   "unit": "@{{quoteItem.quoteItemPrice.price.dutyFreeAmount.unit}}",
+                   "value": "@{{quoteItem.quoteItemPrice.price.dutyFreeAmount.value}}"
+                 },
+                 "taxRate":"@{{quoteItem.quoteItemPrice.price.taxRate}}",
+                 "taxIncludedAmount": {
+                   "unit": "@{{quoteItem.quoteItemPrice.price.taxIncludedAmount.unit}}",
+                   "value": "@{{quoteItem.quoteItemPrice.price.taxIncludedAmount.value}}"
+                 }
+               },
+               "name":"@{{quoteItem.quoteItemPrice.name}}",
+               "priceType":"@{{quoteItem.quoteItemPrice.priceType}}",
+               "description":"@{{quoteItem.quoteItemPrice.description}}",
+               "recurringChargePeriod":"@{{quoteItem.quoteItemPrice.recurringChargePeriod}}"
+             }]
+          }],
+          "quoteDate": "${T(com.consoleconnect.kraken.operator.core.toolkit.DateTime).nowInUTCFormatted()}",
+          "externalId":"${mefRequestBody[externalId]?:''}",
+          "instantSyncQuote":"${mefRequestBody[instantSyncQuote]?:''}",
+          "requestedQuoteCompletionDate": "${mefRequestBody[requestedQuoteCompletionDate]?:''}"
+        }

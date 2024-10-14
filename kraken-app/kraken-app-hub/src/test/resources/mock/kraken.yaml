@@ -1,0 +1,11 @@
+---
+kind: kraken.workspace
+apiVersion: v1
+metadata:
+  name: Default Workspace
+  key: default
+  description: Default Workspace
+  icon: https://storage.googleapis.com/console-connect-static-assets/catacomb/bigquery.png
+spec:
+  productPaths:
+    - classpath:/mock/product.yaml

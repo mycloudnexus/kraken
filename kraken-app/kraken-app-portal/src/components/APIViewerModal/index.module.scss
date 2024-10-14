@@ -1,0 +1,6 @@
+.modal {
+  :global(.ant-modal-content) {
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+}

@@ -1,0 +1,29 @@
+
+---
+kind: kraken.component.api-target
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target.order.eline.delete
+  name: Order Connection API
+  mapperKey: mef.sonata.api-target-mapper.order.eline.delete
+  version: 4
+spec:
+  inputs:
+    - mefQuery
+    - mefRequestBody
+  trigger:
+    path: /mefApi/sonata/productOrderingManagement/v10/productOrder
+    method: post
+    productType: access_e_line
+    actionType: delete
+  endpoints:
+    - id: delete connection by id
+      path: ""
+      method: ""
+      responseBody: |
+        {
+          "id":"${entity.id}",
+          "relatedContactInformation": "${T(com.consoleconnect.kraken.operator.gateway.func.SpelFunc).appendSellerInformation(env.seller.role, env.seller.name, env.seller.emailAddress, env.seller.number, mefRequestBody.relatedContactInformation)}",
+          "productOrderItem": "${mefRequestBody.productOrderItem}",
+          "state": "@{{state}}"
+        }

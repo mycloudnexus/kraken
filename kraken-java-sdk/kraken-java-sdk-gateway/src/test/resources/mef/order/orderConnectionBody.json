@@ -1,0 +1,49 @@
+{
+  "relatedContactInformation": [
+    {
+      "emailAddress": "buyer@ccc.com",
+      "name": "buyer-01",
+      "number": "100-1112234",
+      "role": "BuyerOrderContact"
+    }
+  ],
+  "productOrderItem": [
+    {
+      "action": "add",
+      "id": "item-Access_E_Line-01",
+      "product": {
+        "productConfiguration": {
+          "@type": "ACCESS_E_LINE",
+          "access_e_line": {
+            "bandwidth": 10,
+            "bandwidthUnit": "Mbps",
+            "paymentType": "invoice",
+            "classOfService": "BRONZE",
+            "evergreen": true,
+            "destMetroId": "60ddad391b467a00152d0b14",
+            "srcPortId": "65fbe6168ff718b6e2e0352a",
+            "destPortId": "65f259da180faf71c5d4c7bf",
+            "srcRegionId": "5c05cb06cad910000ae251f4",
+            "destRegionId": "5a370b348f220300127f834e",
+            "destCompanyName": "consolecore-poping-company"
+          },
+          "productOffering": {
+            "id": "product-offering-001"
+          }
+        }
+      },
+      "requestedItemTerm": {
+        "duration": {
+          "amount": 1,
+          "units": "calendarMonths"
+        },
+        "endOfTermAction": "roll",
+        "name": "test-mef-conneciton",
+        "rollInterval": {
+          "amount": 1,
+          "units": "calendarMonths"
+        }
+      }
+    }
+  ]
+}

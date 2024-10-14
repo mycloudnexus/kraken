@@ -1,0 +1,155 @@
+server:
+  port: ${port:8000}
+
+spring:
+  application:
+    name: "@project.artifactId@"
+    description: "@project.name@"
+  build:
+    version: "@project.version@"
+  jackson:
+    default-property-inclusion: NON_NULL
+    deserialization:
+      fail-on-unknown-properties: false
+  data:
+    rest:
+      detection-strategy: ANNOTATED
+  datasource:
+    driverClassName: org.postgresql.Driver
+    #    password: ${DB_PASSWORD}
+    #    url: ${DB_URL}
+    #    username: ${DB_USERNAME}
+    hikari:
+      pool-name: hikari-platform-service-platform
+      connection-test-query: SELECT 1
+      maximum-pool-size: 2
+      max-lifetime: 600000
+      connection-timeout: 60000
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    database: POSTGRESQL
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          time_zone: UTC
+  flyway:
+    # clean-on-validation-error: true
+    baseline-on-migrate: true
+    ignore-missing-migrations: true
+    # enabled: false
+  codec:
+    max-in-memory-size: 10MB
+management:
+  endpoint:
+    health:
+      show-details: ALWAYS
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure:
+        include: health,info,prometheus
+info:
+  app:
+    encoding: "@project.build.sourceEncoding@"
+    java:
+      source: "@java.version@"
+      target: "@java.version@"
+
+springdoc:
+  show-actuator: true
+  api-docs:
+    enabled: true
+    path: /api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    supported-submit-methods: [ "get", "post", "patch", "delete" ]
+    config-url: /v3/api-docs/swagger-config
+    urls:
+      - url: /v3/api-docs
+        name: Kraken Operator
+      - url: /organizations/ef90f7e7-dc7d-4538-aa5b-a4a7d8432da2/products/product.mef.sonata.api/components/mef.sonata.api.site/api-docs
+        name: Order Management Service
+
+  servers:
+    - url: http://localhost:8000
+      description: localhost
+
+logging:
+  level:
+    com.consoleconnect.kraken.operator.core.service: INFO
+app:
+  mgmt:
+    enabled: true
+    apiToken:
+      secretKey: secret
+      enabled: true
+    template-upgrade:
+      exclude-kinds:
+        - kraken.workspace
+        - kraken.product
+        - kraken.component.api-spec
+      exclude-keys:
+        - mef.sonata.api-target.order.notification.state.change
+      distribution-envs:
+        - local_dev
+
+  tenant:
+    tenantId: ef90f7e7-dc7d-4538-aa5b-a4a7d8432da2
+    mode: SINGLE
+    workspacePath: classpath:/deployment-config/kraken.yaml
+  controlPlane:
+    url: http://localhost:8000
+    token: 123456
+  env:
+    target:
+      url: https://httpbin.org/
+  useCLoudLog: true
+  run:
+    mode: control
+  unified-asset:
+    endpoints:
+      exposure:
+        include: asset, component, product, ingestion, component-operation, component-mapper
+
+  security:
+    resource-server:
+      enabled: false
+    login:
+      enabled: false
+    auth-server:
+      enabled: false
+  api-spec-order-by:
+    mef.sonata.api-spec.serviceability.address: 1
+    mef.sonata.api-spec.quote: 2
+    mef.sonata.api-spec.product.offering.qualification: 3
+    mef.sonata.api-spec.order: 4
+    mef.sonata.api-spec.inventory: 5
+  api-target-mapper-order-by:
+    mef.sonata.api-target-mapper.address.validate: <1,1>
+    mef.sonata.api-target-mapper.address.retrieve: <2,1>
+    mef.sonata.api-target-mapper.poq.uni.add: <1,1>
+    mef.sonata.api-target-mapper.poq.eline.add: <1,2>
+    mef.sonata.api-target-mapper.poq.uni.read: <2,1>
+    mef.sonata.api-target-mapper.poq.eline.read: <2,2>
+    mef.sonata.api-target-mapper.quote.uni.add.sync: <1,1>
+    mef.sonata.api-target-mapper.quote.eline.add.sync: <1,2>
+    mef.sonata.api-target-mapper.quote.uni.read.sync: <2,1>
+    mef.sonata.api-target-mapper.quote.eline.read.sync: <2,2>
+    mef.sonata.api-target-mapper.quote.uni.add: <1,1>
+    mef.sonata.api-target-mapper.quote.eline.add: <1,2>
+    mef.sonata.api-target-mapper.quote.uni.read: <2,1>
+    mef.sonata.api-target-mapper.quote.eline.read: <2,2>
+    mef.sonata.api-target-mapper.order.uni.add: <1,1>
+    mef.sonata.api-target-mapper.order.eline.add: <1,2>
+    mef.sonata.api-target-mapper.order.uni.delete: <1,3>
+    mef.sonata.api-target-mapper.order.eline.delete: <1,4>
+    mef.sonata.api-target-mapper.order.uni.read: <2,1>
+    mef.sonata.api-target-mapper.order.eline.read: <2,2>
+    mef.sonata.api-target-mapper.inventory.uni.list: <1,1>
+    mef.sonata.api-target-mapper.inventory.eline.list: <1,2>
+    mef.sonata.api-target-mapper.inventory.uni.read: <2,1>
+    mef.sonata.api-target-mapper.inventory.eline.read: <2,2>

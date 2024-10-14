@@ -1,0 +1,40 @@
+---
+kind: kraken.component.api
+apiVersion: v1
+metadata:
+  key: mef.sonata.api.order
+  name: Product Ordering Management
+  labels:
+    mef-api-release: grace
+    order-api-version: v10
+spec:
+  mappings:
+    - uri: https://api.test.consoleconnect.com/
+      trigger:
+        path: /mefApi/sonata/productOrderingManagement/v10/productOrder
+        method: post
+        queryParams:
+          - buyerId
+      actions:
+        - type: Persist
+          enabled: true
+          entityType: productOrder
+          output:
+            - mefRequestBody
+
+        - type: ReWritePath
+          required:
+            - body
+          filters:
+            - id: order_uni
+              if: ${mefRequestBody['productOrderItem'][0]['product']['productConfiguration']['@type'] == 'UNI' && mefRequestBody['productOrderItem'][0]['action'] == 'add'}
+              targetAPIKey: api.target.order.add.port
+            - id: order_e_line
+              if: ${mefRequestBody['productOrderItem'][0]['product']['productConfiguration']['@type'] == 'ACCESS_E_LINE' && mefRequestBody['productOrderItem'][0]['action'] == 'add'}
+              targetAPIKey: api.target.order.add.access_e_line
+
+        - type: Persist
+          entity: productOrder
+
+        - type: ModifyResponse
+          transformerKey: xxx

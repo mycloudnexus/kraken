@@ -1,0 +1,62 @@
+---
+kind: kraken.product
+apiVersion: v1
+metadata:
+  key: mef.sonata
+  name: MEF Sonata API
+  labels:
+    mef-api-release: grace
+  version: 1
+spec:
+  componentPaths:
+    - classpath:/mef-sonata/apis/api.order.yaml
+    - classpath:/mef-sonata/apis/api.address.yaml
+    - classpath:/mef-sonata/apis/api.quote.yaml
+    - classpath:/mef-sonata/apis/api.product.offering.yaml
+    - classpath:/mef-sonata/api-specs/api-spec.order.yaml
+    - classpath:/mef-sonata/api-specs/api-spec.address.yaml
+    - classpath:/mef-sonata/api-specs/api-spec.quote.yaml
+    - classpath:/mef-sonata/api-specs/api-spec.product.offering.yaml
+    - classpath:/mef-sonata/api-targets/api-target.order.uni.add.yaml
+    - classpath:/mef-sonata/api-targets/api-target.order.eline.add.yam
+    - classpath:/mef-sonata/api-targets/api-target.order.uni.add.yaml
+    - classpath:/mef-sonata/api-targets/api-target.order.eline.add.yaml
+    - classpath:/mef-sonata/api-targets/api-target.order.uni.read.yaml
+    - classpath:/mef-sonata/api-targets/api-target.order.eline.read.yaml
+    - classpath:/mef-sonata/api-targets/api-target.order.uni.delete.yaml
+    - classpath:/mef-sonata/api-targets/api-target.order.eline.delete.yaml
+    - classpath:/mef-sonata/api-targets/api-target.quote.eline.add.yaml
+    - classpath:/mef-sonata/api-targets/api-target.quote.eline.add.yaml
+    - classpath:/mef-sonata/api-targets/api-target.quote.uni.add.yaml
+    - classpath:/mef-sonata/api-targets/api-target.quote.uni.read.yaml
+    - classpath:/mef-sonata/api-targets/api-target.quote.eline.read.yaml
+    - classpath:/mef-sonata/api-targets/api-target.address.validate.yaml
+    - classpath:/mef-sonata/api-targets/api-target.address.retrieve.yaml
+    - classpath:/mef-sonata/api-targets/api-target.product.offering.uni.add.yaml
+    - classpath:/mef-sonata/api-targets/api-target.product.offering.eline.add.yaml
+    - classpath:/mef-sonata/api-targets/api-target.product.offering.uni.read.yaml
+    - classpath:/mef-sonata/api-targets/api-target.product.offering.eline.read.yaml
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.order.uni.add.yaml
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.order.eline.add.yam
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.order.uni.add.yaml
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.order.eline.add.yaml
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.order.uni.read.yaml
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.order.eline.read.yaml
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.order.uni.delete.yaml
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.order.eline.delete.yaml
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.eline.add.yaml
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.eline.add.yaml
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.uni.add.yaml
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.uni.read.yaml
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.eline.read.yaml
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.address.validate.yaml
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.address.retrieve.yaml
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.product.offering.uni.add.yaml
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.product.offering.eline.add.yaml
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.product.offering.uni.read.yaml
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.product.offering.eline.read.yaml
+    - classpath:/assets/environments/dev.yaml
+    - classpath:/assets/environments/uat.yaml
+    - classpath:/assets/environments/stage.yaml
+    - classpath:/assets/environments/prod.yaml
+    - classpath:/assets/template-upgrade/release.1.0.1.yaml

@@ -1,0 +1,32 @@
+{
+  "kind": "kraken.product-buyer",
+  "apiVersion": "v1",
+  "metadata": {
+    "id": "b51bc72e-e4f4-4feb-af4f-3851eff0da23",
+    "name": "Buyer",
+    "version": 0,
+    "key": "mef.sonata.buyer1721286208382",
+    "description": "Onboard buyer information",
+    "status": "activated",
+    "labels": {
+      "envId": "0cd3c1ec-e463-48a4-9f07-8c841b7dde2f",
+      "buyerId": "test-202407181600"
+    }
+  },
+  "facets": {
+    "buyerInfo": {
+      "envId": "0cd3c1ec-e463-48a4-9f07-8c841b7dde2f",
+      "buyerId": "test-202407181600"
+    }
+  },
+  "links": [],
+  "id": "b51bc72e-e4f4-4feb-af4f-3851eff0da23",
+  "parentId": "d77a5f52-8456-48ac-9839-68e933523613",
+  "createdAt": "2024-07-18T07:03:28.3986Z",
+  "updatedAt": "2024-07-18T07:03:28.399763Z",
+  "syncMetadata": {
+    "fullPath": "",
+    "syncedSha": "",
+    "syncedAt": "2024-07-18T07:03:28.389715143Z"
+  }
+}

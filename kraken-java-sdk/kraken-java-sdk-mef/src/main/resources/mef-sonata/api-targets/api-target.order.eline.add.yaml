@@ -1,0 +1,33 @@
+
+---
+kind: kraken.component.api-target
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target.order.eline.add
+  name: Order Connection API
+  mapperKey: mef.sonata.api-target-mapper.order.eline.add
+  version: 7
+spec:
+  inputs:
+    - mefQuery
+    - mefRequestBody
+  trigger:
+    path: /mefApi/sonata/productOrderingManagement/v10/productOrder
+    method: post
+    productType: access_e_line
+    actionType: add
+  endpoints:
+    - id: create connection order
+      path: ""
+      method: ""
+      requestBody: "${mefRequestBody.productOrderItem[0].product.productConfiguration.access_e_line}"
+      responseBody: |
+        {
+          "relatedContactInformation": "${T(com.consoleconnect.kraken.operator.gateway.func.SpelFunc).appendSellerInformation(env.seller.role, env.seller.name, env.seller.emailAddress, env.seller.number, mefRequestBody.relatedContactInformation)}",
+          "id": "${entity.id}",
+          "orderDate":"${T(com.consoleconnect.kraken.operator.core.toolkit.DateTime).nowInUTCFormatted()}",
+          "productOrderItem": "${mefRequestBody.productOrderItem}",
+          "state": "@{{state}}",
+         "orderId": "@{{orderId}}",
+         "instanceId": "@{{instanceId}}"
+        }

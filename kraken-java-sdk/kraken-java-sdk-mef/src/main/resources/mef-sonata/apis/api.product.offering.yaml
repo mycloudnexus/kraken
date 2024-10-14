@@ -1,0 +1,258 @@
+---
+kind: kraken.component.api
+apiVersion: v1
+metadata:
+  key: mef.sonata.api.poq
+  name: Product Offering Qualification (POQ) API Management
+  labels:
+    mef-api-release: grace
+    poq-api-version: v7
+  version: 3
+spec:
+  supportedProductTypesAndActions:
+    - path: /mefApi/sonata/productOfferingQualification/v7/productOfferingQualification
+      method: post
+      actionTypes:
+        - add
+      productTypes:
+        - UNI
+        - ACCESS_E_LINE
+    - path: /mefApi/sonata/productOfferingQualification/v7/productOfferingQualification/{id}
+      method: get
+      productTypes:
+        - UNI
+        - ACCESS_E_LINE
+  mappings:
+    - uri: ${env.target.url}
+      trigger:
+        path: /mefApi/sonata/productOfferingQualification/v7/productOfferingQualification
+        method: post
+      metadata:
+        cacheRequestBody: true
+      actions:
+        - id: calculate_poq_order_type_and_action_via_javascript
+          actionType: engine@javascript
+          env:
+            productOfferingQualificationItem: ${body['productOfferingQualificationItem'][0]}
+          with:
+            code: |
+              (jsonStr) => {
+                console.log("input: " + jsonStr);
+                let input = JSON.parse(jsonStr);
+                let targetAPIConfigKey = '';
+                if(input.productOfferingQualificationItem['product']['productConfiguration']['@type'] == 'UNI') {
+                  targetAPIConfigKey = 'mef.sonata.api-target.poq.uni.add';
+                } else if(input.productOfferingQualificationItem['product']['productConfiguration']['@type'] == 'ACCESS_E_LINE') {
+                  targetAPIConfigKey = 'mef.sonata.api-target.poq.eline.add';
+                } else {
+                  targetAPIConfigKey = 'targetKey:notFound';
+                }
+                let ret = {
+                  productOfferingType: input.productOfferingQualificationItem['product']['productConfiguration']['@type'],
+                  targetAPIConfigKey: targetAPIConfigKey
+                };
+                return JSON.stringify(ret);
+              }
+          outputKey: productOfferingQualification
+
+        - id: persist_http_request
+          actionType: buildin@db
+          env:
+            bizType: ${productOfferingQualification.productOfferingType}
+          with:
+            action: create
+            properties:
+              - headers
+              - queryParameters
+              - requestBody
+          preRequest: true
+
+        - id: load-downstream-api-config
+          actionType: buildin@load-target-api-config
+          env:
+            configKey: ${productOfferingQualification.targetAPIConfigKey}
+            mefQuery: ${query}
+            mefRequestBody: ${body}
+            entity: ${entity}
+          with:
+            render: true
+          outputKey: targetApiConfig
+
+        - id: rewrite-path
+          actionType: buildin@rewrite-path
+          env:
+            path: ${targetApiConfig.endpoints[0].path}
+            method: ${targetApiConfig.endpoints[0].method}
+
+        - id: modify-request-body-for-poq-add
+          actionType: buildin@modify-request-body
+          env:
+            code: ${targetApiConfig.endpoints[0].requestBody}
+
+        - id: modify-response-body-for-poq-add
+          actionType: buildin@modify-response-body
+          with:
+            engine: spel
+            successStatus: 201
+          env:
+            code: ${targetApiConfig.endpoints[0].responseBody}
+            inputs: ${targetApiConfig.inputs}
+            mefRequestBody: ${body}
+
+        - actionType: buildin@db
+          with:
+            action: update
+            properties:
+              - responseBody
+              - responseStatusCode
+          preRequest: false
+          postRequest: true
+          order: -4
+
+    - uri: ${env.target.url}
+      trigger:
+        path: /mefApi/sonata/productOfferingQualification/v7/productOfferingQualification/**
+        method: get
+      metadata:
+        cacheRequestBody: false
+      actions:
+        - name: retrieve productOfferingQualification Identifier from path
+          actionType: buildin@pattern
+          env:
+            input: ${path}
+            pattern: /mefApi/sonata/productOfferingQualification/v7/productOfferingQualification/(?<segment>.*)
+
+        - id: read request payload by id
+          actionType: buildin@db
+          env:
+            id: ${segment}
+          with:
+            action: read
+          preRequest: true
+
+        - id: calculate_product_offering_type_read_via_javascript
+          actionType: engine@javascript
+          env:
+            bizType: ${entity.bizType}
+          with:
+            code: |
+              (jsonStr) => {
+                console.log("input: " + jsonStr);
+                let input = JSON.parse(jsonStr);
+                let targetAPIConfigKey = '';
+                if(input.bizType == 'UNI') {
+                  targetAPIConfigKey = 'mef.sonata.api-target.poq.uni.read';
+                } else if(input.bizType == 'ACCESS_E_LINE') {
+                  targetAPIConfigKey = 'mef.sonata.api-target.poq.eline.read';
+                } else {
+                  targetAPIConfigKey = 'notImplemented';
+                }
+                let ret = {
+                  productOfferingType: input.bizType,
+                  targetAPIConfigKey: targetAPIConfigKey
+                };
+                return JSON.stringify(ret);
+              }
+          outputKey: productOfferingQualification
+
+        - id: load-downstream-api-config
+          actionType: buildin@load-target-api-config
+          env:
+            configKey: ${productOfferingQualification.targetAPIConfigKey}
+            mefQuery: ${query}
+            entity: ${entity}
+          with:
+            render: true
+          outputKey: targetApiConfig
+
+        - id: rewrite-path
+          actionType: buildin@rewrite-path
+          env:
+            path: ${targetApiConfig.endpoints[0].path}
+            method: ${targetApiConfig.endpoints[0].method}
+
+        - id: modify-request-body
+          actionType: buildin@modify-request-body
+          env:
+            code: ${targetApiConfig.endpoints[0].requestBody}
+
+        - id: modify-response-body
+          actionType: buildin@modify-response-body
+          with:
+            engine: spel
+          env:
+            code: ${targetApiConfig.endpoints[0].responseBody}
+            inputs: ${targetApiConfig.inputs}
+
+    - trigger:
+        path: /mefApi/sonata/productOfferingQualification/v7/productOfferingQualification/hub
+        method: post
+      metadata:
+        cacheRequestBody: true
+      actions:
+
+        - id: calculate_poq_event_types_via_javascript
+          actionType: engine@javascript
+          env:
+            query: ${body.query}
+          with:
+            code: |
+              (jsonStr) => {
+                console.log("input: " + jsonStr);
+                let input = JSON.parse(jsonStr);
+                let query = input.query;
+                let arr = query.split("=");
+                let eventArr = arr[1].split(",");
+                let ret = {
+                  "eventTypes": eventArr,
+                  "targetAPIConfigKey": "mef.sonata.api-target.hub.add"
+                };
+                return JSON.stringify(ret);
+              }
+          outputKey: event
+        - id: register-poq-event
+          actionType: buildin@register-event
+          env:
+            eventTypes: ${event.eventTypes}
+          with:
+            action: register
+
+        - id: load-downstream-api-config
+          actionType: buildin@load-target-api-config
+          env:
+            configKey: ${event.targetAPIConfigKey}
+            mefRequestBody: ${body}
+            entity: ${entity}
+          with:
+            render: true
+          outputKey: targetApiConfig
+
+        - id: mock-response
+          actionType: buildin@mock-response
+
+        - id: modify-response-body
+          actionType: buildin@modify-response-body
+          with:
+            engine: spel
+          env:
+            code: ${targetApiConfig.endpoints[0].responseBody}
+            inputs: ${targetApiConfig.inputs}
+links:
+  - targetAssetKey: mef.sonata.api-target.poq.eline.add
+    relationship: implementation.target
+  - targetAssetKey: mef.sonata.api-target.poq.eline.read
+    relationship: implementation.target
+  - targetAssetKey: mef.sonata.api-target.poq.uni.add
+    relationship: implementation.target
+  - targetAssetKey: mef.sonata.api-target.poq.uni.read
+    relationship: implementation.target
+  - targetAssetKey: mef.sonata.api-target-mapper.poq.eline.add
+    relationship: implementation.target-mapper
+  - targetAssetKey: mef.sonata.api-target-mapper.poq.eline.read
+    relationship: implementation.target-mapper
+  - targetAssetKey: mef.sonata.api-target-mapper.poq.uni.add
+    relationship: implementation.target-mapper
+  - targetAssetKey: mef.sonata.api-target-mapper.poq.uni.read
+    relationship: implementation.target-mapper
+  - targetAssetKey: mef.sonata.api-spec.product.offering.qualification
+    relationship: implementation.standard.api-spec

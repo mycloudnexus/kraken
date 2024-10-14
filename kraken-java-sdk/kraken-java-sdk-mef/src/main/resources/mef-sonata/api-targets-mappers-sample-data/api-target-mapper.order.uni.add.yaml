@@ -1,0 +1,72 @@
+kind: kraken.component.api-target-mapper
+apiVersion: v1
+metadata:
+  id: e4235ae2-b7de-4ab4-9609-b320947e8f05
+  name: Mapper Of Creating Order Port
+  version: 1
+  key: mef.sonata.api-target-mapper.order.uni.add
+  description: This operation creates a ProductOrder entity
+  labels: {}
+facets:
+  endpoints:
+    - id: create port order
+      path: /api/company/{companyName}/ports/orders
+      method: put
+      mappers:
+        request:
+          - name: mapper.order.uni.add.buyerId
+            title: >-
+              The unique identifier of the organization that is acting as the a
+              Buyer.
+            source: '@{{buyerId}}'
+            target: '@{{companyName}}'
+            description: ''
+            sourceLocation: QUERY
+            targetLocation: PATH
+            requiredMapping: false
+        response:
+          - name: mapper.order.uni.add.state
+            title: Order State
+            source: '@{{responseBody.status}}'
+            target: '@{{state}}'
+            targetType: enum
+            description: ''
+            targetValues:
+              - acknowledged
+              - assessingCancellation
+              - held.assessingCharge
+              - pending.assessingModification
+              - cancelled
+              - pendingCancellation
+              - completed
+              - failed
+              - inProgress
+              - partial
+              - rejected
+            valueMapping:
+              created: acknowledged
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.order.uni.add.orderId
+            title: order Id from seller
+            source: '@{{responseBody.id}}'
+            target: '@{{orderId}}'
+            description: orderId mapping
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.order.uni.add.instanceId
+            title: instance id from seller
+            source: '@{{responseBody.port.id}}'
+            target: '@{{instanceId}}'
+            description: order instanceId mapping
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: false
+      serverKey: ""
+  trigger:
+    path: /mefApi/sonata/productOrderingManagement/v10/productOrder
+    method: post
+    actionType: add
+    productType: uni

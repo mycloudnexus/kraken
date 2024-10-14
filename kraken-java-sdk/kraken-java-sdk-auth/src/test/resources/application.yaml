@@ -1,0 +1,61 @@
+server:
+  port: ${port:8000}
+
+spring:
+  application:
+    name: "@project.artifactId@"
+    description: "@project.name@"
+  build:
+    version: "@project.version@"
+  jackson:
+    default-property-inclusion: NON_NULL
+    deserialization:
+      fail-on-unknown-properties: false
+  data:
+    rest:
+      detection-strategy: ANNOTATED
+  datasource:
+    driverClassName: org.postgresql.Driver
+    #    password: ${DB_PASSWORD}
+    #    url: ${DB_URL}
+    #    username: ${DB_USERNAME}
+    hikari:
+      pool-name: hikari-platform-service-platform
+      connection-test-query: SELECT 1
+      maximum-pool-size: 2
+      max-lifetime: 600000
+      connection-timeout: 60000
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    database: POSTGRESQL
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          time_zone: UTC
+logging:
+  level:
+    com.consoleconnect.kraken: DEBUG
+    org.springframework.security: DEBUG
+app:
+  unified-asset:
+    endpoints:
+      exposure:
+        include: asset
+  security:
+    login:
+      enabled: false
+      hmac-secret: W7YBfqDrZfpsU8ql
+      user-list:
+        - email: admin
+          password: 44ce4b6047338ac3de06da480c5717e89eff7fc30f44e8a3a850c5fb3a3f1876d663df4026bab3c5ee6e89d961ffbe275aa670d453a99c6d584af929b96cfa8d
+          role: ADMIN
+        - email: test
+          password: 44ce4b6047338ac3de06da480c5717e89eff7fc30f44e8a3a850c5fb3a3f1876d663df4026bab3c5ee6e89d961ffbe275aa670d453a99c6d584af929b96cfa8d
+          role: USER
+    resource-server:
+      enabled: false
+    auth-server:
+      enabled: false

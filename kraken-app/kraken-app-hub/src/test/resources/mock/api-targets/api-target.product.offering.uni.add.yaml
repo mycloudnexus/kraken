@@ -1,0 +1,33 @@
+---
+kind: kraken.component.api-target
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target.poq.uni.add
+  name: Product Offering Qualification (POQ) API
+  mapperKey: mef.sonata.api-target-mapper.poq.uni.add
+spec:
+  inputs:
+    - mefQuery
+    - mefRequestBody
+  trigger:
+    path: /mefApi/sonata/productOfferingQualification/v7/productOfferingQualification
+    method: post
+    productType: uni
+    actionType: add
+  endpoints:
+    - id: create a product offering qualification for port
+      path: /api/pricing/calculate
+      method: post
+      requestBody: ${mefRequestBody.productOfferingQualificationItem[0].product.productConfiguration.uni}
+      responseBody: |
+        {
+          "id":  "${entity.id}",
+          "productOfferingQualificationItem": [{
+              "product": "${mefRequestBody.productOfferingQualificationItem[0].product}",
+              "action": "${mefRequestBody.productOfferingQualificationItem[0].action}",
+              "id":"${mefRequestBody.productOfferingQualificationItem[0].id}",
+              "state":"@{{itemState}}"
+           }],
+          "relatedContactInformation": "${T(com.consoleconnect.kraken.operator.gateway.func.SpelFunc).appendSellerInformation(env.seller.role, env.seller.name, env.seller.emailAddress, env.seller.number, mefRequestBody.relatedContactInformation)}",
+          "state": "@{{state}}"
+        }

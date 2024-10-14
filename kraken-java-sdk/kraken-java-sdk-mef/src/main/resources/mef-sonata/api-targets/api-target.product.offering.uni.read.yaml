@@ -1,0 +1,33 @@
+---
+kind: kraken.component.api-target
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target.poq.uni.read
+  name: Product Offering Qualification (POQ) API
+  mapperKey: mef.sonata.api-target-mapper.poq.uni.read
+  version: 1
+spec:
+  inputs:
+    - mefQuery
+    - mefRequestBody
+  trigger:
+    path: /mefApi/sonata/productOfferingQualification/v7/productOfferingQualification/{id}
+    method: get
+    productType: uni
+  endpoints:
+    - id: Retrieves a product offering qualification by id for port
+      path: ""
+      method: ""
+      requestBody: ${entity.request.productOfferingQualificationItem[0].product.productConfiguration.uni}
+      responseBody: |
+        {
+          "id": "${entity.id}",
+          "productOfferingQualificationItem": [{
+              "product": "${entity.request.productOfferingQualificationItem[0].product}",
+              "action": "${entity.request.productOfferingQualificationItem[0].action}",
+              "id":"${entity.request.productOfferingQualificationItem[0].id}",
+              "state":"@{{itemState}}"
+           }],
+          "relatedContactInformation": "${entity.request.relatedContactInformation}",
+          "state": "@{{state}}"
+        }

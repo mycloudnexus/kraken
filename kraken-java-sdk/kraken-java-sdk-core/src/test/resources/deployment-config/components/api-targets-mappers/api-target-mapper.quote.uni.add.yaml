@@ -1,0 +1,105 @@
+---
+kind: kraken.component.api-target-mapper
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target-mapper.quote.uni.add
+spec:
+  trigger:
+    path: /mefApi/sonata/quoteManagement/v8/quote
+    method: post
+    productType: uni
+  endpoints:
+    - id: create quote for port
+      path: /api/pricing/calculate
+      method: post
+      serverKey: mef.sonata.api-target-spec.con1718940696857
+      mappers:
+        request:
+          - name: mapper.order.quote.uni.add.buyerId
+            title: The unique identifier of the organization that is acting as the a Buyer.
+              MUST be specified in the request only when the requester represents more than
+              one Buyer.
+            source: "@{{buyerId}}"
+            target: "@{{companyName}}"
+            replaceStar: true
+            sourceLocation: QUERY
+            targetLocation: PATH
+            customizedField: false
+            requiredMapping: false
+          - title: Title of Property Mapping
+            source: "@{{externalId}}"
+            target: "@{{requestBody.orderId}}"
+            description: description
+            replaceStar: true
+            sourceLocation: QUERY
+            targetLocation: BODY
+            customizedField: true
+            requiredMapping: false
+        response:
+          - name: mapper.quote.uni.add.state
+            title: Quote State Mapping
+            description: quote state mapping
+            source: "answered"
+            sourceLocation: ""
+            target: "@{{quoteItem[*].state}}"
+            targetType: enum
+            targetLocation: BODY
+            requiredMapping: true
+            targetValues:
+              - accepted
+              - acknowledged
+              - answered
+              - approved.orderable
+              - approved.orderableAlternate
+              - inProgress
+              - inProgress.draft
+              - abandoned
+              - rejected
+              - unableToProvide
+            valueMapping:
+              ANSWERED: answered
+              ACCEPTED: accepted
+          - name: mapper.quote.uni.add.price.value
+            title: Quote Price Value Mapping
+            description: quote price mapping
+            source: "@{{responseBody.results[0].price}}"
+            sourceLocation: BODY
+            target: "@{{quoteItem.quoteItemPrice.price.dutyFreeAmount.value}}"
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.quote.uni.add.price.unit
+            title: Quote Price Unit Mapping
+            description: quote price mapping
+            source: "USD"
+            sourceLocation: BODY
+            target: "@{{quoteItem.quoteItemPrice.price.dutyFreeAmount.unit}}"
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.quote.uni.add.duration.amount
+            title: Quote Duration Amount Mapping
+            description: quote duration amount mapping
+            source: ""
+            sourceLocation: BODY
+            target: "@{{quoteItem[*].requestedQuoteItemTerm.duration.amount}}"
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.quote.uni.add.duration.units
+            title: Quote Duration Units Mapping
+            description: quote duration units mapping
+            source: "@{{responseBody.results[0].entity.durationUnit}}"
+            sourceLocation: BODY
+            target: "@{{quoteItem[*].requestedQuoteItemTerm.duration.units}}"
+            targetType: enum
+            targetLocation: BODY
+            requiredMapping: true
+            targetValues:
+              - calendarMonths
+              - calendarDays
+              - calendarHours
+              - calendarMinutes
+              - businessDays
+              - businessHours
+              - businessMinutes
+            valueMapping:
+              y: calendarMonths
+              m: calendarMonths

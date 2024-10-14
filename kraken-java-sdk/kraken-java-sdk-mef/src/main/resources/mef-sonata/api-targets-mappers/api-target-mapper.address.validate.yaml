@@ -1,0 +1,138 @@
+---
+kind: kraken.component.api-target-mapper
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target-mapper.address.validate
+  name: Mapper Of Validating Geographic Address
+  description: This operation creates a GeographicAddressValidation entity
+  version: 6
+spec:
+  trigger:
+    path: /mefApi/sonata/geographicAddressManagement/v7/geographicAddressValidation
+    method: post
+    provideAlternative: false
+    addressType: FieldedAddress
+  endpoints:
+    - id: validate address
+      path: ""
+      method: ""
+      serverKey: ""
+      mappers:
+        request:
+          - name: address.validation.city
+            title: "The city that the address is in"
+            description: ""
+            source: "@{{submittedGeographicAddress.city}}"
+            sourceLocation: BODY
+            requiredMapping: true
+            target: ""
+            targetLocation: ""
+          - name: address.validation.country
+            title: "The country that the address is in"
+            description: ""
+            source: "@{{submittedGeographicAddress.country}}"
+            sourceLocation: BODY
+            requiredMapping: true
+            target: ""
+            targetLocation: ""
+          - name: address.validation.streetName
+            title: "Name of the street or other street type"
+            description: ""
+            source: "@{{submittedGeographicAddress.streetName}}"
+            sourceLocation: BODY
+            requiredMapping: false
+            target: ""
+            targetLocation: ""
+        response:
+          - name: mapper.address.validation.id
+            title: "Unique identifier of the identified alternate Geographic Address"
+            description: ""
+            source: ""
+            sourceLocation: "BODY"
+            target: "@{{alternateGeographicAddress[*].id}}"
+            targetType: string
+            targetLocation: BODY
+            requiredMapping: true
+            replaceStar: false
+          - name: address.validation.country.mapper
+            title: "The country of the identified alternate Geographic Address"
+            description: ""
+            source: ""
+            sourceLocation: "BODY"
+            target: "@{{alternateGeographicAddress[*].country}}"
+            targetType: string
+            targetLocation: BODY
+            requiredMapping: false
+            replaceStar: false
+          - name: address.validation.city.mapper
+            title: "The city of the identified alternate Geographic Address"
+            description: ""
+            source: ""
+            sourceLocation: "BODY"
+            target: "@{{alternateGeographicAddress[*].city}}"
+            targetType: string
+            targetLocation: BODY
+            requiredMapping: false
+            replaceStar: false
+          - name: address.validation.address.mapper
+            title: "The street of the identified alternate Geographic Address"
+            description: ""
+            source: ""
+            sourceLocation: ""
+            target: "@{{alternateGeographicAddress[*].streetName}}"
+            targetType: string
+            targetLocation: BODY
+            requiredMapping: false
+            replaceStar: false
+          - name: address.validation.metroId.mapper
+            title: "The metroId of the identified alternate Geographic Address"
+            description: ""
+            source: ""
+            sourceLocation: ""
+            target: "@{{alternateGeographicAddress[*].metroId}}"
+            targetType: string
+            targetLocation: BODY
+            requiredMapping: false
+            replaceStar: false
+          - name: address.validation.bestMatch.id.mapper
+            title: "Unique identifier of the identified best match Address"
+            requiredMapping: false
+            description: ""
+            source: ""
+            sourceLocation: ""
+            target: "@{{bestMatchGeographicAddress.id}}"
+            targetType: string
+            targetLocation: BODY
+            checkPath: "$.bestMatchGeographicAddress.id"
+            deletePath: "$.bestMatchGeographicAddress"
+            replaceStar: false
+          - name: address.validation.bestMatch.city.mapper
+            title: "The City of the identified best match Address"
+            requiredMapping: false
+            description: ""
+            source: ""
+            sourceLocation: ""
+            target: "@{{bestMatchGeographicAddress.city}}"
+            targetType: string
+            targetLocation: BODY
+            replaceStar: false
+          - name: address.validation.bestMatch.country.mapper
+            title: "The Country of the identified best match Address"
+            requiredMapping: false
+            description: ""
+            source: ""
+            sourceLocation: ""
+            target: "@{{bestMatchGeographicAddress.country}}"
+            targetType: string
+            targetLocation: BODY
+            replaceStar: false
+          - name: address.validation.bestMatch.streetName.mapper
+            title: "The streetName of the identified best match Address"
+            requiredMapping: false
+            description: ""
+            source: ""
+            sourceLocation: ""
+            target: "@{{bestMatchGeographicAddress.streetName}}"
+            targetType: string
+            targetLocation: BODY
+            replaceStar: false

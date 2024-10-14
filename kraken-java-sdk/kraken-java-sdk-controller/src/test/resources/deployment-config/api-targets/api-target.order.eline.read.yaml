@@ -1,0 +1,30 @@
+---
+kind: kraken.component.api-target
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target.order.eline.read
+  name: Order Connection API
+  mapperKey: mef.sonata.api-target-mapper.order.eline.read
+  version: 0
+spec:
+  inputs:
+    - mefQuery
+    - mefRequestBody
+    - entity
+  trigger:
+    path: /mefApi/sonata/productOrderingManagement/v10/productOrder/{id}
+    method: get
+    productType: access_e_line
+  endpoints:
+    - id: retrieve connection detail by id
+      path: ""
+      pathReferId: "mef.sonata.api-target-mapper.order.eline.add#mapper.order.eline.add.orderId"
+      method: ""
+      responseBody: |
+        {
+          "id": "${entity.id}",
+          "relatedContactInformation": "${entity.request.relatedContactInformation}",
+          "productOrderItem": "${entity.request.productOrderItem}",
+          "state": "@{{state}}"
+        }
+  

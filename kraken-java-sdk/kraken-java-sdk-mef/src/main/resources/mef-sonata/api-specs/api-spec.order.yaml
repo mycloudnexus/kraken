@@ -1,0 +1,17 @@
+---
+kind: kraken.component.api-spec
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-spec.order
+  name: Product Ordering Management
+  icon: https://storage.googleapis.com/console-connect-static-assets/krakenUI/order.png
+  labels:
+    mef-api-release: grace
+    order-api-version: v10
+  version: 1
+spec:
+  baseSpec:
+    path: classpath:/mef-sonata/openapi/productOrderManagement.api.yaml
+  customizedSpec:
+    path: classpath:/mef-sonata/openapi/productOrderManagement.api.customized.yaml
+

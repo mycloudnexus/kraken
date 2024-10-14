@@ -1,0 +1,56 @@
+---
+kind: kraken.component.api-target-mapper
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target-mapper.quote.uni.read
+  name: Mapper Of Reading Quote UNI
+  description: This operation retrieves a Quote entity. Attribute selection is enabled for all first level attributes.
+spec:
+  trigger:
+    path: /mefApi/sonata/quoteManagement/v8/quote/{id}
+    method: get
+    productType: uni
+  endpoints:
+    - id: retrieve quote for port
+      path: /api/pricing/calculate
+      method: post
+      serverKey: mef.sonata.api-target-spec.con1718940696857
+      mappers:
+        request:
+        response:
+          - name: mapper.quote.uni.read.state
+            title: Quote State Mapping
+            description: quote state mapping
+            source: "answered"
+            sourceLocation: ""
+            target: "@{{quoteItem.state}}"
+            targetType: enum
+            targetLocation: BODY
+            targetValues:
+              - accepted
+              - acknowledged
+              - answered
+              - approved.orderable
+              - approved.orderableAlternate
+              - cancelled
+              - unableToProvide
+              - declined
+              - expired
+              - inProgress
+              - inProgress.draft
+              - rejected
+            valueMapping: {}
+          - name: mapper.quote.uni.read.price.value
+            title: Quote Price Value Mapping
+            description: quote price value mapping
+            source: "@{{responseBody.results[0].price}}"
+            sourceLocation: BODY
+            target: "@{{quoteItem.quoteItemPrice.price.dutyFreeAmount.value}}"
+            targetLocation: BODY
+          - name: mapper.quote.uni.read.price.unit
+            title: Quote Price Unit Mapping
+            description: quote price unit mapping
+            source: "USD"
+            sourceLocation: BODY
+            target: "@{{quoteItem.quoteItemPrice.price.dutyFreeAmount.unit}}"
+            targetLocation: BODY

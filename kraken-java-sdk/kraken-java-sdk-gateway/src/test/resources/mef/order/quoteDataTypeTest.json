@@ -1,0 +1,23 @@
+{
+  "id": "${entity.id}",
+  "buyerRequestedQuoteLevel": "${buyerRequestedQuoteLevel}",
+  "quoteItem": [{
+    "product": "${quoteItem[0].product}",
+    "requestedQuoteItemTerm": {
+      "duration": {
+        "amount": "@{{quoteItem.requestedQuoteItemTerm.duration.amount}}",
+        "units": "@{{quoteItem[0].requestedQuoteItemTerm.duration.units}}"
+      }
+    },
+    "state": "@{{quoteItem[0].state}}",
+    "quoteItemPrice": {
+      "price": {
+        "dutyFreeAmount": {
+          "unit": "@{{quoteItem.quoteItemPrice.price.dutyFreeAmount.unit}}",
+          "value": "@{{quoteItem.quoteItemPrice.price.dutyFreeAmount.value}}"
+        }
+      }
+    }
+  }],
+  "quoteDate": "${T(com.consoleconnect.kraken.operator.core.toolkit.DateTime).nowInUTCFormatted()}"
+}

@@ -1,0 +1,46 @@
+---
+kind: kraken.component.api
+apiVersion: v1
+metadata:
+  key: mef.sonata.api.order
+  name: Product Ordering Management
+  labels:
+    mef-api-release: grace
+    order-api-version: v10
+spec:
+  apiSpec:
+    key: mef.sonata.api-spec.order
+  mappings:
+    - uri: https://api.test.consoleconnect.com/
+      trigger:
+        path: /mefApi/sonata/productOrderingManagement/v10/productOrder
+        method: post
+        queryParams:
+          - buyerId
+      actions:
+        - required:
+            - body
+          filters:
+            - id: order_uni
+              if: ${body['productOrderItem'][0]['product']['productConfiguration']['@type'] == 'UNI' && body['productOrderItem'][0]['action'] == 'add'}
+              path: /api/company/${query.buyerId}/ports/orders
+              method: put
+              requestBody:
+                transformerKey: component.transformer.order.create.uni.request
+              response:
+                statusCode: 200
+                body:
+                  transformerKey: component.transformer.order.create.uni.response
+            - id: order_e_line
+              if: ${body['productOrderItem'][0]['product']['productConfiguration']['@type'] == 'ACCESS_E_LINE' && body['productOrderItem'][0]['action'] == 'add'}
+              path: /api/v2/company/${query.buyerId}/connections/layer2
+              method: put
+              requestBody:
+                transformerKey: component.transformer.order.create.connection.request
+              response:
+                statusCode: 200
+                body:
+                  transformerKey: component.transformer.order.create.connection.response
+  apiTargetMapping:
+    keys:
+      - api.target.order.add.eLine

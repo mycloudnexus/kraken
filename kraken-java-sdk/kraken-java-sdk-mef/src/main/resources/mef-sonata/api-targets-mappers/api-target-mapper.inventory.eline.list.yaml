@@ -1,0 +1,68 @@
+---
+kind: kraken.component.api-target-mapper
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target-mapper.inventory.eline.list
+  name: Inventory Connection API
+  version: 2
+spec:
+  inputs:
+    - mefQuery
+    - mefRequestBody
+    - entity
+  trigger:
+    path: /mefApi/sonata/productInventory/v7/product
+    method: get
+    productType: access_e_line
+  endpoints:
+    - id: list eline product
+      path: ""
+      method: ""
+      mappers:
+        request:
+          - name: mapper.inventory.eline.list.buyerId
+            title: "The unique identifier of the organization that is acting as the a Buyer. MUST be specified in the request only when the requester represents more than one Buyer."
+            source: "@{{buyerId}}"
+            sourceLocation: "QUERY"
+            target: ""
+            targetType: string
+            targetLocation: ""
+            requiredMapping: false
+        response:
+          - name: mapper.inventory.eline.list.id
+            title: "Unique identifier of the product"
+            source: ""
+            sourceLocation: ""
+            target: "@{{id}}"
+            targetType: string
+            targetLocation: BODY
+            requiredMapping: true
+            checkPath: "$[0].id"
+            deletePath: "$[*]"
+          - name:  mapper.inventory.eline.list.startDate
+            title: "The date from which the product starts"
+            description: ""
+            source: ""
+            sourceLocation: ""
+            target: "@{{startDate}}"
+            targetType: string
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.inventory.eline.list.status
+            title: "Possible values for the status of a MEF product"
+            source: ""
+            sourceLocation: ""
+            target: "@{{[*].status}}"
+            targetType: enum
+            targetLocation: BODY
+            requiredMapping: true
+            targetValues:
+              - active
+              - active.pendingChange
+              - cancelled
+              - pendingActive
+              - pendingTerminate
+              - suspended
+              - suspendedPendingTerminate
+              - terminated
+            valueMappings: {}

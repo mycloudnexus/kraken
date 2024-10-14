@@ -1,0 +1,47 @@
+---
+kind: kraken.component.api-target
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target.quote.uni.add
+  name: Quote Management API
+  mapperKey: mef.sonata.api-target-mapper.quote.uni.add
+  version: 1
+spec:
+  inputs:
+    - mefQuery
+    - mefRequestBody
+    - entity
+  trigger:
+    path: /mefApi/sonata/quoteManagement/v8/quote
+    method: post
+    productType: uni
+    actionType: add
+  endpoints:
+    - id: create quote for port
+      path: ""
+      method: ""
+      requestBody: ${mefRequestBody.quoteItem[0].product.productConfiguration.uni}
+      responseBody: |
+        {
+          "id": "${entity.id}",
+          "buyerRequestedQuoteLevel": "${mefRequestBody.buyerRequestedQuoteLevel}",
+          "relatedContactInformation": "${T(com.consoleconnect.kraken.operator.gateway.func.SpelFunc).appendSellerInformation(env.seller.role, env.seller.name, env.seller.emailAddress, env.seller.number, mefRequestBody.relatedContactInformation)}",
+          "quoteItem": [
+            {
+              "product": "${mefRequestBody.quoteItem[0].product}",
+              "state": "@{{quoteItem[*].state}}",
+              "quoteItemPrice": {
+                "price": {
+                  "dutyFreeAmount": {
+                    "unit": "@{{quoteItem.quoteItemPrice.price.dutyFreeAmount.unit}}",
+                    "value": "@{{quoteItem.quoteItemPrice.price.dutyFreeAmount.value}}"
+                  }
+                }
+              }
+            }
+          ],
+          "quoteDate": "${T(com.consoleconnect.kraken.operator.core.toolkit.DateTime).nowInUTCFormatted()}",
+          "externalId":"${mefRequestBody[externalId]?:''}",
+          "instantSyncQuote":"${mefRequestBody[instantSyncQuote]?:''}",
+          "requestedQuoteCompletionDate": "${mefRequestBody[requestedQuoteCompletionDate]?:''}"
+        }

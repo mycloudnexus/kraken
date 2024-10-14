@@ -1,0 +1,79 @@
+
+---
+kind: kraken.component.api-target-mapper
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target-mapper.order.uni.add
+  name: Mapper Of Creating Order Port
+  description: This operation creates a ProductOrder entity
+spec:
+  trigger:
+    path: /mefApi/sonata/productOrderingManagement/v10/productOrder
+    method: post
+    productType: uni
+    actionType: add
+  endpoints:
+    - id: create port order
+      path: /api/company/{companyName}/ports/orders
+      method: put
+      serverKey: mef.sonata.api-target-spec.con1718940696857
+      mappers:
+        request:
+          - name: mapper.order.uni.add.companyName
+            title: Property mapping
+            source: "@{{buyerId}}"
+            target: "@{{companyName}}"
+            sourceLocation: QUERY
+            targetLocation: PATH
+        response:
+          - name: mapper.order.uni.add.state
+            title: Order State Mapping
+            description: Please map order status between Sonata API and Seller API
+            target:  "@{{state}}"
+            targetType: enum
+            targetLocation: BODY
+            targetValues:
+              - acknowledged
+              - assessingCancellation
+              - held.assessingCharge
+              - pending.assessingModification
+              - cancelled
+              - pendingCancellation
+              - completed
+              - failed
+              - inProgress
+              - partial
+              - rejected
+            valueMapping:
+              progressing: inProgress,
+              created: acknowledged,
+              CREATING: acknowledged,
+              ACTIVATING: inProgress,
+              ACCEPTED: inProgress,
+              MANUAL: inProgress,
+              DELETING: inProgress,
+              DISABLING: inProgress,
+              DENIED: rejected,
+              ERROR: failed,
+              ACTIVE: completed,
+              DISABLED: disabled,
+              CANCELLED: disabled,
+              PENDING: pending,
+              PENDING_ACCEPTANCE: pending,
+              DELETED: completed
+            source: "@{{responseBody.status}}"
+            sourceLocation: BODY
+            requiredMapping: true
+          - name: mapper.order.uni.add.orderId
+            title: Order Id location
+            id: orderId
+            description: Please specify the field that represent the order Id from Seller API response
+            source: ""
+            sourceLocation: ""
+          - name: mapper.order.uni.add.instanceId
+            title: Instance Id location
+            id: instanceId
+            description: Please specify the field that represent the instance Id from Seller API response
+            source: ""
+            sourceLocation: ""
+

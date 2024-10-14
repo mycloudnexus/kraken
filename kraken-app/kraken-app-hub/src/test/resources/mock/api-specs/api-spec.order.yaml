@@ -1,0 +1,32 @@
+---
+kind: kraken.component.api-spec
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-spec.order
+  name: Product Ordering Management
+  icon: https://storage.googleapis.com/console-connect-static-assets/krakenUI/order.png
+  labels:
+    mef-api-release: grace
+    order-api-version: v10
+  version: 1
+spec:
+  baseSpec:
+    path: classpath:/mock/openapi/productOrderManagement.api.yaml
+  customizedSpec:
+    path: classpath:/mock/openapi/productOrderManagement.api.customized.yaml
+links:
+  - targetAssetKey: mef.sonata.api.order
+    relationship: implementation.workflow
+  - targetAssetKey: mef.sonata.api-target.order.eline.add
+    relationship: implementation.target
+  - targetAssetKey: mef.sonata.api-target.order.eline.delete
+    relationship: implementation.target
+  - targetAssetKey: mef.sonata.api-target.order.eline.read
+    relationship: implementation.target
+  - targetAssetKey: mef.sonata.api-target.order.uni.delete
+    relationship: implementation.target
+  - targetAssetKey: mef.sonata.api-target.order.uni.read
+    relationship: implementation.target
+  - targetAssetKey: mef.sonata.api-target.order.uni.add
+    relationship: implementation.target
+

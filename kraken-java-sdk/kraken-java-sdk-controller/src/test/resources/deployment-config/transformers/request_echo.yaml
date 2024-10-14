@@ -1,0 +1,10 @@
+---
+kind: kraken.component.transformer
+version: v1
+metadata:
+  key: component.transformer.request.echo
+  name: echo
+spec:
+  script:
+    path: classpath:deployment-config/components/js/request_echo.js
+    engine: javascript

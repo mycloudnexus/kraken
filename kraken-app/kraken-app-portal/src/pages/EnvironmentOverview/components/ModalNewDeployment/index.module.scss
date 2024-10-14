@@ -1,0 +1,38 @@
+.title {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px !important;
+  margin-top: 10px;
+  gap: 8px;
+  &:before {
+    content: "";
+    display: block;
+    width: 4px;
+    height: 14px;
+    border-radius: 80px;
+    background-color: #096dd9;
+  }
+}
+.collapse {
+  &:global(> .ant-collapse-item) {
+    &:global(> .ant-collapse-header) {
+      padding-left: 0;
+    }
+    &:global(> .ant-collapse-content) {
+      &:global(> .ant-collapse-content-box) {
+        padding-left: 18px;
+        padding-block: 0;
+      }
+    }
+  }
+}
+.verticalRadio {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.formContainer{
+  :global(.ant-form-item){
+margin-bottom: 10px;
+  }
+}

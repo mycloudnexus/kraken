@@ -1,0 +1,4 @@
+app:
+  security:
+    resource-server:
+      enabled: false

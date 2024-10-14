@@ -1,0 +1,28 @@
+---
+kind: kraken.component.api-target
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target.address.validate
+  name: Geographic Address Management
+spec:
+  inputs:
+    - mefQuery
+    - mefRequestBody
+    - entity
+  endpoints:
+    - id: validate address
+      path:  /v2/data-center-facility/search
+      method: get
+      responseBody: |
+        {
+          "validationResult": "partial",
+          "alternateGeographicAddress": "${responseBody.![{
+                         id: id,
+                         '@type': 'FieldedAddress',
+                         country: company.addresses[0].country,
+                         city: company.addresses[0].city,
+                         streetName: company.addresses[0].address
+                      }]}",
+          "provideAlternative": "${mefRequestBody.provideAlternative}",
+          "submittedGeographicAddress": "${mefRequestBody.submittedGeographicAddress}"
+        }

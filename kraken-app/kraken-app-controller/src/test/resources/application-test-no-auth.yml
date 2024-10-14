@@ -1,0 +1,8 @@
+app:
+  security:
+    login:
+      enabled: false
+    auth-server:
+      enabled: false
+    resource-server:
+      enabled: false

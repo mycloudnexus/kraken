@@ -1,0 +1,30 @@
+---
+kind: kraken.component.api-target
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target-mapper.quote.notification.state.change
+  name: Quote Notification API
+  version: 2
+spec:
+  inputs:
+    - mefQuery
+    - mefRequestBody
+    - entity
+  trigger:
+    path: /mefApi/sonata/quoteNotification/v8/listener/quoteStateChangeEvent
+    method: post
+  endpoints:
+    - id: notify quote state change
+      mappers:
+        serverKey: NONE
+        path: NONE
+        method: NONE
+        request:
+          - name: order_id
+            title: order id
+            description: Please specify the field that represent the order Id from Seller API request
+            source: ""
+            function: "@spelFunc.renderId(source)"
+            sourceLocation: ""
+            targetLocation: "BODY"
+            target: "@{{event.id}}"

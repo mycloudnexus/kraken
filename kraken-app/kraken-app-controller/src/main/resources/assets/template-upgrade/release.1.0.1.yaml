@@ -1,0 +1,13 @@
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.1.0.1
+  name: V1.0.1
+  labels:
+    release-version: V1.0.1
+    release-date: 2024-08-12
+  description: |
+    Update mapper order uni read
+    Add mapper matrix
+  version: 2

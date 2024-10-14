@@ -1,0 +1,39 @@
+---
+kind: kraken.component.api-target
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target.order.uni.add
+  name: Order Port API
+spec:
+  inputs:
+    - mefQuery
+    - mefRequestBody
+    - entity
+    - stateMapping: |
+        {
+          "created": "acknowledged",
+          "error": "failed",
+          "pending": "pending",
+          "done": "completed",
+          "allocated": "inProgress",
+          "loa_sent": "inProgress",
+          "processing": "inProgress"
+        }
+  endpoints:
+    - id: create order
+      path: /anything?buyerId=${mefQuery.buyerId}
+      method: put
+      requestBody: |
+        {
+          "portName": "${mefRequestBody.productOrderItem[0].requestedItemTerm.name}",
+          "dataCenterFacility": "${mefRequestBody.productOrderItem[0].product.place[0].id}",
+          "durationUnit": "${mefRequestBody.productOrderItem[0].requestedItemTerm.duration.units == 'calendarMonths'&&mefRequestBody.productOrderItem[0].requestedItemTerm.duration.amount == 12 ? 'y':'m' }",
+          "speed": "${mefRequestBody.productOrderItem[0].product.productConfiguration.uni.bandwidth}",
+          "paymentType": "${mefRequestBody.productOrderItem[0].product.productConfiguration.uni.paymentType}",
+          "bundleCrossConnect": "${mefRequestBody.productOrderItem[0].product.productConfiguration.uni.bundleCrossConnect}"
+        }
+      responseBody:
+        id: ${entity.id}
+        relatedContactInformation: ${mefRequestBody.relatedContactInformation}
+        productOrderItem: ${mefRequestBody.productOrderItem}
+        state: ${responseBody.status}
