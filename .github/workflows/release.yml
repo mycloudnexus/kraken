@@ -33,13 +33,13 @@ jobs:
           echo $RELEASE_VERSION
           echo ${{ steps.vars.outputs.release-version }}
 
-      - name: Build kraken-app-mgmt container
+      - name: Build kraken-app-controller container
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./docker/app-mgmt/Dockerfile
+          file: ./docker/app-controller/Dockerfile
           push: true
-          tags: "cloudnexusopsdockerhub/kraken-app-mgmt:${{ steps.vars.outputs.release-version }}"
+          tags: "cloudnexusopsdockerhub/kraken-app-controller:${{ steps.vars.outputs.release-version }}"
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
