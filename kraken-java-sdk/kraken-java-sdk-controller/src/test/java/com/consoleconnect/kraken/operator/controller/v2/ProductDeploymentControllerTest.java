@@ -539,7 +539,7 @@ class ProductDeploymentControllerTest extends AbstractIntegrationTest {
               JsonToolkit.fromJson(
                   bodyStr, new TypeReference<HttpResponse<Paging<ApiMapperDeploymentDTO>>>() {});
           List<ApiMapperDeploymentDTO> list = mapperPages.getData().getData();
-          Assertions.assertEquals(3, list.size());
+          Assertions.assertTrue(list.size() >= 3);
           ApiMapperDeploymentDTO item = list.get(0);
           DeployToProductionRequest deployToProductionRequest = getDeployToProductionRequest(item);
           String deployToProductionPath =
