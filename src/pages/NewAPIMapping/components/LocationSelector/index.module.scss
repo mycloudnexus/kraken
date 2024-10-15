@@ -1,0 +1,23 @@
+.locationSelector {
+  padding: 0;
+  width: fit-content;
+  height: fit-content;
+
+  .ant-btn-icon svg {
+    width: 14px;
+  }
+
+  :global {
+    .ant-select-selector {
+      padding: 0 !important;
+    }
+  }
+}
+
+.selectOptionDivider {
+  padding: 4px 12px !important;
+
+  .optionDivider {
+    margin: 0;
+  }
+}

@@ -1,6 +1,7 @@
 .root {
   border: 1px solid #dde1e5;
   border-radius: 4px;
+
   svg {
     width: 28px;
   }
@@ -15,15 +16,16 @@
 
 .container {
   padding: 12px;
+
   svg {
     width: 28px;
   }
 }
 
 .sellerPropItemWrapper {
-  width: calc(50% - 22px);
   background: #f2f3f5;
   cursor: pointer;
+
   input {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -65,4 +67,13 @@
 
 .selectPopup {
   visibility: hidden;
+}
+
+.flexColumn {
+  flex-direction: column;
+  flex: 1;
+}
+
+.mappingIcon {
+  margin-bottom: 4px;
 }

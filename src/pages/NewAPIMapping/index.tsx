@@ -35,7 +35,7 @@ import { queryClient } from "@/utils/helpers/reactQuery";
 import styles from "./index.module.scss";
 import buildInitListMapping from "@/utils/helpers/buildInitListMapping";
 import { useMappingUiStore } from "@/stores/mappingUi.store";
-import Text from "@/components/Text";
+import { Text } from "@/components/Text";
 import SonataResponseMapping from "./components/SonataResponseMapping";
 import DeployHistory from "./components/DeployHistory";
 import DeployStage from "@/components/DeployStage";
@@ -384,14 +384,8 @@ const NewAPIMapping = ({
         mappers: {
           request: newRequest.map((rm) => ({
             ...rm,
-            target: get(rm, "target", "")
-              ?.replace?.("path.", "")
-              .replace?.("query.", "")
-              .replace?.("hybrid.", ""),
-            source: get(rm, "source", "")
-              ?.replace?.("path.", "")
-              .replace?.("query.", "")
-              .replace?.("hybrid.", ""),
+            target: get(rm, "target", ""),
+            source: get(rm, "source", ""),
             targetLocation:
               isEmpty(rm?.target) && rm?.targetLocation === "HYBRID"
                 ? ""

@@ -1,21 +1,21 @@
 import { IRequestMapping } from "@/utils/types/component.type";
 import styles from "./index.module.scss";
-import { Button, Flex, Input, Select, Tooltip } from "antd";
+import { Button, Flex, Input, Select } from "antd";
 import Text from "@/components/Text";
 import MappingIcon from "@/assets/newAPIMapping/mapping-icon.svg";
 import clsx from "clsx";
-import { cloneDeep, difference, get, isEmpty, isEqual, set } from "lodash";
+import { cloneDeep, difference, get, isEmpty, set } from "lodash";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
-import { EnumRightType } from "@/utils/types/common.type";
 import {
   CheckOutlined,
   CloseOutlined,
   DeleteOutlined,
   EditOutlined,
-  RightOutlined,
 } from "@ant-design/icons";
 import { useBoolean } from "usehooks-ts";
 import { useEffect, useState } from "react";
+import { TargetInput } from "./TargetInput";
+import { SourceInput } from "./SourceInput";
 
 type Props = {
   item: IRequestMapping;
@@ -25,11 +25,7 @@ type Props = {
 const RequestItem = ({ item, index }: Props) => {
   const {
     requestMapping,
-    setRightSide,
-    setRightSideInfo,
     setRequestMapping,
-    rightSideInfo,
-    rightSide,
     listMappingStateRequest: listMapping,
     setListMappingStateRequest,
   } = useNewApiMappingStore();
@@ -60,7 +56,7 @@ const RequestItem = ({ item, index }: Props) => {
     if (!descriptionInput) {
       setDescriptionInput(item.description);
     }
-  }, [item.title]);
+  }, [item.title, descriptionInput, setTitleInput, setDescriptionInput, titleInput, item.description]);
 
   const onChangeDescription = () => {
     const newRequest = cloneDeep(requestMapping);
@@ -197,101 +193,16 @@ const RequestItem = ({ item, index }: Props) => {
           </Flex>
         )}
       </Flex>
-      <Flex className={styles.container} gap={8} wrap="wrap">
-        <Tooltip title={item.source}>
-          <Input
-            variant="filled"
-            disabled={!item.customizedField}
-            placeholder="Select or input property"
-            className={clsx(styles.requestMappingItemWrapper, {
-              [styles.active]:
-                rightSide === EnumRightType.AddSonataProp &&
-                isEqual(item, rightSideInfo?.previousData),
-            })}
-            value={item.source}
-            style={{ width: "calc(50% - 22px)" }}
-            onClick={() => {
-              if (item.requiredMapping) {
-                return;
-              }
-              setRightSide(EnumRightType.AddSonataProp);
-              setRightSideInfo({
-                method: "update",
-                title: item.title,
-                previousData: item,
-              });
-            }}
-            onChange={(e) => {
-              const newValue = get(e, "target.value", "")
-                .replace?.("@{{", "")
-                .replace?.("}}", "");
-              let sourceLocation = get(item, "sourceLocation", "");
-              if (newValue.includes(".")) {
-                const splited = newValue.split(".");
-                const pathValue = get(splited, "[0]", "").toLocaleUpperCase();
-                sourceLocation =
-                  pathValue === "REQUESTBODY" ? "BODY" : pathValue;
-              }
-              const newRequest = cloneDeep(requestMapping);
-              set(newRequest, `[${index}].source`, get(e, "target.value", ""));
-              set(newRequest, `[${index}].sourceLocation`, sourceLocation);
-              setRequestMapping(newRequest);
-            }}
-          />
-        </Tooltip>
-        <MappingIcon />
-        <Tooltip title={item.target}>
-          <Input
-            id={JSON.stringify(item)}
-            variant="filled"
-            style={{ width: "calc(50% - 30px)" }}
-            className={clsx(styles.sellerPropItemWrapper, {
-              [styles.active]:
-                rightSide === EnumRightType.AddSellerProp &&
-                isEqual(item, rightSideInfo?.previousData),
-            })}
-            onClick={() => {
-              setRightSide(EnumRightType.AddSellerProp);
-              setRightSideInfo({
-                method: "update",
-                previousData: item,
-                title: item.title,
-              });
-            }}
-            value={item.target}
-            placeholder="Select or input property"
-            suffix={
-              <RightOutlined style={{ fontSize: 12, color: "#C9CDD4" }} />
-            }
-            onChange={(e) => {
-              if (e.target?.value?.startsWith("hybrid.")) {
-                const newRequest = cloneDeep(requestMapping);
-                set(
-                  newRequest,
-                  `[${index}].target`,
-                  get(e, "target.value", "")
-                );
-                set(newRequest, `[${index}].targetLocation`, "HYBRID");
-                setRequestMapping(newRequest);
-                return;
-              }
-              const newValue = get(e, "target.value", "")
-                .replace?.("@{{", "")
-                .replace?.("}}", "");
-              let targetLocation = get(item, "targetLocation", "");
-              if (newValue.includes(".")) {
-                const splited = newValue.split(".");
-                const pathValue = get(splited, "[0]", "").toLocaleUpperCase();
-                targetLocation =
-                  pathValue === "REQUESTBODY" ? "BODY" : pathValue;
-              }
-              const newRequest = cloneDeep(requestMapping);
-              set(newRequest, `[${index}].target`, get(e, "target.value", ""));
-              set(newRequest, `[${index}].targetLocation`, targetLocation);
-              setRequestMapping(newRequest);
-            }}
-          />
-        </Tooltip>
+      <Flex className={styles.container} gap={14} wrap="wrap" align="flex-end">
+        {/* Source property mapping */}
+        <SourceInput item={item} index={index} />
+
+        <span className={styles.mappingIcon}>
+          <MappingIcon />
+        </span>
+
+        {/* Target property mapping */}
+        <TargetInput item={item} index={index} />
       </Flex>
       {!isEmpty(item?.sourceValues) && (
         <Flex vertical gap={20} style={{ marginTop: 8, width: "100%" }}>

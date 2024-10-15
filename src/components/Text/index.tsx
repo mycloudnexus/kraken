@@ -1,8 +1,8 @@
-import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
+import type { CSSProperties, HTMLAttributes, PropsWithChildren, ReactNode } from "react";
 interface Props extends HTMLAttributes<HTMLElement> {
   children?: ReactNode;
-  size?: string;
-  bold?: string;
+  size?: string | number;
+  bold?: string | number;
   color?: string;
   style?: CSSProperties;
   className?: string;
@@ -243,6 +243,24 @@ const BoldTiny = ({ children, color, style, className, ...props }: Props) => {
   );
 };
 
+const secondaryText = (variant: 'bold' | 'medium' | 'light') =>
+  (size: 'large' | 'normal' | 'small') =>
+    ({ children, ...props }: Readonly<PropsWithChildren<Props>>) => {
+      const fontWeight = variant === 'bold' ? 700 : variant === 'medium' ? 500 : 400
+      const fontSize = size === 'large' ? 16 : size === 'normal' ? 14 : 10
+
+      return (
+        <Custom
+          {...props}
+          size={fontSize}
+          bold={fontWeight}
+          color="#00000073"
+        >
+          {children}
+        </Custom>
+      )
+    }
+
 export const Text = {
   Custom,
   LightSmall,
@@ -258,5 +276,17 @@ export const Text = {
   NormalTiny,
   BoldTiny,
 };
+
+export const SecondaryText = {
+  Large: secondaryText('medium')('large'),
+  Normal: secondaryText('medium')('normal'),
+  Small: secondaryText('medium')('small'),
+  BoldLarge: secondaryText('bold')('small'),
+  BoldNormal: secondaryText('bold')('small'),
+  BoldSmall: secondaryText('bold')('small'),
+  LightLarge: secondaryText('light')('small'),
+  LightNormal: secondaryText('light')('small'),
+  LightSmall: secondaryText('light')('small'),
+}
 
 export default Text;

@@ -1,6 +1,7 @@
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { Button, Flex } from "antd";
 import RequestItem from "../RequestItem";
+import { IRequestMapping } from "@/utils/types/component.type";
 
 const RequestMapping = () => {
   const { requestMapping, setRequestMapping } = useNewApiMappingStore();
@@ -16,7 +17,7 @@ const RequestMapping = () => {
   };
   return (
     <Flex vertical gap={26}>
-      {requestMapping.map((it, index: number) => (
+      {requestMapping.map((it: IRequestMapping, index: number) => (
         <RequestItem item={it} index={index} />
       ))}
       <Button

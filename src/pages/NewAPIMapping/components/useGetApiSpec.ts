@@ -4,7 +4,6 @@ import {
   useGetComponentListV2,
 } from "@/hooks/product";
 import { extractOpenApiStrings } from "@/utils/helpers/schema";
-import transformTarget from "@/utils/helpers/transformTarget";
 import { decode } from "js-base64";
 import jsYaml from "js-yaml";
 import { useMemo, useCallback } from "react";
@@ -63,7 +62,6 @@ const useGetApiSpec = (currentProduct: string, targetMapperKey: string) => {
   const resetMapping = useCallback(() => {
     return mappers?.request?.map((rm: any) => ({
       ...rm,
-      target: transformTarget(rm.target, rm.targetLocation),
     }));
   }, [mappers?.request]);
 
