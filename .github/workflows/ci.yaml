@@ -1,5 +1,5 @@
 ---
-name: ci-unit-test
+name: ci
 on:
   push:
     branches:
