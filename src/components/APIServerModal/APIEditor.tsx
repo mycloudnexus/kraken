@@ -1,3 +1,8 @@
+import TitleIcon from "@/assets/title-icon.svg";
+import { useGetProductEnvs } from "@/hooks/product";
+import { useAppStore } from "@/stores/app.store";
+import { isURL } from "@/utils/helpers/url";
+import { PaperClipOutlined, UploadOutlined } from "@ant-design/icons";
 import {
   Button,
   Checkbox,
@@ -9,9 +14,8 @@ import {
   Upload,
   notification,
 } from "antd";
-import Text from "../Text";
-import { PaperClipOutlined, UploadOutlined } from "@ant-design/icons";
-import Flex from "../Flex";
+import { decode } from "js-base64";
+import jsYaml from "js-yaml";
 import {
   cloneDeep,
   get,
@@ -21,15 +25,11 @@ import {
   pickBy,
   set,
 } from "lodash";
-import { isURL } from "@/utils/helpers/url";
 import { Fragment, useEffect, useState } from "react";
-import { decode } from "js-base64";
-import jsYaml from "js-yaml";
-import { useAppStore } from "@/stores/app.store";
-import TitleIcon from "@/assets/title-icon.svg";
 import { useNavigate } from "react-router-dom";
+import Flex from "../Flex";
 import RequestMethod from "../Method";
-import { useGetProductEnvs } from "@/hooks/product";
+import Text from "../Text";
 import styles from "./index.module.scss";
 
 type Props = {
@@ -68,7 +68,7 @@ const APIEditor = ({
         swaggerData = jsYaml.load(fileDecode);
       }
       const environments = get(detail, "facets.environments");
-      let newEnv = {};
+      const newEnv = {};
       const keys = Object.keys(environments);
 
       for (const key of keys) {

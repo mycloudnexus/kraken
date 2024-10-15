@@ -7,9 +7,15 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint:fix": "eslint --fix  ./**/*.{tsx,ts,js}",
+    "prepare": "husky",
+    "prettier:fix": "prettier --write \"**/(*.{tsx,ts,css,cjs,mjs,json})\"",
     "preview": "vite preview",
     "test": "vitest",
     "test:coverage": "vitest --coverage"
+  },
+  "lint-staged": {
+    "**/*.{js,ts,tsx,mts,cjs,md,css,scss,json}": "prettier --write"
   },
   "dependencies": {
     "@ant-design/icons": "^5.3.7",
@@ -17,7 +23,6 @@
     "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
     "@esbuild-plugins/node-modules-polyfill": "^0.2.2",
     "@tanstack/react-query": "^5.40.0",
-    "@types/node": "^20.14.0",
     "antd": "5.17.4",
     "axios": "^1.7.4",
     "axios-auth-refresh": "^3.3.6",
@@ -42,31 +47,32 @@
   "devDependencies": {
     "@testing-library/jest-dom": "^6.4.5",
     "@testing-library/react": "^16.0.0",
+    "@trivago/prettier-plugin-sort-imports": "4.2.1",
     "@types/dompurify": "^3.0.5",
     "@types/js-yaml": "^4.0.9",
     "@types/lodash": "^4.17.4",
+    "@types/node": "^22.7.5",
     "@types/qs": "^6.9.15",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
     "@typescript-eslint/eslint-plugin": "^7.2.0",
     "@typescript-eslint/parser": "^7.2.0",
-    "@vitejs/plugin-react": "^4.2.1",
+    "@vitejs/plugin-react-swc": "^3.7.1",
     "@vitest/coverage-v8": "^1.6.0",
     "@vitest/ui": "^1.6.0",
     "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.6",
+    "husky": "^9.1.6",
     "jsdom": "^24.1.0",
+    "lint-staged": "^15.2.10",
+    "prettier": "^3.2.5",
     "sass": "^1.77.4",
     "typescript": "^5.2.2",
     "vite": "5.3.6",
     "vite-plugin-svgr": "^4.2.0",
     "vitest": "^1.6.0"
-  },
-  "overrides": {
-    "ws": "8.17.1",
-    "vite": "5.3.6",
-    "rollup": "4.22.4",
-    "cookie": "0.7.0"
   }
 }

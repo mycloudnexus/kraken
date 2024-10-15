@@ -1,3 +1,4 @@
+import BreadCrumb from "@/components/Breadcrumb";
 import {
   useCreateNewComponent,
   useEditComponent,
@@ -6,19 +7,18 @@ import {
 } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
 import { COMPONENT_KIND_API_TARGET_SPEC } from "@/utils/constants/product";
+import { transformApiData } from "@/utils/helpers/swagger";
 import { Flex, Form, Spin, notification } from "antd";
+import { decode } from "js-base64";
+import jsYaml from "js-yaml";
 import { get, isEmpty, set } from "lodash";
+import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import AddEnv from "./components/AddEnv";
 import BtnStep from "./components/BtnStep";
 import SelectAPIServer from "./components/SelectAPIServer";
-import styles from "./index.module.scss";
 import UploadYaml from "./components/UploadYaml";
-import { useEffect } from "react";
-import { decode } from "js-base64";
-import jsYaml from "js-yaml";
-import { transformApiData } from "@/utils/helpers/swagger";
-import BreadCrumb from "@/components/Breadcrumb";
+import styles from "./index.module.scss";
 
 const NewAPIServer = () => {
   const { componentId } = useParams();
@@ -129,7 +129,7 @@ const NewAPIServer = () => {
         swaggerData = jsYaml.load(fileDecode);
       }
       const environments = get(componentDetail, "facets.environments");
-      let newEnv = {};
+      const newEnv = {};
       const keys = Object.keys(environments);
 
       for (const key of keys) {
@@ -187,13 +187,13 @@ const NewAPIServer = () => {
               }}
             >
               <BreadCrumb
-                mainUrl={`/component/${id}/list`}
                 lastItem={
                   isEmpty(componentId) ? "Create API server" : "Edit API server"
                 }
+                mainUrl={`/component/${id}/list`}
               />
               <div className={styles.paper} style={{ flex: 1, marginTop: 8 }}>
-                <div style={{ maxWidth: "60%", minWidth: 600 }}>
+                <div id="12" style={{ maxWidth: "60%", minWidth: 600 }}>
                   <SelectAPIServer />
                   <AddEnv form={form} env={env} />
                   <UploadYaml form={form} />

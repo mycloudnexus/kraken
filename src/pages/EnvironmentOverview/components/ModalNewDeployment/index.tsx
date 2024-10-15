@@ -3,11 +3,9 @@ import {
   useDeployProduct,
   useGetProductComponentVersions,
 } from "@/hooks/product";
-import type { IComponentVersion } from "@/utils/types/component.type";
 import { useAppStore } from "@/stores/app.store";
-
+import type { IComponentVersion } from "@/utils/types/component.type";
 import { Select, Modal, notification, Form, Tag, Spin } from "antd";
-
 import { useCallback, useEffect } from "react";
 import styles from "./index.module.scss";
 
@@ -140,7 +138,7 @@ const ModalNewDeployment = ({
             name="versions"
             rules={[
               {
-                validator: async (_aa) => {
+                validator: async () => {
                   const { versions } = form.getFieldsValue();
                   const haveVersion = versions.some((v: any) => v);
                   if (!haveVersion) {
