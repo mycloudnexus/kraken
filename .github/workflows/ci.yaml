@@ -80,7 +80,7 @@ jobs:
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       
-      - uses: anchore/scan-action/download-grype@v3
+      - uses: anchore/scan-action/download-grype@v4
         id: grype
 
       - name: code scan
