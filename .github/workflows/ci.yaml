@@ -1,0 +1,115 @@
+---
+name: ci-unit-test
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  vulnerability-scan:
+    name: vulnerability-scan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      statuses: read
+      checks: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+      - uses: anchore/scan-action/download-grype@v4
+        id: grype
+
+      - name: code scan
+        run: ${{steps.grype.outputs.cmd}} -v -o json --file output.json --fail-on high --only-fixed dir:.
+
+      - name: Output results to markdown table as a comment on the PR
+        if: (success() || failure()) && github.event_name == 'pull_request'
+        run: |
+          echo '### Library Vulnerability scan results' > table.txt
+          echo -e 'The following vulnerabilities have been found in libraries included in the repository (some might be dependencies of dependencies).\n' >> table.txt
+          echo -e 'Critical and High severity vulnerabilities **must** be fixed before the PR can be merged, even if they are dependencies of dependencies.\n' >> table.txt
+
+          jq -r '.matches[] |  [.artifact.name, .artifact.version, .vulnerability.severity, .vulnerability.fix.versions[0], .vulnerability.id, .vulnerability.dataSource] | @tsv' output.json | awk -v FS="\t" 'BEGIN{print "| Library | Vulnerable version | Severity | Fix version | Vulnerability ID |";print "| ------------ | ------------ | ------------ | ------------ | ------------ |"}{printf "| %s | %s | %s | %s | [%s](%s) |%s",$1,$2,$3,$4,$5,$6,ORS}' >> table.txt
+          sed -ie 's/Critical/**Critical** :red_circle:/g' table.txt
+          sed -ie 's/High/**High** :yellow_circle:/g' table.txt
+
+          cat table.txt
+
+          PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+
+          gh pr comment $PR_NUMBER -F table.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  java-unit-test:
+    name: java-unit-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'zulu' # Alternative distribution options are available.
+
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
+      - name: Build and analyze SDK
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+        run: |
+            mvn -B verify
+
+  nodejs-unit-test:
+    name: nodejs-unit-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20.12
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Get npm cache directory
+        id: npm-cache-dir
+        shell: bash
+        working-directory: ./kraken-app/kraken-app-portal
+        run: echo "dir=$(npm config get cache)" >> "${GITHUB_OUTPUT}"
+
+      - uses: actions/cache@v3
+        id: npm-cache  # use this to check for `cache-hit` ==> if: steps.npm-cache.outputs.cache-hit != 'true'
+        with:
+          path: ${{ steps.npm-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - uses: browser-actions/setup-chrome@latest
+
+
+      # Skip post-install scripts here, as a malicious
+      # script could steal NODE_AUTH_TOKEN.
+      - run: npm ci --ignore-scripts --legacy-peer-deps
+        working-directory: ./kraken-app/kraken-app-portal
+
+      - run: npm run build --if-present
+        working-directory: ./kraken-app/kraken-app-portal
+
+      # some repos don't have unit test now, need to add in future.
+      - run: CHROME_BIN=$(which chrome) npm run test:coverage -- -u
+        working-directory: ./kraken-app/kraken-app-portal
