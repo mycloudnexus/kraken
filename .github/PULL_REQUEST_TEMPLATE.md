@@ -32,6 +32,7 @@
 - [ ] New feature (non-breaking change which adds functionality)
 - [ ] Breaking change (fix or feature that would cause existing functionality to change)
 - [ ] Refactoring or add test (improvements in base code or adds test coverage to functionality)
+- [ ] CI/CD or documentation update (changes to CI/CD pipeline or documentation)
 
 ## Checklist
 
