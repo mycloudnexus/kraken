@@ -1,5 +1,5 @@
 ---
-name: lint-pr-title
+name: lint-pull-request
 on:
   pull_request:
     types: [opened, synchronize, reopened]
@@ -29,6 +29,7 @@ jobs:
             sdk
             api
             portal
+            ci-cd
             misc
           # Configure that a scope must always be provided.
           requireScope: true
