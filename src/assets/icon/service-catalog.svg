@@ -1,0 +1,26 @@
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path
+    d="M14.3333 9V4.66667C14.3333 4.29847 14.0349 4 13.6667 4H7.99999L6.33332 2H2.33332C1.96513 2 1.66666 2.29848 1.66666 2.66667V13.3333C1.66666 13.7015 1.96513 14 2.33332 14H6.99999"
+    stroke="black" strokeOpacity="0.85" strokeWidth="1.2" strokeLinecap="round"
+    strokeLinejoin="round" />
+  <path
+    d="M11.6667 14.3327C12.4031 14.3327 13 13.7357 13 12.9993C13 12.263 12.4031 11.666 11.6667 11.666C10.9303 11.666 10.3333 12.263 10.3333 12.9993C10.3333 13.7357 10.9303 14.3327 11.6667 14.3327Z"
+    stroke="black" strokeOpacity="0.85" strokeWidth="1.2" />
+  <path d="M11.6667 10.666V11.666" stroke="black" strokeOpacity="0.85" strokeWidth="1.2"
+    strokeLinecap="round" strokeLinejoin="round" />
+  <path d="M11.6667 14.334V15.334" stroke="black" strokeOpacity="0.85" strokeWidth="1.2"
+    strokeLinecap="round" strokeLinejoin="round" />
+  <path d="M13.2761 11.334L12.569 12.0411" stroke="black" strokeOpacity="0.85" strokeWidth="1.2"
+    strokeLinecap="round" strokeLinejoin="round" />
+  <path d="M10.6094 14L9.90234 14.7071" stroke="black" strokeOpacity="0.85" strokeWidth="1.2"
+    strokeLinecap="round" strokeLinejoin="round" />
+  <path d="M10 11.334L10.7071 12.0411" stroke="black" strokeOpacity="0.85" strokeWidth="1.2"
+    strokeLinecap="round" strokeLinejoin="round" />
+  <path d="M12.6667 14L13.3738 14.7071" stroke="black" strokeOpacity="0.85" strokeWidth="1.2"
+    strokeLinecap="round" strokeLinejoin="round" />
+  <path d="M9.33334 13H9.83334H10.3333" stroke="black" strokeOpacity="0.85" strokeWidth="1.2"
+    strokeLinecap="round" strokeLinejoin="round" />
+  <path d="M13 13H13.5H14" stroke="black" strokeOpacity="0.85" strokeWidth="1.2"
+    strokeLinecap="round" strokeLinejoin="round" />
+</svg>
+  

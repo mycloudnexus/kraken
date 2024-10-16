@@ -8,6 +8,8 @@ import {
   resetPwdUser,
 } from "@/services/user";
 import { queryClient } from "@/utils/helpers/reactQuery";
+import { IPagingData } from "@/utils/types/common.type";
+import { IUser } from "@/utils/types/user.type";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 export const USER_CACHE_KEYS = {
@@ -20,7 +22,7 @@ export const USER_CACHE_KEYS = {
   reset_password: "reset_password",
 };
 export const useGetUserList = (params: Record<string, any>, options?: any) => {
-  return useQuery<any, Error>({
+  return useQuery<any, Error, IPagingData<IUser>>({
     queryKey: [USER_CACHE_KEYS.get_user, params],
     queryFn: () => getListUser(params),
     select: (data) => data?.data,

@@ -1,10 +1,6 @@
 import {
   HomeOutlined,
   ApiOutlined,
-  AlertOutlined,
-  FolderAddOutlined,
-  CloudServerOutlined,
-  UsergroupAddOutlined,
   SettingOutlined,
   DoubleLeftOutlined,
 } from "@ant-design/icons";
@@ -19,6 +15,10 @@ import { useGetProductEnvs } from "@/hooks/product";
 import { last } from "lodash";
 import { useSessionStorage } from "usehooks-ts";
 import { IEnv } from "@/utils/types/env.type";
+import SellerAPISetupIcon from '@/assets/icon/seller-api-setup.svg'
+import ServiceCatalogIcon from '@/assets/icon/service-catalog.svg'
+import ActivityLogIcon from '@/assets/icon/activity-log.svg'
+import BuyerIcon from '@/assets/icon/buyer.svg'
 
 const flattenMenu = (
   menuArr: any[],
@@ -75,23 +75,23 @@ const SideNavigation = () => {
       {
         key: "component/",
         label: <Link to="/component/mef.sonata/list">Seller API setup</Link>,
-        icon: <AlertOutlined />,
+        icon: <SellerAPISetupIcon />,
       },
       {
         key: "env",
         label: <Link to="/env">Deployment</Link>,
-        icon: <FolderAddOutlined />,
+        icon: <ServiceCatalogIcon />,
       },
       {
         key: `env/${stageId}`,
         label: <Link to={`/env/${stageId}`}>API activity log</Link>,
-        icon: <CloudServerOutlined />,
+        icon: <ActivityLogIcon />,
         matching: ["env/[a-z0-9-]+"],
       },
       {
         key: "buyer",
         label: <Link to="/buyer">Buyer management</Link>,
-        icon: <UsergroupAddOutlined />,
+        icon: <BuyerIcon />,
       },
       {
         label: "Settings",

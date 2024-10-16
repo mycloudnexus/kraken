@@ -1,32 +1,27 @@
 import {
-  Avatar,
   Button,
   Card,
+  Divider,
   Dropdown,
   Flex,
-  Input,
   Select,
   Tooltip,
 } from "antd";
 import styles from "./index.module.scss";
 import Logo from "@/assets/logo.svg";
 import {
-  BellOutlined,
   CloseOutlined,
-  DownOutlined,
   EditTwoTone,
   LogoutOutlined,
   QuestionCircleOutlined,
-  SearchOutlined,
-  UpOutlined,
-  UserOutlined,
 } from "@ant-design/icons";
 import { DEFAULT_PRODUCT } from "@/utils/constants/product";
 import { useAppStore } from "@/stores/app.store";
 import { useTutorialStore } from "@/stores/tutorial.store";
 import useUser from "@/hooks/user/useUser";
 import Text from "../Text";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { UserAvatar } from "./UserAvatar";
 
 const TooltipBody = (setTutorialCompleted: (value: boolean) => void) => (
   <div className={styles.tooltip}>
@@ -80,9 +75,7 @@ const Header = () => {
       >
         <Flex justify="center" align="center" vertical gap={8}>
           <div style={{ position: "relative" }}>
-            <Avatar size={64}>
-              <UserOutlined />
-            </Avatar>
+            <UserAvatar size={64} className={styles.avatarLg} user={currentUser} />
             <div className={styles.edit}>
               <EditTwoTone style={{ fontSize: 12 }} />
             </div>
@@ -100,11 +93,14 @@ const Header = () => {
 
   return (
     <div className={styles.header}>
-      <Flex gap={48}>
-        <div className={styles.logo}>
+      <Flex gap={16} align="center">
+        <Link to="/" className={styles.logo}>
           <Logo />
-          KRAKEN
-        </div>
+          Kraken
+        </Link>
+
+        <Divider type="vertical" className={styles.divider} />
+
         <Select
           allowClear={false}
           value={currentProduct}
@@ -112,24 +108,14 @@ const Header = () => {
           options={[
             {
               value: DEFAULT_PRODUCT,
-              label: <span style={{ fontWeight: 500 }}>MEF Sonata API</span>,
+              label: 'MEF Sonata API',
             },
           ]}
-          suffixIcon={
-            <div className={styles.selectIcon}>
-              <UpOutlined style={{ fontSize: 8 }} />
-              <DownOutlined style={{ fontSize: 8 }} />
-            </div>
-          }
+          suffixIcon={<></>}
         />
       </Flex>
 
       <div className={styles.rightMenu}>
-        <Input
-          placeholder="Search"
-          suffix={<SearchOutlined style={{ cursor: "pointer" }} />}
-          style={{ borderRadius: "156px" }}
-        />
         <Tooltip
           align={{ offset: [12, 15] }}
           overlayInnerStyle={{ zIndex: 1 }}
@@ -141,14 +127,13 @@ const Header = () => {
           <QuestionCircleOutlined onClick={() => setOpenTutorial(true)} />
         </Tooltip>
 
-        <BellOutlined />
         <Dropdown
           placement="bottomRight"
           className={styles.avatar}
           menu={{ items: [] }}
           dropdownRender={dropdownRender}
         >
-          <UserOutlined />
+          <UserAvatar size={24} user={currentUser} />
         </Dropdown>
       </div>
     </div>
