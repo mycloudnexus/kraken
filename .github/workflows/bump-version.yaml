@@ -1,0 +1,53 @@
+---
+name: Bump version
+on:
+  workflow_dispatch:
+    inputs:
+      ref: 
+        description: 'The branch checkout'
+        required: false
+        type: string
+        default: ''
+      new-version:
+        description: 'The new version to bump to'
+        required: true
+        type: string
+jobs:
+  bump-version:
+    name: Bump version to ${{ inputs.new-version }} in ${{ inputs.ref }} 
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Check out the repo
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: Create a branch for the new version
+        run: |
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+
+          git switch --create "bump-version/${{ inputs.new-version }}"
+
+      - name: Bump version in pom.xml files
+        run: |
+          echo "NEW_VERSION: ${{ inputs.new-version }}"
+          ./mvnw -q versions:set -DnewVersion=${{ inputs.new-version }} -DprocessAllModules
+          git commit -am "Bump verson to ${{ inputs.new-version }} in pom.xml files"
+
+      - name: Bump version in package.json files
+        run: |
+          echo "NEW_VERSION: ${{ inputs.new-version }}"
+          cd kraken-app/kraken-app-portal
+          npm version ${{ inputs.new-version }}
+          cd ../..
+          git commit -am "Bump version to ${{ inputs.new-version }} in package.json files"
+
+      - name: Create a PR for the new version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git push -u origin "bump-version/${{ inputs.new-version }}"
+          gh pr create --title "build(misc): bump version to ${{ inputs.new-version }} in ${{ inputs.ref }}" --body "Bump version to ${{ inputs.new-version }} " --base ${{inputs.ref}}
