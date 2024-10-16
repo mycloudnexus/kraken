@@ -3,7 +3,7 @@ name: Bump version
 on:
   workflow_dispatch:
     inputs:
-      ref: 
+      branch: 
         description: 'The branch checkout'
         required: false
         type: string
@@ -14,14 +14,14 @@ on:
         type: string
 jobs:
   bump-version:
-    name: Bump version to ${{ inputs.new-version }} in ${{ inputs.ref }} 
+    name: Bump version to ${{ inputs.new-version }} in ${{ inputs.branch }} 
     runs-on: ubuntu-latest
     steps:
 
       - name: Check out the repo
         uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.ref }}
+          ref: ${{ inputs.branch }}
 
       - name: Create a branch for the new version
         run: |
@@ -50,4 +50,4 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git push -u origin "bump-version/${{ inputs.new-version }}"
-          gh pr create --title "build(misc): bump version to ${{ inputs.new-version }} in ${{ inputs.ref }}" --body "Bump version to ${{ inputs.new-version }} " --base ${{inputs.ref}}
+          gh pr create --title "build(misc): bump version to ${{ inputs.new-version }} in ${{ inputs.branch }}" --body "Bump version to ${{ inputs.new-version }} " --base ${{inputs.branch}}
