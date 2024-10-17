@@ -4,6 +4,7 @@ export interface IUserParams {
   q?: string;
   page?: number;
   size?: number;
+  filterInternalUser?: boolean;
 }
 
 type UserStore = {
@@ -17,6 +18,7 @@ export const defaultData = {
     q: undefined,
     page: 0,
     size: 10,
+    filterInternalUser: true
   },
 };
 

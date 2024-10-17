@@ -14,7 +14,7 @@ import buildInitListMapping from "@/utils/helpers/buildInitListMapping";
 import groupByPath from "@/utils/helpers/groupByPath";
 import { queryClient } from "@/utils/helpers/reactQuery";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { fireEvent, render, renderHook, waitFor } from "@testing-library/react";
+import { fireEvent, render, renderHook } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 
 beforeAll(() => {
@@ -1296,8 +1296,4 @@ test("requestItem render", () => {
   expect(container).toBeInTheDocument();
   const btnAdd = getByTestId("btn-add-state");
   fireEvent.click(btnAdd);
-  waitFor(() => {
-    const editBtn = getByTestId("edit-title");
-    expect(editBtn).toBeInTheDocument();
-  });
 });

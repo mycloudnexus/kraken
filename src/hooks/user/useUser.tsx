@@ -4,7 +4,7 @@ import { isEmpty } from "lodash";
 
 const useUser = () => {
   const { data: dataUser, isLoading } = useGetUserList(
-    { size: 200, page: 0 },
+    { size: 200, page: 0, filterInternalUser: true },
     { staleTime: 999999 }
   );
   const { data: currentUser } = useGetCurrentUser();
