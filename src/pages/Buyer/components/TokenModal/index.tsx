@@ -1,4 +1,4 @@
-import Text from "@/components/Text";
+import { Text } from "@/components/Text";
 import { IBuyer } from "@/utils/types/component.type";
 import { Flex, Modal, Typography, notification } from "antd";
 import styles from "./index.module.scss";

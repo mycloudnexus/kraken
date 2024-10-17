@@ -1,5 +1,5 @@
 import Flex from "@/components/Flex";
-import Text from "@/components/Text";
+import { Text } from "@/components/Text";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import {
   convertSchemaToTypeOnly,

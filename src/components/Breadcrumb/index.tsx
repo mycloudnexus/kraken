@@ -1,7 +1,7 @@
 import { LeftOutlined } from "@ant-design/icons";
 import { Flex } from "antd";
 import { useNavigate } from "react-router-dom";
-import Text from "../Text";
+import { Text } from "../Text";
 import styles from "./index.module.scss";
 
 type Props = {

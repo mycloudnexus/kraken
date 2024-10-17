@@ -1,7 +1,7 @@
 import { Flex, Spin, Typography } from "antd";
 import styles from "./index.module.scss";
 import classes from "classnames";
-import Text from "@/components/Text";
+import { Text } from "@/components/Text";
 import {
   ApiOutlined,
   CheckCircleFilled,

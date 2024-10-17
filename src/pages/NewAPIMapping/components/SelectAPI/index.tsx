@@ -1,5 +1,5 @@
 import Flex from "@/components/Flex";
-import Text from "@/components/Text";
+import { Text } from "@/components/Text";
 import { useGetComponentListAPISpec } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";

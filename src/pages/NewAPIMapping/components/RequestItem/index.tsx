@@ -1,7 +1,7 @@
 import { IRequestMapping } from "@/utils/types/component.type";
 import styles from "./index.module.scss";
 import { Button, Flex, Input, Select } from "antd";
-import Text from "@/components/Text";
+import { Text } from "@/components/Text";
 import MappingIcon from "@/assets/newAPIMapping/mapping-icon.svg";
 import clsx from "clsx";
 import { cloneDeep, difference, get, isEmpty, set } from "lodash";

@@ -1,4 +1,4 @@
-import Text from "@/components/Text";
+import { Text } from "@/components/Text";
 import { Button, Flex, Popconfirm, Table, notification } from "antd";
 import styles from "./index.module.scss";
 import { useBuyerStore } from "@/stores/buyer.store";

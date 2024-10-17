@@ -4,7 +4,7 @@ import { Flex, Typography, Table, Switch, Tree, Button } from "antd";
 import styles from "../index.module.scss";
 import { IActivityLog } from "@/utils/types/env.type";
 import { Dispatch, SetStateAction, useState } from "react";
-import Text from "@/components/Text";
+import { Text } from "@/components/Text";
 
 interface ActivitySwitchProps {
   value: boolean;

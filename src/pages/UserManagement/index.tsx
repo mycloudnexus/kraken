@@ -1,4 +1,4 @@
-import Text from "@/components/Text";
+import { Text } from "@/components/Text";
 import styles from "./index.module.scss";
 import { Button, Flex, Input, Switch, Table, notification } from "antd";
 import { useEffect, useMemo, useRef } from "react";

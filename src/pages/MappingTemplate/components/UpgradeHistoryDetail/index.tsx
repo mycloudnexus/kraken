@@ -1,4 +1,4 @@
-import Text from "@/components/Text";
+import { Text } from "@/components/Text";
 import { CloseOutlined, InfoCircleFilled } from "@ant-design/icons";
 import { Drawer, Flex, Radio, Spin, Table, Typography } from "antd";
 import { useMemo, useState } from "react";

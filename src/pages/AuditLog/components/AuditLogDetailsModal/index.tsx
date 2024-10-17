@@ -1,5 +1,5 @@
 import { Flex, Drawer, Table, Typography } from "antd";
-import Text from "@/components/Text";
+import { Text } from "@/components/Text";
 import styles from "./index.module.scss";
 import { ILogActivity } from "@/utils/types/env.type";
 import LogMethodTag from "@/components/LogMethodTag";

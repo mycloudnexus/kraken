@@ -1,4 +1,4 @@
-import Text from "@/components/Text";
+import { Text } from "@/components/Text";
 import { CloseOutlined } from "@ant-design/icons";
 import {
   Button,

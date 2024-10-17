@@ -1,6 +1,6 @@
 import { Button, Flex, Input, Tree, notification } from "antd";
 import styles from "./index.module.scss";
-import Text from "@/components/Text";
+import { Text } from "@/components/Text";
 import { Key, useCallback, useEffect, useMemo, useState } from "react";
 import { getCorrectSpec } from "../RightAddSonataProp";
 import swaggerClient from "swagger-client";

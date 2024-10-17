@@ -1,4 +1,4 @@
-import Text from "@/components/Text";
+import { Text } from "@/components/Text";
 import {
   PRODUCT_CACHE_KEYS,
   useDeployMappingTemplateProduction,

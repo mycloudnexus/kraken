@@ -4,7 +4,7 @@ import EmptyIcon from "@/assets/icon/empty.svg";
 import InformationModal from "@/components/DeployStage/InformationModal";
 import MappingMatrix from "@/components/MappingMatrix";
 import RequestMethod from "@/components/Method";
-import Text from "@/components/Text";
+import { Text } from "@/components/Text";
 import TrimmedPath from "@/components/TrimmedPath";
 import {
   useDeployProduction,

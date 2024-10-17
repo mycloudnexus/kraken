@@ -6,7 +6,7 @@ import { Flex, Table, Tag, Tooltip, Typography } from "antd";
 import { useMemo, useState } from "react";
 import MappingMatrix from "@/components/MappingMatrix";
 import styles from "./index.module.scss";
-import Text from "@/components/Text";
+import { Text } from "@/components/Text";
 import { toDateTime } from "@/libs/dayjs";
 import { get, isEmpty, join, slice, split } from "lodash";
 type Props = {

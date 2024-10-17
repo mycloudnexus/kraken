@@ -9,7 +9,7 @@ import {
 } from "@/hooks/product";
 import type { IUnifiedAsset } from "@/utils/types/common.type";
 import { SPEC_VALUE } from "@/utils/constants/product";
-import Text from "@/components/Text";
+import { Text } from "@/components/Text";
 import ApiComponent from "./ApiComponent";
 import { get, isEmpty, isUndefined, min } from "lodash";
 import styles from "./index.module.scss";

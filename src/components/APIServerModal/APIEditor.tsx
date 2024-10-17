@@ -29,7 +29,7 @@ import { Fragment, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Flex from "../Flex";
 import RequestMethod from "../Method";
-import Text from "../Text";
+import { Text } from "../Text";
 import styles from "./index.module.scss";
 
 type Props = {

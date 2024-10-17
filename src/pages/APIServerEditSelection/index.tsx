@@ -3,7 +3,7 @@ import { useAppStore } from "@/stores/app.store";
 import { useNavigate, useParams } from "react-router";
 import SwaggerInfo from "../NewAPIServer/components/SwaggerInfo";
 import styles from "./index.module.scss";
-import Text from "@/components/Text";
+import { Text } from "@/components/Text";
 import Flex from "@/components/Flex";
 import { useEffect, useState } from "react";
 import { Button, Empty, Transfer, TransferProps, notification } from "antd";

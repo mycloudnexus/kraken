@@ -1,4 +1,4 @@
-import Text from "@/components/Text";
+import { Text } from "@/components/Text";
 import { useGetMappingTemplateCurrentVersion } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
 import { Flex, Tag } from "antd";

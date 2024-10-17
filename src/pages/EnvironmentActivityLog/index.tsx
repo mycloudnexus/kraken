@@ -26,7 +26,7 @@ import styles from "./index.module.scss";
 import { debounce, omit } from "lodash";
 
 import dayjs from "dayjs";
-import Text from "@/components/Text";
+import { Text } from "@/components/Text";
 import useSize from "@/hooks/useSize";
 const { RangePicker } = DatePicker;
 

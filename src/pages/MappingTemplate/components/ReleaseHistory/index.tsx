@@ -1,4 +1,4 @@
-import Text from "@/components/Text";
+import { Text } from "@/components/Text";
 import { Empty, Flex, Spin, Tag } from "antd";
 import { RightOutlined } from "@ant-design/icons";
 

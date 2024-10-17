@@ -1,7 +1,7 @@
 import { useGetProductEnvs } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
 import { Flex, Tabs } from "antd";
-import Text from "../Text";
+import { Text } from "../Text";
 
 import { useEffect, useMemo } from "react";
 import { capitalize, get, isEmpty } from "lodash";

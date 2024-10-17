@@ -1,4 +1,4 @@
-import Text from "@/components/Text";
+import { Text } from "@/components/Text";
 import { IComponent } from "@/utils/types/product.type";
 import { Card, Col, Flex, Row, Tag, Typography, notification } from "antd";
 import { get } from "lodash";

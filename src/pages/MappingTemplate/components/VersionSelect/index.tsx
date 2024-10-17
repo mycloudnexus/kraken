@@ -1,4 +1,4 @@
-import Text from "@/components/Text";
+import { Text } from "@/components/Text";
 import styles from "./index.module.scss";
 import { Flex, Tag } from "antd";
 import { IReleaseHistory } from "@/utils/types/product.type";

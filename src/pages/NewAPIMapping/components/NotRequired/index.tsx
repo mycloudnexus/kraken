@@ -1,6 +1,6 @@
 import { Flex } from "antd";
 import styles from "./index.module.scss";
-import Text from "@/components/Text";
+import { Text } from "@/components/Text";
 const NotRequired = () => {
   return (
     <Flex vertical className={styles.root}>

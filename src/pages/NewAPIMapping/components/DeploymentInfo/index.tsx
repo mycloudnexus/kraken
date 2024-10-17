@@ -1,5 +1,5 @@
 import Flex from "@/components/Flex";
-import Text from "@/components/Text";
+import { Text } from "@/components/Text";
 import useUser from "@/hooks/user/useUser";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import { Tooltip } from "antd";

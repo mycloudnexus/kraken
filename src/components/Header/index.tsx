@@ -19,7 +19,7 @@ import { DEFAULT_PRODUCT } from "@/utils/constants/product";
 import { useAppStore } from "@/stores/app.store";
 import { useTutorialStore } from "@/stores/tutorial.store";
 import useUser from "@/hooks/user/useUser";
-import Text from "../Text";
+import { Text } from "../Text";
 import { Link, useNavigate } from "react-router-dom";
 import { UserAvatar } from "./UserAvatar";
 

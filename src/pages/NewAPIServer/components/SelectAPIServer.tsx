@@ -1,4 +1,4 @@
-import Text from "@/components/Text";
+import { Text } from "@/components/Text";
 import { Form, Input } from "antd";
 import Flex from "@/components/Flex";
 import { isEmpty } from "lodash";

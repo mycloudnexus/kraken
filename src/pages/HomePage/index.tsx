@@ -8,7 +8,7 @@ import { useGetComponentList } from "@/hooks/product";
 import { useCallback, useEffect } from "react";
 import { isEmpty } from "lodash";
 import { clearData, getData } from "@/utils/helpers/token";
-import Text from "@/components/Text";
+import { Text } from "@/components/Text";
 
 const HomePage = () => {
   const { currentProduct } = useAppStore();

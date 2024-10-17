@@ -1,7 +1,7 @@
 import { IReleaseHistory } from "@/utils/types/product.type";
 import styles from "./index.module.scss";
 import { Flex, Input } from "antd";
-import Text from "@/components/Text";
+import { Text } from "@/components/Text";
 import { isEmpty } from "lodash";
 import VersionBtn from "../VersionBtn";
 import RichTextViewer from "@/components/RichTextViewer";

@@ -1,4 +1,4 @@
-import Text from "@/components/Text";
+import { Text } from "@/components/Text";
 import { UploadOutlined, PaperClipOutlined } from "@ant-design/icons";
 import { Upload, notification, Button, Form, FormInstance } from "antd";
 import { get } from "lodash";

@@ -1,5 +1,5 @@
 import LogMethodTag from "@/components/LogMethodTag";
-import Text from "@/components/Text";
+import { Text } from "@/components/Text";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { EnumRightType } from "@/utils/types/common.type";
 import { CloseCircleFilled, RightOutlined } from "@ant-design/icons";
