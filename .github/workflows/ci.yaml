@@ -25,3 +25,4 @@ jobs:
     secrets: inherit
     with:
       nodejs-version: "20.12"
+      grype-version: "v0.82.1"

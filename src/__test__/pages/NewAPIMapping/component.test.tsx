@@ -1286,7 +1286,7 @@ test("requestItem render", () => {
             },
             sourceLocation: "BODY",
             targetLocation: "BODY",
-            customizedField: false,
+            customizedField: true,
             requiredMapping: true,
           }}
         />
