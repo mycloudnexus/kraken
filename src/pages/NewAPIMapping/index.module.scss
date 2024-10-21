@@ -82,6 +82,16 @@
 .revertButton {
   display: flex;
   align-items: center;
+  justify-content: center;
+  width: 32px;
+  padding: 0;
+
+  :global {
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+  }
 }
 
 .infoBox {

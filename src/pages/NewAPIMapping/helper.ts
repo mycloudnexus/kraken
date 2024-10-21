@@ -1,13 +1,13 @@
 import { IMappers } from "@/utils/types/component.type";
 
 /**
- *  Returns properties id whose source/target/location data is missing (applicable for custom fields only)
+ *  Returns properties id whose source/target/location data is missing (applicable for seller apis, and sonata's custom fields only)
  *
  */
 export function validateMappers(mappers: IMappers) {
   const requestIds = mappers.request
     .filter((property) => {
-      if (!property.customizedField) return false;
+      if (!property.customizedField) return !property.targetLocation;
 
       return (
         !property.source ||
@@ -20,7 +20,7 @@ export function validateMappers(mappers: IMappers) {
 
   const responseIds = mappers.response
     .filter((property) => {
-      if (!property.customizedField) return false;
+      if (!property.customizedField) return !property.sourceLocation;
 
       return (
         !property.source ||

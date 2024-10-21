@@ -612,7 +612,6 @@ const NewAPIMapping = ({
                       className={styles.btnSave}
                     >
                       Save
-                      <InfoCircleOutlined style={{ fontSize: 14 }} />
                     </Button>
                   </Tooltip>
                   <Button type="default">Compare</Button>

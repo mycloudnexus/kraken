@@ -241,7 +241,13 @@ const RequestItem = ({ item, index }: Props) => {
                       title: item,
                     }))}
                   />
-                  <DeleteOutlined onClick={() => handleDeleteMapping(key)} />
+                  <Button
+                    className={styles.btnRemoveValueMapping}
+                    type="link"
+                    onClick={() => handleDeleteMapping(key)}
+                  >
+                    <DeleteOutlined />
+                  </Button>
                 </Flex>
                 <MappingIcon />
                 <Select
