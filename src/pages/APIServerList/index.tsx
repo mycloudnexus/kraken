@@ -11,8 +11,11 @@ import styles from "./index.module.scss";
 
 const APIServerList = () => {
   const { currentProduct } = useAppStore();
-  const { data: dataList, isLoading } =
-    useGetComponentListAPISpec(currentProduct);
+  const {
+    data: dataList,
+    isLoading,
+    refetch,
+  } = useGetComponentListAPISpec(currentProduct);
   const navigate = useNavigate();
 
   return (
@@ -36,7 +39,11 @@ const APIServerList = () => {
               style={{ width: "100%" }}
             >
               {dataList?.data?.map((item: IComponent) => (
-                <APIServerCard item={item} key={item.id} />
+                <APIServerCard
+                  item={item}
+                  key={item.id}
+                  refetchList={refetch}
+                />
               ))}
             </Flex>
             {isEmpty(dataList?.data) && (

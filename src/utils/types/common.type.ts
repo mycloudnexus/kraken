@@ -40,6 +40,7 @@ export interface ISyncMetadata {
 
 export interface IUnifiedAsset {
   kind: string;
+  inUse: boolean;
   apiVersion: string;
   metadata: IMetadata;
   facets: Record<string, any>;
@@ -51,6 +52,27 @@ export interface IUnifiedAsset {
   updatedAt: string;
   updatedBy: string;
   syncMetadata: ISyncMetadata;
+}
+
+interface ControlPlane {
+  kind: string;
+  apiVersion: string;
+  metadata: IMetadata;
+  facets: Record<string, any>;
+  links: any[];
+  id: string;
+  parentId: string;
+  createdAt: string;
+  updatedAt: string;
+  syncMetadata: ISyncMetadata;
+}
+
+export interface IEndpointUsageAsset {
+  endpointUsage: {
+    controlPlane: ControlPlane[];
+    dataPlaneProduction: any[];
+    dataPlaneStage: any[];
+  };
 }
 
 export enum EnumRightType {

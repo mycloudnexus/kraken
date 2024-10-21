@@ -1,26 +1,35 @@
+import { queryClient } from "@/utils/helpers/reactQuery";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { render } from "@testing-library/react";
-import APIServerCard from "../components/APIServerCard";
 import { BrowserRouter } from "react-router-dom";
+import APIServerCard from "../components/APIServerCard";
 
 describe("ExpandRow", () => {
   test("renders empty table when selectedAPIs is empty", () => {
     const { container } = render(
-      <BrowserRouter>
-        <APIServerCard item={{ facets: {} } as any} />
-      </BrowserRouter>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <APIServerCard item={{ facets: { selectedAPIs: [] } } as any} />
+        </BrowserRouter>
+      </QueryClientProvider>
     );
     expect(container).toBeInTheDocument();
   });
 
   test("renders table with data when selectedAPIs is not empty", () => {
     const { container } = render(
-      <BrowserRouter>
-        <APIServerCard
-          item={
-            { facets: {}, metadata: { key: "1", name: "1", id: "1" } } as any
-          }
-        />
-      </BrowserRouter>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <APIServerCard
+            item={
+              {
+                facets: { selectedAPIs: [{}] },
+                metadata: { key: "1", name: "1", id: "1" },
+              } as any
+            }
+          />
+        </BrowserRouter>
+      </QueryClientProvider>
     );
     expect(container).toBeInTheDocument();
   });

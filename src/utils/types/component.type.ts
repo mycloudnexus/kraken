@@ -58,6 +58,7 @@ export interface IComponent {
   facets: IFacets & Record<string, any>;
   links: any[];
   id: string;
+  inUse?: boolean;
   parentId: string;
   createdAt: string;
   updatedAt: string;

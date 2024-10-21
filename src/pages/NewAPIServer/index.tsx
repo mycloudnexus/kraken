@@ -1,4 +1,5 @@
 import BreadCrumb from "@/components/Breadcrumb";
+import DeleteApiButton from "@/components/DeleteApiButton";
 import {
   useCreateNewComponent,
   useEditComponent,
@@ -216,7 +217,14 @@ const NewAPIServer = () => {
                       disabled={disabledEnv}
                       loading={loadingCreate || isPending}
                       onNext={handleSave}
-                    />
+                    >
+                      {!isEmpty(componentId) && (
+                        <DeleteApiButton
+                          item={componentDetail}
+                          isInEditMode={true}
+                        />
+                      )}
+                    </BtnStep>
                   );
                 }}
               </Form.Item>

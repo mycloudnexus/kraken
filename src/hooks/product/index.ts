@@ -38,6 +38,8 @@ import {
   activateBuyer,
   deactivateBuyer,
   regenerateBuyerAccessToken,
+  getComponentSpecDetails,
+  deleteAPIServer,
 } from "@/services/products";
 import {
   COMPONENT_KIND_API,
@@ -47,6 +49,7 @@ import {
 import { queryClient } from "@/utils/helpers/reactQuery";
 import {
   IDetailsData,
+  IEndpointUsageAsset,
   IPagingData,
   IPagingParams,
   IUnifiedAsset,
@@ -71,50 +74,52 @@ import { AxiosResponse } from "axios";
 import { get } from "lodash";
 
 export const PRODUCT_CACHE_KEYS = {
-  get_audit_logs: "get_audit_logs",
-  get_product_component_list: "get_product_component_list",
-  get_component_api_doc: "get_component_api_doc",
+  active_buyer: "active_buyer",
+  create_api_key: "create_api_key",
+  create_buyer: "create_buyer",
   create_new_component: "create_new_component",
-  get_component_list: "get_component_list",
-  get_component_list_v2: "get_component_list_v2",
-  get_product_env_list: "get_product_env_list",
-  get_product_env_activity_list: "get_product_env_activity_list",
-  get_product_env_activity_detail: "get_product_env_activity_detail",
-  get_component_detail_mapping: "get_component_detail_mapping",
-  get_component_detail: "get_component_detail",
-  edit_component_detail: "edit_component_detail",
-  get_product_deployment_list: "get_product_deployment_list",
-  get_product_component_version_list: "get_product_component_version_list",
+  create_new_version: "create_new_version",
+  deactive_buyer: "deactive_buyer",
+  delete_api_server: "delete_api_server",
   deploy_product: "deploy_product",
+  deploy_stage_to_production: "deploy_stage_to_production",
+  deploy_to_env: "deploy_to_env",
+  edit_component_detail: "edit_component_detail",
   get_all_api_key: "get_all_api_key",
   get_all_data_plane: "get_all_data_plane",
-  get_running_component: "get_running_component",
-  create_new_version: "create_new_version",
-  get_version_list: "get_version_list",
-  create_api_key: "create_api_key",
-  get_running_version: "get_running_version",
-  update_target_mapper: "update_target_mapper",
-  get_mapper_details: "get_mapper_details",
-  deploy_to_env: "deploy_to_env",
-  get_running_api_list: "get_running_api_list",
-  get_list_api_deployments: "get_list_api_deployments",
+  get_audit_logs: "get_audit_logs",
   get_buyer_list: "get_buyer_list",
-  create_buyer: "create_buyer",
-  verify_product: "verify_product",
-  deploy_stage_to_production: "deploy_stage_to_production",
-  get_component_list_spec: "get_component_list_spec",
-  get_component_list_api_spec: "get_component_list_api_spec",
+  get_component_api_doc: "get_component_api_doc",
+  get_component_detail: "get_component_detail",
+  get_component_detail_mapping: "get_component_detail_mapping",
+  get_component_list: "get_component_list",
   get_component_list_api: "get_component_list_api",
-  get_running_list_api: "get_running_list_api",
-  get_release_list: "get_release_list",
+  get_component_list_api_spec: "get_component_list_api_spec",
+  get_component_list_spec: "get_component_list_spec",
+  get_component_list_v2: "get_component_list_v2",
+  get_component_spec_details: "get_component_spec_details",
   get_current_version: "get_current_version",
-  get_upgrade_list: "get_upgrade_list",
+  get_list_api_deployments: "get_list_api_deployments",
+  get_mapper_details: "get_mapper_details",
+  get_product_component_list: "get_product_component_list",
+  get_product_component_version_list: "get_product_component_version_list",
+  get_product_deployment_list: "get_product_deployment_list",
+  get_product_env_activity_detail: "get_product_env_activity_detail",
+  get_product_env_activity_list: "get_product_env_activity_list",
+  get_product_env_list: "get_product_env_list",
+  get_release_list: "get_release_list",
+  get_running_api_list: "get_running_api_list",
+  get_running_component: "get_running_component",
+  get_running_list_api: "get_running_list_api",
+  get_running_version: "get_running_version",
   get_upgrade_detail: "get_upgrade_detail",
-  upgrade_mapping_template_stage: "upgrade_mapping_template_stage",
-  upgrade_mapping_template_production: "upgrade_mapping_template_production",
-  active_buyer: "active_buyer",
-  deactive_buyer: "deactive_buyer",
+  get_upgrade_list: "get_upgrade_list",
+  get_version_list: "get_version_list",
   regenerate_token: "regenerate_token",
+  update_target_mapper: "update_target_mapper",
+  upgrade_mapping_template_production: "upgrade_mapping_template_production",
+  upgrade_mapping_template_stage: "upgrade_mapping_template_stage",
+  verify_product: "verify_product",
 };
 
 export const useCreateNewComponent = () => {
@@ -258,6 +263,23 @@ export const useGetComponentDetail = (
   });
 };
 
+export const useGetComponentSpecDetails = (
+  productId: string,
+  componentId: string,
+  open = true
+) => {
+  return useQuery<any, Error, IEndpointUsageAsset>({
+    queryKey: [
+      PRODUCT_CACHE_KEYS.get_component_spec_details,
+      productId,
+      componentId,
+    ],
+    queryFn: () => getComponentSpecDetails(productId, componentId),
+    enabled: Boolean(productId && componentId && open),
+    select: (data) => data.data,
+  });
+};
+
 export const useGetComponentDetailMapping = (
   productId: string,
   componentId: string,
@@ -322,6 +344,19 @@ export const useDeployProduct = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [PRODUCT_CACHE_KEYS.get_product_deployment_list],
+      });
+    },
+  });
+};
+
+export const useDeleteApiServer = () => {
+  return useMutation<any, Error>({
+    mutationKey: [PRODUCT_CACHE_KEYS.delete_api_server],
+    mutationFn: ({ productId, componentId }: any) =>
+      deleteAPIServer(productId, componentId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [PRODUCT_CACHE_KEYS.delete_api_server],
       });
     },
   });

@@ -137,7 +137,6 @@ const VersionBtn = ({ item }: Props) => {
               oldData,
               item.templateUpgradeId
             );
-            console.log(newData);
             return { ...newData };
           }
         );

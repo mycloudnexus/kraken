@@ -1,3 +1,10 @@
+import ActivityLogIcon from "@/assets/icon/activity-log.svg";
+import BuyerIcon from "@/assets/icon/buyer.svg";
+import SellerAPISetupIcon from "@/assets/icon/seller-api-setup.svg";
+import ServiceCatalogIcon from "@/assets/icon/service-catalog.svg";
+import { useGetProductEnvs } from "@/hooks/product";
+import { useAppStore } from "@/stores/app.store";
+import { IEnv } from "@/utils/types/env.type";
 import {
   HomeOutlined,
   ApiOutlined,
@@ -5,20 +12,13 @@ import {
   DoubleLeftOutlined,
 } from "@ant-design/icons";
 import { Button, Flex, Menu, Typography } from "antd";
-import { Link } from "react-router-dom";
-import styles from "./index.module.scss";
-import { useMemo, useState } from "react";
 import Sider from "antd/es/layout/Sider";
-import ETIcon from "../../assets/et.svg";
-import { useAppStore } from "@/stores/app.store";
-import { useGetProductEnvs } from "@/hooks/product";
 import { last } from "lodash";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { useSessionStorage } from "usehooks-ts";
-import { IEnv } from "@/utils/types/env.type";
-import SellerAPISetupIcon from '@/assets/icon/seller-api-setup.svg'
-import ServiceCatalogIcon from '@/assets/icon/service-catalog.svg'
-import ActivityLogIcon from '@/assets/icon/activity-log.svg'
-import BuyerIcon from '@/assets/icon/buyer.svg'
+import ETIcon from "../../assets/et.svg";
+import styles from "./index.module.scss";
 
 const flattenMenu = (
   menuArr: any[],
@@ -47,8 +47,9 @@ const flattenMenu = (
 };
 
 const SideNavigation = () => {
+  const location = useLocation();
   const [collapsed, setCollapsed] = useSessionStorage("collapsed", false);
-  const [activeKey, setActiveKey] = useState<string>(window.location.pathname);
+  const [activeKey, setActiveKey] = useState<string>(location.pathname);
   const { currentProduct } = useAppStore();
   const { data: envs } = useGetProductEnvs(currentProduct);
 
@@ -146,6 +147,10 @@ const SideNavigation = () => {
   const handleNavigationSet = (key: string) => {
     setActiveKey(key);
   };
+
+  useEffect(() => {
+    handleNavigationSet(location.pathname);
+  }, [location.pathname]);
 
   const openKeys = useMemo(() => {
     if (collapsed) {

@@ -1,16 +1,16 @@
+import TitleIcon from "@/assets/title-icon.svg";
+import Flex from "@/components/Flex";
+import SpecDrawer from "@/components/SpecDrawer";
 import { Text } from "@/components/Text";
 import { UploadOutlined, PaperClipOutlined } from "@ant-design/icons";
 import { Upload, notification, Button, Form, FormInstance } from "antd";
-import { get } from "lodash";
-import ReplaceFileModal from "./ReplaceFileModal";
-import { useBoolean } from "usehooks-ts";
-import Flex from "@/components/Flex";
-import TitleIcon from "@/assets/title-icon.svg";
-import styles from "./index.module.scss";
-import SpecDrawer from "@/components/SpecDrawer";
-import { useEffect, useState } from "react";
-import { decode } from "js-base64";
 import clsx from "clsx";
+import { decode } from "js-base64";
+import { get } from "lodash";
+import { useEffect, useState } from "react";
+import { useBoolean } from "usehooks-ts";
+import ReplaceFileModal from "./ReplaceFileModal";
+import styles from "./index.module.scss";
 
 type Props = {
   form: FormInstance<any>;
