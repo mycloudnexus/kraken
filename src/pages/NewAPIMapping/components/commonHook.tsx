@@ -1,4 +1,6 @@
+import ExampleValueModal from "@/components/ExampleValueModal";
 import TypeTag from "@/components/TypeTag";
+import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import {
   Button,
   CollapseProps,
@@ -8,12 +10,10 @@ import {
   notification,
 } from "antd";
 import clsx from "clsx";
-import { Dispatch, useCallback, useMemo, useState } from "react";
-import styles from "./RightAddSellerProp/index.module.scss";
 import { get, isEmpty, omit } from "lodash";
-import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
+import { Dispatch, useCallback, useMemo, useState } from "react";
 import { useBoolean } from "usehooks-ts";
-import ExampleValueModal from "@/components/ExampleValueModal";
+import styles from "./RightAddSellerProp/index.module.scss";
 
 interface Props {
   selectedProp: any;
@@ -44,12 +44,17 @@ export const useCommonAddProp = ({
       notification.error({ message: "Please select one property!" });
       return;
     }
-    onSelect?.({ ...selectedProp, title: rightSideInfo?.title });
+    // selectedProp = { name: string, location: string }
+    // propery name should follow this format: @{{ prop_name }}
+    onSelect?.({
+      ...selectedProp,
+      name: `@{{${selectedProp.name}}}`,
+      title: rightSideInfo?.title,
+    });
   }, [selectedProp, onSelect, rightSideInfo]);
 
   const selectedKey = useMemo(
-    () =>
-      get(selectedProp, "name", ""),
+    () => get(selectedProp, "name", ""),
     [selectedProp]
   );
 
@@ -61,11 +66,14 @@ export const useCommonAddProp = ({
     open();
   };
 
-  const handleAddPathHybrid = (value: string) => {
+  const setHybridField = (
+    field: keyof typeof sellerAPIExampleProps,
+    value: string
+  ) => {
     if (isEmpty(value)) {
       setSellerAPIExampleProps({
         ...sellerAPIExampleProps,
-        path: omit(sellerAPIExampleProps?.path, [
+        [field]: omit(sellerAPIExampleProps?.[field], [
           `${get(currentProp, "name", "")}`,
         ]),
       });
@@ -78,8 +86,8 @@ export const useCommonAddProp = ({
     }
     setSellerAPIExampleProps({
       ...sellerAPIExampleProps,
-      path: {
-        ...sellerAPIExampleProps?.path,
+      [field]: {
+        ...sellerAPIExampleProps?.[field],
         [get(currentProp, "name", "")]: value,
       },
     });
@@ -90,33 +98,12 @@ export const useCommonAddProp = ({
     });
   };
 
+  const handleAddPathHybrid = (value: string) => {
+    setHybridField("path", value);
+  };
+
   const handleAddParamHybrid = (value: string) => {
-    if (isEmpty(value)) {
-      setSellerAPIExampleProps({
-        ...sellerAPIExampleProps,
-        param: omit(sellerAPIExampleProps?.param, [
-          `${get(currentProp, "name", "")}`,
-        ]),
-      });
-      setSelectedProp({
-        location: "",
-        name: "",
-      });
-      close();
-      return;
-    }
-    setSellerAPIExampleProps({
-      ...sellerAPIExampleProps,
-      param: {
-        ...sellerAPIExampleProps.param,
-        [get(currentProp, "name", "")]: value,
-      },
-    });
-    close();
-    setSelectedProp({
-      location: "HYBRID",
-      name: value,
-    });
+    setHybridField("param", value);
   };
 
   const collapseItems = useMemo(() => {
@@ -154,7 +141,8 @@ export const useCommonAddProp = ({
                     [styles.active]:
                       (selectedProp?.location === "PATH" &&
                         selectedProp?.name === parameter.name) ||
-                      (selectedProp?.name === sellerAPIExampleProps?.path?.[parameter.name] &&
+                      (selectedProp?.name ===
+                        sellerAPIExampleProps?.path?.[parameter.name] &&
                         selectedProp?.location === "HYBRID"),
                   })}
                   key={parameter.name}
@@ -230,7 +218,8 @@ export const useCommonAddProp = ({
                     [styles.active]:
                       (selectedProp?.location === "QUERY" &&
                         selectedProp?.name === parameter.name) ||
-                      (selectedProp?.name === sellerAPIExampleProps?.param?.[parameter.name] &&
+                      (selectedProp?.name ===
+                        sellerAPIExampleProps?.param?.[parameter.name] &&
                         selectedProp?.location === "HYBRID"),
                   })}
                   onClick={() => {
@@ -288,6 +277,7 @@ export const useCommonAddProp = ({
         children: (
           <div className={styles.tree}>
             <Tree
+              blockNode
               treeData={requestBodyTree}
               selectable
               selectedKeys={

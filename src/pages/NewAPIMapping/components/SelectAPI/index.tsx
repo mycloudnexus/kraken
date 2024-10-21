@@ -1,24 +1,24 @@
+import EmptyIcon from "@/assets/newAPIServer/empty.svg";
 import Flex from "@/components/Flex";
+import RequestMethod from "@/components/Method";
 import { Text } from "@/components/Text";
 import { useGetComponentListAPISpec } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
-import { IComponent } from "@/utils/types/product.type";
+import { extractOpenApiStrings } from "@/utils/helpers/schema";
+import { IComponent } from "@/utils/types/component.type";
 import { DownOutlined, RightOutlined } from "@ant-design/icons";
 import { Button, Input, Spin, Tooltip, Typography, notification } from "antd";
 import clsx from "clsx";
+import { decode } from "js-base64";
 import jsYaml from "js-yaml";
 import { cloneDeep, delay, get, isEmpty } from "lodash";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import swaggerClient from "swagger-client";
 import { useBoolean } from "usehooks-ts";
-import styles from "./index.module.scss";
 import useGetApiSpec from "../useGetApiSpec";
-import EmptyIcon from "@/assets/newAPIServer/empty.svg";
-import RequestMethod from "@/components/Method";
-import { extractOpenApiStrings } from "@/utils/helpers/schema";
-import { decode } from "js-base64";
+import styles from "./index.module.scss";
 
 type ItemProps = {
   item: IComponent;
@@ -142,22 +142,22 @@ export const APIItem = ({
 
   return (
     <>
-      <Flex justifyContent="space-between">
-        <Flex
-          justifyContent="flex-start"
-          gap={8}
-          alignItems="center"
-          onClick={toggleOpen}
-          style={{ cursor: "pointer" }}
-        >
-          {isOpen ? (
-            <DownOutlined style={{ fontSize: 10 }} />
-          ) : (
-            <RightOutlined style={{ fontSize: 10 }} />
-          )}
-          <Text.NormalMedium>{get(item, "metadata.name")}</Text.NormalMedium>
-        </Flex>
+      <Flex
+        justifyContent="flex-start"
+        gap={8}
+        alignItems="center"
+        onClick={toggleOpen}
+        style={{ cursor: "pointer" }}
+        className={styles.groupTitle}
+      >
+        {isOpen ? (
+          <DownOutlined style={{ fontSize: 10 }} />
+        ) : (
+          <RightOutlined style={{ fontSize: 10 }} />
+        )}
+        <Text.NormalMedium>{get(item, "metadata.name")}</Text.NormalMedium>
       </Flex>
+
       <Flex
         flexDirection="column"
         gap={12}

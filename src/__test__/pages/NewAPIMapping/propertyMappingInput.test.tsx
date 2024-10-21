@@ -1,62 +1,62 @@
-import { fireEvent, render, waitFor } from "@testing-library/react"
-import * as apiMappingHooks from "@/stores/newApiMapping.store";
-import { SourceInput as RequestSourceInput } from "@/pages/NewAPIMapping/components/RequestItem/SourceInput"
+import { SourceInput as RequestSourceInput } from "@/pages/NewAPIMapping/components/RequestItem/SourceInput";
 import { TargetInput as RequestTargetInput } from "@/pages/NewAPIMapping/components/RequestItem/TargetInput";
-import { SourceInput as ResponseSourceInput } from "@/pages/NewAPIMapping/components/ResponseItem/SourceInput"
+import { SourceInput as ResponseSourceInput } from "@/pages/NewAPIMapping/components/ResponseItem/SourceInput";
 import { TargetInput as ResponseTargetInput } from "@/pages/NewAPIMapping/components/ResponseItem/TargetInput";
+import * as apiMappingHooks from "@/stores/newApiMapping.store";
+import { fireEvent, render, waitFor } from "@testing-library/react";
 
 const request = {
   requestMapping: [
     {
-      "name": "address.validation.city",
-      "title": "The city that the address is in",
-      "source": "@{{hello}}",
-      "target": "@{{world}}",
-      "description": "",
-      "replaceStar": true,
-      "sourceLocation": "",
-      "targetLocation": "QUERY",
-      "customizedField": true,
-      "requiredMapping": false
+      name: "address.validation.city",
+      title: "The city that the address is in",
+      source: "@{{hello}}",
+      target: "@{{world}}",
+      description: "",
+      replaceStar: true,
+      sourceLocation: "",
+      targetLocation: "QUERY",
+      customizedField: true,
+      requiredMapping: false,
     },
   ],
   rightSide: 2,
   rightSideInfo: {
-    "method": "update",
-    "previousData": {
-      "name": "address.validation.streetName",
-      "title": "Name of the street or other street type",
-      "source": "@{{hello}}",
-      "target": "",
-      "description": "",
-      "replaceStar": true,
-      "sourceLocation": "",
-      "targetLocation": "",
-      "customizedField": true,
-      "requiredMapping": false
+    method: "update",
+    previousData: {
+      name: "address.validation.streetName",
+      title: "Name of the street or other street type",
+      source: "@{{hello}}",
+      target: "",
+      description: "",
+      replaceStar: true,
+      sourceLocation: "",
+      targetLocation: "",
+      customizedField: true,
+      requiredMapping: false,
     },
-    "title": "Name of the street or other street type"
+    title: "Name of the street or other street type",
   },
   setRightSide: vi.fn(),
   setRightSideInfo: vi.fn(),
   setRequestMapping: vi.fn(),
-}
+};
 
 const response = {
   responseMapping: [
     {
-      "name": "address.validation.city",
-      "title": "The city that the address is in",
-      "source": "@{{source}}",
-      "target": "@{{target}}",
-      "description": "",
-      "replaceStar": true,
-      "sourceLocation": "",
-      "targetLocation": "PATH",
-      "customizedField": true,
-      "requiredMapping": false,
-      "targetType": "",
-      "targetValues": [],
+      name: "address.validation.city",
+      title: "The city that the address is in",
+      source: "@{{source}}",
+      target: "@{{target}}",
+      description: "",
+      replaceStar: true,
+      sourceLocation: "",
+      targetLocation: "PATH",
+      customizedField: true,
+      requiredMapping: false,
+      targetType: "",
+      targetValues: [],
     },
   ],
   rightSide: 2,
@@ -64,140 +64,148 @@ const response = {
   setResponseMapping: vi.fn(),
   setActiveSonataResponse: vi.fn(),
   setActiveResponseName: vi.fn(),
-}
+};
 
 beforeEach(() => {
-  vi.clearAllMocks()
-})
+  vi.clearAllMocks();
+});
 
-describe('NewAPIMapping > request mapping', () => {
-  it('should render a source property input', async () => {
-    vi.spyOn(apiMappingHooks, 'useNewApiMappingStore').mockImplementation(
+describe("NewAPIMapping > request mapping", () => {
+  it("should render a source property input", async () => {
+    vi.spyOn(apiMappingHooks, "useNewApiMappingStore").mockImplementation(
       vi.fn().mockReturnValue(request)
-    )
+    );
 
-    const { getByTestId, getByRole, getAllByRole } =
-      render(<RequestSourceInput item={request.requestMapping[0]} index={0} />)
+    const { getByTestId, getByRole, getAllByRole } = render(
+      <RequestSourceInput item={request.requestMapping[0]} index={0} />
+    );
 
-    const input = getByTestId('sourceInput')
-    expect(input).toHaveValue(request.requestMapping[0].source)
-  
-    fireEvent.click(input)
-    expect(request.setRightSide).toHaveBeenCalledTimes(1)
-    expect(request.setRightSideInfo).toHaveBeenCalledTimes(1)
+    const input = getByTestId("sourceInput");
+    expect(input).toHaveValue(request.requestMapping[0].source);
 
-    fireEvent.change(input, { target: { value: '@{{not.hello}}' }})
-    expect(input).toHaveValue('@{{not.hello}}')
+    fireEvent.click(input);
+    expect(request.setRightSide).toHaveBeenCalledTimes(1);
+    expect(request.setRightSideInfo).toHaveBeenCalledTimes(1);
 
-    fireEvent.blur(input)
-    expect(request.setRequestMapping).toHaveBeenCalledTimes(1)
+    fireEvent.change(input, { target: { value: "@{{not.hello}}" } });
+    expect(input).toHaveValue("@{{not.hello}}");
 
-    let btnSelectLoc: HTMLElement
-    await waitFor(() => expect((btnSelectLoc = getByTestId('btnSelectLocation'))).toBeInTheDocument())
-    expect(btnSelectLoc!).toHaveTextContent('Please select location')
+    fireEvent.blur(input);
+    expect(request.setRequestMapping).toHaveBeenCalledTimes(1);
 
-    fireEvent.mouseEnter(btnSelectLoc!)
+    const btnSelectLoc = getByTestId("btnSelectLocation");
+    expect(btnSelectLoc).toHaveTextContent("Please select location");
 
-    await waitFor(() => expect(getByRole('menu')).toBeInTheDocument())
+    fireEvent.mouseEnter(btnSelectLoc!);
 
-    const items = getAllByRole('menuitem')
-    expect(items.length).toBe(5) // path, query, body, constant + divider
+    await waitFor(() => expect(getByRole("menu")).toBeInTheDocument());
 
-    expect(items[0]).toHaveTextContent('Path parameter')
-    expect(items[1]).toHaveTextContent('Query parameter')
-    expect(items[2]).toHaveTextContent('Request body')
-    expect(items[4]).toHaveTextContent('Constant value')
+    const items = getAllByRole("menuitem");
+    expect(items.length).toBe(6); // path, query, body, constant + divider
 
-    fireEvent.click(items[2])
-    expect(request.setRequestMapping).toHaveBeenCalledTimes(2)
-  })
+    expect(items[0]).toHaveTextContent("Hybrid");
+    expect(items[1]).toHaveTextContent("Path parameter");
+    expect(items[2]).toHaveTextContent("Query parameter");
+    expect(items[3]).toHaveTextContent("Request body");
+    expect(items[5]).toHaveTextContent("Constant value");
 
-  it('should render a target property input', async () => {
-    vi.spyOn(apiMappingHooks, 'useNewApiMappingStore').mockImplementation(
+    fireEvent.click(items[2]);
+    expect(request.setRequestMapping).toHaveBeenCalledTimes(2);
+  });
+
+  it("should render a target property input", async () => {
+    vi.spyOn(apiMappingHooks, "useNewApiMappingStore").mockImplementation(
       vi.fn().mockReturnValue(request)
-    )
+    );
 
-    const { getByTestId } =
-      render(<RequestTargetInput item={request.requestMapping[0]} index={0} />)
+    const { getByTestId } = render(
+      <RequestTargetInput item={request.requestMapping[0]} index={0} />
+    );
 
-    const input = getByTestId('targetInput')
-    expect(input).toHaveValue(request.requestMapping[0].target)
+    const input = getByTestId("targetInput");
+    expect(input).toHaveValue(request.requestMapping[0].target);
 
-    expect(getByTestId('targetLocation')).toHaveTextContent('Query parameter') // ~ QUERY
-  
-    fireEvent.click(input)
-    expect(request.setRightSideInfo).toHaveBeenCalledTimes(1)
-    expect(request.setRightSide).toHaveBeenCalledTimes(1)
+    expect(getByTestId("btnSelectLocation")).toHaveTextContent(
+      "Query parameter"
+    ); // ~ QUERY
 
-    fireEvent.change(input, { target: { value: '@{{target2}}' }})
-    expect(input).toHaveValue('@{{target2}}')
+    fireEvent.click(input);
+    expect(request.setRightSideInfo).toHaveBeenCalledTimes(1);
+    expect(request.setRightSide).toHaveBeenCalledTimes(1);
 
-    fireEvent.blur(input)
-    expect(request.setRequestMapping).toHaveBeenCalledTimes(1)
-  })
-})
+    fireEvent.change(input, { target: { value: "@{{target2}}" } });
+    expect(input).toHaveValue("@{{target2}}");
 
-describe('NewAPIMapping > response mapping', () => {
-  it('should render a source property input', async () => {
-    vi.spyOn(apiMappingHooks, 'useNewApiMappingStore').mockImplementation(
+    fireEvent.blur(input);
+    expect(request.setRequestMapping).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("NewAPIMapping > response mapping", () => {
+  it("should render a source property input", async () => {
+    vi.spyOn(apiMappingHooks, "useNewApiMappingStore").mockImplementation(
       vi.fn().mockReturnValue(response)
-    )
+    );
 
-    const { getByTestId, getByRole, getAllByRole } =
-      render(<ResponseSourceInput item={response.responseMapping[0]} index={0} />)
+    const { getByTestId, getByRole, getAllByRole } = render(
+      <ResponseSourceInput item={response.responseMapping[0]} index={0} />
+    );
 
-    const input = getByTestId('sourceInput')
-    expect(input).toHaveValue(response.responseMapping[0].source)
-  
-    fireEvent.click(input)
-    expect(response.setActiveResponseName).toHaveBeenCalledTimes(1)
-    expect(response.setRightSide).toHaveBeenCalledTimes(1)
+    const input = getByTestId("sourceInput");
+    expect(input).toHaveValue(response.responseMapping[0].source);
 
-    fireEvent.change(input, { target: { value: '@{{source2}}' }})
-    expect(input).toHaveValue('@{{source2}}')
+    fireEvent.click(input);
+    expect(response.setActiveResponseName).toHaveBeenCalledTimes(1);
+    expect(response.setRightSide).toHaveBeenCalledTimes(1);
 
-    fireEvent.blur(input)
-    expect(response.setActiveResponseName).toHaveBeenCalledTimes(2)
+    fireEvent.change(input, { target: { value: "@{{source2}}" } });
+    expect(input).toHaveValue("@{{source2}}");
 
-    let btnSelectLoc: HTMLElement
-    await waitFor(() => expect((btnSelectLoc = getByTestId('btnSelectLocation'))).toBeInTheDocument())
-    expect(btnSelectLoc!).toHaveTextContent('Please select location')
+    fireEvent.blur(input);
+    expect(response.setActiveResponseName).toHaveBeenCalledTimes(2);
+    expect(response.setResponseMapping).toHaveBeenCalledTimes(1);
 
-    fireEvent.mouseEnter(btnSelectLoc!)
+    const btnSelectLoc = getByTestId("btnSelectLocation");
+    expect(btnSelectLoc!).toHaveTextContent("Please select location");
 
-    await waitFor(() => expect(getByRole('menu')).toBeInTheDocument())
+    fireEvent.mouseEnter(btnSelectLoc!);
 
-    const items = getAllByRole('menuitem')
-    expect(items.length).toBe(3) // body, constant + divider
+    await waitFor(() => expect(getByRole("menu")).toBeInTheDocument());
 
-    expect(items[0]).toHaveTextContent('Request body')
-    expect(items[2]).toHaveTextContent('Constant value')
+    const items = getAllByRole("menuitem");
+    expect(items.length).toBe(3); // body, constant + divider
 
-    fireEvent.click(items[1])
-    expect(response.setResponseMapping).toHaveBeenCalledTimes(1)
-  })
+    expect(items[0]).toHaveTextContent("Request body");
+    expect(items[2]).toHaveTextContent("Constant value");
 
-  it('should render a target property input', async () => {
-    vi.spyOn(apiMappingHooks, 'useNewApiMappingStore').mockImplementation(
+    fireEvent.click(items[0]);
+    expect(response.setResponseMapping).toHaveBeenCalledTimes(2);
+  });
+
+  it("should render a target property input", async () => {
+    vi.spyOn(apiMappingHooks, "useNewApiMappingStore").mockImplementation(
       vi.fn().mockReturnValue(response)
-    )
+    );
 
-    const { getByTestId } =
-      render(<ResponseTargetInput item={response.responseMapping[0]} index={0} />)
+    const { getByTestId } = render(
+      <ResponseTargetInput item={response.responseMapping[0]} index={0} />
+    );
 
-    const input = getByTestId('targetInput')
-    expect(input).toHaveValue(response.responseMapping[0].target)
+    const input = getByTestId("targetInput");
+    expect(input).toHaveValue(response.responseMapping[0].target);
 
-    expect(getByTestId('targetLocation')).toHaveTextContent('Path parameter') // ~ PATH
-  
-    fireEvent.click(input)
-    expect(response.setActiveSonataResponse).toHaveBeenCalledTimes(1)
-    expect(response.setRightSide).toHaveBeenCalledTimes(1)
+    expect(getByTestId("btnSelectLocation")).toHaveTextContent(
+      "Path parameter"
+    ); // ~ PATH
 
-    fireEvent.change(input, { target: { value: '@{{target2}}' }})
-    expect(input).toHaveValue('@{{target2}}')
+    fireEvent.click(input);
+    expect(response.setActiveSonataResponse).toHaveBeenCalledTimes(1);
+    expect(response.setRightSide).toHaveBeenCalledTimes(1);
 
-    fireEvent.blur(input)
-    expect(response.setActiveSonataResponse).toHaveBeenCalledTimes(2)
-  })
-})
+    fireEvent.change(input, { target: { value: "@{{target2}}" } });
+    expect(input).toHaveValue("@{{target2}}");
+
+    fireEvent.blur(input);
+    expect(response.setActiveSonataResponse).toHaveBeenCalledTimes(2);
+  });
+});

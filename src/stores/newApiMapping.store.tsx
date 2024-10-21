@@ -32,6 +32,11 @@ type NewApiMappingStore = {
   setActiveSonataResponse: (value?: string) => void;
   listMappingStateRequest: IMapping[];
   setListMappingStateRequest: (value?: IMapping[]) => void;
+  errors?: {
+    requestIds: Set<string>;
+    responseIds: Set<string>;
+  };
+  setErrors(value: { requestIds: Set<string>; responseIds: Set<string> }): void;
 };
 
 const defaultData = {
@@ -71,4 +76,5 @@ export const useNewApiMappingStore = create<NewApiMappingStore>()((set) => ({
     set({ activeSonataResponse: value }),
   setListMappingStateRequest: (value?: IMapping[]) =>
     set({ listMappingStateRequest: value }),
+  setErrors: (value) => set({ errors: value }),
 }));

@@ -1,17 +1,19 @@
+import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { EnumRightType } from "@/utils/types/common.type";
+import { IResponseMapping } from "@/utils/types/component.type";
 import { RightOutlined } from "@ant-design/icons";
 import { Flex, Input, Tooltip } from "antd";
 import clsx from "clsx";
 import { cloneDeep, set } from "lodash";
-import styles from "./index.module.scss";
-import { SecondaryText } from "@/components/Text";
-import { locationMapping } from "../RequestItem/util";
-import { IResponseMapping } from "@/utils/types/component.type";
-import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { useEffect, useState } from "react";
+import { locationMapping } from "../../helper";
 import { LocationSelector } from "../LocationSelector";
+import styles from "./index.module.scss";
 
-export function SourceInput({ item, index }: Readonly<{ item: IResponseMapping; index: number }>) {
+export function SourceInput({
+  item,
+  index,
+}: Readonly<{ item: IResponseMapping; index: number }>) {
   const {
     responseMapping,
     activeResponseName,
@@ -19,9 +21,10 @@ export function SourceInput({ item, index }: Readonly<{ item: IResponseMapping; 
     rightSide,
     setResponseMapping,
     setActiveResponseName,
+    errors,
   } = useNewApiMappingStore();
 
-  const [value, setValue] = useState('')
+  const [value, setValue] = useState("");
 
   const handleChange = (field: keyof typeof item, value: any) => {
     const cloneObj = cloneDeep(responseMapping);
@@ -30,28 +33,25 @@ export function SourceInput({ item, index }: Readonly<{ item: IResponseMapping; 
     );
     set(cloneObj, `[${itemIndex}].${field}`, value);
     setResponseMapping(cloneObj);
-  }
+  };
 
   useEffect(() => {
-    setValue(item.source)
-  }, [item.source, setValue])
+    setValue(item.source);
+  }, [item.source, setValue]);
 
-  const id = `${index}-${item?.name}`
-  const isFocused = rightSide === EnumRightType.AddSellerResponse &&
-    activeResponseName === id
+  const id = `${index}-${item?.name}`;
+  const isFocused =
+    rightSide === EnumRightType.AddSellerResponse && activeResponseName === id;
 
   return (
     <Flex className={styles.flexColumn} gap={4}>
-      {item.sourceLocation && (
-        <SecondaryText.Normal data-testid="sourceLocation">
-          {locationMapping(item.sourceLocation)}
-        </SecondaryText.Normal>
-      )}
-
-      {item.customizedField && item.source && !item.sourceLocation && !isFocused && (
+      {item.source && (
         <LocationSelector
           type="response"
-          onChange={value => handleChange('sourceLocation', value)} />
+          disabled={!item.customizedField}
+          value={locationMapping(item.sourceLocation)}
+          onChange={(value) => handleChange("sourceLocation", value)}
+        />
       )}
 
       <Tooltip title={item?.source}>
@@ -62,22 +62,21 @@ export function SourceInput({ item, index }: Readonly<{ item: IResponseMapping; 
           placeholder="Select or input property"
           className={clsx(styles.input, {
             [styles.activeInput]: isFocused,
+            [styles.error]: errors?.responseIds?.has(item.id!) && !item.source,
           })}
           value={value}
-          suffix={
-            <RightOutlined style={{ fontSize: 12, color: "#C9CDD4" }} />
-          }
+          suffix={<RightOutlined style={{ fontSize: 12, color: "#C9CDD4" }} />}
           onClick={() => {
             setActiveResponseName(id);
             setRightSide(EnumRightType.AddSellerResponse);
           }}
           onChange={(e) => setValue(e.target.value)}
           onBlur={() => {
-            handleChange('source', value)
+            handleChange("source", value);
             setActiveResponseName(undefined);
           }}
         />
       </Tooltip>
     </Flex>
-  )
+  );
 }

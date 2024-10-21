@@ -1,50 +1,68 @@
-import { Button, Divider, Dropdown } from "antd";
-import styles from "./index.module.scss";
 import { DownOutlined } from "@ant-design/icons";
+import { Button, Divider, Dropdown } from "antd";
 import { ItemType } from "antd/es/menu/interface";
+import styles from "./index.module.scss";
 
 const items: ItemType[] = [
   {
-    label: 'Path parameter',
-    key: 'PATH',
+    label: "Hybrid",
+    key: "Hybrid",
   },
   {
-    label: 'Query parameter',
-    key: 'QUERY',
+    label: "Path parameter",
+    key: "PATH",
   },
   {
-    label: 'Request body',
-    key: 'BODY'
+    label: "Query parameter",
+    key: "QUERY",
+  },
+  {
+    label: "Request body",
+    key: "BODY",
   },
   {
     label: <Divider className={styles.optionDivider} />,
     className: styles.selectOptionDivider,
     disabled: true,
-    key: 'DIVIDER'
+    key: "DIVIDER",
   },
   {
-    label: 'Constant value',
-    key: 'CONSTANT',
-  }
-]
+    label: "Constant value",
+    key: "CONSTANT",
+  },
+];
 
-export function LocationSelector({ type, onChange }: Readonly<{ type: 'response' | 'request'; onChange(value: string): void }>) {
-  const menuItems = type === 'response' ? items.slice(-3) : items
+export function LocationSelector({
+  type,
+  disabled,
+  value,
+  onChange,
+}: Readonly<{
+  type: "response" | "request";
+  disabled?: boolean;
+  value?: string;
+  onChange(value: string): void;
+}>) {
+  const menuItems = type === "response" ? items.slice(-3) : items;
 
   return (
     <Dropdown
       data-testid="locationSelector"
-      menu={{ items: menuItems, onClick: (info) => onChange(info.key) }}>
+      className={styles.locationDropdown}
+      disabled={disabled}
+      menu={{ items: menuItems, onClick: (info) => onChange(info.key) }}
+    >
       <Button
         data-testid="btnSelectLocation"
         className={styles.locationSelector}
         type="link"
-        danger
-        icon={<DownOutlined />}
+        danger={!value}
+        icon={!disabled && <DownOutlined />}
         iconPosition="end"
-        onClick={(e) => e.preventDefault()}>
-        Please select location
+        onClick={(e) => e.preventDefault()}
+      >
+        {value || "Please select location"}
       </Button>
     </Dropdown>
-  )
+  );
 }

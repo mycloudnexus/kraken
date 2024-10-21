@@ -1,13 +1,13 @@
+import ContactIcon from "@/assets/standardAPIMapping/contact.svg";
+import InventoryIcon from "@/assets/standardAPIMapping/inventory.svg";
+import OrderIcon from "@/assets/standardAPIMapping/order.svg";
+import QuoteIcon from "@/assets/standardAPIMapping/quote.svg";
+import { useMappingUiStore } from "@/stores/mappingUi.store";
+import { IComponent } from "@/utils/types/component.type";
 import { Flex, Select, Typography } from "antd";
+import { isEmpty } from "lodash";
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { isEmpty } from "lodash";
-import { useMappingUiStore } from "@/stores/mappingUi.store";
-import ContactIcon from "@/assets/standardAPIMapping/contact.svg";
-import OrderIcon from "@/assets/standardAPIMapping/order.svg";
-import InventoryIcon from "@/assets/standardAPIMapping/inventory.svg";
-import QuoteIcon from "@/assets/standardAPIMapping/quote.svg";
-import { IComponent } from "@/utils/types/product.type";
 import styles from "./index.module.scss";
 
 type ComponentSelectProps = {

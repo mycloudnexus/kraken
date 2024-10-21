@@ -1,16 +1,16 @@
-import { Text } from "@/components/Text";
-import { IComponent } from "@/utils/types/product.type";
-import { Card, Col, Flex, Row, Tag, Typography, notification } from "antd";
-import { get } from "lodash";
-import { useBoolean } from "usehooks-ts";
 import TitleIcon from "@/assets/title-icon.svg";
-import { useMemo } from "react";
-import { PaperClipOutlined } from "@ant-design/icons";
-import jsYaml from "js-yaml";
-import { decode } from "js-base64";
 import SpecDrawer from "@/components/SpecDrawer";
-import { useNavigate } from "react-router-dom";
+import { Text } from "@/components/Text";
 import { useAppStore } from "@/stores/app.store";
+import { IComponent } from "@/utils/types/component.type";
+import { PaperClipOutlined } from "@ant-design/icons";
+import { Card, Col, Flex, Row, Tag, Typography, notification } from "antd";
+import { decode } from "js-base64";
+import jsYaml from "js-yaml";
+import { get } from "lodash";
+import { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import { useBoolean } from "usehooks-ts";
 
 type Props = {
   item: IComponent;

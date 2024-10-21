@@ -1,3 +1,5 @@
+@import "../../../../variables.scss";
+
 .root {
   border: 1px solid #dde1e5;
   border-radius: 4px;
@@ -32,6 +34,17 @@
   input {
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  &:disabled {
+    color: #000 !important;
+    background: #f0f2f5 !important;
+    border: none !important;
+    cursor: default;
+  }
+
+  &.error {
+    border-color: $error !important;
   }
 }
 

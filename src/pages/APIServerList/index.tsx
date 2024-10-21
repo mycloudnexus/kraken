@@ -2,14 +2,12 @@ import Flex from "@/components/Flex";
 import { Text } from "@/components/Text";
 import { useGetComponentListAPISpec } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
+import { IComponent } from "@/utils/types/component.type";
 import { Button, ConfigProvider, Empty, Spin } from "antd";
 import { isEmpty } from "lodash";
 import { useNavigate } from "react-router";
-
-import styles from "./index.module.scss";
-
-import { IComponent } from "@/utils/types/product.type";
 import APIServerCard from "./components/APIServerCard";
+import styles from "./index.module.scss";
 
 const APIServerList = () => {
   const { currentProduct } = useAppStore();

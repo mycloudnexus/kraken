@@ -1,7 +1,27 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { InfoCircleOutlined } from "@ant-design/icons";
 import RollbackIcon from "@/assets/newAPIMapping/Rollback.svg";
+import DeployStage from "@/components/DeployStage";
+import Flex from "@/components/Flex";
+import StepBar from "@/components/StepBar";
+import { Text } from "@/components/Text";
+import {
+  PRODUCT_CACHE_KEYS,
+  useGetLatestRunningList,
+  useUpdateTargetMapper,
+} from "@/hooks/product";
+import useSize from "@/hooks/useSize";
+import useUser from "@/hooks/user/useUser";
+import { useAppStore } from "@/stores/app.store";
+import { useMappingUiStore } from "@/stores/mappingUi.store";
+import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
+import { EStep } from "@/utils/constants/common";
+import buildInitListMapping from "@/utils/helpers/buildInitListMapping";
+import { isElementInViewport } from "@/utils/helpers/html";
+import { queryClient } from "@/utils/helpers/reactQuery";
+import { EnumRightType } from "@/utils/types/common.type";
+import { IMappers } from "@/utils/types/component.type";
+import { InfoCircleOutlined } from "@ant-design/icons";
 import { Button, Tabs, TabsProps, Tooltip, notification } from "antd";
+import dayjs from "dayjs";
 import {
   chain,
   cloneDeep,
@@ -11,42 +31,24 @@ import {
   reduce,
   uniqBy,
 } from "lodash";
-import Flex from "@/components/Flex";
-import StepBar from "@/components/StepBar";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useSessionStorage } from "usehooks-ts";
+import DeployHistory from "./components/DeployHistory";
+import DeploymentInfo from "./components/DeploymentInfo";
+import HeaderMapping from "./components/HeaderMapping";
+import NotRequired from "./components/NotRequired";
 import RequestMapping from "./components/RequestMapping";
 import ResponseMapping, { IMapping } from "./components/ResponseMapping";
 import RightAddSellerProp from "./components/RightAddSellerProp";
 import RightAddSonataProp from "./components/RightAddSonataProp";
 import SelectAPI from "./components/SelectAPI";
 import SelectResponseProperty from "./components/SelectResponseProperty";
+import SonataResponseMapping from "./components/SonataResponseMapping";
+import StatusIcon from "./components/StatusIcon";
 import useGetApiSpec from "./components/useGetApiSpec";
 import useGetDefaultSellerApi from "./components/useGetDefaultSellerApi";
-import HeaderMapping from "./components/HeaderMapping";
-import {
-  PRODUCT_CACHE_KEYS,
-  useGetLatestRunningList,
-  useUpdateTargetMapper,
-} from "@/hooks/product";
-import { useAppStore } from "@/stores/app.store";
-import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
-import { EStep } from "@/utils/constants/common";
-import { EnumRightType } from "@/utils/types/common.type";
-import { queryClient } from "@/utils/helpers/reactQuery";
+import { validateMappers } from "./helper";
 import styles from "./index.module.scss";
-import buildInitListMapping from "@/utils/helpers/buildInitListMapping";
-import { useMappingUiStore } from "@/stores/mappingUi.store";
-import { Text } from "@/components/Text";
-import SonataResponseMapping from "./components/SonataResponseMapping";
-import DeployHistory from "./components/DeployHistory";
-import DeployStage from "@/components/DeployStage";
-import dayjs from "dayjs";
-import useSize from "@/hooks/useSize";
-import useUser from "@/hooks/user/useUser";
-import DeploymentInfo from "./components/DeploymentInfo";
-import StatusIcon from "./components/StatusIcon";
-import { useSessionStorage } from "usehooks-ts";
-import NotRequired from "./components/NotRequired";
-import { isElementInViewport } from "@/utils/helpers/html";
 
 type Props = {
   rightSide: number;
@@ -126,6 +128,7 @@ const NewAPIMapping = ({
     setListMappingStateRequest,
     listMappingStateRequest,
     setRightSideInfo,
+    setErrors,
   } = useNewApiMappingStore();
   const queryData = JSON.parse(query ?? "{}");
 
@@ -148,7 +151,7 @@ const NewAPIMapping = ({
   } = useGetApiSpec(currentProduct, queryData.targetMapperKey ?? "");
 
   const { sellerApi: defaultSellerApi, serverKey: defaultServerKey } =
-    useGetDefaultSellerApi(currentProduct, serverKeyInfo);
+    useGetDefaultSellerApi(currentProduct, serverKeyInfo as any);
 
   const [mainTabKey, setMainTabKey] = useState<string>(EMainTab.mapping);
   const [firstTimeLoadSellerAPI, setFirstTimeLoadSellerAPI] = useState(true);
@@ -185,7 +188,7 @@ const NewAPIMapping = ({
 
   useEffect(() => {
     if (firstTimeLoad && !isEmpty(mappers?.request)) {
-      setListMappingStateRequest(buildInitListMapping(mappers?.request));
+      setListMappingStateRequest(buildInitListMapping(mappers?.request as any));
       setRequestMapping(resetMapping() ?? []);
     }
   }, [mappers?.request, firstTimeLoad]);
@@ -193,7 +196,9 @@ const NewAPIMapping = ({
   useEffect(() => {
     if (firstTimeLoad && !isEmpty(mappers?.response)) {
       setResponseMapping(resetResponseMapping());
-      setListMappingStateResponse(buildInitListMapping(mappers?.response));
+      setListMappingStateResponse(
+        buildInitListMapping(mappers?.response as any)
+      );
       setFirstTimeLoad(false);
     }
   }, [mappers?.response, firstTimeLoad]);
@@ -342,6 +347,19 @@ const NewAPIMapping = ({
 
   const handleSave = async (callback?: () => void) => {
     try {
+      // Validate properties name and location
+      const { requestIds, responseIds, errorMessage } = validateMappers({
+        request: requestMapping,
+        response: responseMapping,
+      });
+      setErrors({ requestIds, responseIds });
+
+      if (errorMessage) {
+        notification.error({ message: errorMessage });
+
+        return;
+      }
+
       const newData = transformListMappingItem(listMappingStateResponse);
       const newDataRequest = transformListMappingItem(listMappingStateRequest);
       let newResponse = cloneDeep(responseMapping);
@@ -375,34 +393,39 @@ const NewAPIMapping = ({
         });
       }
 
-      const data = cloneDeep(mapperResponse);
+      const mappers: IMappers = {
+        request: newRequest.map((rm) => ({
+          ...rm,
+          target: get(rm, "target", ""),
+          source: get(rm, "source", ""),
+          targetLocation:
+            isEmpty(rm?.target) && rm?.targetLocation === "HYBRID"
+              ? ""
+              : get(rm, "targetLocation", ""),
+          sourceLocation: get(rm, "sourceLocation", ""),
+          requiredMapping: Boolean(rm.requiredMapping),
+          id: undefined, // Omit id from patch payload
+        })),
+        response: newResponse.map((rm) => ({
+          ...rm,
+          targetLocation: get(rm, "targetLocation", ""),
+          sourceLocation: get(rm, "sourceLocation", ""),
+          target: get(rm, "target", ""),
+          source: get(rm, "source", ""),
+          requiredMapping: Boolean(rm.requiredMapping),
+          id: undefined, // Omit id from patch payload
+        })),
+      };
+
+      const data = cloneDeep(mapperResponse)!;
       data.facets.endpoints[0] = {
         ...data.facets.endpoints[0],
-        serverKey,
+        serverKey: serverKey as any,
         method: sellerApi.method,
         path: sellerApi.url,
-        mappers: {
-          request: newRequest.map((rm) => ({
-            ...rm,
-            target: get(rm, "target", ""),
-            source: get(rm, "source", ""),
-            targetLocation:
-              isEmpty(rm?.target) && rm?.targetLocation === "HYBRID"
-                ? ""
-                : get(rm, "targetLocation", ""),
-            sourceLocation: get(rm, "sourceLocation", ""),
-            requiredMapping: Boolean(rm.requiredMapping),
-          })),
-          response: newResponse.map((rm) => ({
-            ...rm,
-            targetLocation: get(rm, "targetLocation", ""),
-            sourceLocation: get(rm, "sourceLocation", ""),
-            target: get(rm, "target", ""),
-            source: get(rm, "source", ""),
-            requiredMapping: Boolean(rm.requiredMapping),
-          })),
-        },
+        mappers,
       };
+
       const res = await updateTargetMapper({
         productId: currentProduct,
         componentId: data.metadata.id,
@@ -428,7 +451,7 @@ const NewAPIMapping = ({
   const handleRevert = () => {
     setRequestMapping(resetMapping() ?? []);
     setResponseMapping(mappers?.response);
-    setListMappingStateResponse(buildInitListMapping(mappers?.response));
+    setListMappingStateResponse(buildInitListMapping(mappers?.response as any));
     setActiveTab("request");
   };
 
@@ -598,7 +621,7 @@ const NewAPIMapping = ({
               <DeployStage
                 inComplete={queryData.mappingStatus === "incomplete"}
                 diffWithStage={queryData.diffWithStage}
-                metadataKey={metadataKey}
+                metadataKey={metadataKey as any}
               />
             </Flex>
           </Flex>

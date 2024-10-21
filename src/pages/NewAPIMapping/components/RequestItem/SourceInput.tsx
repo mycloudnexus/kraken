@@ -1,17 +1,19 @@
-import { SecondaryText } from "@/components/Text";
+import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { EnumRightType } from "@/utils/types/common.type";
 import { IRequestMapping } from "@/utils/types/component.type";
 import { Flex, Tooltip, Input } from "antd";
 import clsx from "clsx";
 import { isEqual, cloneDeep, set } from "lodash";
-import styles from "./index.module.scss";
-import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
-import { locationMapping } from "./util";
 import { useEffect, useMemo, useState } from "react";
+import { locationMapping } from "../../helper";
 import { LocationSelector } from "../LocationSelector";
+import styles from "./index.module.scss";
 
-export function SourceInput({ item, index }: Readonly<{ item: IRequestMapping; index: number }>) {
-  const [value, setValue] = useState('')
+export function SourceInput({
+  item,
+  index,
+}: Readonly<{ item: IRequestMapping; index: number }>) {
+  const [value, setValue] = useState("");
 
   const {
     requestMapping,
@@ -20,35 +22,42 @@ export function SourceInput({ item, index }: Readonly<{ item: IRequestMapping; i
     setRequestMapping,
     rightSideInfo,
     rightSide,
+    errors,
   } = useNewApiMappingStore();
 
-  const isFocused = useMemo(() =>
-    rightSide === EnumRightType.AddSonataProp &&
-    isEqual(item, rightSideInfo?.previousData),
-    [rightSide, item, rightSideInfo?.previousData])
+  const isFocused = useMemo(
+    () =>
+      rightSide === EnumRightType.AddSonataProp &&
+      isEqual(item, rightSideInfo?.previousData),
+    [rightSide, item, rightSideInfo?.previousData]
+  );
 
-  const handleChange = (field: keyof typeof item, value: any) => {
+  const handleChange = (changes: { [field in keyof typeof item]?: any }) => {
     const newRequest = cloneDeep(requestMapping);
-    set(newRequest, `[${index}].${field}`, value);
+    for (const field in changes) {
+      set(
+        newRequest,
+        `[${index}].${field}`,
+        changes[field as keyof typeof item]
+      );
+    }
+
     setRequestMapping(newRequest);
-  }
+  };
 
   useEffect(() => {
-    setValue(item.source)
-  }, [item.source, setValue])
+    setValue(item.source);
+  }, [item.source, setValue]);
 
   return (
     <Flex className={styles.flexColumn} gap={4}>
-      {item.sourceLocation && (
-        <SecondaryText.Normal data-testid="sourceLocation">
-          {locationMapping(item.sourceLocation)}
-        </SecondaryText.Normal>
-      )}
-
-      {item.customizedField && item.source && !item.sourceLocation && !isFocused && (
+      {item.source && (
         <LocationSelector
           type="request"
-          onChange={value => handleChange('sourceLocation', value)} />
+          disabled={!item.customizedField}
+          value={locationMapping(item.sourceLocation)}
+          onChange={(value) => handleChange({ sourceLocation: value })}
+        />
       )}
 
       <Tooltip title={item.source}>
@@ -59,6 +68,8 @@ export function SourceInput({ item, index }: Readonly<{ item: IRequestMapping; i
           placeholder="Select or input property"
           className={clsx(styles.requestMappingItemWrapper, {
             [styles.active]: isFocused,
+            [styles.error]:
+              errors?.requestIds?.has(item.id as any) && !item.source,
           })}
           value={value}
           style={{ flex: 1 }}
@@ -73,10 +84,16 @@ export function SourceInput({ item, index }: Readonly<{ item: IRequestMapping; i
               previousData: item,
             });
           }}
-          onChange={e => setValue(e.target.value)}
-          onBlur={() => handleChange('source', value)}
+          onChange={(e) => setValue(e.target.value)}
+          onBlur={() => {
+            if (!value) {
+              handleChange({ source: value, sourceLocation: undefined });
+            } else {
+              handleChange({ source: value });
+            }
+          }}
         />
       </Tooltip>
     </Flex>
-  )
+  );
 }

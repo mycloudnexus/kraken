@@ -52,6 +52,7 @@ import {
   IUnifiedAsset,
 } from "@/utils/types/common.type";
 import {
+  IComponent,
   IComponentVersion,
   IProductWithComponentVersion,
 } from "@/utils/types/component.type";
@@ -64,7 +65,6 @@ import {
   IMapperDetails,
   IRunningComponentItem,
 } from "@/utils/types/env.type";
-
 import { IEnvComponent } from "@/utils/types/envComponent.type";
 import { useMutation, useQuery, useQueries } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
@@ -180,7 +180,7 @@ export const useGetComponentListV2 = (
   productId: string,
   targetMapperKey: string
 ) => {
-  return useQuery<any, Error>({
+  return useQuery<any, Error, IComponent>({
     queryKey: [
       PRODUCT_CACHE_KEYS.get_component_list_v2,
       productId,

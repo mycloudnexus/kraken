@@ -1,9 +1,7 @@
 .content {
   display: flex;
   flex-direction: column;
-  gap: 16px;
   max-height: calc(100% - 35px);
-  overflow-y: auto;
 }
 
 .loading {
@@ -33,7 +31,6 @@
 
 .container {
   padding: 20px;
-  overflow-y: auto;
 }
 
 .search {
@@ -64,4 +61,12 @@
   svg {
     width: 100%;
   }
+}
+
+.groupTitle {
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index: 2;
+  padding: 16px 0;
 }

@@ -1,21 +1,21 @@
-import { IResponseMapping } from "@/utils/types/component.type";
-import styles from "./index.module.scss";
-import { Button, Flex, Input, Select } from "antd";
-import { Text } from "@/components/Text";
 import MappingIcon from "@/assets/newAPIMapping/mapping-icon-response.svg";
-import { cloneDeep, difference, get, isEmpty, set } from "lodash";
+import { Text } from "@/components/Text";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
+import { IResponseMapping } from "@/utils/types/component.type";
 import {
   CheckOutlined,
   CloseOutlined,
   DeleteOutlined,
   EditOutlined,
 } from "@ant-design/icons";
-import { useBoolean } from "usehooks-ts";
-import { useEffect, useState } from "react";
+import { Button, Flex, Input, Select } from "antd";
 import clsx from "clsx";
+import { cloneDeep, difference, get, isEmpty, set } from "lodash";
+import { useEffect, useState } from "react";
+import { useBoolean } from "usehooks-ts";
 import { SourceInput } from "./SourceInput";
 import { TargetInput } from "./TargetInput";
+import styles from "./index.module.scss";
 
 type Props = {
   item: IResponseMapping;
@@ -195,7 +195,12 @@ const ResponseItem = ({ item, index }: Props) => {
         )}
       </Flex>
       <Flex className={styles.container} gap={14} wrap="wrap" align="flex-end">
-        <TargetInput item={item} index={index} onChange={updateResponseMapping} />
+        {/* Target response input */}
+        <TargetInput
+          item={item}
+          index={index}
+          onChange={updateResponseMapping}
+        />
 
         <span className={styles.mappingIcon}>
           <MappingIcon />
