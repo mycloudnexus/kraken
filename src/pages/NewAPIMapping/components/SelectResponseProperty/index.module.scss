@@ -3,8 +3,9 @@
   border: 1px solid #ddd;
   background-color: #f5f5f5;
   max-width: 100%;
-  max-height: 500px;
   overflow: auto;
+  flex: 1;
+  margin-top: 12px;
 
   :global(.ant-tree-list) {
     background-color: #f5f5f5;
@@ -36,12 +37,10 @@
     .ant-tree-switcher {
       background: #fff;
       border-radius: 0;
+      width: fit-content;
     }
     .ant-tree-switcher-noop {
       visibility: hidden;
-    }
-    .ant-tree-list {
-      padding-left: 20px;
     }
   }
 }
@@ -58,7 +57,7 @@
 
   padding: 2px 4px;
   background: #fff;
-  width: 50px;
+  width: 80px;
 }
 
 .root {
@@ -78,6 +77,8 @@
   padding: 16px;
   flex: 1;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .footer {

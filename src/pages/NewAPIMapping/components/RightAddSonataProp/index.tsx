@@ -5,11 +5,11 @@ import {
   parseObjectDescriptionToTreeData,
 } from "@/utils/helpers/schema";
 import { Button, Collapse, Empty, Flex } from "antd";
+import { isEmpty } from "lodash";
 import { useEffect, useMemo, useState } from "react";
 import swaggerClient from "swagger-client";
 import { useCommonAddProp } from "../commonHook";
 import styles from "./index.module.scss";
-import { isEmpty } from "lodash";
 
 export const getCorrectSpec = (spec: any, method: string) => {
   if (!spec) return;
@@ -102,7 +102,6 @@ const RightAddSonataProp = ({
   return (
     <Flex
       vertical
-      gap={16}
       style={{ width: "100%", height: "100%" }}
       className={styles.root}
     >

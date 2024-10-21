@@ -5,10 +5,10 @@ import {
   parseObjectDescriptionToTreeData,
 } from "@/utils/helpers/schema";
 import { Button, Collapse, Empty, Flex } from "antd";
+import { isEmpty } from "lodash";
 import { useMemo, useState } from "react";
 import { useCommonAddProp } from "../commonHook";
 import styles from "./index.module.scss";
-import { isEmpty } from "lodash";
 
 interface Props {
   onSelect?: (prop: any) => void;
@@ -58,7 +58,7 @@ const RightAddSellerProp = ({ onSelect }: Readonly<Props>) => {
   });
 
   return (
-    <Flex vertical gap={16} style={{ width: "100%", height: "100%" }}>
+    <Flex vertical style={{ width: "100%", height: "100%" }}>
       <div className={styles.header}>
         <Text.NormalLarge lineHeight="24px">
           Select Seller API mapping property

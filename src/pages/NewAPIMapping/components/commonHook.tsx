@@ -9,6 +9,7 @@ import {
   Typography,
   notification,
 } from "antd";
+import classNames from "classnames";
 import clsx from "clsx";
 import { get, isEmpty, omit } from "lodash";
 import { Dispatch, useCallback, useMemo, useState } from "react";
@@ -274,6 +275,7 @@ export const useCommonAddProp = ({
             Request body
           </Typography.Text>
         ),
+        className: classNames(styles.flexOne, styles.requestBodySection),
         children: (
           <div className={styles.tree}>
             <Tree

@@ -41,6 +41,9 @@
     .tree-item-wrapper {
       flex-wrap: wrap;
     }
+    .ant-tree-title {
+      display: flex;
+    }
     .ant-tree-node-content-wrapper {
       padding-left: 0;
       cursor: default;
@@ -48,12 +51,10 @@
     .ant-tree-switcher {
       background: #fff;
       border-radius: 0;
+      width: fit-content;
     }
     .ant-tree-switcher-noop {
       visibility: hidden;
-    }
-    .ant-tree-list {
-      padding-left: 20px;
     }
   }
   :global(.ant-tree-list) {
@@ -61,7 +62,6 @@
   }
   :global(.ant-tree-treenode),
   :global(.ant-tree-node-content-wrapper) {
-    width: 100%;
     &:hover {
       background-color: #f5f5f5;
     }
@@ -85,6 +85,7 @@
   padding: 2px 4px;
   background: #fff;
   word-break: break-all;
+  white-space: wrap;
 }
 
 .nodeExample {

@@ -194,8 +194,8 @@ const ResponseItem = ({ item, index }: Props) => {
           </Flex>
         )}
       </Flex>
-      <Flex className={styles.container} gap={14} wrap="wrap" align="flex-end">
-        {/* Target response input */}
+      <Flex className={styles.container} gap={8} wrap="wrap" align="flex-end">
+        {/* Sonata side Target response input */}
         <TargetInput
           item={item}
           index={index}
@@ -206,8 +206,8 @@ const ResponseItem = ({ item, index }: Props) => {
           <MappingIcon />
         </span>
 
-        {/* Source response input */}
-        <SourceInput item={item} index={index} />
+        {/* Seller side Source response input */}
+        <SourceInput item={item} index={index} isSellerSideProps />
       </Flex>
       {!isEmpty(item?.targetValues) && (
         <Flex vertical gap={20} style={{ width: "100%", marginTop: 8 }}>
@@ -221,11 +221,7 @@ const ResponseItem = ({ item, index }: Props) => {
                 wrap="wrap"
                 align="center"
               >
-                <Flex
-                  align="center"
-                  gap={8}
-                  style={{ width: "calc(50% - 30px)" }}
-                >
+                <Flex align="center" gap={8} style={{ flex: 1 }}>
                   <Select
                     className={styles.stateSelect}
                     data-testid="select-sonata-state"
@@ -251,7 +247,7 @@ const ResponseItem = ({ item, index }: Props) => {
                   mode="tags"
                   key={`enum-${key}`}
                   placeholder="Input seller order state, Enter for multiple states"
-                  style={{ width: "calc(50% - 30px)" }}
+                  style={{ flex: 1 }}
                   value={to}
                   className={styles.stateSelect}
                   onChange={(e) => handleChangeInput(e, key)}

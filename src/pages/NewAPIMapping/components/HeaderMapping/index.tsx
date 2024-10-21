@@ -1,20 +1,20 @@
+import MappingReverseIcon from "@/assets/newAPIMapping/mapping-icon-reverse.svg";
+import MappingIcon from "@/assets/newAPIMapping/mapping-icon.svg";
 import LogMethodTag from "@/components/LogMethodTag";
 import { Text } from "@/components/Text";
+import { useMappingUiStore } from "@/stores/mappingUi.store";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { EnumRightType } from "@/utils/types/common.type";
-import { CloseCircleFilled, RightOutlined } from "@ant-design/icons";
-import { Flex, Modal, Typography } from "antd";
-import clsx from "clsx";
-import MappingIcon from "@/assets/newAPIMapping/mapping-icon.svg";
-import MappingReverseIcon from "@/assets/newAPIMapping/mapping-icon-reverse.svg";
-import styles from "./index.module.scss";
-import { useMappingUiStore } from "@/stores/mappingUi.store";
-import { get, isEmpty } from "lodash";
-import { useBoolean } from "usehooks-ts";
 import {
   IRequestMapping,
   IResponseMapping,
 } from "@/utils/types/component.type";
+import { CloseCircleFilled, RightOutlined } from "@ant-design/icons";
+import { Flex, Modal, Typography } from "antd";
+import clsx from "clsx";
+import { get, isEmpty } from "lodash";
+import { useBoolean } from "usehooks-ts";
+import styles from "./index.module.scss";
 
 type Props = {
   disabled: boolean;
@@ -157,7 +157,7 @@ const HeaderMapping = ({
           </Typography.Text>
         </Text.NormalLarge>
       </Flex>
-      <Flex align="center" gap={9} style={{ marginBottom: 26 }}>
+      <Flex align="center" gap={8} style={{ marginBottom: 26 }}>
         <Flex
           align="center"
           gap={6}

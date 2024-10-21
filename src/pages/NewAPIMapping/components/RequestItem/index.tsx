@@ -1,21 +1,21 @@
-import { IRequestMapping } from "@/utils/types/component.type";
-import styles from "./index.module.scss";
-import { Button, Flex, Input, Select } from "antd";
-import { Text } from "@/components/Text";
 import MappingIcon from "@/assets/newAPIMapping/mapping-icon.svg";
-import clsx from "clsx";
-import { cloneDeep, difference, get, isEmpty, set } from "lodash";
+import { Text } from "@/components/Text";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
+import { IRequestMapping } from "@/utils/types/component.type";
 import {
   CheckOutlined,
   CloseOutlined,
   DeleteOutlined,
   EditOutlined,
 } from "@ant-design/icons";
-import { useBoolean } from "usehooks-ts";
+import { Button, Flex, Input, Select } from "antd";
+import clsx from "clsx";
+import { cloneDeep, difference, get, isEmpty, set } from "lodash";
 import { useEffect, useState } from "react";
-import { TargetInput } from "./TargetInput";
+import { useBoolean } from "usehooks-ts";
 import { SourceInput } from "./SourceInput";
+import { TargetInput } from "./TargetInput";
+import styles from "./index.module.scss";
 
 type Props = {
   item: IRequestMapping;
@@ -56,7 +56,14 @@ const RequestItem = ({ item, index }: Props) => {
     if (!descriptionInput) {
       setDescriptionInput(item.description);
     }
-  }, [item.title, descriptionInput, setTitleInput, setDescriptionInput, titleInput, item.description]);
+  }, [
+    item.title,
+    descriptionInput,
+    setTitleInput,
+    setDescriptionInput,
+    titleInput,
+    item.description,
+  ]);
 
   const onChangeDescription = () => {
     const newRequest = cloneDeep(requestMapping);
@@ -193,7 +200,7 @@ const RequestItem = ({ item, index }: Props) => {
           </Flex>
         )}
       </Flex>
-      <Flex className={styles.container} gap={14} wrap="wrap" align="flex-end">
+      <Flex className={styles.container} gap={8} wrap="wrap" align="flex-end">
         {/* Source property mapping */}
         <SourceInput item={item} index={index} />
 
@@ -202,7 +209,7 @@ const RequestItem = ({ item, index }: Props) => {
         </span>
 
         {/* Target property mapping */}
-        <TargetInput item={item} index={index} />
+        <TargetInput item={item} index={index} isSellerSideProps />
       </Flex>
       {!isEmpty(item?.sourceValues) && (
         <Flex vertical gap={20} style={{ marginTop: 8, width: "100%" }}>
@@ -216,11 +223,7 @@ const RequestItem = ({ item, index }: Props) => {
                 wrap="wrap"
                 gap={8}
               >
-                <Flex
-                  align="center"
-                  gap={8}
-                  style={{ width: "calc(50% - 30px)" }}
-                >
+                <Flex align="center" gap={8} style={{ flex: 1 }}>
                   <Select
                     data-testid="select-sonata-state"
                     className={styles.stateSelect}
@@ -247,7 +250,7 @@ const RequestItem = ({ item, index }: Props) => {
                   placeholder="Input seller order state, Enter for multiple states"
                   key={`enum-${key}`}
                   value={to}
-                  style={{ width: "calc(50% - 30px)" }}
+                  style={{ flex: 1 }}
                   onChange={(e) => handleChangeInput(e, key)}
                   className={styles.stateSelect}
                 />

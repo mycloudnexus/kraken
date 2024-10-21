@@ -1,20 +1,20 @@
-import { Button, Flex, Input, Tree, notification } from "antd";
-import styles from "./index.module.scss";
+import TitleIcon from "@/assets/title-icon.svg";
 import { Text } from "@/components/Text";
-import { Key, useCallback, useEffect, useMemo, useState } from "react";
-import { getCorrectSpec } from "../RightAddSonataProp";
-import swaggerClient from "swagger-client";
-import { clone, get, isEmpty, set } from "lodash";
+import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
+import { isElementInViewport } from "@/utils/helpers/html";
 import {
   convertSchemaToTypeOnly,
   exampleParse,
   parseObjectDescriptionToTreeData,
 } from "@/utils/helpers/schema";
-import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
-import { useBoolean } from "usehooks-ts";
 import { DownOutlined, RightOutlined } from "@ant-design/icons";
-import TitleIcon from "@/assets/title-icon.svg";
-import { isElementInViewport } from "@/utils/helpers/html";
+import { Button, Flex, Input, Tree, notification } from "antd";
+import { clone, get, isEmpty, set } from "lodash";
+import { Key, useCallback, useEffect, useMemo, useState } from "react";
+import swaggerClient from "swagger-client";
+import { useBoolean } from "usehooks-ts";
+import { getCorrectSpec } from "../RightAddSonataProp";
+import styles from "./index.module.scss";
 
 interface Props {
   spec: any;
@@ -165,34 +165,31 @@ const SonataResponseMapping = ({ method, spec }: Props) => {
         </Text.Custom>
       </div>
       <div className={styles.container}>
-        <div>
-          <Search
-            placeholder="input search text"
-            style={{ width: "100%", marginBottom: 8 }}
-            value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
-          />
-        </div>
-        <div style={{ marginTop: 16 }}>
-          <Flex
-            style={{ cursor: "pointer" }}
-            justify="space-between"
-            gap={8}
-            align="center"
-            onClick={toggleOpen}
-            role="none"
-          >
-            <Flex justify="flex-start" gap={8} align="center">
-              <TitleIcon />
-              <Text.NormalMedium>Response body</Text.NormalMedium>
-            </Flex>
-            {isOpen ? (
-              <DownOutlined style={{ fontSize: 10 }} />
-            ) : (
-              <RightOutlined style={{ fontSize: 10 }} />
-            )}
+        <Search
+          placeholder="input search text"
+          style={{ width: "100%", marginBottom: 8 }}
+          value={searchValue}
+          onChange={(e) => setSearchValue(e.target.value)}
+        />
+
+        <Flex
+          style={{ cursor: "pointer", marginTop: 16 }}
+          justify="space-between"
+          gap={8}
+          align="center"
+          onClick={toggleOpen}
+          role="none"
+        >
+          <Flex justify="flex-start" gap={8} align="center">
+            <TitleIcon />
+            <Text.NormalMedium>Response body</Text.NormalMedium>
           </Flex>
-        </div>
+          {isOpen ? (
+            <DownOutlined style={{ fontSize: 10 }} />
+          ) : (
+            <RightOutlined style={{ fontSize: 10 }} />
+          )}
+        </Flex>
         {isOpen && (
           <>
             <div style={{ marginTop: 12, marginBottom: 4 }}>
@@ -206,6 +203,7 @@ const SonataResponseMapping = ({ method, spec }: Props) => {
                 treeData={treeData}
                 onSelect={handleSelect}
                 selectable
+                blockNode
               />
             </div>
           </>

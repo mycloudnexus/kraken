@@ -13,7 +13,12 @@ import styles from "./index.module.scss";
 export function SourceInput({
   item,
   index,
-}: Readonly<{ item: IResponseMapping; index: number }>) {
+  isSellerSideProps,
+}: Readonly<{
+  item: IResponseMapping;
+  index: number;
+  isSellerSideProps?: boolean;
+}>) {
   const {
     responseMapping,
     activeResponseName,
@@ -48,7 +53,7 @@ export function SourceInput({
       {item.source && (
         <LocationSelector
           type="response"
-          disabled={!item.customizedField}
+          disabled={!isSellerSideProps && !item.customizedField}
           value={locationMapping(item.sourceLocation)}
           onChange={(value) => handleChange("sourceLocation", value)}
         />
@@ -73,7 +78,7 @@ export function SourceInput({
           onChange={(e) => setValue(e.target.value)}
           onBlur={() => {
             handleChange("source", value);
-            setActiveResponseName(undefined);
+            // setActiveResponseName(undefined);
           }}
         />
       </Tooltip>

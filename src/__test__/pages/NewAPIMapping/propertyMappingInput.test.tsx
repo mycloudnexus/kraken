@@ -162,7 +162,7 @@ describe("NewAPIMapping > response mapping", () => {
     expect(input).toHaveValue("@{{source2}}");
 
     fireEvent.blur(input);
-    expect(response.setActiveResponseName).toHaveBeenCalledTimes(2);
+    expect(response.setActiveResponseName).toHaveBeenCalledTimes(1);
     expect(response.setResponseMapping).toHaveBeenCalledTimes(1);
 
     const btnSelectLoc = getByTestId("btnSelectLocation");

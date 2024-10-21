@@ -1,6 +1,8 @@
+import TitleIcon from "@/assets/title-icon.svg";
 import Flex from "@/components/Flex";
 import { Text } from "@/components/Text";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
+import { isElementInViewport } from "@/utils/helpers/html";
 import {
   convertSchemaToTypeOnly,
   exampleParse,
@@ -12,8 +14,6 @@ import { clone, get, isEmpty, set } from "lodash";
 import { Key, useCallback, useMemo, useState } from "react";
 import { useBoolean } from "usehooks-ts";
 import styles from "./index.module.scss";
-import TitleIcon from "@/assets/title-icon.svg";
-import { isElementInViewport } from "@/utils/helpers/html";
 
 const Search = Input.Search;
 
@@ -102,10 +102,10 @@ const SelectResponseProperty = () => {
       return input;
     }
     const parts = input
-      ?.replaceAll("0[*]", "[*]")
-      ?.replaceAll("[*]", "[0]")
+      .replaceAll("0[*]", "[*]")
+      .replaceAll("[*]", "[0]")
       .split(".");
-    const newString = parts.join(".")?.replace("[0]", "[*]");
+    const newString = parts.join(".").replace("[0]", "[*]");
     return newString;
   };
 
@@ -180,26 +180,25 @@ const SelectResponseProperty = () => {
                 200
               </Button>
             </div>
-            <div style={{ marginTop: 4 }}>
-              <div className={styles.tree}>
-                <Tree
-                  data-testid="tree-item"
-                  selectedKeys={selectedKeys}
-                  treeData={newTreeData}
-                  selectable
-                  onSelect={(keys: Key[]) => {
-                    if (!activeResponseName) {
-                      notification.warning({
-                        message:
-                          "Please select property from Seller API response first",
-                      });
-                      return;
-                    }
-                    const mainKey: any = get(keys, "[0]");
-                    setSelectedKeys([mainKey]);
-                  }}
-                />
-              </div>
+
+            <div className={styles.tree}>
+              <Tree
+                data-testid="tree-item"
+                selectedKeys={selectedKeys}
+                treeData={newTreeData}
+                selectable
+                onSelect={(keys: Key[]) => {
+                  if (!activeResponseName) {
+                    notification.warning({
+                      message:
+                        "Please select property from Seller API response first",
+                    });
+                    return;
+                  }
+                  const mainKey: any = get(keys, "[0]");
+                  setSelectedKeys([mainKey]);
+                }}
+              />
             </div>
           </>
         )}
