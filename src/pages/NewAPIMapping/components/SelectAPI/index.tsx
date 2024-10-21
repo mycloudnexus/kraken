@@ -2,7 +2,7 @@ import EmptyIcon from "@/assets/newAPIServer/empty.svg";
 import Flex from "@/components/Flex";
 import RequestMethod from "@/components/Method";
 import { Text } from "@/components/Text";
-import { useGetComponentListAPISpec } from "@/hooks/product";
+import { useGetSellerAPIList } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { extractOpenApiStrings } from "@/utils/helpers/schema";
@@ -240,7 +240,7 @@ const SelectAPI = ({
   } = useNewApiMappingStore();
   const navigate = useNavigate();
   const { data: dataList, isLoading } =
-    useGetComponentListAPISpec(currentProduct);
+    useGetSellerAPIList(currentProduct);
   const queryData = JSON.parse(query ?? "{}");
 
   const { mappers } = useGetApiSpec(

@@ -40,6 +40,7 @@ import {
   regenerateBuyerAccessToken,
   getComponentSpecDetails,
   deleteAPIServer,
+  getAPIServers,
 } from "@/services/products";
 import {
   COMPONENT_KIND_API,
@@ -93,6 +94,7 @@ export const PRODUCT_CACHE_KEYS = {
   get_component_detail: "get_component_detail",
   get_component_detail_mapping: "get_component_detail_mapping",
   get_component_list: "get_component_list",
+  get_seller_api_list: "get_seller_api_list",
   get_component_list_api: "get_component_list_api",
   get_component_list_api_spec: "get_component_list_api_spec",
   get_component_list_spec: "get_component_list_spec",
@@ -147,6 +149,19 @@ export const useGetComponentListAPI = (productId: string) => {
     queryKey: [PRODUCT_CACHE_KEYS.get_component_list_api, productId],
     queryFn: () =>
       getListComponents(productId, {
+        kind: COMPONENT_KIND_API,
+        size: 500,
+      }),
+    enabled: Boolean(productId),
+    select: (data) => data?.data,
+  });
+};
+
+export const useGetSellerAPIList = (productId: string) => {
+  return useQuery<any, Error>({
+    queryKey: [PRODUCT_CACHE_KEYS.get_seller_api_list, productId],
+    queryFn: () =>
+      getAPIServers(productId, {
         kind: COMPONENT_KIND_API,
         size: 500,
       }),

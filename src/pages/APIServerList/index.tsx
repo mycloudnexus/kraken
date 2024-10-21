@@ -1,6 +1,6 @@
 import Flex from "@/components/Flex";
 import { Text } from "@/components/Text";
-import { useGetComponentListAPISpec } from "@/hooks/product";
+import { useGetSellerAPIList } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
 import { IComponent } from "@/utils/types/component.type";
 import { Button, ConfigProvider, Empty, Spin } from "antd";
@@ -15,7 +15,7 @@ const APIServerList = () => {
     data: dataList,
     isLoading,
     refetch,
-  } = useGetComponentListAPISpec(currentProduct);
+  } = useGetSellerAPIList(currentProduct);
   const navigate = useNavigate();
 
   return (

@@ -8,12 +8,9 @@ export const getListComponents = (
   productId: string,
   params: Record<string, any>
 ) => {
-  return request(
-    `/v2${PRODUCT}/${productId}/components/${productId}/api-servers`,
-    {
-      params: { ...params, facetIncluded: true },
-    }
-  );
+  return request(`${PRODUCT}/${productId}/components`, {
+    params,
+  });
 };
 
 export const getListComponentsV2 = (
@@ -115,6 +112,18 @@ export const createApiKey = (payload: ICreateParameter) => {
       name,
     },
   });
+};
+
+export const getAPIServers = (
+  productId: string,
+  params: Record<string, any>
+) => {
+  return request(
+    `/v2${PRODUCT}/${productId}/components/${productId}/api-servers`,
+    {
+      params: { ...params, facetIncluded: true },
+    }
+  );
 };
 
 export const deleteAPIServer = (productId: string, componentId: string) => {
