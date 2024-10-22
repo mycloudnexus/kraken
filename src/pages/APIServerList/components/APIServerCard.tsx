@@ -81,7 +81,7 @@ const APIServerCard = ({ item, refetchList }: Props) => {
                 {get(item, "metadata.name", "")}
               </Text.NormalLarge>
               <Tag color={isApiInUse ? "blue" : ""}>
-                {isApiInUse ? "IN USE" : "NOT IN USE"}
+                {isApiInUse ? "In use" : "Not in use"}
               </Tag>
             </Flex>
             <Flex gap={12}>

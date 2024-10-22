@@ -58,8 +58,8 @@ const DeleteApiButton = ({
         placement={isInEditMode ? "topLeft" : "bottomLeft"}
         align={{
           offset: [
-            isApiInUse ? -20 : 55,
-            isInEditMode ? (isApiInUse ? -10 : -20) : isApiInUse ? 10 : 20,
+            isApiInUse ? -40 : 35,
+            isInEditMode ? (isApiInUse ? -10 : -20) : 20
           ],
         }}
         defaultOpen={false}

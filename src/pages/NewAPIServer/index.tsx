@@ -1,5 +1,4 @@
 import BreadCrumb from "@/components/Breadcrumb";
-import DeleteApiButton from "@/components/DeleteApiButton";
 import {
   useCreateNewComponent,
   useEditComponent,
@@ -218,12 +217,12 @@ const NewAPIServer = () => {
                       loading={loadingCreate || isPending}
                       onNext={handleSave}
                     >
-                      {!isEmpty(componentId) && (
+                      {/* {!isEmpty(componentId) && (
                         <DeleteApiButton
                           item={componentDetail}
                           isInEditMode={true}
                         />
-                      )}
+                      )} */}
                     </BtnStep>
                   );
                 }}

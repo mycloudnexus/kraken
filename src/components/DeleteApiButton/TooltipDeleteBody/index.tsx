@@ -7,22 +7,25 @@ const TooltipDeleteBody = (
   setOpenTooltip: (value: boolean) => void
 ) => (
   <Flex vertical gap={20}>
-    <Flex gap={12}>
-      <Flex>
-        <ExclamationCircleFilled style={{ color: "#FAAD14" }} />
-      </Flex>
+    <Flex gap={8}>
       <Flex vertical>
-        <Text.NormalLarge color="black">
-          Are you sure to delete this API server?
-        </Text.NormalLarge>
-        <Text.LightMedium color="rgba(0,0,0,0.45)">
-          No endpoint in this API server is in use.
-        </Text.LightMedium>
+        <Flex gap={10}>
+          <ExclamationCircleFilled style={{ color: "#FAAD14" }} />
+          <Text.NormalLarge color="black">
+            Are you sure to delete this API server?
+          </Text.NormalLarge>
+        </Flex>
+        <Flex style={{ paddingLeft: "25px" }}>
+          <Text.LightMedium color="rgba(0,0,0,0.45)">
+            No endpoint in this API server is in use.
+          </Text.LightMedium>
+        </Flex>
       </Flex>
+
     </Flex>
     <Flex justify="end" gap={12}>
       <Button onClick={() => setOpenTooltip(false)}>Cancel</Button>
-      <Button style={{ color: "red" }} onClick={handleDelete}>
+      <Button type="primary" danger onClick={handleDelete}>
         Delete
       </Button>
     </Flex>
