@@ -7,7 +7,8 @@ import { IMappers } from "@/utils/types/component.type";
 export function validateMappers(mappers: IMappers) {
   const requestIds = mappers.request
     .filter((property) => {
-      if (!property.customizedField) return !property.targetLocation;
+      if (!property.customizedField)
+        return property.target && !property.targetLocation;
 
       return (
         !property.source ||
@@ -20,7 +21,8 @@ export function validateMappers(mappers: IMappers) {
 
   const responseIds = mappers.response
     .filter((property) => {
-      if (!property.customizedField) return !property.sourceLocation;
+      if (!property.customizedField)
+        return property.source && !property.sourceLocation;
 
       return (
         !property.source ||
@@ -50,10 +52,13 @@ export function validateMappers(mappers: IMappers) {
   };
 }
 
-export function locationMapping(loc: string): string {
+export function locationMapping(
+  loc: string,
+  type: "request" | "response"
+): string {
   switch (loc) {
     case "BODY":
-      return "Request body";
+      return type === "request" ? "Request body" : "Response body";
     case "QUERY":
       return "Query parameter";
     case "PATH":

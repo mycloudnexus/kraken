@@ -209,7 +209,7 @@ const RequestItem = ({ item, index }: Props) => {
         </span>
 
         {/* Target property mapping */}
-        <TargetInput item={item} index={index} isSellerSideProps />
+        <TargetInput item={item} index={index} />
       </Flex>
       {!isEmpty(item?.sourceValues) && (
         <Flex vertical gap={20} style={{ marginTop: 8, width: "100%" }}>

@@ -3,7 +3,7 @@ import { Button, Divider, Dropdown } from "antd";
 import { ItemType } from "antd/es/menu/interface";
 import styles from "./index.module.scss";
 
-const items: ItemType[] = [
+const requestItems: ItemType[] = [
   {
     label: "Hybrid",
     key: "Hybrid",
@@ -32,6 +32,23 @@ const items: ItemType[] = [
   },
 ];
 
+const responseItems: ItemType[] = [
+  {
+    label: "Response body",
+    key: "BODY",
+  },
+  {
+    label: <Divider className={styles.optionDivider} />,
+    className: styles.selectOptionDivider,
+    disabled: true,
+    key: "DIVIDER",
+  },
+  {
+    label: "Constant value",
+    key: "CONSTANT",
+  },
+];
+
 export function LocationSelector({
   type,
   disabled,
@@ -43,7 +60,7 @@ export function LocationSelector({
   value?: string;
   onChange(value: string): void;
 }>) {
-  const menuItems = type === "response" ? items.slice(-3) : items;
+  const menuItems = type === "response" ? responseItems : requestItems;
 
   return (
     <Dropdown

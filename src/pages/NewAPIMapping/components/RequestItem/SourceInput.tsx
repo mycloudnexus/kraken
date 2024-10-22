@@ -55,7 +55,7 @@ export function SourceInput({
         <LocationSelector
           type="request"
           disabled={!item.customizedField}
-          value={locationMapping(item.sourceLocation)}
+          value={locationMapping(item.sourceLocation, "request")}
           onChange={(value) => handleChange({ sourceLocation: value })}
         />
       )}

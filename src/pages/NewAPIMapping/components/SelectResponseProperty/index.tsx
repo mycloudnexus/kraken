@@ -126,7 +126,7 @@ const SelectResponseProperty = () => {
       const value =
         newKey.startsWith("[*]") || newKey.startsWith("[0]")
           ? `@{{responseBody${newKey}}}`
-          : `@{{responseBody.${newKey}}}`;
+          : `@{{${newKey}}}`;
       set(cloneObj, `[${responseIndex}].source`, value);
       set(cloneObj, `[${responseIndex}].sourceLocation`, `BODY`);
       setResponseMapping(cloneObj);

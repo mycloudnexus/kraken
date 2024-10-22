@@ -175,7 +175,7 @@ describe("NewAPIMapping > response mapping", () => {
     const items = getAllByRole("menuitem");
     expect(items.length).toBe(3); // body, constant + divider
 
-    expect(items[0]).toHaveTextContent("Request body");
+    expect(items[0]).toHaveTextContent("Response body");
     expect(items[2]).toHaveTextContent("Constant value");
 
     fireEvent.click(items[0]);

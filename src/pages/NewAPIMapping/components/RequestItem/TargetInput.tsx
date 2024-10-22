@@ -13,11 +13,9 @@ import styles from "./index.module.scss";
 export function TargetInput({
   item,
   index,
-  isSellerSideProps,
 }: Readonly<{
   item: IRequestMapping;
   index: number;
-  isSellerSideProps?: boolean;
 }>) {
   const {
     requestMapping,
@@ -59,8 +57,8 @@ export function TargetInput({
       {item.target && (
         <LocationSelector
           type="request"
-          disabled={!isSellerSideProps && !item.customizedField}
-          value={locationMapping(item.targetLocation)}
+          // disabled={!item.customizedField}
+          value={locationMapping(item.targetLocation, "request")}
           onChange={(value) => handleChange({ targetLocation: value })}
         />
       )}

@@ -42,7 +42,7 @@ export function TargetInput({
         <LocationSelector
           type="response"
           disabled={!item.customizedField}
-          value={locationMapping(item.targetLocation)}
+          value={locationMapping(item.targetLocation, "response")}
           onChange={(value) => onChange?.("targetLocation", value)}
         />
       )}

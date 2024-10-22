@@ -13,11 +13,9 @@ import styles from "./index.module.scss";
 export function SourceInput({
   item,
   index,
-  isSellerSideProps,
 }: Readonly<{
   item: IResponseMapping;
   index: number;
-  isSellerSideProps?: boolean;
 }>) {
   const {
     responseMapping,
@@ -53,8 +51,8 @@ export function SourceInput({
       {item.source && (
         <LocationSelector
           type="response"
-          disabled={!isSellerSideProps && !item.customizedField}
-          value={locationMapping(item.sourceLocation)}
+          // disabled={!item.customizedField}
+          value={locationMapping(item.sourceLocation, "response")}
           onChange={(value) => handleChange("sourceLocation", value)}
         />
       )}

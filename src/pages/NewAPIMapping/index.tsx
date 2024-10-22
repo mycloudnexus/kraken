@@ -47,7 +47,7 @@ import SonataResponseMapping from "./components/SonataResponseMapping";
 import StatusIcon from "./components/StatusIcon";
 import useGetApiSpec from "./components/useGetApiSpec";
 import useGetDefaultSellerApi from "./components/useGetDefaultSellerApi";
-import { validateMappers } from "./helper";
+// import { validateMappers } from "./helper";
 import styles from "./index.module.scss";
 
 type Props = {
@@ -128,7 +128,7 @@ const NewAPIMapping = ({
     setListMappingStateRequest,
     listMappingStateRequest,
     setRightSideInfo,
-    setErrors,
+    // setErrors,
   } = useNewApiMappingStore();
   const queryData = JSON.parse(query ?? "{}");
 
@@ -347,18 +347,19 @@ const NewAPIMapping = ({
 
   const handleSave = async (callback?: () => void) => {
     try {
+      // @TODO: temporarily remove for demo
       // Validate properties name and location
-      const { requestIds, responseIds, errorMessage } = validateMappers({
-        request: requestMapping,
-        response: responseMapping,
-      });
-      setErrors({ requestIds, responseIds });
+      // const { requestIds, responseIds, errorMessage } = validateMappers({
+      //   request: requestMapping,
+      //   response: responseMapping,
+      // });
+      // setErrors({ requestIds, responseIds });
 
-      if (errorMessage) {
-        notification.error({ message: errorMessage });
+      // if (errorMessage) {
+      //   notification.error({ message: errorMessage });
 
-        return;
-      }
+      //   return;
+      // }
 
       const newData = transformListMappingItem(listMappingStateResponse);
       const newDataRequest = transformListMappingItem(listMappingStateRequest);

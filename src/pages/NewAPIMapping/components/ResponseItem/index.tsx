@@ -207,7 +207,7 @@ const ResponseItem = ({ item, index }: Props) => {
         </span>
 
         {/* Seller side Source response input */}
-        <SourceInput item={item} index={index} isSellerSideProps />
+        <SourceInput item={item} index={index} />
       </Flex>
       {!isEmpty(item?.targetValues) && (
         <Flex vertical gap={20} style={{ width: "100%", marginTop: 8 }}>
