@@ -65,7 +65,7 @@ export function TargetInput({
           onChange={(e) => setValue(e.target.value)}
           onBlur={() => {
             onChange?.("target", value);
-            setActiveSonataResponse(undefined);
+            // setActiveSonataResponse(undefined);
           }}
         />
       </Tooltip>

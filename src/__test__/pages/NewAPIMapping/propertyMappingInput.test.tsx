@@ -206,6 +206,6 @@ describe("NewAPIMapping > response mapping", () => {
     expect(input).toHaveValue("@{{target2}}");
 
     fireEvent.blur(input);
-    expect(response.setActiveSonataResponse).toHaveBeenCalledTimes(2);
+    expect(response.setActiveSonataResponse).toHaveBeenCalledTimes(1);
   });
 });
