@@ -41,102 +41,143 @@ Kraken follows a modular architecture, comprising several components that work t
 
 ## Get Started
 
-### Prerequisites
+To begin, clone the repository and navigate to the project directory:
 
-Before compile the source code, ensure you have the following prerequisites:
-
-- Maven
-- JDK 17 or later
-- Node 20 or later
-- NPM
-
-### Run Kraken
-
-#### Step 1 - Clone the source code
 ```console
-git clone git@github.com:mycloudnexus/kraken.git
+git clone https://github.com/mycloudnexus/kraken.git
 cd kraken
 ```
 
-#### Step 2 - Compile the Kraken API servers
+### Run via docker
 
-1. Run tests:
+The simplest way to get Kraken up and running is with Docker. Follow these steps:
 
-```shell
-mvn test
-```
-
-2. Package the application:
-
-```shell
-mvn package
-```
-
-#### Step 3 - Run API Servers
-
-There are 3 API servers, (controller, Hub and Agent)
-
-3.1 Run Kraken App Hub
-
-```shell
-java -jar kraken-app/kraken-app-hub/target/*.jar
-```
-
-Then can open the API server swagger-ui via http://localhost:8000
-
-3.2 Run Kraken App Controller
-
-```shell
-java -jar kraken-app/kraken-app-controller/target/*.jar
-```
-Then can open the API server swagger-ui via http://localhost:8001
-
-
-3.3 Run Kraken App Agent
-
-```shell
-java -jar kraken-app/kraken-app-agent/target/*.jar
-```
-Then can open the API server swagger-ui via http://localhost:8002
-
-#### Step 4 - Run Portal
-
-```
-cd kraken-app/kraken-app-portal
-npm install
-npm run dev
-```
-Then open the portal via http://localhost:5173/
-The default login is admin/admin
-
-
-### Build docker images
-
-There is a bash to build the docker images 
-```
-./docker/dockerBuild.sh
-```
-It will build the following docker images:
-
-- mycloudnexus/kraken-app-hub:latest
-- mycloudnexus/kraken-app-controller:latest
-- mycloudnexus/kraken-app-agent:latest
-- mycloudnexus/kraken-app-portal:latest
-
-Then you can run them via docker-compose.yaml
+1. Navigate to the docker directory:
 
 ```
 cd docker
+```
+
+2. Start the services using Docker Compose:
+```
 docker-compose up
 ```
 
-if everything run correctly, the following servers are up:
+If all services start correctly, the following servers will be accessible:
 
 - Portal: http://localhost:3000
 - Controller: http://localhost:8001
 - Hub: http://localhost:8000
 - Agent: http://localhost:8002
 
+
+### Run via Source Code
+
+For a more customizable setup, you can compile and run the project from the source code. Ensure the following prerequisites are installed:
+
+#### Prerequisites
+
+Before compile the source code, ensure you have the following prerequisites:
+
+- Maven (https://maven.apache.org)
+- JDK 17 or later
+- NodeJS 20 or later (https://nodejs.org/en)
+- NPM
+
+You can verify the installed versions with the following commands:
+
+```
+1. mvn -v
+2. java -version
+3. node -v
+4. npm -v
+```
+
+
+#### Step 1 - Run the Control Portal
+
+1. From the base of the repository, navigate to the portal directory:
+```
+cd kraken-app/kraken-app-portal
+```
+2. Install the dependencies and start the development server:
+```
+npm install
+npm run dev
+```
+
+3. Open the portal in your browser at [http://localhost:5173](http://localhost:5173).  
+   > **Note**: You will not be able to log in yet as the API server is not running. The default login is **admin/admin**.
+
+
+#### Step 2 - Run the Control API Server
+
+The Control API Server relies on a PostgreSQL database. You can set up a PostgreSQL server using Docker:
+
+1. **Start PostgreSQL** using Docker Compose:
+
+   ```bash
+   cd docker
+   docker-compose up db-control-plane
+   ```
+
+   Alternatively, you can set up PostgreSQL manually based on your environment's requirements.
+
+2. **Compile the source code**:
+
+   ```bash
+   mvn package -DskipTests
+   ```
+
+3. **Set up environment variables**:
+
+   ```bash
+   export DB_URL=jdbc:postgresql://localhost:5432/kraken-mgmt
+   export DB_USERNAME=postgresql
+   export DB_PASSWORD=password
+   ```
+
+4. **Run the Control API Server**:
+
+   ```bash
+   java -jar kraken-app/kraken-app-controller/target/*.jar
+   ```
+
+5. Access the Swagger UI at [http://localhost:8001](http://localhost:8001).  
+   You should now be able to log into the portal at [http://localhost:5173](http://localhost:5173) using the default credentials **admin/admin**.
+
+#### Step 3 (Optional): Run Data Plane API Servers
+
+If you want to test the data plane features, you can run the Hub and Agent API servers as follows:
+
+1. **Set up environment variables** for both servers:
+
+   ```bash
+   export DB_URL=jdbc:postgresql://localhost:5432/kraken
+   export DB_USERNAME=postgresql
+   export DB_PASSWORD=password
+   ```
+
+2. **Run the Hub API Server**:
+
+   ```bash
+   java -jar kraken-app/kraken-app-hub/target/*.jar
+   ```
+
+3. **Run the Agent API Server**:
+
+   ```bash
+   java -jar kraken-app/kraken-app-agent/target/*.jar
+   ```
+
+4. Access the Hub’s Swagger UI at [http://localhost:8000](http://localhost:8000).
+
+---
+
+#### Troubleshooting
+
+- **Database Connectivity**: Ensure that the PostgreSQL instance is running and the connection details (`DB_URL`, `DB_USERNAME`, and `DB_PASSWORD`) are correctly set.
+- **Port Conflicts**: If any of the ports are already in use, you can modify them in the `docker-compose.yml` file or the respective configuration files.
 
 ### Code Structure
 ```
@@ -184,13 +225,14 @@ kraken/
 │   └──jvm.config
 │
 ├── docker/
-│   ├── deployment-config/
-│   │   └── app-agent-config.yaml
-│   │   └── app-hub-config.yaml
-│   │   └── app-controller-config.yaml
+│   ├── app-controller/
+│   │   └── application-default.yaml
+│   │   └── Dockerfile
+│   ├── app-hub/
+│   ├── app-agent/
+│   ├── app-portal/
 │   ├── docker-compose.yaml
 │
-├── Dockerfile
 ├── README.md
 ├── CONTRIBUTING.md
 ├── LICENSE.md
