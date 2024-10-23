@@ -28,9 +28,9 @@ spring:
       fail-on-unknown-properties: false
   datasource:
     driverClassName: org.postgresql.Driver
-    password: password
-    url: jdbc:postgresql://localhost:5432/kraken
-    username: postgresql
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/kraken}
+    username: ${DB_USERNAME:postgresql}
+    password: ${DB_PASSWORD:password}
     hikari:
       pool-name: hikari-platform-service-platform
       connection-test-query: SELECT 1
