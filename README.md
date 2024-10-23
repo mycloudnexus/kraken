@@ -63,7 +63,7 @@ cd docker
 docker-compose up
 ```
 
-If all services start correctly, the following servers will be accessible:
+If all services start correctly, the following servers will be accessible(The default login is **admin/admin**):
 
 - Portal: http://localhost:3000
 - Controller: http://localhost:8001
@@ -79,8 +79,8 @@ For a more customizable setup, you can compile and run the project from the sour
 
 Before compile the source code, ensure you have the following prerequisites:
 
-- Maven (https://maven.apache.org)
-- JDK 17 or later
+- [Maven] (https://maven.apache.org)
+- [JDK 17 or later](https://openjdk.org/)
 - NodeJS 20 or later (https://nodejs.org/en)
 - NPM
 
