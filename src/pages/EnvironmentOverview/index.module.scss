@@ -2,9 +2,9 @@
   box-sizing: border-box;
   min-height: 100%;
   width: 100%;
-  padding: 16px 20px;
-  background-color: #f4f4f4;
   overflow-y: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .fullWidth {
@@ -50,8 +50,8 @@
   padding: 16px 20px;
   background-color: #fff;
   display: flex;
-  height: calc(100% - 215px);
-  min-width: 800px;
+  flex: 1;
+  min-height: 600px;
 }
 .overviewContainer {
   display: flex;

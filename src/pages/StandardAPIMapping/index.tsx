@@ -1,23 +1,24 @@
+import BreadCrumb from "@/components/Breadcrumb";
+import { PageLayout } from "@/components/Layout";
 import {
   useGetComponentDetail,
   useGetComponentDetailMapping,
   useGetComponentListAPI,
 } from "@/hooks/product";
-import { Flex, Spin } from "antd";
-import styles from "./index.module.scss";
-import { delay, get, isEmpty } from "lodash";
-import { useParams } from "react-router";
 import { useAppStore } from "@/stores/app.store";
-import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { useMappingUiStore } from "@/stores/mappingUi.store";
+import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
+import groupByPath from "@/utils/helpers/groupByPath";
+import { IMapperDetails } from "@/utils/types/env.type";
+import { Flex, Spin } from "antd";
+import { delay, get, isEmpty } from "lodash";
+import { useEffect, useMemo } from "react";
+import { useParams } from "react-router";
+import { useBoolean } from "usehooks-ts";
+import NewAPIMapping from "../NewAPIMapping";
 import ComponentSelect from "./components/ComponentSelect";
 import MappingDetailsList from "./components/MappingDetailsList";
-import { useEffect, useMemo } from "react";
-import { IMapperDetails } from "@/utils/types/env.type";
-import NewAPIMapping from "../NewAPIMapping";
-import groupByPath from "@/utils/helpers/groupByPath";
-import { useBoolean } from "usehooks-ts";
-import BreadCrumb from "@/components/Breadcrumb";
+import styles from "./index.module.scss";
 
 const StandardAPIMapping = () => {
   const { currentProduct } = useAppStore();
@@ -84,8 +85,8 @@ const StandardAPIMapping = () => {
   }, [detailDataMapping]);
 
   return (
-    <Flex align="stretch" vertical className={styles.pageWrapper}>
-      <Spin spinning={isLoading}>
+    <PageLayout
+      title={
         <Flex
           align="center"
           justify="space-between"
@@ -102,42 +103,42 @@ const StandardAPIMapping = () => {
             }
           />
         </Flex>
+      }
+    >
+      <Spin spinning={isLoading}>
         <Flex className={styles.pageBody}>
-          <Flex vertical gap={12}>
-            <Flex
-              vertical
-              justify={isLoading ? "center" : "space-between"}
-              className={styles.leftWrapper}
-            >
-              {!isGroupedPathsEmpty && (
-                <MappingDetailsList
-                  groupedPaths={groupedPaths}
-                  setActiveSelected={handleDisplay}
-                />
-              )}
-            </Flex>
+          <Flex
+            vertical
+            justify={isLoading ? "center" : "space-between"}
+            className={styles.leftWrapper}
+          >
+            {!isGroupedPathsEmpty && (
+              <MappingDetailsList
+                groupedPaths={groupedPaths}
+                setActiveSelected={handleDisplay}
+              />
+            )}
           </Flex>
-          <Flex vertical gap={20} className={styles.mainWrapper}>
-            <Flex
-              align="center"
-              justify="center"
-              className={styles.versionListWrapper}
-            >
-              {activePath && !isChangeMappingKey ? (
-                <NewAPIMapping
-                  refetch={refetch}
-                  isRequiredMapping={isRequiredMapping}
-                />
-              ) : (
-                <div className={styles.empty}>
-                  <Spin size="large" />
-                </div>
-              )}
-            </Flex>
+
+          <Flex
+            align="center"
+            justify="center"
+            className={styles.versionListWrapper}
+          >
+            {activePath && !isChangeMappingKey ? (
+              <NewAPIMapping
+                refetch={refetch}
+                isRequiredMapping={isRequiredMapping}
+              />
+            ) : (
+              <div className={styles.empty}>
+                <Spin size="large" />
+              </div>
+            )}
           </Flex>
         </Flex>
       </Spin>
-    </Flex>
+    </PageLayout>
   );
 };
 

@@ -2,7 +2,17 @@
   width: 240px;
   border-right: 1px solid #f0f0f0;
   padding-right: 12px;
-  overflow-y: auto;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+
+  .versionList {
+    margin-top: 10px;
+    position: absolute;
+    height: calc(100% - 30px);
+    overflow-y: auto;
+    width: calc(100% - 12px);
+  }
 
   &::-webkit-scrollbar {
     height: 18px;

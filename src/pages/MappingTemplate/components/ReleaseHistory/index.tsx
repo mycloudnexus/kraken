@@ -1,20 +1,19 @@
+import DoneIcon from "@/assets/icon/upgrade-done.svg";
+import ReleaseBg from "@/assets/release-bg.svg?url";
 import { Text } from "@/components/Text";
-import { Empty, Flex, Spin, Tag } from "antd";
-import { RightOutlined } from "@ant-design/icons";
-
-import styles from "./index.module.scss";
-import VersionSelect from "../VersionSelect";
-import VersionDetail from "../VersionDetail";
-import { useAppStore } from "@/stores/app.store";
 import { useGetMappingTemplateReleaseHistoryList } from "@/hooks/product";
+import { useAppStore } from "@/stores/app.store";
 import { useMappingTemplateStore } from "@/stores/mappingTemplate";
 import { IReleaseHistory } from "@/utils/types/product.type";
-import { useState, useMemo } from "react";
+import { RightOutlined } from "@ant-design/icons";
+import { Empty, Flex, Spin, Tag } from "antd";
 import { isEmpty } from "lodash";
-import ReleaseBg from "@/assets/release-bg.svg?url";
-import DoneIcon from "@/assets/icon/upgrade-done.svg";
+import { useState, useMemo } from "react";
+import VersionDetail from "../VersionDetail";
+import VersionSelect from "../VersionSelect";
+import styles from "./index.module.scss";
 
-const ReleaseHistory = ({ maxHeight = 0 }) => {
+const ReleaseHistory = () => {
   const { currentProduct } = useAppStore();
   const { releaseParams } = useMappingTemplateStore();
   const { data: releaseData, isLoading } =
@@ -33,7 +32,7 @@ const ReleaseHistory = ({ maxHeight = 0 }) => {
     );
   }, [releaseData, selectedVersion]);
   return (
-    <div className={styles.root} style={{ maxHeight }}>
+    <div className={styles.root}>
       <Flex
         vertical
         className={styles.info}
@@ -65,7 +64,7 @@ const ReleaseHistory = ({ maxHeight = 0 }) => {
           </Tag>
         </Flex>
       </Flex>
-      <Flex className={styles.content} style={{ maxHeight: maxHeight - 188 }}>
+      <Flex className={styles.content}>
         {!isLoading && isEmpty(currentData?.data) && (
           <Empty description="No release history" className={styles.empty} />
         )}

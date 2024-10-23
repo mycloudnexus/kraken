@@ -1,22 +1,12 @@
-.root {
+.container {
+  height: 100%;
   display: flex;
-  background: #f0f2f5;
-  height: calc(100vh - 58px);
-  width: calc(100vw - 240px);
-  min-width: 800px;
+  flex-direction: column;
   :global {
     .ant-form-item {
       margin-bottom: 18px;
     }
   }
-}
-
-.container {
-  padding: 20px;
-  width: 100%;
-  min-width: 800px;
-  display: flex;
-  flex-direction: column;
 }
 
 .paper {
@@ -26,7 +16,6 @@
   padding: 16px 20px;
   overflow-y: auto;
   box-sizing: border-box;
-  max-height: calc(100vh - 175px);
 
   &::-webkit-scrollbar {
     display: block !important;

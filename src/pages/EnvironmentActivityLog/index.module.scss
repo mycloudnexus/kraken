@@ -77,14 +77,6 @@
     }
   }
 }
-.wrapper {
-  padding: 10px 20px 20px 20px;
-  background: var(--Page-bg, #f0f2f5);
-  height: calc(100vh - 58px);
-  overflow: hidden;
-  min-width: 800px;
-  box-sizing: border-box;
-}
 
 .breadHeader {
   display: flex;
@@ -102,11 +94,12 @@
   cursor: default;
 }
 .contentWrapper {
-  margin-top: 10px;
-  height: calc(100% - 28px);
+  height: 100%;
   border-radius: 4px;
   background: var(--Page-container-bg, #fff);
   padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
 }
 
 .inputPath {
@@ -115,5 +108,5 @@
 }
 
 .tableWrapper {
-  height: 100%;
+  flex: 1;
 }

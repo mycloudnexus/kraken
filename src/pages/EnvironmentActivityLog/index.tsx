@@ -1,12 +1,12 @@
+import { PageLayout } from "@/components/Layout";
 import LogMethodTag from "@/components/LogMethodTag";
-
 import { useGetProductEnvActivities, useGetProductEnvs } from "@/hooks/product";
 import { useCommonListProps } from "@/hooks/useCommonListProps";
+import useSize from "@/hooks/useSize";
 import { toDateTime } from "@/libs/dayjs";
 import { useAppStore } from "@/stores/app.store";
 import { DEFAULT_PAGING } from "@/utils/constants/common";
 import { IActivityLog } from "@/utils/types/env.type";
-
 import {
   Button,
   DatePicker,
@@ -18,16 +18,13 @@ import {
   Space,
 } from "antd";
 import { ColumnsType } from "antd/es/table";
-
+import dayjs from "dayjs";
+import { debounce, omit } from "lodash";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import ActivityDetailModal from "./components/ActivityDetailModal";
 import styles from "./index.module.scss";
-import { debounce, omit } from "lodash";
 
-import dayjs from "dayjs";
-import { Text } from "@/components/Text";
-import useSize from "@/hooks/useSize";
 const { RangePicker } = DatePicker;
 
 const initPagination = {
@@ -181,8 +178,7 @@ const EnvironmentActivityLog = () => {
     },
   ];
   return (
-    <div className={styles.wrapper}>
-      <Text.LightLarge>API activity log</Text.LightLarge>
+    <PageLayout title="API activity log">
       <div className={styles.contentWrapper} ref={refWrapper}>
         <Flex align="center" className={styles.filterWrapper} ref={ref}>
           <Form
@@ -278,7 +274,7 @@ const EnvironmentActivityLog = () => {
         open={modalOpen}
         setOpen={(value) => setModalOpen(value)}
       />
-    </div>
+    </PageLayout>
   );
 };
 

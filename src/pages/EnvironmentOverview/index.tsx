@@ -1,10 +1,4 @@
-import { useState, useCallback, useMemo, useEffect, useRef } from "react";
-import { useSearchParams } from "react-router-dom";
-import dayjs from "dayjs";
-import clsx from "clsx";
-import { Dropdown, Flex, Radio, Spin, Typography, notification } from "antd";
-import { MoreOutlined } from "@ant-design/icons";
-import { every, isEmpty, sortBy } from "lodash";
+import { PageLayout } from "@/components/Layout";
 import {
   useGetProductEnvs,
   useGetAllApiKeyList,
@@ -13,15 +7,22 @@ import {
   useCreateApiKey,
 } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
+import { IEnv } from "@/utils/types/env.type";
+import { MoreOutlined } from "@ant-design/icons";
+import { Dropdown, Flex, Radio, Spin, Typography, notification } from "antd";
+import clsx from "clsx";
+import dayjs from "dayjs";
+import { every, isEmpty, sortBy } from "lodash";
+import { useState, useCallback, useMemo, useEffect, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
+import DeployHistory from "../NewAPIMapping/components/DeployHistory";
 import EnvStatus from "./components/EnvStatus";
 import { showModalConfirmRotate } from "./components/ModalConfirmRotateAPIKey";
 import ModalNewDeployment from "./components/ModalNewDeployment";
 import { showModalShowNew } from "./components/ModalShowAPIKey";
-import RunningAPIMapping from "./components/RunningAPIMapping";
 import NoAPIKey from "./components/NoAPIKey";
+import RunningAPIMapping from "./components/RunningAPIMapping";
 import styles from "./index.module.scss";
-import { IEnv } from "@/utils/types/env.type";
-import DeployHistory from "../NewAPIMapping/components/DeployHistory";
 
 const initPaginationParams = {
   page: 0,
@@ -150,118 +151,123 @@ const EnvironmentOverview = () => {
   }, [observedDiv.current]);
 
   return (
-    <Flex vertical gap={12} className={styles.pageWrapper}>
-      <Flex vertical gap={14} className={styles.scroll}>
-        <Spin spinning={loadingEnvs}>
-          <div className={styles.overviewContainer}>
-            {envList?.map((env) => {
-              const haveApiKey = !!apiKey?.data?.find(
-                (i) => i.envId === env.id
-              );
-              const { disConnectNum, connectNum, len } = getDataPlaneInfo(
-                env.id
-              );
-              return (
-                <div
-                  key={env.id}
-                  className={clsx(
-                    styles.overviewItem,
-                    selectedEnv?.id === env.id && styles.overviewItemActive
-                  )}
-                  role="none"
-                  onClick={() => setSelectedEnv(env)}
-                >
-                  <Flex
-                    vertical
-                    gap={12}
-                    align="start"
-                    className={styles.fullWidth}
+    <PageLayout title="Deployment">
+      <Flex vertical gap={12} className={styles.pageWrapper}>
+        <Flex vertical gap={14} className={styles.scroll}>
+          <Spin spinning={loadingEnvs}>
+            <div className={styles.overviewContainer}>
+              {envList?.map((env) => {
+                const haveApiKey = !!apiKey?.data?.find(
+                  (i) => i.envId === env.id
+                );
+                const { disConnectNum, connectNum, len } = getDataPlaneInfo(
+                  env.id
+                );
+                return (
+                  <div
+                    key={env.id}
+                    className={clsx(
+                      styles.overviewItem,
+                      selectedEnv?.id === env.id && styles.overviewItemActive
+                    )}
+                    role="none"
+                    onClick={() => setSelectedEnv(env)}
                   >
                     <Flex
-                      align="center"
-                      justify="space-between"
+                      vertical
+                      gap={12}
+                      align="start"
                       className={styles.fullWidth}
                     >
-                      <Typography.Text
-                        ellipsis={{ tooltip: env.name }}
-                        style={{
-                          marginRight: 16,
-                          textTransform: "capitalize",
-                          maxWidth: 200,
-                          fontSize: 16,
-                          fontWeight: 500,
-                        }}
+                      <Flex
+                        align="center"
+                        justify="space-between"
+                        className={styles.fullWidth}
                       >
-                        {env.name} Environment
-                      </Typography.Text>
-                      <Dropdown
-                        disabled={!haveApiKey}
-                        menu={{ items: dropdownItems(env.id, env.name) }}
-                      >
-                        <MoreOutlined
+                        <Typography.Text
+                          ellipsis={{ tooltip: env.name }}
                           style={{
-                            cursor: haveApiKey ? "default" : "not-allowed",
+                            marginRight: 16,
+                            textTransform: "capitalize",
+                            maxWidth: 200,
+                            fontSize: 16,
+                            fontWeight: 500,
                           }}
-                        />
-                      </Dropdown>
+                        >
+                          {env.name} Environment
+                        </Typography.Text>
+                        <Dropdown
+                          disabled={!haveApiKey}
+                          menu={{ items: dropdownItems(env.id, env.name) }}
+                        >
+                          <MoreOutlined
+                            style={{
+                              cursor: haveApiKey ? "default" : "not-allowed",
+                            }}
+                          />
+                        </Dropdown>
+                      </Flex>
+                      <EnvStatus
+                        env={env}
+                        apiKey={haveApiKey}
+                        status={getDataPlaneInfo(env.id)?.status}
+                        disConnect={disConnectNum}
+                        connect={connectNum}
+                        dataPlane={len}
+                        loading={loadingDataPlane}
+                      />
                     </Flex>
-                    <EnvStatus
-                      env={env}
-                      apiKey={haveApiKey}
-                      status={getDataPlaneInfo(env.id)?.status}
-                      disConnect={disConnectNum}
-                      connect={connectNum}
-                      dataPlane={len}
-                      loading={loadingDataPlane}
-                    />
-                  </Flex>
-                </div>
-              );
-            })}
-          </div>
-        </Spin>
-      </Flex>
-      {!isHaveApiKey && !loadingApiKey ? (
-        <NoAPIKey env={selectedEnv} />
-      ) : (
-        <Flex
-          vertical
-          gap={12}
-          className={styles.sectionWrapper}
-          ref={observedDiv}
-        >
-          <Flex align="center" justify="space-between">
-            <Radio.Group
-              onChange={(e) => {
-                setActiveTab(e.target.value);
-              }}
-              value={activeTab}
-            >
-              <Radio.Button value="running_api">
-                Running API mappings
-              </Radio.Button>
-              <Radio.Button value="deployment_history">
-                Deployment history
-              </Radio.Button>
-            </Radio.Group>
-          </Flex>
-          {activeTab === "running_api" && selectedEnv && (
-            <RunningAPIMapping scrollHeight={height} env={selectedEnv} />
-          )}
-          {activeTab === "deployment_history" && (
-            <div style={{ marginTop: -12 }}>
-              <DeployHistory scrollHeight={height} selectedEnv={selectedEnv} />
+                  </div>
+                );
+              })}
             </div>
-          )}
+          </Spin>
         </Flex>
-      )}
-      <ModalNewDeployment
-        open={open}
-        setOpen={setOpen}
-        runningComponent={runningComponent}
-        currentEnvId={currentEnvId!}
-      />
-    </Flex>
+        {!isHaveApiKey && !loadingApiKey ? (
+          <NoAPIKey env={selectedEnv} />
+        ) : (
+          <Flex
+            vertical
+            gap={12}
+            className={styles.sectionWrapper}
+            ref={observedDiv}
+          >
+            <Flex align="center" justify="space-between">
+              <Radio.Group
+                onChange={(e) => {
+                  setActiveTab(e.target.value);
+                }}
+                value={activeTab}
+              >
+                <Radio.Button value="running_api">
+                  Running API mappings
+                </Radio.Button>
+                <Radio.Button value="deployment_history">
+                  Deployment history
+                </Radio.Button>
+              </Radio.Group>
+            </Flex>
+            {activeTab === "running_api" && selectedEnv && (
+              <RunningAPIMapping scrollHeight={height} env={selectedEnv} />
+            )}
+            {activeTab === "deployment_history" && (
+              <div style={{ marginTop: -12 }}>
+                <DeployHistory
+                  scrollHeight={height}
+                  selectedEnv={selectedEnv}
+                />
+              </div>
+            )}
+          </Flex>
+        )}
+        <ModalNewDeployment
+          open={open}
+          setOpen={setOpen}
+          runningComponent={runningComponent}
+          currentEnvId={currentEnvId!}
+        />
+      </Flex>
+    </PageLayout>
   );
 };
 

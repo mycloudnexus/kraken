@@ -1,24 +1,25 @@
+import BuyerStatus from "@/components/BuyerStatus";
+import EnvTabs from "@/components/EnvTabs";
+import { PageLayout } from "@/components/Layout";
 import { Text } from "@/components/Text";
-import { Button, Flex, Popconfirm, Table, notification } from "antd";
-import styles from "./index.module.scss";
-import { useBuyerStore } from "@/stores/buyer.store";
-import { useEffect, useMemo, useRef } from "react";
 import {
   useActiveBuyer,
   useDeactiveBuyer,
   useGetBuyerList,
 } from "@/hooks/product";
-import { useAppStore } from "@/stores/app.store";
-import NewBuyerModal from "./components/NewBuyerModal";
-import { useBoolean } from "usehooks-ts";
-import { get, isEmpty, omitBy } from "lodash";
 import useDebouncedCallback from "@/hooks/useDebouncedCallback";
-import EnvTabs from "@/components/EnvTabs";
-import { IBuyer } from "@/utils/types/component.type";
-import { ContentTime } from "../NewAPIMapping/components/DeployHistory";
-import BuyerStatus from "@/components/BuyerStatus";
-import RegenToken from "./components/RegenToken";
 import useSize from "@/hooks/useSize";
+import { useAppStore } from "@/stores/app.store";
+import { useBuyerStore } from "@/stores/buyer.store";
+import { IBuyer } from "@/utils/types/component.type";
+import { Button, Flex, Popconfirm, Table, notification } from "antd";
+import { get, isEmpty, omitBy } from "lodash";
+import { useEffect, useMemo, useRef } from "react";
+import { useBoolean } from "usehooks-ts";
+import { ContentTime } from "../NewAPIMapping/components/DeployHistory";
+import NewBuyerModal from "./components/NewBuyerModal";
+import RegenToken from "./components/RegenToken";
+import styles from "./index.module.scss";
 
 const Buyer = () => {
   const { currentProduct } = useAppStore();
@@ -163,13 +164,7 @@ const Buyer = () => {
   }, [resetParams, debouncedFn]);
 
   return (
-    <div className={styles.root}>
-      <NewBuyerModal
-        open={isModalVisible}
-        onClose={hideModal}
-        currentEnv={params.envId ?? ""}
-      />
-      <Text.LightLarge>Buyer management</Text.LightLarge>
+    <PageLayout title="Buyer management">
       <Flex vertical className={styles.paper} gap={12}>
         <Flex justify="space-between" align="center">
           <EnvTabs
@@ -203,7 +198,13 @@ const Buyer = () => {
           />
         </div>
       </Flex>
-    </div>
+
+      <NewBuyerModal
+        open={isModalVisible}
+        onClose={hideModal}
+        currentEnv={params.envId ?? ""}
+      />
+    </PageLayout>
   );
 };
 

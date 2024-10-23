@@ -1,13 +1,13 @@
-import { Text } from "@/components/Text";
-import { Form, Input } from "antd";
-import Flex from "@/components/Flex";
-import { isEmpty } from "lodash";
-import { isURL } from "@/utils/helpers/url";
 import TitleIcon from "@/assets/title-icon.svg";
+import Flex from "@/components/Flex";
+import { Text } from "@/components/Text";
+import { isURL } from "@/utils/helpers/url";
+import { Form, Input } from "antd";
+import { isEmpty } from "lodash";
 
 const SelectAPIServer = () => {
   return (
-    <div>
+    <>
       <Flex gap={8} justifyContent="flex-start">
         <TitleIcon />
         <Text.NormalLarge>Seller API Server basics</Text.NormalLarge>
@@ -49,7 +49,7 @@ const SelectAPIServer = () => {
       >
         <Input placeholder="Add link" style={{ width: "100%" }} />
       </Form.Item>
-    </div>
+    </>
   );
 };
 

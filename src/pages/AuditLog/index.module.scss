@@ -1,18 +1,8 @@
-.root {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  padding: 16px 20px;
-  background: #f0f2f5;
-  min-height: calc(100% - 24px);
-}
-
 .tableWrapper {
   height: 100%;
   padding: 16px 20px;
   border-radius: 4px;
   background: #ffffff;
-  margin-top: 8px;
 }
 
 .filterWrapper {

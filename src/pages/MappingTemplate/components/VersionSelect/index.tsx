@@ -1,10 +1,11 @@
 import { Text } from "@/components/Text";
-import styles from "./index.module.scss";
-import { Flex, Tag } from "antd";
 import { IReleaseHistory } from "@/utils/types/product.type";
+import { Flex, Tag } from "antd";
 import clsx from "clsx";
-import { isEmpty } from "lodash";
 import dayjs from "dayjs";
+import { isEmpty } from "lodash";
+import styles from "./index.module.scss";
+
 type Props = {
   data: {
     data: IReleaseHistory[];
@@ -23,7 +24,7 @@ const VersionSelect = ({
   return (
     <div className={styles.root}>
       <Text.NormalMedium lineHeight="22px">Previous releases</Text.NormalMedium>
-      <Flex vertical style={{ marginTop: 10 }}>
+      <Flex vertical className={styles.versionList}>
         {data?.data?.map((d) => (
           <Flex
             key={d.templateUpgradeId}

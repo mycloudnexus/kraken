@@ -1,24 +1,18 @@
-import { Text } from "@/components/Text";
-import styles from "./index.module.scss";
+import { PageLayout } from "@/components/Layout";
 import { Flex, Input, Tabs } from "antd";
 import { useRef, useState } from "react";
 import CurrentVersion from "./components/CurrentVersion";
 import ReleaseHistory from "./components/ReleaseHistory";
 import UpgradeHistory from "./components/UpgradeHistory";
-import useSize from "@/hooks/useSize";
-import { get } from "lodash";
+import styles from "./index.module.scss";
+
 const MappingTemplate = () => {
   const [activeKey, setActiveKey] = useState("1");
   const ref = useRef<any>();
-  const size = useSize(ref);
 
   return (
-    <div className={styles.root} ref={ref}>
-      <Text.LightLarge>Mapping template release & Upgrade</Text.LightLarge>
-      <div
-        className={styles.container}
-        style={{ maxHeight: get(size, "height", 0) - 28 }}
-      >
+    <PageLayout title="Mapping template release & Upgrade">
+      <div ref={ref} className={styles.container}>
         <Flex justify="space-between" align="center">
           <Tabs
             activeKey={activeKey}
@@ -34,13 +28,9 @@ const MappingTemplate = () => {
             <Input.Search placeholder="Search" style={{ width: 264 }} />
           )}
         </Flex>
-        {activeKey === "1" ? (
-          <ReleaseHistory maxHeight={get(size, "height", 0) - 114} />
-        ) : (
-          <UpgradeHistory />
-        )}
+        {activeKey === "1" ? <ReleaseHistory /> : <UpgradeHistory />}
       </div>
-    </div>
+    </PageLayout>
   );
 };
 

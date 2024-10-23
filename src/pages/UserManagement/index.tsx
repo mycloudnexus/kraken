@@ -1,26 +1,23 @@
-import { Text } from "@/components/Text";
-import styles from "./index.module.scss";
-import { Button, Flex, Input, Switch, Table, notification } from "antd";
-import { useEffect, useMemo, useRef } from "react";
-import { useDisableUser, useEnableUser, useGetUserList } from "@/hooks/user";
-import { useUserStore } from "@/stores/user.store";
-import { debounce, get } from "lodash";
+import { PageLayout } from "@/components/Layout";
 import { ERole } from "@/components/Role";
-import dayjs from "dayjs";
-import useSize from "@/hooks/useSize";
+import { useDisableUser, useEnableUser, useGetUserList } from "@/hooks/user";
 import useUser from "@/hooks/user/useUser";
-import UserModal from "./components/UserModal";
-import { useBoolean } from "usehooks-ts";
+import { useUserStore } from "@/stores/user.store";
 import { IUser } from "@/utils/types/user.type";
-import UserRoleEdit from "./components/UserRoleEdit";
+import { Button, Flex, Input, Switch, Table, notification } from "antd";
+import dayjs from "dayjs";
+import { debounce, get } from "lodash";
+import { useEffect, useMemo } from "react";
+import { useBoolean } from "usehooks-ts";
 import ResetPwd from "./components/ResetPwd";
+import UserModal from "./components/UserModal";
+import UserRoleEdit from "./components/UserRoleEdit";
+import styles from "./index.module.scss";
 
 const UserManagement = () => {
   const { currentUser } = useUser();
   const { userParams, setUserParams, resetParams } = useUserStore();
   const { data: dataUser, isLoading: loadingUser } = useGetUserList(userParams);
-  const ref = useRef<any>();
-  const size = useSize(ref);
   const { value: isOpen, setTrue: open, setFalse: close } = useBoolean(false);
   const { mutateAsync: runEnable, isPending: pendingEnable } = useEnableUser();
   const { mutateAsync: runDisable, isPending: pendingDisable } =
@@ -139,10 +136,8 @@ const UserManagement = () => {
   }, 500);
 
   return (
-    <div className={styles.root}>
-      {isOpen && <UserModal open={isOpen} onClose={close} />}
-      <Text.LightLarge>User management</Text.LightLarge>
-      <div className={styles.container} ref={ref}>
+    <PageLayout title="User management">
+      <div className={styles.container}>
         <Flex justify="space-between" align="center">
           <Input.Search
             placeholder="Search user"
@@ -173,12 +168,14 @@ const UserManagement = () => {
             },
           }}
           scroll={{
-            y: get(size, "height", 0) - 164,
+            // y: get(size, "height", 0) - 164,
             x: "auto",
           }}
         />
       </div>
-    </div>
+
+      {isOpen && <UserModal open={isOpen} onClose={close} />}
+    </PageLayout>
   );
 };
 

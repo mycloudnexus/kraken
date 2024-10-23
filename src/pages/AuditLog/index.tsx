@@ -1,29 +1,21 @@
+import EmptyIcon from "@/assets/icon/empty.svg";
+import { PageLayout } from "@/components/Layout";
 import { useGetAuditLogs } from "@/hooks/product";
+import { useCommonListProps } from "@/hooks/useCommonListProps";
+import useUser from "@/hooks/user/useUser";
 import { toDateTime } from "@/libs/dayjs";
 import { DEFAULT_PAGING } from "@/utils/constants/common";
 import { ILogActivity } from "@/utils/types/env.type";
-import EmptyIcon from "@/assets/icon/empty.svg";
-import {
-  Button,
-  DatePicker,
-  Flex,
-  Form,
-  Input,
-  Result,
-  Table,
-  Typography,
-} from "antd";
+import { SearchOutlined } from "@ant-design/icons";
+import { Button, DatePicker, Flex, Form, Input, Result, Table } from "antd";
 import { ColumnsType } from "antd/es/table";
+import dayjs from "dayjs";
+import { debounce, omit } from "lodash";
 import { useCallback, useEffect, useState } from "react";
+import DeploymentStatus from "../EnvironmentOverview/components/DeploymentStatus";
 import ActivityDetailModal from "./components/AuditLogDetailsModal";
 import styles from "./index.module.scss";
-import { debounce, omit } from "lodash";
 
-import dayjs from "dayjs";
-import { SearchOutlined } from "@ant-design/icons";
-import DeploymentStatus from "../EnvironmentOverview/components/DeploymentStatus";
-import useUser from "@/hooks/user/useUser";
-import { useCommonListProps } from "@/hooks/useCommonListProps";
 const { RangePicker } = DatePicker;
 
 const initPagination = {
@@ -147,8 +139,7 @@ const AuditLog = () => {
     },
   ];
   return (
-    <div className={styles.root}>
-      <Typography.Text style={{ fontSize: 16 }}>Audit log</Typography.Text>
+    <PageLayout title="Audit log">
       <div className={styles.tableWrapper}>
         <Flex align="center" className={styles.filterWrapper}>
           <Form
@@ -208,7 +199,7 @@ const AuditLog = () => {
         open={modalOpen}
         onClose={() => setModalOpen(false)}
       />
-    </div>
+    </PageLayout>
   );
 };
 

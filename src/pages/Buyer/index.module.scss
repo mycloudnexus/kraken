@@ -1,22 +1,13 @@
-.root {
-  width: 100%;
-  padding: 10px 20px;
-  background: #f0f2f5;
-  height: calc(100vh - 58px);
+.paper {
+  padding: 4px 16px 20px;
+  border-radius: 4px;
+  background: #ffffff;
+  height: 100%;
   :global {
     .ant-tabs-nav {
       margin-bottom: 0;
     }
   }
-}
-
-.paper {
-  padding: 16px 20px;
-  border-radius: 4px;
-  background: #ffffff;
-  margin-top: 10px;
-  height: calc(100% - 28px);
-  max-height: calc(100% - 28px);
 }
 
 .btn {
