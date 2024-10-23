@@ -39,7 +39,10 @@ jobs:
           context: .
           file: ./docker/app-controller/Dockerfile
           push: true
-          tags: "cloudnexusopsdockerhub/kraken-app-controller:${{ steps.vars.outputs.release-version }}"
+          tags: |
+            cloudnexusopsdockerhub/kraken-app-controller:${{ steps.vars.outputs.release-version }}
+            cloudnexusopsdockerhub/kraken-app-controller:latest
+
 
       - name: Build kraken-app-hub container
         uses: docker/build-push-action@v5
@@ -47,7 +50,10 @@ jobs:
           context: .
           file: ./docker/app-hub/Dockerfile
           push: true
-          tags: "cloudnexusopsdockerhub/kraken-app-hub:${{ steps.vars.outputs.release-version }}"
+          tags: |
+            cloudnexusopsdockerhub/kraken-app-hub:${{ steps.vars.outputs.release-version }}
+            cloudnexusopsdockerhub/kraken-app-hub:latest
+
   
       - name: Build kraken-app-agent container
         uses: docker/build-push-action@v5
@@ -55,7 +61,9 @@ jobs:
           context: .
           file: ./docker/app-agent/Dockerfile
           push: true
-          tags: "cloudnexusopsdockerhub/kraken-app-agent:${{ steps.vars.outputs.release-version }}"
+          tags: |
+            cloudnexusopsdockerhub/kraken-app-agent:${{ steps.vars.outputs.release-version }}
+            cloudnexusopsdockerhub/kraken-app-agent:latest
 
       - name: Build kraken-app-portal container
         uses: docker/build-push-action@v5
@@ -63,4 +71,6 @@ jobs:
           context: .
           file: ./docker/app-portal/Dockerfile
           push: true
-          tags: "cloudnexusopsdockerhub/kraken-app-portal:${{ steps.vars.outputs.release-version }}"
+          tags: |
+            cloudnexusopsdockerhub/kraken-app-portal:${{ steps.vars.outputs.release-version }}
+            cloudnexusopsdockerhub/kraken-app-portal:latest
