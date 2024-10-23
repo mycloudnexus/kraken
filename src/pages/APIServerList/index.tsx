@@ -15,6 +15,7 @@ const APIServerList = () => {
   const {
     data: dataList,
     isLoading,
+    isRefetching,
     refetch,
   } = useGetSellerAPIList(currentProduct);
   const navigate = useNavigate();
@@ -34,7 +35,7 @@ const APIServerList = () => {
       }
     >
       <div className={styles.content}>
-        <Spin spinning={isLoading}>
+        <Spin spinning={isLoading || isRefetching}>
           <Flex
             flexDirection="column"
             alignItems="flex-start"
@@ -42,7 +43,9 @@ const APIServerList = () => {
             style={{ width: "100%" }}
           >
             {dataList?.data?.map((item: IComponent) => (
-              <APIServerCard item={item} key={item.id} refetchList={refetch} />
+              <div key={item.id} style={{ width: "100%" }}>
+                <APIServerCard item={item} refetchList={refetch} />
+              </div>
             ))}
           </Flex>
           {isEmpty(dataList?.data) && (

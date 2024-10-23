@@ -1,6 +1,6 @@
-import { useDeleteApiServer } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
 import { IUnifiedAsset } from "@/utils/types/common.type";
+import { IComponent } from "@/utils/types/component.type";
 import { Button, Tooltip } from "antd";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -8,33 +8,36 @@ import APIServerDrawer from "../APIServerDrawer";
 import TooltipDeleteBody from "./TooltipDeleteBody";
 import TooltipInfoBody from "./TooltipInfoBody";
 import styles from "./index.module.scss";
-import { IComponent } from '@/utils/types/component.type';
 
 type Item = IComponent | IUnifiedAsset | undefined;
 type Props = {
   item: Item;
+  openMappingDrawer: boolean;
+  setOpenMappingDrawer: (value: boolean) => void;
+  deleteCallback: (params: any) => Promise<void>;
   isInEditMode?: boolean;
   refetchList?: () => void;
 };
 
 const DeleteApiButton = ({
   item,
+  openMappingDrawer,
+  setOpenMappingDrawer,
+  deleteCallback,
   isInEditMode = false,
   refetchList,
 }: Props) => {
   const [openTooltip, setOpenTooltip] = useState(false);
-  const [openDrawer, setOpenDrawer] = useState(false);
   const { currentProduct } = useAppStore();
   const navigate = useNavigate();
-  const { mutateAsync: deleteApiServer } = useDeleteApiServer();
 
   const isApiInUse = useMemo(() => !!item?.inUse, [item]);
   const componentId = useMemo(() => item?.metadata?.key, [item?.metadata?.key]);
 
   const handleDelete = async () => {
     if (componentId) {
-      await deleteApiServer({ productId: currentProduct, componentId } as any);
       setOpenTooltip(false);
+      await deleteCallback({ productId: currentProduct, componentId } as any);
       refetchList
         ? refetchList()
         : navigate(`/component/${currentProduct}/list`);
@@ -52,33 +55,33 @@ const DeleteApiButton = ({
     </Button>
   );
 
+  const offsetValueX = isApiInUse ? -40 : 35;
+  const offsetValueY = isInEditMode ? (isApiInUse ? -10 : -20) : 20;
+
   return (
     <div>
       <Tooltip
+        rootClassName={styles.tooltip}
         placement={isInEditMode ? "topLeft" : "bottomLeft"}
         align={{
-          offset: [
-            isApiInUse ? -40 : 35,
-            isInEditMode ? (isApiInUse ? -10 : -20) : 20
-          ],
+          offset: [offsetValueX, offsetValueY],
         }}
         defaultOpen={false}
         open={openTooltip || undefined}
         title={
           isApiInUse
-            ? TooltipInfoBody(setOpenDrawer, setOpenTooltip)
+            ? TooltipInfoBody(setOpenMappingDrawer, setOpenTooltip)
             : TooltipDeleteBody(handleDelete, setOpenTooltip)
         }
-        rootClassName={styles.tooltip}
       >
         {isApiInUse && DeleteButton}
       </Tooltip>
       {!isApiInUse && DeleteButton}
 
-      {componentId && openDrawer && (
+      {componentId && openMappingDrawer && (
         <APIServerDrawer
-          onClose={() => setOpenDrawer(false)}
-          isOpen={openDrawer}
+          onClose={() => setOpenMappingDrawer(false)}
+          isOpen={openMappingDrawer}
           componentId={componentId}
         />
       )}

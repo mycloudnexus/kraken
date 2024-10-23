@@ -1,9 +1,11 @@
 import BreadCrumb from "@/components/Breadcrumb";
+import DeleteApiButton from "@/components/DeleteApiButton";
 import { PageLayout } from "@/components/Layout";
 import {
   useCreateNewComponent,
+  useDeleteApiServer,
   useEditComponent,
-  useGetComponentDetail,
+  useGetComponentDetailV2,
   useGetProductEnvs,
 } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
@@ -13,7 +15,7 @@ import { Flex, Form, Spin, notification } from "antd";
 import { decode } from "js-base64";
 import jsYaml from "js-yaml";
 import { get, isEmpty, set } from "lodash";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import AddEnv from "./components/AddEnv";
 import BtnStep from "./components/BtnStep";
@@ -24,8 +26,10 @@ import styles from "./index.module.scss";
 const NewAPIServer = () => {
   const { componentId } = useParams();
   const { currentProduct: id } = useAppStore();
-
-  const { data: componentDetail, isLoading } = useGetComponentDetail(
+  const [openMappingDrawer, setOpenMappingDrawer] = useState(false);
+  const { mutateAsync: deleteApiServer, isPending: isDeletePending } =
+    useDeleteApiServer();
+  const { data: componentDetail, isLoading } = useGetComponentDetailV2(
     id,
     (componentId ?? "").replace(".api.", ".api-spec.")
   );
@@ -171,7 +175,7 @@ const NewAPIServer = () => {
         />
       }
     >
-      <Spin spinning={isLoading}>
+      <Spin spinning={isLoading || isDeletePending}>
         <Form
           className={styles.container}
           form={form}
@@ -219,12 +223,15 @@ const NewAPIServer = () => {
                   loading={loadingCreate || isPending}
                   onNext={handleSave}
                 >
-                  {/* {!isEmpty(componentId) && (
+                  {!isEmpty(componentId) && (
                     <DeleteApiButton
+                      openMappingDrawer={openMappingDrawer}
+                      deleteCallback={deleteApiServer}
+                      setOpenMappingDrawer={setOpenMappingDrawer}
                       item={componentDetail}
                       isInEditMode={true}
                     />
-                  )} */}
+                  )}
                 </BtnStep>
               );
             }}

@@ -21,7 +21,6 @@ const TooltipDeleteBody = (
           </Text.LightMedium>
         </Flex>
       </Flex>
-
     </Flex>
     <Flex justify="end" gap={12}>
       <Button onClick={() => setOpenTooltip(false)}>Cancel</Button>

@@ -50,6 +50,13 @@ export const getComponentDetail = (productId: string, componentId: string) => {
   return request(`${PRODUCT}/${productId}/components/${componentId}`);
 };
 
+export const getComponentDetailV2 = (
+  productId: string,
+  componentId: string
+) => {
+  return request(`/v2${PRODUCT}/${productId}/components/${componentId}`);
+};
+
 export const getComponentDetailMapping = (
   productId: string,
   componentId: string

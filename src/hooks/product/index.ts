@@ -41,6 +41,7 @@ import {
   getComponentSpecDetails,
   deleteAPIServer,
   getAPIServers,
+  getComponentDetailV2,
 } from "@/services/products";
 import {
   COMPONENT_KIND_API,
@@ -273,6 +274,19 @@ export const useGetComponentDetail = (
   return useQuery<any, Error, IUnifiedAsset>({
     queryKey: [PRODUCT_CACHE_KEYS.get_component_detail, productId, componentId],
     queryFn: () => getComponentDetail(productId, componentId),
+    enabled: Boolean(productId && componentId && open),
+    select: (data) => data.data,
+  });
+};
+
+export const useGetComponentDetailV2 = (
+  productId: string,
+  componentId: string,
+  open = true
+) => {
+  return useQuery<any, Error, IUnifiedAsset>({
+    queryKey: [PRODUCT_CACHE_KEYS.get_component_detail, productId, componentId],
+    queryFn: () => getComponentDetailV2(productId, componentId),
     enabled: Boolean(productId && componentId && open),
     select: (data) => data.data,
   });

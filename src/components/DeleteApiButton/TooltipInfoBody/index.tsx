@@ -8,16 +8,18 @@ const TooltipInfoBody = (
 ) => (
   <Flex vertical gap={20}>
     <Flex gap={12}>
-      <Flex>
-        <ExclamationCircleFilled style={{ color: "#FAAD14" }} />
-      </Flex>
       <Flex vertical>
-        <Text.NormalLarge color="black">
-          This API server can't be deleted
-        </Text.NormalLarge>
-        <Text.LightMedium color="rgba(0,0,0,0.45)">
-          Some endpoints in this API server are being used.
-        </Text.LightMedium>
+        <Flex gap={10}>
+          <ExclamationCircleFilled style={{ color: "#FAAD14" }} />
+          <Text.NormalLarge color="black">
+            This API server can't be deleted
+          </Text.NormalLarge>
+        </Flex>
+        <Flex style={{ paddingLeft: "25px" }}>
+          <Text.LightMedium color="rgba(0,0,0,0.45)">
+            Some endpoints in this API server are being used.
+          </Text.LightMedium>
+        </Flex>
       </Flex>
     </Flex>
     <Flex justify="end" gap={12}>

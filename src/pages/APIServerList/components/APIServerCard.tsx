@@ -1,9 +1,10 @@
-import { IComponent } from "@/utils/types/component.type";
 import TitleIcon from "@/assets/title-icon.svg";
 import DeleteApiButton from "@/components/DeleteApiButton";
 import SpecDrawer from "@/components/SpecDrawer";
 import { Text } from "@/components/Text";
+import { useDeleteApiServer } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
+import { IComponent } from "@/utils/types/component.type";
 import { PaperClipOutlined } from "@ant-design/icons";
 import {
   Button,
@@ -11,6 +12,7 @@ import {
   Col,
   Flex,
   Row,
+  Spin,
   Tag,
   Typography,
   notification,
@@ -18,7 +20,7 @@ import {
 import { decode } from "js-base64";
 import jsYaml from "js-yaml";
 import { get } from "lodash";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useBoolean } from "usehooks-ts";
 
@@ -29,6 +31,14 @@ type Props = {
 
 const APIServerCard = ({ item, refetchList }: Props) => {
   const { currentProduct } = useAppStore();
+  const {
+    value: isHover,
+    setTrue: trueHover,
+    setFalse: falseHover,
+  } = useBoolean(false);
+  const [openMappingDrawer, setOpenMappingDrawer] = useState(false);
+  const { mutateAsync: deleteApiServer, isPending } = useDeleteApiServer();
+
   const navigate = useNavigate();
   const {
     value: isOpenDrawer,
@@ -64,7 +74,7 @@ const APIServerCard = ({ item, refetchList }: Props) => {
   const isApiInUse = useMemo(() => !!item?.inUse, [item]);
 
   return (
-    <>
+    <Spin spinning={isPending}>
       {isOpenDrawer && (
         <SpecDrawer
           onClose={closeDrawer}
@@ -76,19 +86,41 @@ const APIServerCard = ({ item, refetchList }: Props) => {
         style={{ borderRadius: 4, width: "100%" }}
         title={
           <Flex justify="space-between" gap={12} align="center">
-            <Flex gap={12}>
-              <Text.NormalLarge>
-                {get(item, "metadata.name", "")}
-              </Text.NormalLarge>
-              <Tag color={isApiInUse ? "blue" : ""}>
-                {isApiInUse ? "In use" : "Not in use"}
-              </Tag>
+            <Flex gap={8}>
+              <Flex align="center">
+                <Text.NormalLarge>
+                  {get(item, "metadata.name", "")}
+                </Text.NormalLarge>
+              </Flex>
+              <div onMouseEnter={trueHover} onMouseLeave={falseHover}>
+                {isHover && isApiInUse ? (
+                  <Button
+                    style={{ padding: "0px" }}
+                    type="link"
+                    onClick={() => {
+                      setOpenMappingDrawer(true);
+                    }}
+                  >
+                    Check details
+                  </Button>
+                ) : (
+                  <Tag color={isApiInUse ? "blue" : ""}>
+                    {isApiInUse ? "In use" : "Not in use"}
+                  </Tag>
+                )}
+              </div>
             </Flex>
             <Flex gap={12}>
               <Button type="link" onClick={handleEdit}>
                 Edit
               </Button>
-              <DeleteApiButton item={item} refetchList={refetchList} />
+              <DeleteApiButton
+                openMappingDrawer={openMappingDrawer}
+                deleteCallback={deleteApiServer}
+                setOpenMappingDrawer={setOpenMappingDrawer}
+                item={item}
+                refetchList={refetchList}
+              />
             </Flex>
           </Flex>
         }
@@ -187,7 +219,7 @@ const APIServerCard = ({ item, refetchList }: Props) => {
           </Col>
         </Row>
       </Card>
-    </>
+    </Spin>
   );
 };
 
