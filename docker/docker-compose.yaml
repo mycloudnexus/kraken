@@ -42,7 +42,7 @@ services:
     networks:
       - kraken-dev
   kraken-app-portal:
-    image: mycloudnexus/kraken-app-portal:latest
+    image: cloudnexusopsdockerhub/kraken-app-portal:1.0.1
     ports:
       - '3000:8080'
     environment:
@@ -50,7 +50,7 @@ services:
     networks:
       - kraken-dev
   kraken-app-hub:
-    image: mycloudnexus/kraken-app-hub:latest
+    image: cloudnexusopsdockerhub/kraken-app-hub:1.0.1
     volumes:
       - >-
         ./app-hub/application-default.yaml:/opt/app/config/application-default.yaml:ro
@@ -64,7 +64,7 @@ services:
     networks:
       - kraken-dev
   kraken-app-controller:
-    image: mycloudnexus/kraken-app-controller:latest
+    image: cloudnexusopsdockerhub/kraken-app-controller:1.0.1
     volumes:
       - >-
         ./app-controller/application-default.yaml:/opt/app/config/application-default.yaml:ro
@@ -78,7 +78,7 @@ services:
     networks:
       - kraken-dev
   kraken-app-agent:
-    image: mycloudnexus/kraken-app-agent:latest
+    image: cloudnexusopsdockerhub/kraken-app-agent:1.1.1
     volumes:
       - >-
         ./app-agent/application-default.yaml:/opt/app/config/application-default.yaml:ro
