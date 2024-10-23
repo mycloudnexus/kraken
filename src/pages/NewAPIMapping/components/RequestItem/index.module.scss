@@ -72,10 +72,12 @@
 
 .itemContainer {
   padding: 0 12px;
-}
 
-.selectPopup {
-  visibility: hidden;
+  :global {
+    .ant-input {
+      max-width: calc((100% - 28px) / 2 - 8px);
+    }
+  }
 }
 
 .flexColumn {

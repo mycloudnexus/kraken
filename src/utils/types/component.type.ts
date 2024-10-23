@@ -47,6 +47,7 @@ export interface IResponseMapping {
   requiredMapping: boolean;
   targetValues: string[];
   customizedField?: boolean;
+  valueMapping?: Record<string, any>;
   // Custom field
   id?: string;
 }

@@ -1,5 +1,6 @@
 import MappingIcon from "@/assets/newAPIMapping/mapping-icon.svg";
 import { Text } from "@/components/Text";
+import { Input } from "@/components/form";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { IRequestMapping } from "@/utils/types/component.type";
 import {
@@ -8,9 +9,10 @@ import {
   DeleteOutlined,
   EditOutlined,
 } from "@ant-design/icons";
-import { Button, Flex, Input, Select } from "antd";
+import { Button, Flex, Select } from "antd";
 import clsx from "clsx";
-import { cloneDeep, difference, get, isEmpty, set } from "lodash";
+import { cloneDeep, difference, isEmpty, set } from "lodash";
+import { nanoid } from "nanoid";
 import { useEffect, useState } from "react";
 import { useBoolean } from "usehooks-ts";
 import { SourceInput } from "./SourceInput";
@@ -79,11 +81,10 @@ const RequestItem = ({ item, index }: Props) => {
   };
 
   const handleAdd = (name: string) => {
-    const newKey = get(listMapping, `[${listMapping.length - 1}].key`, 0) + 1;
     setListMappingStateRequest([
       ...listMapping,
       {
-        key: newKey,
+        key: nanoid(),
         from: undefined,
         to: undefined,
         name,
@@ -91,18 +92,18 @@ const RequestItem = ({ item, index }: Props) => {
     ]);
   };
 
-  const handleDeleteMapping = (key: number) => {
+  const handleDeleteMapping = (key: React.Key) => {
     setListMappingStateRequest(listMapping.filter((item) => item.key !== key));
   };
 
-  const handleSelect = (value: string, key: number) => {
+  const handleSelect = (value: string, key: React.Key) => {
     const cloneArr = cloneDeep(listMapping);
     const itemIndex = listMapping.findIndex((l) => l.key === key);
     set(cloneArr, `[${itemIndex}].from`, value);
     setListMappingStateRequest(cloneArr);
   };
 
-  const handleChangeInput = (value: string[], key: number) => {
+  const handleChangeInput = (value: string[], key: React.Key) => {
     const cloneArr = cloneDeep(listMapping);
     const itemIndex = listMapping.findIndex((l) => l.key === key);
     set(cloneArr, `[${itemIndex}].to`, value);
@@ -122,7 +123,7 @@ const RequestItem = ({ item, index }: Props) => {
           {isEditTitle ? (
             <Flex align="center" gap={10} style={{ flex: 1 }}>
               <Input
-                onChange={(e) => setTitleInput(e.target.value)}
+                onChange={(value) => setTitleInput(value)}
                 value={titleInput}
                 allowClear
                 style={{ width: "calc(50% + 15px)" }}
@@ -166,7 +167,7 @@ const RequestItem = ({ item, index }: Props) => {
         {isEditDescription ? (
           <Flex align="center" gap={10}>
             <Input
-              onChange={(e) => setDescriptionInput(e.target.value)}
+              onChange={(value) => setDescriptionInput(value)}
               value={descriptionInput}
               allowClear
               style={{ width: "calc(50% - 22px)" }}
@@ -250,14 +251,12 @@ const RequestItem = ({ item, index }: Props) => {
                   </Button>
                 </Flex>
                 <MappingIcon />
-                <Select
-                  popupClassName={styles.selectPopup}
-                  mode="tags"
-                  placeholder="Input seller order state, Enter for multiple states"
-                  key={`enum-${key}`}
-                  value={to}
+                <Input
+                  placeholder="Input seller order state"
+                  // key={`enum-${key}`}
+                  value={to?.[0]}
                   style={{ flex: 1 }}
-                  onChange={(e) => handleChangeInput(e, key)}
+                  onChange={(value) => handleChangeInput([value], key)}
                   className={styles.stateSelect}
                 />
               </Flex>

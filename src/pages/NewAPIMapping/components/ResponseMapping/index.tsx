@@ -8,7 +8,7 @@ import ResponseItem from "../ResponseItem";
 import styles from "./index.module.scss";
 
 export interface IMapping {
-  key: number;
+  key: React.Key;
   from?: string;
   to?: string[];
   name?: string;

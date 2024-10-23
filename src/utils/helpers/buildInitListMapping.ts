@@ -1,22 +1,36 @@
-import { IMapping } from '@/pages/NewAPIMapping/components/ResponseMapping';
-import { isEmpty, every, chain, keys, pickBy } from 'lodash';
+import { IMapping } from "@/pages/NewAPIMapping/components/ResponseMapping";
+import { isEmpty, every, chain, keys, pickBy } from "lodash";
+import { nanoid } from "nanoid";
+import { IRequestMapping, IResponseMapping } from "../types/component.type";
 
-const buildInitListMapping = (responseMapping: any[]) => {
-  let k = 0;
+const buildInitListMapping = (
+  valuesMapping: (IRequestMapping | IResponseMapping)[],
+  type: "request" | "response"
+) => {
+  if (type === "request") {
+    return valuesMapping.flatMap(({ name, valueMapping }) =>
+      Object.keys(valueMapping ?? {}).map((sonataProp) => ({
+        name,
+        key: nanoid(),
+        from: sonataProp,
+        to: [valueMapping?.[sonataProp]], // seller prop
+      }))
+    ) as IMapping[];
+  }
+
   let list: IMapping[] = [];
-  for (const item of responseMapping) {
+  for (const item of valuesMapping) {
     if (
       !isEmpty(item.valueMapping) &&
       every(item.valueMapping, (v) => !isEmpty(v))
     ) {
       const res = chain(item.valueMapping)
-        .groupBy(value => value)
+        .groupBy((value) => value)
         .map((_, from) => {
-          k += 1;
           return {
             from,
-            to: keys(pickBy(item.valueMapping, v => v === from)),
-            key: k,
+            to: keys(pickBy(item.valueMapping, (v) => v === from)),
+            key: nanoid(),
             name: item.name,
           };
         })

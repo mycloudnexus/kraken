@@ -10,7 +10,8 @@ import {
 } from "@ant-design/icons";
 import { Button, Flex, Input, Select } from "antd";
 import clsx from "clsx";
-import { cloneDeep, difference, get, isEmpty, set } from "lodash";
+import { cloneDeep, difference, isEmpty, set } from "lodash";
+import { nanoid } from "nanoid";
 import { useEffect, useState } from "react";
 import { useBoolean } from "usehooks-ts";
 import { SourceInput } from "./SourceInput";
@@ -75,11 +76,10 @@ const ResponseItem = ({ item, index }: Props) => {
   };
 
   const handleAdd = (name: string) => {
-    const newKey = get(listMapping, `[${listMapping.length - 1}].key`, 0) + 1;
     setListMappingStateResponse([
       ...listMapping,
       {
-        key: newKey,
+        key: nanoid(),
         from: undefined,
         to: undefined,
         name,
@@ -87,18 +87,18 @@ const ResponseItem = ({ item, index }: Props) => {
     ]);
   };
 
-  const handleDeleteMapping = (key: number) => {
+  const handleDeleteMapping = (key: React.Key) => {
     setListMappingStateResponse(listMapping.filter((item) => item.key !== key));
   };
 
-  const handleSelect = (value: string, key: number) => {
+  const handleSelect = (value: string, key: React.Key) => {
     const cloneArr = cloneDeep(listMapping);
     const itemIndex = listMapping.findIndex((l) => l.key === key);
     set(cloneArr, `[${itemIndex}].from`, value);
     setListMappingStateResponse(cloneArr);
   };
 
-  const handleChangeInput = (value: string[], key: number) => {
+  const handleChangeInput = (value: string[], key: React.Key) => {
     const cloneArr = cloneDeep(listMapping);
     const itemIndex = listMapping.findIndex((l) => l.key === key);
     set(cloneArr, `[${itemIndex}].to`, value);
@@ -239,7 +239,13 @@ const ResponseItem = ({ item, index }: Props) => {
                       value: item,
                     }))}
                   />
-                  <DeleteOutlined onClick={() => handleDeleteMapping(key)} />
+                  <Button
+                    className={styles.btnRemoveValueMapping}
+                    type="link"
+                    onClick={() => handleDeleteMapping(key)}
+                  >
+                    <DeleteOutlined />
+                  </Button>
                 </Flex>
                 <MappingIcon />
                 <Select

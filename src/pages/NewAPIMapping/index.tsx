@@ -188,7 +188,9 @@ const NewAPIMapping = ({
 
   useEffect(() => {
     if (firstTimeLoad && !isEmpty(mappers?.request)) {
-      setListMappingStateRequest(buildInitListMapping(mappers?.request as any));
+      setListMappingStateRequest(
+        buildInitListMapping(mappers?.request as any, "request")
+      );
       setRequestMapping(resetMapping() ?? []);
     }
   }, [mappers?.request, firstTimeLoad]);
@@ -197,7 +199,7 @@ const NewAPIMapping = ({
     if (firstTimeLoad && !isEmpty(mappers?.response)) {
       setResponseMapping(resetResponseMapping());
       setListMappingStateResponse(
-        buildInitListMapping(mappers?.response as any)
+        buildInitListMapping(mappers?.response as any, "response")
       );
       setFirstTimeLoad(false);
     }
@@ -333,13 +335,19 @@ const NewAPIMapping = ({
     [rightSideInfo, requestMapping, setRequestMapping]
   );
 
-  const transformListMappingItem = (item: IMapping[]) => {
+  const transformListMappingItem = (
+    item: IMapping[],
+    type: "request" | "response"
+  ) => {
     return chain(item)
       .groupBy("name")
       .map((items, name) => ({
         name,
         valueMapping: flatMap(items, (item) =>
-          item?.to?.map((to) => ({ [to]: item.from }))
+          // item?.to?.map((to) => ({ [to]: item.from }))
+          type === "request"
+            ? [{ [item.from as string]: item.to?.[0] }]
+            : item?.to?.map((to) => ({ [to]: item.from }))
         ),
       }))
       .value();
@@ -361,11 +369,18 @@ const NewAPIMapping = ({
       //   return;
       // }
 
-      const newData = transformListMappingItem(listMappingStateResponse);
-      const newDataRequest = transformListMappingItem(listMappingStateRequest);
+      const newDataResponse = transformListMappingItem(
+        listMappingStateResponse,
+        "response"
+      );
+      const newDataRequest = transformListMappingItem(
+        listMappingStateRequest,
+        "request"
+      );
+
       let newResponse = cloneDeep(responseMapping);
-      if (!isEmpty(newData)) {
-        newData.forEach((it) => {
+      if (!isEmpty(newDataResponse)) {
+        newDataResponse.forEach((it) => {
           newResponse = newResponse.map((rm) => {
             if (rm.name === it.name) {
               rm.valueMapping = reduce(
@@ -452,7 +467,9 @@ const NewAPIMapping = ({
   const handleRevert = () => {
     setRequestMapping(resetMapping() ?? []);
     setResponseMapping(mappers?.response);
-    setListMappingStateResponse(buildInitListMapping(mappers?.response as any));
+    setListMappingStateResponse(
+      buildInitListMapping(mappers?.response as any, "response")
+    );
     setActiveTab("request");
   };
 
