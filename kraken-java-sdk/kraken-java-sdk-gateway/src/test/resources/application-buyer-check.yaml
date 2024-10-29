@@ -1,0 +1,17 @@
+app:
+  security:
+    resource-server:
+      security-filter:
+        enabled: true
+        filter-configs:
+          - filter-name: securityBuyerChecker
+            paths:
+              - /assets/**
+              - /products/{id}/**
+              - /mefApi/**
+      enabled: true
+      bearerTokenHeaderName: x-kraken-key
+      jwt:
+        - issuer: https://kraken.consoleconnect.com/issuer
+          key-id: kraken
+          secret: Y2ZmZTdlZmUtMzdiMS00ZGVmLWEzMWItMWNiMGM4ZGQxYWU1

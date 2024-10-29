@@ -16,4 +16,5 @@ public class UnifiedAssetDto extends UnifiedAsset {
   private String updatedBy;
   private SyncMetadata syncMetadata;
   private String mappingStatus;
+  private Boolean inUse;
 }

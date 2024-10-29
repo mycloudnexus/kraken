@@ -6,4 +6,5 @@ import lombok.Data;
 public class AssetLink {
   private String targetAssetKey;
   private String relationship;
+  private String group;
 }

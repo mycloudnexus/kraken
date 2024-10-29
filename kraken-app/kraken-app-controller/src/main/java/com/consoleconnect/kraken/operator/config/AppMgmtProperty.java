@@ -1,5 +1,6 @@
 package com.consoleconnect.kraken.operator.config;
 
+import com.consoleconnect.kraken.operator.controller.dto.CreateEnvRequest;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,6 +14,6 @@ public class AppMgmtProperty {
   @Setter
   public static class Product {
     private String key;
-    private List<String> environments;
+    private List<CreateEnvRequest> environments;
   }
 }

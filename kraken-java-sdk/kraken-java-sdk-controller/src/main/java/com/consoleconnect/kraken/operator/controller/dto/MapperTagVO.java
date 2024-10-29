@@ -10,4 +10,6 @@ public class MapperTagVO extends TagInfoDto {
   private String componentKey;
   private ComponentExpandDTO.MappingMatrix mappingMatrix;
   private String status;
+  private String method;
+  private String path;
 }

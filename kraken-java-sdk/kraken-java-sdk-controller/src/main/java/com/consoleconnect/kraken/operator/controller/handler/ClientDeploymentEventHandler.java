@@ -1,15 +1,15 @@
 package com.consoleconnect.kraken.operator.controller.handler;
 
-import com.consoleconnect.kraken.operator.controller.entity.EnvironmentClientEntity;
-import com.consoleconnect.kraken.operator.controller.repo.EnvironmentClientRepository;
 import com.consoleconnect.kraken.operator.controller.service.ProductDeploymentService;
 import com.consoleconnect.kraken.operator.core.client.ClientEvent;
 import com.consoleconnect.kraken.operator.core.client.ClientEventTypeEnum;
 import com.consoleconnect.kraken.operator.core.client.ClientInstanceDeployment;
+import com.consoleconnect.kraken.operator.core.entity.EnvironmentClientEntity;
 import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
 import com.consoleconnect.kraken.operator.core.enums.ClientReportTypeEnum;
 import com.consoleconnect.kraken.operator.core.enums.DeployStatusEnum;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
+import com.consoleconnect.kraken.operator.core.repo.EnvironmentClientRepository;
 import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import java.time.ZonedDateTime;
@@ -45,14 +45,14 @@ public class ClientDeploymentEventHandler extends ClientEventHandler {
         JsonToolkit.fromJson(event.getEventPayload(), ClientInstanceDeployment.class);
     EnvironmentClientEntity environmentClientEntity =
         environmentClientRepository
-            .findOneByEnvIdAndAndClientIpAndKind(
+            .findOneByEnvIdAndClientKeyAndKind(
                 envId, event.getClientId(), ClientReportTypeEnum.DEPLOY.name())
             .orElseGet(
                 () -> {
                   EnvironmentClientEntity entity = new EnvironmentClientEntity();
                   entity.setEnvId(envId);
                   entity.setKind(ClientReportTypeEnum.DEPLOY.name());
-                  entity.setClientIp(event.getClientId());
+                  entity.setClientKey(event.getClientId());
                   entity.setCreatedAt(ZonedDateTime.now());
                   entity.setCreatedBy(userId);
                   return entity;
@@ -72,7 +72,12 @@ public class ClientDeploymentEventHandler extends ClientEventHandler {
           deployment.getProductReleaseId());
       deploymentOptional.get().setStatus(DeployStatusEnum.SUCCESS.name());
       unifiedAssetRepository.save(deploymentOptional.get());
-      productDeploymentService.reportConfigurationReloadingResult(deployment.getProductReleaseId());
+      try {
+        productDeploymentService.reportConfigurationReloadingResult(
+            deployment.getProductReleaseId());
+      } catch (Exception e) {
+        log.error("Failed to reportConfigurationReloadingResult", e);
+      }
     } else {
       log.info(
           "report asset {} configuration  reloading result failed",

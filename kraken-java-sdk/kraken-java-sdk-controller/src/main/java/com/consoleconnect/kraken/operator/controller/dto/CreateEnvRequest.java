@@ -5,4 +5,5 @@ import lombok.Data;
 @Data
 public class CreateEnvRequest {
   private String name;
+  private String id;
 }

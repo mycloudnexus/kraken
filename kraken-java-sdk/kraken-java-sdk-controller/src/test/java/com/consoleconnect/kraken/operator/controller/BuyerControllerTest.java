@@ -7,15 +7,17 @@ import static org.hamcrest.Matchers.*;
 import com.consoleconnect.kraken.operator.config.TestApplication;
 import com.consoleconnect.kraken.operator.controller.dto.BuyerAssetDto;
 import com.consoleconnect.kraken.operator.controller.dto.CreateBuyerRequest;
-import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
+import com.consoleconnect.kraken.operator.core.dto.Tuple2;
+import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
-import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
+import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
+import com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
+import com.consoleconnect.kraken.operator.core.toolkit.LabelConstants;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import com.fasterxml.jackson.core.type.TypeReference;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.MethodOrderer;
@@ -35,33 +37,23 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ActiveProfiles("test-rs256")
 class BuyerControllerTest extends AbstractIntegrationTest {
-  private static final String PRODUCT_ID = "mef.sonata.test";
+  private static final String PRODUCT_ID = "product.mef.sonata.api";
   public static final String BASE_URL = String.format("/products/%s/buyers", PRODUCT_ID);
+  public static final String BUYER_ID = "consolecore-poping-company";
 
-  private final UnifiedAssetRepository unifiedAssetRepository;
   private final WebTestClientHelper webTestClient;
+  @Autowired private UnifiedAssetService unifiedAssetService;
 
   @Autowired
-  public BuyerControllerTest(
-      WebTestClient webTestClient, UnifiedAssetRepository unifiedAssetRepository) {
+  public BuyerControllerTest(WebTestClient webTestClient) {
     this.webTestClient = new WebTestClientHelper(webTestClient);
-    this.unifiedAssetRepository = unifiedAssetRepository;
   }
 
   @Test
   @Order(2)
   void givenBuyer_whenCreate_thenOK() {
-    Optional<UnifiedAssetEntity> optionalMefSonataProduct =
-        unifiedAssetRepository.findOneByKey(PRODUCT_ID);
-    if (optionalMefSonataProduct.isEmpty()) {
-      UnifiedAssetEntity mefSonataProduct = new UnifiedAssetEntity();
-      mefSonataProduct.setKey(PRODUCT_ID);
-      mefSonataProduct.setKind(AssetKindEnum.PRODUCT.getKind());
-      mefSonataProduct.setName("MEF Sonata API");
-      unifiedAssetRepository.save(mefSonataProduct);
-    }
     CreateBuyerRequest requestEntity = new CreateBuyerRequest();
-    requestEntity.setBuyerId("consolecore-poping-company");
+    requestEntity.setBuyerId(BUYER_ID);
     requestEntity.setEnvId("stage");
     requestEntity.setCompanyName("console connect");
 
@@ -114,7 +106,7 @@ class BuyerControllerTest extends AbstractIntegrationTest {
   @Order(4)
   void givenDuplicatedBuyer_whenCreate_thenNot200() {
     CreateBuyerRequest requestEntity = new CreateBuyerRequest();
-    requestEntity.setBuyerId("consolecore-poping-company");
+    requestEntity.setBuyerId(BUYER_ID);
     requestEntity.setEnvId("stage");
     requestEntity.setCompanyName("console connect");
 
@@ -149,7 +141,7 @@ class BuyerControllerTest extends AbstractIntegrationTest {
   @Order(6)
   void givenBlankEnv_whenCreateBuyer_thenNot200() {
     CreateBuyerRequest requestEntity = new CreateBuyerRequest();
-    requestEntity.setBuyerId("buyer");
+    requestEntity.setBuyerId(BUYER_ID);
     requestEntity.setEnvId("");
     requestEntity.setCompanyName("console connect");
     webTestClient.requestAndVerify(
@@ -160,9 +152,57 @@ class BuyerControllerTest extends AbstractIntegrationTest {
         bodyStr -> {
           assertThat(bodyStr, hasJsonPath("$.code", not(200)));
         });
+  }
 
-    Optional<UnifiedAssetEntity> optionalMefSonataProduct =
-        unifiedAssetRepository.findOneByKey(PRODUCT_ID);
-    optionalMefSonataProduct.ifPresent(unifiedAssetRepository::delete);
+  @Test
+  @Order(7)
+  void givenCreateBuyer_whenDeactivate_thenOK() {
+    UnifiedAssetDto buyerAsset =
+        unifiedAssetService
+            .findBySpecification(
+                Tuple2.ofList(AssetsConstants.FIELD_KIND, AssetKindEnum.PRODUCT_BUYER.getKind()),
+                Tuple2.ofList(LabelConstants.LABEL_BUYER_ID, BUYER_ID),
+                null,
+                null,
+                null)
+            .getData()
+            .get(0);
+    webTestClient.requestAndVerify(
+        HttpMethod.POST,
+        uriBuilder ->
+            uriBuilder
+                .path("/products/{productId}/buyers/{id}/deactivate")
+                .build(PRODUCT_ID, buyerAsset.getId()),
+        HttpStatus.OK.value(),
+        null,
+        bodyStr -> {
+          assertThat(bodyStr, hasJsonPath("$.code", is(200)));
+        });
+  }
+
+  @Test
+  @Order(8)
+  void givenBuyerDeactivate_whenActivate_thenOK() {
+    UnifiedAssetDto buyerAsset =
+        unifiedAssetService
+            .findBySpecification(
+                Tuple2.ofList(AssetsConstants.FIELD_KIND, AssetKindEnum.PRODUCT_BUYER.getKind()),
+                Tuple2.ofList(LabelConstants.LABEL_BUYER_ID, BUYER_ID),
+                null,
+                null,
+                null)
+            .getData()
+            .get(0);
+    webTestClient.requestAndVerify(
+        HttpMethod.POST,
+        uriBuilder ->
+            uriBuilder
+                .path("/products/{productId}/buyers/{id}/activate")
+                .build(PRODUCT_ID, buyerAsset.getId()),
+        HttpStatus.OK.value(),
+        null,
+        bodyStr -> {
+          assertThat(bodyStr, hasJsonPath("$.code", is(200)));
+        });
   }
 }

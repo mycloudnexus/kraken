@@ -1,0 +1,9 @@
+{
+  "relatedContactInformation": "${T(com.consoleconnect.kraken.operator.gateway.func.SpelFunc).appendSellerInformation(env.seller.role, env.seller.name, env.seller.emailAddress, env.seller.number, mefRequestBody.relatedContactInformation)}",
+  "id": "${entity.id}",
+  "orderDate": "function.now()",
+  "productOrderItem": "${mefRequestBody.productOrderItem}",
+  "state": "${responseBody.status}",
+  "orderId":"${responseBody.id}",
+  "instanceId":"${responseBody.port.id}"
+}

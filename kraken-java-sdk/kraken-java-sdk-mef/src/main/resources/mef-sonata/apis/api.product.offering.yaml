@@ -240,19 +240,27 @@ spec:
 links:
   - targetAssetKey: mef.sonata.api-target.poq.eline.add
     relationship: implementation.target
+    group: mef.sonata.api-target.poq.eline.add
   - targetAssetKey: mef.sonata.api-target.poq.eline.read
     relationship: implementation.target
+    group: mef.sonata.api-target.poq.eline.read
   - targetAssetKey: mef.sonata.api-target.poq.uni.add
     relationship: implementation.target
+    group: mef.sonata.api-target.poq.uni.add
   - targetAssetKey: mef.sonata.api-target.poq.uni.read
     relationship: implementation.target
+    group: mef.sonata.api-target.poq.uni.read
   - targetAssetKey: mef.sonata.api-target-mapper.poq.eline.add
     relationship: implementation.target-mapper
+    group: mef.sonata.api-target.poq.eline.add
   - targetAssetKey: mef.sonata.api-target-mapper.poq.eline.read
     relationship: implementation.target-mapper
+    group: mef.sonata.api-target.poq.eline.read
   - targetAssetKey: mef.sonata.api-target-mapper.poq.uni.add
     relationship: implementation.target-mapper
+    group: mef.sonata.api-target.poq.uni.add
   - targetAssetKey: mef.sonata.api-target-mapper.poq.uni.read
     relationship: implementation.target-mapper
+    group: mef.sonata.api-target.poq.uni.read
   - targetAssetKey: mef.sonata.api-spec.product.offering.qualification
     relationship: implementation.standard.api-spec

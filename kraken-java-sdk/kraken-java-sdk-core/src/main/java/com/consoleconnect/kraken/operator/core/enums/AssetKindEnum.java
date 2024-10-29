@@ -10,6 +10,7 @@ public enum AssetKindEnum {
   PRODUCT("kraken.product"),
   PRODUCT_DEPLOYMENT("kraken.product-deployment"),
   PRODUCT_TEMPLATE_DEPLOYMENT("kraken.product.template-deployment"),
+  PRODUCT_TEMPLATE_CONTROL_DEPLOYMENT("kraken.product.template-control-deployment"),
   PRODUCT_TEMPLATE_UPGRADE("kraken.product.template-upgrade"),
   PRODUCT_ENV("kraken.product-env"),
   PRODUCT_BUYER("kraken.product-buyer"),
@@ -24,6 +25,7 @@ public enum AssetKindEnum {
   COMPONENT_TRANSFORMER("kraken.component.transformer"),
   COMPONENT_WORKFLOW("kraken.component.workflow"),
   PRODUCT_MAPPING_MATRIX("kraken.product.mapping.matrix"),
+  PRODUCT_RELEASE_DOWNLOAD("kraken.product.release.download"),
   COMPONENT_API_SERVER("kraken.component.api-server");
 
   private final String kind;

@@ -6,6 +6,7 @@ public class LabelConstants {
   public static final String LABEL_ENV_ID = "envId";
   public static final String LABEL_ENV_NAME = "envName";
   public static final String LABEL_VERSION_NAME = "version";
+  public static final String LABEL_SUB_VERSION_NAME = "subVersion";
   public static final String LABEL_RELEASE_KIND = "releaseKind";
   public static final String LABEL_BUYER_ID = "buyerId";
   public static final String VERIFIED_STATUS = "verifiedStatus";
@@ -19,8 +20,17 @@ public class LabelConstants {
 
   public static final String VALUE_DEPLOYED_STATUS_DEPLOYED = "DEPLOYED";
   public static final String VALUE_DEPLOYED_STATUS_NOT_DEPLOYED = "NOT_DEPLOYED";
-  public static final String LABEL_RELEASE_DATE = "release-date";
-  public static final String LABEL_RELEASE_VERSION = "release-version";
   public static final String KIND = "kind";
   public static final String STATUS = "status";
+  public static final String LABEL_PRODUCT_VERSION = "productVersion";
+  public static final String LABEL_PRODUCT_SPEC = "productSpec";
+  public static final String LABEL_PUBLISH_DATE = "publishDate";
+  public static final String LABEL_PUBLISH_BY = "publishBy";
+  public static final String LABEL_RELEASE_ID = "releaseId";
+  public static final String LABEL_RELEASE_KEY = "releaseKey";
+  public static final String LABEL_UPGRADE_SOURCE = "upgradeSource";
+  public static final String LABEL_PRODUCT_KEY = "productKey";
+  public static final String LABEL_EXPIRED_AT = "expiredAt";
+  public static final String LABEL_ISSUE_AT = "issueAt";
+  public static final String MEF_API_RELEASE = "mef-api-release";
 }

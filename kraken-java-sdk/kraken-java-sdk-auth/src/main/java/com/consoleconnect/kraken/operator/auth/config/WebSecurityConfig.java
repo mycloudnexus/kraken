@@ -3,14 +3,15 @@ package com.consoleconnect.kraken.operator.auth.config;
 import com.consoleconnect.kraken.operator.auth.model.AuthDataProperty;
 import com.consoleconnect.kraken.operator.auth.model.ResourceServerEnabled;
 import com.consoleconnect.kraken.operator.auth.model.UserLoginEnabled;
-import com.consoleconnect.kraken.operator.auth.security.JWTSecurityGlobalFilter;
-import com.consoleconnect.kraken.operator.auth.security.KrakenPasswordEncoder;
-import com.consoleconnect.kraken.operator.auth.security.TenantAuthenticationManagerResolver;
+import com.consoleconnect.kraken.operator.auth.security.*;
 import com.consoleconnect.kraken.operator.auth.service.JwtDecoderService;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -54,8 +55,10 @@ public class WebSecurityConfig {
       ServerHttpSecurity http,
       AuthDataProperty.ResourceServer resourceServer,
       JwtIssuerReactiveAuthenticationManagerResolver resolver,
-      ServerAuthenticationConverter authenticationConverter) {
-    return http.csrf(ServerHttpSecurity.CsrfSpec::disable)
+      ServerAuthenticationConverter authenticationConverter,
+      Map<String, SecurityChecker> securityCheckerMap,
+      ApplicationContext applicationContext) {
+    http.csrf(ServerHttpSecurity.CsrfSpec::disable)
         .cors(
             cors ->
                 cors.configurationSource(
@@ -97,8 +100,9 @@ public class WebSecurityConfig {
                     .authenticationManagerResolver(resolver)
                     .bearerTokenConverter(authenticationConverter))
         .addFilterAfter(
-            new JWTSecurityGlobalFilter(resourceServer), SecurityWebFiltersOrder.AUTHORIZATION)
-        .build();
+            new JWTSecurityGlobalFilter(resourceServer), SecurityWebFiltersOrder.AUTHORIZATION);
+    addSecurityFilter(http, resourceServer, securityCheckerMap);
+    return http.build();
   }
 
   @ConditionalOnBean(ResourceServerEnabled.class)
@@ -134,7 +138,7 @@ public class WebSecurityConfig {
 
   CorsConfigurationSource corsConfigurationSource(
       List<String> allowedHeaders, List<String> allowedOrigins, List<String> allowedMethods) {
-    org.springframework.web.cors.CorsConfiguration configuration = new CorsConfiguration();
+    CorsConfiguration configuration = new CorsConfiguration();
     configuration.setAllowedHeaders(allowedHeaders);
     configuration.setAllowedOrigins(allowedOrigins);
     configuration.setAllowedMethods(allowedMethods);
@@ -142,5 +146,25 @@ public class WebSecurityConfig {
         new UrlBasedCorsConfigurationSource();
     urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", configuration);
     return urlBasedCorsConfigurationSource;
+  }
+
+  private void addSecurityFilter(
+      ServerHttpSecurity http,
+      AuthDataProperty.ResourceServer resourceServer,
+      Map<String, SecurityChecker> securityCheckerMap) {
+    AuthDataProperty.SecurityFilter securityFilter = resourceServer.getSecurityFilter();
+    if (!securityFilter.isEnabled()) {
+      return;
+    }
+    securityFilter.getFilterConfigs().stream()
+        .filter(t -> securityCheckerMap.containsKey(t.getFilterName()))
+        .map(
+            config -> {
+              SecurityChecker securityChecker = securityCheckerMap.get(config.getFilterName());
+              return new SecurityCheckHolderFilter(
+                  config.getFilterName(), config.getPaths(), securityChecker);
+            })
+        .sorted(Comparator.comparing(SecurityCheckHolderFilter::getOrder))
+        .forEach(filter -> http.addFilterAfter(filter, SecurityWebFiltersOrder.AUTHORIZATION));
   }
 }

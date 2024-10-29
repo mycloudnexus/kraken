@@ -5,7 +5,7 @@ metadata:
   key: mef.sonata.api-target-mapper.quote.eline.add.sync
   name: Mapper Of Creating Quote Eline
   description: This operation creates a Quote entity
-  version: 2
+  version: 4
 spec:
   trigger:
     path: /mefApi/sonata/quoteManagement/v8/quote
@@ -21,13 +21,130 @@ spec:
       serverKey: mef.sonata.api-target-spec.con1718940696857
       mappers:
         request:
+          - name: mapper.quote.eline.add.sync.duration.amount
+            title: "quote item Term duration"
+            source: "@{{quoteItem[0].requestedQuoteItemTerm.duration.amount}}"
+            sourceLocation: BODY
+            target: ""
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.quote.eline.add.sync.duration.units
+            title: "quote item Term unit"
+            source: "@{{quoteItem[0].requestedQuoteItemTerm.duration.units}}"
+            sourceLocation: BODY
+            sourceType: enum
+            sourceValues:
+              - calendarYears
+              - calendarMonths
+              - calendarDays
+              - calendarHours
+              - calendarMinutes
+              - businessDays
+              - businessHours
+              - businessMinutes
+            valueMapping: {}
+            target: ""
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.quote.eline.add.sync.endOfTermAction
+            title: "MEFEndOfTermAction"
+            source: "@{{quoteItem[0].requestedQuoteItemTerm.endOfTermAction}}"
+            sourceLocation: BODY
+            sourceType: enum
+            sourceValues:
+              - roll
+              - autoDisconnect
+              - autoRenew
+            valueMapping: {}
+            target: ""
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.quote.eline.add.sync.rollInterval.amount
+            title: "quote item Term roll duration"
+            source: "@{{quoteItem[0].requestedQuoteItemTerm.rollInterval.amount}}"
+            sourceLocation: BODY
+            target: ""
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.quote.eline.add.sync.rollInterval.units
+            title: "quote item Term roll unit"
+            source: "@{{quoteItem[0].requestedQuoteItemTerm.rollInterval.units}}"
+            sourceLocation: BODY
+            sourceType: enum
+            sourceValues:
+              - calendarYears
+              - calendarMonths
+              - calendarDays
+              - calendarHours
+              - calendarMinutes
+              - businessDays
+              - businessHours
+              - businessMinutes
+            valueMapping: {}
+            target: ""
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.quote.eline.add.sync.place0.id
+            title: "The id of the place where source location of the quoted product"
+            source: "@{{quoteItem[0].product.place[0].id}}"
+            sourceLocation: BODY
+            target: ""
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.quote.eline.add.sync.place1.id
+            title: "The id of the place where destination location of the quoted product"
+            source: "@{{quoteItem[0].product.place[1].id}}"
+            sourceLocation: BODY
+            target: ""
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.quote.eline.add.sync.productConfiguration.bandwidth
+            title: "Bandwidth of the Eline"
+            source: "@{{quoteItem[0].product.productConfiguration.bandwidth}}"
+            sourceLocation: BODY
+            target: ""
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.quote.eline.add.sync.productConfiguration.bandwidthUnit
+            title: "The unit of bandwidth"
+            source: "@{{quoteItem[0].product.productConfiguration.bandwidthUnit}}"
+            sourceLocation: BODY
+            sourceType: enum
+            sourceValues:
+              - GBPS
+              - MBPS
+            valueMapping: {}
+            target: ""
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.quote.eline.add.sync.productConfiguration.classOfService
+            title: "The class of Service of the Eline"
+            source: "@{{quoteItem[0].product.productConfiguration.classOfService}}"
+            sourceLocation: BODY
+            target: ""
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.quote.eline.add.sync.productConfiguration.paymentType
+            title: "The payment type of the Eline"
+            source: "@{{quoteItem[0].product.productConfiguration.paymentType}}"
+            sourceLocation: BODY
+            target: ""
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.quote.eline.add.sync.productOffering.id
+            title: "The id of the quoted product offering"
+            source: "@{{quoteItem[0].product.productOffering.id}}"
+            sourceLocation: BODY
+            target: ""
+            targetLocation: BODY
+            requiredMapping: false
         response:
           - name: mapper.quote.eline.add.sync.unitOfMeasure
             title: "Unit of Measure if price depending on it"
             description: ""
             source: ""
             sourceLocation: BODY
-            target: "@{{quoteItem.quoteItemPrice.unitOfMeasure}}"
+            target: "@{{quoteItem[0].quoteItemPrice[*].unitOfMeasure}}"
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.quote.eline.add.sync.price.unit
@@ -35,7 +152,7 @@ spec:
             description: ""
             source: ""
             sourceLocation: BODY
-            target: "@{{quoteItem.quoteItemPrice.price.dutyFreeAmount.unit}}"
+            target: "@{{quoteItem[0].quoteItemPrice[*].price.dutyFreeAmount.unit}}"
             targetLocation: BODY
             requiredMapping: true
           - name: mapper.quote.eline.add.sync.price.value
@@ -43,7 +160,7 @@ spec:
             description: ""
             source: ""
             sourceLocation: ""
-            target: "@{{quoteItem.quoteItemPrice.price.dutyFreeAmount.value}}"
+            target: "@{{quoteItem[0].quoteItemPrice[*].price.dutyFreeAmount.value}}"
             targetLocation: BODY
             requiredMapping: true
             checkPath: "$['quoteItem'][0]['quoteItemPrice'][0]['price']['dutyFreeAmount']['unit']"
@@ -53,7 +170,7 @@ spec:
             description: ""
             source: ""
             sourceLocation: BODY
-            target: "@{{quoteItem.quoteItemPrice.price.taxRate}}"
+            target: "@{{quoteItem[0].quoteItemPrice[*].price.taxRate}}"
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.quote.eline.add.sync.taxIncludedAmount.unit
@@ -61,7 +178,7 @@ spec:
             description: ""
             source: ""
             sourceLocation: BODY
-            target: "@{{quoteItem.quoteItemPrice.price.taxIncludedAmount.unit}}"
+            target: "@{{quoteItem[0].quoteItemPrice[*].price.taxIncludedAmount.unit}}"
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.quote.eline.add.sync.taxIncludedAmount.value
@@ -69,7 +186,7 @@ spec:
             description: ""
             source: ""
             sourceLocation: BODY
-            target: "@{{quoteItem.quoteItemPrice.price.taxIncludedAmount.value}}"
+            target: "@{{quoteItem[0].quoteItemPrice[*].price.taxIncludedAmount.value}}"
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.quote.eline.add.sync.quoteItemPrice.name
@@ -77,7 +194,7 @@ spec:
             description: ""
             source: ""
             sourceLocation: BODY
-            target: "@{{quoteItem.quoteItemPrice.name}}"
+            target: "@{{quoteItem[0].quoteItemPrice[*].name}}"
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.quote.eline.add.sync.quoteItemPrice.priceType
@@ -85,7 +202,7 @@ spec:
             description: ""
             source: ""
             sourceLocation: BODY
-            target: "@{{quoteItem.quoteItemPrice.priceType}}"
+            target: "@{{quoteItem[0].quoteItemPrice[*].priceType}}"
             targetType: enum
             targetLocation: BODY
             requiredMapping: false
@@ -99,7 +216,7 @@ spec:
             description: ""
             source: ""
             sourceLocation: BODY
-            target: "@{{quoteItem.quoteItemPrice.description}}"
+            target: "@{{quoteItem[0].quoteItemPrice[*].description}}"
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.quote.eline.add.sync.quoteItemPrice.recurringChargePeriod
@@ -107,7 +224,7 @@ spec:
             description: ""
             source: ""
             sourceLocation: BODY
-            target: "@{{quoteItem.quoteItemPrice.recurringChargePeriod}}"
+            target: "@{{quoteItem[0].quoteItemPrice[*].recurringChargePeriod}}"
             targetType: enum
             targetLocation: BODY
             requiredMapping: false

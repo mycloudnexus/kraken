@@ -11,7 +11,8 @@ import reactor.core.publisher.Mono;
 public class UserContext {
 
   public static final String ANONYMOUS = "anonymous";
-  public static final String SYSTEM = "SYSTEM_UPGRADE";
+  public static final String SYSTEM_UPGRADE = "SYSTEM_UPGRADE";
+  public static final String SYSTEM_UPGRADE_NAME = "system";
 
   public static final String AUTHORIZATION_HEADER = "Authorization";
   public static final String AUTHORIZATION_HEADER_PREFIX = "Bearer ";

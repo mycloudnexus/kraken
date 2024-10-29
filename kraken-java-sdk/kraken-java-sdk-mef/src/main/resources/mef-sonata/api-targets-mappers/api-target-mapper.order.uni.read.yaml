@@ -26,6 +26,15 @@ spec:
             target: ""
             targetLocation: ""
             requiredMapping: false
+          - name: mapper.order.uni.read.orderId
+            title: "Order Unique Identifier."
+            description: ""
+            source: "@{{id}}"
+            sourceLocation: "PATH"
+            target: ""
+            convertValue: "mef.sonata.api-target-mapper.order.uni.add#mapper.order.uni.add.orderId"
+            targetLocation: ""
+            requiredMapping: true
         response:
           - name: mapper.order.uni.read.state
             title: "ProductOrderState"
@@ -48,12 +57,20 @@ spec:
               - rejected
             valueMapping: {}
             source: ""
-            sourceLocation: ""
+            sourceLocation: "BODY"
+          - name: mapper.order.uni.read.completionDate
+            title: "order complete date"
+            description: ""
+            source: ""
+            sourceLocation: "BODY"
+            target: "@{{completionDate}}"
+            targetLocation: "BODY"
+            requiredMapping: false
           - name: mapper.order.uni.read.instanceId
             title: "instance id from seller"
             description: ""
             source: ""
-            sourceLocation: ""
-            target: "@{{instanceId}}"
+            sourceLocation: "BODY"
+            target: "@{{productOrderItem[0].product.id}}"
             targetLocation: "BODY"
             requiredMapping: false

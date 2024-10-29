@@ -1,14 +1,10 @@
 package com.consoleconnect.kraken.operator.controller.v2;
 
 import com.consoleconnect.kraken.operator.config.TestApplication;
+import com.consoleconnect.kraken.operator.controller.APITokenCreator;
 import com.consoleconnect.kraken.operator.controller.WebTestClientHelper;
-import com.consoleconnect.kraken.operator.controller.dto.CreateAPITokenRequest;
-import com.consoleconnect.kraken.operator.controller.model.APIToken;
 import com.consoleconnect.kraken.operator.controller.service.APITokenService;
-import com.consoleconnect.kraken.operator.core.client.ClientEvent;
-import com.consoleconnect.kraken.operator.core.client.ClientEventTypeEnum;
-import com.consoleconnect.kraken.operator.core.client.ClientInstanceDeployment;
-import com.consoleconnect.kraken.operator.core.client.ClientInstanceHeartbeat;
+import com.consoleconnect.kraken.operator.core.client.*;
 import com.consoleconnect.kraken.operator.core.dto.ApiActivityLog;
 import com.consoleconnect.kraken.operator.core.request.LogSearchRequest;
 import com.consoleconnect.kraken.operator.core.service.ApiActivityLogService;
@@ -17,6 +13,7 @@ import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import java.util.*;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,8 +29,8 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @MockIntegrationTest
 @ContextConfiguration(classes = {TestApplication.class})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class ClientPubSubControllerTest extends AbstractIntegrationTest {
-  @Autowired APITokenService apiTokenService;
+class ClientPubSubControllerTest extends AbstractIntegrationTest implements APITokenCreator {
+  @Getter @Autowired APITokenService apiTokenService;
   @Autowired ApiActivityLogService apiActivityLogService;
 
   public static final String PRODUCT_ID = "mef.sonata";
@@ -48,24 +45,16 @@ class ClientPubSubControllerTest extends AbstractIntegrationTest {
     this.webTestClientHelper = new WebTestClientHelper(webTestClient);
   }
 
-  private APIToken createToken(String envId) {
-    CreateAPITokenRequest body = new CreateAPITokenRequest();
-    body.setName("Token-" + System.currentTimeMillis());
-    body.setEnvId(envId);
-    return apiTokenService.createToken(PRODUCT_ID, body, null);
-  }
-
   @BeforeEach
   public void setup() {
     if (accessToken == null) {
-      accessToken = "Bearer " + createToken(TestApplication.envId).getToken();
+      accessToken = "Bearer " + createToken(TestApplication.envId, PRODUCT_ID).getToken();
     }
   }
 
   @Test
   @Order(1)
   void givenAPILogEvent_whenOnEvent_thenEventPersisted() {
-
     // given
     ApiActivityLog requestEntity = new ApiActivityLog();
     requestEntity.setUri("localhost");
@@ -153,6 +142,32 @@ class ClientPubSubControllerTest extends AbstractIntegrationTest {
     instance2.setInstanceId("2");
     instance2.setUpdatedAt(DateTime.nowInUTC());
     event.setEventPayload(JsonToolkit.toJson(List.of(instance1, instance2)));
+
+    Map<String, String> headers = new HashMap<>();
+    headers.put("Authorization", accessToken);
+    webTestClientHelper.requestAndVerify(
+        HttpMethod.POST,
+        uriBuilder -> uriBuilder.path(CLIENT_EVENT_ENDPOINT).build(),
+        headers,
+        HttpStatus.OK.value(),
+        event,
+        Assertions::assertNotNull);
+  }
+
+  @Test
+  @Order(2)
+  void givenClientServerAPIEvent_whenUploadEvent_thenResponseOK() {
+    ClientEvent event = new ClientEvent();
+    event.setClientId(UUID.randomUUID().toString());
+    event.setEventType(ClientEventTypeEnum.CLIENT_SERVER_API);
+
+    ServerAPIDto serverAPIDto = new ServerAPIDto();
+    serverAPIDto.setServerKey("mef.sonata.api-target-spec.con1718940696857");
+    serverAPIDto.setPath("/api/pricing/calculate");
+    serverAPIDto.setMethod("post");
+    serverAPIDto.setMapperKey("mef.sonata.api-target-mapper.quote.eline.add.sync");
+    List<ServerAPIDto> serverAPIDtoList = List.of(serverAPIDto);
+    event.setEventPayload(JsonToolkit.toJson(serverAPIDtoList));
 
     Map<String, String> headers = new HashMap<>();
     headers.put("Authorization", accessToken);

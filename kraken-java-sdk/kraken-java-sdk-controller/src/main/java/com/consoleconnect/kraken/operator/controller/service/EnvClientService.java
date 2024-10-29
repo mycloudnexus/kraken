@@ -1,10 +1,10 @@
 package com.consoleconnect.kraken.operator.controller.service;
 
-import com.consoleconnect.kraken.operator.controller.entity.EnvironmentClientEntity;
 import com.consoleconnect.kraken.operator.controller.mapper.EnvironmentClientMapper;
 import com.consoleconnect.kraken.operator.controller.model.EnvironmentClient;
-import com.consoleconnect.kraken.operator.controller.repo.EnvironmentClientRepository;
+import com.consoleconnect.kraken.operator.core.entity.EnvironmentClientEntity;
 import com.consoleconnect.kraken.operator.core.enums.ClientReportTypeEnum;
+import com.consoleconnect.kraken.operator.core.repo.EnvironmentClientRepository;
 import com.consoleconnect.kraken.operator.core.toolkit.Paging;
 import com.consoleconnect.kraken.operator.core.toolkit.PagingHelper;
 import java.time.ZonedDateTime;

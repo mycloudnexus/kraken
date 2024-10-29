@@ -4,6 +4,7 @@ apiVersion: v1
 metadata:
   key: test.add.component
   name: Order Connection API
+  version: 0
 spec:
   inputs:
     - mefQuery

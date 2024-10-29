@@ -1,6 +1,6 @@
 package com.consoleconnect.kraken.operator.controller.model;
 
-import com.consoleconnect.kraken.operator.controller.entity.EnvironmentClientEntity;
+import com.consoleconnect.kraken.operator.core.entity.EnvironmentClientEntity;
 import com.consoleconnect.kraken.operator.core.model.AbstractModel;
 import jakarta.validation.constraints.Size;
 import lombok.Data;

@@ -1,4 +1,3 @@
----
 app:
   security:
     login:
@@ -6,10 +5,10 @@ app:
       jwt:
         issuer: https://kraken.consoleconnect.com/issuer
         key-id: kraken
-        secret: MjRhMjNhNGYtMWUzMS00ZTY4LTlhYzgtMzY5NDcwYzNjNDE4
+        secret: Y2ZmZTdlZmUtMzdiMS00ZGVmLWEzMWItMWNiMGM4ZGQxYWU1
     resource-server:
       enabled: true
       jwt:
         - issuer: https://kraken.consoleconnect.com/issuer
           key-id: kraken
-          secret: MjRhMjNhNGYtMWUzMS00ZTY4LTlhYzgtMzY5NDcwYzNjNDE4
+          secret: Y2ZmZTdlZmUtMzdiMS00ZGVmLWEzMWItMWNiMGM4ZGQxYWU1

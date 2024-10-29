@@ -86,9 +86,10 @@ spec:
             description: orderId mapping
             source: ""
             sourceLocation: ""
+            requiredMapping: false
           - name: mapper.order.eline.add.instanceId
             title: Instance Id location
             description: order instanceId mapping
             source: ""
             sourceLocation: ""
-
+            requiredMapping: false

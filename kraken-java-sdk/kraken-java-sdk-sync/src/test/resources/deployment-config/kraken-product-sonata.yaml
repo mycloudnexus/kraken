@@ -14,5 +14,5 @@ spec:
     - classpath:deployment-config/components/apis/productOrderManagement.api.yaml
     - classpath:deployment-config/components/transformers/request_echo.yaml
     - classpath:deployment-config/components/transformers/response_echo.yaml
-    - classpath:deployment-config/components/api-targets/mef.sonata.api.order.eline.add.yaml
-    - classpath:deployment-config/components/api-targets-mappers/api-target-mapper.order.uni.add.yaml
+#    - classpath:deployment-config/components/api-targets/mef.sonata.api.order.eline.add.yaml
+#    - classpath:deployment-config/components/api-targets-mappers/api-target-mapper.order.uni.add.yaml

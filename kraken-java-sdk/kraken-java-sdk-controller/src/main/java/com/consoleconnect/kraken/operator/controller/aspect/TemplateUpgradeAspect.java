@@ -26,15 +26,17 @@ public class TemplateUpgradeAspect {
   public Object validateAspect(ProceedingJoinPoint pjp) throws Throwable {
     Paging<UnifiedAssetDto> assetDtoPaging =
         unifiedAssetService.findBySpecification(
+            null,
+            null,
+            null,
+            null,
             Tuple2.ofList(
                 AssetsConstants.FIELD_KIND,
                 AssetKindEnum.PRODUCT_TEMPLATE_DEPLOYMENT.getKind(),
                 AssetsConstants.FIELD_STATUS,
-                DeployStatusEnum.IN_PROCESS.name()),
-            null,
-            null,
-            null,
-            null);
+                DeployStatusEnum.IN_PROCESS.name(),
+                AssetsConstants.FIELD_KIND,
+                AssetKindEnum.PRODUCT_TEMPLATE_CONTROL_DEPLOYMENT.getKind()));
     if (CollectionUtils.isNotEmpty(assetDtoPaging.getData())) {
       throw KrakenException.forbidden(
           "Due to ongoing(IN_PROCESS) deployments,update operations are not allowed");

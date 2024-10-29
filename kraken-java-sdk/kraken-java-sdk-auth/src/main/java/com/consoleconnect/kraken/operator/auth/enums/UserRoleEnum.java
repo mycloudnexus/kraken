@@ -4,4 +4,5 @@ public enum UserRoleEnum {
   ADMIN,
   USER,
   API_CLIENT,
+  INTERNAL_USER
 }

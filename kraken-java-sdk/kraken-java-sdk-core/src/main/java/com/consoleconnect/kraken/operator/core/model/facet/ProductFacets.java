@@ -8,4 +8,5 @@ public class ProductFacets {
   private List<String> componentPaths;
   private List<String> templateUpgradePaths;
   private List<String> sampleMapperDataPaths;
+  private List<String> sampleConfigPaths;
 }

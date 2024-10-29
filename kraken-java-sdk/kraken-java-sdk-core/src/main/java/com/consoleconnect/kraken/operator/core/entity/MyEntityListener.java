@@ -5,6 +5,7 @@ import jakarta.persistence.PostRemove;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import java.time.ZonedDateTime;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -12,6 +13,9 @@ public class MyEntityListener {
 
   @PrePersist
   public void onCreate(AbstractEntity entity) {
+    if (entity.getId() == null) {
+      entity.setId(UUID.randomUUID());
+    }
     if (entity.getCreatedAt() == null) {
       ZonedDateTime current = DateTime.nowInUTC();
       entity.setCreatedAt(current);

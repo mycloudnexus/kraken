@@ -4,6 +4,7 @@ kind: kraken.component.api-target
 apiVersion: v1
 metadata:
   key: mef.sonata.api-target.order.eline.add
+  mapperKey: mef.sonata.api-target-mapper.order.eline.add
   name: Order Connection API
   version: 1
 spec:

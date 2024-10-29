@@ -2,6 +2,7 @@ package com.consoleconnect.kraken.operator.sync.service;
 
 import static org.mockito.Mockito.*;
 
+import com.consoleconnect.kraken.operator.core.enums.ResourceRoleEnum;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import com.consoleconnect.kraken.operator.core.toolkit.DateTime;
 import com.consoleconnect.kraken.operator.data.entity.InstanceHeartbeatEntity;
@@ -36,12 +37,14 @@ class PushHeartbeatServiceTest extends AbstractIntegrationTest {
     // given
     InstanceHeartbeatEntity instance1 = new InstanceHeartbeatEntity();
     instance1.setInstanceId("10.0.0.1");
+    instance1.setRole(ResourceRoleEnum.WORKER.name());
     instance1.setCreatedAt(DateTime.nowInUTC());
     instance1.setUpdatedAt(DateTime.nowInUTC());
     heartbeatRepository.save(instance1);
 
     InstanceHeartbeatEntity instance2 = new InstanceHeartbeatEntity();
     instance2.setInstanceId("10.0.0.2");
+    instance1.setRole(ResourceRoleEnum.WORKER.name());
     instance2.setCreatedAt(DateTime.nowInUTC());
     instance2.setUpdatedAt(DateTime.nowInUTC());
 

@@ -24,6 +24,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -64,7 +65,8 @@ public class ProductDeploymentController {
             userId ->
                 service.createMapperVersionAndDeploy(
                     productId, request, ReleaseKindEnum.API_LEVEL, userId, false))
-        .map(HttpResponse::ok);
+        .map(
+            item -> HttpResponse.of(HttpStatus.OK.value(), "Deployment request is accepted", item));
   }
 
   @Operation(summary = "create a deployment from stage to production at the API mapper level")

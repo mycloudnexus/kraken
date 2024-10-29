@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -42,6 +43,16 @@ public class ComponentAPIServerController {
         .map(
             userId ->
                 service.createAPIServer(componentId, request, userId).getData().getId().toString())
+        .map(HttpResponse::ok);
+  }
+
+  @Operation(summary = "Delete API server")
+  @DeleteMapping()
+  public Mono<HttpResponse<Boolean>> removeAPIServer(
+      @PathVariable String productId, @PathVariable String componentId) {
+    return UserContext.getUserId()
+        .publishOn(Schedulers.boundedElastic())
+        .map(userId -> service.deleteAPIServer(productId, componentId, userId))
         .map(HttpResponse::ok);
   }
 
@@ -74,5 +85,17 @@ public class ComponentAPIServerController {
             facetIncluded,
             null,
             getSearchPageRequest(page, size, direction, orderBy)));
+  }
+
+  @Operation(summary = "list api servers of an api component")
+  @GetMapping("/{name}")
+  public HttpResponse<Boolean> checkServerAPIName(
+      @PathVariable String productId, @PathVariable String componentId, @PathVariable String name) {
+    boolean exist = this.service.checkServerAPIName(productId, componentId, name);
+    if (exist) {
+      String err = "The API Server name has existed:" + name;
+      return HttpResponse.of(HttpStatus.BAD_REQUEST.value(), err, Boolean.FALSE);
+    }
+    return HttpResponse.ok(true);
   }
 }

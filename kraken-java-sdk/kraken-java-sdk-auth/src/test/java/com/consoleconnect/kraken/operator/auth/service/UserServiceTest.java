@@ -1,19 +1,23 @@
 package com.consoleconnect.kraken.operator.auth.service;
 
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 
 import com.consoleconnect.kraken.operator.TestApplication;
 import com.consoleconnect.kraken.operator.TestContextConstants;
 import com.consoleconnect.kraken.operator.auth.dto.AuthRequest;
 import com.consoleconnect.kraken.operator.auth.dto.CreateUserRequest;
+import com.consoleconnect.kraken.operator.auth.entity.UserEntity;
 import com.consoleconnect.kraken.operator.auth.enums.UserStateEnum;
 import com.consoleconnect.kraken.operator.auth.model.AuthDataProperty;
 import com.consoleconnect.kraken.operator.auth.model.User;
+import com.consoleconnect.kraken.operator.auth.security.UserContext;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.SpyBean;
@@ -165,5 +169,17 @@ class UserServiceTest extends AbstractIntegrationTest {
     // login via new password should work
     loginRequest.setPassword(newPassword);
     Assertions.assertNotNull(userService.login(loginRequest).getAccessToken());
+  }
+
+  @Test
+  @Order(3)
+  void givenInitializedUpgradeUser_whenUpdateName_thenOk() {
+    UserEntity userEntity = new UserEntity();
+    userEntity.setName("upgrade_test");
+    userEntity.setEmail(UserContext.SYSTEM_UPGRADE);
+    login.getUserList().add(userEntity);
+    userService.initSystemUpgradeUser();
+    UserEntity oneByIdOrEmail = userService.findOneByIdOrEmail(UserContext.SYSTEM_UPGRADE);
+    MatcherAssert.assertThat(oneByIdOrEmail.getName(), is("upgrade_test"));
   }
 }

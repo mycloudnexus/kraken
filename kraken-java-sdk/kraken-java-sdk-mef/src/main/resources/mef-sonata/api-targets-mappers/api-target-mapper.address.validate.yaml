@@ -48,7 +48,7 @@ spec:
             title: "Unique identifier of the identified alternate Geographic Address"
             description: ""
             source: ""
-            sourceLocation: "BODY"
+            sourceLocation: ""
             target: "@{{alternateGeographicAddress[*].id}}"
             targetType: string
             targetLocation: BODY
@@ -58,7 +58,7 @@ spec:
             title: "The country of the identified alternate Geographic Address"
             description: ""
             source: ""
-            sourceLocation: "BODY"
+            sourceLocation: ""
             target: "@{{alternateGeographicAddress[*].country}}"
             targetType: string
             targetLocation: BODY
@@ -68,7 +68,7 @@ spec:
             title: "The city of the identified alternate Geographic Address"
             description: ""
             source: ""
-            sourceLocation: "BODY"
+            sourceLocation: ""
             target: "@{{alternateGeographicAddress[*].city}}"
             targetType: string
             targetLocation: BODY
@@ -84,12 +84,12 @@ spec:
             targetLocation: BODY
             requiredMapping: false
             replaceStar: false
-          - name: address.validation.metroId.mapper
+          - name: address.validation.locality.mapper
             title: "The metroId of the identified alternate Geographic Address"
             description: ""
             source: ""
             sourceLocation: ""
-            target: "@{{alternateGeographicAddress[*].metroId}}"
+            target: "@{{alternateGeographicAddress[*].locality}}"
             targetType: string
             targetLocation: BODY
             requiredMapping: false

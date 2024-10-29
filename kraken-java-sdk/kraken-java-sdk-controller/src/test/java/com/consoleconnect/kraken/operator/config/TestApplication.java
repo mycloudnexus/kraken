@@ -10,7 +10,6 @@ import com.consoleconnect.kraken.operator.controller.service.APITokenService;
 import com.consoleconnect.kraken.operator.controller.service.EnvironmentService;
 import com.consoleconnect.kraken.operator.core.event.PlatformSettingCompletedEvent;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -27,27 +26,45 @@ public class TestApplication {
   }
 
   public static final String ENV_NAME = "local_dev";
+  public static final String ENV_PRODUCTION_NAME = "production";
   public static String envId;
+  public static String productionEnvId;
 
   @Autowired private EnvironmentService environmentService;
 
   @EventListener(PlatformSettingCompletedEvent.class)
   public void initialize() {
     if (envId == null) {
-      Optional<Environment> optionalEnvironment =
+      envId =
           environmentService
               .search(PRODUCT_ID, UnifiedAssetService.getSearchPageRequest(0, Integer.MAX_VALUE))
               .getData()
               .stream()
               .filter(environment -> environment.getName().equalsIgnoreCase(ENV_NAME))
-              .findFirst();
-      if (optionalEnvironment.isPresent()) {
-        envId = optionalEnvironment.get().getId();
-      } else {
-        CreateEnvRequest createEnvRequest = new CreateEnvRequest();
-        createEnvRequest.setName(ENV_NAME);
-        envId = environmentService.create(PRODUCT_ID, createEnvRequest, null).getId();
-      }
+              .findFirst()
+              .map(Environment::getId)
+              .orElseGet(
+                  () -> {
+                    CreateEnvRequest createEnvRequest = new CreateEnvRequest();
+                    createEnvRequest.setName(ENV_NAME);
+                    return environmentService.create(PRODUCT_ID, createEnvRequest, null).getId();
+                  });
+    }
+    if (productionEnvId == null) {
+      productionEnvId =
+          environmentService
+              .search(PRODUCT_ID, UnifiedAssetService.getSearchPageRequest(0, Integer.MAX_VALUE))
+              .getData()
+              .stream()
+              .filter(environment -> environment.getName().equalsIgnoreCase(ENV_PRODUCTION_NAME))
+              .findFirst()
+              .map(Environment::getId)
+              .orElseGet(
+                  () -> {
+                    CreateEnvRequest createEnvRequest = new CreateEnvRequest();
+                    createEnvRequest.setName(ENV_PRODUCTION_NAME);
+                    return environmentService.create(PRODUCT_ID, createEnvRequest, null).getId();
+                  });
     }
   }
 

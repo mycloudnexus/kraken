@@ -17,6 +17,7 @@ public class ApiMapperDeploymentDTO extends ComponentExpandDTO.TargetMappingDeta
   private String releaseId;
   private String tagId;
   private String version;
+  private String subVersion;
   private String status;
   private String verifiedBy;
   private String verifiedAt;

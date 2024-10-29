@@ -23,7 +23,7 @@ spec:
             description: ""
             source: "@{{id}}"
             sourceLocation: "PATH"
-            target: ""
+            target: "}"
             targetLocation: ""
             requiredMapping: true
         response:
@@ -63,12 +63,12 @@ spec:
             targetType: string
             targetLocation: BODY
             requiredMapping: false
-          - name: address.validation.metroId.mapper
+          - name: address.validation.locality.mapper
             title: "The metroId of the identified alternate Geographic Address"
             description: ""
             source: ""
             sourceLocation: ""
-            target: "@{{alternateGeographicAddress.metroId}}"
+            target: "@{{associatedGeographicAddress.locality}}"
             targetType: string
             targetLocation: BODY
             requiredMapping: false

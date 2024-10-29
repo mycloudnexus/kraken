@@ -240,10 +240,10 @@ public class AuditLogFilter implements WebFilter, Ordered {
         AuditAction auditAction = (AuditAction) exchange.getAttributes().get(AUDIT_ANNOTATION_KEY);
         if (StringUtils.isBlank(id)) {
           log.error("can not find id in exchange attributes");
-          return chain.filter(exchange);
+          return exchange.getResponse().writeWith(join(body));
         }
         if (auditAction == null || auditAction.ignoreResponse()) {
-          return chain.filter(exchange);
+          return exchange.getResponse().writeWith(join(body));
         }
         return join(body)
             .flatMap(

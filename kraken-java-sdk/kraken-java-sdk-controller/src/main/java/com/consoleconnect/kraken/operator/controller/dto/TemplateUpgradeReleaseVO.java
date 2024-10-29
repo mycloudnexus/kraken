@@ -7,9 +7,11 @@ import lombok.Data;
 public class TemplateUpgradeReleaseVO {
   private String templateUpgradeId;
   private String name;
-  private String releaseVersion;
-  private String releaseDate;
+  private String productVersion;
+  private String productSpec;
+  private String publishDate;
   private String description;
   private List<TemplateUpgradeDeploymentVO> deployments;
-  private boolean showUpgradeButton = false;
+  private boolean showStageUpgradeButton = false;
+  private boolean showProductionUpgradeButton = false;
 }

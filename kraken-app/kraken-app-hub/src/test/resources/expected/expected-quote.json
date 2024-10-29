@@ -1,0 +1,24 @@
+{
+  "id": "${entity.id}",
+  "buyerRequestedQuoteLevel": "${mefRequestBody.buyerRequestedQuoteLevel}",
+  "quoteItem": [
+    {
+      "product": "${mefRequestBody.quoteItem[0].product}",
+      "state": "answered",
+      "quoteItemPrice": [
+        {
+          "price": {
+            "dutyFreeAmount": {
+              "unit": "USD",
+              "value": "${responseBody.results[0].price}"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "quoteDate": "function.now()",
+  "externalId": "${mefRequestBody[externalId]?:''}",
+  "instantSyncQuote": "${mefRequestBody[instantSyncQuote]?:''}",
+  "requestedQuoteCompletionDate": "${mefRequestBody[requestedQuoteCompletionDate]?:''}"
+}

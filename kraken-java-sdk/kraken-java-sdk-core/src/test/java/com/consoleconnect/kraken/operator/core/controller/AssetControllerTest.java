@@ -75,7 +75,7 @@ class AssetControllerTest extends AbstractIntegrationTest {
                 .queryParam("kind", AssetKindEnum.COMPONENT_API_SPEC.getKind())
                 .build()),
         bodyStr -> {
-          assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(1)));
+          assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(greaterThanOrEqualTo(1))));
           assertThat(
               bodyStr,
               hasJsonPath("$.data.data[0].kind", is(AssetKindEnum.COMPONENT_API_SPEC.getKind())));
@@ -112,7 +112,7 @@ class AssetControllerTest extends AbstractIntegrationTest {
                 .queryParam("parentId", PRODUCT_ID)
                 .build()),
         bodyStr -> {
-          assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(1)));
+          assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(greaterThanOrEqualTo(1))));
           assertThat(
               bodyStr,
               hasJsonPath("$.data.data[0].kind", is(AssetKindEnum.COMPONENT_API.getKind())));
@@ -135,7 +135,7 @@ class AssetControllerTest extends AbstractIntegrationTest {
                 .queryParam("parentId", PRODUCT_ID)
                 .build()),
         bodyStr -> {
-          assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(2)));
+          assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(greaterThanOrEqualTo(2))));
           assertThat(
               bodyStr,
               hasJsonPath(

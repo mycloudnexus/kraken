@@ -1,0 +1,34 @@
+{
+  "kind": "kraken.product.template-upgrade",
+  "apiVersion": "v1",
+  "metadata": {
+    "name": "V1.1.0",
+    "version": 0,
+    "key": "mef.sonata.release@1.1.0.published",
+    "description": "v1.1.0",
+    "status": "WAIT_TO_DOWNLOAD_CONTENT",
+    "labels": {
+      "publishBy": "admin",
+      "releaseDate": "2024-09-01",
+      "releasedBy": "Dave Xiong",
+      "release-date": "2024-09-10 16:04:24",
+      "publishDate": "2024-09-10 16:04:24",
+      "releaseKey": "mef.sonata.release@1.1.0.published",
+      "productKey": "mef.sonata",
+      "release-version": "1.1.0",
+      "productVersion": "1.1.0",
+      "releaseId": "64fadc1d-5711-45b4-8e07-c10a55e42299",
+      "productSpec": "grace",
+      "status": "RELEASED",
+      "kraken-engine": "1.*.*"
+    }
+  },
+  "facets": {
+    "source-code": {
+      "tag": "V1.1.0",
+      "path": "/grace",
+      "repoFullName": "console-core/mef-lso-sonata-api"
+    }
+  },
+  "parentId": "mef.sonata"
+}

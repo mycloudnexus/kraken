@@ -1,0 +1,15 @@
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.1.4.7
+  name: V1.4.7
+  labels:
+    productSpec: grace
+    productVersion: V1.4.7
+    publishDate: 2024-10-17
+  description: |
+    New feature:
+      split matrix file
+
+  version: 2

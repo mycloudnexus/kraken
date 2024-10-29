@@ -52,6 +52,9 @@ public class EnvironmentService {
     environmentEntity.setName(request.getName());
     environmentEntity.setProductId(productId);
     environmentEntity.setCreatedBy(createdBy);
+    if (request.getId() != null) {
+      environmentEntity.setId(UUID.fromString(request.getId()));
+    }
     environmentEntity = environmentRepository.save(environmentEntity);
     return EnvironmentMapper.INSTANCE.toEnv(environmentEntity);
   }

@@ -21,12 +21,49 @@ spec:
       method: ""
       pathReferId: "mef.sonata.api-target-mapper.order.uni.add#mapper.order.uni.add.orderId"
       responseBody: |
-        { 
-          "id": "${entity.id}",
-          "relatedContactInformation": "${T(com.consoleconnect.kraken.operator.gateway.func.SpelFunc).appendSellerInformation(env.seller.role, env.seller.name, env.seller.emailAddress, env.seller.number, entity.request.relatedContactInformation)}",
-          "productOrderItem": "${entity.request.productOrderItem}",
-          "state": "@{{state}}",
-          "orderDate":"${entity.renderedResponse.orderDate}",
-          "orderId": "${entity.renderedResponse.orderId}",
-          "instanceId": "@{{instanceId}}"
+        {
+            "id": "${entity.id}",
+            "relatedContactInformation": "${T(com.consoleconnect.kraken.operator.gateway.func.SpelFunc).appendSellerInformation(env.seller.role, env.seller.name, env.seller.emailAddress, env.seller.number, entity.request.relatedContactInformation)}",
+            "productOrderItem": [
+            {
+            "action": "${entity.renderedResponse.productOrderItem[0].action}",
+            "agreementName": "${entity.renderedResponse.productOrderItem[0].agreementName}",
+            "billingAccount": "${entity.renderedResponse.productOrderItem[0].billingAccount}",
+            "coordinatedAction": "${entity.renderedResponse.productOrderItem[0].coordinatedAction}",
+            "endCustomerName": "${entity.renderedResponse.productOrderItem[0].endCustomerName}",
+            "expediteIndicator": "${entity.renderedResponse.productOrderItem[0].expediteIndicator}",
+            "id": "${entity.renderedResponse.productOrderItem[0].id}",
+            "expectedCompletionDate": "${entity.renderedResponse.productOrderItem[0].expectedCompletionDate}",
+            "note": "${entity.renderedResponse.productOrderItem[0].note}",
+            "product": {
+            "productOffering": "${entity.renderedResponse.productOrderItem[0].product.productOffering}",
+            "productConfiguration": "${entity.renderedResponse.productOrderItem[0].product.productConfiguration}",
+            "productRelationship": "${entity.renderedResponse.productOrderItem[0].product.productRelationship}",
+            "place": "${entity.renderedResponse.productOrderItem[0].product.place}",
+            "href": "${entity.renderedResponse.productOrderItem[0].product.href}",
+            "id": ""
+            },
+            "productOfferingQualificationItem": "${entity.renderedResponse.productOrderItem[0].productOfferingQualificationItem}",
+            "productOrderItemRelationship": "${entity.renderedResponse.productOrderItem[0].productOrderItemRelationship}",
+            "quoteItem": "${entity.renderedResponse.productOrderItem[0].quoteItem}",
+            "relatedBuyerPON": "${entity.renderedResponse.productOrderItem[0].relatedBuyerPON}",
+            "relatedContactInformation": "${entity.renderedResponse.productOrderItem[0].relatedContactInformation}",
+            "requestedCompletionDate": "${entity.renderedResponse.productOrderItem[0].requestedCompletionDate}",
+            "requestedItemTerm": "${entity.renderedResponse.productOrderItem[0].requestedItemTerm}",
+            "tspRestorationPriority": "${entity.renderedResponse.productOrderItem[0].tspRestorationPriority}",
+            "charge": "${entity.renderedResponse.productOrderItem[0].charge}",
+            "completionDate": "((mefResponseBody.state=='completed'?mefResponseBody.completionDate:null))",
+            "expectedCompletionDate": "${entity.renderedResponse.productOrderItem[0].requestedCompletionDate}",
+            "expediteAcceptedIndicator": "${entity.renderedResponse.productOrderItem[0].expediteIndicator}",
+            "itemTerm": "${entity.renderedResponse.productOrderItem[0].itemTerm}",
+            "milestone": "${entity.renderedResponse.productOrderItem[0].milestone}",
+            "state": "((mefResponseBody.state))",
+            "terminationError": "${entity.renderedResponse.productOrderItem[0].terminationError}"
+            }
+            ],
+            "orderDate":"${entity.renderedResponse.orderDate}",
+            "state": "",
+            "orderId": "${entity.renderedResponse.orderId}",
+            "completionDate": "((mefResponseBody.state=='completed'?mefResponseBody.completionDate:null))",
+            "instanceId": ""
         }

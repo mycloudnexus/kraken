@@ -6,9 +6,11 @@ import lombok.Data;
 
 @Data
 public class MgmtProperty {
-  public static final String DEFAULT_TOKEN_EXPIRED_SECONDS = "157680000";
+  public static final String DEFAULT_TOKEN_EXPIRED_SECONDS = "3153600000";
   private boolean enabled;
   private String defaultEnv = "stage";
+  private boolean mgmtServerEnabled = false;
+  private boolean demoEnvEnabled = true;
 
   private APIToken apiToken = new APIToken();
   private String buyerTokenExpiredSeconds = DEFAULT_TOKEN_EXPIRED_SECONDS;

@@ -13,6 +13,7 @@ import com.consoleconnect.kraken.operator.core.dto.Tuple2;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
 import com.consoleconnect.kraken.operator.core.enums.DeployStatusEnum;
+import com.consoleconnect.kraken.operator.core.enums.EnvNameEnum;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants;
@@ -69,17 +70,52 @@ public class TemplateUpgradeController {
     List<TemplateUpgradeReleaseVO> list =
         assetDtoPaging.getData().stream().map(this::toTemplateUpgradeReleaseVO).toList();
     // the latest can upgrade
-    list.stream().findFirst().ifPresent(vo -> vo.setShowUpgradeButton(true));
+    list.stream()
+        .findFirst()
+        .ifPresent(
+            vo -> {
+              vo.setShowStageUpgradeButton(true);
+              vo.setShowProductionUpgradeButton(true);
+            });
+    allowProductionUpgrade(list);
     return HttpResponse.ok(
         PagingHelper.toPageNoSubList(
             list, assetDtoPaging.getPage(), assetDtoPaging.getSize(), assetDtoPaging.getTotal()));
   }
 
+  private static void allowProductionUpgrade(List<TemplateUpgradeReleaseVO> list) {
+    list.stream()
+        .filter(vo -> !vo.isShowStageUpgradeButton())
+        .filter(vo -> CollectionUtils.isNotEmpty(vo.getDeployments()))
+        .findFirst()
+        .ifPresent(
+            vo -> {
+              vo.setShowStageUpgradeButton(true);
+              TemplateUpgradeDeploymentVO latestProdDeployment =
+                  list.get(0).getDeployments().stream()
+                      .filter(t -> t.getEnvName().equalsIgnoreCase(EnvNameEnum.PRODUCTION.name()))
+                      .findFirst()
+                      .orElse(null);
+              if (latestProdDeployment != null) {
+                return;
+              }
+              vo.getDeployments().stream()
+                  .filter(
+                      deployment ->
+                          deployment.getEnvName().equalsIgnoreCase(EnvNameEnum.PRODUCTION.name()))
+                  .findFirst()
+                  .ifPresentOrElse(
+                      d -> vo.setShowProductionUpgradeButton(false),
+                      () -> vo.setShowProductionUpgradeButton(true));
+            });
+  }
+
   protected TemplateUpgradeReleaseVO toTemplateUpgradeReleaseVO(UnifiedAssetDto assetDto) {
     TemplateUpgradeReleaseVO templateUpgradeReleaseVO = new TemplateUpgradeReleaseVO();
     Map<String, String> labels = assetDto.getMetadata().getLabels();
-    templateUpgradeReleaseVO.setReleaseDate(labels.get(LabelConstants.LABEL_RELEASE_DATE));
-    templateUpgradeReleaseVO.setReleaseVersion(labels.get(LabelConstants.LABEL_RELEASE_VERSION));
+    templateUpgradeReleaseVO.setPublishDate(labels.get(LabelConstants.LABEL_PUBLISH_DATE));
+    templateUpgradeReleaseVO.setProductVersion(labels.get(LabelConstants.LABEL_PRODUCT_VERSION));
+    templateUpgradeReleaseVO.setProductSpec(labels.get(LabelConstants.LABEL_PRODUCT_SPEC));
     templateUpgradeReleaseVO.setName(assetDto.getMetadata().getName());
     templateUpgradeReleaseVO.setDescription(assetDto.getMetadata().getDescription());
     templateUpgradeReleaseVO.setTemplateUpgradeId(assetDto.getId());
@@ -141,7 +177,7 @@ public class TemplateUpgradeController {
                   createUpgradeRequest.getTemplateUpgradeId());
               templateUpgradeEvent.setEnvId(createUpgradeRequest.getStageEnvId());
               templateUpgradeEvent.setUserId(userId);
-              return templateIngestService.triggerManualTemplateUpgrade(templateUpgradeEvent);
+              return templateUpgradeService.stageUpgrade(templateUpgradeEvent);
             })
         .map(HttpResponse::ok);
   }
@@ -158,7 +194,7 @@ public class TemplateUpgradeController {
             userId -> {
               templateUpgradeService.checkCondition2ProductionUpgrade(
                   createProductionUpgradeRequest);
-              return templateUpgradeService.deployProduction(
+              return templateUpgradeService.deployProductionV2(
                   createProductionUpgradeRequest.getTemplateUpgradeId(),
                   createProductionUpgradeRequest.getStageEnvId(),
                   createProductionUpgradeRequest.getProductEnvId(),

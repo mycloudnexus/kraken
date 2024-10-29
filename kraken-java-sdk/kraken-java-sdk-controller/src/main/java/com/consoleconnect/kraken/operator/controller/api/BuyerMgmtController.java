@@ -45,7 +45,7 @@ public class BuyerMgmtController {
   @Operation(summary = "Regenerate a new token for a buyer")
   @PostMapping("/{id}/access-tokens")
   @Validated
-  public HttpResponse<BuyerAssetDto> regenerate(
+  public Mono<HttpResponse<BuyerAssetDto>> regenerate(
       @Valid @NotBlank @PathVariable("productId") String productId,
       @Valid @NotBlank @PathVariable("id") String id,
       @RequestParam(
@@ -53,7 +53,10 @@ public class BuyerMgmtController {
               required = false,
               defaultValue = MgmtProperty.DEFAULT_TOKEN_EXPIRED_SECONDS)
           Long tokenExpiredInSeconds) {
-    return HttpResponse.ok(buyerService.regenerate(productId, id, tokenExpiredInSeconds));
+    return UserContext.getUserId()
+        .publishOn(Schedulers.boundedElastic())
+        .map(userId -> buyerService.regenerate(productId, id, tokenExpiredInSeconds, userId))
+        .map(HttpResponse::ok);
   }
 
   @Operation(summary = "List buyers")
@@ -78,5 +81,25 @@ public class BuyerMgmtController {
             status,
             null,
             PageRequest.of(page, size, direction, FIELD_CREATE_AT_ORIGINAL)));
+  }
+
+  @Operation(summary = "activate buyer")
+  @PostMapping(value = "/{id}/activate")
+  public Mono<HttpResponse<BuyerAssetDto>> activate(
+      @PathVariable String productId, @PathVariable("id") String id) {
+    return UserContext.getUserId()
+        .publishOn(Schedulers.boundedElastic())
+        .map(userId -> buyerService.activate(productId, id, userId))
+        .map(HttpResponse::ok);
+  }
+
+  @Operation(summary = "deactivate buyer")
+  @PostMapping(value = "/{id}/deactivate")
+  public Mono<HttpResponse<Boolean>> deactivate(
+      @PathVariable String productId, @PathVariable("id") String id) {
+    return UserContext.getUserId()
+        .publishOn(Schedulers.boundedElastic())
+        .map(userId -> buyerService.deactivate(productId, id, userId))
+        .map(HttpResponse::ok);
   }
 }

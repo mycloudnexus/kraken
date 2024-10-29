@@ -1,6 +1,7 @@
 package com.consoleconnect.kraken.operator.auth.repo;
 
 import com.consoleconnect.kraken.operator.auth.entity.UserEntity;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
@@ -17,7 +18,8 @@ public interface UserRepository
   @Query(
       value =
           "select e from #{#entityName} e "
-              + " where  ( (:q) is null or LOWER(e.name) like %:q% or LOWER(e.email) like %:q% )")
+              + " where  ( (:q) is null or LOWER(e.name) like %:q% or LOWER(e.email) like %:q% )"
+              + " and ( (:filterRoles) is null or e.role not in :filterRoles )")
   @Transactional(readOnly = true)
-  Page<UserEntity> search(String q, Pageable pageable);
+  Page<UserEntity> search(String q, Pageable pageable, List<String> filterRoles);
 }
