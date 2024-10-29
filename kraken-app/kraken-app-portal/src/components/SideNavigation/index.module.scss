@@ -6,10 +6,10 @@
     .ant-menu {
       border-right: unset !important;
       background: unset !important;
-      
     }
 
-    .ant-menu-item, .ant-menu-submenu-title {
+    .ant-menu-item,
+    .ant-menu-submenu-title {
       &:hover {
         background: unset !important;
       }
@@ -18,13 +18,17 @@
     .ant-menu-item-selected {
       border-radius: 0;
       background-color: rgba(41, 98, 255, 0.2) !important;
-       &:hover {
+      &:hover {
         background: rgba(41, 98, 255, 0.2) !important;
       }
-      border-right: 3px solid #2962FF !important;
+      border-right: 3px solid #2962ff !important;
       .ant-menu-item-only-child {
-        border-right: 3px solid #2962FF !important;
+        border-right: 3px solid #2962ff !important;
       }
+    }
+    .ant-menu-item:not(.ant-menu-item-selected):hover {
+      background-color: #f5f5f5 !important;
+      border-radius: 0;
     }
   }
 }

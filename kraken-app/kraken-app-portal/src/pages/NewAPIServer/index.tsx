@@ -1,30 +1,35 @@
+import BreadCrumb from "@/components/Breadcrumb";
+import DeleteApiButton from "@/components/DeleteApiButton";
+import { PageLayout } from "@/components/Layout";
 import {
   useCreateNewComponent,
+  useDeleteApiServer,
   useEditComponent,
-  useGetComponentDetail,
+  useGetComponentDetailV2,
   useGetProductEnvs,
 } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
 import { COMPONENT_KIND_API_TARGET_SPEC } from "@/utils/constants/product";
+import { transformApiData } from "@/utils/helpers/swagger";
 import { Flex, Form, Spin, notification } from "antd";
+import { decode } from "js-base64";
+import jsYaml from "js-yaml";
 import { get, isEmpty, set } from "lodash";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import AddEnv from "./components/AddEnv";
 import BtnStep from "./components/BtnStep";
 import SelectAPIServer from "./components/SelectAPIServer";
-import styles from "./index.module.scss";
 import UploadYaml from "./components/UploadYaml";
-import { useEffect } from "react";
-import { decode } from "js-base64";
-import jsYaml from "js-yaml";
-import { transformApiData } from "@/utils/helpers/swagger";
-import BreadCrumb from "@/components/Breadcrumb";
+import styles from "./index.module.scss";
 
 const NewAPIServer = () => {
   const { componentId } = useParams();
   const { currentProduct: id } = useAppStore();
-
-  const { data: componentDetail, isLoading } = useGetComponentDetail(
+  const [openMappingDrawer, setOpenMappingDrawer] = useState(false);
+  const { mutateAsync: deleteApiServer, isPending: isDeletePending } =
+    useDeleteApiServer();
+  const { data: componentDetail, isLoading } = useGetComponentDetailV2(
     id,
     (componentId ?? "").replace(".api.", ".api-spec.")
   );
@@ -129,7 +134,7 @@ const NewAPIServer = () => {
         swaggerData = jsYaml.load(fileDecode);
       }
       const environments = get(componentDetail, "facets.environments");
-      let newEnv = {};
+      const newEnv = {};
       const keys = Object.keys(environments);
 
       for (const key of keys) {
@@ -160,71 +165,76 @@ const NewAPIServer = () => {
   }, [componentDetail, componentId]);
 
   return (
-    <Spin spinning={isLoading}>
-      <Form
-        form={form}
-        onFinish={onFinish}
-        requiredMark={(label, { required }) =>
-          required ? (
-            <Flex align="center" gap={4}>
-              {label}{" "}
-              <span className="required-label" style={{ color: "#FF4D4F" }}>
-                *
-              </span>
-            </Flex>
-          ) : (
-            <span>{label}</span>
-          )
-        }
-      >
-        <div className={styles.root}>
-          <div className={styles.container}>
-            <div
-              style={{
-                display: "flex",
-                flex: 1,
-                flexDirection: "column",
-              }}
-            >
-              <BreadCrumb
-                mainUrl={`/component/${id}/list`}
-                lastItem={
-                  isEmpty(componentId) ? "Create API server" : "Edit API server"
-                }
-              />
-              <div className={styles.paper} style={{ flex: 1, marginTop: 8 }}>
-                <div style={{ maxWidth: "60%", minWidth: 600 }}>
-                  <SelectAPIServer />
-                  <AddEnv form={form} env={env} />
-                  <UploadYaml form={form} />
-                </div>
-              </div>
-              <Form.Item noStyle shouldUpdate>
-                {({ getFieldValue }) => {
-                  const checkConditionEnv = () => {
-                    return env.reduce((prev, curr) => {
-                      return (
-                        prev ||
-                        (!!getFieldValue(`is${curr.name}`) &&
-                          !isEmpty(getFieldValue(["environments", curr.name])))
-                      );
-                    }, false);
-                  };
-                  const disabledEnv = !checkConditionEnv();
-                  return (
-                    <BtnStep
-                      disabled={disabledEnv}
-                      loading={loadingCreate || isPending}
-                      onNext={handleSave}
-                    />
-                  );
-                }}
-              </Form.Item>
+    <PageLayout
+      title={
+        <BreadCrumb
+          lastItem={
+            isEmpty(componentId) ? "Create API server" : "Edit API server"
+          }
+          mainUrl={`/component/${id}/list`}
+        />
+      }
+    >
+      <Spin spinning={isLoading || isDeletePending}>
+        <Form
+          className={styles.container}
+          form={form}
+          onFinish={onFinish}
+          requiredMark={(label, { required }) =>
+            required ? (
+              <Flex align="center" gap={4}>
+                {label}{" "}
+                <span className="required-label" style={{ color: "#FF4D4F" }}>
+                  *
+                </span>
+              </Flex>
+            ) : (
+              <span>{label}</span>
+            )
+          }
+        >
+          <main id="12" className={styles.paper} style={{ flex: 1 }}>
+            <div id="12" style={{ maxWidth: "60%", minWidth: 600 }}>
+              <SelectAPIServer />
+              <AddEnv form={form} env={env} />
+              <UploadYaml form={form} />
             </div>
-          </div>
-        </div>
-      </Form>
-    </Spin>
+          </main>
+
+          <Form.Item noStyle shouldUpdate>
+            {({ getFieldValue }) => {
+              const checkConditionEnv = () => {
+                return env.reduce((prev, curr) => {
+                  return (
+                    prev ||
+                    (!!getFieldValue(`is${curr.name}`) &&
+                      !isEmpty(getFieldValue(["environments", curr.name])))
+                  );
+                }, false);
+              };
+              const disabledEnv = !checkConditionEnv();
+              return (
+                <BtnStep
+                  disabled={disabledEnv}
+                  loading={loadingCreate || isPending}
+                  onNext={handleSave}
+                >
+                  {!isEmpty(componentId) && (
+                    <DeleteApiButton
+                      openMappingDrawer={openMappingDrawer}
+                      deleteCallback={deleteApiServer}
+                      setOpenMappingDrawer={setOpenMappingDrawer}
+                      item={componentDetail}
+                      isInEditMode={true}
+                    />
+                  )}
+                </BtnStep>
+              );
+            }}
+          </Form.Item>
+        </Form>
+      </Spin>
+    </PageLayout>
   );
 };
 

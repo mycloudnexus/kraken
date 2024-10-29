@@ -3,7 +3,7 @@ import { get, isEmpty } from "lodash";
 import { useMemo } from "react";
 import styles from "./index.module.scss";
 import { exampleParse, schemaParses } from "@/utils/helpers/schema";
-import Text from "@/components/Text";
+import { Text } from "@/components/Text";
 
 type Props = {
   item: any;

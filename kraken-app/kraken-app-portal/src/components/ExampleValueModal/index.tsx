@@ -1,7 +1,7 @@
 import { Input, Modal, Tag } from "antd";
 import Flex from "../Flex";
 import styles from "./index.module.scss";
-import Text from "../Text";
+import { Text } from "../Text";
 import { useEffect, useState } from "react";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { get } from "lodash";

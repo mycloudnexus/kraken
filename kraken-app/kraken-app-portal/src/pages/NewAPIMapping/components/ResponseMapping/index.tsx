@@ -1,14 +1,14 @@
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
-
-import { isEmpty } from "lodash";
-import { useEffect } from "react";
-import styles from "./index.module.scss";
 import { IResponseMapping } from "@/utils/types/component.type";
-import ResponseItem from "../ResponseItem";
 import { Button, Flex } from "antd";
+import { isEmpty } from "lodash";
+import { nanoid } from "nanoid";
+import { useEffect } from "react";
+import ResponseItem from "../ResponseItem";
+import styles from "./index.module.scss";
 
 export interface IMapping {
-  key: number;
+  key: React.Key;
   from?: string;
   to?: string[];
   name?: string;
@@ -32,7 +32,8 @@ const ResponseMapping = () => {
         sourceLocation: "",
         target: "",
         targetLocation: "",
-      },
+        id: nanoid(),
+      } as IResponseMapping,
     ]);
   };
 
@@ -46,7 +47,7 @@ const ResponseMapping = () => {
     <div className={styles.root}>
       <Flex vertical gap={26}>
         {responseMapping?.map((item: IResponseMapping, index: number) => (
-          <ResponseItem item={item} index={index} />
+          <ResponseItem key={item.id} item={item} index={index} />
         ))}
         <Button
           type="primary"

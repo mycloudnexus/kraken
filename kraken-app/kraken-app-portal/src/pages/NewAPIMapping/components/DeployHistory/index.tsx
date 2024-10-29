@@ -1,3 +1,24 @@
+import DeployIcon from "@/assets/icon/deploy.svg";
+import DetailIcon from "@/assets/icon/detail.svg";
+import EmptyIcon from "@/assets/icon/empty.svg";
+import InformationModal from "@/components/DeployStage/InformationModal";
+import MappingMatrix from "@/components/MappingMatrix";
+import RequestMethod from "@/components/Method";
+import { Text } from "@/components/Text";
+import TrimmedPath from "@/components/TrimmedPath";
+import {
+  useDeployProduction,
+  useGetAPIDeployments,
+  useGetProductEnvs,
+  useVerifyProduct,
+} from "@/hooks/product";
+import { useCommonListProps } from "@/hooks/useCommonListProps";
+import useUser from "@/hooks/user/useUser";
+import DeploymentStatus from "@/pages/EnvironmentOverview/components/DeploymentStatus";
+import { useAppStore } from "@/stores/app.store";
+import { DEFAULT_PAGING } from "@/utils/constants/common";
+import { IEnv } from "@/utils/types/env.type";
+import { IDeploymentHistory } from "@/utils/types/product.type";
 import {
   Button,
   Flex,
@@ -10,32 +31,11 @@ import {
   Typography,
   notification,
 } from "antd";
-import styles from "./index.module.scss";
-import { useEffect, useMemo, useState } from "react";
-import {
-  useDeployProduction,
-  useGetAPIDeployments,
-  useGetProductEnvs,
-  useVerifyProduct,
-} from "@/hooks/product";
-import { useAppStore } from "@/stores/app.store";
-import EmptyIcon from "@/assets/icon/empty.svg";
-import DeployIcon from "@/assets/icon/deploy.svg";
-import DetailIcon from "@/assets/icon/detail.svg";
-import Text from "@/components/Text";
 import dayjs from "dayjs";
 import { get, isEmpty, omit } from "lodash";
-import DeploymentStatus from "@/pages/EnvironmentOverview/components/DeploymentStatus";
-import { IDeploymentHistory } from "@/utils/types/product.type";
-import useUser from "@/hooks/user/useUser";
-import InformationModal from "@/components/DeployStage/InformationModal";
+import { useEffect, useMemo, useState } from "react";
 import { useBoolean } from "usehooks-ts";
-import { IEnv } from "@/utils/types/env.type";
-import MappingMatrix from "@/components/MappingMatrix";
-import RequestMethod from "@/components/Method";
-import TrimmedPath from "@/components/TrimmedPath";
-import { useCommonListProps } from "@/hooks/useCommonListProps";
-import { DEFAULT_PAGING } from "@/utils/constants/common";
+import styles from "./index.module.scss";
 
 const initPagination = {
   pageSize: DEFAULT_PAGING.size,
@@ -92,15 +92,17 @@ export const DeploymentBtn = ({
   return (
     <>
       <InformationModal modalText={modalText} open={isOpen} onClose={close} />
-      <Button
-        loading={isPending}
-        disabled={!record?.verifiedStatus}
-        type="text"
-        className={styles.defaultBtn}
-        onClick={handleClick}
-      >
-        <DeployIcon />
-      </Button>
+      <Tooltip title="Deploy to Production">
+        <Button
+          loading={isPending}
+          disabled={!record?.verifiedStatus}
+          type="text"
+          className={styles.defaultBtn}
+          onClick={handleClick}
+        >
+          <DeployIcon />
+        </Button>
+      </Tooltip>
     </>
   );
 };
@@ -180,11 +182,7 @@ const DeployHistory = ({
                     style={{ color: "#2962FF" }}
                     ellipsis={{ tooltip: item?.path }}
                   >
-                    <TrimmedPath
-                      trimLevel={2}
-                      path={item?.path}
-                      color="#2962FF"
-                    />
+                    <TrimmedPath trimLevel={2} path={item?.path} />
                   </Typography.Text>
                   <MappingMatrix mappingMatrix={item.mappingMatrix} />
                 </Flex>
@@ -194,7 +192,7 @@ const DeployHistory = ({
         {
           title: "Version",
           dataIndex: "version",
-          width: selectedEnv ? 90 : undefined,
+          width: 90,
           render: (text: string) => (
             <Flex align="center" gap={8}>
               {text}
@@ -230,7 +228,7 @@ const DeployHistory = ({
           ? {
               title: "Verified for Production",
               dataIndex: "verifiedStatus",
-              width: selectedEnv ? 180 : undefined,
+              width: selectedEnv ? 180 : 140,
               render: (verifiedStatus: boolean, record: IDeploymentHistory) =>
                 record?.envName?.toLowerCase?.() === "stage" && (
                   <Switch
@@ -269,9 +267,7 @@ const DeployHistory = ({
                 </Button>
               </Tooltip>
               {record.envName !== "production" && (
-                <Tooltip title="Deploy to Production">
-                  <DeploymentBtn record={record} env={envItems} />
-                </Tooltip>
+                <DeploymentBtn record={record} env={envItems} />
               )}
             </Flex>
           ),
@@ -280,12 +276,7 @@ const DeployHistory = ({
     [envItems, selectedEnv]
   );
 
-  const onChange: TableProps<any>["onChange"] = (
-    pagination,
-    filters,
-    __,
-    ___
-  ) => {
+  const onChange: TableProps<any>["onChange"] = (pagination, filters) => {
     const envId: any = get(filters, "1.[0]");
     if (filters[1]?.length === 1) {
       setQueryParams({ envId: envId });

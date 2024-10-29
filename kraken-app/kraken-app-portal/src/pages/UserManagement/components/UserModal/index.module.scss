@@ -1,0 +1,19 @@
+.root {
+  :global {
+    .ant-form-item-required {
+      &::after {
+        display: inline-block;
+        margin-inline-start: 4px !important;
+        color: #ff4d4f;
+        font-size: 14px;
+        font-family: SimSun, sans-serif;
+        line-height: 1;
+        content: "*" !important;
+        visibility: visible !important;
+      }
+      &::before {
+        display: none !important;
+      }
+    }
+  }
+}

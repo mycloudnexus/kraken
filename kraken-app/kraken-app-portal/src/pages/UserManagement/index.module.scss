@@ -1,0 +1,22 @@
+.container {
+  padding: 12px 20px;
+  background: #fff;
+  border-radius: 4px;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.table {
+  width: 100%;
+  box-sizing: border-box;
+  flex: 1;
+  margin-top: 12px;
+
+  :global {
+    .ant-table-cell:has(.role-edit) {
+      padding: 0;
+    }
+  }
+}

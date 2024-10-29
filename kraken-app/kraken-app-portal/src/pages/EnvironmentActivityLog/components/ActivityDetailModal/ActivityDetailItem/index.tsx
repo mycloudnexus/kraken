@@ -1,10 +1,10 @@
 import LogMethodTag from "@/components/LogMethodTag";
+import { Text } from "@/components/Text";
 import { parseObjectDescriptionToTreeData } from "@/utils/helpers/schema";
-import { Flex, Typography, Table, Switch, Tree, Button } from "antd";
-import styles from "../index.module.scss";
 import { IActivityLog } from "@/utils/types/env.type";
+import { Flex, Typography, Table, Switch, Tree, Button } from "antd";
 import { Dispatch, SetStateAction, useState } from "react";
-import Text from "@/components/Text";
+import styles from "../index.module.scss";
 
 interface ActivitySwitchProps {
   value: boolean;
@@ -56,20 +56,16 @@ const ActivityDetailItem = ({
 
   return (
     <div className={styles.activity} key={activity.requestId}>
-      <Text.NormalLarge lineHeight="24px" style={{ marginLeft: 10 }}>
-        {title}
-      </Text.NormalLarge>
+      <Text.NormalLarge lineHeight="24px">{title}</Text.NormalLarge>
       <div
         className={styles.activityWrapper}
         key={`${activity.method}_${activity.path}`}
       >
-        <Flex vertical gap={24} className={styles.activityHeader}>
-          <Flex gap={8} align="center">
-            <LogMethodTag method={activity.method} />
-            <Typography.Text ellipsis={{ tooltip: true }}>
-              {activity.path}
-            </Typography.Text>
-          </Flex>
+        <Flex gap={8} align="center" className={styles.activityHeader}>
+          <LogMethodTag method={activity.method} />
+          <Typography.Text ellipsis={{ tooltip: true }}>
+            {activity.path}
+          </Typography.Text>
         </Flex>
         <div className={styles.activityBody}>
           <h3>Parameters</h3>
@@ -77,6 +73,8 @@ const ActivityDetailItem = ({
             columns={collapseItems(activity)?.parameterColumns}
             dataSource={collapseItems(activity)?.parameterList}
             pagination={false}
+            tableLayout="fixed"
+            style={{ width: "100%" }}
           />
           {activity?.request && (
             <>

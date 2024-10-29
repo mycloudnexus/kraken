@@ -1,14 +1,12 @@
-import styles from "./index.module.scss";
-import {  Flex } from "antd";
-import { useNavigate } from "react-router-dom";
+import { PageLayout } from "@/components/Layout";
+import { useGetComponentList } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
 import { COMPONENT_KIND_API_TARGET_SPEC } from "@/utils/constants/product";
-import StepCard from "./components/StepCard";
-import { useGetComponentList } from "@/hooks/product";
-import { useCallback, useEffect } from "react";
-import { isEmpty } from "lodash";
 import { clearData, getData } from "@/utils/helpers/token";
-import Text from "@/components/Text";
+import { isEmpty } from "lodash";
+import { useCallback, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import StepCard from "./components/StepCard";
 
 const HomePage = () => {
   const { currentProduct } = useAppStore();
@@ -27,7 +25,6 @@ const HomePage = () => {
     navigate(`/component/${currentProduct}/list`);
   }, [apiList, currentProduct]);
 
-
   const navigateCreateAPI = useCallback(() => {
     navigate(`/component/${currentProduct}/new`);
   }, [currentProduct]);
@@ -43,14 +40,12 @@ const HomePage = () => {
   }, [isLoading]);
 
   return (
-    <div className={styles.homePage}>
-      <Flex align="center" justify="space-between">
-        <Text.Custom size="20px" bold="500" lineHeight="28px">
-          MEF LSO Sonata Adapters
-        </Text.Custom>
-      </Flex>
-      <StepCard navigateApi={navigateApi} navigateCreateAPI={navigateCreateAPI} />
-    </div>
+    <PageLayout title="MEF LSO Sonata Adapters">
+      <StepCard
+        navigateApi={navigateApi}
+        navigateCreateAPI={navigateCreateAPI}
+      />
+    </PageLayout>
   );
 };
 

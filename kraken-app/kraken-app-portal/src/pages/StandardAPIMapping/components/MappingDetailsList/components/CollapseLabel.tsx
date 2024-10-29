@@ -1,8 +1,8 @@
-import RequestMethod from '@/components/Method';
-import { Flex } from 'antd';
-import styles from '../index.module.scss';
-import Dot from './Dot';
-import { IMapperDetails } from '@/utils/types/env.type';
+import RequestMethod from "@/components/Method";
+import { Flex } from "antd";
+import styles from "../index.module.scss";
+import Dot from "./Dot";
+import { IMapperDetails } from "@/utils/types/env.type";
 
 type CollapseLabelProps = {
   handleSelection: (mapItem: IMapperDetails) => void;
@@ -25,11 +25,13 @@ const CollapseLabel = ({
     handleSelection(labelProps);
   };
 
-  const pathSnippet = labelProps.path.split('/').slice(-2).join('/');
+  const pathSnippet = labelProps.path.split("/").slice(-2).join("/");
 
   return (
     <Flex
-      className={`${styles.labelWrapper} ${highlighted ? styles.highlighted : ''}`}
+      className={`${styles.labelWrapper} ${
+        highlighted ? styles.highlighted : ""
+      } ${isOneChild && highlighted ? "hightlight-one" : ""}`}
       onClick={handleClick}
     >
       {isActive && !isOneChild && <Dot />}

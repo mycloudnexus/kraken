@@ -1,0 +1,31 @@
+.root {
+  flex: 1;
+  padding-left: 12px;
+}
+
+.container {
+  margin-top: 12px;
+  border-top: 1px solid #0000000f;
+  padding-top: 12px;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px !important;
+  margin-top: 10px;
+  gap: 8px;
+  &:before {
+    content: "";
+    display: block;
+    width: 4px;
+    height: 14px;
+    border-radius: 80px;
+    background-color: #096dd9;
+  }
+}
+
+.content {
+  margin-top: 12px;
+  line-height: 22px;
+}

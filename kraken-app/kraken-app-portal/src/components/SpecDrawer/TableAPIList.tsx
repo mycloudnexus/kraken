@@ -3,7 +3,7 @@ import { IItem } from ".";
 import { useMemo, useState } from "react";
 import RequestMethod from "../Method";
 import styles from "./index.module.scss";
-import Text from "../Text";
+import { Text } from "../Text";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 
 type Props = {

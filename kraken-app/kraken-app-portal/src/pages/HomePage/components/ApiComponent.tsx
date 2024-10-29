@@ -4,7 +4,7 @@ import styles from "./index.module.scss";
 import { ReactNode, useCallback } from "react";
 import { IUnifiedAsset } from "@/utils/types/common.type";
 import { useNavigate } from "react-router-dom";
-import Text from "@/components/Text";
+import { Text } from "@/components/Text";
 
 type Props = {
   targetSpec: Record<string, any>;

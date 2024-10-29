@@ -1,7 +1,7 @@
-import { Button, Modal } from "antd";
-import styles from "./index.module.scss";
-import { useNavigate, useParams } from "react-router-dom";
 import { ExclamationCircleFilled } from "@ant-design/icons";
+import { Button, Modal } from "antd";
+import { useNavigate, useParams } from "react-router-dom";
+import styles from "./index.module.scss";
 
 type Props = {
   onNext: () => void;
@@ -11,7 +11,12 @@ type Props = {
 
 const { confirm } = Modal;
 
-const BtnStep = ({ onNext, disabled, loading }: Props) => {
+const BtnStep = ({
+  children,
+  onNext,
+  disabled,
+  loading,
+}: React.PropsWithChildren<Props>) => {
   const { componentId } = useParams();
   const navigate = useNavigate();
   const showConfirm = () => {
@@ -41,6 +46,8 @@ const BtnStep = ({ onNext, disabled, loading }: Props) => {
       <Button onClick={showConfirm} type="text">
         Cancel
       </Button>
+
+      {children}
       <Button
         type="primary"
         shape="default"

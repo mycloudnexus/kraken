@@ -1,7 +1,27 @@
-import { useCallback, useEffect, useState } from "react";
-import { CheckCircleFilled, InfoCircleOutlined } from "@ant-design/icons";
 import RollbackIcon from "@/assets/newAPIMapping/Rollback.svg";
-import { Button, Tabs, TabsProps, Tag, Tooltip, notification } from "antd";
+import DeployStage from "@/components/DeployStage";
+import Flex from "@/components/Flex";
+import StepBar from "@/components/StepBar";
+import { Text } from "@/components/Text";
+import {
+  PRODUCT_CACHE_KEYS,
+  useGetLatestRunningList,
+  useUpdateTargetMapper,
+} from "@/hooks/product";
+import useSize from "@/hooks/useSize";
+import useUser from "@/hooks/user/useUser";
+import { useAppStore } from "@/stores/app.store";
+import { useMappingUiStore } from "@/stores/mappingUi.store";
+import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
+import { EStep } from "@/utils/constants/common";
+import buildInitListMapping from "@/utils/helpers/buildInitListMapping";
+import { isElementInViewport } from "@/utils/helpers/html";
+import { queryClient } from "@/utils/helpers/reactQuery";
+import { EnumRightType } from "@/utils/types/common.type";
+import { IMappers } from "@/utils/types/component.type";
+import { InfoCircleOutlined } from "@ant-design/icons";
+import { Button, Tabs, TabsProps, Tooltip, notification } from "antd";
+import dayjs from "dayjs";
 import {
   chain,
   cloneDeep,
@@ -11,32 +31,24 @@ import {
   reduce,
   uniqBy,
 } from "lodash";
-import Flex from "@/components/Flex";
-import StepBar from "@/components/StepBar";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useSessionStorage } from "usehooks-ts";
+import DeployHistory from "./components/DeployHistory";
+import DeploymentInfo from "./components/DeploymentInfo";
+import HeaderMapping from "./components/HeaderMapping";
+import NotRequired from "./components/NotRequired";
 import RequestMapping from "./components/RequestMapping";
-import ResponseMapping from "./components/ResponseMapping";
+import ResponseMapping, { IMapping } from "./components/ResponseMapping";
 import RightAddSellerProp from "./components/RightAddSellerProp";
 import RightAddSonataProp from "./components/RightAddSonataProp";
 import SelectAPI from "./components/SelectAPI";
 import SelectResponseProperty from "./components/SelectResponseProperty";
+import SonataResponseMapping from "./components/SonataResponseMapping";
+import StatusIcon from "./components/StatusIcon";
 import useGetApiSpec from "./components/useGetApiSpec";
 import useGetDefaultSellerApi from "./components/useGetDefaultSellerApi";
-import HeaderMapping from "./components/HeaderMapping";
-import { PRODUCT_CACHE_KEYS, useUpdateTargetMapper } from "@/hooks/product";
-import { useAppStore } from "@/stores/app.store";
-import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
-import { EStep } from "@/utils/constants/common";
-import { EnumRightType } from "@/utils/types/common.type";
-import { toDateTime } from "@/libs/dayjs";
-import { queryClient } from "@/utils/helpers/reactQuery";
+// import { validateMappers } from "./helper";
 import styles from "./index.module.scss";
-import buildInitListMapping from "@/utils/helpers/buildInitListMapping";
-import { useMappingUiStore } from "@/stores/mappingUi.store";
-import Text from "@/components/Text";
-import SonataResponseMapping from "./components/SonataResponseMapping";
-import DeployHistory from "./components/DeployHistory";
-import DeployStage from "@/components/DeployStage";
-import dayjs from "dayjs";
 
 type Props = {
   rightSide: number;
@@ -86,6 +98,8 @@ const RightSide = ({
   }
 };
 
+const collapsedStyle = { maxWidth: `calc(100vw - 462px)` };
+
 const NewAPIMapping = ({
   refetch,
   isRequiredMapping,
@@ -93,6 +107,7 @@ const NewAPIMapping = ({
   refetch?: () => void;
   isRequiredMapping: boolean;
 }) => {
+  const [collapsed] = useSessionStorage("collapsed", false);
   const { currentProduct } = useAppStore();
   const { activeTab, setActiveTab } = useMappingUiStore();
   const {
@@ -105,12 +120,15 @@ const NewAPIMapping = ({
     sellerApi,
     setRequestMapping,
     setRightSide,
-    setRightSideInfo,
     setResponseMapping,
     setSellerApi,
     setServerKey,
     setListMappingStateResponse,
     listMappingStateResponse,
+    setListMappingStateRequest,
+    listMappingStateRequest,
+    setRightSideInfo,
+    // setErrors,
   } = useNewApiMappingStore();
   const queryData = JSON.parse(query ?? "{}");
 
@@ -133,15 +151,34 @@ const NewAPIMapping = ({
   } = useGetApiSpec(currentProduct, queryData.targetMapperKey ?? "");
 
   const { sellerApi: defaultSellerApi, serverKey: defaultServerKey } =
-    useGetDefaultSellerApi(currentProduct, serverKeyInfo);
+    useGetDefaultSellerApi(currentProduct, serverKeyInfo as any);
 
   const [mainTabKey, setMainTabKey] = useState<string>(EMainTab.mapping);
+  const [firstTimeLoadSellerAPI, setFirstTimeLoadSellerAPI] = useState(true);
+
+  const ref = useRef<any>();
+  const size = useSize(ref);
+  const { findUserName } = useUser();
+  const { data: runningDeploymentData } = useGetLatestRunningList(
+    currentProduct,
+    queryData?.targetMapperKey
+  );
+  const deploymentInfo = useMemo(() => {
+    const stage = runningDeploymentData?.find(
+      (item: any) => item?.envName?.toLowerCase?.() === "stage"
+    );
+    const production = runningDeploymentData?.find(
+      (item: any) => item?.envName?.toLowerCase?.() === "production"
+    );
+    return { stage, production };
+  }, [runningDeploymentData]);
 
   useEffect(() => {
-    if (!sellerApi && defaultSellerApi) {
+    if (!sellerApi && defaultSellerApi && firstTimeLoadSellerAPI) {
       setSellerApi(defaultSellerApi);
+      setFirstTimeLoadSellerAPI(false);
     }
-  }, [sellerApi, setSellerApi, defaultSellerApi]);
+  }, [sellerApi, setSellerApi, defaultSellerApi, firstTimeLoadSellerAPI]);
 
   useEffect(() => {
     if (!serverKey && defaultServerKey) {
@@ -151,6 +188,9 @@ const NewAPIMapping = ({
 
   useEffect(() => {
     if (firstTimeLoad && !isEmpty(mappers?.request)) {
+      setListMappingStateRequest(
+        buildInitListMapping(mappers?.request as any, "request")
+      );
       setRequestMapping(resetMapping() ?? []);
     }
   }, [mappers?.request, firstTimeLoad]);
@@ -158,7 +198,9 @@ const NewAPIMapping = ({
   useEffect(() => {
     if (firstTimeLoad && !isEmpty(mappers?.response)) {
       setResponseMapping(resetResponseMapping());
-      setListMappingStateResponse(buildInitListMapping(mappers?.response));
+      setListMappingStateResponse(
+        buildInitListMapping(mappers?.response as any, "response")
+      );
       setFirstTimeLoad(false);
     }
   }, [mappers?.response, firstTimeLoad]);
@@ -189,20 +231,12 @@ const NewAPIMapping = ({
     {
       key: "request",
       label: "Request mapping",
-      children: isRequiredMapping ? (
-        <RequestMapping />
-      ) : (
-        <Text.LightMedium>Not required.</Text.LightMedium>
-      ),
+      children: isRequiredMapping ? <RequestMapping /> : <NotRequired />,
     },
     {
       key: "response",
       label: "Response mapping",
-      children: isRequiredMapping ? (
-        <ResponseMapping />
-      ) : (
-        <Text.LightMedium>Not required.</Text.LightMedium>
-      ),
+      children: isRequiredMapping ? <ResponseMapping /> : <NotRequired />,
       disabled: loadingMapper,
     },
   ];
@@ -243,9 +277,21 @@ const NewAPIMapping = ({
             `${rm.source}_${rm.sourceLocation}_${rm.target}_${rm.targetLocation}`
         );
         setRequestMapping(updatedMapping);
+        setRightSideInfo({
+          ...rightSideInfo,
+          previousData: {
+            ...rightSideInfo.previousData,
+            source: selected.name,
+            sourceLocation: selected.location,
+          },
+        });
+        const currentDom = document.getElementById(
+          JSON.stringify(rightSideInfo.previousData)
+        );
+        if (currentDom && !isElementInViewport(currentDom, 130)) {
+          currentDom?.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
       }
-      setRightSideInfo(undefined);
-      setRightSide(undefined);
     },
     [rightSideInfo, requestMapping, setRequestMapping]
   );
@@ -271,26 +317,70 @@ const NewAPIMapping = ({
           `${rm.source}_${rm.sourceLocation}_${rm.target}_${rm.targetLocation}`
       );
       setRequestMapping(updatedMapping);
-      setRightSideInfo(undefined);
-      setRightSide(undefined);
+      setRightSideInfo({
+        ...rightSideInfo,
+        previousData: {
+          ...rightSideInfo.previousData,
+          target: selected.name,
+          targetLocation: selected.location,
+        },
+      });
+      const currentDom = document.getElementById(
+        JSON.stringify(rightSideInfo.previousData)
+      );
+      if (currentDom && !isElementInViewport(currentDom, 130)) {
+        currentDom?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
     },
     [rightSideInfo, requestMapping, setRequestMapping]
   );
 
+  const transformListMappingItem = (
+    item: IMapping[],
+    type: "request" | "response"
+  ) => {
+    return chain(item)
+      .groupBy("name")
+      .map((items, name) => ({
+        name,
+        valueMapping: flatMap(items, (item) =>
+          // item?.to?.map((to) => ({ [to]: item.from }))
+          type === "request"
+            ? [{ [item.from as string]: item.to?.[0] }]
+            : item?.to?.map((to) => ({ [to]: item.from }))
+        ),
+      }))
+      .value();
+  };
+
   const handleSave = async (callback?: () => void) => {
     try {
-      const newData = chain(listMappingStateResponse)
-        .groupBy("name")
-        .map((items, name) => ({
-          name,
-          valueMapping: flatMap(items, (item) =>
-            item?.to?.map((to) => ({ [to]: item.from }))
-          ),
-        }))
-        .value();
+      // @TODO: temporarily remove for demo
+      // Validate properties name and location
+      // const { requestIds, responseIds, errorMessage } = validateMappers({
+      //   request: requestMapping,
+      //   response: responseMapping,
+      // });
+      // setErrors({ requestIds, responseIds });
+
+      // if (errorMessage) {
+      //   notification.error({ message: errorMessage });
+
+      //   return;
+      // }
+
+      const newDataResponse = transformListMappingItem(
+        listMappingStateResponse,
+        "response"
+      );
+      const newDataRequest = transformListMappingItem(
+        listMappingStateRequest,
+        "request"
+      );
+
       let newResponse = cloneDeep(responseMapping);
-      if (!isEmpty(newData)) {
-        newData.forEach((it) => {
+      if (!isEmpty(newDataResponse)) {
+        newDataResponse.forEach((it) => {
           newResponse = newResponse.map((rm) => {
             if (rm.name === it.name) {
               rm.valueMapping = reduce(
@@ -303,41 +393,55 @@ const NewAPIMapping = ({
           });
         });
       }
+      let newRequest = cloneDeep(requestMapping);
+      if (!isEmpty(newDataRequest)) {
+        newDataRequest.forEach((it) => {
+          newRequest = newRequest.map((rm) => {
+            if (rm.name === it.name) {
+              rm.valueMapping = reduce(
+                it.valueMapping,
+                (acc, obj) => ({ ...acc, ...obj }),
+                {}
+              );
+            }
+            return rm;
+          });
+        });
+      }
 
-      const data = cloneDeep(mapperResponse);
+      const mappers: IMappers = {
+        request: newRequest.map((rm) => ({
+          ...rm,
+          target: get(rm, "target", ""),
+          source: get(rm, "source", ""),
+          targetLocation:
+            isEmpty(rm?.target) && rm?.targetLocation === "HYBRID"
+              ? ""
+              : get(rm, "targetLocation", ""),
+          sourceLocation: get(rm, "sourceLocation", ""),
+          requiredMapping: Boolean(rm.requiredMapping),
+          id: undefined, // Omit id from patch payload
+        })),
+        response: newResponse.map((rm) => ({
+          ...rm,
+          targetLocation: get(rm, "targetLocation", ""),
+          sourceLocation: get(rm, "sourceLocation", ""),
+          target: get(rm, "target", ""),
+          source: get(rm, "source", ""),
+          requiredMapping: Boolean(rm.requiredMapping),
+          id: undefined, // Omit id from patch payload
+        })),
+      };
+
+      const data = cloneDeep(mapperResponse)!;
       data.facets.endpoints[0] = {
         ...data.facets.endpoints[0],
-        serverKey,
+        serverKey: serverKey as any,
         method: sellerApi.method,
         path: sellerApi.url,
-        mappers: {
-          request: requestMapping.map((rm) => ({
-            ...rm,
-            target: get(rm, "target", "")
-              ?.replace?.("path.", "")
-              .replace?.("query.", "")
-              .replace?.("hybrid.", ""),
-            source: get(rm, "source", "")
-              ?.replace?.("path.", "")
-              .replace?.("query.", "")
-              .replace?.("hybrid.", ""),
-            targetLocation:
-              isEmpty(rm?.target) && rm?.targetLocation === "HYBRID"
-                ? ""
-                : get(rm, "targetLocation", ""),
-            sourceLocation: get(rm, "sourceLocation", ""),
-            requiredMapping: Boolean(rm.requiredMapping),
-          })),
-          response: newResponse.map((rm) => ({
-            ...rm,
-            targetLocation: get(rm, "targetLocation", ""),
-            sourceLocation: get(rm, "sourceLocation", ""),
-            target: get(rm, "target", ""),
-            source: get(rm, "source", ""),
-            requiredMapping: Boolean(rm.requiredMapping),
-          })),
-        },
+        mappers,
       };
+
       const res = await updateTargetMapper({
         productId: currentProduct,
         componentId: data.metadata.id,
@@ -363,7 +467,9 @@ const NewAPIMapping = ({
   const handleRevert = () => {
     setRequestMapping(resetMapping() ?? []);
     setResponseMapping(mappers?.response);
-    setListMappingStateResponse(buildInitListMapping(mappers?.response));
+    setListMappingStateResponse(
+      buildInitListMapping(mappers?.response as any, "response")
+    );
     setActiveTab("request");
   };
 
@@ -371,11 +477,26 @@ const NewAPIMapping = ({
     (tabName: string) => {
       if (tabName === "response" && !isEmpty(sellerApi)) {
         setRightSide(EnumRightType.AddSellerResponse);
+      } else {
+        setRightSide(EnumRightType.AddSonataProp);
       }
       setActiveTab(tabName);
     },
     [sellerApi, setActiveTab, setRightSide]
   );
+
+  const renderDeployText = useCallback((status: string) => {
+    switch (status) {
+      case "SUCCESS":
+        return "success.";
+      case "IN_PROCESS":
+        return "in process.";
+      case "FAILED":
+        return "failed.";
+      default:
+        return "";
+    }
+  }, []);
 
   return (
     <Flex className={styles.container}>
@@ -385,8 +506,16 @@ const NewAPIMapping = ({
         activeKey={activeKey}
         setActiveKey={setActiveKey}
       />
-      <Flex gap={8} className={styles.mainWrapper}>
-        <div className={styles.center}>
+
+      <Flex
+        flexDirection="column"
+        justifyContent="flex-start"
+        className={styles.newMainWrapper}
+      >
+        <Flex
+          justifyContent="space-between"
+          style={{ width: "100%", paddingBottom: 16 }}
+        >
           <Tabs
             id="tab-mapping"
             activeKey={mainTabKey}
@@ -408,61 +537,71 @@ const NewAPIMapping = ({
               { label: "Deploy history", key: EMainTab.deploy },
             ]}
           />
-          {mainTabKey === EMainTab.mapping ? (
-            <>
-              {!isRequiredMapping && (
-                <Flex
-                  justifyContent="flex-start"
-                  gap={10}
-                  className={styles.isRequiredMapping}
-                  alignItems="center"
-                >
-                  <InfoCircleOutlined style={{ color: "#00000073" }} />
-                  <Text.LightSmall color="#000000D9">
-                    This mapping is not needed, all the data will be queried
-                    from Adapter layer. This end point is able to deploy.
+          <DeploymentInfo runningData={runningDeploymentData} />
+        </Flex>
+        {mainTabKey === EMainTab.mapping && (
+          <Flex className={styles.breadcrumb} justifyContent="space-between">
+            <Flex className={styles.infoBox}>
+              {queryData?.lastDeployedAt && (
+                <Flex justifyContent="flex-start" gap={12}>
+                  <Text.LightSmall color="#00000073">
+                    Last deployment
                   </Text.LightSmall>
+                  <Flex gap={4}>
+                    <StatusIcon status={deploymentInfo?.stage?.status} />
+                    <Text.LightSmall lineHeight="20px">Stage</Text.LightSmall>
+                    <Tooltip
+                      title={
+                        <>
+                          Deploy{" "}
+                          {renderDeployText(deploymentInfo?.stage?.status)}
+                          <br />
+                          <>
+                            By {findUserName(deploymentInfo?.stage?.createBy)}{" "}
+                            {dayjs(deploymentInfo?.stage?.createAt).format(
+                              "YYYY-MM-DD HH:mm:ss"
+                            )}
+                          </>
+                        </>
+                      }
+                    >
+                      <InfoCircleOutlined />
+                    </Tooltip>
+                  </Flex>
+                  <Flex gap={4}>
+                    <StatusIcon status={deploymentInfo?.production?.status} />
+                    <Text.LightSmall lineHeight="20px">
+                      Production
+                    </Text.LightSmall>
+                    <Tooltip
+                      title={
+                        <>
+                          Deploy{" "}
+                          {renderDeployText(deploymentInfo?.production?.status)}
+                          <br />
+                          <>
+                            By{" "}
+                            {findUserName(deploymentInfo?.production?.createBy)}{" "}
+                            {dayjs(deploymentInfo?.production?.createAt).format(
+                              "YYYY-MM-DD HH:mm:ss"
+                            )}
+                          </>
+                        </>
+                      }
+                    >
+                      <InfoCircleOutlined />
+                    </Tooltip>
+                  </Flex>
                 </Flex>
               )}
-              <Flex
-                className={styles.breadcrumb}
-                justifyContent="space-between"
-              >
-                <Flex className={styles.infoBox}>
-                  {queryData?.lastDeployedAt && (
-                    <Flex
-                      flexDirection="column"
-                      gap={4}
-                      alignItems="flex-start"
-                    >
-                      <Tag
-                        bordered={false}
-                        color="success"
-                        style={{ color: "#389E0D" }}
-                        icon={
-                          <CheckCircleFilled style={{ color: "#389E0D" }} />
-                        }
-                      >
-                        Success
-                      </Tag>
-                      <Flex justifyContent="flex-start" gap={8}>
-                        <Tooltip title="Last deployed at">
-                          <InfoCircleOutlined
-                            style={{ fontSize: 12, color: "#00000040" }}
-                          />
-                        </Tooltip>
-                        <Text.LightSmall color="#00000073">
-                          {toDateTime(queryData.lastDeployedAt)}
-                        </Text.LightSmall>
-                      </Flex>
-                    </Flex>
-                  )}
-                </Flex>
-                <Flex
-                  justifyContent="flex-end"
-                  gap={8}
-                  className={styles.bottomWrapper}
-                >
+            </Flex>
+            <Flex
+              justifyContent="flex-end"
+              gap={8}
+              className={styles.bottomWrapper}
+            >
+              {isRequiredMapping && (
+                <>
                   <Tooltip title="Restore">
                     <Button
                       disabled={!isRequiredMapping}
@@ -491,40 +630,79 @@ const NewAPIMapping = ({
                       className={styles.btnSave}
                     >
                       Save
-                      <InfoCircleOutlined style={{ fontSize: 14 }} />
                     </Button>
                   </Tooltip>
                   <Button type="default">Compare</Button>
-                  <DeployStage
-                    inComplete={queryData.mappingStatus === "incomplete"}
-                    diffWithStage={queryData.diffWithStage}
-                    metadataKey={metadataKey}
-                  />
-                </Flex>
-              </Flex>
-              <HeaderMapping disabled={!isRequiredMapping} />
-              <Tabs
-                items={items}
-                activeKey={activeTab}
-                onChange={handleTabSwitch}
+                </>
+              )}
+              <DeployStage
+                inComplete={queryData.mappingStatus === "incomplete"}
+                diffWithStage={queryData.diffWithStage}
+                metadataKey={metadataKey as any}
               />
-            </>
+            </Flex>
+          </Flex>
+        )}
+        <div
+          ref={ref}
+          className={styles.newContent}
+          style={collapsed ? collapsedStyle : {}}
+        >
+          {mainTabKey === EMainTab.mapping ? (
+            <Flex
+              gap={12}
+              className={styles.mainWrapper}
+              style={collapsed ? collapsedStyle : {}}
+            >
+              <div className={styles.center}>
+                {!isRequiredMapping && (
+                  <Flex
+                    justifyContent="flex-start"
+                    gap={10}
+                    className={styles.isRequiredMapping}
+                    alignItems="center"
+                  >
+                    <InfoCircleOutlined style={{ color: "#00000073" }} />
+                    <Text.LightSmall color="#000000D9">
+                      This mapping is not needed, all the data will be queried
+                      from Adapter layer. This end point is able to deploy.
+                    </Text.LightSmall>
+                  </Flex>
+                )}
+
+                <HeaderMapping
+                  disabled={!isRequiredMapping}
+                  mappers={mappers}
+                />
+                <Tabs
+                  items={items}
+                  activeKey={activeTab}
+                  onChange={handleTabSwitch}
+                />
+              </div>
+
+              {isRequiredMapping && (
+                <div className={styles.right}>
+                  <RightSide
+                    rightSide={Number(rightSide)}
+                    isRequiredMapping={isRequiredMapping}
+                    method={queryData?.method}
+                    jsonSpec={jsonSpec}
+                    handleSelectSellerProp={handleSelectSellerProp}
+                    handleSelectSonataProp={handleSelectSonataProp}
+                  />
+                </div>
+              )}
+            </Flex>
           ) : (
-            <DeployHistory targetMapperKey={queryData.targetMapperKey} />
+            <div className={styles.history}>
+              <DeployHistory
+                targetMapperKey={queryData.targetMapperKey}
+                scrollHeight={get(size, "height", 0) + 70}
+              />
+            </div>
           )}
         </div>
-        {mainTabKey !== EMainTab.deploy && (
-          <div className={styles.right}>
-            <RightSide
-              rightSide={Number(rightSide)}
-              isRequiredMapping={isRequiredMapping}
-              method={queryData?.method}
-              jsonSpec={jsonSpec}
-              handleSelectSellerProp={handleSelectSellerProp}
-              handleSelectSonataProp={handleSelectSonataProp}
-            />
-          </div>
-        )}
       </Flex>
     </Flex>
   );

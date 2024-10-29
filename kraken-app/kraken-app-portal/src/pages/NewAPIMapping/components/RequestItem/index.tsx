@@ -1,20 +1,23 @@
-import { IRequestMapping } from "@/utils/types/component.type";
-import styles from "./index.module.scss";
-import { Button, Flex, Input, Tooltip } from "antd";
-import Text from "@/components/Text";
 import MappingIcon from "@/assets/newAPIMapping/mapping-icon.svg";
-import clsx from "clsx";
-import { cloneDeep, get, isEqual, set } from "lodash";
+import { Text } from "@/components/Text";
+import { Input } from "@/components/form";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
-import { EnumRightType } from "@/utils/types/common.type";
+import { IRequestMapping } from "@/utils/types/component.type";
 import {
   CheckOutlined,
   CloseOutlined,
+  DeleteOutlined,
   EditOutlined,
-  RightOutlined,
 } from "@ant-design/icons";
-import { useBoolean } from "usehooks-ts";
+import { Button, Flex, Select } from "antd";
+import clsx from "clsx";
+import { cloneDeep, difference, isEmpty, set } from "lodash";
+import { nanoid } from "nanoid";
 import { useEffect, useState } from "react";
+import { useBoolean } from "usehooks-ts";
+import { SourceInput } from "./SourceInput";
+import { TargetInput } from "./TargetInput";
+import styles from "./index.module.scss";
 
 type Props = {
   item: IRequestMapping;
@@ -24,11 +27,9 @@ type Props = {
 const RequestItem = ({ item, index }: Props) => {
   const {
     requestMapping,
-    setRightSide,
-    setRightSideInfo,
     setRequestMapping,
-    rightSideInfo,
-    rightSide,
+    listMappingStateRequest: listMapping,
+    setListMappingStateRequest,
   } = useNewApiMappingStore();
   const [titleInput, setTitleInput] = useState("");
   const [descriptionInput, setDescriptionInput] = useState("");
@@ -57,7 +58,14 @@ const RequestItem = ({ item, index }: Props) => {
     if (!descriptionInput) {
       setDescriptionInput(item.description);
     }
-  }, [item.title]);
+  }, [
+    item.title,
+    descriptionInput,
+    setTitleInput,
+    setDescriptionInput,
+    titleInput,
+    item.description,
+  ]);
 
   const onChangeDescription = () => {
     const newRequest = cloneDeep(requestMapping);
@@ -72,19 +80,50 @@ const RequestItem = ({ item, index }: Props) => {
     setRequestMapping(newRequest);
   };
 
+  const handleAdd = (name: string) => {
+    setListMappingStateRequest([
+      ...listMapping,
+      {
+        key: nanoid(),
+        from: undefined,
+        to: undefined,
+        name,
+      },
+    ]);
+  };
+
+  const handleDeleteMapping = (key: React.Key) => {
+    setListMappingStateRequest(listMapping.filter((item) => item.key !== key));
+  };
+
+  const handleSelect = (value: string, key: React.Key) => {
+    const cloneArr = cloneDeep(listMapping);
+    const itemIndex = listMapping.findIndex((l) => l.key === key);
+    set(cloneArr, `[${itemIndex}].from`, value);
+    setListMappingStateRequest(cloneArr);
+  };
+
+  const handleChangeInput = (value: string[], key: React.Key) => {
+    const cloneArr = cloneDeep(listMapping);
+    const itemIndex = listMapping.findIndex((l) => l.key === key);
+    set(cloneArr, `[${itemIndex}].to`, value);
+    setListMappingStateRequest(cloneArr);
+  };
+
   return (
     <div
       className={clsx([
         styles.root,
         item.requiredMapping && styles.rootRequired,
       ])}
+      id={JSON.stringify(item)}
     >
       <Flex vertical gap={4} className={styles.header}>
         <Flex align="center" justify="space-between">
           {isEditTitle ? (
             <Flex align="center" gap={10} style={{ flex: 1 }}>
               <Input
-                onChange={(e) => setTitleInput(e.target.value)}
+                onChange={(value) => setTitleInput(value)}
                 value={titleInput}
                 allowClear
                 style={{ width: "calc(50% + 15px)" }}
@@ -106,6 +145,7 @@ const RequestItem = ({ item, index }: Props) => {
               <Text.NormalMedium>{item.title}</Text.NormalMedium>
               {Boolean(item?.customizedField) && (
                 <EditOutlined
+                  data-testid="edit-title"
                   onClick={() => {
                     enableEditTitle();
                     disableEditDescription();
@@ -127,7 +167,7 @@ const RequestItem = ({ item, index }: Props) => {
         {isEditDescription ? (
           <Flex align="center" gap={10}>
             <Input
-              onChange={(e) => setDescriptionInput(e.target.value)}
+              onChange={(value) => setDescriptionInput(value)}
               value={descriptionInput}
               allowClear
               style={{ width: "calc(50% - 22px)" }}
@@ -161,101 +201,78 @@ const RequestItem = ({ item, index }: Props) => {
           </Flex>
         )}
       </Flex>
-      <Flex className={styles.container} gap={8} wrap="wrap">
-        <Tooltip title={item.source}>
-          <Input
-            variant="filled"
-            disabled={!item.customizedField}
-            placeholder="Select or input property"
-            className={clsx(styles.requestMappingItemWrapper, {
-              [styles.active]:
-                rightSide === EnumRightType.AddSonataProp &&
-                isEqual(item, rightSideInfo?.previousData),
-            })}
-            value={item.source}
-            style={{ width: "calc(50% - 22px)" }}
-            onClick={() => {
-              if (item.requiredMapping) {
-                return;
-              }
-              setRightSide(EnumRightType.AddSonataProp);
-              setRightSideInfo({
-                method: "update",
-                title: item.title,
-                previousData: item,
-              });
-            }}
-            onChange={(e) => {
-              const newValue = get(e, "target.value", "")
-                .replace?.("@{{", "")
-                .replace?.("}}", "");
-              let sourceLocation = get(item, "sourceLocation", "");
-              if (newValue.includes(".")) {
-                const splited = newValue.split(".");
-                const pathValue = get(splited, "[0]", "").toLocaleUpperCase();
-                sourceLocation =
-                  pathValue === "REQUESTBODY" ? "BODY" : pathValue;
-              }
-              const newRequest = cloneDeep(requestMapping);
-              set(newRequest, `[${index}].source`, get(e, "target.value", ""));
-              set(newRequest, `[${index}].sourceLocation`, sourceLocation);
-              setRequestMapping(newRequest);
-            }}
-          />
-        </Tooltip>
-        <MappingIcon />
-        <Tooltip title={item.target}>
-          <Input
-            variant="filled"
-            style={{ width: "calc(50% - 30px)" }}
-            className={clsx(styles.sellerPropItemWrapper, {
-              [styles.active]:
-                rightSide === EnumRightType.AddSellerProp &&
-                isEqual(item, rightSideInfo?.previousData),
-            })}
-            onClick={() => {
-              setRightSide(EnumRightType.AddSellerProp);
-              setRightSideInfo({
-                method: "update",
-                previousData: item,
-                title: item.title,
-              });
-            }}
-            value={item.target}
-            placeholder="Select or input property"
-            suffix={
-              <RightOutlined style={{ fontSize: 12, color: "#C9CDD4" }} />
-            }
-            onChange={(e) => {
-              if (e.target?.value?.startsWith("hybrid.")) {
-                const newRequest = cloneDeep(requestMapping);
-                set(
-                  newRequest,
-                  `[${index}].target`,
-                  get(e, "target.value", "")
-                );
-                set(newRequest, `[${index}].targetLocation`, "HYBRID");
-                setRequestMapping(newRequest);
-                return;
-              }
-              const newValue = get(e, "target.value", "")
-                .replace?.("@{{", "")
-                .replace?.("}}", "");
-              let targetLocation = get(item, "targetLocation", "");
-              if (newValue.includes(".")) {
-                const splited = newValue.split(".");
-                const pathValue = get(splited, "[0]", "").toLocaleUpperCase();
-                targetLocation =
-                  pathValue === "REQUESTBODY" ? "BODY" : pathValue;
-              }
-              const newRequest = cloneDeep(requestMapping);
-              set(newRequest, `[${index}].target`, get(e, "target.value", ""));
-              set(newRequest, `[${index}].targetLocation`, targetLocation);
-              setRequestMapping(newRequest);
-            }}
-          />
-        </Tooltip>
+      <Flex className={styles.container} gap={8} wrap="wrap" align="flex-end">
+        {/* Source property mapping */}
+        <SourceInput item={item} index={index} />
+
+        <span className={styles.mappingIcon}>
+          <MappingIcon />
+        </span>
+
+        {/* Target property mapping */}
+        <TargetInput item={item} index={index} />
       </Flex>
+      {!isEmpty(item?.sourceValues) && (
+        <Flex vertical gap={20} style={{ marginTop: 8, width: "100%" }}>
+          {listMapping
+            ?.filter((i) => i.name === item?.name)
+            ?.map(({ key, from, to }) => (
+              <Flex
+                className={styles.itemContainer}
+                align="center"
+                key={`${item.title}-${item.name}-${key}`}
+                wrap="wrap"
+                gap={8}
+              >
+                <Flex align="center" gap={8} style={{ flex: 1 }}>
+                  <Select
+                    data-testid="select-sonata-state"
+                    className={styles.stateSelect}
+                    placeholder="State"
+                    onSelect={(v) => handleSelect(v, key)}
+                    value={from}
+                    style={{ flex: 1 }}
+                    options={difference(
+                      item?.sourceValues,
+                      listMapping
+                        ?.filter((l) => l.name === item.name)
+                        .map((item) => item.from)
+                    ).map((item) => ({
+                      value: item,
+                      title: item,
+                    }))}
+                  />
+                  <Button
+                    className={styles.btnRemoveValueMapping}
+                    type="link"
+                    onClick={() => handleDeleteMapping(key)}
+                  >
+                    <DeleteOutlined />
+                  </Button>
+                </Flex>
+                <MappingIcon />
+                <Input
+                  placeholder="Input seller order state"
+                  // key={`enum-${key}`}
+                  value={to?.[0]}
+                  style={{ flex: 1 }}
+                  onChange={(value) => handleChangeInput([value], key)}
+                  className={styles.stateSelect}
+                />
+              </Flex>
+            ))}
+          <Flex className={styles.itemContainer}>
+            <Button
+              style={{ marginBottom: 12 }}
+              onClick={() => handleAdd(item?.name)}
+              data-testid="btn-add-state"
+              type="primary"
+            >
+              + Add Value Mapping
+            </Button>
+          </Flex>
+        </Flex>
+      )}
     </div>
   );
 };

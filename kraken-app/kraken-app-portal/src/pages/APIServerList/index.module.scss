@@ -1,62 +1,61 @@
-.root {
-  width: 100%;
-  padding: 14px 20px;
-  background: #f0f2f5;
+.content {
+  border-radius: 4px;
+
   :global {
     .ant-card-head,
     .ant-card-body {
       padding-left: 20px;
       padding-right: 20px;
     }
-  }
-}
 
-.content {
-  margin-top: 10px;
-  box-sizing: border-box;
-  border-radius: 4px;
-  max-height: calc(100vh - 152px);
-  overflow-y: scroll;
-
-  :global {
     .expand-table {
       box-sizing: border-box;
+
       table {
         table-layout: fixed !important;
       }
     }
+
     .ant-table {
       border-radius: 8px;
     }
+
     .ant-table-expanded-row-level-1 {
       td {
         background: #fff !important;
       }
+
       .ant-table-cell {
         padding: 0;
       }
     }
+
     .ant-table-row-level-0 {
       td {
         background: #fafafa;
       }
     }
+
     .ant-table-tbody {
       tr:first-child {
         td:first-child {
           border-top-left-radius: 8px;
         }
+
         td:last-child {
           border-top-right-radius: 8px;
         }
       }
+
       tr:last-child {
         td:first-child {
           border-bottom-left-radius: 8px;
         }
+
         td:last-child {
           border-bottom-right-radius: 8px;
         }
+
         td {
           border-bottom: none;
         }

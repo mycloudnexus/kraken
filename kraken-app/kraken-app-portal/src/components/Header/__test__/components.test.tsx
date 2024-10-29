@@ -1,7 +1,4 @@
-import { render, renderHook } from "@testing-library/react";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient } from "@/utils/helpers/reactQuery";
-import { BrowserRouter } from "react-router-dom";
+import { render, renderHook } from "@/__test__/utils";
 import { useTutorialStore } from '@/stores/tutorial.store';
 import Header from '..';
 
@@ -12,11 +9,7 @@ test("test Header", () => {
     result.current.setTutorialCompleted(false)
   });
   const { container } = render(
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <Header />
-      </BrowserRouter>
-    </QueryClientProvider>
+    <Header />
   );
   expect(container).toBeInTheDocument();
 });

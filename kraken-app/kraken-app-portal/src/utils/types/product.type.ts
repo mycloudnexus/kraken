@@ -1,21 +1,10 @@
-export interface IComponent {
-  kind: string;
-  apiVersion: string;
-  metadata: IMetadata;
-  id: string;
-  organizationId: string;
-  parentId: string;
-  createdAt: string;
-  updatedAt: string;
-  facets: Record<string, any>;
-}
-
 export interface IMetadata {
   id: string;
   name: string;
   version: number;
   key: string;
   description?: string;
+  status?: string;
 }
 
 export interface INewVersionParams {
@@ -53,4 +42,36 @@ export interface IDeploymentHistory {
 export interface IMappingMatrix {
   provideAlternative: boolean;
   addressType: string;
+}
+
+export interface IReleaseHistory {
+  templateUpgradeId: string;
+  name: string;
+  productVersion: string;
+  publishDate: string;
+  description: string;
+  deployments: Deployment[];
+  showStageUpgradeButton: boolean;
+  showProductionUpgradeButton: boolean;
+  productSpec?: string;
+}
+
+export interface Deployment {
+  deploymentId: string;
+  templateUpgradeId: string;
+  envName: string;
+  productVersion: string;
+  upgradeBy: string;
+  status: string;
+  createdAt: string;
+}
+
+export interface IUpgrade {
+  deploymentId: string;
+  templateUpgradeId: string;
+  envName: string;
+  productVersion: string;
+  upgradeBy: string;
+  status: string;
+  createdAt: string;
 }

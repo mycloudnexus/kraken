@@ -1,5 +1,5 @@
 import Flex from "@/components/Flex";
-import Text from "@/components/Text";
+import { Text } from "@/components/Text";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { Modal } from "antd";
 

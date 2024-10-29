@@ -1,23 +1,44 @@
-import Text from "@/components/Text";
-import { IComponent } from "@/utils/types/product.type";
-import { Card, Col, Flex, Row, Tag, Typography, notification } from "antd";
-import { get } from "lodash";
-import { useBoolean } from "usehooks-ts";
 import TitleIcon from "@/assets/title-icon.svg";
-import { useMemo } from "react";
-import { PaperClipOutlined } from "@ant-design/icons";
-import jsYaml from "js-yaml";
-import { decode } from "js-base64";
+import DeleteApiButton from "@/components/DeleteApiButton";
 import SpecDrawer from "@/components/SpecDrawer";
-import { useNavigate } from "react-router-dom";
+import { Text } from "@/components/Text";
+import { useDeleteApiServer } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
+import { IComponent } from "@/utils/types/component.type";
+import { PaperClipOutlined } from "@ant-design/icons";
+import {
+  Button,
+  Card,
+  Col,
+  Flex,
+  Row,
+  Spin,
+  Tag,
+  Typography,
+  notification,
+} from "antd";
+import { decode } from "js-base64";
+import jsYaml from "js-yaml";
+import { get } from "lodash";
+import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useBoolean } from "usehooks-ts";
 
 type Props = {
   item: IComponent;
+  refetchList?: () => void;
 };
 
-const APIServerCard = ({ item }: Props) => {
+const APIServerCard = ({ item, refetchList }: Props) => {
   const { currentProduct } = useAppStore();
+  const {
+    value: isHover,
+    setTrue: trueHover,
+    setFalse: falseHover,
+  } = useBoolean(false);
+  const [openMappingDrawer, setOpenMappingDrawer] = useState(false);
+  const { mutateAsync: deleteApiServer, isPending } = useDeleteApiServer();
+
   const navigate = useNavigate();
   const {
     value: isOpenDrawer,
@@ -50,8 +71,10 @@ const APIServerCard = ({ item }: Props) => {
     }
   }, [item]);
 
+  const isApiInUse = useMemo(() => !!item?.inUse, [item]);
+
   return (
-    <>
+    <Spin spinning={isPending}>
       {isOpenDrawer && (
         <SpecDrawer
           onClose={closeDrawer}
@@ -62,18 +85,43 @@ const APIServerCard = ({ item }: Props) => {
       <Card
         style={{ borderRadius: 4, width: "100%" }}
         title={
-          <Flex justify="flex-start" gap={12} align="center">
-            <Text.NormalLarge>
-              {get(item, "metadata.name", "")}
-            </Text.NormalLarge>
-            <Text.LightMedium
-              color="#2962FF"
-              style={{ cursor: "pointer" }}
-              role="none"
-              onClick={handleEdit}
-            >
-              Edit
-            </Text.LightMedium>
+          <Flex justify="space-between" gap={12} align="center">
+            <Flex gap={8}>
+              <Flex align="center">
+                <Text.NormalLarge>
+                  {get(item, "metadata.name", "")}
+                </Text.NormalLarge>
+              </Flex>
+              <div onMouseEnter={trueHover} onMouseLeave={falseHover}>
+                {isHover && isApiInUse ? (
+                  <Button
+                    style={{ padding: "0px" }}
+                    type="link"
+                    onClick={() => {
+                      setOpenMappingDrawer(true);
+                    }}
+                  >
+                    Check details
+                  </Button>
+                ) : (
+                  <Tag color={isApiInUse ? "blue" : ""}>
+                    {isApiInUse ? "In use" : "Not in use"}
+                  </Tag>
+                )}
+              </div>
+            </Flex>
+            <Flex gap={12}>
+              <Button type="link" onClick={handleEdit}>
+                Edit
+              </Button>
+              <DeleteApiButton
+                openMappingDrawer={openMappingDrawer}
+                deleteCallback={deleteApiServer}
+                setOpenMappingDrawer={setOpenMappingDrawer}
+                item={item}
+                refetchList={refetchList}
+              />
+            </Flex>
           </Flex>
         }
       >
@@ -155,9 +203,6 @@ const APIServerCard = ({ item }: Props) => {
                 <Text.NormalMedium color="#000000D9">
                   API spec in yaml format
                 </Text.NormalMedium>
-                <Tag>
-                  {get(item, "facets.selectedAPIs", []).length} APIs in use
-                </Tag>
               </Flex>
               <Flex gap={9} justify="flex-start">
                 <PaperClipOutlined />
@@ -174,7 +219,7 @@ const APIServerCard = ({ item }: Props) => {
           </Col>
         </Row>
       </Card>
-    </>
+    </Spin>
   );
 };
 

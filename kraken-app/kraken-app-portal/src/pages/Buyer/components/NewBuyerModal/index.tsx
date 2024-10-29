@@ -1,13 +1,13 @@
-import { Flex, Form, Input, Modal, Radio, notification } from "antd";
+import { Flex, Form, Input, Modal, Tooltip, notification } from "antd";
 import styles from "./index.module.scss";
 import { useAppStore } from "@/stores/app.store";
-import { useCreateBuyer, useGetProductEnvs } from "@/hooks/product";
-import Text from "@/components/Text";
-import { get, sortBy } from "lodash";
-import { useEffect, useMemo, useState } from "react";
+import { useCreateBuyer } from "@/hooks/product";
+import { get } from "lodash";
+import { useEffect, useState } from "react";
 import TokenModal from "../TokenModal";
 import { useBoolean } from "usehooks-ts";
 import { IBuyer } from "@/utils/types/component.type";
+import { InfoCircleOutlined } from "@ant-design/icons";
 
 type Props = {
   open: boolean;
@@ -17,7 +17,6 @@ type Props = {
 
 const NewBuyerModal = ({ open, onClose, currentEnv }: Props) => {
   const { currentProduct } = useAppStore();
-  const { data } = useGetProductEnvs(currentProduct);
   const [form] = Form.useForm();
   const { mutateAsync: createBuyer } = useCreateBuyer();
   const {
@@ -37,7 +36,10 @@ const NewBuyerModal = ({ open, onClose, currentEnv }: Props) => {
     try {
       const params: any = {
         productId: currentProduct,
-        data: values,
+        data: {
+          ...values,
+          envId: currentEnv,
+        },
       };
       const res = await createBuyer(params);
       notification.success({ message: get(res, "message", "Success!") });
@@ -50,18 +52,6 @@ const NewBuyerModal = ({ open, onClose, currentEnv }: Props) => {
       });
     }
   };
-
-  const envOptions = useMemo(() => {
-    const envReverse = sortBy(get(data, "data", []), "name").reverse();
-    return envReverse.map((item) => ({
-      label: (
-        <Text.LightMedium style={{ textTransform: "capitalize" }}>
-          {item.name}
-        </Text.LightMedium>
-      ),
-      value: item.id,
-    }));
-  }, [data?.data]);
 
   useEffect(() => {
     if (!open) {
@@ -93,7 +83,11 @@ const NewBuyerModal = ({ open, onClose, currentEnv }: Props) => {
             name="buyerId"
             label={
               <Flex gap={4}>
-                Company ID<span style={{ color: "#FF4D4F" }}> *</span>
+                Company ID
+                <Tooltip title="Please input buyer’s company ID in Seller’s legacy API platform">
+                  <InfoCircleOutlined style={{ color: "#8C8C8C" }} />
+                </Tooltip>
+                <span style={{ color: "#FF4D4F" }}>*</span>
               </Flex>
             }
             rules={[
@@ -104,21 +98,20 @@ const NewBuyerModal = ({ open, onClose, currentEnv }: Props) => {
               },
             ]}
           >
-            <Input placeholder="Please input buyer’s company ID in Seller’s legacy API platform" />
-          </Form.Item>
-          <Form.Item name="companyName" label="Company name">
-            <Input placeholder="Please input buyer’s company name in Seller’s legacy API platform" />
+            <Input placeholder="Please enter" />
           </Form.Item>
           <Form.Item
-            name="envId"
+            name="companyName"
             label={
               <Flex gap={4}>
-                Environment<span style={{ color: "#FF4D4F" }}> *</span>
+                Company name
+                <Tooltip title="Please input buyer’s company name in Seller’s legacy API platform">
+                  <InfoCircleOutlined style={{ color: "#8C8C8C" }} />
+                </Tooltip>
               </Flex>
             }
-            rules={[{ required: true, message: "Please select environment" }]}
           >
-            <Radio.Group className={styles.radio} options={envOptions} />
+            <Input placeholder="Please enter" />
           </Form.Item>
         </Form>
       </Modal>

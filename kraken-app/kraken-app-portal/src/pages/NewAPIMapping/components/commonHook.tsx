@@ -1,4 +1,6 @@
+import ExampleValueModal from "@/components/ExampleValueModal";
 import TypeTag from "@/components/TypeTag";
+import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import {
   Button,
   CollapseProps,
@@ -7,13 +9,12 @@ import {
   Typography,
   notification,
 } from "antd";
+import classNames from "classnames";
 import clsx from "clsx";
-import { Dispatch, useCallback, useMemo, useState } from "react";
-import styles from "./RightAddSellerProp/index.module.scss";
 import { get, isEmpty, omit } from "lodash";
-import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
+import { Dispatch, useCallback, useMemo, useState } from "react";
 import { useBoolean } from "usehooks-ts";
-import ExampleValueModal from "@/components/ExampleValueModal";
+import styles from "./RightAddSellerProp/index.module.scss";
 
 interface Props {
   selectedProp: any;
@@ -44,15 +45,17 @@ export const useCommonAddProp = ({
       notification.error({ message: "Please select one property!" });
       return;
     }
-    onSelect?.({ ...selectedProp, title: rightSideInfo?.title });
+    // selectedProp = { name: string, location: string }
+    // propery name should follow this format: @{{ prop_name }}
+    onSelect?.({
+      ...selectedProp,
+      name: `@{{${selectedProp.name}}}`,
+      title: rightSideInfo?.title,
+    });
   }, [selectedProp, onSelect, rightSideInfo]);
 
   const selectedKey = useMemo(
-    () =>
-      get(selectedProp, "name", "")
-        .replace("@{{", "")
-        .replace("}}", "")
-        .replace("requestBody.", ""),
+    () => get(selectedProp, "name", ""),
     [selectedProp]
   );
 
@@ -64,11 +67,14 @@ export const useCommonAddProp = ({
     open();
   };
 
-  const handleAddPathHybrid = (value: string) => {
+  const setHybridField = (
+    field: keyof typeof sellerAPIExampleProps,
+    value: string
+  ) => {
     if (isEmpty(value)) {
       setSellerAPIExampleProps({
         ...sellerAPIExampleProps,
-        path: omit(sellerAPIExampleProps?.path, [
+        [field]: omit(sellerAPIExampleProps?.[field], [
           `${get(currentProp, "name", "")}`,
         ]),
       });
@@ -81,45 +87,24 @@ export const useCommonAddProp = ({
     }
     setSellerAPIExampleProps({
       ...sellerAPIExampleProps,
-      path: {
-        ...sellerAPIExampleProps?.path,
+      [field]: {
+        ...sellerAPIExampleProps?.[field],
         [get(currentProp, "name", "")]: value,
       },
     });
     close();
     setSelectedProp({
       location: "HYBRID",
-      name: `hybrid.${value}`,
+      name: value,
     });
   };
 
+  const handleAddPathHybrid = (value: string) => {
+    setHybridField("path", value);
+  };
+
   const handleAddParamHybrid = (value: string) => {
-    if (isEmpty(value)) {
-      setSellerAPIExampleProps({
-        ...sellerAPIExampleProps,
-        param: omit(sellerAPIExampleProps?.param, [
-          `${get(currentProp, "name", "")}`,
-        ]),
-      });
-      setSelectedProp({
-        location: "",
-        name: "",
-      });
-      close();
-      return;
-    }
-    setSellerAPIExampleProps({
-      ...sellerAPIExampleProps,
-      param: {
-        ...sellerAPIExampleProps.param,
-        [get(currentProp, "name", "")]: value,
-      },
-    });
-    close();
-    setSelectedProp({
-      location: "HYBRID",
-      name: `hybrid.${value}`,
-    });
+    setHybridField("param", value);
   };
 
   const collapseItems = useMemo(() => {
@@ -156,11 +141,9 @@ export const useCommonAddProp = ({
                   className={clsx(styles.paramItem, {
                     [styles.active]:
                       (selectedProp?.location === "PATH" &&
-                        selectedProp?.name === `@{{path.${parameter.name}}}`) ||
+                        selectedProp?.name === parameter.name) ||
                       (selectedProp?.name ===
-                        `hybrid.${
-                          sellerAPIExampleProps?.path?.[parameter.name]
-                        }` &&
+                        sellerAPIExampleProps?.path?.[parameter.name] &&
                         selectedProp?.location === "HYBRID"),
                   })}
                   key={parameter.name}
@@ -168,15 +151,13 @@ export const useCommonAddProp = ({
                     if (sellerAPIExampleProps?.path?.[parameter.name]) {
                       setSelectedProp({
                         location: "HYBRID",
-                        name: `hybrid.${
-                          sellerAPIExampleProps?.path?.[parameter.name]
-                        }`,
+                        name: sellerAPIExampleProps?.path?.[parameter.name],
                       });
                       return;
                     }
                     setSelectedProp({
                       location: "PATH",
-                      name: `@{{path.${parameter.name}}}`,
+                      name: parameter.name,
                     });
                   }}
                 >
@@ -237,27 +218,22 @@ export const useCommonAddProp = ({
                   className={clsx(styles.paramItem, {
                     [styles.active]:
                       (selectedProp?.location === "QUERY" &&
-                        selectedProp?.name ===
-                          `@{{query.${parameter.name}}}`) ||
+                        selectedProp?.name === parameter.name) ||
                       (selectedProp?.name ===
-                        `hybrid.${
-                          sellerAPIExampleProps?.param?.[parameter.name]
-                        }` &&
+                        sellerAPIExampleProps?.param?.[parameter.name] &&
                         selectedProp?.location === "HYBRID"),
                   })}
                   onClick={() => {
                     if (sellerAPIExampleProps?.param?.[parameter.name]) {
                       setSelectedProp({
                         location: "HYBRID",
-                        name: `hybrid.${
-                          sellerAPIExampleProps?.param?.[parameter.name]
-                        }`,
+                        name: sellerAPIExampleProps?.param?.[parameter.name],
                       });
                       return;
                     }
                     setSelectedProp({
                       location: "QUERY",
-                      name: `@{{query.${parameter.name}}}`,
+                      name: parameter.name,
                     });
                   }}
                 >
@@ -299,9 +275,11 @@ export const useCommonAddProp = ({
             Request body
           </Typography.Text>
         ),
+        className: classNames(styles.flexOne, styles.requestBodySection),
         children: (
           <div className={styles.tree}>
             <Tree
+              blockNode
               treeData={requestBodyTree}
               selectable
               selectedKeys={
@@ -310,7 +288,7 @@ export const useCommonAddProp = ({
               onSelect={(_, e) => {
                 setSelectedProp({
                   location: "BODY",
-                  name: `@{{requestBody.${e.node.key}}}`,
+                  name: e.node.key,
                 });
               }}
             />
