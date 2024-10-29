@@ -5,8 +5,9 @@ metadata:
   key: mef.sonata.template.upgrade.1.0.1
   name: V1.0.1
   labels:
-    release-version: V1.0.1
-    release-date: 2024-08-12
+    productSpec: grace
+    productVersion: V1.0.1
+    publishDate: 2024-09-03
   description: |
     V1.0.1
     add template
