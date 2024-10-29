@@ -6,7 +6,7 @@ import static com.consoleconnect.kraken.operator.gateway.runner.SpelEngineAction
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
-import com.consoleconnect.kraken.operator.core.dto.ResponseTargetMapperDto;
+import com.consoleconnect.kraken.operator.core.dto.StateValueMappingDto;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPIFacets;
 import com.consoleconnect.kraken.operator.gateway.CustomConfig;
@@ -61,9 +61,10 @@ class ModifyResponseBodyTransformerFuncTest extends AbstractIntegrationTest {
     valueMappings.put("y", "calendarMonth");
     valueMappings.put("m", "calendarMonth");
 
-    ResponseTargetMapperDto dto = new ResponseTargetMapperDto();
-    dto.setTargetPathMapper(List.of("$.results[0].entity.durationUnit"));
-    dto.setTargetValueMapper(valueMappings);
+    StateValueMappingDto dto = new StateValueMappingDto();
+    Map<String, Map<String, String>> targetPathValueMapping = new HashMap<>();
+    targetPathValueMapping.put("$.results[0].entity.durationUnit", valueMappings);
+    dto.setTargetPathValueMapping(targetPathValueMapping);
 
     Map<String, Object> with = new HashMap<>();
     with.put(INPUT_CODE, responseBody);

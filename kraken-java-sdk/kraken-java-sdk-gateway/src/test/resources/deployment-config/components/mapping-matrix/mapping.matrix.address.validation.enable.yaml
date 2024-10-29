@@ -12,21 +12,26 @@ spec:
     mef.sonata.api-target.address.validate:
       - name: provide_alternative_true
         path: "$.body.provideAlternative"
-        expected: true
+        expectType: EXPECTED
+        value: true
       - name: address_type_FieldedAddress
         path: "$.body.submittedGeographicAddress.['@type']"
-        expected: FieldedAddress
+        expectType: EXPECTED
+        value: FieldedAddress
       - name: address_submittedGeographicAddress_country
         path: "$.body.submittedGeographicAddress.['country']"
-        expectedTrue: "${param!=''}"
+        expectType: EXPECTED_TRUE
+        value: "${param!=''}"
         errorMsg: "submittedGeographicAddress.country can not be null"
       - name: address_submittedGeographicAddress_city
         path: "$.body.submittedGeographicAddress.['city']"
-        expectedTrue: "${param!=''}"
+        expectType: EXPECTED_TRUE
+        value: "${param!=''}"
         errorMsg: "submittedGeographicAddress.city can not be null"
       - name: address_submittedGeographicAddress_streetName
         path: "$.body.submittedGeographicAddress.['streetName']"
-        expectedTrue: "${param!=''}"
+        expectType: EXPECTED_TRUE
+        value: "${param!=''}"
         errorMsg: "submittedGeographicAddress.streetName can not be null"
 
 

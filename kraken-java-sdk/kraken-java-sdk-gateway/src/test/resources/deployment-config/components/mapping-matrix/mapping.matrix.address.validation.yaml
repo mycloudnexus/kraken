@@ -11,13 +11,16 @@ spec:
   matrix:
     mef.sonata.api-target.address.validate:
       - name: enabled
-        expected: false
+        expectType: EXPECTED
+        value: false
       - name: provide_alternative_true
         path: "$.body.provideAlternative"
-        expected: true
+        expectType: EXPECTED
+        value: true
       - name: address_type_FieldedAddress
         path: "$.body.submittedGeographicAddress.['@type']"
-        expected: FieldedAddress
+        expectType: EXPECTED
+        value: FieldedAddress
 
 
 

@@ -2,6 +2,7 @@ package com.consoleconnect.kraken.operator.gateway.runner;
 
 import com.consoleconnect.kraken.operator.core.enums.ActionTypeEnum;
 import com.consoleconnect.kraken.operator.core.enums.DBActionTypeEnum;
+import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPIFacets;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
@@ -12,6 +13,7 @@ import com.consoleconnect.kraken.operator.gateway.service.FilterHeaderService;
 import java.util.*;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.server.ServerWebExchange;
@@ -20,7 +22,6 @@ import org.springframework.web.server.ServerWebExchange;
 @Slf4j
 public class DBCrudActionRunner extends AbstractActionRunner {
   private static final String ENTITY_NOT_FOUND_ERR = "DBCrudFilterFactory: entity not found";
-  private static final String ENTITY_ID_NULL_ERR = "DBCrudFilterFactory: entityId is null";
   private final HttpRequestRepository repository;
   private final FilterHeaderService filterHeaderService;
 
@@ -113,14 +114,8 @@ public class DBCrudActionRunner extends AbstractActionRunner {
 
   private void onUpdate(ServerWebExchange exchange, Config config) {
     String entityId = exchange.getAttribute(KrakenFilterConstants.X_ENTITY_ID);
-    if (entityId == null) {
-      log.error(ENTITY_ID_NULL_ERR);
-      return;
-    }
-    log.info("update entity:{}", entityId);
-    Optional<HttpRequestEntity> optionalEntity = repository.findById(UUID.fromString(entityId));
+    Optional<HttpRequestEntity> optionalEntity = readRequestEntity(entityId);
     if (optionalEntity.isEmpty()) {
-      log.error(ENTITY_NOT_FOUND_ERR);
       return;
     }
     HttpRequestEntity updatedEntity = optionalEntity.get();
@@ -143,12 +138,7 @@ public class DBCrudActionRunner extends AbstractActionRunner {
   }
 
   private void onRead(ServerWebExchange exchange, Config config) {
-    String entityId = config.getId();
-    if (entityId == null) {
-      log.error(ENTITY_ID_NULL_ERR);
-      return;
-    }
-    Optional<HttpRequestEntity> optionalEntity = repository.findById(UUID.fromString(entityId));
+    Optional<HttpRequestEntity> optionalEntity = readRequestEntity(config.getId());
     if (optionalEntity.isEmpty()) {
       log.error(ENTITY_NOT_FOUND_ERR);
       return;
@@ -156,6 +146,21 @@ public class DBCrudActionRunner extends AbstractActionRunner {
     HttpRequestEntity entity = optionalEntity.get();
     exchange.getAttributes().put(KrakenFilterConstants.X_ENTITY_ID, entity.getId().toString());
     exchange.getAttributes().put(KrakenFilterConstants.X_ENTITY, JsonToolkit.toJson(entity));
+  }
+
+  private Optional<HttpRequestEntity> readRequestEntity(String entityId) {
+    if (StringUtils.isBlank(entityId)) {
+      return Optional.empty();
+    }
+    UUID entityUUID = null;
+    try {
+      entityUUID = UUID.fromString(entityId);
+    } catch (Exception e) {
+      String error = ENTITY_NOT_FOUND_ERR + ", entityId:" + entityId;
+      log.error(error, e);
+      throw KrakenException.notFound(error);
+    }
+    return repository.findById(entityUUID);
   }
 
   @Data

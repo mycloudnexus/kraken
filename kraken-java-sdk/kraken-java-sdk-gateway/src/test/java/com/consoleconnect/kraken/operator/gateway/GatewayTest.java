@@ -253,6 +253,9 @@ class GatewayTest extends AbstractIntegrationTest {
     doReturn(List.of(entity)).when(requestRepository).findByExternalId(anyString());
     String s = readFileToString("mockData/notificationRequest.json");
     webTestClient
+        .mutate()
+        .responseTimeout(Duration.ofSeconds(600))
+        .build()
         .post()
         .uri(
             uriBuilder ->

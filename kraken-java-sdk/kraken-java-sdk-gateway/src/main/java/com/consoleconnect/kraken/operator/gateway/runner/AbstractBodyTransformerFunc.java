@@ -2,7 +2,7 @@ package com.consoleconnect.kraken.operator.gateway.runner;
 
 import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.GATEWAY_ROUTE_ATTR;
 
-import com.consoleconnect.kraken.operator.core.dto.ResponseTargetMapperDto;
+import com.consoleconnect.kraken.operator.core.dto.StateValueMappingDto;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPIFacets;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
@@ -140,17 +140,16 @@ public abstract class AbstractBodyTransformerFunc
   }
 
   private String rendResponseWithSpEl(Map<String, Object> context, boolean postRequest) {
-
     Object o = context.get(SpelEngineActionRunner.INPUT_CODE);
 
     SpELEngine.parseToList(o, context, new ArrayList<>());
     String retJsonString =
         SpELEngine.evaluate(o, context, postRequest && !action.isPostResultRender());
     Object targetObj = context.get(TARGET_VALUE_MAPPER_KEY);
-    ResponseTargetMapperDto responseTargetMapperDto = new ResponseTargetMapperDto();
+    StateValueMappingDto responseTargetMapperDto = new StateValueMappingDto();
     if (Objects.nonNull(targetObj)) {
       responseTargetMapperDto =
-          JsonToolkit.fromJson(JsonToolkit.toJson(targetObj), ResponseTargetMapperDto.class);
+          JsonToolkit.fromJson(JsonToolkit.toJson(targetObj), StateValueMappingDto.class);
     }
     retJsonString = renderStatus(responseTargetMapperDto, retJsonString);
     if (StringUtils.isBlank(retJsonString)) {
@@ -166,6 +165,6 @@ public abstract class AbstractBodyTransformerFunc
       retJsonString = calculateBasedOnResponseBody(retJsonString, context);
     }
     // clear empty attribute
-    return deleteNodeByPath(responseTargetMapperDto.getTargetCheckPathMapper(), retJsonString);
+    return resetNodeByPath(responseTargetMapperDto.getTargetCheckPathMapper(), retJsonString);
   }
 }

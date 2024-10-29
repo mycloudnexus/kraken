@@ -5,7 +5,6 @@ import com.consoleconnect.kraken.operator.core.toolkit.StringUtils;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeansException;
@@ -76,6 +75,18 @@ public class SpELEngine implements BeanFactoryAware {
       log.error("Error evaluating expression: {}", expression, ex);
       return null;
     }
+  }
+
+  public <T> T evaluateWithoutSuppressException(String expression, Class<T> clazz) {
+    return expressionParser
+        .parseExpression(expression, parserContext)
+        .getValue(evaluationContext, clazz);
+  }
+
+  public static <T> T evaluateWithoutSuppressException(
+      String expression, Map<String, Object> variables, Class<T> tClass) {
+    SpELEngine spELEngine = new SpELEngine(variables);
+    return spELEngine.evaluateWithoutSuppressException(expression, tClass);
   }
 
   public static boolean isTrue(String expression, Map<String, Object> variables) {
@@ -188,26 +199,22 @@ public class SpELEngine implements BeanFactoryAware {
 
   public static Object evaluateMap(
       Map<String, Object> map, Map<String, Object> context, boolean postRequest) {
-    return map.entrySet().stream()
-        .collect(
-            Collectors.toMap(
-                Map.Entry::getKey,
-                v -> {
-                  try {
-                    if (v.getValue() instanceof String value) {
-                      Object evaluate = SpELEngine.evaluate(value, context, Object.class);
-                      if (postRequest) {
-                        return evaluate == null ? "" : evaluate;
-                      }
-                      return evaluate == null ? value : evaluate;
-                    } else {
-                      return evaluateObject(v.getValue(), context, postRequest);
-                    }
-                  } catch (Exception e) {
-                    log.warn("parse map error!");
-                  }
-                  return v.getValue();
-                }));
+    if (map == null) {
+      return null;
+    }
+    for (Map.Entry<String, Object> v : map.entrySet()) {
+      try {
+        if (v.getValue() != null && v.getValue() instanceof String value) {
+          Object evaluate = SpELEngine.evaluate(value, context, Object.class);
+          v.setValue(evaluate == null && !postRequest ? value : evaluate);
+        } else {
+          v.setValue(evaluateObject(v.getValue(), context, postRequest));
+        }
+      } catch (Exception e) {
+        log.warn("parse map error!");
+      }
+    }
+    return map;
   }
 
   public static String escape(String raw) {
