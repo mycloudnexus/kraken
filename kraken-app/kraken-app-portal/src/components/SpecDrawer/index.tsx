@@ -1,5 +1,5 @@
 import { Button, Drawer, Empty, Flex, notification } from "antd";
-import Text from "../Text";
+import { Text } from "../Text";
 import { CloseOutlined } from "@ant-design/icons";
 import styles from "./index.module.scss";
 import jsYaml from "js-yaml";

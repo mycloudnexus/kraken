@@ -58,6 +58,11 @@
 }
 
 .defaultBtn {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   padding: 5px;
   path {
     fill: #595959;

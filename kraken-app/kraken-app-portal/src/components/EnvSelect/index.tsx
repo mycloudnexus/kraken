@@ -1,7 +1,7 @@
 import { useGetProductEnvs } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
 import { Button, Dropdown, Flex, MenuProps, Radio, Space } from "antd";
-import Text from "../Text";
+import { Text } from "../Text";
 import { DownOutlined } from "@ant-design/icons";
 import { useEffect, useMemo, useState } from "react";
 import { get, isEmpty, sortBy } from "lodash";

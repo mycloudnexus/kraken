@@ -1,6 +1,6 @@
-import { defineConfig } from "vitest/config";
 import path from "path";
 import svgr from "vite-plugin-svgr";
+import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   plugins: [
@@ -9,7 +9,6 @@ export default defineConfig({
       exclude: "**/*.svg?url",
       svgrOptions: {
         exportType: "default",
-        
       },
     }),
   ],

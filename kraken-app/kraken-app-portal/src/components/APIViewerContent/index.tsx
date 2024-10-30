@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import swaggerClient from "swagger-client";
 import { decode } from "js-base64";
 import jsYaml from "js-yaml";
-import Text from "../Text";
+import { Text } from "../Text";
 import RequestBody from "@/pages/NewAPIServer/components/RequestBody";
 import Response from "@/pages/NewAPIServer/components/Response";
 import styles from "./index.module.scss";

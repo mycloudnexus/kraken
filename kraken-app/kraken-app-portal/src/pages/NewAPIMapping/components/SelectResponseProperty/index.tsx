@@ -1,6 +1,8 @@
+import TitleIcon from "@/assets/title-icon.svg";
 import Flex from "@/components/Flex";
-import Text from "@/components/Text";
+import { Text } from "@/components/Text";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
+import { isElementInViewport } from "@/utils/helpers/html";
 import {
   convertSchemaToTypeOnly,
   exampleParse,
@@ -12,18 +14,12 @@ import { clone, get, isEmpty, set } from "lodash";
 import { Key, useCallback, useMemo, useState } from "react";
 import { useBoolean } from "usehooks-ts";
 import styles from "./index.module.scss";
-import TitleIcon from "@/assets/title-icon.svg";
 
 const Search = Input.Search;
 
 const SelectResponseProperty = () => {
-  const {
-    sellerApi,
-    activeResponseName,
-    responseMapping,
-    setResponseMapping,
-    setActiveResponseName,
-  } = useNewApiMappingStore();
+  const { sellerApi, activeResponseName, responseMapping, setResponseMapping } =
+    useNewApiMappingStore();
   const { value: isOpen, toggle: toggleOpen } = useBoolean(true);
   const [searchValue, setSearchValue] = useState("");
   const [selectedKeys, setSelectedKeys] = useState<Key[]>([]);
@@ -106,10 +102,10 @@ const SelectResponseProperty = () => {
       return input;
     }
     const parts = input
-      ?.replaceAll("0[*]", "[*]")
-      ?.replaceAll("[*]", "[0]")
+      .replaceAll("0[*]", "[*]")
+      .replaceAll("[*]", "[0]")
       .split(".");
-    const newString = parts.join(".")?.replace("[0]", "[*]");
+    const newString = parts.join(".").replace("[0]", "[*]");
     return newString;
   };
 
@@ -127,15 +123,15 @@ const SelectResponseProperty = () => {
       }
       const cloneObj = clone(responseMapping);
 
-      const value =
-        newKey.startsWith("[*]") || newKey.startsWith("[0]")
-          ? `@{{responseBody${newKey}}}`
-          : `@{{responseBody.${newKey}}}`;
+      const value = `@{{${newKey}}}`;
       set(cloneObj, `[${responseIndex}].source`, value);
       set(cloneObj, `[${responseIndex}].sourceLocation`, `BODY`);
       setResponseMapping(cloneObj);
-      setActiveResponseName(undefined);
       setSelectedKeys([]);
+      const currentDom = document.getElementById(activeResponseName);
+      if (currentDom && !isElementInViewport(currentDom, 210)) {
+        currentDom?.scrollIntoView({ block: "center" });
+      }
     }
   };
 
@@ -144,9 +140,7 @@ const SelectResponseProperty = () => {
   return (
     <div className={styles.root}>
       <div className={styles.header}>
-        <Text.BoldLarge>
-          Select response property from seller API
-        </Text.BoldLarge>
+        <Text.NormalLarge>Select Seller API response property</Text.NormalLarge>
       </div>
       <div className={styles.container}>
         <div>
@@ -158,15 +152,21 @@ const SelectResponseProperty = () => {
           />
         </div>
         <div style={{ marginTop: 16 }}>
-          <Flex justifyContent="space-between" gap={8}>
+          <Flex
+            justifyContent="space-between"
+            gap={8}
+            onClick={toggleOpen}
+            role="none"
+            style={{ cursor: "pointer" }}
+          >
             <Flex justifyContent="flex-start" gap={8}>
               <TitleIcon />
               <Text.NormalMedium>Response body</Text.NormalMedium>
             </Flex>
             {isOpen ? (
-              <DownOutlined onClick={toggleOpen} style={{ fontSize: 10 }} />
+              <DownOutlined style={{ fontSize: 10 }} />
             ) : (
-              <RightOutlined onClick={toggleOpen} style={{ fontSize: 10 }} />
+              <RightOutlined style={{ fontSize: 10 }} />
             )}
           </Flex>
         </div>
@@ -177,26 +177,25 @@ const SelectResponseProperty = () => {
                 200
               </Button>
             </div>
-            <div style={{ marginTop: 4 }}>
-              <div className={styles.tree}>
-                <Tree
-                  data-testid="tree-item"
-                  selectedKeys={selectedKeys}
-                  treeData={newTreeData}
-                  selectable
-                  onSelect={(keys: Key[]) => {
-                    if (!activeResponseName) {
-                      notification.warning({
-                        message:
-                          "Please select property from Seller API response first",
-                      });
-                      return;
-                    }
-                    const mainKey: any = get(keys, "[0]");
-                    setSelectedKeys([mainKey]);
-                  }}
-                />
-              </div>
+
+            <div className={styles.tree}>
+              <Tree
+                data-testid="tree-item"
+                selectedKeys={selectedKeys}
+                treeData={newTreeData}
+                selectable
+                onSelect={(keys: Key[]) => {
+                  if (!activeResponseName) {
+                    notification.warning({
+                      message:
+                        "Please select property from Seller API response first",
+                    });
+                    return;
+                  }
+                  const mainKey: any = get(keys, "[0]");
+                  setSelectedKeys([mainKey]);
+                }}
+              />
             </div>
           </>
         )}

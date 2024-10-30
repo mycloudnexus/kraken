@@ -5,6 +5,7 @@ import { GroupedByPath } from "@/utils/helpers/groupByPath";
 import { IMapperDetails } from "@/utils/types/env.type";
 import styles from "./index.module.scss";
 import { CollapseItem, CollapseLabel } from "./components";
+import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 
 type MappingDetailsListProps = {
   groupedPaths: GroupedByPath;
@@ -26,10 +27,11 @@ const MappingDetailsList = ({
     setActivePath,
     setActiveTab,
   } = useMappingUiStore();
+  const { setRightSideInfo } = useNewApiMappingStore();
 
   useEffect(() => {
     setActiveLabel(Object.keys(groupedPaths));
-  }, [groupedPaths])
+  }, [groupedPaths]);
 
   const initList = useCallback(() => {
     const headersList = Object.keys(groupedPaths);
@@ -39,14 +41,15 @@ const MappingDetailsList = ({
       setActivePath(initialMapItem.path);
       setActiveSelected(initialMapItem);
     }
-  }, [activePath])
+  }, [activePath]);
 
   useEffect(() => {
-    initList()
+    initList();
   }, [window.location.pathname]);
 
   const handleSelection = useCallback(
     (mapItem: IMapperDetails) => {
+      setRightSideInfo(undefined);
       setActiveSelected(mapItem);
       setActiveTab("request");
     },

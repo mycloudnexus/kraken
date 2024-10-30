@@ -16,7 +16,6 @@ type BuyerStore = {
 const DEFAULT_PARAMS = {
   page: 0,
   size: 50,
-  status: "activated",
   orderBy: "createdAt",
   direction: "DESC",
 };

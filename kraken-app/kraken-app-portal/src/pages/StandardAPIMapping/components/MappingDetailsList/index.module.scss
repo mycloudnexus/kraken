@@ -6,20 +6,28 @@
       overflow-wrap: anywhere;
       border-radius: 0px !important;
       &:hover {
-        background-color: rgba(41, 98, 255, 0.2);
-        border-right: 3px solid #2962FF;
+        background-color: rgb(219, 228, 251);
       }
     }
     &:global(> .ant-collapse-content) {
       &:global(> .ant-collapse-content-box) {
         padding: 0;
         padding-block: 0;
-        background-color: #F4F4F4;
-        
+        background-color: #f4f4f4;
       }
     }
   }
+  :global {
+    .ant-collapse-item {
+      border-radius: 0 !important;
+    }
+    .ant-collapse-item:has(.hightlight-one) {
+      background-color: rgba(41, 98, 255, 0.2) !important;
+      border-right: 3px solid #2962ff;
+    }
+  }
 }
+
 .collapseItem {
   position: relative;
   padding: 15px 10px 15px 15px;
@@ -30,7 +38,7 @@
 
   &:last-child {
     &:after {
-      content: '';
+      content: "";
       width: 2px;
       height: 30px;
       background: repeating-linear-gradient(
@@ -46,7 +54,7 @@
     }
   }
   &:after {
-    content: '';
+    content: "";
     width: 2px;
     height: 100%;
     background: repeating-linear-gradient(
@@ -65,7 +73,13 @@
     width: 2px;
     height: 12px;
     transform: rotateZ(90deg);
-    background: repeating-linear-gradient(to bottom, rgba(152, 161, 168, 0.7), rgba(152, 161, 168, 0.7) 2px, transparent 2px, transparent 6px);
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(152, 161, 168, 0.7),
+      rgba(152, 161, 168, 0.7) 2px,
+      transparent 2px,
+      transparent 6px
+    );
     position: absolute;
     top: 25px;
     left: 25px;
@@ -79,7 +93,7 @@
 
 .collapseItemActive {
   background-color: rgba(41, 98, 255, 0.2);
-  border-right: 3px solid #2962FF;
+  border-right: 3px solid #2962ff;
 }
 
 .labelWrapper {
@@ -88,7 +102,7 @@
   gap: 5px;
 }
 .highlighted {
-  color: #2962FF;
+  color: #2962ff;
 }
 .dot {
   width: 8px;
@@ -97,7 +111,7 @@
   border-radius: 50%;
   position: relative;
   &:after {
-    content: '';
+    content: "";
     width: 2px;
     height: 15px;
     background: repeating-linear-gradient(
@@ -123,22 +137,26 @@
   position: relative;
   max-height: 480px;
   overflow: hidden;
-  box-shadow: #2962FF;
+  box-shadow: #2962ff;
   &:after {
-    content: '';
+    content: "";
     position: absolute;
     left: 0px;
     right: 0px;
     height: 10%;
     bottom: 0px;
-    background: linear-gradient(180deg, rgba(139,167,32,0) 0%, rgba(255,255,255,1) 100%);
+    background: linear-gradient(
+      180deg,
+      rgba(139, 167, 32, 0) 0%,
+      rgba(255, 255, 255, 1) 100%
+    );
     pointer-events: none;
   }
 }
 
 .showMoreLess {
   background: white;
-  color: rgba(22, 93, 255, 1) ;
+  color: rgba(22, 93, 255, 1);
   cursor: pointer;
   padding: 10px 20px;
 }

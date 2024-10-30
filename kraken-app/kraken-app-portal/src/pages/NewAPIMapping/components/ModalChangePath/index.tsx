@@ -1,6 +1,6 @@
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Modal, Flex, Button } from 'antd';
-import Text from "@/components/Text";
+import { Text } from "@/components/Text";
 
 export const showModalChangePath = (handleSave: () => void, handleRevert: () => void) => {
   Modal.confirm({

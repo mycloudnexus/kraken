@@ -1,3 +1,4 @@
+import RequestItem from "@/pages/NewAPIMapping/components/RequestItem";
 import ResponseMapping from "@/pages/NewAPIMapping/components/ResponseMapping";
 import RightAddSellerProp from "@/pages/NewAPIMapping/components/RightAddSellerProp";
 import RightAddSonataProp, {
@@ -14,6 +15,7 @@ import groupByPath from "@/utils/helpers/groupByPath";
 import { queryClient } from "@/utils/helpers/reactQuery";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render, renderHook } from "@testing-library/react";
+import { omit } from "lodash";
 import { BrowserRouter } from "react-router-dom";
 
 beforeAll(() => {
@@ -1053,56 +1055,56 @@ test("groupPath fnc", () => {
 });
 
 test("parse fnc", () => {
-  const result = buildInitListMapping([
-    {
-      name: "mapper.quote.uni.add.state",
-      title: "Quote State Mapping",
-      source: "@{{responseBody.id}}",
-      target: "@{{quoteItem[*].state}}",
-      targetType: "enum",
-      description: "quote state mapping",
-      targetValues: [
-        "accepted",
-        "acknowledged",
-        "answered",
-        "approved.orderable",
-        "approved.orderableAlternate",
-        "inProgress",
-        "inProgress.draft",
-        "abandoned",
-        "rejected",
-        "unableToProvide",
-      ],
-      valueMapping: {
-        "1": "accepted",
-        "2": "accepted",
-        a: "inProgress.draft",
-        b: "inProgress.draft",
-        dd: "accepted",
-        ee: "inProgress",
-        fff: "inProgress",
+  const result = buildInitListMapping(
+    [
+      {
+        name: "mapper.quote.uni.add.state",
+        title: "Quote State Mapping",
+        source: "@{{responseBody.id}}",
+        target: "@{{quoteItem[*].state}}",
+        targetType: "enum",
+        description: "quote state mapping",
+        targetValues: [
+          "accepted",
+          "acknowledged",
+          "answered",
+          "approved.orderable",
+          "approved.orderableAlternate",
+          "inProgress",
+          "inProgress.draft",
+          "abandoned",
+          "rejected",
+          "unableToProvide",
+        ],
+        valueMapping: {
+          "1": "accepted",
+          "2": "accepted",
+          a: "inProgress.draft",
+          b: "inProgress.draft",
+          dd: "accepted",
+          ee: "inProgress",
+          fff: "inProgress",
+        },
+        sourceLocation: "BODY",
+        targetLocation: "BODY",
+        requiredMapping: true,
       },
-      sourceLocation: "BODY",
-      targetLocation: "BODY",
-      requiredMapping: true,
-    },
-  ]);
-  expect(result).toEqual([
+    ],
+    "response"
+  );
+  expect(result.map((value) => omit(value, "key"))).toEqual([
     {
       from: "accepted",
-      key: 1,
       name: "mapper.quote.uni.add.state",
       to: ["1", "2", "dd"],
     },
     {
       from: "inProgress.draft",
-      key: 2,
       name: "mapper.quote.uni.add.state",
       to: ["a", "b"],
     },
     {
       from: "inProgress",
-      key: 3,
       name: "mapper.quote.uni.add.state",
       to: ["ee", "fff"],
     },
@@ -1257,4 +1259,42 @@ test("SonataResponseMapping", () => {
     </QueryClientProvider>
   );
   expect(container).toBeInTheDocument();
+});
+
+test("requestItem render", () => {
+  const { container, getByTestId } = render(
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <RequestItem
+          index={2}
+          item={{
+            description: "",
+            name: "mapper.order.eline.add.duration.unit",
+            title: "order item Term unit",
+            source: "@{{productOrderItem[0].requestedItemTerm.duration.units}}",
+            target: "@{{requestBody.durationUnit}}",
+            sourceValues: [
+              "calendarMonths",
+              "calendarDays",
+              "calendarHours",
+              "calendarMinutes",
+              "businessDays",
+              "businessHours",
+            ],
+            valueMapping: {
+              calendarMonths: "calendarMonths",
+              calendarDays: "calendarDays",
+            },
+            sourceLocation: "BODY",
+            targetLocation: "BODY",
+            customizedField: true,
+            requiredMapping: true,
+          }}
+        />
+      </BrowserRouter>
+    </QueryClientProvider>
+  );
+  expect(container).toBeInTheDocument();
+  const btnAdd = getByTestId("btn-add-state");
+  fireEvent.click(btnAdd);
 });

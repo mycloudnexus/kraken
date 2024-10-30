@@ -1,4 +1,4 @@
-import Text from "@/components/Text";
+import { Text } from "@/components/Text";
 import styles from "./index.module.scss";
 import { Col, Form, Row, Input, Checkbox, FormInstance } from "antd";
 import { IEnv } from "@/utils/types/env.type";

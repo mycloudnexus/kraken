@@ -1,6 +1,6 @@
 import Flex from "@/components/Flex";
-import { get, isArray, isBoolean, isEmpty, isObject } from "lodash";
 import { TreeDataNode, Typography } from "antd";
+import { get, isArray, isBoolean, isEmpty, isObject } from "lodash";
 
 const { Text } = Typography;
 
@@ -123,23 +123,25 @@ export const parseObjectDescriptionToTreeData = (
     }
     return {
       title: (
-        <Flex
-          justifyContent="flex-start"
-          style={{ width: "100%" }}
-          gap={4}
-          className="tree-item-wrapper"
-        >
-          <Text className={titleClassName} ellipsis={{ tooltip: true }}>
-            "{key}"
+        <>
+          <Text
+            className={titleClassName}
+            ellipsis={{ tooltip: true }}
+            style={{ flex: 1 }}
+          >
+            {key}
           </Text>
           <Text
             className={exampleClassName}
-            style={{ flex: `0 0 calc((40% + ${24 * level * 0.4}px))` }}
+            style={{
+              minWidth: 80,
+              borderLeft: "3px solid #f5f5f5",
+            }}
             ellipsis={{ tooltip: true }}
           >
             {renderValue(value, typeOfValue)}
           </Text>
-        </Flex>
+        </>
       ),
       key: buildPrefix(prefix, key, isArray(value) ? "[*]" : ""),
       selectable: isSonataResponse ? true : typeOfValue !== "object",

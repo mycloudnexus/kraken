@@ -1,4 +1,4 @@
-import Text from "@/components/Text";
+import { Text } from "@/components/Text";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { Button, Flex, Input, Modal } from "antd";
 

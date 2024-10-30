@@ -1,9 +1,7 @@
-.root {
+.container {
+  height: 100%;
   display: flex;
-  background: #f0f2f5;
-  height: calc(100vh - 78px);
-  width: calc(100vw - 240px);
-  min-width: 800px;
+  flex-direction: column;
   :global {
     .ant-form-item {
       margin-bottom: 18px;
@@ -11,23 +9,14 @@
   }
 }
 
-.container {
-  padding: 20px;
-  width: 100%;
-  min-width: 800px;
-  display: flex;
-  flex-direction: column;
-}
-
 .paper {
+  border-radius: 4px;
   margin-top: 4px;
   background: #fff;
   padding: 16px 20px;
   overflow-y: auto;
   box-sizing: border-box;
-  max-height: calc(100vh - 195px);
 
-  
   &::-webkit-scrollbar {
     display: block !important;
     height: 18px;

@@ -1,8 +1,8 @@
 import { PRODUCT } from "@/utils/constants/api";
 import request from "@/utils/helpers/request";
-import { INewVersionParams } from "@/utils/types/product.type";
-import { ICreateParameter } from "@/utils/types/env.type";
 import type { IPagingParams } from "@/utils/types/common.type";
+import { ICreateParameter } from "@/utils/types/env.type";
+import { INewVersionParams } from "@/utils/types/product.type";
 
 export const getListComponents = (
   productId: string,
@@ -50,12 +50,28 @@ export const getComponentDetail = (productId: string, componentId: string) => {
   return request(`${PRODUCT}/${productId}/components/${componentId}`);
 };
 
+export const getComponentDetailV2 = (
+  productId: string,
+  componentId: string
+) => {
+  return request(`/v2${PRODUCT}/${productId}/components/${componentId}`);
+};
+
 export const getComponentDetailMapping = (
   productId: string,
   componentId: string
 ) => {
   return request(
     `${PRODUCT}/${productId}/components/${componentId}/mapper-details`
+  );
+};
+
+export const getComponentSpecDetails = (
+  productId: string,
+  componentId: string
+) => {
+  return request(
+    `${PRODUCT}/${productId}/components/${componentId}/spec-details`
   );
 };
 
@@ -103,6 +119,27 @@ export const createApiKey = (payload: ICreateParameter) => {
       name,
     },
   });
+};
+
+export const getAPIServers = (
+  productId: string,
+  params: Record<string, any>
+) => {
+  return request(
+    `/v2${PRODUCT}/${productId}/components/${productId}/api-servers`,
+    {
+      params: { ...params, facetIncluded: true },
+    }
+  );
+};
+
+export const deleteAPIServer = (productId: string, componentId: string) => {
+  return request(
+    `/v2${PRODUCT}/${productId}/components/${componentId}/api-servers`,
+    {
+      method: "DELETE",
+    }
+  );
 };
 
 export const getAllDataPlaneList = (
@@ -224,14 +261,12 @@ export const getBuyerList = (
   });
 };
 
-export const getAuditLogs = (
-  params: Record<string, any>
-) => {
+export const getAuditLogs = (params: Record<string, any>) => {
   return request(`/audit/logs`, {
     method: "GET",
     params,
-  }); 
-}
+  });
+};
 
 export const createBuyer = (productId: string, data: any) => {
   return request(`${PRODUCT}/${productId}/buyers`, {
@@ -251,5 +286,87 @@ export const deployProduction = (productId: string, data: any) => {
   return request(`/v2${PRODUCT}/${productId}/deploy-stage-to-production`, {
     method: "POST",
     data,
+  });
+};
+
+export const getLatestRunningAPI = (productId: string, mapperKey: string) => {
+  return request(
+    `/v2${PRODUCT}/${productId}/latest-running-api-mapper-deployments?mapperKey=${mapperKey}`
+  );
+};
+
+export const getMappingTemplateReleaseHistory = (
+  productId: string,
+  params: any
+) => {
+  return request(`/v2${PRODUCT}/${productId}/template-upgrade/releases`, {
+    method: "GET",
+    params,
+  });
+};
+
+export const getMappingTemplateCurrentVersion = (productId: string) => {
+  return request(
+    `/v2${PRODUCT}/${productId}/template-upgrade/current-versions`,
+    {
+      method: "GET",
+    }
+  );
+};
+
+export const getMappingTemplateUpgradeList = (
+  productId: string,
+  params: any
+) => {
+  return request(
+    `/v2${PRODUCT}/${productId}/template-upgrade/template-deployments`,
+    {
+      method: "GET",
+      params,
+    }
+  );
+};
+
+export const getMappingTemplateUpgradeDetail = (
+  productId: string,
+  id: string
+) => {
+  return request(
+    `/v2${PRODUCT}/${productId}/template-upgrade/template-deployments/${id}`,
+    {
+      method: "GET",
+    }
+  );
+};
+
+export const productUpgradeStage = (productId: string, data: any) => {
+  return request(`/v2${PRODUCT}/${productId}/template-upgrade/stage`, {
+    method: "POST",
+    data,
+  });
+};
+
+export const productUpgradeProd = (productId: string, data: any) => {
+  return request(`/v2${PRODUCT}/${productId}/template-upgrade/production`, {
+    method: "POST",
+    data,
+  });
+};
+
+export const activateBuyer = (productId: string, id: string) => {
+  return request(`${PRODUCT}/${productId}/buyers/${id}/activate`, {
+    method: "POST",
+  });
+};
+
+export const deactivateBuyer = (productId: string, id: string) => {
+  return request(`${PRODUCT}/${productId}/buyers/${id}/deactivate`, {
+    method: "POST",
+  });
+};
+
+export const regenerateBuyerAccessToken = (productId: string, id: string) => {
+  return request(`${PRODUCT}/${productId}/buyers/${id}/access-tokens`, {
+    method: "POST",
   });
 };

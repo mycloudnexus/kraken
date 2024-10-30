@@ -16,15 +16,20 @@ describe("test login", () => {
     expect(container).toBeInTheDocument();
   });
 
-  test("Login page fail", async () => {
+  test("Login page", async () => {
     vi.mock("@/hooks/login", async () => {
       const actual = await vi.importActual("@/hooks/login");
       return {
         ...actual,
-        useLogin: vi.fn().mockResolvedValue({
-          mutateAsync: vi
-            .fn()
-            .mockRejectedValue(new Error({ reason: "abc" } as any)),
+        useLogin: vi.fn().mockReturnValue({
+          mutateAsync: vi.fn().mockReturnValue({
+            data: {
+              accessToken: "a",
+              expiresIn: "b",
+              refreshToken: "c",
+              refreshTokenExpiresIn: "d",
+            },
+          }),
           isLoading: false,
         }),
       };

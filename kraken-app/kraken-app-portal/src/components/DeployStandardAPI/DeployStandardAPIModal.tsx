@@ -1,5 +1,5 @@
 import { Checkbox, Flex, Modal, Spin, Tag, notification } from "antd";
-import Text from "../Text";
+import { Text } from "../Text";
 import styles from "./index.module.scss";
 import { InfoCircleFilled } from "@ant-design/icons";
 import {
