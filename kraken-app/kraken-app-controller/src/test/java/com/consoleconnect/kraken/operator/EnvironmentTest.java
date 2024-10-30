@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.*;
 
 import com.consoleconnect.kraken.operator.config.AppMgmtConfig;
 import com.consoleconnect.kraken.operator.config.AppMgmtProperty;
+import com.consoleconnect.kraken.operator.controller.dto.CreateEnvRequest;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import java.util.List;
@@ -36,7 +37,9 @@ class EnvironmentTest extends AbstractIntegrationTest {
     Assertions.assertNotNull(property);
     AppMgmtProperty.Product env = new AppMgmtProperty.Product();
     env.setKey(UUID.randomUUID().toString());
-    env.setEnvironments(List.of("dev"));
+    CreateEnvRequest createEnvRequest = new CreateEnvRequest();
+    createEnvRequest.setName("dev");
+    env.setEnvironments(List.of(createEnvRequest));
     property.setProducts(List.of(env));
     Assertions.assertNotNull(property.getProducts());
   }

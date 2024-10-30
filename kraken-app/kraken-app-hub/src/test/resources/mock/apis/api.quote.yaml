@@ -6,8 +6,8 @@ metadata:
   name: Quote Management
   labels:
     mef-api-release: grace
-    order-api-version: v10
-  version: 1
+    quote-api-version: v8
+  version: 8
 spec:
   supportedProductTypesAndActions:
     - path: /mefApi/sonata/quoteManagement/v8/quote
@@ -45,14 +45,18 @@ spec:
                 if(input.quoteItem['product']['productConfiguration']['@type'] == 'UNI') {
                   if(input.instantSyncQuote === true) {
                     targetAPIConfigKey = 'mef.sonata.api-target.quote.uni.add.sync';
+                    matrixConfigKey = 'mef.sonata.api.matrix.quote.uni.add.sync'
                   } else {
                     targetAPIConfigKey = 'mef.sonata.api-target.quote.uni.add';
+                    matrixConfigKey = 'mef.sonata.api.matrix.quote.uni.add'
                   }
                 } else if(input.quoteItem['product']['productConfiguration']['@type'] == 'ACCESS_E_LINE') {
                   if(input.instantSyncQuote === true) {
                     targetAPIConfigKey = 'mef.sonata.api-target.quote.eline.add.sync';
+                    matrixConfigKey = 'mef.sonata.api.matrix.quote.eline.add.sync'
                   } else {
                     targetAPIConfigKey = 'mef.sonata.api-target.quote.eline.add';
+                    matrixConfigKey = 'mef.sonata.api.matrix.quote.eline.add'
                   }
                 } else {
                   targetAPIConfigKey = 'targetKey:notFound';
@@ -61,12 +65,18 @@ spec:
                   quoteType: input.quoteItem['product']['productConfiguration']['@type'],
                   instantSyncQuote: input.instantSyncQuote,
                   forwardDownstream: forwardDownstream,
-                  targetAPIConfigKey: targetAPIConfigKey
+                  targetAPIConfigKey: targetAPIConfigKey,
+                  matrixConfigKey: matrixConfigKey
                 };
                 return JSON.stringify(ret);
               }
           outputKey: quote
 
+        - id: mapping_matrix_check_quote
+          actionType: buildin@mapping-matrix-checker
+          env:
+            mappingMatrixKey: ${quote.matrixConfigKey}
+            targetKey: ${quote.targetAPIConfigKey}
         - id: persist_http_request
           actionType: buildin@db
           env:
@@ -88,7 +98,6 @@ spec:
             entity: ${entity}
           with:
             render: true
-            replaceStar: true
           outputKey: targetApiConfig
 
         - id: rewrite-path
@@ -183,7 +192,6 @@ spec:
                 return JSON.stringify(ret);
               }
           outputKey: quote
-
         - id: load-downstream-api-config-quote-read
           actionType: buildin@load-target-api-config
           env:
@@ -217,39 +225,118 @@ spec:
           env:
             code: ${targetApiConfig.endpoints[0].responseBody}
             inputs: ${targetApiConfig.inputs}
+    - trigger:
+        path: /mefApi/sonata/quoteManagement/v8/quote/hub
+        method: post
+      metadata:
+        cacheRequestBody: true
+      actions:
+        - id: calculate_quote_event_types_via_javascript
+          actionType: engine@javascript
+          env:
+            query: ${body.query}
+          with:
+            code: |
+              (jsonStr) => {
+                console.log("input: " + jsonStr);
+                let input = JSON.parse(jsonStr);
+                let query = input.query;
+                let arr = query.split("=");
+                let eventArr = arr[1].split(",");
+                let ret = {
+                  "eventTypes": eventArr,
+                  "targetAPIConfigKey": "mef.sonata.api-target.hub.add"
+                };
+                return JSON.stringify(ret);
+              }
+          outputKey: event
+        - id: register-quote-event
+          actionType: buildin@register-event
+          env:
+            eventTypes: ${event.eventTypes}
+          with:
+            action: register
+
+        - id: load-downstream-api-config
+          actionType: buildin@load-target-api-config
+          env:
+            configKey: ${event.targetAPIConfigKey}
+            mefRequestBody: ${body}
+            entity: ${entity}
+          with:
+            render: true
+          outputKey: targetApiConfig
+
+        - id: mock-response
+          actionType: buildin@mock-response
+
+        - id: modify-response-body
+          actionType: buildin@modify-response-body
+          with:
+            engine: spel
+          env:
+            code: ${targetApiConfig.endpoints[0].responseBody}
+            inputs: ${targetApiConfig.inputs}
 links:
   - targetAssetKey: mef.sonata.api-target.quote.eline.add
     relationship: implementation.target
+    group: mef.sonata.api-target.quote.eline.add
   - targetAssetKey: mef.sonata.api-target.quote.eline.read
     relationship: implementation.target
+    group: mef.sonata.api-target.quote.eline.read
   - targetAssetKey: mef.sonata.api-target.quote.uni.add
     relationship: implementation.target
+    group: mef.sonata.api-target.quote.uni.add
   - targetAssetKey: mef.sonata.api-target.quote.uni.read
     relationship: implementation.target
+    group: mef.sonata.api-target.quote.uni.read
   - targetAssetKey: mef.sonata.api-target.quote.eline.add.sync
     relationship: implementation.target
+    group:  mef.sonata.api-target.quote.eline.add.sync
   - targetAssetKey: mef.sonata.api-target.quote.eline.read.sync
     relationship: implementation.target
+    group: mef.sonata.api-target.quote.eline.read.sync
   - targetAssetKey: mef.sonata.api-target.quote.uni.add.sync
     relationship: implementation.target
+    group: mef.sonata.api-target.quote.uni.add.sync
   - targetAssetKey: mef.sonata.api-target.quote.uni.read.sync
     relationship: implementation.target
+    group: mef.sonata.api-target.quote.uni.read.sync
   - targetAssetKey: mef.sonata.api-spec.quote
     relationship: implementation.standard.api-spec
-
   - targetAssetKey: mef.sonata.api-target-mapper.quote.eline.add
     relationship: implementation.target-mapper
+    group: mef.sonata.api-target.quote.eline.add
+  - targetAssetKey: mef.sonata.api.matrix.quote.eline.add
+    relationship: implementation.matrix
+    group: mef.sonata.api-target.quote.eline.add
   - targetAssetKey: mef.sonata.api-target-mapper.quote.uni.add
     relationship: implementation.target-mapper
+    group: mef.sonata.api-target.quote.uni.add
+  - targetAssetKey: mef.sonata.api.matrix.quote.uni.add
+    relationship: implementation.matrix
+    group: mef.sonata.api-target.quote.uni.add
   - targetAssetKey: mef.sonata.api-target-mapper.quote.uni.read
     relationship: implementation.target-mapper
+    group: mef.sonata.api-target.quote.uni.read
   - targetAssetKey: mef.sonata.api-target-mapper.quote.eline.read
     relationship: implementation.target-mapper
+    group: mef.sonata.api-target.quote.eline.read
   - targetAssetKey: mef.sonata.api-target-mapper.quote.eline.add.sync
     relationship: implementation.target-mapper
+    group: mef.sonata.api-target.quote.eline.add.sync
+  - targetAssetKey: mef.sonata.api.matrix.quote.eline.add.sync
+    relationship: implementation.matrix
+    group: mef.sonata.api-target.quote.eline.add.sync
   - targetAssetKey: mef.sonata.api-target-mapper.quote.uni.add.sync
     relationship: implementation.target-mapper
+    group: mef.sonata.api-target.quote.uni.add.sync
+  - targetAssetKey: mef.sonata.api.matrix.quote.uni.add.sync
+    relationship: implementation.matrix
+    group: mef.sonata.api-target.quote.uni.add.sync
   - targetAssetKey: mef.sonata.api-target-mapper.quote.uni.read.sync
     relationship: implementation.target-mapper
+    group: mef.sonata.api-target.quote.uni.read.sync
   - targetAssetKey: mef.sonata.api-target-mapper.quote.eline.read.sync
     relationship: implementation.target-mapper
+    group: mef.sonata.api-target.quote.eline.read.sync

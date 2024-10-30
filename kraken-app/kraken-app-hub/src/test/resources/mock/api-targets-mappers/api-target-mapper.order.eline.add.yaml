@@ -19,13 +19,123 @@ spec:
       serverKey: mef.sonata.api-target-spec.con1718940696857
       mappers:
         request:
-          - name: order.eline.add.buyerId.mapper
-            title: ""
-            description: ""
+          - name: mapper.order.eline.add.buyerId
+            title: The unique identifier of the organization that is acting as the a Buyer.
             source: "@{{buyerId}}"
+            target: "@{{username}}"
+            description:
+            replaceStar: true
             sourceLocation: QUERY
-            target: "@{{companyName}}"
             targetLocation: PATH
+            customizedField: false
+            requiredMapping: false
+          - name: mapper.order.eline.add.duration
+            title: "order item Term duration"
+            source: "@{{productOrderItem[0].requestedItemTerm.duration.amount}}"
+            target: "@{{duration}}"
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.order.eline.add.duration.unit
+            title: "order item Term unit"
+            source: "@{{productOrderItem[0].requestedItemTerm.duration.units}}"
+            target: "@{{durationUnit}}"
+            sourceType: enum
+            sourceValues:
+              - calendarMonths
+              - calendarDays
+              - calendarHours
+              - calendarMinutes
+              - businessDays
+              - businessHours
+            sourceLocation: BODY
+            targetLocation: BODY
+            valueMapping:
+              calendarMonths: m
+              calendarDays: d
+            requiredMapping: true
+          - name: mapper.order.eline.add.endOfTermAction
+            title: "MEFEndOfTermAction"
+            source: "@{{productOrderItem[0].requestedItemTerm.endOfTermAction}}"
+            target: "roll"
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.order.eline.add.rollInterval.amount
+            title: " quote item Term roll duration"
+            source: "@{{productOrderItem[0].requestedItemTerm.rollInterval.amount}}"
+            target: ""
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.order.eline.add.rollInterval.units
+            title: " quote item Term roll unit"
+            source: "@{{productOrderItem[0].requestedItemTerm.rollInterval.units}}"
+            target: ""
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.order.eline.add.bandwidthUnit
+            title: "The unit of bandwidth"
+            source: "@{{productOrderItem[0].product.productConfiguration.bandwidthUnit}}"
+            sourceType: enum
+            sourceValues:
+              - MBPS
+              - GBPS
+            target: "MBPS"
+            sourceLocation: BODY
+            targetLocation: BODY
+            valueMapping: {}
+            requiredMapping: true
+          - name: mapper.order.eline.add.bandwidth
+            title: "Bandwidth of the UNI"
+            source: "@{{productOrderItem[0].product.productConfiguration.bandwidth}}"
+            target: "@{{speed}}"
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.order.eline.add.name
+            title: "The name of the UNI"
+            source: "@{{productOrderItem[0].product.productConfiguration.name}}"
+            target: "@{{name}}"
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.order.eline.add.paymentType
+            title: "The payment type of the UNI"
+            source: "@{{productOrderItem[0].product.productConfiguration.paymentType}}"
+            target: "@{{paymentType}}"
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.order.eline.add.classOfService
+            title: "The class of Service of the Eline"
+            source: "@{{productOrderItem[0].product.productConfiguration.classOfService}}"
+            target: "@{{classOfService}}"
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.order.eline.add.srcUNI
+            title: "source UNI or ENNI id"
+            source: "@{{productOrderItem[0].product.productRelationship[0].id}}"
+            target: "@{{portId}}"
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.order.eline.add.destUNI
+            title: "destination UNI id"
+            source: "@{{productOrderItem[0].product.productRelationship[1].id}}"
+            target: "@{{destPortId}}"
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.order.eline.add.productOffering.id
+            title: "id of a Product Offering"
+            source: "@{{productOrderItem[0].product.productOffering.id}}"
+            target: "ACCESS_E_LINE"
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: true
         response:
           - name: mapper.order.eline.add.state
             title: Order State Mapping
@@ -66,11 +176,20 @@ spec:
           - name: mapper.order.eline.add.orderId
             title: Order Id location
             description: orderId mapping
-            source: ""
-            sourceLocation: ""
+            source: "@{{responseBody.id}}"
+            sourceLocation: BODY
+            target: "@{{orderId}}"
+            targetLocation: BODY
+            customizedField: false
+            requiredMapping: true
           - name: mapper.order.eline.add.instanceId
             title: Instance Id location
             description: order instanceId mapping
-            source: ""
-            sourceLocation: ""
+            source: "@{{responseBody.port.id}}"
+            sourceLocation: BODY
+            target: "@{{instanceId}}"
+            targetLocation: BODY
+            customizedField: false
+            requiredMapping: true
+
 

@@ -19,12 +19,102 @@ spec:
       serverKey: mef.sonata.api-target-spec.con1718940696857
       mappers:
         request:
-          - name: mapper.order.uni.add.companyName
-            title: Property mapping
-            source: "@{{buyerId}}"
+          - name: mapper.order.uni.add.buyerId
+            title: >-
+              The unique identifier of the organization that is acting as the a
+              Buyer.
+            source: '@{{buyerId}}'
             target: "@{{companyName}}"
+            description: ""
             sourceLocation: QUERY
             targetLocation: PATH
+            requiredMapping: false
+          - name: mapper.order.uni.add.duration.units
+            title: "order item Term unit"
+            source: "@{{productOrderItem[0].requestedItemTerm.duration.units}}"
+            target: "@{{durationUnit}}"
+            sourceType: enum
+            sourceValues:
+              - calendarMonths
+              - calendarDays
+              - calendarHours
+              - calendarMinutes
+              - businessDays
+              - businessHours
+            sourceLocation: BODY
+            targetLocation: BODY
+            valueMapping:
+              calendarMonths: m
+            requiredMapping: true
+          - name: mapper.order.eline.add.endOfTermAction
+            title: "MEFEndOfTermAction"
+            source: "@{{productOrderItem[0].requestedItemTerm.endOfTermAction}}"
+            target: "roll"
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.order.eline.add.rollInterval.amount
+            title: " quote item Term roll duration"
+            source: "@{{productOrderItem[0].requestedItemTerm.rollInterval.amount}}"
+            target: ""
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.order.eline.add.rollInterval.units
+            title: " quote item Term roll unit"
+            source: "@{{productOrderItem[0].requestedItemTerm.rollInterval.units}}"
+            target: ""
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.order.uni.add.place.id
+            title: >-
+              the id of the place where the products' installation must be done.
+            source: '@{{productOrderItem[0].product.place[0].id}}'
+            target: '@{{dataCenterFacility}}'
+            description: ''
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.order.uni.add.bandwidthUnit
+            title: "The unit of bandwidth"
+            source: "@{{productOrderItem[0].product.productConfiguration.bandwidthUnit}}"
+            sourceType: enum
+            sourceValues:
+              - MBPS
+              - GBPS
+            target: "MBPS"
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.order.uni.add.bandwidth
+            title: "Bandwidth of the UNI"
+            source: "@{{productOrderItem[0].product.productConfiguration.bandwidth}}"
+            target: "@{{speed}}"
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.order.uni.add.name
+            title: "The name of the UNI"
+            source: "@{{productOrderItem[0].product.productConfiguration.name}}"
+            target: "@{{portName}}"
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.order.uni.add.paymentType
+            title: "The payment type of the UNI"
+            source: "@{{productOrderItem[0].product.productConfiguration.paymentType}}"
+            target: "@{{paymentType}}"
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.order.uni.add.productOffering.id
+            title: "id of a Product Offering"
+            source: "@{{productOrderItem[0].product.productOffering.id}}"
+            target: "UNI"
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: true
         response:
           - name: mapper.order.uni.add.state
             title: Order State Mapping
@@ -65,15 +155,19 @@ spec:
             sourceLocation: BODY
             requiredMapping: true
           - name: mapper.order.uni.add.orderId
-            title: Order Id location
-            id: orderId
-            description: Please specify the field that represent the order Id from Seller API response
-            source: ""
-            sourceLocation: ""
+            title: order Id from seller
+            source: "@{{responseBody.id}}"
+            target: '@{{orderId}}'
+            description: orderId mapping
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: true
           - name: mapper.order.uni.add.instanceId
-            title: Instance Id location
-            id: instanceId
-            description: Please specify the field that represent the instance Id from Seller API response
-            source: ""
-            sourceLocation: ""
+            title: instance id from seller
+            source: "@{{responseBody.port.id}}"
+            target: '@{{instanceId}}'
+            description: order instanceId mapping
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: false
 

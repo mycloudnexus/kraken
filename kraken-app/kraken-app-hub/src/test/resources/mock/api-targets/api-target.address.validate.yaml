@@ -24,19 +24,19 @@ spec:
             "validationResult": "((mefResponseBody.bestMatchGeographicAddress.id == '' ? (mefResponseBody.alternateGeographicAddress.size() == 0 ?'fail':'partial'): 'success'))",
             "alternateGeographicAddress": [
                 {
-                    "id": "@{{alternateGeographicAddress[*].id}}",
+                    "id": "",
                     "@type": "FieldedAddress",
-                    "country": "@{{alternateGeographicAddress[*].country}}",
-                    "city": "@{{alternateGeographicAddress[*].city}}",
-                    "streetName": "@{{alternateGeographicAddress[*].streetName}}"
+                    "country": "",
+                    "city": "",
+                    "streetName": ""
                 }
             ],
             "provideAlternative": "${mefRequestBody.provideAlternative}",
             "submittedGeographicAddress": "${mefRequestBody.submittedGeographicAddress}",
             "bestMatchGeographicAddress": {
-                "id": "@{{bestMatchGeographicAddress.id}}",
+                "id": "",
                 "type": "FieldedAddress",
-                "city": "@{{bestMatchGeographicAddress.city}}",
-                "country": "@{{bestMatchGeographicAddress.country}}"
+                "city": "",
+                "country": ""
             }
         }
