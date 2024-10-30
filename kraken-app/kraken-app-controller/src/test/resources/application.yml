@@ -82,7 +82,5 @@ app:
     endpoints:
       exposure:
         include: asset, component, product, ingestion, component-operation
-
-
   mgmt:
     mgmt-server-enabled: false
