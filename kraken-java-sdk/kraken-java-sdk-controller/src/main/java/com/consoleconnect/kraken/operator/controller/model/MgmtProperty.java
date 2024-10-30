@@ -10,7 +10,6 @@ public class MgmtProperty {
   private boolean enabled;
   private String defaultEnv = "stage";
   private boolean mgmtServerEnabled = false;
-  private boolean demoEnvEnabled = true;
 
   private APIToken apiToken = new APIToken();
   private String buyerTokenExpiredSeconds = DEFAULT_TOKEN_EXPIRED_SECONDS;

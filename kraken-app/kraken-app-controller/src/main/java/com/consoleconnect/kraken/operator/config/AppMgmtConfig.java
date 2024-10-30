@@ -12,10 +12,4 @@ public class AppMgmtConfig {
   public AppMgmtProperty appMgmtProperty() {
     return new AppMgmtProperty();
   }
-
-  @Bean
-  @ConfigurationProperties(prefix = "app.demo")
-  public AppDemoProperty appDemoProperty() {
-    return new AppDemoProperty();
-  }
 }

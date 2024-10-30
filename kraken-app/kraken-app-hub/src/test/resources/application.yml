@@ -67,7 +67,7 @@ springdoc:
     config-url: /v3/api-docs/swagger-config
     urls:
       - url: /v3/api-docs
-        name: Kraken Operator
+        name: Kraken Hub
   servers:
     - url: http://localhost:8000
       description: localhost

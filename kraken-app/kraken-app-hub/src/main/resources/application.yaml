@@ -99,10 +99,10 @@ app:
       enabled: false
   env:
     seller:
-      name: consoleconnect
+      name: kraken
       number: N/A
       role: sellerContact
-      emailAddress: support@consoleconnect.com
+      emailAddress: support@kraken.com
   filter-headers:
     - token
     - Authorization

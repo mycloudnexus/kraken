@@ -7,6 +7,3 @@ app:
           name: stage
         - id: e1f5d4f6-1cd9-4071-b08c-da72aadc05fe
           name: production
-  demo:
-    default-buyer-id: demo-buyer-1
-    enabled: true
