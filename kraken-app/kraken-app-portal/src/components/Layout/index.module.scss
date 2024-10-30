@@ -1,11 +1,49 @@
+@import "../../variables.scss";
+
 .content {
   display: flex;
-  height: calc(100vh - 78px);
+  height: calc(100vh - 58px);
   overflow: hidden;
 }
 
 .main {
   ::-webkit-scrollbar {
     display: none;
+  }
+}
+
+.layout {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  background-color: $bg;
+  padding: 0 20px 20px;
+
+  .pageTitle {
+    min-height: 44px;
+    max-height: 52px;
+    font-weight: 400;
+    font-size: 16px;
+    width: 100%;
+    justify-content: space-between;
+
+    &:has(button) {
+      height: 52px;
+    }
+  }
+
+  .pageContent {
+    flex: 1;
+    overflow: auto !important;
+
+    :global {
+      .ant-spin-nested-loading,
+      .ant-spin-container {
+        width: 100%;
+        height: 100%;
+      }
+    }
   }
 }

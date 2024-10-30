@@ -3,7 +3,7 @@ import { Button, Col, Flex, Row } from "antd";
 
 import { Step1Icon, RightArrow, Step2Icon, Step3Icon, Step4Icon } from "./Icon";
 import { Fragment } from "react/jsx-runtime";
-import Text from "@/components/Text";
+import { Text } from "@/components/Text";
 import { useBoolean } from "usehooks-ts";
 const step = [
   {

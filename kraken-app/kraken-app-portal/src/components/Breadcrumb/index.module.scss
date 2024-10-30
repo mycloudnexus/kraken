@@ -1,0 +1,7 @@
+.canClick {
+  padding: 0 4px;
+  &:hover {
+    background: #e3e6eb;
+    border-radius: 2px;
+  }
+}

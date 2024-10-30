@@ -1,12 +1,12 @@
+import { PageLayout } from "@/components/Layout";
 import LogMethodTag from "@/components/LogMethodTag";
-
 import { useGetProductEnvActivities, useGetProductEnvs } from "@/hooks/product";
 import { useCommonListProps } from "@/hooks/useCommonListProps";
+import useSize from "@/hooks/useSize";
 import { toDateTime } from "@/libs/dayjs";
 import { useAppStore } from "@/stores/app.store";
 import { DEFAULT_PAGING } from "@/utils/constants/common";
 import { IActivityLog } from "@/utils/types/env.type";
-
 import {
   Button,
   DatePicker,
@@ -18,14 +18,13 @@ import {
   Space,
 } from "antd";
 import { ColumnsType } from "antd/es/table";
-
-import { useCallback, useEffect, useMemo, useState } from "react";
+import dayjs from "dayjs";
+import { debounce, omit } from "lodash";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import ActivityDetailModal from "./components/ActivityDetailModal";
 import styles from "./index.module.scss";
-import { debounce, omit } from "lodash";
 
-import dayjs from "dayjs";
 const { RangePicker } = DatePicker;
 
 const initPagination = {
@@ -54,6 +53,10 @@ const EnvironmentActivityLog = () => {
   const { data: envData, isLoading: loadingEnv } =
     useGetProductEnvs(currentProduct);
   const [form] = Form.useForm();
+  const ref = useRef<any>();
+  const size = useSize(ref);
+  const refWrapper = useRef<any>();
+  const sizeWrapper = useSize(refWrapper);
 
   const {
     tableData,
@@ -155,10 +158,12 @@ const EnvironmentActivityLog = () => {
       key: "date",
       title: "Time",
       render: (log: IActivityLog) => toDateTime(log.createdAt),
+      width: 200,
     },
     {
       key: "action",
-      title: "",
+      title: "Action",
+      width: 200,
       render: (log: IActivityLog) => (
         <Button
           type="link"
@@ -173,9 +178,9 @@ const EnvironmentActivityLog = () => {
     },
   ];
   return (
-    <div className={styles.wrapper}>
-      <div className={styles.contentWrapper}>
-        <Flex align="center" className={styles.filterWrapper}>
+    <PageLayout title="API activity log">
+      <div className={styles.contentWrapper} ref={refWrapper}>
+        <Flex align="center" className={styles.filterWrapper} ref={ref}>
           <Form
             initialValues={{ envId }}
             form={form}
@@ -256,7 +261,9 @@ const EnvironmentActivityLog = () => {
               onShowSizeChange: handlePaginationShowSizeChange,
               showTotal: (total) => `Total ${total} items`,
             }}
-            scroll={{ y: `calc(100vh - 310px)` }}
+            scroll={{
+              y: (sizeWrapper?.height ?? 0) - (size?.height ?? 0) - 120,
+            }}
           />
         </div>
       </div>
@@ -267,7 +274,7 @@ const EnvironmentActivityLog = () => {
         open={modalOpen}
         setOpen={(value) => setModalOpen(value)}
       />
-    </div>
+    </PageLayout>
   );
 };
 

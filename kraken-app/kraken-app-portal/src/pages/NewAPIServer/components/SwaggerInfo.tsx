@@ -1,4 +1,4 @@
-import Text from "@/components/Text";
+import { Text } from "@/components/Text";
 import styles from "./index.module.scss";
 import { get, isEmpty } from "lodash";
 import { Collapse, Table } from "antd";

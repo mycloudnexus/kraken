@@ -6,7 +6,7 @@ import APIEditor from "./APIEditor";
 import APIViewer from "./APIViewer";
 import { CloseOutlined } from "@ant-design/icons";
 import Flex from "../Flex";
-import Text from "../Text";
+import { Text } from "../Text";
 import styles from "./index.module.scss";
 
 type Props = {

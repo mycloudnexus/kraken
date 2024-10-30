@@ -5,6 +5,20 @@ import utc from "dayjs/plugin/utc";
 
 dayjs.extend(utc);
 
+class ResizeObserver {
+  observe() {
+    return;
+  }
+  unobserve() {
+    return;
+  }
+  disconnect() {
+    return ;
+  }
+}
+
+(window as any).ResizeObserver = ResizeObserver;
+
 Object.defineProperty(window, "matchMedia", {
   writable: true,
   value: vi.fn().mockImplementation((query) => ({

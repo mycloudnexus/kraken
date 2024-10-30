@@ -1,5 +1,7 @@
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
+import { IRequestMapping } from "@/utils/types/component.type";
 import { Button, Flex } from "antd";
+import { nanoid } from "nanoid";
 import RequestItem from "../RequestItem";
 
 const RequestMapping = () => {
@@ -11,13 +13,14 @@ const RequestMapping = () => {
         title: "Title of Property Mapping",
         description: "description",
         customizedField: true,
-      },
+        id: nanoid(),
+      } as IRequestMapping,
     ]);
   };
   return (
     <Flex vertical gap={26}>
-      {requestMapping.map((it, index: number) => (
-        <RequestItem item={it} index={index} />
+      {requestMapping.map((it: IRequestMapping, index: number) => (
+        <RequestItem key={it.id} item={it} index={index} />
       ))}
       <Button
         type="primary"

@@ -1,5 +1,5 @@
 import { Button, Col, Row, notification } from "antd";
-import Text from "../Text";
+import { Text } from "../Text";
 import styles from "./index.module.scss";
 import { useMemo } from "react";
 import { get } from "lodash";

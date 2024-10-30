@@ -1,7 +1,7 @@
 import { CloseCircleOutlined } from "@ant-design/icons";
 import { Flex, Modal } from "antd";
 import styles from "./index.module.scss";
-import Text from "../Text";
+import { Text } from "../Text";
 
 type Props = {
   open: boolean;

@@ -1,0 +1,10 @@
+.popconfirm {
+  :global {
+    .ant-popconfirm-description {
+      margin-top: 0 !important;
+    }
+    .ant-popover-inner {
+      width: 20vw;
+    }
+  }
+}

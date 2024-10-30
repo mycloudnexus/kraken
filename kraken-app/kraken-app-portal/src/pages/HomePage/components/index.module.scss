@@ -1,15 +1,4 @@
-.componentsWrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  background: var(--Page-bg, #f0f2f5);
-  padding: 32px 20px 20px 20px;
-  overflow-y: scroll;
-  height: calc(100% - 54px);
-}
-
 .stepContainer {
-  margin-top: 24px;
   padding: 20px 20px 24px 20px;
   border-radius: 8px;
   background: linear-gradient(236deg, #2962ff -89.03%, #9584ff 90.4%);
@@ -54,6 +43,7 @@
       width: 100%;
       display: -webkit-box;
       -webkit-box-orient: vertical;
+      line-clamp: 2;
       -webkit-line-clamp: 2;
       min-height: 48px;
     }
@@ -83,6 +73,7 @@
       width: 100%;
       display: -webkit-box;
       -webkit-box-orient: vertical;
+      line-clamp: 4;
       -webkit-line-clamp: 4;
     }
     svg {
@@ -158,6 +149,7 @@
     width: 100%;
     display: -webkit-box;
     -webkit-box-orient: vertical;
+    line-clamp: 3;
     -webkit-line-clamp: 3;
     margin: 8px 0 4px;
   }
@@ -240,6 +232,6 @@
   :global(.ant-tooltip-content .ant-tooltip-inner) {
     max-height: 250px;
     overflow-y: auto;
-    width: 150%;
+    //width: 150%;
   }
 }

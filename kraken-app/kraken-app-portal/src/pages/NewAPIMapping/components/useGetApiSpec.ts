@@ -4,9 +4,9 @@ import {
   useGetComponentListV2,
 } from "@/hooks/product";
 import { extractOpenApiStrings } from "@/utils/helpers/schema";
-import transformTarget from "@/utils/helpers/transformTarget";
 import { decode } from "js-base64";
 import jsYaml from "js-yaml";
+import { nanoid } from "nanoid";
 import { useMemo, useCallback } from "react";
 
 const useGetApiSpec = (currentProduct: string, targetMapperKey: string) => {
@@ -60,16 +60,18 @@ const useGetApiSpec = (currentProduct: string, targetMapperKey: string) => {
     [endpoint]
   );
 
+  // ~ reset request mapping
   const resetMapping = useCallback(() => {
     return mappers?.request?.map((rm: any) => ({
       ...rm,
-      target: transformTarget(rm.target, rm.targetLocation),
+      id: nanoid(),
     }));
   }, [mappers?.request]);
 
   const resetResponseMapping = useCallback(() => {
     return mappers?.response?.map((rm: any) => ({
       ...rm,
+      id: nanoid(),
     }));
   }, [mappers?.response]);
 

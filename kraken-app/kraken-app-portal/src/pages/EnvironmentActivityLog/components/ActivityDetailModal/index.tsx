@@ -5,6 +5,7 @@ import { Flex, Button, Spin, Drawer } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { useCallback, useMemo } from "react";
 import ActivityDetailItem from "./ActivityDetailItem";
+import styles from "./index.module.scss";
 
 interface Props {
   envId: string;
@@ -41,6 +42,7 @@ const ActivityDetailModal = ({
         {
           key: "name",
           title: "Name",
+          width: 160,
           render: (item) => `${item.key}`,
         },
         {
@@ -69,12 +71,8 @@ const ActivityDetailModal = ({
         </div>
       }
     >
-      <Spin spinning={isLoading}>
-        <Flex
-          gap={18}
-          align="stretch"
-          style={{ maxHeight: "calc(100vh - 108px)" }}
-        >
+      <Flex className={styles.details}>
+        <Spin spinning={isLoading}>
           {activityList?.map((activity, n) => (
             <ActivityDetailItem
               key={`${activity.path}-${n}`}
@@ -83,8 +81,8 @@ const ActivityDetailModal = ({
               collapseItems={collapseItems}
             />
           ))}
-        </Flex>
-      </Spin>
+        </Spin>
+      </Flex>
     </Drawer>
   );
 };

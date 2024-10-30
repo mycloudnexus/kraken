@@ -1,6 +1,6 @@
 import { IEnv } from "@/utils/types/env.type";
 import styles from "./index.module.scss";
-import Text from "@/components/Text";
+import { Text } from "@/components/Text";
 import { Button, notification } from "antd";
 import { PRODUCT_CACHE_KEYS, useCreateApiKey } from "@/hooks/product";
 import { useCallback, useRef } from "react";

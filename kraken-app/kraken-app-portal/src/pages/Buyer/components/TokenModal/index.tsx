@@ -1,9 +1,9 @@
-import Text from "@/components/Text";
+import { Text } from "@/components/Text";
 import { IBuyer } from "@/utils/types/component.type";
-import { Flex, Modal, Typography } from "antd";
+import { Flex, Modal, Typography, notification } from "antd";
 import styles from "./index.module.scss";
 import { get } from "lodash";
-import { CopyOutlined } from "@ant-design/icons";
+import { CopyIcon } from "@/components/Icon";
 
 type Props = {
   open: boolean;
@@ -17,32 +17,42 @@ const TokenModal = ({ open, onClose, item }: Props) => {
       open={open}
       closable={false}
       className={styles.modal}
-      okText="Done"
+      okText="OK"
       onOk={onClose}
-      onCancel={onClose}
+      cancelButtonProps={{
+        style: { display: "none" },
+      }}
     >
       <Flex vertical gap={4}>
         <Text.NormalLarge>Here’s your generated token</Text.NormalLarge>
         <Text.LightMedium>
           This token will be used by buyer to call Sonata API in the
-          corresponding environment. Please copy to use it.
+          corresponding environment.
         </Text.LightMedium>
       </Flex>
-      <Flex style={{ marginTop: 24 }} className={styles.token}>
-        <Typography.Text
-          className={styles.tokenText}
-          ellipsis={{ tooltip: get(item, "buyerToken.accessToken", "") }}
-          copyable={{
-            icon: (
-              <Flex align="center" justify="flex-end" gap={2}>
-                <CopyOutlined />
-                <Text.LightMedium>Copy</Text.LightMedium>
-              </Flex>
-            ),
-          }}
-        >
+      <Flex
+        style={{ marginTop: 24 }}
+        className={styles.token}
+        align="flex-start"
+        gap={12}
+      >
+        <Typography.Paragraph className={styles.tokenText}>
           {get(item, "buyerToken.accessToken", "")}
-        </Typography.Text>
+        </Typography.Paragraph>
+        <CopyIcon
+          style={{ marginTop: 4 }}
+          role="none"
+          onClick={() => {
+            if (!navigator) {
+              return;
+            }
+            navigator.clipboard
+              .writeText(get(item, "buyerToken.accessToken", ""))
+              .then(() => {
+                notification.success({ message: "Copied!" });
+              });
+          }}
+        />
       </Flex>
     </Modal>
   );

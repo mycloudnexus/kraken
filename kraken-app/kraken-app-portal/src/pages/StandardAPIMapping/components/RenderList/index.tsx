@@ -1,5 +1,5 @@
 import LogMethodTag from "@/components/LogMethodTag";
-import Text from "@/components/Text";
+import { Text } from "@/components/Text";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { ROUTES } from "@/utils/constants/route";
 import { Button, Flex, Tag, Typography } from "antd";

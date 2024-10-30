@@ -1,9 +1,7 @@
 .content {
   display: flex;
   flex-direction: column;
-  gap: 16px;
   max-height: calc(100% - 35px);
-  overflow-y: auto;
 }
 
 .loading {
@@ -18,20 +16,21 @@
   box-sizing: border-box;
   cursor: pointer;
 
-  &:hover,
+  &:hover {
+    background: rgba(219, 228, 251, 0.4);
+  }
   &.active {
     background: #dbe4fb;
   }
 }
 
 .header {
-  padding: 16px 20px;
+  padding: 12px 20px;
   box-shadow: 0px -1px 0px 0px #f0f0f0 inset;
 }
 
 .container {
   padding: 20px;
-  overflow-y: auto;
 }
 
 .search {
@@ -52,8 +51,8 @@
       &::-webkit-scrollbar {
         display: none;
       }
-        -ms-overflow-style: none;
-        scrollbar-width: none;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
     }
   }
 }
@@ -62,4 +61,12 @@
   svg {
     width: 100%;
   }
+}
+
+.groupTitle {
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index: 2;
+  padding: 16px 0;
 }

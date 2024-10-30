@@ -1,18 +1,17 @@
-import { Col, Row, Spin } from "antd";
-import { useAppStore } from "@/stores/app.store";
-import yaml from "js-yaml";
-import { decode } from "js-base64";
-import { useCallback, useMemo } from "react";
+import { PageLayout } from "@/components/Layout";
 import {
   useGetComponentListAPI,
   useGetComponentListSpec,
 } from "@/hooks/product";
-import type { IUnifiedAsset } from "@/utils/types/common.type";
+import { useAppStore } from "@/stores/app.store";
 import { SPEC_VALUE } from "@/utils/constants/product";
-import Text from "@/components/Text";
-import ApiComponent from "./ApiComponent";
+import type { IUnifiedAsset } from "@/utils/types/common.type";
+import { Col, Row, Spin } from "antd";
+import { decode } from "js-base64";
+import yaml from "js-yaml";
 import { get, isEmpty, isUndefined, min } from "lodash";
-import styles from "./index.module.scss";
+import { useCallback, useMemo } from "react";
+import ApiComponent from "./ApiComponent";
 
 const ApiComponents = () => {
   const { currentProduct } = useAppStore();
@@ -76,10 +75,7 @@ const ApiComponents = () => {
   }, [componentList?.data, componentWithSpec?.data, specLoading, isLoading]);
 
   return (
-    <div className={styles.componentsWrapper}>
-      <Text.Custom size="20px" bold="500">
-        Standard API components {countComponent}
-      </Text.Custom>
+    <PageLayout title={`Standard API components ${countComponent}`}>
       <Spin spinning={specLoading || isLoading}>
         <Row gutter={[24, 24]} style={{ marginBottom: 24 }}>
           {componentList?.data?.map((i: IUnifiedAsset) => {
@@ -106,7 +102,7 @@ const ApiComponents = () => {
           })}
         </Row>
       </Spin>
-    </div>
+    </PageLayout>
   );
 };
 

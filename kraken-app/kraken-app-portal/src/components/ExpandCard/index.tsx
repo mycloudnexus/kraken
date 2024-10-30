@@ -1,7 +1,7 @@
 import { useBoolean } from "usehooks-ts";
 import Flex from "../Flex";
 import { DownOutlined, RightOutlined } from "@ant-design/icons";
-import Text from "../Text";
+import { Text } from "../Text";
 import { ReactNode } from "react";
 
 type Props = {

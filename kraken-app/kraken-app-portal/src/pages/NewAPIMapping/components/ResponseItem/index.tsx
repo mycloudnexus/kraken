@@ -1,21 +1,22 @@
-import { IResponseMapping } from "@/utils/types/component.type";
-import styles from "./index.module.scss";
-import { Button, Flex, Input, Select, Tooltip, Typography } from "antd";
-import Text from "@/components/Text";
 import MappingIcon from "@/assets/newAPIMapping/mapping-icon-response.svg";
-import { cloneDeep, difference, get, isEmpty, set } from "lodash";
+import { Text } from "@/components/Text";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
+import { IResponseMapping } from "@/utils/types/component.type";
 import {
   CheckOutlined,
   CloseOutlined,
   DeleteOutlined,
   EditOutlined,
-  RightOutlined,
 } from "@ant-design/icons";
-import { useBoolean } from "usehooks-ts";
-import { useEffect, useState } from "react";
-import { EnumRightType } from "@/utils/types/common.type";
+import { Button, Flex, Input, Select } from "antd";
 import clsx from "clsx";
+import { cloneDeep, difference, isEmpty, set } from "lodash";
+import { nanoid } from "nanoid";
+import { useEffect, useState } from "react";
+import { useBoolean } from "usehooks-ts";
+import { SourceInput } from "./SourceInput";
+import { TargetInput } from "./TargetInput";
+import styles from "./index.module.scss";
 
 type Props = {
   item: IResponseMapping;
@@ -27,17 +28,13 @@ const ResponseItem = ({ item, index }: Props) => {
     responseMapping,
     setResponseMapping,
     listMappingStateResponse: listMapping,
-    activeResponseName,
-    setRightSide,
-    setActiveResponseName,
     setListMappingStateResponse,
-    setActiveSonataResponse,
-    activeSonataResponse,
-    rightSide,
   } = useNewApiMappingStore();
 
   const [titleInput, setTitleInput] = useState(item.title || "");
-  const [descriptionInput, setDescriptionInput] = useState(item.description || "");
+  const [descriptionInput, setDescriptionInput] = useState(
+    item.description || ""
+  );
 
   const {
     value: isEditTitle,
@@ -78,17 +75,11 @@ const ResponseItem = ({ item, index }: Props) => {
     setResponseMapping(newResponse);
   };
 
-  const openSelectorForProp = (index?: number, name?: string) => {
-    setActiveResponseName(`${index}-${name}`);
-    setRightSide(EnumRightType.AddSellerResponse);
-  };
-
   const handleAdd = (name: string) => {
-    const newKey = get(listMapping, `[${listMapping.length - 1}].key`, 0) + 1;
     setListMappingStateResponse([
       ...listMapping,
       {
-        key: newKey,
+        key: nanoid(),
         from: undefined,
         to: undefined,
         name,
@@ -96,40 +87,22 @@ const ResponseItem = ({ item, index }: Props) => {
     ]);
   };
 
-  const handleDeleteMapping = (key: number) => {
+  const handleDeleteMapping = (key: React.Key) => {
     setListMappingStateResponse(listMapping.filter((item) => item.key !== key));
   };
 
-  const handleSelect = (value: string, key: number) => {
-
+  const handleSelect = (value: string, key: React.Key) => {
     const cloneArr = cloneDeep(listMapping);
     const itemIndex = listMapping.findIndex((l) => l.key === key);
     set(cloneArr, `[${itemIndex}].from`, value);
     setListMappingStateResponse(cloneArr);
   };
 
-  const handleChangeInput = (value: string[], key: number) => {
-
+  const handleChangeInput = (value: string[], key: React.Key) => {
     const cloneArr = cloneDeep(listMapping);
     const itemIndex = listMapping.findIndex((l) => l.key === key);
     set(cloneArr, `[${itemIndex}].to`, value);
     setListMappingStateResponse(cloneArr);
-  };
-
-  const handleChangeResponse = (
-    value: string,
-    name: string,
-    target: string
-  ) => {
-
-    const cloneObj = cloneDeep(responseMapping);
-    const itemIndex = cloneObj?.findIndex(
-      (i) => i.name === name && i.target === target
-    );
-    set(cloneObj, `[${itemIndex}].source`, value);
-    set(cloneObj, `[${itemIndex}].sourceLocation`, `BODY`);
-    setResponseMapping(cloneObj);
-    setActiveResponseName(undefined);
   };
 
   return (
@@ -221,68 +194,20 @@ const ResponseItem = ({ item, index }: Props) => {
           </Flex>
         )}
       </Flex>
-      <Flex className={styles.container} gap={8} wrap="wrap" align="center">
-        {!item.customizedField ? (
-          <div className={styles.target}>
-            <Typography.Text
-              ellipsis={{ tooltip: item.target }}
-              style={{ lineHeight: "32px", fontWeight: 400 }}
-            >
-              {!isEmpty(item?.target)
-                ? item?.target
-                : "No mapping to Sonata API is required"}
-            </Typography.Text>
-          </div>
-        ) : (
-          <Tooltip title={item?.target}>
-            <Input
-              placeholder="Select or input property"
-              style={{
-                width: "calc(50% - 30px)",
-              }}
-              variant="filled"
-              className={clsx(styles.input, {
-                [styles.activeInput]:
-                  rightSide === EnumRightType.SonataResponse &&
-                  activeSonataResponse === `${index}-${item?.name}`,
-              })}
-              value={isEmpty(item?.target) ? undefined : get(item, "target")}
-              onClick={() => {
-                setActiveSonataResponse(`${index}-${item.name}`);
-                setRightSide(EnumRightType.SonataResponse);
-              }}
-              onChange={(e) => {
-                updateResponseMapping("target", e?.target?.value ?? "");
-              }}
-            />
-          </Tooltip>
-        )}
+      <Flex className={styles.container} gap={8} wrap="wrap" align="flex-end">
+        {/* Sonata side Target response input */}
+        <TargetInput
+          item={item}
+          index={index}
+          onChange={updateResponseMapping}
+        />
 
-        <MappingIcon />
-        <Tooltip title={item?.source}>
-          <Input
-            variant="filled"
-            placeholder="Select or input property"
-            style={{
-              width: "calc(50% - 30px)",
-            }}
-            className={clsx(styles.input, {
-              [styles.activeInput]:
-                rightSide === EnumRightType.AddSellerResponse &&
-                activeResponseName === `${index}-${item?.name}`,
-            })}
-            value={isEmpty(item?.source) ? undefined : get(item, "source")}
-            onClick={() => {
-              openSelectorForProp(index, get(item, "name"));
-            }}
-            onChange={(e) =>
-              handleChangeResponse(e.target.value, item?.name, item?.target)
-            }
-            suffix={
-              <RightOutlined style={{ fontSize: 12, color: "#C9CDD4" }} />
-            }
-          />
-        </Tooltip>
+        <span className={styles.mappingIcon}>
+          <MappingIcon />
+        </span>
+
+        {/* Seller side Source response input */}
+        <SourceInput item={item} index={index} />
       </Flex>
       {!isEmpty(item?.targetValues) && (
         <Flex vertical gap={20} style={{ width: "100%", marginTop: 8 }}>
@@ -296,11 +221,7 @@ const ResponseItem = ({ item, index }: Props) => {
                 wrap="wrap"
                 align="center"
               >
-                <Flex
-                  align="center"
-                  gap={8}
-                  style={{ width: "calc(50% - 30px)" }}
-                >
+                <Flex align="center" gap={8} style={{ flex: 1 }}>
                   <Select
                     className={styles.stateSelect}
                     data-testid="select-sonata-state"
@@ -318,7 +239,13 @@ const ResponseItem = ({ item, index }: Props) => {
                       value: item,
                     }))}
                   />
-                  <DeleteOutlined onClick={() => handleDeleteMapping(key)} />
+                  <Button
+                    className={styles.btnRemoveValueMapping}
+                    type="link"
+                    onClick={() => handleDeleteMapping(key)}
+                  >
+                    <DeleteOutlined />
+                  </Button>
                 </Flex>
                 <MappingIcon />
                 <Select
@@ -326,7 +253,7 @@ const ResponseItem = ({ item, index }: Props) => {
                   mode="tags"
                   key={`enum-${key}`}
                   placeholder="Input seller order state, Enter for multiple states"
-                  style={{ width: "calc(50% - 30px)" }}
+                  style={{ flex: 1 }}
                   value={to}
                   className={styles.stateSelect}
                   onChange={(e) => handleChangeInput(e, key)}
