@@ -20,14 +20,14 @@ spec:
     - id: create port order
       path: ""
       method: ""
-      requestBody: ${mefRequestBody.productOrderItem[0].product.productConfiguration.uni}
+      requestBody: | 
+        {}
       responseBody: |
         {
-          "relatedContactInformation": "${T(com.consoleconnect.kraken.operator.gateway.func.SpelFunc).appendSellerInformation(env.seller.role, env.seller.name, env.seller.emailAddress, env.seller.number, mefRequestBody.relatedContactInformation)}",
+         "relatedContactInformation": "${T(com.consoleconnect.kraken.operator.gateway.func.SpelFunc).appendSellerInformation(env.seller.role, env.seller.name, env.seller.emailAddress, env.seller.number, mefRequestBody.relatedContactInformation)}",
          "id": "${entity.id}",
          "orderDate":"${T(com.consoleconnect.kraken.operator.core.toolkit.DateTime).nowInUTCFormatted()}",
          "productOrderItem": "${mefRequestBody.productOrderItem}",
-         "state": "@{{state}}",
-         "orderId": "@{{orderId}}",
-         "instanceId": "@{{instanceId}}"
+         "state": "",
+         "orderId": ""
         }

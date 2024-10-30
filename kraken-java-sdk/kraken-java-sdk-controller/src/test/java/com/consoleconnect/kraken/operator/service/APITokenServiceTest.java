@@ -22,6 +22,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.test.context.ContextConfiguration;
 
 @MockIntegrationTest
@@ -147,8 +148,16 @@ class APITokenServiceTest extends AbstractIntegrationTest {
   @Test
   void givenAccessToken_thenFindEnvId_shouldReturnExpectedEnvId() {
     APIToken apiToken = createAccessToken();
-    String accessToken = "Bearer " + apiToken.getToken();
-    String envId = tokenService.findEnvId(accessToken, null);
+    Jwt jwt =
+        Jwt.withTokenValue(apiToken.getToken())
+            .claim(APITokenService.ENV_ID, apiToken.getEnvId())
+            .claim(APITokenService.PRODUCT_ID, apiToken.getProductId())
+            .subject(apiToken.getUserId())
+            .header("alg", "HS256")
+            .issuer("http://mock-issuer")
+            .build();
+    JwtAuthenticationToken authenticationToken = new JwtAuthenticationToken(jwt);
+    String envId = tokenService.findEnvId(authenticationToken, null);
     Assertions.assertEquals(TestApplication.envId, envId);
   }
 

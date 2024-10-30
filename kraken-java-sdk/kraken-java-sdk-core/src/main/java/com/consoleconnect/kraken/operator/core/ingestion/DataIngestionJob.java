@@ -88,15 +88,20 @@ public class DataIngestionJob {
           HttpStatus.BAD_REQUEST.value(), "Cannot parse yaml/json content from " + fullPath);
     }
     UnifiedAsset asset = assetOptional.get();
-
     if (parentId == null && asset.getMetadata().getProductKey() != null) {
       parentId = asset.getMetadata().getProductKey();
     }
-    if (event.isMergeLabels()) {
+    if (event.isMergeLabels() && assetService.existed(asset.getMetadata().getKey())) {
       UnifiedAssetDto db = assetService.findOne(asset.getMetadata().getKey());
       Map<String, String> labels = new HashMap<>();
-      Optional.ofNullable(db.getMetadata().getLabels()).ifPresent(labels::putAll);
-      Optional.ofNullable(asset.getMetadata().getLabels()).ifPresent(labels::putAll);
+      Optional.ofNullable(db)
+          .map(UnifiedAssetDto::getMetadata)
+          .map(Metadata::getLabels)
+          .ifPresent(labels::putAll);
+      Optional.of(asset)
+          .map(UnifiedAsset::getMetadata)
+          .map(Metadata::getLabels)
+          .ifPresent(labels::putAll);
       if (MapUtils.isNotEmpty(labels)) {
         asset.getMetadata().setLabels(labels);
       }

@@ -26,15 +26,15 @@ spec:
           "buyerRequestedQuoteLevel": "${entity.request.buyerRequestedQuoteLevel}",
           "quoteItem": [{
              "product": "${entity.request.quoteItem[0].product}",
-             "state": "@{{quoteItem.state}}",
-             "quoteItemPrice": {
+             "state": "",
+             "quoteItemPrice": [{
                "price": {
                  "dutyFreeAmount": {
-                   "unit": "@{{quoteItem.quoteItemPrice.price.dutyFreeAmount.unit}}",
-                   "value": "@{{quoteItem.quoteItemPrice.price.dutyFreeAmount.value}}"
+                   "unit": "",
+                   "value": ""
                  }
                }
-             }
+             }]
            }
           ],
           "quoteDate": "function.now()",

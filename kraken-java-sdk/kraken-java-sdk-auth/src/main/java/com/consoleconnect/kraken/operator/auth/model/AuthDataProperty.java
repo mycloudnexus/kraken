@@ -69,6 +69,7 @@ public class AuthDataProperty {
 
     private String bearerTokenHeaderName = "Authorization";
     private String userId = "x-kraken-userId";
+    private SecurityFilter securityFilter = new SecurityFilter();
   }
 
   @Data
@@ -105,7 +106,28 @@ public class AuthDataProperty {
     private String jwksUri;
     private String publicKey;
     private String secret;
+    private Introspection introspection = new Introspection();
 
     private Map<String, Object> verifier;
+  }
+
+  @Data
+  public static class Introspection {
+    private boolean enabled;
+    private String url;
+    private String clientId;
+    private String clientSecret;
+  }
+
+  @Data
+  public static class SecurityFilter {
+    private boolean enabled;
+    private List<FilterConfig> filterConfigs;
+  }
+
+  @Data
+  public static class FilterConfig {
+    private List<String> paths = List.of();
+    private String filterName;
   }
 }

@@ -1,10 +1,10 @@
 package com.consoleconnect.kraken.operator.controller.api.v2;
 
 import com.consoleconnect.kraken.operator.auth.model.AuthDataProperty;
-import com.consoleconnect.kraken.operator.controller.entity.MgmtEventEntity;
 import com.consoleconnect.kraken.operator.controller.service.ComponentLoadService;
 import com.consoleconnect.kraken.operator.controller.service.EventService;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
+import com.consoleconnect.kraken.operator.core.entity.MgmtEventEntity;
 import com.consoleconnect.kraken.operator.core.enums.EventStatusType;
 import com.consoleconnect.kraken.operator.core.enums.MgmtEventType;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;

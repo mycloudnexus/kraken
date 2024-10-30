@@ -226,7 +226,7 @@ public class UnifiedAssetService {
   public IngestionDataResult syncAsset(
       String parentKey, UnifiedAsset data, SyncMetadata syncMetadata, boolean enforceSync) {
     log.info(
-        "sync asset,  kind: {}, key: {}, parentKey:{},fullPath:{}",
+        "sync asset, kind: {}, key: {}, parentKey:{},fullPath:{}",
         data.getKind(),
         data.getMetadata().getKey(),
         parentKey,
@@ -480,6 +480,7 @@ public class UnifiedAssetService {
       linkEntity.setAsset(assetEntity);
       linkEntity.setTargetAssetKey(link.getTargetAssetKey());
       linkEntity.setRelationship(link.getRelationship());
+      linkEntity.setGroup(link.getGroup());
       newLinks.add(linkEntity);
     }
     this.assetLinkRepository.saveAll(newLinks);
@@ -601,5 +602,11 @@ public class UnifiedAssetService {
 
   public List<AssetLinkEntity> findAssetLink(String targetKey, String relationShip) {
     return assetLinkRepository.findAllByTargetAssetKeyAndRelationship(targetKey, relationShip);
+  }
+
+  public boolean existed(String idOrKey) {
+    return getUUID(idOrKey)
+        .map(assetRepository::existsById)
+        .orElseGet(() -> assetRepository.existsByKey(idOrKey));
   }
 }

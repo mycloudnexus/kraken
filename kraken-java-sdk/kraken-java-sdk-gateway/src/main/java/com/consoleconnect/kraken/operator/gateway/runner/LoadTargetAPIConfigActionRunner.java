@@ -2,8 +2,8 @@ package com.consoleconnect.kraken.operator.gateway.runner;
 
 import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.COMPONENT_API_SERVER;
 
-import com.consoleconnect.kraken.operator.core.dto.ResponseTargetMapperDto;
 import com.consoleconnect.kraken.operator.core.dto.SimpleApiServerDto;
+import com.consoleconnect.kraken.operator.core.dto.StateValueMappingDto;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.enums.ActionTypeEnum;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
@@ -19,10 +19,7 @@ import com.consoleconnect.kraken.operator.gateway.template.SpELEngine;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -36,7 +33,6 @@ public class LoadTargetAPIConfigActionRunner extends AbstractActionRunner {
 
   public static final String INPUT_CONFIG_KEY = "configKey";
   public static final String INPUT_RENDER = "render";
-  public static final String INPUT_REPLACE_STAR = "replaceStar";
   public static final String URLS = "urls";
   @Getter private final UnifiedAssetService unifiedAssetService;
   private final RenderRequestService renderRequestService;
@@ -72,7 +68,6 @@ public class LoadTargetAPIConfigActionRunner extends AbstractActionRunner {
     mergeMappers(asset, facets);
 
     String serverKey = facets.getEndpoints().get(0).getServerKey();
-
     if (StringUtils.isNotBlank(facets.getEndpoints().get(0).getUrl())) {
       outputs.put(
           "url", SpELEngine.evaluate(facets.getEndpoints().get(0).getUrl(), inputs, String.class));
@@ -82,9 +77,9 @@ public class LoadTargetAPIConfigActionRunner extends AbstractActionRunner {
       outputs.put("url", serverUrl);
     }
 
-    renderRequestService.parseRequest(facets);
+    StateValueMappingDto stateValueMappingDto = new StateValueMappingDto();
+    renderRequestService.parseRequest(facets, stateValueMappingDto);
 
-    ResponseTargetMapperDto responseTargetMapperDto = new ResponseTargetMapperDto();
     if (render != null && render) {
       facets
           .getEndpoints()
@@ -92,10 +87,12 @@ public class LoadTargetAPIConfigActionRunner extends AbstractActionRunner {
               endpoint -> {
                 if (Objects.nonNull(endpoint.getRequestBody())) {
                   String replaced = replaceStar(endpoint.getRequestBody());
-                  endpoint.setRequestBody(SpELEngine.evaluate(replaced, inputs));
+                  String renderedRequest =
+                      renderStatus(stateValueMappingDto, SpELEngine.evaluate(replaced, inputs));
+                  endpoint.setRequestBody(renderedRequest);
                 }
                 if (Objects.nonNull(endpoint.getResponseBody())) {
-                  String transformedResp = transform(endpoint, responseTargetMapperDto);
+                  String transformedResp = transform(endpoint, stateValueMappingDto);
                   endpoint.setResponseBody(SpELEngine.evaluate(transformedResp, inputs));
                 }
                 if (Objects.nonNull(endpoint.getPath())) {
@@ -107,7 +104,7 @@ public class LoadTargetAPIConfigActionRunner extends AbstractActionRunner {
     }
     outputs.put(
         KrakenFilterConstants.X_KRAKEN_TARGET_VALUE_MAPPER,
-        JsonToolkit.toJson(responseTargetMapperDto));
+        JsonToolkit.toJson(stateValueMappingDto));
 
     outputs.put(action.getOutputKey(), JsonToolkit.toJson(facets));
     return Optional.empty();
@@ -119,8 +116,8 @@ public class LoadTargetAPIConfigActionRunner extends AbstractActionRunner {
     if (split.length > 1) {
       pathBuilder.append("?");
       String params = split[1];
-      String[] paramArr = params.split("&");
-      for (String param : paramArr) {
+      List<String> list = Arrays.stream(params.split("&")).distinct().toList();
+      for (String param : list) {
         String[] splitArr = param.split("=");
         pathBuilder.append(splitArr[0]).append("=");
         if (splitArr.length > 1) {
@@ -160,6 +157,6 @@ public class LoadTargetAPIConfigActionRunner extends AbstractActionRunner {
         .filter(serverDto -> Objects.equals(serverDto.getApiServerKey(), serverKey))
         .map(SimpleApiServerDto::getUrl)
         .findFirst()
-        .orElseThrow();
+        .orElseThrow(() -> KrakenException.notFound("the target url is not found"));
   }
 }

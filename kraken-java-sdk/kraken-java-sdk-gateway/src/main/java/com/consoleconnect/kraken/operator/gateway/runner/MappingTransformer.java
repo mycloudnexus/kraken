@@ -1,6 +1,8 @@
 package com.consoleconnect.kraken.operator.gateway.runner;
 
-import com.consoleconnect.kraken.operator.core.dto.ResponseTargetMapperDto;
+import static com.consoleconnect.kraken.operator.core.toolkit.ConstructExpressionUtil.convertToJsonPointer;
+
+import com.consoleconnect.kraken.operator.core.dto.StateValueMappingDto;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPIFacets;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
@@ -8,22 +10,14 @@ import com.consoleconnect.kraken.operator.gateway.template.SpELEngine;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import java.util.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 
 public interface MappingTransformer {
   String REPLACEMENT_KEY_PREFIX = "@{{";
   String REPLACEMENT_KEY_SUFFIX = "}}";
-  String TARGET_PATTERN = "@\\{\\{([^}]+)\\}\\}";
   String ARRAY_WILD_MASK = "[*]";
   String ARRAY_FIRST_ELE = "[0]";
   String TARGET_VALUE_MAPPER_KEY = "targetValueMapping";
@@ -34,6 +28,8 @@ public interface MappingTransformer {
   String LEFT_SQUARE_BRACKET = "[";
   String RIGHT_SQUARE_BRACKET = "]";
   String FORWARD_DOWNSTREAM = "forwardDownstream";
+  String REQUEST_BODY = "requestBody.";
+  String RESPONSE_BODY = "responseBody";
 
   @Slf4j
   final class LogHolder {}
@@ -45,17 +41,16 @@ public interface MappingTransformer {
    * @return the response body replaced by mappers
    */
   default String transform(
-      ComponentAPITargetFacets.Endpoint endpoint, ResponseTargetMapperDto responseTargetMapperDto) {
+      ComponentAPITargetFacets.Endpoint endpoint, StateValueMappingDto responseTargetMapperDto) {
     String responseBody = endpoint.getResponseBody();
     ComponentAPITargetFacets.Mappers mappers = endpoint.getMappers();
     if (Objects.isNull(mappers) || CollectionUtils.isEmpty(mappers.getResponse())) {
       return com.consoleconnect.kraken.operator.core.toolkit.StringUtils.compact(responseBody);
     }
-    String compactedResp =
+    String compactedResponseBody =
         com.consoleconnect.kraken.operator.core.toolkit.StringUtils.compact(responseBody);
-    LogHolder.log.info("compactedResp:{}", compactedResp);
+    LogHolder.log.info("compactedResponseBody:{}", compactedResponseBody);
     List<ComponentAPITargetFacets.Mapper> response = mappers.getResponse();
-    Map<String, String> target2Source = new HashMap<>();
     for (ComponentAPITargetFacets.Mapper mapper : response) {
       // Preparing check and delete path for final result
       if (StringUtils.isNotBlank(mapper.getCheckPath())
@@ -70,29 +65,30 @@ public interface MappingTransformer {
           && StringUtils.isBlank(mapper.getDefaultValue())) {
         continue;
       }
-      Pair<String, String> sourcePair =
+      String convertedSource =
           convertSource(
               mapper.getSource(),
               mapper.getDefaultValue(),
               mapper.getTargetType(),
               mapper.getReplaceStar());
-      String target = convertTarget(mapper.getTarget());
-      addTargetValueMapping(mapper, responseTargetMapperDto, target);
+      String convertedTarget = convertTarget(mapper.getTarget());
+      addTargetValueMapping(mapper, responseTargetMapperDto, convertedTarget);
       LogHolder.log.info(
-          "target:{}, source left:{}, source right:{}",
-          target,
-          sourcePair.getLeft(),
-          sourcePair.getRight());
-      target2Source.put(target, sourcePair.getRight());
+          "converted source:{}, converted target:{},", convertedSource, convertedTarget);
+      compactedResponseBody =
+          JsonToolkit.generateJson(
+              convertToJsonPointer(mapper.getTarget().replace(REQUEST_BODY, StringUtils.EMPTY)),
+              convertedSource,
+              compactedResponseBody);
     }
-    String result = search(compactedResp, target2Source);
-    LogHolder.log.info("response mapper transform result:{}", result);
-    return result;
+    LogHolder.log.info("response mapper transform result:{}", compactedResponseBody);
+    return com.consoleconnect.kraken.operator.core.toolkit.StringUtils.compact(
+        compactedResponseBody);
   }
 
   default void addTargetValueMapping(
       ComponentAPITargetFacets.Mapper mapper,
-      ResponseTargetMapperDto responseTargetMapperDto,
+      StateValueMappingDto responseTargetMapperDto,
       String target) {
     if (mapper.getTargetType() == null
         || !ENUM_KIND.equalsIgnoreCase(mapper.getTargetType())
@@ -100,35 +96,33 @@ public interface MappingTransformer {
             && MapUtils.isEmpty(mapper.getValueMapping())) {
       return;
     }
-    responseTargetMapperDto.getTargetPathMapper().add(target);
-    responseTargetMapperDto
-        .getTargetValueMapper()
-        .putAll(
-            MapUtils.isEmpty(mapper.getValueMapping())
-                ? Collections.emptyMap()
-                : mapper.getValueMapping());
-  }
-
-  default String renderStatus(
-      ResponseTargetMapperDto responseTargetMapperDto, String responseBody) {
-    try {
-      LogHolder.log.info(
-          "renderStatus targetValueMapping:{}", responseTargetMapperDto.getTargetValueMapper());
-      List<String> pathExpressionList = new ArrayList<>();
-      for (String path : responseTargetMapperDto.getTargetPathMapper()) {
-        LogHolder.log.info("render state targetPathMapping:{}", path);
-        String pathExpression = JSON_PATH_EXPRESSION_PREFIX + path;
-        pathExpressionList.add(pathExpression);
-      }
-      return rewriteValueByJsonPath(
-          pathExpressionList, responseBody, responseTargetMapperDto.getTargetValueMapper());
-    } catch (Exception e) {
-      LogHolder.log.error("render status error!", e);
-      return responseBody;
+    Map<String, Map<String, String>> targetPathValueMapping =
+        responseTargetMapperDto.getTargetPathValueMapping();
+    Map<String, String> valueMappings =
+        targetPathValueMapping.getOrDefault(target, new HashMap<>());
+    if (MapUtils.isNotEmpty(mapper.getValueMapping())) {
+      valueMappings.putAll(mapper.getValueMapping());
     }
+    targetPathValueMapping.put(target, valueMappings);
   }
 
-  default String deleteNodeByPath(Map<String, String> checkPathMap, String json) {
+  default String renderStatus(StateValueMappingDto responseTargetMapperDto, String responseBody) {
+    for (Map.Entry<String, Map<String, String>> entry :
+        responseTargetMapperDto.getTargetPathValueMapping().entrySet()) {
+      try {
+        String targetPath = entry.getKey();
+        Map<String, String> valueMapping = entry.getValue();
+        LogHolder.log.info("render state targetPath:{}, valueMapping:{}", targetPath, valueMapping);
+        String pathExpression = JSON_PATH_EXPRESSION_PREFIX + targetPath;
+        responseBody = rewriteValueByJsonPath(pathExpression, responseBody, valueMapping);
+      } catch (Exception e) {
+        LogHolder.log.error("render status error!", e);
+      }
+    }
+    return responseBody;
+  }
+
+  default String resetNodeByPath(Map<String, String> checkPathMap, String json) {
     DocumentContext doc = JsonPath.parse(json);
     checkPathMap.forEach(
         (key, value) -> {
@@ -155,39 +149,40 @@ public interface MappingTransformer {
 
   default String calculateBasedOnResponseBody(String responseBody, Map<String, Object> context) {
     String replace = responseBody.replace("((", "${").replace("))", "}");
-    return SpELEngine.evaluate(JsonToolkit.fromJson(replace, Object.class), context, true);
+    LogHolder.log.info("calculateBasedOnResponseBody replace:{}", replace);
+    Object obj = JsonToolkit.fromJson(replace, Object.class);
+    LogHolder.log.info("calculateBasedOnResponseBody obj:{}", obj);
+    return SpELEngine.evaluate(obj, context, true);
   }
 
   default String rewriteValueByJsonPath(
-      List<String> pathExpressionList, String jsonData, Map<String, String> map) {
-    if (CollectionUtils.isEmpty(pathExpressionList) || StringUtils.isBlank(jsonData)) {
+      String pathExpression, String jsonData, Map<String, String> map) {
+    if (StringUtils.isEmpty(pathExpression) || StringUtils.isBlank(jsonData)) {
       return jsonData;
     }
     DocumentContext doc = JsonPath.parse(jsonData);
-    pathExpressionList.forEach(
-        pathExpression -> {
-          int idx = pathExpression.lastIndexOf(ARRAY_WILD_MASK);
-          if (idx > 0) {
-            String arrayRoot = pathExpression.substring(0, idx);
-            if (arrayRoot.endsWith(DOT)) {
-              arrayRoot = arrayRoot + LENGTH_FUNC;
-            } else {
-              arrayRoot = arrayRoot + DOT + LENGTH_FUNC;
-            }
-            int length = doc.read(arrayRoot);
-            for (int i = 0; i < length; i++) {
-              String exp =
-                  pathExpression.substring(0, idx)
-                      + LEFT_SQUARE_BRACKET
-                      + i
-                      + RIGHT_SQUARE_BRACKET
-                      + pathExpression.substring(idx + ARRAY_WILD_MASK.length());
-              overwritePathValue(doc, exp, map);
-            }
-          } else {
-            overwritePathValue(doc, pathExpression, map);
-          }
-        });
+    int idx = pathExpression.lastIndexOf(ARRAY_WILD_MASK);
+    if (idx > 0) {
+      String arrayRoot = pathExpression.substring(0, idx);
+      if (arrayRoot.endsWith(DOT)) {
+        arrayRoot = arrayRoot + LENGTH_FUNC;
+      } else {
+        arrayRoot = arrayRoot + DOT + LENGTH_FUNC;
+      }
+      int length = doc.read(arrayRoot);
+      for (int i = 0; i < length; i++) {
+        String exp =
+            pathExpression.substring(0, idx)
+                + LEFT_SQUARE_BRACKET
+                + i
+                + RIGHT_SQUARE_BRACKET
+                + pathExpression.substring(idx + ARRAY_WILD_MASK.length());
+        overwritePathValue(doc, exp, map);
+      }
+    } else {
+      overwritePathValue(doc, pathExpression, map);
+    }
+
     return doc.jsonString();
   }
 
@@ -203,16 +198,17 @@ public interface MappingTransformer {
     if (null == customizedExpress || !customizedExpress.startsWith(REPLACEMENT_KEY_PREFIX)) {
       return customizedExpress;
     }
+    customizedExpress = customizedExpress.replace(REQUEST_BODY, StringUtils.EMPTY);
     // Remove the leading "@" and double curly braces
     return customizedExpress.substring(
         REPLACEMENT_KEY_PREFIX.length(),
         customizedExpress.length() - REPLACEMENT_KEY_SUFFIX.length());
   }
 
-  default Pair<String, String> convertSource(
+  default String convertSource(
       String source, String defaultValue, String targetType, Boolean replaceStar) {
     if (null == source || !source.startsWith(REPLACEMENT_KEY_PREFIX)) {
-      return Pair.of(null, StringUtils.isBlank(source) ? defaultValue : source);
+      return (StringUtils.isBlank(source) ? defaultValue : source);
     }
     // Remove the leading "@" and double curly braces
     String strippedValue =
@@ -220,42 +216,22 @@ public interface MappingTransformer {
             REPLACEMENT_KEY_PREFIX.length(), source.length() - REPLACEMENT_KEY_SUFFIX.length());
     LogHolder.log.info("source strippedValue:{}, targetType:{}", strippedValue, targetType);
     int loc = strippedValue.lastIndexOf(ARRAY_WILD_MASK);
+    if (!strippedValue.startsWith(RESPONSE_BODY)) {
+      if (strippedValue.startsWith(ARRAY_FIRST_ELE) || strippedValue.startsWith(ARRAY_WILD_MASK)) {
+        strippedValue = RESPONSE_BODY + strippedValue;
+      } else {
+        strippedValue = RESPONSE_BODY + "." + strippedValue;
+      }
+    }
     if (loc > 0) {
       if (Objects.equals(targetType, ENUM_KIND)) {
-        return Pair.of(null, String.format("${%s}", strippedValue));
+        return String.format("${%s}", strippedValue);
       }
       if (Boolean.TRUE.equals(replaceStar)) {
-        return Pair.of(null, String.format("${%s}", replaceStar(strippedValue)));
+        return String.format("${%s}", replaceStar(strippedValue));
       }
     }
-    return Pair.of(null, "${" + strippedValue + "}");
-  }
-
-  default String search(String inputString, Map<String, String> target2Source) {
-    // Define the target marker pattern
-    Pattern pattern = Pattern.compile(TARGET_PATTERN);
-    Matcher matcher = pattern.matcher(inputString);
-    // Use StringBuilder for efficient string modification
-    StringBuilder processedString = new StringBuilder();
-
-    int lastEndIndex = 0;
-    while (matcher.find()) {
-      processedString.append(inputString, lastEndIndex, matcher.start());
-      String target = matcher.group(1);
-      String sourceValue = target2Source.get(target);
-      if (sourceValue != null) {
-        processedString.append(sourceValue);
-      } else {
-        // Handle missing source value, and array response
-        // Removed processedString.append(target)
-        LogHolder.log.info("Missing source value for target:{}", target);
-      }
-      lastEndIndex = matcher.end();
-    }
-    // Append the remaining string after the last match
-    processedString.append(inputString.substring(lastEndIndex));
-
-    return processedString.toString();
+    return "${" + strippedValue + "}";
   }
 
   default void mergeMapper(

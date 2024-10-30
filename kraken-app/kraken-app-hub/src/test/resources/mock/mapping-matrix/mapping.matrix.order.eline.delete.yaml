@@ -1,0 +1,45 @@
+---
+kind: kraken.product.mapping.matrix
+apiVersion: v1
+metadata:
+  key: mef.sonata.api.matrix.order.eline.delete
+  name: MEF Sonata API
+  labels:
+    mef-api-release: grace
+  version: 18
+spec:
+  matrix:
+    mef.sonata.api-target.order.eline.delete:
+      - name: product_type_eline
+        path: "$.body.productOrderItem[*].product.productConfiguration.['@type']"
+        expectType: EXPECTED
+        value: ACCESS_E_LINE
+      - name: action_delete
+        path: "$.body.productOrderItem[*].['action']"
+        expectType: EXPECTED
+        value: delete
+      - name: relatedContactInformation_emailAddress
+        path: "$.body.relatedContactInformation[*]"
+        expectType: EXPECTED_TRUE
+        value: ${param.emailAddress}
+        errorMsg: "relatedContactInformation.emailAddress should exist in request"
+      - name: relatedContactInformation_name
+        path: "$.body.relatedContactInformation[*]"
+        expectType: EXPECTED_TRUE
+        value: ${param.name}
+        errorMsg: "relatedContactInformation.name should exist in request"
+      - name: relatedContactInformation_number
+        path: "$.body.relatedContactInformation[*]"
+        expectType: EXPECTED_TRUE
+        value: ${param.number}
+        errorMsg: "relatedContactInformation.number should exist in request"
+      - name: relatedContactInformation_role
+        path: "$.body.relatedContactInformation[*]"
+        expectType: EXPECTED_TRUE
+        value: ${param.role}
+        errorMsg: "relatedContactInformation.role should exist in request"
+      - name: productOrderItem_id
+        path: "$.body.productOrderItem[0].id"
+        expectType: EXPECTED_EXIST
+        value: true
+        errorMsg: "productOrderItem.id should exist in request"

@@ -6,8 +6,22 @@ metadata:
   name: Product Offering Qualification (POQ) API Management
   labels:
     mef-api-release: grace
-    order-api-version: v10
+    poq-api-version: v7
+  version: 3
 spec:
+  supportedProductTypesAndActions:
+    - path: /mefApi/sonata/productOfferingQualification/v7/productOfferingQualification
+      method: post
+      actionTypes:
+        - add
+      productTypes:
+        - UNI
+        - ACCESS_E_LINE
+    - path: /mefApi/sonata/productOfferingQualification/v7/productOfferingQualification/{id}
+      method: get
+      productTypes:
+        - UNI
+        - ACCESS_E_LINE
   mappings:
     - uri: ${env.target.url}
       trigger:
@@ -131,7 +145,7 @@ spec:
                 } else if(input.bizType == 'ACCESS_E_LINE') {
                   targetAPIConfigKey = 'mef.sonata.api-target.poq.eline.read';
                 } else {
-                  targetAPIConfigKey = 'targetKey:notFound';
+                  targetAPIConfigKey = 'notImplemented';
                 }
                 let ret = {
                   productOfferingType: input.bizType,
@@ -169,22 +183,84 @@ spec:
           env:
             code: ${targetApiConfig.endpoints[0].responseBody}
             inputs: ${targetApiConfig.inputs}
+
+    - trigger:
+        path: /mefApi/sonata/productOfferingQualification/v7/productOfferingQualification/hub
+        method: post
+      metadata:
+        cacheRequestBody: true
+      actions:
+
+        - id: calculate_poq_event_types_via_javascript
+          actionType: engine@javascript
+          env:
+            query: ${body.query}
+          with:
+            code: |
+              (jsonStr) => {
+                console.log("input: " + jsonStr);
+                let input = JSON.parse(jsonStr);
+                let query = input.query;
+                let arr = query.split("=");
+                let eventArr = arr[1].split(",");
+                let ret = {
+                  "eventTypes": eventArr,
+                  "targetAPIConfigKey": "mef.sonata.api-target.hub.add"
+                };
+                return JSON.stringify(ret);
+              }
+          outputKey: event
+        - id: register-poq-event
+          actionType: buildin@register-event
+          env:
+            eventTypes: ${event.eventTypes}
+          with:
+            action: register
+
+        - id: load-downstream-api-config
+          actionType: buildin@load-target-api-config
+          env:
+            configKey: ${event.targetAPIConfigKey}
+            mefRequestBody: ${body}
+            entity: ${entity}
+          with:
+            render: true
+          outputKey: targetApiConfig
+
+        - id: mock-response
+          actionType: buildin@mock-response
+
+        - id: modify-response-body
+          actionType: buildin@modify-response-body
+          with:
+            engine: spel
+          env:
+            code: ${targetApiConfig.endpoints[0].responseBody}
+            inputs: ${targetApiConfig.inputs}
 links:
   - targetAssetKey: mef.sonata.api-target.poq.eline.add
     relationship: implementation.target
+    group: mef.sonata.api-target.poq.eline.add
   - targetAssetKey: mef.sonata.api-target.poq.eline.read
     relationship: implementation.target
+    group: mef.sonata.api-target.poq.eline.read
   - targetAssetKey: mef.sonata.api-target.poq.uni.add
     relationship: implementation.target
-  - targetAssetKey: mef.sonata.api-target.poq.eline.read
+    group: mef.sonata.api-target.poq.uni.add
+  - targetAssetKey: mef.sonata.api-target.poq.uni.read
     relationship: implementation.target
-  - targetAssetKey: mef.sonata.api-spec.product.offering.qualification
-    relationship: implementation.standard.api-spec
-  - targetAssetKey: mef.sonata.api-target-mapper.poq.uni.add
-    relationship: implementation.target-mapper
+    group: mef.sonata.api-target.poq.uni.read
   - targetAssetKey: mef.sonata.api-target-mapper.poq.eline.add
     relationship: implementation.target-mapper
-  - targetAssetKey: mef.sonata.api-target-mapper.poq.uni.read
-    relationship: implementation.target-mapper
+    group: mef.sonata.api-target.poq.eline.add
   - targetAssetKey: mef.sonata.api-target-mapper.poq.eline.read
     relationship: implementation.target-mapper
+    group: mef.sonata.api-target.poq.eline.read
+  - targetAssetKey: mef.sonata.api-target-mapper.poq.uni.add
+    relationship: implementation.target-mapper
+    group: mef.sonata.api-target.poq.uni.add
+  - targetAssetKey: mef.sonata.api-target-mapper.poq.uni.read
+    relationship: implementation.target-mapper
+    group: mef.sonata.api-target.poq.uni.read
+  - targetAssetKey: mef.sonata.api-spec.product.offering.qualification
+    relationship: implementation.standard.api-spec

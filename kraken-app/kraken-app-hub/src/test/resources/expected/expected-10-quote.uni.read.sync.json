@@ -1,0 +1,17 @@
+{
+  "id": "${entity.id}",
+  "buyerRequestedQuoteLevel": "${entity.request.buyerRequestedQuoteLevel}",
+  "quoteItem": [
+    {
+      "product": "${entity.request.quoteItem[0].product}",
+      "action": "${entity.request.quoteItem[0].action}",
+      "id": "${entity.request.quoteItem[0].id}",
+      "state": "${entity.renderedResponse.quoteItem[0].state}",
+      "quoteItemPrice": "${entity.renderedResponse.quoteItem[0].quoteItemPrice}"
+    }
+  ],
+  "quoteDate": "now",
+  "externalId": "${entity.request[externalId]?:''}",
+  "instantSyncQuote": "${entity.request[instantSyncQuote]?:''}",
+  "requestedQuoteCompletionDate": "${entity.request[requestedQuoteCompletionDate]?:''}"
+}

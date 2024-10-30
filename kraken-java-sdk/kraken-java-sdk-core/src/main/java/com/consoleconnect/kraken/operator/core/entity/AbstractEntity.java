@@ -13,9 +13,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 @MappedSuperclass
 @EntityListeners({MyEntityListener.class})
 public class AbstractEntity {
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private UUID id;
+  @Id private UUID id;
 
   @Column(name = "created_by", nullable = true, unique = false)
   private String createdBy;

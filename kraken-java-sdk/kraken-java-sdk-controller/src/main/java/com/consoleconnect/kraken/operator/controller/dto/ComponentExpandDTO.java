@@ -7,6 +7,7 @@ import lombok.Data;
 public class ComponentExpandDTO {
   private List<TargetMappingDetail> details;
   private String componentName;
+  private String componentKey;
 
   @Data
   public static class TargetMappingDetail {

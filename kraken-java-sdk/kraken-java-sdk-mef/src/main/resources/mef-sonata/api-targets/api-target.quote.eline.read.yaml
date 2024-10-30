@@ -23,7 +23,7 @@ spec:
       responseBody: |
         {
           "id": "${entity.id}",
-          "relatedContactInformation": "${T(com.consoleconnect.kraken.operator.gateway.func.SpelFunc).appendSellerInformation(env.seller.role, env.seller.name, env.seller.emailAddress, env.seller.number, entity.request.relatedContactInformation)}",
+          "relatedContactInformation": "${T(com.consoleconnect.kraken.operator.gateway.func.SpelFunc).appendSellerInformation('sellerContactInformation', env.seller.name, env.seller.emailAddress, env.seller.number, entity.request.relatedContactInformation)}",
           "buyerRequestedQuoteLevel": "${entity.request.buyerRequestedQuoteLevel}",
           "quoteItem": [
             {

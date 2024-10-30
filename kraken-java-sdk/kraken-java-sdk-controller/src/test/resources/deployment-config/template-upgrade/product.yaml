@@ -6,8 +6,13 @@ metadata:
   name: MEF Sonata API
 spec:
   componentPaths:
-    - classpath:deployment-config/template-upgrade/1.0.2.Release.yaml
+    - classpath:deployment-config/template-upgrade/1.0.1.Release.yaml
     - classpath:deployment-config/template-upgrade/api-target.address.validate.yaml
+    - classpath:deployment-config/apis/api.address.yaml
+    - classpath:deployment-config/api-targets/api-target.address.retrieve.yaml
+    - classpath:deployment-config/api-targets-mappers/api-target-mapper.address.retrieve.yaml
+
+
   templateUpgradePaths:
     - classpath:deployment-config/template-upgrade/api-target-mapper.address.retrieve.yaml
     - classpath:deployment-config/template-upgrade/api-target-mapper.address.validate.yaml

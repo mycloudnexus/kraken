@@ -1,5 +1,6 @@
 package com.consoleconnect.kraken.operator.controller.service;
 
+import static com.consoleconnect.kraken.operator.core.enums.AssetLinkKindEnum.*;
 import static com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants.*;
 import static com.consoleconnect.kraken.operator.core.toolkit.LabelConstants.*;
 
@@ -8,6 +9,8 @@ import com.consoleconnect.kraken.operator.controller.dto.*;
 import com.consoleconnect.kraken.operator.controller.model.ComponentTag;
 import com.consoleconnect.kraken.operator.controller.model.ComponentTagFacet;
 import com.consoleconnect.kraken.operator.controller.model.DeploymentFacet;
+import com.consoleconnect.kraken.operator.controller.model.Environment;
+import com.consoleconnect.kraken.operator.controller.tools.VersionHelper;
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.entity.*;
@@ -17,17 +20,18 @@ import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.model.*;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
 import com.consoleconnect.kraken.operator.core.repo.AssetFacetRepository;
+import com.consoleconnect.kraken.operator.core.repo.EnvironmentClientRepository;
 import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
-import com.consoleconnect.kraken.operator.core.service.DataIngestionService;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.*;
 import java.util.*;
 import java.util.function.Function;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,16 +44,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 @AllArgsConstructor
 @Service
-public class ApiComponentService implements TargetMappingChecker {
+public class ApiComponentService implements TargetMappingChecker, EndPointUsageCalculator {
   private static final Logger log = LoggerFactory.getLogger(ApiComponentService.class);
   public static final KrakenException ASSET_NOT_FOUND = KrakenException.notFound("asset not found");
-  private final UnifiedAssetService unifiedAssetService;
+  @Getter private final UnifiedAssetService unifiedAssetService;
+  @Getter private final EnvironmentClientRepository environmentClientRepository;
+  @Getter private final EnvironmentService environmentService;
   private final UnifiedAssetRepository unifiedAssetRepository;
   private final AssetFacetRepository assetFacetRepository;
-  private final DataIngestionService ingestionService;
   private final AppProperty appProperty;
-
-  public static final Pattern MAPPER_PATTERN = Pattern.compile("\\S+mapper.(\\S+)");
 
   @Transactional
   public IngestionDataResult updateApiTargetMapper(
@@ -83,6 +86,21 @@ public class ApiComponentService implements TargetMappingChecker {
       Map<String, String> labels =
           assetEntity.getLabels() == null ? new HashMap<>() : assetEntity.getLabels();
       labels.putAll(asset.getMetadata().getLabels());
+    }
+    String version = assetEntity.getLabels().get(LABEL_VERSION_NAME);
+    String subVersion = assetEntity.getLabels().get(LABEL_SUB_VERSION_NAME);
+    if (StringUtils.isBlank(version)) {
+      String mapperId = assetEntity.getId().toString();
+      UnifiedAssetEntity tagEntity =
+          unifiedAssetService
+              .findLatest(mapperId, AssetKindEnum.COMPONENT_API_TARGET_MAPPER_TAG)
+              .orElse(null);
+      assetEntity.getLabels().put(LABEL_VERSION_NAME, VersionHelper.generateVersion(tagEntity));
+      assetEntity.getLabels().put(LABEL_SUB_VERSION_NAME, NumberUtils.INTEGER_ONE.toString());
+    } else {
+      assetEntity
+          .getLabels()
+          .put(LABEL_SUB_VERSION_NAME, String.valueOf(Integer.parseInt(subVersion) + 1));
     }
     // add labels not deployed
     assetEntity
@@ -147,8 +165,6 @@ public class ApiComponentService implements TargetMappingChecker {
               }
               compareProperty(updateMapper.getTitle(), originMapper.getTitle());
               compareProperty(updateMapper.getRequiredMapping(), originMapper.getRequiredMapping());
-              compareProperty(updateMapper.getReplaceStar(), originMapper.getReplaceStar());
-              compareProperty(updateMapper.getFunction(), originMapper.getFunction());
               compareProperty(updateMapper.getCheckPath(), originMapper.getCheckPath());
               compareProperty(updateMapper.getDeletePath(), originMapper.getDeletePath());
             });
@@ -218,30 +234,7 @@ public class ApiComponentService implements TargetMappingChecker {
     List<ComponentExpandDTO.TargetMappingDetail> details = new ArrayList<>();
     assetEntityMap.forEach(
         (k, assetDto) -> {
-          fillMappingStatus(assetDto);
-          ComponentAPITargetFacets mapperFacets =
-              UnifiedAsset.getFacets(assetDto, ComponentAPITargetFacets.class);
-          ComponentAPITargetFacets.Trigger trigger = mapperFacets.getTrigger();
-          ComponentExpandDTO.TargetMappingDetail detail =
-              new ComponentExpandDTO.TargetMappingDetail();
-          if (Objects.nonNull(trigger)) {
-            detail.setPath(trigger.getPath());
-            detail.setMethod(trigger.getMethod());
-            detail.setProductType(trigger.getProductType());
-            detail.setActionType(trigger.getActionType());
-            ComponentExpandDTO.MappingMatrix mappingMatrix = new ComponentExpandDTO.MappingMatrix();
-            BeanUtils.copyProperties(trigger, mappingMatrix);
-            detail.setMappingMatrix(mappingMatrix);
-          }
-          if (containsKeywords(assetDto.getMetadata().getKey())) {
-            detail.setRequiredMapping(false);
-          }
-          detail.setDescription(assetDto.getMetadata().getDescription());
-          detail.setTargetMapperKey(k);
-          detail.setTargetKey(extractTargetKey(k));
-          detail.setMappingStatus(assetDto.getMappingStatus());
-          detail.setUpdatedAt(assetDto.getUpdatedAt());
-          detail.setUpdatedBy(assetDto.getUpdatedBy());
+          ComponentExpandDTO.TargetMappingDetail detail = getTargetMappingDetail(k, assetDto);
           detail.setOrderBy(
               appProperty.getApiTargetMapperOrderBy().getOrDefault(k, "<1000, 1000>"));
           mergeLastDeployment(detail, assetDto, envId);
@@ -320,5 +313,161 @@ public class ApiComponentService implements TargetMappingChecker {
         deployAssetDto.getMetadata().getStatus() == null
             ? ""
             : deployAssetDto.getMetadata().getStatus());
+  }
+
+  @Transactional(readOnly = true)
+  public List<ComponentExpandDTO> listAllApiUseCase() {
+    List<UnifiedAssetDto> componentAssetList =
+        unifiedAssetRepository
+            .findByKindOrderByCreatedAtDesc(AssetKindEnum.COMPONENT_API.getKind())
+            .stream()
+            .map(t -> UnifiedAssetService.toAsset(t, true))
+            .toList();
+    List<UnifiedAssetDto> mapperAssetList =
+        unifiedAssetService.findByKind(AssetKindEnum.COMPONENT_API_TARGET_MAPPER.getKind());
+    return convert(appProperty.getQueryExcludeAssetKeys(), componentAssetList, mapperAssetList);
+  }
+
+  public List<ComponentExpandDTO> convert(
+      List<String> queryExcludeAssets,
+      List<UnifiedAssetDto> componentList,
+      List<UnifiedAssetDto> mapperList) {
+    Map<String, UnifiedAssetDto> mapper2ComponentMap = new HashMap<>();
+    Map<String, UnifiedAssetDto> mapperAssetMap = new HashMap<>();
+    Map<String, ComponentExpandDTO> componentExpandDTOMap = new HashMap<>();
+    componentList.forEach(
+        component ->
+            component
+                .getLinks()
+                .forEach(link -> mapper2ComponentMap.put(link.getTargetAssetKey(), component)));
+    mapperList.stream()
+        .filter(entity -> !queryExcludeAssets.contains(entity.getMetadata().getKey()))
+        .forEach(mapper -> mapperAssetMap.put(mapper.getMetadata().getKey(), mapper));
+    mapperAssetMap.forEach(
+        (k, assetDto) -> {
+          ComponentExpandDTO.TargetMappingDetail detail = getTargetMappingDetail(k, assetDto);
+          UnifiedAssetDto componentAsset = mapper2ComponentMap.get(detail.getTargetMapperKey());
+          if (componentAsset == null) {
+            return;
+          }
+          componentExpandDTOMap.putIfAbsent(
+              componentAsset.getMetadata().getKey(), new ComponentExpandDTO());
+          ComponentExpandDTO componentExpandDTO =
+              componentExpandDTOMap.get(componentAsset.getMetadata().getKey());
+          if (CollectionUtils.isEmpty(componentExpandDTO.getDetails())) {
+            componentExpandDTO.setDetails(new ArrayList<>());
+          }
+          componentExpandDTO.setComponentName(componentAsset.getMetadata().getName());
+          componentExpandDTO.setComponentKey(componentAsset.getMetadata().getKey());
+          List<ComponentExpandDTO.TargetMappingDetail> details = componentExpandDTO.getDetails();
+          details.add(detail);
+        });
+    return componentExpandDTOMap.values().stream()
+        .filter(t -> !queryExcludeAssets.contains(t.getComponentKey()))
+        .toList();
+  }
+
+  private ComponentExpandDTO.TargetMappingDetail getTargetMappingDetail(
+      String mapperKey, UnifiedAssetDto mapperAsset) {
+    fillMappingStatus(mapperAsset);
+    ComponentAPITargetFacets mapperFacets =
+        UnifiedAsset.getFacets(mapperAsset, ComponentAPITargetFacets.class);
+    ComponentAPITargetFacets.Trigger trigger = mapperFacets.getTrigger();
+    ComponentExpandDTO.TargetMappingDetail detail = new ComponentExpandDTO.TargetMappingDetail();
+    if (Objects.nonNull(trigger)) {
+      detail.setPath(trigger.getPath());
+      detail.setMethod(trigger.getMethod());
+      detail.setProductType(trigger.getProductType());
+      detail.setActionType(trigger.getActionType());
+      ComponentExpandDTO.MappingMatrix mappingMatrix = new ComponentExpandDTO.MappingMatrix();
+      BeanUtils.copyProperties(trigger, mappingMatrix);
+      detail.setMappingMatrix(mappingMatrix);
+    }
+    if (containsKeywords(mapperAsset.getMetadata().getKey())) {
+      detail.setRequiredMapping(false);
+    }
+    detail.setDescription(mapperAsset.getMetadata().getDescription());
+    detail.setTargetMapperKey(mapperKey);
+    detail.setTargetKey(extractTargetKey(mapperKey));
+    detail.setMappingStatus(mapperAsset.getMappingStatus());
+    detail.setUpdatedAt(mapperAsset.getUpdatedAt());
+    detail.setUpdatedBy(mapperAsset.getUpdatedBy());
+    return detail;
+  }
+
+  public Map<String, List<Tuple2>> findApiUseCase() {
+    // groupKey,<componentKey,assetLinkKind>
+    Map<String, List<Tuple2>> result = new HashMap<>();
+    unifiedAssetService.findByKind(AssetKindEnum.COMPONENT_API.getKind()).stream()
+        .filter(component -> CollectionUtils.isNotEmpty(component.getLinks()))
+        .forEach(
+            component -> {
+              Map<String, List<Tuple2>> groupMap =
+                  component.getLinks().stream()
+                      .filter(assetLink -> assetLink.getGroup() != null)
+                      .collect(
+                          Collectors.groupingBy(
+                              AssetLink::getGroup,
+                              Collectors.mapping(
+                                  t -> Tuple2.of(t.getTargetAssetKey(), t.getRelationship()),
+                                  Collectors.toList())));
+              groupMap.forEach(
+                  (key, members) -> {
+                    members.add(
+                        Tuple2.of(
+                            component.getMetadata().getKey(), IMPLEMENTATION_WORKFLOW.getKind()));
+                    result.put(key, members);
+                  });
+            });
+    return result;
+  }
+
+  public Optional<ApiUseCaseDto> findRelatedApiUse(
+      String key, Map<String, List<Tuple2>> apiUseCaseMap) {
+    return apiUseCaseMap.entrySet().stream()
+        .map(
+            entry -> {
+              ApiUseCaseDto apiUseCaseDto = new ApiUseCaseDto();
+              entry
+                  .getValue()
+                  .forEach(
+                      tuple2 -> {
+                        if (tuple2
+                            .value()
+                            .equalsIgnoreCase(IMPLEMENTATION_TARGET_MAPPER.getKind())) {
+                          apiUseCaseDto.setMapperKey(tuple2.field());
+                        }
+                        if (tuple2
+                            .value()
+                            .equalsIgnoreCase(IMPLEMENTATION_MAPPING_MATRIX.getKind())) {
+                          apiUseCaseDto.setMappingMatrixKey(tuple2.field());
+                        }
+                        if (tuple2.value().equalsIgnoreCase(IMPLEMENTATION_WORKFLOW.getKind())) {
+                          apiUseCaseDto.setComponentApiKey(tuple2.field());
+                        }
+                        if (tuple2.value().equalsIgnoreCase(IMPLEMENTATION_TARGET.getKind())) {
+                          apiUseCaseDto.setTargetKey(tuple2.field());
+                        }
+                      });
+              return apiUseCaseDto;
+            })
+        .filter(t -> t.membersExcludeApiKey().contains(key))
+        .findFirst();
+  }
+
+  public Optional<ApiUseCaseDto> findRelatedApiUse(String key) {
+    return findRelatedApiUse(key, findApiUseCase());
+  }
+
+  public EndPointUsageDTO queryEndPointUsageDetail(String productId, String componentId) {
+    unifiedAssetService.findOne(productId);
+    UnifiedAssetDto unifiedAssetDto = unifiedAssetService.findOne(componentId);
+    if (!AssetKindEnum.COMPONENT_API_TARGET_SPEC.getKind().equals(unifiedAssetDto.getKind())) {
+      throw KrakenException.badRequest(
+          "the component kind should be " + AssetKindEnum.COMPONENT_API_TARGET_SPEC.getKind());
+    }
+    List<Environment> environments =
+        environmentService.search(productId, PageRequest.of(0, 10)).getData();
+    return calculate(unifiedAssetDto, environments);
   }
 }

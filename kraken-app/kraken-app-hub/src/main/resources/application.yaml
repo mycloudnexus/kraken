@@ -99,28 +99,24 @@ app:
       enabled: false
   env:
     seller:
-      name: seller-01
-      number: 123456
+      name: kraken
+      number: N/A
       role: sellerContact
-      emailAddress: seller@cc.com
+      emailAddress: support@kraken.com
   filter-headers:
     - token
     - Authorization
   filter-paths:
     - /mefApi
   cron-job:
-    push-heartbeat: 0/20 * * * * *
-    check-release: 0 0/1 * * * *
+    push-heartbeat: 0/5 * * * * *
+    check-release: 0/20 * * * * *
   security:
     resource-server:
       enabled: true
       jwt:
         - issuer: https://kraken.consoleconnect.com/issuer
           key-id: kraken
-          # jwks-uri: http://localhost:8001/.well-known/jwks.json
-          secret: MjRhMjNhNGYtMWUzMS00ZTY4LTlhYzgtMzY5NDcwYzNjNDE4
-      bearer-token-header-name: x-kraken-key
-  unified-asset:
-    endpoints:
-      exposure:
-        include:
+          secret: ${ACCESS_TOKEN_JWT_SECRET}
+      bearer-token-header-name: x-sonata-buyer-key
+      user-id: x-kraken-buyer-id

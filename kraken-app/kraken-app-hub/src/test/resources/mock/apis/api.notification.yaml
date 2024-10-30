@@ -1,0 +1,107 @@
+---
+kind: kraken.component.api
+apiVersion: v1
+metadata:
+  key: mef.sonata.api.notification
+  name: Product notification API
+  labels:
+    mef-api-release: grace
+    order-api-version: v10
+  version: 1
+spec:
+  mappings:
+    - uri: ${env.target.url}
+      trigger:
+        path: /mefApi/listener/notification
+        method: post
+        queryParams:
+          - eventType
+      metadata:
+        cacheRequestBody: true
+      actions:
+        - id: persist_http_request
+          actionType: buildin@db
+          env:
+            bizType: notification
+          with:
+            action: create
+            properties:
+              - headers
+              - queryParameters
+              - requestBody
+          preRequest: true
+
+        - id: read-event
+          actionType: buildin@register-event
+          env:
+            eventType: ${query.eventType}
+          with:
+            action: read
+          preRequest: true
+
+        - id: calculate_target_api_via_javascript
+          actionType: engine@javascript
+          env:
+            eventType: ${query.eventType}
+          with:
+            code: |
+              (jsonStr) => {
+                console.log("input: " + jsonStr);
+                let input = JSON.parse(jsonStr);
+                let targetAPIConfigKey = '';
+                if(input.eventType = 'productOrderStateChangeEvent') {
+                  targetAPIConfigKey = 'mef.sonata.api-target.order.notification.state.change';
+                } else if(input.eventType = 'poqStateChangeEvent') {
+                  targetAPIConfigKey = 'mef.sonata.api-target.poq.notification.state.change';
+                } else if(input.eventType = 'quoteStateChangeEvent') {
+                  targetAPIConfigKey = 'mef.sonata.api-target.quote.notification.state.change';
+                }
+                let ret = {
+                  targetAPIConfigKey: targetAPIConfigKey
+                };
+                return JSON.stringify(ret);
+              }
+          outputKey: event
+        - id: load-downstream-api-config
+          actionType: buildin@load-target-api-config
+          env:
+            configKey: ${event.targetAPIConfigKey}
+            mefQuery: ${query}
+            mefRequestBody: ${body}
+            entity: ${entity}
+            eventEntity: ${eventEntity}
+          with:
+            render: true
+          outputKey: targetApiConfig
+
+        - id: rewrite-path
+          actionType: buildin@rewrite-path
+          env:
+            path: ${targetApiConfig.endpoints[0].path}
+            method: ${targetApiConfig.endpoints[0].method}
+
+        - id: modify-request-body
+          actionType: buildin@modify-request-body
+          env:
+            code: ${targetApiConfig.endpoints[0].requestBody}
+
+        - id: modify-response-body
+          actionType: buildin@modify-response-body
+          with:
+            engine: spel
+            successStatus: 201
+          env:
+            code: ${targetApiConfig.endpoints[0].responseBody}
+            inputs: ${targetApiConfig.inputs}
+
+        - id: persist_http_response
+          actionType: buildin@db
+          with:
+            action: update
+            properties:
+              - responseBody
+              - responseStatusCode
+          preRequest: false
+          postRequest: true
+          order: -4
+

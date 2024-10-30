@@ -1,0 +1,20 @@
+{
+  "validationResult": "((mefResponseBody.bestMatchGeographicAddress.id==''?(mefResponseBody.alternateGeographicAddress.size()==0?'fail':'partial'):'success'))",
+  "alternateGeographicAddress": [
+    {
+      "id": "${responseBody[*].id}",
+      "@type": "FieldedAddress",
+      "country": "${responseBody[*].company.addresses[0].country}",
+      "city": "${responseBody[*].company.addresses[0].city}",
+      "streetName": "${responseBody[*].company.addresses[0].address}"
+    }
+  ],
+  "provideAlternative": "${mefRequestBody.provideAlternative}",
+  "submittedGeographicAddress": "${mefRequestBody.submittedGeographicAddress}",
+  "bestMatchGeographicAddress": {
+    "id": "123",
+    "type": "FieldedAddress",
+    "city": "Sydney",
+    "country": "Sydney"
+  }
+}

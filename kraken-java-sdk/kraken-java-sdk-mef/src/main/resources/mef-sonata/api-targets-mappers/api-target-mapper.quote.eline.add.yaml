@@ -5,7 +5,7 @@ metadata:
   key: mef.sonata.api-target-mapper.quote.eline.add
   name: Mapper Of Creating Quote Eline
   description: This operation creates a Quote entity
-  version: 4
+  version: 5
 spec:
   trigger:
     path: /mefApi/sonata/quoteManagement/v8/quote
@@ -50,7 +50,7 @@ spec:
             description: quote price value mapping
             source: ""
             sourceLocation: ""
-            target: "@{{quoteItem.quoteItemPrice.price.dutyFreeAmount.value}}"
+            target: "@{{quoteItem[0].quoteItemPrice[*].price.dutyFreeAmount.value}}"
             targetLocation: BODY
             requiredMapping: true
           - name: quote.eline.add.price.unit.mapper
@@ -58,6 +58,6 @@ spec:
             description: quote price unit mapping
             source: ""
             sourceLocation: ""
-            target: "@{{quoteItem.quoteItemPrice.price.dutyFreeAmount.unit}}"
+            target: "@{{quoteItem[0].quoteItemPrice[*].price.dutyFreeAmount.unit}}"
             targetLocation: BODY
             requiredMapping: true

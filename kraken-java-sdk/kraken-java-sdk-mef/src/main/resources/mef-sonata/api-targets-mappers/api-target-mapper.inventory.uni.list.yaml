@@ -27,6 +27,15 @@ spec:
             target: ""
             targetLocation: ""
             requiredMapping: false
+          - name: mapper.inventory.uni.list.orderId
+            title: "associated order Id."
+            source: "@{{productOrderId}}"
+            sourceLocation: "QUERY"
+            target: ""
+            targetType: string
+            targetLocation: ""
+            convertValue: "mef.sonata.api-target-mapper.order.uni.add#mapper.order.uni.add.orderId"
+            requiredMapping: true
         response:
           - name: mapper.inventory.uni.list.id
             title: "Unique identifier of the product"

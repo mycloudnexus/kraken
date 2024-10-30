@@ -44,11 +44,13 @@ public class ComponentAPITargetFacets {
     private String name;
     private String description;
     private String source;
+    private String sourceType;
     private String sourceLocation;
+    private List<String> sourceValues;
     private String target;
     private String targetType;
     private String targetLocation;
-    private Boolean requiredMapping;
+    private Boolean requiredMapping = Boolean.TRUE;
     private Boolean replaceStar = Boolean.TRUE;
     private String defaultValue;
     private List<String> targetValues;
@@ -57,6 +59,7 @@ public class ComponentAPITargetFacets {
     private String checkPath;
     private String deletePath;
     private Boolean customizedField = false;
+    private String convertValue;
 
     @Override
     public int hashCode() {

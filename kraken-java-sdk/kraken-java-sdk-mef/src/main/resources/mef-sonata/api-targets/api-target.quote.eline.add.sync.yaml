@@ -19,38 +19,43 @@ spec:
     - id: create quote for connection
       path:
       method:
-      requestBody: ${mefRequestBody.quoteItem[0].product.productConfiguration.access_e_line}
+      requestBody: |
+        {}
       responseBody: |
         {
           "id": "${entity.id}",
-          "relatedContactInformation": "${T(com.consoleconnect.kraken.operator.gateway.func.SpelFunc).appendSellerInformation(env.seller.role, env.seller.name, env.seller.emailAddress, env.seller.number, mefRequestBody.relatedContactInformation)}",
           "buyerRequestedQuoteLevel": "${mefRequestBody.buyerRequestedQuoteLevel}",
+          "relatedContactInformation": "${T(com.consoleconnect.kraken.operator.gateway.func.SpelFunc).appendSellerInformation('sellerContactInformation', env.seller.name, env.seller.emailAddress, env.seller.number, mefRequestBody.relatedContactInformation)}",
           "quoteItem": [{
+             "requestedQuoteItemTerm": "${mefRequestBody.quoteItem[0].requestedQuoteItemTerm}",
              "product": "${mefRequestBody.quoteItem[0].product}",
              "action": "add",
              "id": "${mefRequestBody.quoteItem[0].id}",
              "state": "((mefResponseBody.quoteItem[0].quoteItemPrice[0].price.dutyFreeAmount.value == '' ? 'unableToProvide': 'approved.orderable'))",
+             "quoteItemTerm": "${T(java.util.Arrays).asList(mefRequestBody.quoteItem[0].requestedQuoteItemTerm)}",
              "quoteItemPrice": [{
-               "unitOfMeasure":"@{{quoteItem.quoteItemPrice.unitOfMeasure}}",
+               "unitOfMeasure":"",
                "price": {
                  "dutyFreeAmount": {
-                   "unit": "@{{quoteItem.quoteItemPrice.price.dutyFreeAmount.unit}}",
-                   "value": "@{{quoteItem.quoteItemPrice.price.dutyFreeAmount.value}}"
+                   "unit": "",
+                   "value": ""
                  },
-                 "taxRate":"@{{quoteItem.quoteItemPrice.price.taxRate}}",
+                 "taxRate":"",
                  "taxIncludedAmount": {
-                   "unit": "@{{quoteItem.quoteItemPrice.price.taxIncludedAmount.unit}}",
-                   "value": "@{{quoteItem.quoteItemPrice.price.taxIncludedAmount.value}}"
+                   "unit": "",
+                   "value": ""
                  }
                },
-               "name":"@{{quoteItem.quoteItemPrice.name}}",
-               "priceType":"@{{quoteItem.quoteItemPrice.priceType}}",
-               "description":"@{{quoteItem.quoteItemPrice.description}}",
-               "recurringChargePeriod":"@{{quoteItem.quoteItemPrice.recurringChargePeriod}}"
+               "name":"",
+               "priceType":"",
+               "description":"",
+               "recurringChargePeriod":""
              }]
           }],
           "quoteDate": "${T(com.consoleconnect.kraken.operator.core.toolkit.DateTime).nowInUTCFormatted()}",
           "externalId":"${mefRequestBody[externalId]?:''}",
           "instantSyncQuote":"${mefRequestBody[instantSyncQuote]?:''}",
-          "requestedQuoteCompletionDate": "${mefRequestBody[requestedQuoteCompletionDate]?:''}"
+          "requestedQuoteCompletionDate": "${mefRequestBody[requestedQuoteCompletionDate]?:''}",
+          "quoteLevel": "${mefRequestBody.buyerRequestedQuoteLevel}",
+          "state": "((mefResponseBody.quoteItem[0].quoteItemPrice[0].price.dutyFreeAmount.value == '' ? 'unableToProvide': 'approved.orderable'))"
         }

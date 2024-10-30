@@ -8,7 +8,9 @@ public class TemplateUpgradeDeploymentVO {
   private String templateUpgradeId;
   private String templateUpgradeDeploymentId;
   private String envName;
-  private String releaseVersion;
+  private String productVersion;
+  private String productSpec;
+  private String publishDate;
   private String upgradeBy;
   private String envId;
   private String status;

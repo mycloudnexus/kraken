@@ -1,6 +1,7 @@
 package com.consoleconnect.kraken.operator.core.toolkit;
 
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.Optional;
 import org.springframework.http.HttpHeaders;
@@ -26,7 +27,8 @@ public class IpUtils {
     if (ipAddress == null || ipAddress.length() == 0 || IP_UNKNOWN.equalsIgnoreCase(ipAddress)) {
       ipAddress =
           Optional.ofNullable(request.getRemoteAddress())
-              .map(address -> address.getAddress().getHostAddress())
+              .map(InetSocketAddress::getAddress)
+              .map(InetAddress::getHostAddress)
               .orElse("");
       if (IP_LOCAL.equals(ipAddress)) {
         return Constants.IP_LOCAL_HOSTNAME;
@@ -44,6 +46,15 @@ public class IpUtils {
   public static String getHostAddress() {
     try {
       return InetAddress.getLocalHost().getHostAddress();
+    } catch (UnknownHostException e) {
+      return IP_UNKNOWN;
+    }
+  }
+
+  public static String getFQDN() {
+    try {
+      InetAddress address = InetAddress.getLocalHost();
+      return address.getCanonicalHostName();
     } catch (UnknownHostException e) {
       return IP_UNKNOWN;
     }

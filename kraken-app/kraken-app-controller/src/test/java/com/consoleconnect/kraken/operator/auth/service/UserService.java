@@ -7,10 +7,12 @@ import com.consoleconnect.kraken.operator.core.toolkit.Paging;
 import com.consoleconnect.kraken.operator.core.toolkit.PagingHelper;
 import java.util.List;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.test.context.TestComponent;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.util.Assert;
 
+@Slf4j
 @TestComponent
 public class UserService {
   public Paging<User> search(String q, PageRequest pageRequest) {
@@ -31,5 +33,9 @@ public class UserService {
     userEntity.setId(UUID.randomUUID());
     userEntity.setEmail(idOrEmail);
     return userEntity;
+  }
+
+  public void initSystemUpgradeUser() {
+    log.info("Initializing system upgrade user");
   }
 }

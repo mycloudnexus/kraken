@@ -19,10 +19,12 @@ spec:
       requestBody:
       responseBody: |
         {
-          "id": "@{{id}}",
+          "id": "",
           "@type": "FieldedAddress",
-          "country": "@{{associatedGeographicAddress.country}}",
-          "city": "@{{associatedGeographicAddress.city}}",
-          "streetName": "@{{associatedGeographicAddress.streetName}}",
-          "metroId": "@{{alternateGeographicAddress.metroId}}"
+          "associatedGeographicAddress": {
+            "country": "",
+            "city": "",
+            "streetName": "",
+            "locality": ""
+          }
         }

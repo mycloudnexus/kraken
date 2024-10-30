@@ -11,7 +11,6 @@ import com.consoleconnect.kraken.operator.controller.ComponentMgmtControllerTest
 import com.consoleconnect.kraken.operator.controller.WebTestClientHelper;
 import com.consoleconnect.kraken.operator.controller.dto.*;
 import com.consoleconnect.kraken.operator.controller.model.APIToken;
-import com.consoleconnect.kraken.operator.controller.model.Environment;
 import com.consoleconnect.kraken.operator.controller.service.APITokenService;
 import com.consoleconnect.kraken.operator.controller.service.ComponentTagService;
 import com.consoleconnect.kraken.operator.controller.service.EnvironmentService;
@@ -41,7 +40,6 @@ import org.hamcrest.Matchers;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
@@ -89,9 +87,7 @@ class ProductDeploymentControllerTest extends AbstractIntegrationTest {
   @Order(1)
   void givenApiMapper_whenDeploy_thenReturnOk() {
     String path = String.format("%s/%s/api-mapper-deployments", PRODUCT_BASE_PATH, PRODUCT_ID);
-    Paging<Environment> environmentPaging =
-        environmentService.search(PRODUCT_ID, PageRequest.of(0, 1));
-    Environment environment = environmentPaging.getData().get(0);
+
     // create a component tag
     Optional<UnifiedAssetEntity> mapper =
         unifiedAssetRepository.findOneByKey(TestConstant.COMPONENT_ORDER_ELINE_ADD_MAPPER);
@@ -101,7 +97,7 @@ class ProductDeploymentControllerTest extends AbstractIntegrationTest {
     unifiedAssetRepository.save(unifiedAssetEntity);
 
     CreateAPIMapperDeploymentRequest request = new CreateAPIMapperDeploymentRequest();
-    request.setEnvId(environment.getId());
+    request.setEnvId(TestApplication.envId);
     request.setComponentId(TestConstant.COMPONENT_ORDER);
     request.setMapperKeys(List.of(TestConstant.COMPONENT_ORDER_ELINE_ADD_MAPPER));
 
@@ -131,9 +127,7 @@ class ProductDeploymentControllerTest extends AbstractIntegrationTest {
     deploymentAsset.setStatus(DeployStatusEnum.SUCCESS.name());
     unifiedAssetRepository.save(deploymentAsset);
     String path = String.format("%s/%s/api-mapper-deployments", PRODUCT_BASE_PATH, PRODUCT_ID);
-    Paging<Environment> environmentPaging =
-        environmentService.search(PRODUCT_ID, PageRequest.of(0, 1));
-    Environment environment = environmentPaging.getData().get(0);
+
     // create a component tag
     Optional<UnifiedAssetEntity> mapper =
         unifiedAssetRepository.findOneByKey(TestConstant.COMPONENT_ORDER_ELINE_ADD_MAPPER);
@@ -143,7 +137,7 @@ class ProductDeploymentControllerTest extends AbstractIntegrationTest {
     unifiedAssetRepository.save(mapperAsset);
 
     CreateAPIMapperDeploymentRequest request = new CreateAPIMapperDeploymentRequest();
-    request.setEnvId(environment.getId());
+    request.setEnvId(TestApplication.envId);
     request.setComponentId(TestConstant.COMPONENT_ORDER);
     request.setMapperKeys(List.of(TestConstant.COMPONENT_ORDER_ELINE_ADD_MAPPER));
 
@@ -159,9 +153,6 @@ class ProductDeploymentControllerTest extends AbstractIntegrationTest {
   @Test
   void givenAComponent_whenDeploy_thenReturnOK() {
     String path = String.format("%s/%s/deployments", PRODUCT_BASE_PATH, PRODUCT_ID);
-    Paging<Environment> environmentPaging =
-        environmentService.search(PRODUCT_ID, PageRequest.of(0, 1));
-    Environment environment = environmentPaging.getData().get(0);
     // create a component tag
     CreateTagRequest createTagRequest = new CreateTagRequest();
     createTagRequest.setTag("1.0.0");
@@ -177,7 +168,7 @@ class ProductDeploymentControllerTest extends AbstractIntegrationTest {
     String tagId =
         tagService.createTag(COMPONENT_ID, createTagRequest, null).getData().getId().toString();
     CreateProductDeploymentRequest request = new CreateProductDeploymentRequest();
-    request.setEnvId(environment.getId());
+    request.setEnvId(TestApplication.envId);
     request.setTagIds(List.of(tagId));
 
     testClientHelper.postAndVerify(
@@ -196,7 +187,7 @@ class ProductDeploymentControllerTest extends AbstractIntegrationTest {
     testClientHelper.getAndVerify(
         (uriBuilder -> uriBuilder.path(path).build()),
         bodyStr -> {
-          assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(3)));
+          assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(greaterThanOrEqualTo(3))));
         });
   }
 
@@ -222,11 +213,14 @@ class ProductDeploymentControllerTest extends AbstractIntegrationTest {
     APIToken accessToken = TestApplication.createAccessToken(apiTokenService);
     String latestDeploymentPath = "/v2/callback/audits/deployments/latest";
     final Map<String, String> headers = new HashMap<>();
-    headers.put("Authorization", "Bearer " + accessToken.getToken());
     testClientHelper.requestAndVerify(
         HttpMethod.GET,
-        (uriBuilder -> uriBuilder.path(latestDeploymentPath).build()),
-        headers,
+        (uriBuilder ->
+            uriBuilder
+                .path(latestDeploymentPath)
+                .queryParam("env", accessToken.getEnvId())
+                .build()),
+        null,
         HttpStatus.OK.value(),
         null,
         bodyStr -> {
@@ -238,7 +232,11 @@ class ProductDeploymentControllerTest extends AbstractIntegrationTest {
               String.format("/v2/callback/audits/releases/%s/components", response.getData());
           testClientHelper.requestAndVerify(
               HttpMethod.GET,
-              (uriBuilder -> uriBuilder.path(latestDeploymentDetailPath).build()),
+              (uriBuilder ->
+                  uriBuilder
+                      .path(latestDeploymentDetailPath)
+                      .queryParam("env", accessToken.getEnvId())
+                      .build()),
               headers,
               HttpStatus.OK.value(),
               null,
@@ -489,7 +487,7 @@ class ProductDeploymentControllerTest extends AbstractIntegrationTest {
               JsonToolkit.fromJson(
                   bodyStr, new TypeReference<HttpResponse<Paging<ApiMapperDeploymentDTO>>>() {});
           List<ApiMapperDeploymentDTO> list = mapperPages.getData().getData();
-          Assertions.assertTrue(list.size() >= 2);
+          assertThat(list.size(), greaterThanOrEqualTo(2));
           ApiMapperDeploymentDTO item = list.get(1);
           Optional<UnifiedAssetEntity> tagAssetOpt =
               unifiedAssetRepository.findById(UUID.fromString(item.getTagId()));
@@ -539,7 +537,7 @@ class ProductDeploymentControllerTest extends AbstractIntegrationTest {
               JsonToolkit.fromJson(
                   bodyStr, new TypeReference<HttpResponse<Paging<ApiMapperDeploymentDTO>>>() {});
           List<ApiMapperDeploymentDTO> list = mapperPages.getData().getData();
-          Assertions.assertTrue(list.size() >= 3);
+          assertThat(list.size(), greaterThanOrEqualTo(3));
           ApiMapperDeploymentDTO item = list.get(0);
           DeployToProductionRequest deployToProductionRequest = getDeployToProductionRequest(item);
           String deployToProductionPath =

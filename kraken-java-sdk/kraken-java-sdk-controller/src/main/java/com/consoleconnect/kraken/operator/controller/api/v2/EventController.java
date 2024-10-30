@@ -2,9 +2,9 @@ package com.consoleconnect.kraken.operator.controller.api.v2;
 
 import static com.consoleconnect.kraken.operator.core.service.UnifiedAssetService.getSearchPageRequest;
 
-import com.consoleconnect.kraken.operator.controller.entity.MgmtEventEntity;
 import com.consoleconnect.kraken.operator.controller.service.EventService;
 import com.consoleconnect.kraken.operator.core.dto.UpdateStatusDto;
+import com.consoleconnect.kraken.operator.core.entity.MgmtEventEntity;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import com.consoleconnect.kraken.operator.core.toolkit.Paging;
 import com.consoleconnect.kraken.operator.core.toolkit.PagingHelper;

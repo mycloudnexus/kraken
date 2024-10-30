@@ -35,7 +35,15 @@ spec:
             sourceLocation: "BODY"
             target: ""
             targetLocation: ""
-            requiredMapping: false
+            requiredMapping: true
+          - name: mapper.order.uni.delete.productOffering.id
+            title: " id of a Product Offering"
+            description: ""
+            source: "@{{productOrderItem[0].product.productOffering.id}}"
+            sourceLocation: "BODY"
+            target: ""
+            targetLocation: ""
+            requiredMapping: true
         response:
           - name: mapper.order.eline.delete.state
             title: "Order State"
@@ -59,3 +67,11 @@ spec:
             valueMapping: {}
             source: ""
             sourceLocation: ""
+          - name: mapper.order.eline.delete.orderId
+            title: order Id from seller
+            source: ""
+            target: '@{{orderId}}'
+            description: ""
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: true

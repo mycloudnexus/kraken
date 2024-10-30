@@ -1,0 +1,9 @@
+{
+  "id": "${responseBody.id}",
+  "type": "FieldedAddress",
+  "associatedGeographicAddress": {
+    "country": "${responseBody.company.addresses[0].country}",
+    "city": "${responseBody.company.addresses[0].city}",
+    "streetName": "${responseBody.company.addresses[0].address}"
+  }
+}

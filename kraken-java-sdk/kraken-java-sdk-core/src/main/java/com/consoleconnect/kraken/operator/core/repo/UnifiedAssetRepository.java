@@ -91,4 +91,6 @@ and  ( (:tags) is null or cast( tags as jsonb) @> jsonb(:tags) or  cast( tags as
       @Param("status") String status,
       @Param("updatedAt") ZonedDateTime updatedAt,
       Pageable pageable);
+
+  boolean existsByKey(String key);
 }

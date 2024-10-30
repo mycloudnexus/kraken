@@ -7,11 +7,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.consoleconnect.kraken.operator.config.TestApplication;
 import com.consoleconnect.kraken.operator.controller.WebTestClientHelper;
-import com.consoleconnect.kraken.operator.controller.entity.MgmtEventEntity;
-import com.consoleconnect.kraken.operator.controller.repo.EventRepository;
 import com.consoleconnect.kraken.operator.core.dto.UpdateStatusDto;
+import com.consoleconnect.kraken.operator.core.entity.MgmtEventEntity;
 import com.consoleconnect.kraken.operator.core.enums.EventStatusType;
 import com.consoleconnect.kraken.operator.core.enums.MgmtEventType;
+import com.consoleconnect.kraken.operator.core.repo.MgmtEventRepository;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import java.util.List;
@@ -37,7 +37,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 class EventControllerTest extends AbstractIntegrationTest {
   private final WebTestClientHelper testClientHelper;
 
-  @SpyBean private EventRepository eventRepository;
+  @SpyBean private MgmtEventRepository eventRepository;
 
   @Autowired
   public EventControllerTest(WebTestClient webTestClient) {
@@ -48,8 +48,8 @@ class EventControllerTest extends AbstractIntegrationTest {
   @Order(1)
   void givenDataPath_thenOK() {
     MgmtEventEntity entity = new MgmtEventEntity();
-    entity.setStatus(EventStatusType.ACK);
-    entity.setEventType(MgmtEventType.RESET);
+    entity.setStatus(EventStatusType.ACK.name());
+    entity.setEventType(MgmtEventType.RESET.name());
     entity.setResourceId("mef.sonata.api-target-mapper.order.uni.add");
     entity.setId(UUID.randomUUID());
     Mockito.doReturn(Optional.of(entity)).when(eventRepository).findById(ArgumentMatchers.any());
@@ -94,7 +94,7 @@ class EventControllerTest extends AbstractIntegrationTest {
           log.info("testVerified result {}", bodyStrVerified);
           Optional<MgmtEventEntity> mgmtEvent = eventRepository.findById(mgmtEventEntity.getId());
           assertTrue(mgmtEvent.isPresent());
-          assertThat(mgmtEvent.get().getStatus().name(), equalTo("FAILED"));
+          assertThat(mgmtEvent.get().getStatus(), equalTo("FAILED"));
         });
   }
 }

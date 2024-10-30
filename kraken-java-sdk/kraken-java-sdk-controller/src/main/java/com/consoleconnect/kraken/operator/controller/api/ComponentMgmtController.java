@@ -130,4 +130,17 @@ public class ComponentMgmtController {
     return HttpResponse.ok(
         apiComponentService.queryComponentExpandInfo(productId, componentId, envId));
   }
+
+  @Operation(summary = "list all api use case in a product")
+  @GetMapping("/api-use-cases")
+  public HttpResponse<List<ComponentExpandDTO>> listAllApiUseCases(@PathVariable String productId) {
+    return HttpResponse.ok(apiComponentService.listAllApiUseCase());
+  }
+
+  @Operation(summary = "The usage detail of component API Server spec")
+  @GetMapping("/components/{componentId}/spec-details")
+  public HttpResponse<EndPointUsageDTO> detailSpec(
+      @PathVariable String productId, @PathVariable String componentId) {
+    return HttpResponse.ok(apiComponentService.queryEndPointUsageDetail(productId, componentId));
+  }
 }

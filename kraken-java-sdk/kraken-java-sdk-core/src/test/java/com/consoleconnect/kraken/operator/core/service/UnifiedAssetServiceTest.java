@@ -45,12 +45,13 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
         });
   }
 
+  @SneakyThrows
   @Order(20)
   @Test
   void givenAsset_whenDelete_thenResultNoException() {
     Assertions.assertDoesNotThrow(
         () -> {
-          unifiedAssetService.deleteOne("mef.sonata.api.order");
+          unifiedAssetService.deleteOne("test.add.component");
         });
   }
 
@@ -157,5 +158,12 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
     unifiedAssetService.mergeMappers(existMapperMap, existMapperMap);
     int afterSize = existMapperMap.size();
     Assertions.assertEquals(beforeSize, afterSize);
+  }
+
+  @Test
+  void givenNotExistedUuidOrKey_whenExisted_thenReturnFalse() {
+    UUID uuid = UUID.randomUUID();
+    Assertions.assertFalse(unifiedAssetService.existed(uuid.toString()));
+    Assertions.assertFalse(unifiedAssetService.existed("mef.sonata.test"));
   }
 }

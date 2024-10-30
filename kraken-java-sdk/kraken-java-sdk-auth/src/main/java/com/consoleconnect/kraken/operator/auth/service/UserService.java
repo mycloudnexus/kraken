@@ -70,6 +70,42 @@ public class UserService {
     log.info("Creating {} users", loginConfig.getUserList().size());
     userRepository.saveAll(loginConfig.getUserList());
     log.info("User data initialized");
+    log.info("Initializing system upgrade user");
+    initSystemUpgradeUser();
+    log.info("System upgrade user initialized");
+  }
+
+  public void initSystemUpgradeUser() {
+    Paging<User> userPaging =
+        this.search(UserContext.SYSTEM_UPGRADE.toLowerCase(), PageRequest.of(0, 1), false);
+    if (userPaging.getTotal() == 0) {
+      CreateUserRequest request = new CreateUserRequest();
+      request.setEmail(UserContext.SYSTEM_UPGRADE);
+      request.setRole(UserRoleEnum.INTERNAL_USER.name());
+      String userName =
+          loginConfig.getUserList().stream()
+              .filter(user -> user.getEmail().equalsIgnoreCase(UserContext.SYSTEM_UPGRADE))
+              .findFirst()
+              .map(UserEntity::getName)
+              .orElse(UserContext.SYSTEM_UPGRADE_NAME);
+      request.setName(userName);
+      request.setPassword(UUID.randomUUID().toString());
+      this.create(request, UserContext.SYSTEM_UPGRADE);
+    } else {
+      loginConfig.getUserList().stream()
+          .filter(user -> user.getEmail().equalsIgnoreCase(UserContext.SYSTEM_UPGRADE))
+          .findFirst()
+          .map(UserEntity::getName)
+          .or(() -> Optional.of(UserContext.SYSTEM_UPGRADE_NAME))
+          .ifPresent(
+              name -> {
+                User db = userPaging.getData().get(0);
+                UpdateUserRequest request = new UpdateUserRequest();
+                request.setName(name);
+                request.setRole(UserRoleEnum.INTERNAL_USER.name());
+                this.update(db.getId(), request, db.getId());
+              });
+    }
   }
 
   public User create(CreateUserRequest request, String createdBy) {
@@ -93,9 +129,11 @@ public class UserService {
     return UserMapper.INSTANCE.toUser(userEntity);
   }
 
-  public Paging<User> search(String q, PageRequest pageRequest) {
+  public Paging<User> search(String q, PageRequest pageRequest, boolean filterInternalUser) {
     log.info("Searching users, q:{}, pageRequest:{}", q, pageRequest);
-    Page<UserEntity> userEntityPage = userRepository.search(q, pageRequest);
+    Page<UserEntity> userEntityPage =
+        userRepository.search(
+            q, pageRequest, filterInternalUser ? List.of(UserRoleEnum.INTERNAL_USER.name()) : null);
     log.info("Users found:{}", userEntityPage.getTotalElements());
     return PagingHelper.toPaging(userEntityPage, UserMapper.INSTANCE::toUser);
   }
@@ -204,6 +242,9 @@ public class UserService {
     }
 
     log.info("User {} found", userEntity.getId());
+    if (UserRoleEnum.INTERNAL_USER.name().equalsIgnoreCase(userEntity.getRole())) {
+      throw KrakenException.unauthorized("Login prohibited");
+    }
 
     if (!passwordEncoder.matches(loginRequest.getPassword(), userEntity.getPassword())) {
       log.warn("Invalid password, user {}", userEntity.getId());

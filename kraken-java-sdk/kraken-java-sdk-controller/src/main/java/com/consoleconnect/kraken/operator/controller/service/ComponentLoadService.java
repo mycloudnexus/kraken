@@ -1,9 +1,8 @@
 package com.consoleconnect.kraken.operator.controller.service;
 
-import com.consoleconnect.kraken.operator.controller.entity.MgmtEventEntity;
-import com.consoleconnect.kraken.operator.controller.repo.EventRepository;
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
+import com.consoleconnect.kraken.operator.core.entity.MgmtEventEntity;
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.ingestion.ResourceLoaderFactory;
@@ -12,6 +11,7 @@ import com.consoleconnect.kraken.operator.core.model.Metadata;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
 import com.consoleconnect.kraken.operator.core.model.facet.ProductFacets;
+import com.consoleconnect.kraken.operator.core.repo.MgmtEventRepository;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.*;
 import java.util.*;
@@ -29,13 +29,13 @@ public class ComponentLoadService {
   private final UnifiedAssetService unifiedAssetService;
   private final ResourceLoaderFactory loaderFactory;
   private final ApiComponentService apiComponentService;
-  private final EventRepository eventRepository;
+  private final MgmtEventRepository eventRepository;
   private static final String DEFAULT_SERVER_NAME = "mock seller API";
 
   public ComponentLoadService(
       UnifiedAssetService unifiedAssetService,
       ResourceLoaderFactory loaderFactory,
-      EventRepository eventRepository,
+      MgmtEventRepository eventRepository,
       ApiComponentService apiComponentService) {
     this.unifiedAssetService = unifiedAssetService;
     this.loaderFactory = loaderFactory;
@@ -43,7 +43,7 @@ public class ComponentLoadService {
     this.apiComponentService = apiComponentService;
   }
 
-  @EventListener(value = MgmtEventEntity.class, condition = "#entity.eventType.name == 'RESET'")
+  @EventListener(value = MgmtEventEntity.class, condition = "#entity.eventType == 'RESET'")
   @Transactional
   public void onResetEvent(MgmtEventEntity entity) {
     log.info("reset event: {}", JsonToolkit.toJson(entity));

@@ -15,4 +15,13 @@ public class InstanceHeartbeatEntity extends AbstractEntity {
 
   @Column(name = "instance_id", nullable = false, unique = true)
   private String instanceId;
+
+  @Column(name = "fqdn", nullable = true)
+  private String fqdn;
+
+  @Column(name = "role", nullable = true)
+  private String role;
+
+  @Column(name = "app_version", nullable = true)
+  private String appVersion;
 }

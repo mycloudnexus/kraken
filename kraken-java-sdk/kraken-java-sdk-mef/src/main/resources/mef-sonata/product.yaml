@@ -83,15 +83,20 @@ spec:
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.inventory.uni.read.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.address.validation.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.uni.add.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.uni.delete.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.eline.delete.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.eline.add.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.quote.yaml
-    - classpath:/mef-sonata/template-upgrade/release.1.2.0.yaml
-    - classpath:/mef-sonata/template-upgrade/release.1.2.1.yaml
-    - classpath:/mef-sonata/template-upgrade/release.1.2.2.yaml
-    - classpath:/mef-sonata/template-upgrade/release.1.2.3.yaml
-    - classpath:/mef-sonata/template-upgrade/release.1.2.4.yaml
-    - classpath:/mef-sonata/template-upgrade/release.1.2.5.yaml
-    - classpath:/mef-sonata/template-upgrade/release.1.2.6.yaml
-    - classpath:/mef-sonata/template-upgrade/release.1.3.0.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.quote.uni.add.sync.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.quote.uni.add.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.quote.eline.add.sync.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.quote.eline.add.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.inventory.uni.read.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.inventory.eline.read.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.inventory.uni.list.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.inventory.eline.list.yaml
+    - classpath:/mef-sonata/template-upgrade/release.1.5.1.yaml
 
 
   templateUpgradePaths:
@@ -130,7 +135,29 @@ spec:
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.address.validation.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.quote.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.uni.add.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.uni.delete.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.eline.delete.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.eline.add.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.quote.uni.add.sync.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.quote.uni.add.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.quote.eline.add.sync.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.quote.eline.add.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.inventory.uni.read.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.inventory.eline.read.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.inventory.uni.list.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.inventory.eline.list.yaml
+    - classpath:/mef-sonata/apis/api.address.yaml
+    - classpath:/mef-sonata/apis/api.inventory.yaml
+    - classpath:/mef-sonata/apis/api.notification.yaml
+    - classpath:/mef-sonata/apis/api.order.yaml
+    - classpath:/mef-sonata/apis/api.product.offering.yaml
+    - classpath:/mef-sonata/apis/api.quote.yaml
   sampleMapperDataPaths:
     - classpath:/mef-sonata/api-targets-mappers-sample-data/api-target-mapper.order.uni.add.yaml
+  sampleConfigPaths:
+    - classpath:/mef-sonata/api-targets-mappers-sample-data/api-target-spec.mock.yaml
+    - classpath:/mef-sonata/api-targets-mappers-sample-data/api.buyer.mock.yaml
+
 
 

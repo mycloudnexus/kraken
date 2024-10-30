@@ -1,4 +1,3 @@
----
 server:
   port: ${port:8001}
 
@@ -73,7 +72,7 @@ springdoc:
   swagger-ui:
     enabled: true
     path: /swagger-ui.html
-    supported-submit-methods: ["get", "post", "patch", "delete"]
+    supported-submit-methods: [ "get", "post", "patch", "delete" ]
     config-url: /v3/api-docs/swagger-config
     urls:
       - url: /v3/api-docs
@@ -89,8 +88,10 @@ app:
   products:
     - key: mef.sonata
       environments:
-        - stage
-        - production
+        - id: 2fd92244-a8d1-43fc-b76d-d87ffb0172f4
+          name: stage
+        - id: e1f5d4f6-1cd9-4071-b08c-da72aadc05fe
+          name: production
   mgmt:
     enabled: true
     apiToken:
@@ -119,6 +120,9 @@ app:
           email: admin
           role: ADMIN
           password: 182cf072dc112634996cf4abccf2915273ff1a0b53d4436388fe9c55a9531277c6d86a23b7a9addc1c2642a6b62f17cfd18f70c2d98501d520fe4886727b97d1
+        - name: user_upgrade
+          email: SYSTEM_UPGRADE
+          role: INTERNAL_USER
       jwt:
         issuer: https://kraken.consoleconnect.com/issuer
         key-id: kraken

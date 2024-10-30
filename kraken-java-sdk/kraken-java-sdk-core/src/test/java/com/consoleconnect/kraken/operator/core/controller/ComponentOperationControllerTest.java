@@ -7,6 +7,7 @@ import com.consoleconnect.kraken.operator.core.helper.WebTestClientHelper;
 import com.consoleconnect.kraken.operator.core.ingestion.fs.ClassPathResourceLoader;
 import com.consoleconnect.kraken.operator.core.model.FileContentDescriptor;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
+import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.core.toolkit.YamlToolkit;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
@@ -27,6 +28,7 @@ class ComponentOperationControllerTest extends AbstractIntegrationTest {
   private static final String PRODUCT_BASE_PATH = "/products";
   private static final String PRODUCT_ID = "product.mef.sonata.api";
   private final WebTestClientHelper testClientHelper;
+  @Autowired UnifiedAssetService unifiedAssetService;
 
   @Autowired
   ComponentOperationControllerTest(WebTestClient webTestClient) {
@@ -54,7 +56,7 @@ class ComponentOperationControllerTest extends AbstractIntegrationTest {
   void testAddAndUpdateComponent() {
     String path = String.format("%s/%s/components", PRODUCT_BASE_PATH, PRODUCT_ID);
 
-    // add a new component
+    // add a new component if it's not existed.
     String data =
         new ClassPathResourceLoader()
             .readFile("classpath:deployment-config/components/api-targets/test.add.component.yaml")
@@ -66,12 +68,16 @@ class ComponentOperationControllerTest extends AbstractIntegrationTest {
     UnifiedAsset component =
         YamlToolkit.parseYaml(data, UnifiedAsset.class)
             .orElseThrow(() -> KrakenException.badRequest("Failed to parse yaml file"));
-    testClientHelper.postAndVerify(
-        (uriBuilder -> uriBuilder.path(path).build()),
-        JsonToolkit.toJson(component),
-        bodyStr -> {
-          Assertions.assertTrue(true);
-        });
+
+    boolean exist = unifiedAssetService.existed(component.getMetadata().getKey());
+    if (!exist) {
+      testClientHelper.postAndVerify(
+          (uriBuilder -> uriBuilder.path(path).build()),
+          JsonToolkit.toJson(component),
+          bodyStr -> {
+            Assertions.assertTrue(true);
+          });
+    }
 
     // can't update the data with the same version
     component.getMetadata().setName("updated");

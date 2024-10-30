@@ -1,0 +1,18 @@
+kind: kraken.product-buyer
+apiVersion: v1
+metadata:
+  name: Buyer {{buyerId}}
+  version: 0
+  key: mef.sonata.buyer1724148299440
+  description: Onboard buyer information
+  status: activated
+  labels:
+    envId: {{envId}}
+    buyerId: {{buyerId}}
+facets:
+  buyerInfo:
+    envId: {{envId}}
+    buyerId: {{buyerId}}
+    companyName: {{buyerId}}
+links: []
+

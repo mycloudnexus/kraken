@@ -12,29 +12,37 @@ spec:
     mef.sonata.api-target.order.uni.add:
       - name: product_type_UNI
         path: "$.body.productOrderItem[*].product.productConfiguration.['@type']"
-        expected: UNI
+        expectType: EXPECTED
+        value: UNI
       - name: action_add
         path: "$.body.productOrderItem[*].['action']"
-        expected: add
+        expectType: EXPECTED
+        value: add
     mef.sonata.api-target.order.eline.add:
       - name: product_type_eline
         path: "$.body.productOrderItem[*].product.productConfiguration.['@type']"
-        expected: ACCESS_E_LINE
+        expectType: EXPECTED
+        value: ACCESS_E_LINE
       - name: action_add
         path: "$.body.productOrderItem[*].['action']"
-        expected: add
+        expectType: EXPECTED
+        value: add
     mef.sonata.api-target.order.eline.delete:
       - name: product_type_eline
         path: "$.body.productOrderItem[*].product.productConfiguration.['@type']"
-        expected: ACCESS_E_LINE
+        expectType: EXPECTED
+        value: ACCESS_E_LINE
       - name: action_delete
         path: "$.body.productOrderItem[*].['action']"
-        expected: delete
+        expectType: EXPECTED
+        value: delete
     mef.sonata.api-target.order.uni.delete:
       - name: product_type_uni
         path: "$.body.productOrderItem[*].product.productConfiguration.['@type']"
-        expected: UNI
+        expectType: EXPECTED
+        value: UNI
       - name: action_delete
         path: "$.body.productOrderItem[*].['action']"
-        expected: delete
+        expectType: EXPECTED
+        value: delete
 

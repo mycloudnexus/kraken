@@ -6,7 +6,6 @@ import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPIFacets;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
-import com.consoleconnect.kraken.operator.gateway.filter.QueryParamsRoutePredicateFactory;
 import com.consoleconnect.kraken.operator.gateway.func.KrakenGatewayFilterSpecFunc;
 import com.consoleconnect.kraken.operator.gateway.repo.HttpRequestRepository;
 import com.consoleconnect.kraken.operator.gateway.runner.AbstractActionRunner;
@@ -59,18 +58,10 @@ public class KrakenAPIRouteLocatorImpl implements RouteLocator {
       ComponentAPIFacets.Trigger trigger = mapping.getTrigger();
       builder.route(
           r -> {
-            BooleanSpec booleanSpec = r.path(trigger.getPath());
+            BooleanSpec booleanSpec = r.path(filterSlash(trigger.getPath()));
             if (trigger.getMethod() != null) {
               log.info("method: {}", trigger.getMethod());
               booleanSpec = booleanSpec.and().method(trigger.getMethod().toUpperCase());
-            }
-            if (trigger.getQueryParams() != null && !trigger.getQueryParams().isEmpty()) {
-              log.info("query params: {}", trigger.getQueryParams());
-              QueryParamsRoutePredicateFactory.Config config =
-                  new QueryParamsRoutePredicateFactory.Config();
-              config.setQueryParams(trigger.getQueryParams());
-              booleanSpec =
-                  booleanSpec.and().predicate(new QueryParamsRoutePredicateFactory().apply(config));
             }
             return booleanSpec
                 .filters(
@@ -106,5 +97,9 @@ public class KrakenAPIRouteLocatorImpl implements RouteLocator {
     }
 
     return builder.build().getRoutes();
+  }
+
+  private String[] filterSlash(String path) {
+    return path.startsWith("/") ? new String[] {path.substring(1), path} : new String[] {path};
   }
 }

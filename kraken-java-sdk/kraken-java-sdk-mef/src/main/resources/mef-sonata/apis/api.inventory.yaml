@@ -45,21 +45,30 @@ spec:
                 console.log("input: " + jsonStr);
                 let input = JSON.parse(jsonStr);
                 let targetAPIConfigKey = '';
+                let matrixConfigKey = '';
                 if(input.bizType == 'UNI') {
                   targetAPIConfigKey = 'mef.sonata.api-target.inventory.uni.list';
+                  matrixConfigKey = 'mef.sonata.api.matrix.inventory.uni.list';
                 } else if(input.bizType == 'ACCESS_E_LINE') {
                   targetAPIConfigKey = 'mef.sonata.api-target.inventory.eline.list';
+                  matrixConfigKey = 'mef.sonata.api.matrix.inventory.eline.list';
                 } else {
                   targetAPIConfigKey = 'targetKey:notFound';
+                  matrixConfigKey = 'productOrderId:notFound';
                 }
                 let ret = {
                   orderType: input.bizType,
-                  targetAPIConfigKey: targetAPIConfigKey
+                  targetAPIConfigKey: targetAPIConfigKey,
+                  matrixConfigKey: matrixConfigKey
                 };
                 return JSON.stringify(ret);
               }
           outputKey: order
-
+        - id: mapping-matrix-check-inventory
+          actionType: buildin@mapping-matrix-checker
+          env:
+            mappingMatrixKey: ${order.matrixConfigKey}
+            targetKey: ${order.targetAPIConfigKey}
         - id: load-downstream-api-config
           actionType: buildin@load-target-api-config
           env:
@@ -107,20 +116,31 @@ spec:
                 console.log("input: " + jsonStr);
                 let input = JSON.parse(jsonStr);
                 let targetAPIConfigKey = '';
+                let matrixConfigKey = '';
                 if(input.bizType == 'UNI') {
                   targetAPIConfigKey = 'mef.sonata.api-target.inventory.uni.read';
+                  matrixConfigKey = 'mef.sonata.api.matrix.inventory.uni.read';
                 } else if(input.bizType == 'ACCESS_E_LINE') {
                   targetAPIConfigKey = 'mef.sonata.api-target.inventory.eline.read';
+                  matrixConfigKey = 'mef.sonata.api.matrix.inventory.eline.read';
                 } else {
                   targetAPIConfigKey = 'targetKey:notFound';
+                  matrixConfigKey = 'productType:notFound';
                 }
                 let ret = {
                   orderType: input.bizType,
-                  targetAPIConfigKey: targetAPIConfigKey
+                  targetAPIConfigKey: targetAPIConfigKey,
+                  matrixConfigKey: matrixConfigKey
                 };
                 return JSON.stringify(ret);
               }
           outputKey: order
+        - id: mapping-matrix-check-inventory-read
+          actionType: buildin@mapping-matrix-checker
+          env:
+            mappingMatrixKey: ${order.matrixConfigKey}
+            targetKey: ${order.targetAPIConfigKey}
+            id: ${segment}
         - id: load-downstream-api-config
           actionType: buildin@load-target-api-config
           env:
@@ -149,23 +169,39 @@ spec:
 links:
   - targetAssetKey: mef.sonata.api-target.inventory.uni.list
     relationship: implementation.target
+    group: mef.sonata.api-target.inventory.uni.list
+  - targetAssetKey: mef.sonata.api.matrix.inventory.uni.list
+    relationship: implementation.matrix
+    group: mef.sonata.api-target.inventory.uni.list
   - targetAssetKey: mef.sonata.api-target.inventory.eline.list
     relationship: implementation.target
+    group: mef.sonata.api-target.inventory.eline.list
+  - targetAssetKey: mef.sonata.api.matrix.inventory.eline.list
+    relationship: implementation.matrix
+    group: mef.sonata.api-target.inventory.eline.list
   - targetAssetKey: mef.sonata.api-target.inventory.eline.read
     relationship: implementation.target
+    group: mef.sonata.api-target.inventory.eline.read
+  - targetAssetKey: mef.sonata.api.matrix.inventory.eline.read
+    relationship: implementation.matrix
+    group: mef.sonata.api-target.inventory.eline.read
   - targetAssetKey: mef.sonata.api-target.inventory.uni.read
     relationship: implementation.target
+    group: mef.sonata.api-target.inventory.uni.read
+  - targetAssetKey: mef.sonata.api.matrix.inventory.uni.read
+    relationship: implementation.matrix
+    group: mef.sonata.api-target.inventory.uni.read
   - targetAssetKey: mef.sonata.api-target-mapper.inventory.eline.read
     relationship: implementation.target-mapper
+    group: mef.sonata.api-target.inventory.eline.read
   - targetAssetKey: mef.sonata.api-target-mapper.inventory.uni.read
     relationship: implementation.target-mapper
+    group: mef.sonata.api-target.inventory.uni.read
   - targetAssetKey: mef.sonata.api-target-mapper.inventory.eline.list
     relationship: implementation.target-mapper
+    group: mef.sonata.api-target.inventory.eline.list
   - targetAssetKey: mef.sonata.api-target-mapper.inventory.uni.list
     relationship: implementation.target-mapper
+    group: mef.sonata.api-target.inventory.uni.list
   - targetAssetKey: mef.sonata.api-spec.inventory
     relationship: implementation.standard.api-spec
-
-
-
-

@@ -5,5 +5,7 @@ public enum DeployStatusEnum {
   INIT,
   IN_PROCESS,
   FAILED,
-  SUCCESS
+  SUCCESS,
+  WAIT_TO_DOWNLOAD_CONTENT,
+  WAIT_TO_PUBLISH;
 }

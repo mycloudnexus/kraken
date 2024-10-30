@@ -4,6 +4,7 @@ import static com.consoleconnect.kraken.operator.core.service.UnifiedAssetServic
 
 import com.consoleconnect.kraken.operator.controller.dto.UnifiedAssetDetailsDto;
 import com.consoleconnect.kraken.operator.controller.mapper.AssetMapper;
+import com.consoleconnect.kraken.operator.controller.service.ComponentAPIServerService;
 import com.consoleconnect.kraken.operator.core.dto.AssetLinkDto;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 public class ComponentController {
 
   private final UnifiedAssetService service;
+  private final ComponentAPIServerService componentAPIServerService;
 
   @Operation(summary = "List all components")
   @GetMapping()
@@ -55,7 +57,7 @@ public class ComponentController {
 
   @Operation(summary = "Retrieve a component details")
   @GetMapping("/{componentId}")
-  public HttpResponse<UnifiedAssetDetailsDto> findOneComponent(
+  public HttpResponse<UnifiedAssetDto> findOneComponent(
       @PathVariable("productId") String productId,
       @PathVariable String componentId,
       @RequestParam(value = "linkIncluded", required = false, defaultValue = "false")
@@ -71,6 +73,10 @@ public class ComponentController {
         details.setAssetLinks(links);
       }
       return HttpResponse.ok(details);
+    } else if (AssetKindEnum.COMPONENT_API_TARGET_SPEC.getKind().equalsIgnoreCase(asset.getKind())
+        && product.getId().equalsIgnoreCase(asset.getParentId())) {
+      componentAPIServerService.inUse(asset);
+      return HttpResponse.ok(asset);
     }
     throw KrakenException.badRequest("Asset is not a component");
   }

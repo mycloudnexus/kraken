@@ -1,7 +1,6 @@
 package com.consoleconnect.kraken.operator.controller.service;
 
 import static com.consoleconnect.kraken.operator.controller.service.ApiComponentService.ASSET_NOT_FOUND;
-import static com.consoleconnect.kraken.operator.controller.service.ApiComponentService.MAPPER_PATTERN;
 import static com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants.FIELD_CREATE_AT_ORIGINAL;
 import static com.consoleconnect.kraken.operator.core.toolkit.LabelConstants.*;
 
@@ -9,6 +8,7 @@ import com.consoleconnect.kraken.operator.controller.dto.*;
 import com.consoleconnect.kraken.operator.controller.model.ComponentTag;
 import com.consoleconnect.kraken.operator.controller.model.ComponentTagFacet;
 import com.consoleconnect.kraken.operator.controller.model.DeploymentFacet;
+import com.consoleconnect.kraken.operator.controller.tools.VersionHelper;
 import com.consoleconnect.kraken.operator.core.dto.AssetLinkDto;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
@@ -24,18 +24,16 @@ import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.*;
 import com.consoleconnect.kraken.operator.core.toolkit.LabelConstants;
 import com.fasterxml.jackson.core.type.TypeReference;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -49,6 +47,7 @@ public class ComponentTagService implements TargetMappingChecker, LatestDeployme
   public static final String TAG = ".tag.";
   @Getter private final UnifiedAssetService unifiedAssetService;
   private final UnifiedAssetRepository unifiedAssetRepository;
+  private final ApiComponentService apiComponentService;
 
   @Transactional
   public IngestionDataResult createTag(
@@ -65,7 +64,7 @@ public class ComponentTagService implements TargetMappingChecker, LatestDeployme
     String tagVersion = Constants.INIT_VERSION;
     if (latestTagOpt.isPresent()) {
       UnifiedAssetEntity unifiedAssetEntity = latestTagOpt.get();
-      tagVersion = generateVersion(unifiedAssetEntity);
+      tagVersion = VersionHelper.generateVersion(unifiedAssetEntity);
       Optional<UnifiedAssetDto> any =
           links.stream()
               .map(AssetLinkDto::getTargetAsset)
@@ -111,30 +110,32 @@ public class ComponentTagService implements TargetMappingChecker, LatestDeployme
       String componentId, String mapperKey, String createdBy) {
     UnifiedAssetEntity mapperEntity =
         unifiedAssetRepository.findOneByKey(mapperKey).orElseThrow(() -> ASSET_NOT_FOUND);
-    Optional<UnifiedAssetEntity> latestTagOpt =
-        unifiedAssetService.findLatest(
-            mapperEntity.getId().toString(), AssetKindEnum.COMPONENT_API_TARGET_MAPPER_TAG);
+    String newVersion = newVersion(mapperEntity);
+    // upgrade version for mapper
+    mapperEntity.getLabels().put(LABEL_VERSION_NAME, newVersion);
+    mapperEntity.getLabels().put(LABEL_SUB_VERSION_NAME, NumberUtils.INTEGER_ONE.toString());
+    unifiedAssetRepository.save(mapperEntity);
     UnifiedAssetDto componentAsset = unifiedAssetService.findOne(componentId);
-    Matcher matcher = MAPPER_PATTERN.matcher(mapperKey);
-    String suffix = (matcher.find() ? matcher.group(1) : "non-exist");
-    List<UnifiedAssetDto> childAssets =
-        componentAsset.getLinks().stream()
-            .filter(link -> link.getTargetAssetKey().endsWith(suffix))
-            .map(link -> unifiedAssetService.findOneByIdOrKey(link.getTargetAssetKey()))
-            .map(asset -> UnifiedAssetService.toAsset(asset, true))
-            .toList();
-
+    List<String> memberKeys =
+        apiComponentService
+            .findRelatedApiUse(mapperKey)
+            .map(ApiUseCaseDto::membersExcludeApiKey)
+            .orElse(List.of());
+    List<UnifiedAssetDto> childAssets = unifiedAssetService.findByAllKeysIn(memberKeys, true);
     changeParentId(childAssets, componentAsset);
     String key = mapperKey + TAG + System.currentTimeMillis();
     UnifiedAsset tagAsset =
         UnifiedAsset.of(
             AssetKindEnum.COMPONENT_API_TARGET_MAPPER_TAG.getKind(), key, generateVersionName());
-    String tagVersion = Constants.INIT_VERSION;
-    if (latestTagOpt.isPresent()) {
-      UnifiedAssetEntity unifiedAssetEntity = latestTagOpt.get();
-      tagVersion = generateVersion(unifiedAssetEntity);
-    }
-    tagAsset.getMetadata().getLabels().put(LabelConstants.LABEL_VERSION_NAME, tagVersion);
+    tagAsset.getMetadata().getLabels().put(LabelConstants.LABEL_VERSION_NAME, newVersion);
+    tagAsset
+        .getMetadata()
+        .getLabels()
+        .put(
+            LABEL_SUB_VERSION_NAME,
+            mapperEntity
+                .getLabels()
+                .getOrDefault(LABEL_SUB_VERSION_NAME, NumberUtils.INTEGER_ONE.toString()));
     tagAsset.getMetadata().getLabels().put(LabelConstants.MAPPER_KEY, mapperKey);
 
     Map<String, Object> facets = new HashMap<>();
@@ -143,6 +144,7 @@ public class ComponentTagService implements TargetMappingChecker, LatestDeployme
 
     tagAsset.setFacets(facets);
     SyncMetadata syncMetadata = new SyncMetadata("", "", DateTime.nowInUTCString(), createdBy);
+    // here has the important point: parent key is mapper
     return unifiedAssetService.syncAsset(mapperKey, tagAsset, syncMetadata, true);
   }
 
@@ -282,17 +284,6 @@ public class ComponentTagService implements TargetMappingChecker, LatestDeployme
         componentId, AssetKindEnum.COMPONENT_API_TAG.getKind(), facetIncluded, q, pageRequest);
   }
 
-  private String generateVersion(UnifiedAssetEntity unifiedAssetEntity) {
-    if (Objects.isNull(unifiedAssetEntity)) {
-      return Constants.INIT_VERSION;
-    }
-    return new BigDecimal(
-            String.valueOf(unifiedAssetEntity.getLabels().get(LabelConstants.LABEL_VERSION_NAME)))
-        .add(BigDecimal.valueOf(0.1))
-        .setScale(1, RoundingMode.HALF_UP)
-        .toString();
-  }
-
   private String generateVersionName() {
     String name = DateTimeFormatter.ofPattern("yyyyMMddHHmm").format(ZonedDateTime.now());
     return String.format("Version:%s", name);
@@ -371,5 +362,13 @@ public class ComponentTagService implements TargetMappingChecker, LatestDeployme
 
     SyncMetadata syncMetadata = new SyncMetadata("", "", DateTime.nowInUTCString());
     return unifiedAssetService.syncAsset(productId, tagAsset, syncMetadata, true);
+  }
+
+  protected String newVersion(UnifiedAssetEntity mapperEntity) {
+    return unifiedAssetService
+        .findLatest(mapperEntity.getId().toString(), AssetKindEnum.COMPONENT_API_TARGET_MAPPER_TAG)
+        .map(tag -> tag.getLabels().get(LABEL_VERSION_NAME))
+        .map(VersionHelper::upgradeVersionByZeroPointOne)
+        .orElse(Constants.INIT_VERSION);
   }
 }

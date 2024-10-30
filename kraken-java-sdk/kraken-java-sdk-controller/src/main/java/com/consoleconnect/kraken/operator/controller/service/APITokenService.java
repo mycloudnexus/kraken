@@ -27,9 +27,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 @Slf4j
 @Service
@@ -37,6 +37,7 @@ import org.springframework.util.StringUtils;
 public class APITokenService {
   private final APITokenRepository apiTokenRepository;
   private final AuthDataProperty.AuthServer authServer;
+  private final AuthDataProperty.ResourceServer resourceServer;
   private final EnvironmentRepository environmentRepository;
   private final Map<String, String> envCache = new ConcurrentHashMap<>();
 
@@ -140,8 +141,8 @@ public class APITokenService {
     return userTokenService.findOneByToken(token).map(this::toAPIToken);
   }
 
-  public String findEnvId(String authorization, String envIdOrKey) {
-    if (authorization == null || !StringUtils.startsWithIgnoreCase(authorization, "bearer")) {
+  public String findEnvId(JwtAuthenticationToken authentication, String envIdOrKey) {
+    if (authentication == null) {
       String envId =
           envIdOrKey == null ? null : envCache.computeIfAbsent(envIdOrKey, this::findEnvId);
       if (envId == null) {
@@ -149,14 +150,27 @@ public class APITokenService {
       }
       return envId;
     }
-    String bearerToken = authorization.substring(7).trim();
-    return findOneByAuth(bearerToken)
-        .map(APIToken::getEnvId)
-        .orElseThrow(
-            () -> {
-              log.warn("No envId found based on the token");
-              return KrakenException.unauthorized("Invalid Token");
-            });
+
+    String issuer = authentication.getToken().getIssuer().toString();
+    String envId = (String) authentication.getTokenAttributes().getOrDefault(ENV_ID, null);
+
+    Optional<AuthDataProperty.JwtDecoderProperty> jwtDecoderPropertyOptional =
+        findJwtDecoderProperty(issuer);
+    if (envId == null
+        || jwtDecoderPropertyOptional.isEmpty()
+        || jwtDecoderPropertyOptional.get().getIntrospection().isEnabled()) {
+      log.info("introspection the accessToken to get envId");
+      return findOneByAuth(authentication.getToken().getTokenValue())
+          .map(APIToken::getEnvId)
+          .orElseThrow(
+              () -> {
+                log.warn("No envId found based on the token");
+                return KrakenException.unauthorized("Invalid Token");
+              });
+    }
+
+    log.info("envId found based on the token");
+    return envId;
   }
 
   private String findEnvId(String envNameOrId) {
@@ -169,5 +183,14 @@ public class APITokenService {
         .findFirst()
         .map(UUID::toString)
         .orElseThrow(() -> KrakenException.notFound("Environment not found"));
+  }
+
+  private Optional<AuthDataProperty.JwtDecoderProperty> findJwtDecoderProperty(String issuer) {
+    if (resourceServer.getJwt() == null) {
+      return Optional.empty();
+    }
+    return resourceServer.getJwt().stream()
+        .filter(jwt -> jwt.getIssuer().equalsIgnoreCase(issuer))
+        .findFirst();
   }
 }

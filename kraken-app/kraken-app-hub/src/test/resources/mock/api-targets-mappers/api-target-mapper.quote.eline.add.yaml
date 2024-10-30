@@ -24,7 +24,7 @@ spec:
             description: quote state mapping
             source: "answered"
             sourceLocation: ""
-            target: "@{{quoteItem[*].state}}"
+            target: "@{{quoteItem[0].state}}"
             targetType: enum
             targetLocation: BODY
             targetValues:
@@ -47,13 +47,13 @@ spec:
             description: quote price value mapping
             source: "@{{responseBody.results[0].price}}"
             sourceLocation: ""
-            target: "@{{quoteItem.quoteItemPrice.price.dutyFreeAmount.value}}"
+            target: "@{{quoteItem[0].quoteItemPrice[*].price.dutyFreeAmount.value}}"
             requiredMapping: true
           - name: mapper.quote.eline.add.price.unit
             title: Quote Price Unit Mapping
             description: quote price unit mapping
             source: "USD"
             sourceLocation: BODY
-            target: "@{{quoteItem.quoteItemPrice.price.dutyFreeAmount.unit}}"
+            target: "@{{quoteItem[0].quoteItemPrice[*].price.dutyFreeAmount.unit}}"
             targetLocation: BODY
             requiredMapping: true

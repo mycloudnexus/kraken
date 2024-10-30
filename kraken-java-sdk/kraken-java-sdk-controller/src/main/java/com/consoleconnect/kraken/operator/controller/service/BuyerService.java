@@ -1,8 +1,7 @@
 package com.consoleconnect.kraken.operator.controller.service;
 
 import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.PRODUCT_BUYER;
-import static com.consoleconnect.kraken.operator.core.toolkit.LabelConstants.LABEL_BUYER_ID;
-import static com.consoleconnect.kraken.operator.core.toolkit.LabelConstants.LABEL_ENV_ID;
+import static com.consoleconnect.kraken.operator.core.toolkit.LabelConstants.*;
 
 import com.consoleconnect.kraken.operator.auth.jwt.JwtEncoderToolkit;
 import com.consoleconnect.kraken.operator.auth.model.AuthDataProperty;
@@ -22,11 +21,14 @@ import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.*;
 import com.fasterxml.jackson.core.type.TypeReference;
+import java.time.Instant;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -39,12 +41,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class BuyerService {
+public class BuyerService extends AssetStatusManager {
   private static final String BUYER_KEY_PREFIX = "mef.sonata.buyer";
   private static final String BUYER_NAME = "Buyer";
   private static final String BUYER_DESC = "Onboard buyer information";
 
-  private final UnifiedAssetService unifiedAssetService;
+  @Getter private final UnifiedAssetService unifiedAssetService;
   private final UnifiedAssetRepository unifiedAssetRepository;
   private final AuthDataProperty.AuthServer authServer;
   private final MgmtProperty appProperty;
@@ -109,7 +111,8 @@ public class BuyerService {
   }
 
   @Transactional
-  public BuyerAssetDto regenerate(String productId, String id, Long tokenExpiredInSeconds) {
+  public BuyerAssetDto regenerate(
+      String productId, String id, Long tokenExpiredInSeconds, String createdBy) {
     log.info(
         "regenerate buyer token, productId:{}, id:{}, tokenExpiredInSeconds:{}",
         productId,
@@ -122,8 +125,18 @@ public class BuyerService {
     if (Objects.isNull(buyerInfo)) {
       throw KrakenException.notFound("The buyer information is not existed.");
     }
-
-    return generateBuyer(buyer, buyerInfo.getBuyerId(), tokenExpiredInSeconds);
+    if (!AssetStatusEnum.ACTIVATED.getKind().equals(buyer.getMetadata().getStatus())) {
+      throw KrakenException.badRequest("The buyer is not activated.");
+    }
+    BuyerAssetDto buyerAssetDto =
+        generateBuyer(buyer, buyerInfo.getBuyerId(), tokenExpiredInSeconds);
+    buyer
+        .getMetadata()
+        .getLabels()
+        .put(LABEL_ISSUE_AT, DateTimeFormatter.ISO_INSTANT.format(Instant.now()));
+    SyncMetadata syncMetadata = new SyncMetadata("", "", DateTime.nowInUTCString(), createdBy);
+    unifiedAssetService.syncAsset(productId, buyer, syncMetadata, true);
+    return buyerAssetDto;
   }
 
   private BuyerAssetDto generateBuyer(
@@ -161,6 +174,10 @@ public class BuyerService {
     unifiedAsset.getMetadata().setDescription(BUYER_DESC);
     unifiedAsset.getMetadata().getLabels().put(LABEL_ENV_ID, envId);
     unifiedAsset.getMetadata().getLabels().put(LABEL_BUYER_ID, buyerId);
+    unifiedAsset
+        .getMetadata()
+        .getLabels()
+        .put(LABEL_ISSUE_AT, DateTimeFormatter.ISO_INSTANT.format(Instant.now()));
     unifiedAsset.getMetadata().setStatus(AssetStatusEnum.ACTIVATED.getKind());
     BuyerOnboardFacets facets = new BuyerOnboardFacets();
     BuyerOnboardFacets.BuyerInfo buyerInfo = new BuyerOnboardFacets.BuyerInfo();
@@ -173,5 +190,39 @@ public class BuyerService {
         JsonToolkit.fromJson(
             JsonToolkit.toJson(facets), new TypeReference<Map<String, Object>>() {}));
     return unifiedAsset;
+  }
+
+  @Transactional
+  public BuyerAssetDto activate(String productId, String id, String createdBy) {
+    UnifiedAssetDto assetDto = activateAsset(id, PRODUCT_BUYER, "buyer not found");
+
+    BuyerOnboardFacets facets = UnifiedAsset.getFacets(assetDto, BuyerOnboardFacets.class);
+    String buyerId = facets.getBuyerInfo().getBuyerId();
+    BuyerAssetDto buyerAssetDto = generateBuyer(assetDto, buyerId, null);
+
+    // add labels
+    Map<String, String> labels = assetDto.getMetadata().getLabels();
+    labels.put(LABEL_ISSUE_AT, DateTimeFormatter.ISO_INSTANT.format(Instant.now()));
+    labels.put(
+        LABEL_EXPIRED_AT,
+        DateTimeFormatter.ISO_INSTANT.format(
+            buyerAssetDto.getBuyerToken().getExpiredAt().toInstant()));
+
+    afterCompletion(assetDto, createdBy);
+    return buyerAssetDto;
+  }
+
+  @Transactional
+  public Boolean deactivate(String productId, String id, String createdBy) {
+    UnifiedAssetDto assetDto = deactivateAsset(id, PRODUCT_BUYER, "buyer not found");
+
+    // add labels
+    assetDto
+        .getMetadata()
+        .getLabels()
+        .put(LABEL_EXPIRED_AT, DateTimeFormatter.ISO_INSTANT.format(Instant.now()));
+
+    afterCompletion(assetDto, createdBy);
+    return true;
   }
 }

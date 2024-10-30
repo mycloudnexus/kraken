@@ -8,7 +8,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -28,9 +30,9 @@ public class ClientPubSubController {
   @PostMapping("/events")
   public Mono<HttpResponse<Void>> onEvent(
       @RequestParam(value = "env", required = false) String env,
-      @RequestHeader(value = "Authorization", required = false) String authorization,
+      @Autowired(required = false) JwtAuthenticationToken authenticationToken,
       @RequestBody ClientEvent event) {
-    String envId = apiTokenService.findEnvId(authorization, env);
+    String envId = apiTokenService.findEnvId(authenticationToken, env);
     return UserContext.getUserId()
         .publishOn(Schedulers.boundedElastic())
         .map(userId -> clientEventService.onEvent(envId, userId, event));

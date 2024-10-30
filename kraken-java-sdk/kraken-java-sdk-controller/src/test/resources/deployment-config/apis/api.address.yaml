@@ -117,14 +117,18 @@ spec:
 links:
   - targetAssetKey: mef.sonata.api-target.address.retrieve
     relationship: implementation.target
+    group: address.retrieve
   - targetAssetKey: mef.sonata.api-target.address.validate
     relationship: implementation.target
+    group: address.validate
   - targetAssetKey: mef.sonata.api-spec.serviceability.address
     relationship: implementation.standard.api-spec
   - targetAssetKey: mef.sonata.api-target-mapper.address.validate
     relationship: implementation.target-mapper
+    group: address.validate
   - targetAssetKey: mef.sonata.api-target-mapper.address.retrieve
     relationship: implementation.target-mapper
+    group: address.retrieve
 
 
 

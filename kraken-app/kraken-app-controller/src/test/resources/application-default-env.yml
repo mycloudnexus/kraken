@@ -3,5 +3,7 @@ app:
   products:
     - key: mef.sonata
       environments:
-        - stage
-        - production
+        - id: 2fd92244-a8d1-43fc-b76d-d87ffb0172f4
+          name: stage
+        - id: e1f5d4f6-1cd9-4071-b08c-da72aadc05fe
+          name: production

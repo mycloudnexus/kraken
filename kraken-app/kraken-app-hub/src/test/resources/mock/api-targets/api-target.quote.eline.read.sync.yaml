@@ -20,7 +20,8 @@ spec:
       url: ${env.target.url}
       path: /api/pricing/calculate
       method: post
-      requestBody: ${entity.request.quoteItem[0].product.productConfiguration.access_e_line}
+      requestBody: |
+        {}
       responseBody: |
         {
           "id": "${entity.id}",

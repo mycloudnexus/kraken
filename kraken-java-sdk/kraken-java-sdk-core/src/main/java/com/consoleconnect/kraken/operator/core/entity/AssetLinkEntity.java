@@ -33,6 +33,9 @@ public class AssetLinkEntity extends AbstractEntity {
   @Column(name = "relationship", nullable = false)
   private String relationship;
 
+  @Column(name = "component_group")
+  private String group;
+
   @Type(JsonType.class)
   @Column(name = "metadata", columnDefinition = "jsonb")
   private Map<String, Object> metadata = new HashMap<>();

@@ -4,6 +4,7 @@ apiVersion: v1
 metadata:
   key: mef.sonata.api-target.order.eline.read
   name: Order Connection API
+  mapperKey: mef.sonata.api-target.order.eline.read
 spec:
   inputs:
     - mefQuery
@@ -32,11 +33,62 @@ spec:
         }
       mappers:
         request:
-          - name: order.eline.read.buyerId.mapper
-            title: ""
+          - name: mapper.order.eline.read.buyerId
+            title: "The unique identifier of the organization that is acting as the a Buyer."
             description: ""
             source: "@{{buyerId}}"
-            sourceLocation: QUERY
-            target: "@{{companyName}}"
-            targetLocation: PATH
+            sourceLocation: "QUERY"
+            target: "@{{username}}"
+            targetLocation: "PATH"
+            requiredMapping: false
+          - name: mapper.order.eline.read.orderId
+            title: "Order Unique Identifier."
+            description: ""
+            source: "@{{id}}"
+            sourceLocation: "PATH"
+            target: "@{{connectionId}}"
+            convertValue: "mef.sonata.api-target.order.eline.add#order.eline.add.orderId.mapper"
+            targetLocation: "PATH"
+            requiredMapping: true
+        response:
+          - name: mapper.order.eline.read.state
+            title: "ProductOrderState"
+            description: ""
+            target: "@{{state}}"
+            targetType: enum
+            targetLocation: BODY
+            requiredMapping: true
+            targetValues:
+              - acknowledged
+              - assessingCancellation
+              - held.assessingCharge
+              - pending.assessingModification
+              - cancelled
+              - pendingCancellation
+              - completed
+              - failed
+              - inProgress
+              - partial
+              - rejected
+            valueMapping:
+              ACTIVE: completed
+              CREATING: acknowledged
+            source: "@{{responseBody.status}}"
+            sourceLocation: "BODY"
+          - name: mapper.order.eline.read.completionDate
+            title: "order complete date"
+            description: ""
+            source: "@{{responseBody.port.activeChangedAt}}"
+            sourceLocation: "BODY"
+            target: "@{{completionDate}}"
+            targetLocation: "BODY"
+            requiredMapping: false
+          - name: mapper.order.eline.read.instanceId
+            title: "instance id from seller"
+            description: ""
+            source: "@{{responseBody.port.id}}"
+            sourceLocation: "BODY"
+            target: "@{{productOrderItem[0].product.id}}"
+            targetLocation: "BODY"
+            requiredMapping: false
         

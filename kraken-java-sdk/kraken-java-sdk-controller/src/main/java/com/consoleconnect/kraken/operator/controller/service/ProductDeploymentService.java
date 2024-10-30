@@ -10,16 +10,21 @@ import com.consoleconnect.kraken.operator.auth.repo.UserRepository;
 import com.consoleconnect.kraken.operator.auth.security.UserContext;
 import com.consoleconnect.kraken.operator.controller.dto.*;
 import com.consoleconnect.kraken.operator.controller.entity.EnvironmentEntity;
+import com.consoleconnect.kraken.operator.controller.enums.SystemStateEnum;
+import com.consoleconnect.kraken.operator.controller.event.SingleMapperReportEvent;
 import com.consoleconnect.kraken.operator.controller.model.*;
 import com.consoleconnect.kraken.operator.controller.repo.EnvironmentRepository;
+import com.consoleconnect.kraken.operator.controller.service.upgrade.UpgradeSourceServiceFactory;
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
+import com.consoleconnect.kraken.operator.core.entity.EnvironmentClientEntity;
 import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
 import com.consoleconnect.kraken.operator.core.enums.*;
 import com.consoleconnect.kraken.operator.core.event.IngestionDataResult;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.model.*;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
+import com.consoleconnect.kraken.operator.core.repo.EnvironmentClientRepository;
 import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.*;
@@ -40,6 +45,7 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.BeanUtils;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -58,6 +64,10 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
   private final EnvironmentRepository environmentRepository;
   private final UserRepository userRepository;
   private final MgmtProperty mgmtProperty;
+  private final UpgradeSourceServiceFactory upgradeSourceServiceFactory;
+  private final ApplicationEventPublisher applicationEventPublisher;
+  private final EnvironmentClientRepository environmentClientRepository;
+  private final SystemInfoService systemInfoService;
 
   @Transactional(readOnly = true)
   public Paging<UnifiedAssetDto> search(
@@ -359,6 +369,9 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
   }
 
   private void handleDeploymentCallback(UnifiedAssetEntity mapperDeployment) {
+    // handle mapper version report
+    handlerMapperVersionReport(mapperDeployment);
+    log.info("handlerMapperVersionReport end ok");
     if (MapUtils.isEmpty(mapperDeployment.getLabels())) {
       return;
     }
@@ -380,12 +393,14 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
                   UnifiedAssetService.toAsset(templateDeployment, true), new TypeReference<>() {});
           TemplateUpgradeDeploymentFacets.EnvDeployment envDeployment =
               templateUpgradeDeploymentFacets.getEnvDeployment();
+          log.info("handleTemplateDeploymentCallback, before union");
           List<UUID> list =
               CollectionUtils.union(
                       envDeployment.getMapperDeployment(), envDeployment.getSystemDeployments())
                   .stream()
                   .map(UUID::fromString)
                   .toList();
+          log.info("handleTemplateDeploymentCallback, after union, list size:{}", list.size());
           unifiedAssetRepository.findAllByIdIn(list).stream()
               .filter(ent -> DeployStatusEnum.IN_PROCESS.name().equalsIgnoreCase(ent.getStatus()))
               .findFirst()
@@ -397,8 +412,36 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
                   () -> {
                     templateDeployment.setStatus(DeployStatusEnum.SUCCESS.name());
                     unifiedAssetRepository.save(templateDeployment);
+                    String templateUpgradeId =
+                        templateDeployment
+                            .getLabels()
+                            .getOrDefault(LABEL_APP_TEMPLATE_UPGRADE_ID, "");
+                    upgradeSourceServiceFactory
+                        .getUpgradeSourceService(templateUpgradeId)
+                        .reportResult(templateUpgradeId, appTemplateDeploymentId);
+                    updateSystemStatus(templateDeployment);
                   });
         });
+  }
+
+  private void updateSystemStatus(UnifiedAssetEntity templateDeployment) {
+    String templateUpgradeId =
+        templateDeployment.getLabels().getOrDefault(LABEL_APP_TEMPLATE_UPGRADE_ID, "");
+    UnifiedAssetDto templateUpgrade = unifiedAssetService.findOne(templateUpgradeId);
+    String envName = templateDeployment.getLabels().get(LABEL_ENV_NAME);
+    if (EnvNameEnum.STAGE.name().equalsIgnoreCase(envName)) {
+      systemInfoService.update(
+          SystemStateEnum.STAGE_UPGRADE_DONE,
+          null,
+          templateUpgrade.getMetadata().getLabels().get(LABEL_PRODUCT_VERSION),
+          null);
+    } else {
+      systemInfoService.update(
+          SystemStateEnum.RUNNING,
+          null,
+          null,
+          templateUpgrade.getMetadata().getLabels().get(LABEL_PRODUCT_VERSION));
+    }
   }
 
   protected void updateDeployedMapperStatus(String deploymentId) {
@@ -620,6 +663,29 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
     if (null == deployments || CollectionUtils.isEmpty(deployments.getData())) {
       return PagingHelper.toPage(Collections.emptyList(), 0, 10);
     }
+    Map<String, Pair<String, String>> mapper2Component = getMapper2Component();
+    Map<String, UnifiedAssetDto> mapperAssetMap = getMapperAssetMap();
+
+    List<ApiMapperDeploymentDTO> result =
+        getApiMapperDeploymentDTOS(deployments, mapperAssetMap, mapper2Component, envId);
+    return PagingHelper.toPageNoSubList(
+        result, deployments.getPage(), deployments.getSize(), deployments.getTotal());
+  }
+
+  private Map<String, UnifiedAssetDto> getMapperAssetMap() {
+    return unifiedAssetService
+        .search(
+            null,
+            AssetKindEnum.COMPONENT_API_TARGET_MAPPER.getKind(),
+            true,
+            null,
+            PageRequest.of(0, 100))
+        .getData()
+        .stream()
+        .collect(Collectors.toMap(t -> t.getMetadata().getKey(), t -> t));
+  }
+
+  private Map<String, Pair<String, String>> getMapper2Component() {
     // <mapperKey,<componentKey,componentName>>
     Map<String, Pair<String, String>> mapper2Component = new HashMap<>();
     unifiedAssetService
@@ -640,22 +706,7 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
                                 Pair.of(
                                     comAsset.getMetadata().getKey(),
                                     comAsset.getMetadata().getName()))));
-    Map<String, UnifiedAssetDto> mapperAssetMap =
-        unifiedAssetService
-            .search(
-                null,
-                AssetKindEnum.COMPONENT_API_TARGET_MAPPER.getKind(),
-                true,
-                null,
-                PageRequest.of(0, 100))
-            .getData()
-            .stream()
-            .collect(Collectors.toMap(t -> t.getMetadata().getKey(), t -> t));
-
-    List<ApiMapperDeploymentDTO> result =
-        getApiMapperDeploymentDTOS(deployments, mapperAssetMap, mapper2Component, envId);
-    return PagingHelper.toPageNoSubList(
-        result, deployments.getPage(), deployments.getSize(), deployments.getTotal());
+    return mapper2Component;
   }
 
   private @NotNull List<ApiMapperDeploymentDTO> getApiMapperDeploymentDTOS(
@@ -845,6 +896,90 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
                                 .orElse(null));
                       });
               return latestDeploymentDTO;
+            })
+        .toList();
+  }
+
+  private void handlerMapperVersionReport(UnifiedAssetEntity mapperDeployment) {
+
+    UnifiedAssetDto assetDto = UnifiedAssetService.toAsset(mapperDeployment, true);
+    DeploymentFacet deploymentFacet = UnifiedAsset.getFacets(assetDto, DeploymentFacet.class);
+    String envId = mapperDeployment.getLabels().get(LABEL_ENV_ID);
+    deploymentFacet
+        .getComponentTags()
+        .forEach(
+            componentTag -> {
+              UnifiedAssetEntity tag =
+                  unifiedAssetService.findOneByIdOrKey(componentTag.getTagId());
+              String version = tag.getLabels().get(LABEL_VERSION_NAME);
+              String subVersion = tag.getLabels().get(LABEL_SUB_VERSION_NAME);
+              log.info(
+                  "handlerMapperVersionReport, version:{}, subVersion:{}", version, subVersion);
+              applicationEventPublisher.publishEvent(
+                  new SingleMapperReportEvent(
+                      envId, componentTag.getParentComponentKey(), version, subVersion));
+            });
+  }
+
+  @Transactional(readOnly = true)
+  public List<ApiMapperDeploymentDTO> listRunningApiMapperDeploymentV3(String envId) {
+    Environment environment = environmentService.findOne(envId);
+    List<EnvironmentClientEntity> allRunningMappers =
+        environmentClientRepository.findAllByEnvIdAndKind(
+            envId, ClientReportTypeEnum.CLIENT_MAPPER_VERSION.name());
+    Map<String, Pair<String, String>> mapper2Component = getMapper2Component();
+    Map<String, UnifiedAssetDto> mapperAssetMap = getMapperAssetMap();
+    Map<String, ClientMapperVersionPayloadDto> mapper2PayLoadMap =
+        allRunningMappers.stream()
+            .sorted(Comparator.comparing(EnvironmentClientEntity::getUpdatedAt).reversed())
+            .map(t -> JsonToolkit.fromJson(t.getPayload(), ClientMapperVersionPayloadDto.class))
+            .collect(Collectors.toMap(ClientMapperVersionPayloadDto::getMapperKey, t -> t));
+    List<String> tagIds =
+        mapper2PayLoadMap.values().stream()
+            .map(ClientMapperVersionPayloadDto::getTagId)
+            .filter(Objects::nonNull)
+            .toList();
+    if (CollectionUtils.isEmpty(tagIds)) {
+      return List.of();
+    }
+    Map<String, UnifiedAssetEntity> tagEntityMap =
+        unifiedAssetService.findAllByIdIn(tagIds).stream()
+            .collect(Collectors.toMap(t -> t.getId().toString(), t -> t));
+    return mapper2PayLoadMap.entrySet().stream()
+        .map(
+            entry -> {
+              String mapperKey = entry.getKey();
+              ClientMapperVersionPayloadDto paylaod = entry.getValue();
+              UnifiedAssetEntity tagEntity = tagEntityMap.get(paylaod.getTagId());
+              UnifiedAssetDto tagAsset = UnifiedAssetService.toAsset(tagEntity, false);
+              Map<String, String> labels = tagAsset.getMetadata().getLabels();
+              UnifiedAssetDto mapperAsset = mapperAssetMap.get(mapperKey);
+              ComponentAPITargetFacets componentAPITargetFacets =
+                  UnifiedAsset.getFacets(mapperAsset, ComponentAPITargetFacets.class);
+              ComponentAPITargetFacets.Trigger trigger = componentAPITargetFacets.getTrigger();
+              ApiMapperDeploymentDTO deploymentDTO = new ApiMapperDeploymentDTO();
+              if (trigger != null) {
+                BeanUtils.copyProperties(trigger, deploymentDTO);
+                ComponentExpandDTO.MappingMatrix mappingMatrix =
+                    new ComponentExpandDTO.MappingMatrix();
+                BeanUtils.copyProperties(trigger, mappingMatrix);
+                deploymentDTO.setMappingMatrix(mappingMatrix);
+              }
+              deploymentDTO.setCreateAt(tagAsset.getCreatedAt());
+              deploymentDTO.setCreateBy(tagAsset.getCreatedBy());
+              setUserName(deploymentDTO);
+              deploymentDTO.setStatus(DeployStatusEnum.SUCCESS.name());
+              deploymentDTO.setTargetMapperKey(mapperKey);
+              deploymentDTO.setVersion(labels.get(LABEL_VERSION_NAME));
+              deploymentDTO.setSubVersion(labels.get(LABEL_SUB_VERSION_NAME));
+              deploymentDTO.setTagId(paylaod.getTagId());
+              deploymentDTO.setEnvId(environment.getId());
+              deploymentDTO.setEnvName(environment.getName());
+              fillVerifiedInfo(tagAsset.getId(), deploymentDTO, envId);
+              calculateCanDeployToTargetEnv(deploymentDTO);
+              deploymentDTO.setComponentKey(mapper2Component.get(mapperKey).getKey());
+              deploymentDTO.setComponentName(mapper2Component.get(mapperKey).getValue());
+              return deploymentDTO;
             })
         .toList();
   }

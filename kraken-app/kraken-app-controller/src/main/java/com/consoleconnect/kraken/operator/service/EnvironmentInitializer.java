@@ -1,16 +1,14 @@
 package com.consoleconnect.kraken.operator.service;
 
 import com.consoleconnect.kraken.operator.config.AppMgmtProperty;
-import com.consoleconnect.kraken.operator.controller.dto.CreateEnvRequest;
-import com.consoleconnect.kraken.operator.controller.model.Environment;
-import com.consoleconnect.kraken.operator.controller.service.EnvironmentService;
-import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
-import com.consoleconnect.kraken.operator.core.event.PlatformSettingCompletedEvent;
-import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
+import com.consoleconnect.kraken.operator.controller.entity.EnvironmentEntity;
+import com.consoleconnect.kraken.operator.controller.repo.EnvironmentRepository;
+import jakarta.annotation.PostConstruct;
 import java.util.List;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.event.EventListener;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 @AllArgsConstructor
@@ -19,11 +17,9 @@ import org.springframework.stereotype.Service;
 public class EnvironmentInitializer {
 
   private final AppMgmtProperty mgmtProperty;
+  private final EnvironmentRepository environmentRepository;
 
-  private final UnifiedAssetService unifiedAssetService;
-  private final EnvironmentService environmentService;
-
-  @EventListener(PlatformSettingCompletedEvent.class)
+  @PostConstruct
   public void initialize() {
     log.info("Initializing environments,{}", mgmtProperty.getProducts());
     mgmtProperty
@@ -31,36 +27,36 @@ public class EnvironmentInitializer {
         .forEach(
             productEnvironment -> {
               log.info("initializing environments for product {}", productEnvironment.getKey());
-              UnifiedAssetEntity product =
-                  unifiedAssetService.findOneByIdOrKey(productEnvironment.getKey());
 
-              List<Environment> existingEnvironments =
-                  environmentService
-                      .search(
-                          product.getKey(),
-                          UnifiedAssetService.getSearchPageRequest(0, Integer.MAX_VALUE))
-                      .getData();
+              List<EnvironmentEntity> existingEnvironments =
+                  environmentRepository
+                      .findAllByProductId(
+                          productEnvironment.getKey(), PageRequest.of(0, Integer.MAX_VALUE))
+                      .getContent();
               productEnvironment.getEnvironments().stream()
                   .filter(
-                      environmentName ->
+                      environment ->
                           existingEnvironments.stream()
                               .noneMatch(
                                   environmentEntity ->
-                                      environmentEntity.getName().equals(environmentName)))
+                                      environmentEntity.getName().equals(environment.getName())))
                   .forEach(
-                      environmentName -> {
-                        CreateEnvRequest createEnvRequest = new CreateEnvRequest();
-                        createEnvRequest.setName(environmentName);
+                      environment -> {
                         log.info(
                             "creating environment {} for product {}",
-                            environmentName,
-                            product.getKey());
-                        environmentService.create(
-                            product.getId().toString(), createEnvRequest, null);
+                            environment,
+                            productEnvironment.getKey());
+                        EnvironmentEntity environmentEntity = new EnvironmentEntity();
+                        environmentEntity.setName(environment.getName());
+                        if (environment.getId() != null) {
+                          environmentEntity.setId(UUID.fromString(environment.getId()));
+                        }
+                        environmentEntity.setProductId(productEnvironment.getKey());
+                        environmentRepository.save(environmentEntity);
                         log.info(
                             "created environment {} for product {}",
-                            environmentName,
-                            product.getKey());
+                            environment,
+                            productEnvironment.getKey());
                       });
             });
     log.info("initialize environments done");

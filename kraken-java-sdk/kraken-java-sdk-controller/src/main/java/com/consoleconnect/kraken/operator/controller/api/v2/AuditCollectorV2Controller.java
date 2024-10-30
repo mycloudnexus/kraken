@@ -17,10 +17,12 @@ import java.util.List;
 import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 @AllArgsConstructor
@@ -39,8 +41,9 @@ public class AuditCollectorV2Controller {
   @GetMapping("/releases/{releaseId}/components")
   public HttpResponse<List<UnifiedAssetDto>> queryContentByToken(
       @PathVariable("releaseId") String productReleaseId,
-      @RequestHeader(value = "Authorization", required = false) String authorization) {
-    String envId = apiTokenService.findEnvId(authorization, null);
+      @RequestParam(value = "env", required = false) String env,
+      @Autowired(required = false) JwtAuthenticationToken authenticationToken) {
+    String envId = apiTokenService.findEnvId(authenticationToken, env);
     log.info("queryContentByToken, productReleaseId:{}, envId:{}", productReleaseId, envId);
     return HttpResponse.ok(productDeploymentService.queryDeployedAssets(productReleaseId));
   }
@@ -49,8 +52,8 @@ public class AuditCollectorV2Controller {
   @GetMapping("/deployments/latest")
   public HttpResponse<String> queryLatestDeployment(
       @RequestParam(value = "env", required = false) String env,
-      @RequestHeader(value = "Authorization", required = false) String authorization) {
-    String envId = apiTokenService.findEnvId(authorization, env);
+      @Autowired(required = false) JwtAuthenticationToken authenticationToken) {
+    String envId = apiTokenService.findEnvId(authenticationToken, env);
     return HttpResponse.ok(productDeploymentService.findLatestInProcessDeployment(envId));
   }
 
@@ -58,8 +61,8 @@ public class AuditCollectorV2Controller {
   @GetMapping("/api-servers")
   public HttpResponse<List<APIServerEnvDTO>> listApiServers(
       @RequestParam(value = "env", required = false) String env,
-      @RequestHeader(value = "Authorization", required = false) String authorization) {
-    String envId = apiTokenService.findEnvId(authorization, env);
+      @Autowired(required = false) JwtAuthenticationToken authenticationToken) {
+    String envId = apiTokenService.findEnvId(authenticationToken, env);
     return HttpResponse.ok(environment2APIServerCache.getAPIServerEnvs(envId));
   }
 
@@ -69,9 +72,9 @@ public class AuditCollectorV2Controller {
       @RequestParam(value = "kind") String kind,
       @RequestParam(value = "updatedAt", required = false) ZonedDateTime lastUpdateTime,
       @RequestParam(value = "env", required = false) String env,
-      @RequestHeader(value = "Authorization", required = false) String authorization) {
+      @Autowired(required = false) JwtAuthenticationToken authenticationToken) {
 
-    String envId = apiTokenService.findEnvId(authorization, env);
+    String envId = apiTokenService.findEnvId(authenticationToken, env);
 
     if (AssetKindEnum.COMPONENT_API_SERVER.getKind().equals(kind)) {
       List<APIServerEnvDTO> apiServerEnvs = environment2APIServerCache.getAPIServerEnvs(envId);

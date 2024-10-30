@@ -23,3 +23,11 @@ app:
             - DELETE
           roles:
             - ADMIN
+      security-filter:
+        enabled: true
+        filter-configs:
+          - filter-name: securityTestChecker
+            paths:
+              - /assets/**
+              - /products/{id}/**
+
