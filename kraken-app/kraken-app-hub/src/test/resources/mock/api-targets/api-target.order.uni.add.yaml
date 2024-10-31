@@ -6,7 +6,7 @@ metadata:
   key: mef.sonata.api-target.order.uni.add
   name: Order Port API
   mapperKey: mef.sonata.api-target-mapper.order.uni.add
-  version: 2
+  version: 4
 spec:
   inputs:
     - mefQuery
@@ -20,15 +20,14 @@ spec:
     - id: create port order
       path: ""
       method: ""
-      requestBody: |
+      requestBody: | 
         {}
       responseBody: |
         {
-          "relatedContactInformation": "${T(com.consoleconnect.kraken.operator.gateway.func.SpelFunc).appendSellerInformation(env.seller.role, env.seller.name, env.seller.emailAddress, env.seller.number, mefRequestBody.relatedContactInformation)}",
-          "id": "${entity.id}",
-          "orderDate":"function.now()",
-          "productOrderItem": "${mefRequestBody.productOrderItem}",
-          "state": "",
-          "orderId": ""
+         "relatedContactInformation": "${T(com.consoleconnect.kraken.operator.gateway.func.SpelFunc).appendSellerInformation(env.seller.role, env.seller.name, env.seller.emailAddress, env.seller.number, mefRequestBody.relatedContactInformation)}",
+         "id": "${entity.id}",
+         "orderDate":"${T(com.consoleconnect.kraken.operator.core.toolkit.DateTime).nowInUTCFormatted()}",
+         "productOrderItem": "${mefRequestBody.productOrderItem}",
+         "state": "",
+         "orderId": ""
         }
-   

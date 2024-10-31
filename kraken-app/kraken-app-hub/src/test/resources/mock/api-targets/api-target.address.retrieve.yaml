@@ -5,7 +5,7 @@ metadata:
   key: mef.sonata.api-target.address.retrieve
   name: Geographic Address Management
   mapperKey: mef.sonata.api-target-mapper.address.retrieve
-  version: 1
+  version: 6
 spec:
   inputs:
     - mefQuery
@@ -14,18 +14,17 @@ spec:
     method: get
   endpoints:
     - id: retrieve address
-      path:
-      method:
+      path: ""
+      method: ""
       requestBody:
       responseBody: |
         {
-          "id": "@{{id}}",
-          "type": "FieldedAddress",
+          "id": "",
+          "@type": "FieldedAddress",
           "associatedGeographicAddress": {
-                 "country": "@{{associatedGeographicAddress.country}}",
-                 "city": "@{{associatedGeographicAddress.city}}",
-                 "streetName": "@{{associatedGeographicAddress.streetName}}"
+            "country": "",
+            "city": "",
+            "streetName": "",
+            "locality": ""
           }
         }
-        
-

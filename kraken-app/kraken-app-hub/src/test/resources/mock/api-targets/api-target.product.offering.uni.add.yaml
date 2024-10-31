@@ -5,6 +5,7 @@ metadata:
   key: mef.sonata.api-target.poq.uni.add
   name: Product Offering Qualification (POQ) API
   mapperKey: mef.sonata.api-target-mapper.poq.uni.add
+  version: 1
 spec:
   inputs:
     - mefQuery
@@ -16,8 +17,8 @@ spec:
     actionType: add
   endpoints:
     - id: create a product offering qualification for port
-      path: /api/pricing/calculate
-      method: post
+      path: ""
+      method: ""
       requestBody: ${mefRequestBody.productOfferingQualificationItem[0].product.productConfiguration.uni}
       responseBody: |
         {

@@ -5,19 +5,16 @@ metadata:
   key: mef.sonata.api-target.address.validate
   name: Geographic Address Management
   mapperKey: mef.sonata.api-target-mapper.address.validate
-  version: 1
+  version: 7
 spec:
   inputs:
     - mefQuery
     - mefRequestBody
-    - entity
   trigger:
     path: /mefApi/sonata/geographicAddressManagement/v7/geographicAddressValidation
     method: post
   endpoints:
     - id: validate address
-      path: /v2/data-center-facility/search
-      method: get
       requestBody:
       responseBody: |
         {
@@ -28,15 +25,18 @@ spec:
                     "@type": "FieldedAddress",
                     "country": "",
                     "city": "",
-                    "streetName": ""
+                    "streetName": "",
+                    "locality": ""
                 }
             ],
             "provideAlternative": "${mefRequestBody.provideAlternative}",
             "submittedGeographicAddress": "${mefRequestBody.submittedGeographicAddress}",
             "bestMatchGeographicAddress": {
                 "id": "",
-                "type": "FieldedAddress",
+                "@type": "FieldedAddress",
                 "city": "",
-                "country": ""
+                "country": "",
+                "streetName": ""
             }
         }
+

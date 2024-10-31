@@ -11,22 +11,7 @@ metadata:
   version: 1
 spec:
   baseSpec:
-    path: classpath:/mock/openapi/productOrderManagement.api.yaml
+    path: classpath:/mef-sonata/openapi/productOrderManagement.api.yaml
   customizedSpec:
-    path: classpath:/mock/openapi/productOrderManagement.api.customized.yaml
-links:
-  - targetAssetKey: mef.sonata.api.order
-    relationship: implementation.workflow
-  - targetAssetKey: mef.sonata.api-target.order.eline.add
-    relationship: implementation.target
-  - targetAssetKey: mef.sonata.api-target.order.eline.delete
-    relationship: implementation.target
-  - targetAssetKey: mef.sonata.api-target.order.eline.read
-    relationship: implementation.target
-  - targetAssetKey: mef.sonata.api-target.order.uni.delete
-    relationship: implementation.target
-  - targetAssetKey: mef.sonata.api-target.order.uni.read
-    relationship: implementation.target
-  - targetAssetKey: mef.sonata.api-target.order.uni.add
-    relationship: implementation.target
+    path: classpath:/mef-sonata/openapi/productOrderManagement.api.customized.yaml
 

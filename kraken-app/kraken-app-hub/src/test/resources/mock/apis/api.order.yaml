@@ -141,6 +141,8 @@ spec:
           actionType: buildin@db
           env:
             id: ${segment}
+            blankIdErrMsg: "order id cannot be blank"
+            notExistedErrMsg: "order id does not exist"
           with:
             action: read
           preRequest: true

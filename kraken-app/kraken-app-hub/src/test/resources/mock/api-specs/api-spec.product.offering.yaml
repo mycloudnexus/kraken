@@ -7,18 +7,7 @@ metadata:
   icon: https://storage.googleapis.com/console-connect-static-assets/krakenUI/product-offering-quality.png
   labels:
     mef-api-release: grace
-    order-api-version: v10
+    poq-api-version: v7
 spec:
   baseSpec:
-    path: classpath:/mock/openapi/productOfferingQualificationManagement.api.yaml
-links:
-  - targetAssetKey: mef.sonata.api.poq
-    relationship: implementation.workflow
-  - targetAssetKey: mef.sonata.api-target.poq.eline.add
-    relationship: implementation.target
-  - targetAssetKey: mef.sonata.api-target.poq.eline.read
-    relationship: implementation.target
-  - targetAssetKey: mef.sonata.api-target.poq.uni.add
-    relationship: implementation.target
-  - targetAssetKey: mef.sonata.api-target.poq.eline.read
-    relationship: implementation.target
+    path: classpath:/mef-sonata/openapi/productOfferingQualificationManagement.api.yaml

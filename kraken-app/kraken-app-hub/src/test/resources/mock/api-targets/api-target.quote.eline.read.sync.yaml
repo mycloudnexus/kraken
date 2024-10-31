@@ -5,7 +5,7 @@ metadata:
   key: mef.sonata.api-target.quote.eline.read.sync
   name: Quote Connection API
   mapperKey: mef.sonata.api-target-mapper.quote.eline.read.sync
-  version: 0
+  version: 2
 spec:
   inputs:
     - mefQuery
@@ -18,13 +18,13 @@ spec:
   endpoints:
     - id: retrieve quote for connection
       url: ${env.target.url}
-      path: /api/pricing/calculate
-      method: post
-      requestBody: |
-        {}
+      path:
+      method:
+      requestBody: ${entity.request.quoteItem[0].product.productConfiguration.access_e_line}
       responseBody: |
         {
           "id": "${entity.id}",
+          "relatedContactInformation": "${T(com.consoleconnect.kraken.operator.gateway.func.SpelFunc).appendSellerInformation('sellerContactInformation', env.seller.name, env.seller.emailAddress, env.seller.number, entity.request.relatedContactInformation)}",
           "buyerRequestedQuoteLevel": "${entity.request.buyerRequestedQuoteLevel}",
           "quoteItem": [{
             "product": "${entity.request.quoteItem[0].product}",
@@ -33,7 +33,7 @@ spec:
             "state": "${entity.renderedResponse.quoteItem[0].state}",
             "quoteItemPrice": "${entity.renderedResponse.quoteItem[0].quoteItemPrice}"
           }],
-          "quoteDate": "now",
+          "quoteDate": "${T(com.consoleconnect.kraken.operator.core.toolkit.DateTime).nowInUTCFormatted()}",
           "externalId":"${entity.request[externalId]?:''}",
           "instantSyncQuote":"${entity.request[instantSyncQuote]?:''}",
           "requestedQuoteCompletionDate": "${entity.request[requestedQuoteCompletionDate]?:''}"

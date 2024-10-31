@@ -32,6 +32,8 @@ spec:
           actionType: buildin@db
           env:
             id: ${query.productOrderId}
+            blankIdErrMsg: "productOrderId id cannot be blank"
+            notExistedErrMsg: "productOrderId id does not exist"
           with:
             action: read
           preRequest: true
@@ -69,7 +71,6 @@ spec:
           env:
             mappingMatrixKey: ${order.matrixConfigKey}
             targetKey: ${order.targetAPIConfigKey}
-            id: ${segment}
         - id: load-downstream-api-config
           actionType: buildin@load-target-api-config
           env:
@@ -141,6 +142,7 @@ spec:
           env:
             mappingMatrixKey: ${order.matrixConfigKey}
             targetKey: ${order.targetAPIConfigKey}
+            id: ${segment}
         - id: load-downstream-api-config
           actionType: buildin@load-target-api-config
           env:
@@ -170,8 +172,14 @@ links:
   - targetAssetKey: mef.sonata.api-target.inventory.uni.list
     relationship: implementation.target
     group: mef.sonata.api-target.inventory.uni.list
+  - targetAssetKey: mef.sonata.api.matrix.inventory.uni.list
+    relationship: implementation.matrix
+    group: mef.sonata.api-target.inventory.uni.list
   - targetAssetKey: mef.sonata.api-target.inventory.eline.list
     relationship: implementation.target
+    group: mef.sonata.api-target.inventory.eline.list
+  - targetAssetKey: mef.sonata.api.matrix.inventory.eline.list
+    relationship: implementation.matrix
     group: mef.sonata.api-target.inventory.eline.list
   - targetAssetKey: mef.sonata.api-target.inventory.eline.read
     relationship: implementation.target
@@ -199,7 +207,3 @@ links:
     group: mef.sonata.api-target.inventory.uni.list
   - targetAssetKey: mef.sonata.api-spec.inventory
     relationship: implementation.standard.api-spec
-
-
-
-

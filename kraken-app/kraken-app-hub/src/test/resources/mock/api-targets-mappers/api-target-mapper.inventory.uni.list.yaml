@@ -45,6 +45,8 @@ spec:
             targetType: string
             targetLocation: BODY
             requiredMapping: true
+            checkPath: "$[0].id"
+            deletePath: "$[*]"
           - name:  mapper.inventory.uni.list.startDate
             title: "The date from which the product starts"
             description: "BODY"

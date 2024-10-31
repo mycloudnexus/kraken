@@ -3303,6 +3303,10 @@ components:
           items:
             $ref: "#/components/schemas/RelatedContactInformation"
           minItems: 1
+        orderId:
+          type: string
+        instanceId:
+          type: string
       required:
         - relatedContactInformation
     ProductOrder_Create:

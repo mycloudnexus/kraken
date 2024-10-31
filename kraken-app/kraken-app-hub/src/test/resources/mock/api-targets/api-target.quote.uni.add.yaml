@@ -5,7 +5,7 @@ metadata:
   key: mef.sonata.api-target.quote.uni.add
   name: Quote Management API
   mapperKey: mef.sonata.api-target-mapper.quote.uni.add
-  version: 4
+  version: 1
 spec:
   inputs:
     - mefQuery
@@ -25,22 +25,27 @@ spec:
         {
           "id": "${entity.id}",
           "buyerRequestedQuoteLevel": "${mefRequestBody.buyerRequestedQuoteLevel}",
+          "relatedContactInformation": "${T(com.consoleconnect.kraken.operator.gateway.func.SpelFunc).appendSellerInformation('sellerContactInformation', env.seller.name, env.seller.emailAddress, env.seller.number, mefRequestBody.relatedContactInformation)}",
           "quoteItem": [
             {
+              "quoteItem": "${mefRequestBody.quoteItem[0].requestedQuoteItemTerm}}",
+              "requestedQuoteItemTerm": "${mefRequestBody.quoteItem[0].requestedQuoteItemTerm}}",
               "product": "${mefRequestBody.quoteItem[0].product}",
               "state": "",
-              "quoteItemPrice": [{
+              "quoteItemPrice": {
                 "price": {
                   "dutyFreeAmount": {
-                     "unit": "",
-                     "value": ""
+                    "unit": "",
+                    "value": ""
                   }
                 }
-              }]
+              }
             }
           ],
-          "quoteDate": "function.now()",
+          "quoteDate": "${T(com.consoleconnect.kraken.operator.core.toolkit.DateTime).nowInUTCFormatted()}",
           "externalId":"${mefRequestBody[externalId]?:''}",
           "instantSyncQuote":"${mefRequestBody[instantSyncQuote]?:''}",
-          "requestedQuoteCompletionDate": "${mefRequestBody[requestedQuoteCompletionDate]?:''}"
+          "requestedQuoteCompletionDate": "${mefRequestBody[requestedQuoteCompletionDate]?:''}"，
+          "quoteLevel": "${mefRequestBody.buyerRequestedQuoteLevel}",
+          "state": "((mefResponseBody.quoteItem[0].quoteItemPrice[0].price.dutyFreeAmount.value == '' ? 'unableToProvide': 'approved.orderable'))"
         }

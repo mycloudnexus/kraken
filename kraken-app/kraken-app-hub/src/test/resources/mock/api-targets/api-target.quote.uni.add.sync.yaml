@@ -5,7 +5,7 @@ metadata:
   key: mef.sonata.api-target.quote.uni.add.sync
   name: Quote Management API
   mapperKey: mef.sonata.api-target-mapper.quote.uni.add.sync
-  version: 0
+  version: 4
 spec:
   inputs:
     - mefQuery
@@ -18,9 +18,8 @@ spec:
     actionType: add
   endpoints:
     - id: create quote for port
-      url: ${env.target.url}
-      path: ""
-      method: ""
+      path:
+      method:
       requestBody: |
         {}
       responseBody: |
@@ -56,7 +55,7 @@ spec:
               }]
             }
           ],
-          "quoteDate": "now",
+          "quoteDate": "${T(com.consoleconnect.kraken.operator.core.toolkit.DateTime).nowInUTCFormatted()}",
           "externalId":"${mefRequestBody[externalId]?:''}",
           "instantSyncQuote":"${mefRequestBody[instantSyncQuote]?:''}",
           "requestedQuoteCompletionDate": "${mefRequestBody[requestedQuoteCompletionDate]?:''}",
