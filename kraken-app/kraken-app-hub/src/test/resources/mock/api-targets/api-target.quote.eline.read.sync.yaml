@@ -5,7 +5,7 @@ metadata:
   key: mef.sonata.api-target.quote.eline.read.sync
   name: Quote Connection API
   mapperKey: mef.sonata.api-target-mapper.quote.eline.read.sync
-  version: 2
+  version: 0
 spec:
   inputs:
     - mefQuery

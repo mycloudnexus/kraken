@@ -11,6 +11,6 @@ metadata:
   version: 2
 spec:
   baseSpec:
-    path: classpath:/mef-sonata/openapi/geographicAddressManagement.api.yaml
+    path: classpath:/mock/openapi/geographicAddressManagement.api.yaml
   customizedSpec:
-    path: classpath:/mef-sonata/openapi/geographicAddressManagement.api.customized.yaml
+    path: classpath:/mock/openapi/geographicAddressManagement.api.customized.yaml

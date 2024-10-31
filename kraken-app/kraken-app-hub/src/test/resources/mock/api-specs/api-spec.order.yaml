@@ -11,7 +11,7 @@ metadata:
   version: 1
 spec:
   baseSpec:
-    path: classpath:/mef-sonata/openapi/productOrderManagement.api.yaml
+    path: classpath:/mock/openapi/productOrderManagement.api.yaml
   customizedSpec:
-    path: classpath:/mef-sonata/openapi/productOrderManagement.api.customized.yaml
+    path: classpath:/mock/openapi/productOrderManagement.api.customized.yaml
 

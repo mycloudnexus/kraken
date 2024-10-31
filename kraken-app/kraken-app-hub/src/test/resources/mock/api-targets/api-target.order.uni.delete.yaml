@@ -5,7 +5,7 @@ metadata:
   key: mef.sonata.api-target.order.uni.delete
   name: Order Port API
   mapperKey: mef.sonata.api-target-mapper.order.uni.delete
-  version: 5
+  version: 1
 spec:
   inputs:
     - mefQuery

@@ -5,7 +5,7 @@ metadata:
   key: mef.sonata.api-target.address.validate
   name: Geographic Address Management
   mapperKey: mef.sonata.api-target-mapper.address.validate
-  version: 7
+  version: 1
 spec:
   inputs:
     - mefQuery

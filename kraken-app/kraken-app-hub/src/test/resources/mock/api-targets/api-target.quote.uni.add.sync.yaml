@@ -5,7 +5,7 @@ metadata:
   key: mef.sonata.api-target.quote.uni.add.sync
   name: Quote Management API
   mapperKey: mef.sonata.api-target-mapper.quote.uni.add.sync
-  version: 4
+  version: 0
 spec:
   inputs:
     - mefQuery

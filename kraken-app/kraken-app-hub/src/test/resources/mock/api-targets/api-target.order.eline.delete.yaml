@@ -6,7 +6,7 @@ metadata:
   key: mef.sonata.api-target.order.eline.delete
   name: Order Connection API
   mapperKey: mef.sonata.api-target-mapper.order.eline.delete
-  version: 4
+  version: 1
 spec:
   inputs:
     - mefQuery

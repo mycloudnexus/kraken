@@ -5,7 +5,7 @@ metadata:
   key: mef.sonata.api-target.quote.uni.read
   name: Quote Management API
   mapperKey: mef.sonata.api-target-mapper.quote.uni.read
-  version: 1
+  version: 2
 spec:
   inputs:
     - mefQuery

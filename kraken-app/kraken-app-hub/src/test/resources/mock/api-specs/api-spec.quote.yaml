@@ -11,6 +11,6 @@ metadata:
   version: 2
 spec:
   baseSpec:
-    path: classpath:/mef-sonata/openapi/quoteManagement.api.yaml
+    path: classpath:/mock/openapi/quoteManagement.api.yaml
   customizedSpec:
-    path: classpath:/mef-sonata/openapi/quoteManagement.api.customized.yaml
+    path: classpath:/mock/openapi/quoteManagement.api.customized.yaml
