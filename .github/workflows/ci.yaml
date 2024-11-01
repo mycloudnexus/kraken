@@ -68,8 +68,8 @@ jobs:
       - name: Build and analyze SDK
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
-        run: |
-            mvn -B verify
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=mycloudnexus_kraken_java
 
   nodejs-unit-test:
     name: nodejs-unit-test
@@ -113,3 +113,10 @@ jobs:
       # some repos don't have unit test now, need to add in future.
       - run: CHROME_BIN=$(which chrome) npm run test:coverage -- -u
         working-directory: ./kraken-app/kraken-app-portal
+
+      - name: SonarCloud Scan
+        if: success() || failure()
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
