@@ -78,4 +78,3 @@ spec:
     #- classpath:/mock/mapping-matrix/mapping.matrix.inventory.eline.read.yaml
     #- classpath:/mock/mapping-matrix/mapping.matrix.inventory.uni.list.yaml
     #- classpath:/mock/mapping-matrix/mapping.matrix.inventory.eline.list.yaml
-

@@ -1,0 +1,201 @@
+---
+kind: kraken.component.api-target-mapper
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target-mapper.quote.uni.add.sync
+  name: Mapper Of Creating Quote UNI
+  description: This operation creates a Quote entity
+spec:
+  trigger:
+    path: /mefApi/sonata/quoteManagement/v8/quote
+    method: post
+    productType: uni
+    actionType: add
+  endpoints:
+    - id: create quote for port
+      path: /api/pricing/calculate
+      method: post
+      serverKey: mef.sonata.api-target-spec.con1718940696857
+      mappers:
+        request:
+          - name: mapper.quote.uni.add.sync.duration.amount
+            source: "@{{quoteItem[0].requestedQuoteItemTerm.duration.amount}}"
+            sourceLocation: BODY
+            target: "1"
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.quote.uni.add.sync.duration.units
+            source: "@{{quoteItem[0].requestedQuoteItemTerm.duration.units}}"
+            sourceLocation: BODY
+            sourceType: enum
+            sourceValues:
+              - calendarMonths
+              - calendarDays
+              - calendarHours
+              - calendarMinutes
+              - businessDays
+              - businessHours
+              - businessMinutes
+            valueMapping:
+              calendarMonths: m
+            target: "@{{ports[*].durationUnit}}"
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.quote.uni.add.sync.endOfTermAction
+            source: "@{{quoteItem[0].requestedQuoteItemTerm.endOfTermAction}}"
+            sourceLocation: BODY
+            sourceType: enum
+            sourceValues:
+              - roll
+              - autoDisconnect
+              - autoRenew
+            valueMapping: {}
+            target: "roll"
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.quote.uni.add.sync.rollInterval.amount
+            source: "@{{quoteItem[0].requestedQuoteItemTerm.rollInterval.amount}}"
+            sourceLocation: BODY
+            target: "1"
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.quote.uni.add.sync.rollInterval.units
+            source: "@{{quoteItem[0].requestedQuoteItemTerm.rollInterval.units}}"
+            sourceLocation: BODY
+            sourceType: enum
+            sourceValues:
+              - calendarMonths
+              - calendarDays
+              - calendarHours
+              - calendarMinutes
+              - businessDays
+              - businessHours
+              - businessMinutes
+            valueMapping: {}
+            target: "calendarMonths"
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.quote.uni.add.sync.place.id
+            source: "@{{quoteItem[0].product.place[0].id}}"
+            sourceLocation: BODY
+            target: "@{{ports[*].dcf}}"
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.quote.uni.add.sync.productConfiguration.bandwidth
+            source: "@{{quoteItem[0].product.productConfiguration.bandwidth}}"
+            sourceLocation: BODY
+            target: "@{{ports[*].speed}}"
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.quote.uni.add.sync.productConfiguration.bandwidthUnit
+            source: "@{{quoteItem[0].product.productConfiguration.bandwidthUnit}}"
+            sourceLocation: BODY
+            sourceType: enum
+            sourceValues:
+              - GBPS
+              - MBPS
+            valueMapping: {}
+            target: "MBPS"
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.quote.uni.add.sync.productOffering.id
+            source: "@{{quoteItem[0].product.productOffering.id}}"
+            sourceLocation: BODY
+            target: "UNI"
+            targetLocation: BODY
+            requiredMapping: false
+        response:
+          - name: mapper.quote.uni.add.sync.unitOfMeasure
+            title: Quote unitOfMeasure Mapping
+            description: quote unitOfMeasure mapping
+            source: "Gb"
+            sourceLocation: BODY
+            target: "@{{quoteItem[0].quoteItemPrice[*].unitOfMeasure}}"
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.quote.uni.add.sync.price.unit
+            title: Quote Price Unit Mapping
+            description: quote price mapping
+            source: "USD"
+            sourceLocation: BODY
+            target: "@{{quoteItem[0].quoteItemPrice[*].price.dutyFreeAmount.unit}}"
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.quote.uni.add.sync.price.value
+            title: Quote Price Value Mapping
+            description: quote price mapping
+            source: "@{{responseBody.results[*].price}}"
+            sourceLocation: BODY
+            target: "@{{quoteItem[0].quoteItemPrice[*].price.dutyFreeAmount.value}}"
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.quote.uni.add.sync.taxRate
+            title: Quote taxRate Mapping
+            description: quote taxRate mapping
+            source: "16"
+            sourceLocation: BODY
+            target: "@{{quoteItem[0].quoteItemPrice[*].price.taxRate}}"
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.quote.uni.add.sync.taxIncludedAmount.unit
+            title: Quote taxIncludedAmount unit Mapping
+            description: quote taxIncludedAmount unit mapping
+            source: "USD"
+            sourceLocation: BODY
+            target: "@{{quoteItem[0].quoteItemPrice[*].price.taxIncludedAmount.unit}}"
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.quote.uni.add.sync.taxIncludedAmount.value
+            title: Quote taxIncludedAmount value Mapping
+            description: quote taxIncludedAmount value mapping
+            source: "100"
+            sourceLocation: BODY
+            target: "@{{quoteItem[0].quoteItemPrice[*].price.taxIncludedAmount.value}}"
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.quote.uni.add.sync.quoteItemPrice.name
+            title: Quote quoteItemPrice name Mapping
+            description: quote quoteItemPrice name mapping
+            source: "name-here"
+            sourceLocation: BODY
+            target: "@{{quoteItem[0].quoteItemPrice[*].name}}"
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.quote.uni.add.sync.quoteItemPrice.priceType
+            title: Quote quoteItemPrice priceType Mapping
+            description: quote quoteItemPrice priceType mapping
+            source: "recurring"
+            sourceLocation: BODY
+            target: "@{{quoteItem[0].quoteItemPrice[*].priceType}}"
+            targetType: enum
+            targetLocation: BODY
+            requiredMapping: false
+            targetValues:
+              - recurring
+              - nonRecurring
+              - usageBased
+            valueMapping: {}
+          - name: mapper.quote.uni.add.sync.quoteItemPrice.description
+            title: Quote quoteItemPrice description Mapping
+            description: quote quoteItemPrice description mapping
+            source: ""
+            sourceLocation: BODY
+            target: "@{{quoteItem[0].quoteItemPrice[*].description}}"
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.quote.uni.add.sync.quoteItemPrice.recurringChargePeriod
+            title: Quote quoteItemPrice recurringChargePeriod Mapping
+            description: quote quoteItemPrice recurringChargePeriod mapping
+            source: "month"
+            sourceLocation: BODY
+            target: "@{{quoteItem[0].quoteItemPrice[*].recurringChargePeriod}}"
+            targetType: enum
+            targetLocation: BODY
+            requiredMapping: false
+            targetValues:
+              - hour
+              - day
+              - week
+              - month
+              - year
+            valueMapping: {}

@@ -1,0 +1,33 @@
+---
+kind: kraken.component.api-target
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target.quote.notification.state.change
+  name: Order Connection API
+  mapperKey: mef.sonata.api-target-mapper.quote.notification.state.change
+  version: 1
+spec:
+  inputs:
+    - mefQuery
+    - mefRequestBody
+    - entity
+    - eventEntity
+  trigger:
+    path: /mefApi/sonata/quoteNotification/v8/listener/quoteStateChangeEvent
+    method: post
+  endpoints:
+    - id: notify quote state change
+      path: "/mefApi/sonata/quoteNotification/v8/listener/quoteStateChangeEvent"
+      url: "${eventEntity.registerInfo.callback}"
+#      path: "/anything"
+      method: post
+      requestBody: |
+        {
+          "eventId": "${eventEntity.id}",
+          "eventTime": "${T(com.consoleconnect.kraken.operator.core.toolkit.DateTime).nowInUTCFormatted()}",
+          "eventType": "${mefQuery.eventType}",
+          "event": {
+            "id": ""
+          }
+        }
+      responseBody:

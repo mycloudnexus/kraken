@@ -1,0 +1,36 @@
+---
+kind: kraken.component.api-target
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target.inventory.eline.list
+  name: Inventory Connection API
+  mapperKey: mef.sonata.api-target-mapper.inventory.eline.list
+  version: 2
+spec:
+  inputs:
+    - mefQuery
+    - mefRequestBody
+    - entity
+  trigger:
+    path: /mefApi/sonata/productInventory/v7/product
+    method: get
+    productType: access_e_line
+  endpoints:
+    - id: list eline product
+      pathReferId: "mef.sonata.api-target-mapper.order.eline.add#mapper.order.eline.add.orderId"
+      responseBody: |
+        [
+          {
+            "id": "",
+            "startDate": "",
+            "status": "",
+            "productSpecification":{},
+            "relatedSite":[],
+            "productOffering":"${entity.request.productOrderItem[0].product.productOffering}",
+            "lastUpdateDate":{},
+            "externalId":"${entity.request[externalId]?:''}",
+            "productRelationship":"${entity.request.productOrderItem[0].product.productRelationship}",
+            "billingAccount":"${entity.request.productOrderItem[0].billingAccount}",
+            "productOrderItem":"${entity.renderedResponse.productOrderItem}"
+          }
+        ]

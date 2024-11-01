@@ -1,0 +1,209 @@
+---
+kind: kraken.component.api
+apiVersion: v1
+metadata:
+  key: mef.sonata.api.inventory
+  name: Product Inventory Management
+  labels:
+    mef-api-release: grace
+    inventory-api-version: v7
+  version: 4
+spec:
+  supportedProductTypesAndActions:
+    - path: /mefApi/sonata/productInventory/v7/product
+      method: get
+      productTypes:
+        - UNI
+        - ACCESS_E_LINE
+    - path: /mefApi/sonata/productInventory/v7/product/{id}
+      method: get
+      productTypes:
+        - UNI
+        - ACCESS_E_LINE
+  mappings:
+    - uri: ${env.target.url}
+      trigger:
+        path: /mefApi/sonata/productInventory/v7/product
+        method: get
+      metadata:
+        cacheRequestBody: false
+      actions:
+        - id: read request payload by id
+          actionType: buildin@db
+          env:
+            id: ${query.productOrderId}
+            blankIdErrMsg: "productOrderId id cannot be blank"
+            notExistedErrMsg: "productOrderId id does not exist"
+          with:
+            action: read
+          preRequest: true
+        - id: calculate_list_type_for_via_javascript
+          actionType: engine@javascript
+          env:
+            bizType: ${entity.bizType}
+          with:
+            code: |
+              (jsonStr) => {
+                console.log("input: " + jsonStr);
+                let input = JSON.parse(jsonStr);
+                let targetAPIConfigKey = '';
+                let matrixConfigKey = '';
+                if(input.bizType == 'UNI') {
+                  targetAPIConfigKey = 'mef.sonata.api-target.inventory.uni.list';
+                  matrixConfigKey = 'mef.sonata.api.matrix.inventory.uni.list';
+                } else if(input.bizType == 'ACCESS_E_LINE') {
+                  targetAPIConfigKey = 'mef.sonata.api-target.inventory.eline.list';
+                  matrixConfigKey = 'mef.sonata.api.matrix.inventory.eline.list';
+                } else {
+                  targetAPIConfigKey = 'targetKey:notFound';
+                  matrixConfigKey = 'productOrderId:notFound';
+                }
+                let ret = {
+                  orderType: input.bizType,
+                  targetAPIConfigKey: targetAPIConfigKey,
+                  matrixConfigKey: matrixConfigKey
+                };
+                return JSON.stringify(ret);
+              }
+          outputKey: order
+        - id: mapping-matrix-check-inventory
+          actionType: buildin@mapping-matrix-checker
+          env:
+            mappingMatrixKey: ${order.matrixConfigKey}
+            targetKey: ${order.targetAPIConfigKey}
+        - id: load-downstream-api-config
+          actionType: buildin@load-target-api-config
+          env:
+            configKey: ${order.targetAPIConfigKey}
+            mefQuery: ${query}
+            entity: ${entity}
+          with:
+            render: true
+            replaceStar: true
+          outputKey: targetApiConfig
+
+        - id: rewrite-path
+          actionType: buildin@rewrite-path
+          env:
+            path: ${targetApiConfig.endpoints[0].path}
+            method: ${targetApiConfig.endpoints[0].method}
+
+        - id: modify-response-body
+          actionType: buildin@modify-response-body
+          with:
+            engine: spel
+          env:
+            code: ${targetApiConfig.endpoints[0].responseBody}
+            inputs: ${targetApiConfig.inputs}
+    - uri: ${env.target.url}
+      trigger:
+        path: /mefApi/sonata/productInventory/v7/product/**
+        method: get
+        queryParams:
+      metadata:
+        cacheRequestBody: true
+      actions:
+        - name: retrieve product id from path
+          actionType: buildin@pattern
+          env:
+            input: ${path}
+            pattern: /mefApi/sonata/productInventory/v7/product/(?<segment>.*)
+        - id: calculate_type_for_via_javascript
+          actionType: engine@javascript
+          env:
+            bizType: ${query.productType}
+          with:
+            code: |
+              (jsonStr) => {
+                console.log("input: " + jsonStr);
+                let input = JSON.parse(jsonStr);
+                let targetAPIConfigKey = '';
+                let matrixConfigKey = '';
+                if(input.bizType == 'UNI') {
+                  targetAPIConfigKey = 'mef.sonata.api-target.inventory.uni.read';
+                  matrixConfigKey = 'mef.sonata.api.matrix.inventory.uni.read';
+                } else if(input.bizType == 'ACCESS_E_LINE') {
+                  targetAPIConfigKey = 'mef.sonata.api-target.inventory.eline.read';
+                  matrixConfigKey = 'mef.sonata.api.matrix.inventory.eline.read';
+                } else {
+                  targetAPIConfigKey = 'targetKey:notFound';
+                  matrixConfigKey = 'productType:notFound';
+                }
+                let ret = {
+                  orderType: input.bizType,
+                  targetAPIConfigKey: targetAPIConfigKey,
+                  matrixConfigKey: matrixConfigKey
+                };
+                return JSON.stringify(ret);
+              }
+          outputKey: order
+        - id: mapping-matrix-check-inventory-read
+          actionType: buildin@mapping-matrix-checker
+          env:
+            mappingMatrixKey: ${order.matrixConfigKey}
+            targetKey: ${order.targetAPIConfigKey}
+            id: ${segment}
+        - id: load-downstream-api-config
+          actionType: buildin@load-target-api-config
+          env:
+            configKey: ${order.targetAPIConfigKey}
+            mefQuery: ${query}
+            id: ${segment}
+          with:
+            render: true
+            replaceStar: true
+          outputKey: targetApiConfig
+
+        - id: rewrite-path
+          actionType: buildin@rewrite-path
+          env:
+            path: ${targetApiConfig.endpoints[0].path}
+            method: ${targetApiConfig.endpoints[0].method}
+
+        - id: modify-response-body
+          actionType: buildin@modify-response-body
+          with:
+            engine: spel
+          env:
+            code: ${targetApiConfig.endpoints[0].responseBody}
+            inputs: ${targetApiConfig.inputs}
+
+links:
+  - targetAssetKey: mef.sonata.api-target.inventory.uni.list
+    relationship: implementation.target
+    group: mef.sonata.api-target.inventory.uni.list
+  - targetAssetKey: mef.sonata.api.matrix.inventory.uni.list
+    relationship: implementation.matrix
+    group: mef.sonata.api-target.inventory.uni.list
+  - targetAssetKey: mef.sonata.api-target.inventory.eline.list
+    relationship: implementation.target
+    group: mef.sonata.api-target.inventory.eline.list
+  - targetAssetKey: mef.sonata.api.matrix.inventory.eline.list
+    relationship: implementation.matrix
+    group: mef.sonata.api-target.inventory.eline.list
+  - targetAssetKey: mef.sonata.api-target.inventory.eline.read
+    relationship: implementation.target
+    group: mef.sonata.api-target.inventory.eline.read
+  - targetAssetKey: mef.sonata.api.matrix.inventory.eline.read
+    relationship: implementation.matrix
+    group: mef.sonata.api-target.inventory.eline.read
+  - targetAssetKey: mef.sonata.api-target.inventory.uni.read
+    relationship: implementation.target
+    group: mef.sonata.api-target.inventory.uni.read
+  - targetAssetKey: mef.sonata.api.matrix.inventory.uni.read
+    relationship: implementation.matrix
+    group: mef.sonata.api-target.inventory.uni.read
+  - targetAssetKey: mef.sonata.api-target-mapper.inventory.eline.read
+    relationship: implementation.target-mapper
+    group: mef.sonata.api-target.inventory.eline.read
+  - targetAssetKey: mef.sonata.api-target-mapper.inventory.uni.read
+    relationship: implementation.target-mapper
+    group: mef.sonata.api-target.inventory.uni.read
+  - targetAssetKey: mef.sonata.api-target-mapper.inventory.eline.list
+    relationship: implementation.target-mapper
+    group: mef.sonata.api-target.inventory.eline.list
+  - targetAssetKey: mef.sonata.api-target-mapper.inventory.uni.list
+    relationship: implementation.target-mapper
+    group: mef.sonata.api-target.inventory.uni.list
+  - targetAssetKey: mef.sonata.api-spec.inventory
+    relationship: implementation.standard.api-spec
