@@ -13,7 +13,6 @@ import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
@@ -67,8 +66,7 @@ public class BuyerCheckerService implements SecurityChecker {
                       .orElse(Instant.MIN);
               Jwt principal = (Jwt) authentication.getPrincipal();
               Instant issuedAt = principal.getIssuedAt();
-              if (Objects.nonNull(issuedAt)
-                  && issuedAt.isBefore(dbGeneratedAt.minusSeconds(INTERVAL))) {
+              if (issuedAt.isBefore(dbGeneratedAt.minusSeconds(INTERVAL))) {
                 sink.error(KrakenException.badRequest("Token expired "));
                 return;
               }
