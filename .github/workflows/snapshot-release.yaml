@@ -2,12 +2,7 @@
 name: Snapshot release
 on:
   workflow_dispatch:
-    inputs:
-      branch:
-        description: 'The branch checkout'
-        required: false
-        type: string
-        default: 'main'
+
 jobs:
   container_release:
     name: Build docker images and publish to Docker Hub
@@ -15,8 +10,6 @@ jobs:
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.branch }}
 
       - name: Get the current version
         id: vars
