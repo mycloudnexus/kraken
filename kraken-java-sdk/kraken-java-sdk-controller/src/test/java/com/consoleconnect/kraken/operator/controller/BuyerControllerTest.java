@@ -7,6 +7,8 @@ import static org.hamcrest.Matchers.*;
 import com.consoleconnect.kraken.operator.config.TestApplication;
 import com.consoleconnect.kraken.operator.controller.dto.BuyerAssetDto;
 import com.consoleconnect.kraken.operator.controller.dto.CreateBuyerRequest;
+import com.consoleconnect.kraken.operator.controller.model.Environment;
+import com.consoleconnect.kraken.operator.controller.service.EnvironmentService;
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
@@ -18,6 +20,7 @@ import com.consoleconnect.kraken.operator.core.toolkit.LabelConstants;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import com.fasterxml.jackson.core.type.TypeReference;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.MethodOrderer;
@@ -36,13 +39,14 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @ContextConfiguration(classes = {TestApplication.class})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ActiveProfiles("test-rs256")
-class BuyerControllerTest extends AbstractIntegrationTest {
+class BuyerControllerTest extends AbstractIntegrationTest implements EnvCreator {
   private static final String PRODUCT_ID = "product.mef.sonata.api";
   public static final String BASE_URL = String.format("/products/%s/buyers", PRODUCT_ID);
   public static final String BUYER_ID = "consolecore-poping-company";
 
   private final WebTestClientHelper webTestClient;
   @Autowired private UnifiedAssetService unifiedAssetService;
+  @Getter @Autowired EnvironmentService environmentService;
 
   @Autowired
   public BuyerControllerTest(WebTestClient webTestClient) {
@@ -52,9 +56,10 @@ class BuyerControllerTest extends AbstractIntegrationTest {
   @Test
   @Order(2)
   void givenBuyer_whenCreate_thenOK() {
+    Environment envStage = createStage(PRODUCT_ID);
     CreateBuyerRequest requestEntity = new CreateBuyerRequest();
     requestEntity.setBuyerId(BUYER_ID);
-    requestEntity.setEnvId("stage");
+    requestEntity.setEnvId(envStage.getId());
     requestEntity.setCompanyName("console connect");
 
     String resp =
@@ -107,7 +112,8 @@ class BuyerControllerTest extends AbstractIntegrationTest {
   void givenDuplicatedBuyer_whenCreate_thenNot200() {
     CreateBuyerRequest requestEntity = new CreateBuyerRequest();
     requestEntity.setBuyerId(BUYER_ID);
-    requestEntity.setEnvId("stage");
+    Environment envStage = createStage(PRODUCT_ID);
+    requestEntity.setEnvId(envStage.getId());
     requestEntity.setCompanyName("console connect");
 
     webTestClient.requestAndVerify(

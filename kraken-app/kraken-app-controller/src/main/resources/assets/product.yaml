@@ -18,7 +18,7 @@ spec:
     - classpath:/mef-sonata/api-specs/api-spec.quote.yaml
     - classpath:/mef-sonata/api-specs/api-spec.product.offering.yaml
     - classpath:/mef-sonata/api-targets/api-target.order.uni.add.yaml
-    - classpath:/mef-sonata/api-targets/api-target.order.eline.add.yam
+    - classpath:/mef-sonata/api-targets/api-target.order.eline.add.yaml
     - classpath:/mef-sonata/api-targets/api-target.order.uni.add.yaml
     - classpath:/mef-sonata/api-targets/api-target.order.eline.add.yaml
     - classpath:/mef-sonata/api-targets/api-target.order.uni.read.yaml
