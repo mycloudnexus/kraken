@@ -38,8 +38,7 @@ jobs:
           context: .
           file: ./docker/app-controller/Dockerfile
           push: true
-          tags: |
-            cloudnexusopsdockerhub/kraken-app-controller:${{ steps.vars.outputs.docker-image-tag }}
+          tags: cloudnexusopsdockerhub/kraken-app-controller:${{ steps.vars.outputs.docker-image-tag }}
 
       - name: Build kraken-app-hub container
         uses: docker/build-push-action@v5
@@ -47,8 +46,7 @@ jobs:
           context: .
           file: ./docker/app-hub/Dockerfile
           push: true
-          tags: |
-            cloudnexusopsdockerhub/kraken-app-hub:${{ steps.vars.outputs.docker-image-tag }}
+          tags: cloudnexusopsdockerhub/kraken-app-hub:${{ steps.vars.outputs.docker-image-tag }}
 
 
       - name: Build kraken-app-agent container
@@ -57,8 +55,7 @@ jobs:
           context: .
           file: ./docker/app-agent/Dockerfile
           push: true
-          tags: |
-            cloudnexusopsdockerhub/kraken-app-agent:${{ steps.vars.outputs.docker-image-tag }}
+          tags: cloudnexusopsdockerhub/kraken-app-agent:${{ steps.vars.outputs.docker-image-tag }}
 
       - name: Build kraken-app-portal container
         uses: docker/build-push-action@v5
@@ -66,5 +63,4 @@ jobs:
           context: .
           file: ./docker/app-portal/Dockerfile
           push: true
-          tags: |
-            cloudnexusopsdockerhub/kraken-app-portal:${{ steps.vars.outputs.docker-image-tag }}
+          tags: cloudnexusopsdockerhub/kraken-app-portal:${{ steps.vars.outputs.docker-image-tag }}
