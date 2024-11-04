@@ -54,7 +54,7 @@ spec:
             targetLocation: BODY
             requiredMapping: true
             replaceStar: false
-          - name: address.validation.country.mapper
+          - name: mapper.address.validation.country
             title: "The country of the identified alternate Geographic Address"
             description: ""
             source: ""
@@ -64,7 +64,7 @@ spec:
             targetLocation: BODY
             requiredMapping: false
             replaceStar: false
-          - name: address.validation.city.mapper
+          - name: mapper.address.validation.city
             title: "The city of the identified alternate Geographic Address"
             description: ""
             source: ""
@@ -74,7 +74,7 @@ spec:
             targetLocation: BODY
             requiredMapping: false
             replaceStar: false
-          - name: address.validation.address.mapper
+          - name: mapper.address.validation.address
             title: "The street of the identified alternate Geographic Address"
             description: ""
             source: ""
@@ -84,7 +84,7 @@ spec:
             targetLocation: BODY
             requiredMapping: false
             replaceStar: false
-          - name: address.validation.locality.mapper
+          - name: mapper.address.validation.locality
             title: "The metroId of the identified alternate Geographic Address"
             description: ""
             source: ""
@@ -94,7 +94,7 @@ spec:
             targetLocation: BODY
             requiredMapping: false
             replaceStar: false
-          - name: address.validation.bestMatch.id.mapper
+          - name: mapper.address.validation.bestMatch.id
             title: "Unique identifier of the identified best match Address"
             requiredMapping: false
             description: ""
@@ -106,7 +106,7 @@ spec:
             checkPath: "$.bestMatchGeographicAddress.id"
             deletePath: "$.bestMatchGeographicAddress"
             replaceStar: false
-          - name: address.validation.bestMatch.city.mapper
+          - name: mapper.address.validation.bestMatch.city
             title: "The City of the identified best match Address"
             requiredMapping: false
             description: ""
@@ -116,7 +116,7 @@ spec:
             targetType: string
             targetLocation: BODY
             replaceStar: false
-          - name: address.validation.bestMatch.country.mapper
+          - name: mapper.address.validation.bestMatch.country
             title: "The Country of the identified best match Address"
             requiredMapping: false
             description: ""
@@ -126,7 +126,7 @@ spec:
             targetType: string
             targetLocation: BODY
             replaceStar: false
-          - name: address.validation.bestMatch.streetName.mapper
+          - name: mapper.address.validation.bestMatch.streetName
             title: "The streetName of the identified best match Address"
             requiredMapping: false
             description: ""

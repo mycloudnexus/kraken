@@ -32,6 +32,8 @@ spec:
           actionType: buildin@db
           env:
             id: ${query.productOrderId}
+            blankIdErrMsg: "productOrderId id cannot be blank"
+            notExistedErrMsg: "productOrderId id does not exist"
           with:
             action: read
           preRequest: true
