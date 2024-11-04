@@ -6,7 +6,7 @@
     <groupId>com.consoleconnect.kraken</groupId>
     <artifactId>kraken-platform</artifactId>
     <name>kraken platform</name>
-    <version>1.1.0-rc.0</version>
+    <version>1.2.0-snapshot</version>
     <packaging>pom</packaging>
 
     <parent>
@@ -56,6 +56,26 @@
         <lombok.version>1.18.34</lombok.version>
         <org.lombok-mapstruct-binding.version>0.2.0</org.lombok-mapstruct-binding.version>
         <org.mapstruct.version>1.6.0</org.mapstruct.version>
+
+
+        <sonar.organization>mycloudnexus</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.projectName>kraken_java</sonar.projectName>
+        <sonar.coverage.jacoco.xmlReportPaths>
+            ${project.basedir}/kraken-java-sdk/kraken-java-sdk-core/target/site/jacoco-aggregate/jacoco.xml,
+            ${project.basedir}/kraken-java-sdk/kraken-java-sdk-gateway/target/site/jacoco-aggregate/jacoco.xml,
+            ${project.basedir}/kraken-java-sdk/kraken-java-sdk-data/target/site/jacoco-aggregate/jacoco.xml,
+            ${project.basedir}/kraken-java-sdk/kraken-java-sdk-sync/target/site/jacoco-aggregate/jacoco.xml,
+            ${project.basedir}/kraken-java-sdk/kraken-java-sdk-controller/target/site/jacoco-aggregate/jacoco.xml,
+            ${project.basedir}/kraken-java-sdk/kraken-java-sdk-mef/target/site/jacoco-aggregate/jacoco.xml,
+            ${project.basedir}/kraken-app/kraken-app-hub/target/site/jacoco-aggregate/jacoco.xml,
+            ${project.basedir}/kraken-app/kraken-app-agent/target/site/jacoco-aggregate/jacoco.xml,
+            ${project.basedir}/kraken-app/kraken-app-mgmt/target/site/jacoco-aggregate/jacoco.xml
+        </sonar.coverage.jacoco.xmlReportPaths>
+        <sonar.exclusions>
+            ${project.basedir}/kraken-java-sdk/kraken-java-sdk-test/**
+            ${project.basedir}/kraken-app/kraken-app-portal/**
+        </sonar.exclusions>
     </properties>
 
     <build>

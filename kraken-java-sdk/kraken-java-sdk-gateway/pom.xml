@@ -5,12 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>kraken-java-sdk-gateway</artifactId>
     <name>kraken-java-sdk-gateway</name>
-    <version>1.1.0-rc.0</version>
+    <version>1.2.0-snapshot</version>
     <packaging>jar</packaging>
     <parent>
         <groupId>com.consoleconnect.kraken</groupId>
         <artifactId>kraken-java-sdk</artifactId>
-        <version>1.1.0-rc.0</version>
+        <version>1.2.0-snapshot</version>
     </parent>
 
     <dependencies>
@@ -18,13 +18,13 @@
         <dependency>
             <groupId>com.consoleconnect.kraken</groupId>
             <artifactId>kraken-java-sdk-data</artifactId>
-            <version>1.1.0-rc.0</version>
+            <version>1.2.0-snapshot</version>
         </dependency>
 
         <dependency>
             <groupId>com.consoleconnect.kraken</groupId>
             <artifactId>kraken-java-sdk-auth</artifactId>
-            <version>1.1.0-rc.0</version>
+            <version>1.2.0-snapshot</version>
         </dependency>
 
         <!-- spring cloud gateway -->
@@ -94,7 +94,7 @@
             <groupId>com.consoleconnect.kraken</groupId>
             <artifactId>kraken-java-sdk-test</artifactId>
             <scope>test</scope>
-            <version>1.1.0-rc.0</version>
+            <version>1.2.0-snapshot</version>
         </dependency>
     </dependencies>
 </project>

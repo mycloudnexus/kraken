@@ -4,11 +4,11 @@
     <parent>
         <groupId>com.consoleconnect.kraken</groupId>
         <artifactId>kraken-java-sdk</artifactId>
-        <version>1.1.0-rc.0</version>
+        <version>1.2.0-snapshot</version>
     </parent>
     <artifactId>kraken-java-sdk-auth</artifactId>
     <name>kraken-java-sdk-auth</name>
-    <version>1.1.0-rc.0</version>
+    <version>1.2.0-snapshot</version>
     <packaging>jar</packaging>
     <dependencies>
         <dependency>
@@ -33,13 +33,13 @@
         <dependency>
             <groupId>com.consoleconnect.kraken</groupId>
             <artifactId>kraken-java-sdk-core</artifactId>
-            <version>1.1.0-rc.0</version>
+            <version>1.2.0-snapshot</version>
         </dependency>
         <!-- test -->
         <dependency>
             <groupId>com.consoleconnect.kraken</groupId>
             <artifactId>kraken-java-sdk-test</artifactId>
-            <version>1.1.0-rc.0</version>
+            <version>1.2.0-snapshot</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
