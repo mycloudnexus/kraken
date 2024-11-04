@@ -6,15 +6,17 @@
       "@type": "FieldedAddress",
       "country": "${responseBody[*].company.addresses[0].country}",
       "city": "${responseBody[*].company.addresses[0].city}",
-      "streetName": "${responseBody[*].company.addresses[0].address}"
+      "streetName": "${responseBody[*].company.addresses[0].address}",
+      "locality": "${responseBody[*].dataCenterFacility.metroId}"
     }
   ],
   "provideAlternative": "${mefRequestBody.provideAlternative}",
   "submittedGeographicAddress": "${mefRequestBody.submittedGeographicAddress}",
   "bestMatchGeographicAddress": {
     "id": "123",
-    "type": "FieldedAddress",
+    "@type": "FieldedAddress",
     "city": "Sydney",
-    "country": "Sydney"
+    "country": "Sydney",
+    "streetName": ""
   }
 }

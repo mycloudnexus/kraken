@@ -4,30 +4,18 @@
   "relatedContactInformation": "${T(com.consoleconnect.kraken.operator.gateway.func.SpelFunc).appendSellerInformation('sellerContactInformation',env.seller.name,env.seller.emailAddress,env.seller.number,mefRequestBody.relatedContactInformation)}",
   "quoteItem": [
     {
-      "requestedQuoteItemTerm": "${mefRequestBody.quoteItem[0].requestedQuoteItemTerm}",
+      "quoteItem": "${mefRequestBody.quoteItem[0].requestedQuoteItemTerm}}",
+      "requestedQuoteItemTerm": "${mefRequestBody.quoteItem[0].requestedQuoteItemTerm}}",
       "product": "${mefRequestBody.quoteItem[0].product}",
-      "action": "add",
-      "id": "${mefRequestBody.quoteItem[0].id}",
-      "state": "((mefResponseBody.quoteItem[0].quoteItemPrice[0].price.dutyFreeAmount.value==''?'unableToProvide':'approved.orderable'))",
-      "quoteItemTerm": "${T(java.util.Arrays).asList(mefRequestBody.quoteItem[0].requestedQuoteItemTerm)}",
+      "state": "answered",
       "quoteItemPrice": [
         {
-          "unitOfMeasure": "Gb",
           "price": {
             "dutyFreeAmount": {
               "unit": "USD",
               "value": "${responseBody.results[0].price}"
-            },
-            "taxRate": "16",
-            "taxIncludedAmount": {
-              "unit": "USD",
-              "value": "100"
             }
-          },
-          "name": "name-here",
-          "priceType": "recurring",
-          "description": "",
-          "recurringChargePeriod": "month"
+          }
         }
       ]
     }
