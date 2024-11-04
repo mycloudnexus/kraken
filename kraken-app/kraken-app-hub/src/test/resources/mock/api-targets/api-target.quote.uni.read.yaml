@@ -5,7 +5,7 @@ metadata:
   key: mef.sonata.api-target.quote.uni.read
   name: Quote Management API
   mapperKey: mef.sonata.api-target-mapper.quote.uni.read
-  version: 2
+  version: 1
 spec:
   inputs:
     - mefQuery
@@ -17,28 +17,30 @@ spec:
     productType: uni
   endpoints:
     - id: retrieve quote for port
-      path: /api/pricing/calculate
-      method: post
+      path: ""
+      method: ""
       requestBody: ${entity.request.quoteItem[0].product.productConfiguration.uni}
       responseBody: |
         {
-          "id": "${entity.id}",
-          "buyerRequestedQuoteLevel": "${entity.request.buyerRequestedQuoteLevel}",
-          "quoteItem": [{
+         "id": "${entity.id}",
+         "relatedContactInformation": "${T(com.consoleconnect.kraken.operator.gateway.func.SpelFunc).appendSellerInformation('sellerContactInformation', env.seller.name, env.seller.emailAddress, env.seller.number, entity.request.relatedContactInformation)}",
+         "buyerRequestedQuoteLevel": "${entity.request.buyerRequestedQuoteLevel}",
+         "quoteItem": [
+           {
              "product": "${entity.request.quoteItem[0].product}",
-             "state": "",
+             "state": "@{{quoteItem[*].state}}",
              "quoteItemPrice": [{
                "price": {
                  "dutyFreeAmount": {
-                   "unit": "",
-                   "value": ""
+                   "unit": "@{{quoteItem.quoteItemPrice.price.dutyFreeAmount.unit}}",
+                   "value": "@{{quoteItem.quoteItemPrice.price.dutyFreeAmount.value}}"
                  }
                }
              }]
            }
-          ],
-          "quoteDate": "function.now()",
-          "externalId":"${entity.request[externalId]?:''}",
-          "instantSyncQuote":"${entity.request[instantSyncQuote]?:''}",
-          "requestedQuoteCompletionDate": "${entity.request[requestedQuoteCompletionDate]?:''}"
+         ],
+         "quoteDate": "${T(com.consoleconnect.kraken.operator.core.toolkit.DateTime).nowInUTCFormatted()}",
+         "externalId":"${entity.request[externalId]?:''}",
+         "instantSyncQuote":"${entity.request[instantSyncQuote]?:''}",
+         "requestedQuoteCompletionDate": "${entity.request[requestedQuoteCompletionDate]?:''}"
         }

@@ -5,7 +5,7 @@ metadata:
   key: mef.sonata.api-target.quote.eline.add.sync
   name: Quote Connection API
   mapperKey: mef.sonata.api-target-mapper.quote.eline.add.sync
-  version: 0
+  version: 1
 spec:
   inputs:
     - mefQuery
@@ -17,9 +17,8 @@ spec:
     actionType: add
   endpoints:
     - id: create quote for connection
-      url: ${env.target.url}
-      path: /api/pricing/calculate
-      method: post
+      path:
+      method:
       requestBody: |
         {}
       responseBody: |
@@ -53,7 +52,7 @@ spec:
                "recurringChargePeriod":""
              }]
           }],
-          "quoteDate": "now",
+          "quoteDate": "${T(com.consoleconnect.kraken.operator.core.toolkit.DateTime).nowInUTCFormatted()}",
           "externalId":"${mefRequestBody[externalId]?:''}",
           "instantSyncQuote":"${mefRequestBody[instantSyncQuote]?:''}",
           "requestedQuoteCompletionDate": "${mefRequestBody[requestedQuoteCompletionDate]?:''}",

@@ -122,7 +122,7 @@ public interface MappingTransformer {
     return responseBody;
   }
 
-  default String resetNodeByPath(Map<String, String> checkPathMap, String json) {
+  default String deleteNodeByPath(Map<String, String> checkPathMap, String json) {
     DocumentContext doc = JsonPath.parse(json);
     checkPathMap.forEach(
         (key, value) -> {
@@ -135,11 +135,11 @@ public interface MappingTransformer {
             return;
           }
           if (null == obj || (obj instanceof String str && (StringUtils.isBlank(str)))) {
-            doc.set(value, null);
+            doc.delete(value);
           } else if (obj instanceof Integer i && i <= 0) {
-            doc.set(value, null);
+            doc.delete(value);
           } else if (obj instanceof Boolean b && !b) {
-            doc.set(value, null);
+            doc.delete(value);
           } else {
             LogHolder.log.warn("Reserved key:{}, value:{}", key, value);
           }
