@@ -17,14 +17,17 @@ spec:
     actionType: add
   endpoints:
     - id: create quote for connection
-      path: /api/pricing/calculate
-      method: post
+      path:
+      method:
       requestBody: ${mefRequestBody.quoteItem[0].product.productConfiguration.access_e_line}
       responseBody: |
         {
-          "id": "${entity.id}",
-          "buyerRequestedQuoteLevel": "${mefRequestBody.buyerRequestedQuoteLevel}",
-          "quoteItem": [{
+         "id": "${entity.id}",
+         "relatedContactInformation": "${T(com.consoleconnect.kraken.operator.gateway.func.SpelFunc).appendSellerInformation('sellerContactInformation', env.seller.name, env.seller.emailAddress, env.seller.number, mefRequestBody.relatedContactInformation)}",
+         "buyerRequestedQuoteLevel": "${mefRequestBody.buyerRequestedQuoteLevel}",
+         "quoteItem": [{
+             "quoteItem": "${mefRequestBody.quoteItem[0].requestedQuoteItemTerm}}",
+             "requestedQuoteItemTerm": "${mefRequestBody.quoteItem[0].requestedQuoteItemTerm}}",
              "product": "${mefRequestBody.quoteItem[0].product}",
              "state": "",
              "quoteItemPrice": [{
@@ -35,9 +38,11 @@ spec:
                  }
                }
              }]
-          }],
-          "quoteDate": "function.now()",
-          "externalId":"${mefRequestBody[externalId]?:''}",
-          "instantSyncQuote":"${mefRequestBody[instantSyncQuote]?:''}",
-          "requestedQuoteCompletionDate": "${mefRequestBody[requestedQuoteCompletionDate]?:''}"
+           }],
+         "quoteDate": "${T(com.consoleconnect.kraken.operator.core.toolkit.DateTime).nowInUTCFormatted()}",
+         "externalId":"${mefRequestBody[externalId]?:''}",
+         "instantSyncQuote":"${mefRequestBody[instantSyncQuote]?:''}",
+         "requestedQuoteCompletionDate": "${mefRequestBody[requestedQuoteCompletionDate]?:''}",
+         "quoteLevel": "${mefRequestBody.buyerRequestedQuoteLevel}",
+         "state": "((mefResponseBody.quoteItem[0].quoteItemPrice[0].price.dutyFreeAmount.value == '' ? 'unableToProvide': 'approved.orderable'))"
         }
