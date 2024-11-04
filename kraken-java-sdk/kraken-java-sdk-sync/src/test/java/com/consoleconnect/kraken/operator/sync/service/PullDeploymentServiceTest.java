@@ -77,7 +77,7 @@ class PullDeploymentServiceTest extends AbstractIntegrationTest {
     pullDeploymentService.scheduledCheckLatestProductRelease();
 
     // verify latest releaseId has been downloaded
-    Mockito.verify(pullDeploymentService, Mockito.times(5))
+    Mockito.verify(pullDeploymentService, Mockito.times(1))
         .curl(
             Mockito.eq(HttpMethod.GET),
             Mockito.eq(syncProperty.getControlPlane().getLatestDeploymentEndpoint()),
