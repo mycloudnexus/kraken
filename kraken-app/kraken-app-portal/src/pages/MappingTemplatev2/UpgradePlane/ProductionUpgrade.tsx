@@ -5,12 +5,12 @@ import { TransferIcon } from "./components/TransferIcon";
 
 export default function ProductionUpgrade({
   stageEnvId,
-  productionEnvId,
+  productEnvId,
   isUpgrading,
   isUpgraded,
 }: Readonly<{
   stageEnvId?: string;
-  productionEnvId?: string;
+  productEnvId?: string;
   isUpgrading?: boolean;
   isUpgraded?: boolean;
 }>) {
@@ -21,7 +21,7 @@ export default function ProductionUpgrade({
   const {
     data: productionTemplateUpgrade,
     isFetching: isFetchingProductionUpgrade,
-  } = useGetDataPlaneApiUseCases(productId, productionEnvId as any);
+  } = useGetDataPlaneApiUseCases(productId, productEnvId as any);
 
   return (
     <>
@@ -29,7 +29,6 @@ export default function ProductionUpgrade({
         title={`Data plane (stage) API mappings (${stageTemplateUpgrade?.length ?? 0})`}
         loading={isFetchingStageUpgrade}
         details={stageTemplateUpgrade}
-        statusIndicatorPosition="right"
       />
 
       <TransferIcon active={isUpgrading} completed={isUpgraded} />
@@ -38,7 +37,6 @@ export default function ProductionUpgrade({
         title={`Data plane (production) API mappings (${productionTemplateUpgrade?.length ?? 0})`}
         loading={isFetchingProductionUpgrade}
         details={productionTemplateUpgrade}
-        statusIndicatorPosition="left"
       />
     </>
   );

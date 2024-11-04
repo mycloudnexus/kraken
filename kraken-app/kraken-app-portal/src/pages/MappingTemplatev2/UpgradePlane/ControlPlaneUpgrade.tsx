@@ -8,6 +8,8 @@ import { useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { ApiList } from "./components/ApiList";
 import { TransferIcon } from "./components/TransferIcon";
+import { useLongPolling } from "@/hooks/useLongPolling";
+import { LONG_POLLING_TIME } from "../utils";
 
 export default function ControlPlaneUpgrade({
   isUpgrading,
@@ -18,37 +20,42 @@ export default function ControlPlaneUpgrade({
 
   const {
     data: templateUpgradeApiUseCases,
-    isFetching: isFetchingTemplateUpgradeApis,
+    isLoading: isLoadingTemplateUpgradeApis,
   } = useGetListTemplateUpgradeApiUseCases(
     productId,
     templateUpgradeId as string
   );
-  const { data: apiUseCases, isFetching: isFetchingApiUseCases } =
-    useGetListApiUseCases(productId);
+  const { data: controlPlaneApis, isLoading: isLoadingControlPlaneApis } =
+    useLongPolling(
+      useGetListApiUseCases(productId),
+      LONG_POLLING_TIME,
+      {
+        active: isUpgrading,
+      }
+    );
 
   const leftApis: IRunningMapping[] | undefined = useMemo(
     () => templateUpgradeApiUseCases?.flatMap(({ details }) => details),
     [templateUpgradeApiUseCases]
   );
   const rightApis: IRunningMapping[] | undefined = useMemo(
-    () => apiUseCases?.flatMap(({ details }) => details),
-    [apiUseCases]
+    () => controlPlaneApis?.flatMap(({ details }) => details),
+    [controlPlaneApis]
   );
 
   return (
     <>
       <ApiList
         title={`New template API mappings (${leftApis?.length ?? 0})`}
-        loading={isFetchingTemplateUpgradeApis}
+        loading={isLoadingTemplateUpgradeApis}
         details={leftApis}
-        statusIndicatorPosition="right"
       />
 
       <TransferIcon active={isUpgrading} completed={isUpgraded} />
 
       <ApiList
         title={`Control plane API mappings (${rightApis?.length ?? 0})`}
-        loading={isFetchingApiUseCases}
+        loading={isLoadingControlPlaneApis}
         details={rightApis}
         statusIndicatorPosition="left"
       />

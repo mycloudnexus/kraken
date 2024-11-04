@@ -3,17 +3,20 @@ import { useEffect } from "react";
 
 export function useLongPolling<T>(
   queryResult: UseQueryResult<T, Error>,
-  ms: number
+  ms: number,
+  { active = true } = {}
 ) {
   const { data, isLoading, isFetching, refetch } = queryResult;
 
   useEffect(() => {
-    const intervalId = setInterval(refetch, ms);
+    if (active) {
+      const intervalId = setInterval(refetch, ms);
 
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, []);
+      return () => {
+        clearInterval(intervalId);
+      };
+    }
+  }, [active]);
 
   return {
     data,

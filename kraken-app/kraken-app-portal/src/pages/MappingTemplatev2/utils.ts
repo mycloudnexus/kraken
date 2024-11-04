@@ -17,3 +17,5 @@ export function getUpgradeSteps(deployments: Deployment[]): Deployment[] {
 
   return [controlPlane, stage, production];
 }
+
+export const LONG_POLLING_TIME = 15 * 1000 // 15 secs
