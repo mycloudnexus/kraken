@@ -8,6 +8,7 @@ import com.consoleconnect.kraken.operator.auth.security.UserContext;
 import com.consoleconnect.kraken.operator.auth.service.UserService;
 import com.consoleconnect.kraken.operator.controller.dto.*;
 import com.consoleconnect.kraken.operator.controller.enums.SystemStateEnum;
+import com.consoleconnect.kraken.operator.controller.enums.TemplateViewStatus;
 import com.consoleconnect.kraken.operator.controller.event.TemplateSynCompletedEvent;
 import com.consoleconnect.kraken.operator.controller.event.TemplateUpgradeEvent;
 import com.consoleconnect.kraken.operator.controller.model.*;
@@ -1129,5 +1130,25 @@ public class TemplateUpgradeService {
         assetDto.getMetadata().getLabels().get(LabelConstants.LABEL_PRODUCT_VERSION);
     SystemInfo systemInfo = systemInfoService.find();
     return compatibilityCheckService.check(systemInfo.getStageAppVersion(), productVersion);
+  }
+
+  public void calculateStatus(TemplateUpgradeReleaseVO vo, boolean first) {
+    boolean deployedProduction =
+        vo.getDeployments().stream()
+            .anyMatch(
+                deploy -> deploy.getEnvName().equalsIgnoreCase(EnvNameEnum.PRODUCTION.name()));
+    if (deployedProduction) {
+      vo.setStatus(TemplateViewStatus.UPGRADED.getStatus());
+      return;
+    }
+    if (first) {
+      if (CollectionUtils.isEmpty(vo.getDeployments())) {
+        vo.setStatus(TemplateViewStatus.NOT_UPGRADED.getStatus());
+        return;
+      }
+      vo.setStatus(TemplateViewStatus.UPGRADING.getStatus());
+    } else {
+      vo.setStatus(TemplateViewStatus.DEPRECATED.getStatus());
+    }
   }
 }

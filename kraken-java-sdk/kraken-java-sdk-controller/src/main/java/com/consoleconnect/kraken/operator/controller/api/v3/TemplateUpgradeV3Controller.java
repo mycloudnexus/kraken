@@ -10,7 +10,6 @@ import com.consoleconnect.kraken.operator.controller.service.TemplateUpgradeServ
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
-import com.consoleconnect.kraken.operator.core.enums.EnvNameEnum;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants;
@@ -21,7 +20,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -36,10 +34,6 @@ import reactor.core.scheduler.Schedulers;
 @Tag(name = "Template Upgrade V3", description = "Template Upgrade V3")
 @Slf4j
 public class TemplateUpgradeV3Controller {
-  public static final String UPGRADED = "Upgraded";
-  public static final String NOT_UPGRADED = "Not upgraded";
-  public static final String UPGRADING = "Upgrading";
-  public static final String DEPRECATED = "Deprecated";
   private final TemplateUpgradeService templateUpgradeService;
   private final UnifiedAssetService unifiedAssetService;
 
@@ -135,31 +129,11 @@ public class TemplateUpgradeV3Controller {
             .map(templateUpgradeService::generateTemplateUpgradeReleaseVO)
             .toList();
     // the latest can upgrade
-    list.stream().findFirst().ifPresent(vo -> this.calculateStatus(vo, true));
-    list.stream().skip(1).forEach(vo -> this.calculateStatus(vo, false));
+    list.stream().findFirst().ifPresent(vo -> templateUpgradeService.calculateStatus(vo, true));
+    list.stream().skip(1).forEach(vo -> templateUpgradeService.calculateStatus(vo, false));
     return HttpResponse.ok(
         PagingHelper.toPageNoSubList(
             list, assetDtoPaging.getPage(), assetDtoPaging.getSize(), assetDtoPaging.getTotal()));
-  }
-
-  protected void calculateStatus(TemplateUpgradeReleaseVO vo, boolean first) {
-    boolean deployedProduction =
-        vo.getDeployments().stream()
-            .anyMatch(
-                deploy -> deploy.getEnvName().equalsIgnoreCase(EnvNameEnum.PRODUCTION.name()));
-    if (deployedProduction) {
-      vo.setStatus(UPGRADED);
-      return;
-    }
-    if (first) {
-      if (CollectionUtils.isEmpty(vo.getDeployments())) {
-        vo.setStatus(NOT_UPGRADED);
-        return;
-      }
-      vo.setStatus(UPGRADING);
-    } else {
-      vo.setStatus(DEPRECATED);
-    }
   }
 
   @Operation(summary = "stage environment upgrade check")
@@ -167,8 +141,8 @@ public class TemplateUpgradeV3Controller {
   public HttpResponse<List<String>> checkStageUpgradeCondition(
       @PathVariable("productId") String productId,
       @RequestParam(value = "templateUpgradeId", required = false) String templateUpgradeId,
-      @RequestParam String stageEnvId) {
-    return HttpResponse.ok(templateUpgradeService.stageCheck(templateUpgradeId, stageEnvId));
+      @RequestParam String envId) {
+    return HttpResponse.ok(templateUpgradeService.stageCheck(templateUpgradeId, envId));
   }
 
   @Operation(summary = "product environment upgrade check")
@@ -176,8 +150,7 @@ public class TemplateUpgradeV3Controller {
   public HttpResponse<List<String>> checkProductionUpgradeCondition(
       @PathVariable("productId") String productId,
       @RequestParam(value = "templateUpgradeId", required = false) String templateUpgradeId,
-      @RequestParam String productionEnvId) {
-    return HttpResponse.ok(
-        templateUpgradeService.productionCheck(templateUpgradeId, productionEnvId));
+      @RequestParam String envId) {
+    return HttpResponse.ok(templateUpgradeService.productionCheck(templateUpgradeId, envId));
   }
 }
