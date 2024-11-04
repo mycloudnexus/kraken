@@ -94,7 +94,7 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
   }
 
   @Test
-  @Order(5)
+  @Order(4)
   @SneakyThrows
   void givenPayload_whenOnCheck_thenReturnOK() {
     Map<String, Object> inputs = new HashMap<>();
@@ -108,7 +108,7 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
   }
 
   @Test
-  @Order(5)
+  @Order(4)
   void givenPayloadWithNoRoute_whenOnCheck_thenThrow422() {
     Map<String, Object> inputs = new HashMap<>();
     inputs.put("targetKey", "targetKey:notFound");
@@ -118,27 +118,34 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
   }
 
   @Test
-  @Order(5)
+  @Order(4)
   @SneakyThrows
   void givenPayloadMissEnum_whenOnCheck_thenReturnError() {
-    validateRequest("/mockData/productOrderRequestMissEnum.json", "MBPS");
+    validateOrderRequest("/mockData/productOrderRequestMissEnum.json", "MBPS");
   }
 
   @Test
-  @Order(5)
+  @Order(4)
   @SneakyThrows
   void givenPayloadWrongConstant_whenOnCheck_thenReturnError() {
-    validateRequest("/mockData/productOrderRequestMissConstant.json", "productOffering");
+    validateOrderRequest("/mockData/productOrderRequestMissConstant.json", "productOffering");
   }
 
   @Test
-  @Order(5)
+  @Order(4)
   @SneakyThrows
   void givenPayloadMissMappingParam_whenOnCheck_thenReturnError() {
-    validateRequest("/mockData/productOrderRequestMissMappingParam.json", "productOffering");
+    validateOrderRequest("/mockData/productOrderRequestMissMappingParam.json", "productOffering");
   }
 
-  private void validateRequest(String request, String matchedMsg) throws IOException {
+  @Test
+  @Order(4)
+  @SneakyThrows
+  void givenErrorMsgInMatrixItem_whenChecking_thenThrowsExceptionMessageAsExpected() {
+    validateQuoteRequest("/mockData/quoteWithInstantSyncFalse.json", "instantSyncQuote==false");
+  }
+
+  private void validateOrderRequest(String request, String matchedMsg) throws IOException {
     Map<String, Object> inputs = new HashMap<>();
     inputs.put("query", Map.of("buyerId", "test-company"));
     inputs.put("body", JsonToolkit.fromJson(readFileToString(request), Object.class));
@@ -149,6 +156,18 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
             KrakenException.class, () -> mappingMatrixCheckerActionRunner.onCheck(inputs));
     MatcherAssert.assertThat(
         krakenException.getCause().getMessage(), Matchers.containsString(matchedMsg));
+  }
+
+  private void validateQuoteRequest(String request, String matchedMsg) throws IOException {
+    Map<String, Object> inputs = new HashMap<>();
+    inputs.put("query", Map.of("buyerId", "test-company"));
+    inputs.put("body", JsonToolkit.fromJson(readFileToString(request), Object.class));
+    inputs.put("targetKey", "mef.sonata.api-target.quote.uni.add");
+    inputs.put("mappingMatrixKey", "mef.sonata.api.matrix.quote.uni.add");
+    KrakenException krakenException =
+        Assertions.assertThrowsExactly(
+            KrakenException.class, () -> mappingMatrixCheckerActionRunner.onCheck(inputs));
+    MatcherAssert.assertThat(krakenException.getMessage(), Matchers.containsString(matchedMsg));
   }
 
   @Test

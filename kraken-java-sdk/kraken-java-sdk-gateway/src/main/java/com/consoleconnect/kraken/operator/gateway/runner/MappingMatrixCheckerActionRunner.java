@@ -107,13 +107,8 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner {
           MESSAGE_ALERT.formatted(":lack in check rules for target key: " + targetKey));
     }
     // check enable/disable
-    Optional<PathCheck> enabledOpt =
-        facets.get(targetKey).stream()
-            .filter(check -> CHECK_NAME_ENABLED.equalsIgnoreCase(check.name))
-            .findFirst();
-    if (enabledOpt.isPresent() && enabledOpt.get().value.equals("false")) {
-      throw KrakenException.badRequest(MESSAGE_ALERT.formatted(":disabled"));
-    }
+    enableChecking(facets, targetKey);
+
     if (unifiedAssetRepository.findOneByKey(targetKey).isEmpty()) {
       throw KrakenException.badRequest(MESSAGE_ALERT.formatted(":not deployed"));
     }
@@ -138,6 +133,21 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner {
                 });
     if (!allMatch) {
       throw KrakenException.badRequest(MESSAGE_ALERT.formatted(builder));
+    }
+  }
+
+  public void enableChecking(Map<String, List<PathCheck>> facets, String targetKey) {
+    Optional<PathCheck> enabledOpt =
+        facets.get(targetKey).stream()
+            .filter(check -> CHECK_NAME_ENABLED.equalsIgnoreCase(check.name))
+            .findFirst();
+    if (enabledOpt.isPresent() && enabledOpt.get().value.equals("false")) {
+      if (Objects.isNull(enabledOpt.get().errorMsg)) {
+        throw KrakenException.badRequest(MESSAGE_ALERT.formatted(":disabled"));
+      } else {
+        throw KrakenException.badRequest(
+            MESSAGE_ALERT.formatted(":disabled " + enabledOpt.get().errorMsg));
+      }
     }
   }
 

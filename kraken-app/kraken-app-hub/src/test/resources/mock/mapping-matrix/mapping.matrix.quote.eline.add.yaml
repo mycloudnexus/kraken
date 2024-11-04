@@ -13,6 +13,7 @@ spec:
       - name: enabled
         expectType: EXPECTED
         value: false
+        errorMsg: "instantSyncQuote==false"
       - name: product_type_eline
         path: "$.body.quoteItem[*].product.productConfiguration.['@type']"
         expectType: EXPECTED
