@@ -16,7 +16,8 @@ import {
 } from "recharts";
 import { DiagramProps } from "..";
 import styles from "../index.module.scss";
-import mockData from "./data.json";
+import NoData from '../NoData';
+import { EmptyBin } from '../../Icon';
 
 type Props = {
   props: DiagramProps;
@@ -37,7 +38,7 @@ const ApiActivityDiagram = ({ props }: Props) => {
   }, [props]);
 
   const activityData = useMemo(
-    () => data?.requestStatistics || mockData.requestStatistics,
+    () => data?.requestStatistics,
     [isLoading, data]
   );
 
@@ -47,45 +48,48 @@ const ApiActivityDiagram = ({ props }: Props) => {
         <Text.LightMedium>Requests</Text.LightMedium>
       </Flex>
       <Spin spinning={isLoading || isRefetching}>
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart width={500} height={300} data={activityData}>
-            <XAxis
-              dataKey="date"
-              tickFormatter={formatDiagramDate}
-              tick={{ fill: "#96A5B8" }}
-              strokeOpacity="0.2"
-            />
-            <YAxis
-              tick={{ fill: "#96A5B8" }}
-              strokeOpacity="0.2"
-              label={{
-                value: "# of requests",
-                angle: -90,
-                position: "left",
-                offset: -12,
-              }}
-            />
-            <Tooltip
-              cursor={{ stroke: "#A3B5D6", strokeWidth: 4 }}
-              labelFormatter={formatDiagramDate}
-            />
-            <Legend align="right" formatter={(value) => capitalize(value)} />
-            <Line
-              type="monotone"
-              dot={false}
-              dataKey="success"
-              strokeWidth={5}
-              stroke="#7AD6BE"
-            />
-            <Line
-              type="natural"
-              dot={false}
-              dataKey="error"
-              strokeWidth={5}
-              stroke="#EB5173"
-            />
-          </LineChart>
-        </ResponsiveContainer>
+        {!isLoading && !activityData
+          ? <NoData icon={EmptyBin}/>
+          : <ResponsiveContainer width="100%" height="100%">
+            <LineChart width={500} height={300} data={activityData}>
+              <XAxis
+                dataKey="date"
+                tickFormatter={formatDiagramDate}
+                tick={{ fill: "#96A5B8" }}
+                strokeOpacity="0.2"
+              />
+              <YAxis
+                tick={{ fill: "#96A5B8" }}
+                strokeOpacity="0.2"
+                label={{
+                  value: "# of requests",
+                  angle: -90,
+                  position: "left",
+                  offset: -12,
+                }}
+              />
+              <Tooltip
+                cursor={{ stroke: "#A3B5D6", strokeWidth: 4 }}
+                labelFormatter={formatDiagramDate}
+              />
+              <Legend align="right" formatter={(value) => capitalize(value)} />
+              <Line
+                type="monotone"
+                dot={false}
+                dataKey="success"
+                strokeWidth={5}
+                stroke="#7AD6BE"
+              />
+              <Line
+                type="natural"
+                dot={false}
+                dataKey="error"
+                strokeWidth={5}
+                stroke="#EB5173"
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        }
       </Spin>
     </Flex>
   );

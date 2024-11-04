@@ -16,7 +16,7 @@ import {
 } from "recharts";
 import { DiagramProps } from "..";
 import styles from "../index.module.scss";
-import mockData from "./data.json";
+import NoData from '../NoData';
 
 type Props = {
   props: DiagramProps;
@@ -35,7 +35,7 @@ const ErrorBrakedownDiagram = ({ props }: Props) => {
     refetch();
   }, [props]);
 
-  const processErrorData = (data: IErrorBrakedown) =>
+  const processErrorData = (data: IErrorBrakedown | undefined) =>
     data?.errorBreakdowns.map((item) => ({
       ...item,
       ...item.errors,
@@ -43,7 +43,7 @@ const ErrorBrakedownDiagram = ({ props }: Props) => {
     })) || [];
 
   const errorData = useMemo(
-    () => processErrorData(data || mockData),
+    () => processErrorData(data),
     [data, isLoading]
   );
 
@@ -53,33 +53,36 @@ const ErrorBrakedownDiagram = ({ props }: Props) => {
         <Text.LightMedium>Error brakedown</Text.LightMedium>
       </Flex>
       <Spin spinning={isLoading || isRefetching}>
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={errorData}>
-            <XAxis
-              stroke="0px"
-              dataKey="date"
-              tick={{ fill: "#96A5B8" }}
-              tickFormatter={formatDiagramDate}
-            />
-            <YAxis stroke="0px" tick={{ fill: "#96A5B8" }} />
-            <Tooltip labelFormatter={formatDiagramDate} />
-            <Legend
-              formatter={(value: string) => (
-                <span className={styles.errorBrakedownLegend}>{value}</span>
-              )}
-            />
-            {["500", "404", "401", "400"].map((key, index) => (
-              <Bar
-                key={key}
-                barSize={10}
-                stackId="error"
-                dataKey={key}
-                fill={["#A8071A", "#F5222D", "#FF7875", "#FFF1F0"][index]}
-                radius={key === "400" ? [10, 10, 0, 0] : 0}
+        {!errorData.length
+          ? <NoData description='When errors occur, they will be displayed here.' /> :
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={errorData}>
+              <XAxis
+                stroke="0px"
+                dataKey="date"
+                tick={{ fill: "#96A5B8" }}
+                tickFormatter={formatDiagramDate}
               />
-            ))}
-          </BarChart>
-        </ResponsiveContainer>
+              <YAxis stroke="0px" tick={{ fill: "#96A5B8" }} />
+              <Tooltip labelFormatter={formatDiagramDate} />
+              <Legend
+                formatter={(value: string) => (
+                  <span className={styles.errorBrakedownLegend}>{value}</span>
+                )}
+              />
+              {["500", "404", "401", "400"].map((key, index) => (
+                <Bar
+                  key={key}
+                  barSize={10}
+                  stackId="error"
+                  dataKey={key}
+                  fill={["#A8071A", "#F5222D", "#FF7875", "#FFF1F0"][index]}
+                  radius={key === "400" ? [10, 10, 0, 0] : 0}
+                />
+              ))}
+            </BarChart>
+          </ResponsiveContainer>
+        }
       </Spin>
     </Flex>
   );

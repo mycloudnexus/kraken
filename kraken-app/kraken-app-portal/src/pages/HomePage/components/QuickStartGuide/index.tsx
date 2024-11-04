@@ -111,7 +111,7 @@ const QuickStartGuide = () => {
                           ][
                             goal as keyof (typeof quickStartGuideData)[keyof IQuickStartGuideObject]
                           ] ? (
-                            <Flex key={goal}>
+                            <Flex key={goal} gap={10}>
                               <CheckFilled />
                               <Text.LightMedium>
                                 {i.goals[goal as keyof typeof i.goals]}

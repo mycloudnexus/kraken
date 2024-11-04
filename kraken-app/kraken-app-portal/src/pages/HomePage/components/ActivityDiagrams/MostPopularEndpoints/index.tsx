@@ -8,7 +8,7 @@ import Table, { ColumnsType } from "antd/es/table";
 import { useEffect, useMemo } from "react";
 import { DiagramProps } from "..";
 import styles from "../index.module.scss";
-import mockData from "./data.json";
+import NoData from '../NoData';
 
 type Props = {
   props: DiagramProps;
@@ -29,7 +29,7 @@ const MostPopularEndpoints = ({ props }: Props) => {
 
   const mostPopularEndpointsData = useMemo(
     () =>
-      (data?.endpointUsages || mockData.endpointUsages).map((item, index) => ({
+      data?.endpointUsages.map((item, index) => ({
         key: index,
         ...item,
       })),
@@ -106,14 +106,17 @@ const MostPopularEndpoints = ({ props }: Props) => {
         align="center"
       >
         <Spin spinning={isLoading || isRefetching}>
-          <Table
-            className={styles.table}
-            columns={columns}
-            dataSource={mostPopularEndpointsData}
-            pagination={false}
-            size="small"
-            rowKey="endpoint"
-          />
+          {!mostPopularEndpointsData
+            ? <NoData description='As endpoints are accessed, the most popular ones will be displayed here.' /> :
+            <Table
+              className={styles.table}
+              columns={columns}
+              dataSource={mostPopularEndpointsData}
+              pagination={false}
+              size="small"
+              rowKey="endpoint"
+            />
+          }
         </Spin>
       </Flex>
     </Flex>
