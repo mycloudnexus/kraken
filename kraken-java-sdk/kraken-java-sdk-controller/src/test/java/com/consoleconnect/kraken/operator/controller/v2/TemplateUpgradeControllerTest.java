@@ -235,7 +235,7 @@ class TemplateUpgradeControllerTest {
               uriBuilder
                   .path(url)
                   .queryParam("templateUpgradeId", assetDto.getId())
-                  .queryParam("stageEnvId", TestApplication.envId)
+                  .queryParam("envId", TestApplication.envId)
                   .build(TestContextConstants.PRODUCT_ID),
           body -> {
             assertThat(body, hasJsonPath("$.code", equalTo(200)));
@@ -254,7 +254,7 @@ class TemplateUpgradeControllerTest {
               uriBuilder
                   .path(url)
                   .queryParam("templateUpgradeId", assetDto.getId())
-                  .queryParam("productionEnvId", TestApplication.envId)
+                  .queryParam("envId", TestApplication.envId)
                   .build(TestContextConstants.PRODUCT_ID),
           body -> {
             assertThat(body, hasJsonPath("$.code", equalTo(200)));
