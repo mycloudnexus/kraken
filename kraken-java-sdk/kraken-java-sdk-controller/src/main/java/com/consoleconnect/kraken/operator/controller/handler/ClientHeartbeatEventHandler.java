@@ -94,10 +94,10 @@ public class ClientHeartbeatEventHandler extends ClientEventHandler {
         .findById(UUID.fromString(envId))
         .ifPresent(
             env -> {
-              if (env.getName().equalsIgnoreCase(EnvNameEnum.STAGE.name())) {
+              if (EnvNameEnum.STAGE.name().equalsIgnoreCase(env.getName())) {
                 systemInfoService.updateAppVersion(null, appVersion, null);
               }
-              if (env.getName().equalsIgnoreCase(EnvNameEnum.PRODUCTION.name())) {
+              if (EnvNameEnum.PRODUCTION.name().equalsIgnoreCase(env.getName())) {
                 systemInfoService.updateAppVersion(null, null, appVersion);
               }
             });

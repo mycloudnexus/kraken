@@ -102,12 +102,7 @@ public class PullDeploymentService extends KrakenServerConnector {
 
   @Scheduled(cron = "${app.cron-job.pull-latest-release:-}")
   public void scheduledCheckLatestProductRelease() {
-    for (int i = 0; i < 5; i++) {
-      executeJob();
-    }
-  }
 
-  private void executeJob() {
     // step1: retrieve latest deployment id
     HttpResponse<String> res =
         curl(
