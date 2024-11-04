@@ -82,7 +82,7 @@ const DeleteApiButton = ({
         <APIServerDrawer
           onClose={() => setOpenMappingDrawer(false)}
           isOpen={openMappingDrawer}
-          componentId={componentId}
+          item={item}
         />
       )}
     </div>

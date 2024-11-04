@@ -1,8 +1,9 @@
+import { Layout, Spin } from "antd";
+import { Suspense } from "react";
 import { Outlet } from "react-router-dom";
 import Header from "../Header";
+import SideNavigation from "../SideNavigation";
 import styles from "./index.module.scss";
-import SideNavigation from '../SideNavigation';
-import { Layout } from 'antd';
 
 const BasicLayout = () => {
   return (
@@ -10,7 +11,9 @@ const BasicLayout = () => {
       <Header />
       <Layout hasSider className={styles.content}>
         <SideNavigation />
-        <Outlet />
+        <Suspense fallback={<Spin fullscreen />}>
+          <Outlet />
+        </Suspense>
       </Layout>
     </div>
   );

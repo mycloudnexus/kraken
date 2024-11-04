@@ -21,7 +21,7 @@ export const defaultData = {
     orderBy: "createdAt",
     direction: "DESC",
     page: 0,
-    size: 100,
+    size: 10,
   },
   upgradeParams: {
     hasUpgrade: false,

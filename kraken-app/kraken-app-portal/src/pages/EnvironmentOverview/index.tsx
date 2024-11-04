@@ -13,16 +13,27 @@ import { Dropdown, Flex, Radio, Spin, Typography, notification } from "antd";
 import clsx from "clsx";
 import dayjs from "dayjs";
 import { every, isEmpty, sortBy } from "lodash";
-import { useState, useCallback, useMemo, useEffect, useRef } from "react";
+import {
+  useState,
+  useCallback,
+  useMemo,
+  useEffect,
+  useRef,
+  lazy,
+  Suspense,
+} from "react";
 import { useSearchParams } from "react-router-dom";
-import DeployHistory from "../NewAPIMapping/components/DeployHistory";
 import EnvStatus from "./components/EnvStatus";
 import { showModalConfirmRotate } from "./components/ModalConfirmRotateAPIKey";
 import ModalNewDeployment from "./components/ModalNewDeployment";
 import { showModalShowNew } from "./components/ModalShowAPIKey";
 import NoAPIKey from "./components/NoAPIKey";
-import RunningAPIMapping from "./components/RunningAPIMapping";
 import styles from "./index.module.scss";
+
+const RunningAPIMapping = lazy(() => import("./components/RunningAPIMapping"));
+const DeployHistory = lazy(
+  () => import("../NewAPIMapping/components/DeployHistory")
+);
 
 const initPaginationParams = {
   page: 0,
@@ -30,9 +41,6 @@ const initPaginationParams = {
 };
 
 const EnvironmentOverview = () => {
-  const observedDiv = useRef<HTMLDivElement>(null);
-  const [height, setHeight] = useState<number | undefined>(undefined);
-
   const [searchParams] = useSearchParams();
   const { currentProduct } = useAppStore();
 
@@ -134,22 +142,6 @@ const EnvironmentOverview = () => {
     }
   }, [envList, envId, selectedEnv]);
 
-  useEffect(() => {
-    if (!observedDiv?.current) {
-      return;
-    }
-    const resizeObserver = new ResizeObserver(() => {
-      if (observedDiv.current?.offsetHeight !== height) {
-        setHeight(observedDiv?.current?.offsetHeight ?? 0);
-      }
-    });
-    resizeObserver.observe(observedDiv.current);
-
-    return function cleanup() {
-      resizeObserver.disconnect();
-    };
-  }, [observedDiv.current]);
-
   return (
     <PageLayout title="Deployment">
       <Flex vertical gap={12} className={styles.pageWrapper}>
@@ -226,12 +218,7 @@ const EnvironmentOverview = () => {
         {!isHaveApiKey && !loadingApiKey ? (
           <NoAPIKey env={selectedEnv} />
         ) : (
-          <Flex
-            vertical
-            gap={12}
-            className={styles.sectionWrapper}
-            ref={observedDiv}
-          >
+          <Flex vertical gap={12} className={styles.sectionWrapper}>
             <Flex align="center" justify="space-between">
               <Radio.Group
                 onChange={(e) => {
@@ -239,25 +226,28 @@ const EnvironmentOverview = () => {
                 }}
                 value={activeTab}
               >
-                <Radio.Button value="running_api">
+                <Radio.Button value="running_api" data-testid="apiMappingTab">
                   Running API mappings
                 </Radio.Button>
-                <Radio.Button value="deployment_history">
+                <Radio.Button
+                  value="deployment_history"
+                  data-testid="deploymentHistory"
+                >
                   Deployment history
                 </Radio.Button>
               </Radio.Group>
             </Flex>
-            {activeTab === "running_api" && selectedEnv && (
-              <RunningAPIMapping scrollHeight={height} env={selectedEnv} />
-            )}
-            {activeTab === "deployment_history" && (
-              <div style={{ marginTop: -12 }}>
-                <DeployHistory
-                  scrollHeight={height}
-                  selectedEnv={selectedEnv}
-                />
-              </div>
-            )}
+
+            <Suspense fallback={<Spin spinning />}>
+              {activeTab === "running_api" && selectedEnv && (
+                <RunningAPIMapping env={selectedEnv} />
+              )}
+              {activeTab === "deployment_history" && (
+                <div style={{ marginTop: -12 }}>
+                  <DeployHistory selectedEnv={selectedEnv} />
+                </div>
+              )}
+            </Suspense>
           </Flex>
         )}
         <ModalNewDeployment

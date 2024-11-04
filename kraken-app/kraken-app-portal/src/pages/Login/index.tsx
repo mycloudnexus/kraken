@@ -2,15 +2,18 @@ import loginBg from "@/assets/login/login-bg.svg?url";
 import Logo from "@/assets/logo.svg";
 import Flex from "@/components/Flex";
 import { useLogin } from "@/hooks/login";
-import { getData, isTokenExpired, storeData } from "@/utils/helpers/token";
-import { Button, Form, Input, Typography, notification } from "antd";
+import { storeData } from "@/utils/helpers/token";
+import { Alert, Button, Form, Input, Typography } from "antd";
 import { get } from "lodash";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./index.module.scss";
 
 const Login = () => {
   const navigate = useNavigate();
   const { mutateAsync: login, isPending } = useLogin();
+
+  const [error, setError] = useState<string | null>(null);
 
   const handleFinish = async (values: any) => {
     try {
@@ -19,6 +22,7 @@ const Login = () => {
       const expiresIn = get(res, "data.expiresIn");
       const refreshToken = get(res, "data.refreshToken");
       const refreshTokenExpiresIn = get(res, "data.refreshTokenExpiresIn");
+
       if (accessToken && expiresIn) {
         storeData("token", accessToken);
         storeData("tokenExpired", String(Date.now() + expiresIn * 1000));
@@ -27,19 +31,20 @@ const Login = () => {
           "refreshTokenExpiresIn",
           String(Date.now() + refreshTokenExpiresIn * 1000)
         );
+        setError(null);
         navigate("/", { replace: true });
       } else {
-        notification.error({ message: "Token not found!" });
+        throw new Error("Invalid username or password.");
       }
-    } catch (e) {
-      notification.error({ message: get(e, "reason", "Error on login!") });
+    } catch (e: any) {
+      setError(e.message || "Error on login!");
     }
   };
-  const token = getData("token");
-  if (token && !isTokenExpired()) {
-    window.location.href = window.location.origin;
-    return null;
-  }
+  // const token = getData("token");
+  // if (token && !isTokenExpired()) {
+  //   window.location.href = window.location.origin;
+  //   return null;
+  // }
   return (
     <Flex
       className={styles.pageWrapper}
@@ -60,6 +65,11 @@ const Login = () => {
             Enter your Account Credential to get start
           </Typography.Text>
         </Flex>
+
+        {error && (
+          <Alert className={styles.errorAlert} type="error" message={error} />
+        )}
+
         <Form layout="vertical" className={styles.form} onFinish={handleFinish}>
           <Form.Item name="userName">
             <Input placeholder="User Name" required />

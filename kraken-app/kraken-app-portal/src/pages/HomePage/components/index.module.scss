@@ -1,86 +1,37 @@
+.wrapper {
+  background: #fff;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.guideContainer {
+  min-height: 300px;
+  justify-content: center;
+  align-items: center;
+}
+
 .stepContainer {
+  display: flex;
+  justify-content: center;
   padding: 20px 20px 24px 20px;
   border-radius: 8px;
-  background: linear-gradient(236deg, #2962ff -89.03%, #9584ff 90.4%);
+  width: 100%;
+  background: linear-gradient(
+    101.79deg,
+    rgba(112, 137, 223, 0.9) 22.08%,
+    rgba(106, 217, 178, 0.9) 106.71%
+  );
   vertical-align: middle;
-  h3 {
-    color: var(--Color, #fff);
-    font-size: 30px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 40px;
-    margin: 0;
-    margin-bottom: 20px;
+
+  .diagram {
+    content: url("../../../assets/home/chart.svg");
+    margin-top: 20px;
+    width: -webkit-fill-available;
+    max-width: 1200px;
+    max-height: 372px;
+    align-content: center;
   }
 
-  .stepDetail {
-    padding: 0 16px 16px;
-    text-align: center;
-    border-radius: 8px;
-    border: 1px solid var(--Border-Regular, #dde1e5);
-    border-top: 0px;
-    background: var(--Page-container-bg, #fff);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
-    .stepCount {
-      width: fit-content;
-      text-align: center;
-      padding: 6px 16px;
-      margin: 0;
-      border-radius: 0px 0px 16px 16px;
-      background: #9156e4;
-      color: #fff;
-      font-size: 20px;
-      font-style: normal;
-      font-weight: 500;
-      line-height: 28px;
-    }
-    .title {
-      overflow: hidden;
-
-      width: 100%;
-      display: -webkit-box;
-      -webkit-box-orient: vertical;
-      line-clamp: 2;
-      -webkit-line-clamp: 2;
-      min-height: 48px;
-    }
-    span {
-      color: var(--Texts-Primary, var(--Text-primary, rgba(0, 0, 0, 0.85)));
-      font-size: 16px;
-      font-style: normal;
-      font-weight: 400;
-      line-height: 24px;
-    }
-    .iconContainer {
-      max-width: 100%;
-
-      svg {
-        margin: 9px 0;
-      }
-    }
-
-    p {
-      overflow: hidden;
-      color: var(--Text-secondary, rgba(0, 0, 0, 0.45));
-      height: 80px;
-      font-size: 12px;
-      font-style: normal;
-      font-weight: 400;
-      line-height: 20px;
-      width: 100%;
-      display: -webkit-box;
-      -webkit-box-orient: vertical;
-      line-clamp: 4;
-      -webkit-line-clamp: 4;
-    }
-    svg {
-      max-width: 100%;
-      height: auto;
-    }
-  }
   .arrow {
     svg {
       height: auto;

@@ -15,6 +15,9 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 export const USER_CACHE_KEYS = {
   get_user: "get_user",
   get_current_user: "get_current_user",
+  get_quick_start_guide: "get_quick_start_guide",
+  get_error_brakedown: "get_error_brakedown",
+  get_most_popular_endpoints: "get_most_popular_endpoints",
   create_user: "create_user",
   edit_user: "edit_user",
   enable_user: "enable_user",

@@ -1,21 +1,20 @@
-import { render } from "@testing-library/react";
-
 import {
-  Step1Icon,
-  Step2Icon,
-  Step3Icon,
-  Step4Icon,
-  RightArrow,
+  OneIcon,
+  TwoIcon,
+  ThreeIcon,
+  CheckFilled,
+  CheckGray,
   MoreIcon,
 } from "@/pages/HomePage/components/Icon";
+import { render } from "@testing-library/react";
 
 test("Hompage Icon test", () => {
   [
-    <Step1Icon />,
-    <Step2Icon />,
-    <Step3Icon />,
-    <Step4Icon />,
-    <RightArrow />,
+    <OneIcon />,
+    <TwoIcon />,
+    <ThreeIcon />,
+    <CheckFilled />,
+    <CheckGray />,
     <MoreIcon />,
   ].forEach((f) => {
     const { container } = render(f);

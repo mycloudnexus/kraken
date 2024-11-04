@@ -1,0 +1,79 @@
+.customSteps {
+  :global {
+    .ant-steps-item-icon {
+      background-color: var(--white) !important;
+      border-color: var(--disabled) !important;
+
+      .ant-steps-icon {
+        color: var(--disabled) !important;
+        font-size: 12px !important;
+      }
+    }
+
+    .ant-steps-item.ant-steps-item-active .ant-steps-item-icon {
+      background-color: var(--primary) !important;
+      border-color: var(--primary) !important;
+
+      .ant-steps-icon {
+        color: var(--white) !important;
+        font-size: 12px !important;
+      }
+    }
+
+    .ant-steps-item-finish {
+      .ant-steps-item-icon {
+        border-color: var(--primary) !important;
+
+        .ant-steps-icon {
+          color: var(--primary) !important;
+        }
+      }
+
+      .ant-steps-item-title {
+        color: var(--primary) !important;
+        cursor: pointer;
+      }
+    }
+
+    .ant-steps-item-process.upgrading .ant-steps-item-icon {
+      position: relative;
+      border-color: var(--neutral) !important;
+      background-color: transparent !important;
+      background-image: url(/src/assets/icon/two-thirds-loading.svg);
+      background-position: right;
+      background-size: contain;
+      width: 34px;
+      height: 34px;
+      margin-left: -2px;
+      background-repeat: no-repeat;
+
+      .ant-steps-icon {
+        background-color: var(--primary) !important;
+        color: var(--white) !important;
+        border-radius: 50%;
+        width: 24px;
+        aspect-ratio: 1 / 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        left: 48%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+      }
+    }
+  }
+
+  &.small {
+    :global {
+      .ant-steps-item-process.upgrading .ant-steps-item-icon {
+        width: 28px;
+        height: 28px;
+
+        .ant-steps-icon {
+          width: 18px !important;
+        }
+      }
+    }
+  }
+}

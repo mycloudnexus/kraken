@@ -1,11 +1,12 @@
-import { useMemo, useEffect, useState, useCallback } from "react";
-import { Collapse, Spin } from "antd";
+import { usePathQuery } from "@/hooks/usePathQuery";
 import { useMappingUiStore } from "@/stores/mappingUi.store";
+import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { GroupedByPath } from "@/utils/helpers/groupByPath";
 import { IMapperDetails } from "@/utils/types/env.type";
-import styles from "./index.module.scss";
+import { Collapse, Spin } from "antd";
+import { useMemo, useEffect, useState, useCallback } from "react";
 import { CollapseItem, CollapseLabel } from "./components";
-import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
+import styles from "./index.module.scss";
 
 type MappingDetailsListProps = {
   groupedPaths: GroupedByPath;
@@ -16,6 +17,9 @@ const MappingDetailsList = ({
   groupedPaths,
   setActiveSelected,
 }: MappingDetailsListProps) => {
+  // Grab targetMapperKey in url's query, select the corresponding mapping
+  const query = usePathQuery();
+
   const [activeLabel, setActiveLabel] = useState<string[]>(
     Object.keys(groupedPaths)
   );
@@ -34,9 +38,17 @@ const MappingDetailsList = ({
   }, [groupedPaths]);
 
   const initList = useCallback(() => {
-    const headersList = Object.keys(groupedPaths);
-    if (headersList.length > 0) {
-      const initialMapItem = groupedPaths[headersList[0]][0];
+    const apis = Object.values(groupedPaths).flatMap((subPath) => subPath);
+    if (apis.length > 0) {
+      const targetMapperKey = query.get("targetMapperKey");
+
+      // Auto select the corresponding api
+      const initialMapItem = targetMapperKey
+        ? (apis.find(
+            (mapping) => mapping.targetMapperKey === targetMapperKey
+          ) ?? apis[0])
+        : apis[0];
+
       setSelectedKey(initialMapItem.path);
       setActivePath(initialMapItem.path);
       setActiveSelected(initialMapItem);

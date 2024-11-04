@@ -1,4 +1,5 @@
 import RollbackIcon from "@/assets/newAPIMapping/Rollback.svg";
+import { Alert } from "@/components/Alert";
 import DeployStage from "@/components/DeployStage";
 import Flex from "@/components/Flex";
 import StepBar from "@/components/StepBar";
@@ -8,8 +9,8 @@ import {
   useGetLatestRunningList,
   useUpdateTargetMapper,
 } from "@/hooks/product";
+import { usePathQuery } from "@/hooks/usePathQuery";
 import useSize from "@/hooks/useSize";
-import useUser from "@/hooks/user/useUser";
 import { useAppStore } from "@/stores/app.store";
 import { useMappingUiStore } from "@/stores/mappingUi.store";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
@@ -31,72 +32,26 @@ import {
   reduce,
   uniqBy,
 } from "lodash";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { useSessionStorage } from "usehooks-ts";
 import DeployHistory from "./components/DeployHistory";
+import { Deployment } from "./components/Deployment";
 import DeploymentInfo from "./components/DeploymentInfo";
 import HeaderMapping from "./components/HeaderMapping";
 import NotRequired from "./components/NotRequired";
 import RequestMapping from "./components/RequestMapping";
 import ResponseMapping, { IMapping } from "./components/ResponseMapping";
-import RightAddSellerProp from "./components/RightAddSellerProp";
-import RightAddSonataProp from "./components/RightAddSonataProp";
-import SelectAPI from "./components/SelectAPI";
-import SelectResponseProperty from "./components/SelectResponseProperty";
-import SonataResponseMapping from "./components/SonataResponseMapping";
-import StatusIcon from "./components/StatusIcon";
+import { RightSide } from "./components/RightSide";
 import useGetApiSpec from "./components/useGetApiSpec";
 import useGetDefaultSellerApi from "./components/useGetDefaultSellerApi";
 // import { validateMappers } from "./helper";
 import styles from "./index.module.scss";
 
-type Props = {
-  rightSide: number;
-  jsonSpec: any;
-  method: string;
-  handleSelectSonataProp: (value: any) => void;
-  handleSelectSellerProp: (value: any) => void;
-  isRequiredMapping: boolean;
-};
-
 enum EMainTab {
   mapping = "mapping",
   deploy = "deploy",
 }
-
-const RightSide = ({
-  rightSide,
-  jsonSpec,
-  method,
-  handleSelectSonataProp,
-  handleSelectSellerProp,
-  isRequiredMapping,
-}: Props) => {
-  if (!isRequiredMapping) {
-    return <SelectAPI isRequiredMapping={isRequiredMapping} />;
-  }
-  switch (rightSide) {
-    case EnumRightType.AddSonataProp:
-      return (
-        <RightAddSonataProp
-          spec={jsonSpec}
-          method={method}
-          onSelect={handleSelectSonataProp}
-        />
-      );
-    case EnumRightType.SelectSellerAPI:
-      return <SelectAPI />;
-
-    case EnumRightType.AddSellerProp:
-      return <RightAddSellerProp onSelect={handleSelectSellerProp} />;
-    case EnumRightType.AddSellerResponse:
-      return <SelectResponseProperty />;
-    case EnumRightType.SonataResponse:
-      return <SonataResponseMapping spec={jsonSpec} method={method} />;
-    default:
-      return <></>;
-  }
-};
 
 const collapsedStyle = { maxWidth: `calc(100vw - 462px)` };
 
@@ -107,6 +62,7 @@ const NewAPIMapping = ({
   refetch?: () => void;
   isRequiredMapping: boolean;
 }) => {
+  const pathQuery = usePathQuery();
   const [collapsed] = useSessionStorage("collapsed", false);
   const { currentProduct } = useAppStore();
   const { activeTab, setActiveTab } = useMappingUiStore();
@@ -158,20 +114,8 @@ const NewAPIMapping = ({
 
   const ref = useRef<any>();
   const size = useSize(ref);
-  const { findUserName } = useUser();
-  const { data: runningDeploymentData } = useGetLatestRunningList(
-    currentProduct,
-    queryData?.targetMapperKey
-  );
-  const deploymentInfo = useMemo(() => {
-    const stage = runningDeploymentData?.find(
-      (item: any) => item?.envName?.toLowerCase?.() === "stage"
-    );
-    const production = runningDeploymentData?.find(
-      (item: any) => item?.envName?.toLowerCase?.() === "production"
-    );
-    return { stage, production };
-  }, [runningDeploymentData]);
+  const { data: runningDeploymentData, isFetching: isFetchingDeploymentData } =
+    useGetLatestRunningList(currentProduct, queryData?.targetMapperKey);
 
   useEffect(() => {
     if (!sellerApi && defaultSellerApi && firstTimeLoadSellerAPI) {
@@ -485,18 +429,7 @@ const NewAPIMapping = ({
     [sellerApi, setActiveTab, setRightSide]
   );
 
-  const renderDeployText = useCallback((status: string) => {
-    switch (status) {
-      case "SUCCESS":
-        return "success.";
-      case "IN_PROCESS":
-        return "in process.";
-      case "FAILED":
-        return "failed.";
-      default:
-        return "";
-    }
-  }, []);
+  const upgradingVersion = pathQuery.get("version");
 
   return (
     <Flex className={styles.container}>
@@ -537,62 +470,19 @@ const NewAPIMapping = ({
               { label: "Deploy history", key: EMainTab.deploy },
             ]}
           />
-          <DeploymentInfo runningData={runningDeploymentData} />
+          <DeploymentInfo
+            runningData={runningDeploymentData as any}
+            loading={isFetchingDeploymentData}
+          />
         </Flex>
         {mainTabKey === EMainTab.mapping && (
           <Flex className={styles.breadcrumb} justifyContent="space-between">
             <Flex className={styles.infoBox}>
               {queryData?.lastDeployedAt && (
-                <Flex justifyContent="flex-start" gap={12}>
-                  <Text.LightSmall color="#00000073">
-                    Last deployment
-                  </Text.LightSmall>
-                  <Flex gap={4}>
-                    <StatusIcon status={deploymentInfo?.stage?.status} />
-                    <Text.LightSmall lineHeight="20px">Stage</Text.LightSmall>
-                    <Tooltip
-                      title={
-                        <>
-                          Deploy{" "}
-                          {renderDeployText(deploymentInfo?.stage?.status)}
-                          <br />
-                          <>
-                            By {findUserName(deploymentInfo?.stage?.createBy)}{" "}
-                            {dayjs(deploymentInfo?.stage?.createAt).format(
-                              "YYYY-MM-DD HH:mm:ss"
-                            )}
-                          </>
-                        </>
-                      }
-                    >
-                      <InfoCircleOutlined />
-                    </Tooltip>
-                  </Flex>
-                  <Flex gap={4}>
-                    <StatusIcon status={deploymentInfo?.production?.status} />
-                    <Text.LightSmall lineHeight="20px">
-                      Production
-                    </Text.LightSmall>
-                    <Tooltip
-                      title={
-                        <>
-                          Deploy{" "}
-                          {renderDeployText(deploymentInfo?.production?.status)}
-                          <br />
-                          <>
-                            By{" "}
-                            {findUserName(deploymentInfo?.production?.createBy)}{" "}
-                            {dayjs(deploymentInfo?.production?.createAt).format(
-                              "YYYY-MM-DD HH:mm:ss"
-                            )}
-                          </>
-                        </>
-                      }
-                    >
-                      <InfoCircleOutlined />
-                    </Tooltip>
-                  </Flex>
-                </Flex>
+                <Deployment
+                  deploymentData={runningDeploymentData}
+                  loading={isFetchingDeploymentData}
+                />
               )}
             </Flex>
             <Flex
@@ -648,6 +538,21 @@ const NewAPIMapping = ({
           className={styles.newContent}
           style={collapsed ? collapsedStyle : {}}
         >
+          {upgradingVersion && (
+            <Alert
+              type="warning"
+              style={{ marginBottom: 16 }}
+              description={
+                <>
+                  Upgrading to{" "}
+                  <Link to={`/mapping-template-v2?version=${upgradingVersion}`}>
+                    Api mapping template {upgradingVersion}
+                  </Link>
+                </>
+              }
+            />
+          )}
+
           {mainTabKey === EMainTab.mapping ? (
             <Flex
               gap={12}

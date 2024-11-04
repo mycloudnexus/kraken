@@ -103,6 +103,7 @@ const SideNavigation = () => {
           "audit-log",
           "mapping-template",
           "user-management",
+          "user-management-v2",
         ],
         children: [
           {
@@ -114,6 +115,14 @@ const SideNavigation = () => {
             label: (
               <Link to="/mapping-template">
                 Mapping template release & Upgrade
+              </Link>
+            ),
+          },
+          {
+            key: "mapping-template-v2",
+            label: (
+              <Link to="/mapping-template-v2">
+                Mapping template release & Upgrade v2
               </Link>
             ),
           },

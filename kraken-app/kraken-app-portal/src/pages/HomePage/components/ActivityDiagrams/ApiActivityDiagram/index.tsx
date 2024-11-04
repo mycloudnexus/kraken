@@ -1,0 +1,94 @@
+import { Text } from "@/components/Text";
+import { useGetActivityRequests } from "@/hooks/homepage";
+import { useAppStore } from "@/stores/app.store";
+import { formatDiagramDate } from "@/utils/constants/format";
+import { Flex, Spin } from "antd";
+import { capitalize } from "lodash";
+import { useEffect, useMemo } from "react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+import { DiagramProps } from "..";
+import styles from "../index.module.scss";
+import mockData from "./data.json";
+
+type Props = {
+  props: DiagramProps;
+};
+
+const ApiActivityDiagram = ({ props }: Props) => {
+  const { currentProduct } = useAppStore();
+  const { data, isLoading, refetch, isRefetching } = useGetActivityRequests(
+    currentProduct,
+    props.envId,
+    props.startTime,
+    props.endTime,
+    props.buyer
+  );
+
+  useEffect(() => {
+    refetch();
+  }, [props]);
+
+  const activityData = useMemo(
+    () => data?.requestStatistics || mockData.requestStatistics,
+    [isLoading, data]
+  );
+
+  return (
+    <Flex vertical className={styles.contentBox}>
+      <Flex style={{ paddingBottom: "12px" }}>
+        <Text.LightMedium>Requests</Text.LightMedium>
+      </Flex>
+      <Spin spinning={isLoading || isRefetching}>
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart width={500} height={300} data={activityData}>
+            <XAxis
+              dataKey="date"
+              tickFormatter={formatDiagramDate}
+              tick={{ fill: "#96A5B8" }}
+              strokeOpacity="0.2"
+            />
+            <YAxis
+              tick={{ fill: "#96A5B8" }}
+              strokeOpacity="0.2"
+              label={{
+                value: "# of requests",
+                angle: -90,
+                position: "left",
+                offset: -12,
+              }}
+            />
+            <Tooltip
+              cursor={{ stroke: "#A3B5D6", strokeWidth: 4 }}
+              labelFormatter={formatDiagramDate}
+            />
+            <Legend align="right" formatter={(value) => capitalize(value)} />
+            <Line
+              type="monotone"
+              dot={false}
+              dataKey="success"
+              strokeWidth={5}
+              stroke="#7AD6BE"
+            />
+            <Line
+              type="natural"
+              dot={false}
+              dataKey="error"
+              strokeWidth={5}
+              stroke="#EB5173"
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </Spin>
+    </Flex>
+  );
+};
+
+export default ApiActivityDiagram;

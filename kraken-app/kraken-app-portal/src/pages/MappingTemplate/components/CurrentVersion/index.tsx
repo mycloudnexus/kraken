@@ -22,17 +22,25 @@ const CurrentVersion = () => {
     };
   }, [currentVer]);
   return (
-    <Flex align="center" gap={12}>
+    <Flex align="center" gap={12} style={{ marginBottom: 12 }}>
       <Text.LightMedium lineHeight="20px" color="#00000073">
         Current version
       </Text.LightMedium>
       <Flex align="center" gap={8}>
         <Text.LightMedium lineHeight="20px">Stage</Text.LightMedium>
-        <Tag bordered={false} color="#DBE4FB" style={{ color: "#2962FF" }}>
+        <Tag
+          bordered={false}
+          color="var(--panel-hover-bg)"
+          style={{ color: "var(--primary)" }}
+        >
           {get(currentData, "stage.productVersion")}
         </Tag>
         <Text.LightMedium lineHeight="20px">Production</Text.LightMedium>
-        <Tag bordered={false} color="#DBE4FB" style={{ color: "#2962FF" }}>
+        <Tag
+          bordered={false}
+          color="var(--panel-hover-bg)"
+          style={{ color: "var(--primary)" }}
+        >
           {get(currentData, "production.productVersion")}
         </Tag>
       </Flex>

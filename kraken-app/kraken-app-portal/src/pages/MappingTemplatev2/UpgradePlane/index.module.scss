@@ -1,0 +1,153 @@
+.card {
+  padding: 20px 20px 16px 20px;
+  gap: 16px;
+  border-radius: 4px;
+  background: var(--white);
+  min-width: fit-content;
+  display: flex;
+  margin-bottom: 12px;
+  min-height: 0;
+  overflow-y: auto;
+
+  .mapping {
+    align-items: center;
+    min-height: 300px;
+    flex: 1;
+
+    .apiList {
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+      display: flex;
+      flex-direction: column;
+      padding: 0 12px;
+      flex: 1;
+      height: 100%;
+      overflow-y: auto;
+
+      .listTitle {
+        border-bottom: 1px solid var(--card-border);
+        padding: 12px 0;
+        position: sticky;
+        top: 0;
+        background-color: var(--white);
+        z-index: 2;
+      }
+    }
+  }
+}
+
+.flexOne {
+  flex: 1;
+}
+
+.stepsNav {
+  justify-content: center;
+
+  :global {
+    .ant-steps {
+      padding-top: 0;
+      max-width: 1000px;
+    }
+  }
+}
+
+.errorIcon {
+  color: var(--error);
+  margin-top: 4px;
+
+  :global {
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+}
+
+.btnClose {
+  color: var(--text);
+}
+
+.skeleton {
+  padding: 8px 12px;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+
+  :global {
+    .ant-skeleton {
+      .ant-skeleton-input {
+        height: 14px;
+        min-width: auto;
+      }
+    }
+  }
+}
+
+.btnUpgrade {
+  &:disabled {
+    background-color: var(--bg-disabled) !important;
+    border-color: var(--bg-disabled) !important;
+    color: var(--white) !important;
+  }
+}
+
+.incompleteMappingBadge {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background-color: var(--warning);
+  border-radius: 50%;
+}
+
+.incompleteMapping {
+  background-color: var(--panel-hover-bg);
+  cursor: pointer;
+
+  :global {
+    .ant-typography {
+      color: var(--primary);
+    }
+  }
+}
+
+.upgradeIcon {
+  padding: 8px;
+  display: flex;
+  gap: 2px;
+  color: var(--light-gray);
+  position: relative;
+
+  &.upgrading {
+    svg:first-child {
+      animation: transform 1.8s forwards 0s infinite;
+    }
+
+    svg:nth-child(2) {
+      animation: transform 1.8s forwards 0.6s infinite;
+    }
+
+    svg:nth-child(3) {
+      animation: transform 1.8s forwards 1.2s infinite;
+    }
+  }
+
+  &.upgraded svg {
+    color: var(--primary);
+  }
+}
+
+@keyframes transform {
+  0% {
+    color: var(--primary);
+  }
+
+  80% {
+    color: var(--light-gray);
+  }
+
+  100% {
+    color: var(--light-gray);
+  }
+}

@@ -52,7 +52,7 @@ const StandardAPIMapping = () => {
     if (mapItem) {
       setQuery(JSON.stringify(mapItem));
     }
-  }, [detailDataMapping]);
+  }, [detailDataMapping, selectedKey]);
 
   const handleDisplay = async (mapItem: IMapperDetails) => {
     setIsChangeMappingKey(true);

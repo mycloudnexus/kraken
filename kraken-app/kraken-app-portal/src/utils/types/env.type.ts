@@ -79,6 +79,7 @@ export interface IRunningMapping {
   userName?: string;
   version: string;
   status: string;
+  mappingStatus: string;
 }
 
 export interface IRunningComponentItem {
@@ -115,9 +116,8 @@ export interface IMapperDetails {
   diffWithStage?: boolean;
   requiredMapping: boolean;
   orderBy: string;
-  order?: number
+  order?: number;
 }
-
 
 export interface ILogActivity {
   id: string;
