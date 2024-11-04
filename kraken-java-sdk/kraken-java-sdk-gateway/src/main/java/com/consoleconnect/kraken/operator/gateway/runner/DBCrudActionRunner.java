@@ -144,7 +144,6 @@ public class DBCrudActionRunner extends AbstractActionRunner {
     }
     Optional<HttpRequestEntity> optionalEntity = readRequestEntity(config.getId());
     if (optionalEntity.isEmpty()) {
-      log.error(ENTITY_NOT_FOUND_ERR);
       if (StringUtils.isNotBlank(config.getNotExistedErrMsg())) {
         throw KrakenException.notFound(config.getNotExistedErrMsg());
       } else {
