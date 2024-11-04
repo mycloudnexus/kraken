@@ -14,18 +14,17 @@ spec:
     method: get
   endpoints:
     - id: retrieve address
-      path:
-      method:
+      path: ""
+      method: ""
       requestBody:
       responseBody: |
         {
-          "id": "@{{id}}",
-          "type": "FieldedAddress",
+          "id": "",
+          "@type": "FieldedAddress",
           "associatedGeographicAddress": {
-                 "country": "@{{associatedGeographicAddress.country}}",
-                 "city": "@{{associatedGeographicAddress.city}}",
-                 "streetName": "@{{associatedGeographicAddress.streetName}}"
+            "country": "",
+            "city": "",
+            "streetName": "",
+            "locality": ""
           }
         }
-        
-

@@ -52,13 +52,14 @@ class ResponseMappingTest extends AbstractIntegrationTest implements MappingTran
             "/mock/api-targets-mappers/api-target-mapper.order.uni.add.yaml");
     validate(expectedOrder, input4);
 
-    String expectedQuote = readCompactedFile("expected/expected-quote.json");
+    String expectedQuote = readCompactedFile("expected/expected-quote.eline.add.json");
     String input5 =
         getTarget(
             "/mock/api-targets/api-target.quote.eline.add.yaml",
             "/mock/api-targets-mappers/api-target-mapper.quote.eline.add.yaml");
     validate(expectedQuote, input5);
 
+    expectedQuote = readCompactedFile("expected/expected-quote.uni.add.json");
     String input6 =
         getTarget(
             "/mock/api-targets/api-target.quote.uni.add.yaml",

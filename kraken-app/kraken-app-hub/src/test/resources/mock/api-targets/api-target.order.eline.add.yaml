@@ -26,15 +26,8 @@ spec:
         {
           "relatedContactInformation": "${T(com.consoleconnect.kraken.operator.gateway.func.SpelFunc).appendSellerInformation(env.seller.role, env.seller.name, env.seller.emailAddress, env.seller.number, mefRequestBody.relatedContactInformation)}",
           "id": "${entity.id}",
-          "orderDate":"function.now()",
+          "orderDate":"${T(com.consoleconnect.kraken.operator.core.toolkit.DateTime).nowInUTCFormatted()}",
           "productOrderItem": "${mefRequestBody.productOrderItem}",
           "state": "",
           "orderId": ""
         }
-   
-
-
-
-
-
-
