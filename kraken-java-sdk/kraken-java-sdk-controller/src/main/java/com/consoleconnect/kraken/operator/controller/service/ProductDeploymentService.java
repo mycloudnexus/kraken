@@ -159,7 +159,7 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
         createDeploymentRequest(request.getTargetEnvId(), tagIds);
     createProductDeploymentRequest.setTagIdMappers(tagIdMappers);
     return create(
-        productId, createProductDeploymentRequest, ReleaseKindEnum.API_LEVEL, createdBy, false);
+        productId, createProductDeploymentRequest, ReleaseKindEnum.API_LEVEL, createdBy, true);
   }
 
   private CreateProductDeploymentRequest createDeploymentRequest(
@@ -430,17 +430,19 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
     UnifiedAssetDto templateUpgrade = unifiedAssetService.findOne(templateUpgradeId);
     String envName = templateDeployment.getLabels().get(LABEL_ENV_NAME);
     if (EnvNameEnum.STAGE.name().equalsIgnoreCase(envName)) {
-      systemInfoService.update(
+      systemInfoService.updateProductVersion(
           SystemStateEnum.STAGE_UPGRADE_DONE,
           null,
-          templateUpgrade.getMetadata().getLabels().get(LABEL_PRODUCT_VERSION),
+          Constants.formatVersion(
+              templateUpgrade.getMetadata().getLabels().get(LABEL_PRODUCT_VERSION)),
           null);
     } else {
-      systemInfoService.update(
+      systemInfoService.updateProductVersion(
           SystemStateEnum.RUNNING,
           null,
           null,
-          templateUpgrade.getMetadata().getLabels().get(LABEL_PRODUCT_VERSION));
+          Constants.formatVersion(
+              templateUpgrade.getMetadata().getLabels().get(LABEL_PRODUCT_VERSION)));
     }
   }
 

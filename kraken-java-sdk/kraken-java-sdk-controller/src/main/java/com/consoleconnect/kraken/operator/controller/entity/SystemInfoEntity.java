@@ -23,8 +23,14 @@ public class SystemInfoEntity extends AbstractEntity {
   @Column(name = "production_product_version", nullable = true, unique = false)
   private String productionProductVersion;
 
-  @Column(name = "kraken_app_version", nullable = false, unique = false)
-  private String krakenAppVersion;
+  @Column(name = "control_app_version", nullable = true, unique = false)
+  private String controlAppVersion;
+
+  @Column(name = "stage_app_version", nullable = true, unique = false)
+  private String stageAppVersion;
+
+  @Column(name = "production_app_version", nullable = true, unique = false)
+  private String productionAppVersion;
 
   @Column(name = "product_key", nullable = true, unique = false)
   private String productKey;

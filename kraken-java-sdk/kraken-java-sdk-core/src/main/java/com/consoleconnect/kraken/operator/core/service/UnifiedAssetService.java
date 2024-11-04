@@ -499,11 +499,14 @@ public class UnifiedAssetService {
     return (root, query, criteriaBuilder) -> {
       List<Predicate> predicateList = new ArrayList<>();
       if (CollectionUtils.isNotEmpty(eqConditions)) {
-        eqConditions.forEach(
-            tuple2 -> {
-              Predicate predicate = criteriaBuilder.equal(root.get(tuple2.field()), tuple2.value());
-              predicateList.add(predicate);
-            });
+        eqConditions.stream()
+            .filter(t -> t.value() != null)
+            .forEach(
+                tuple2 -> {
+                  Predicate predicate =
+                      criteriaBuilder.equal(root.get(tuple2.field()), realValue(tuple2));
+                  predicateList.add(predicate);
+                });
       }
       if (CollectionUtils.isNotEmpty(labelConditions)) {
         labelConditions.forEach(
@@ -526,10 +529,9 @@ public class UnifiedAssetService {
             (field, list) -> {
               Path<Object> path = root.get(field);
               CriteriaBuilder.In<Object> in = criteriaBuilder.in(path);
-              List<String> vList = list.stream().map(Tuple2::value).toList();
-              for (String x : vList) {
-                in.value(x);
-              }
+              list.stream()
+                  .filter(t -> t.value() != null)
+                  .forEach(tuple2 -> in.value(realValue(tuple2)));
               Predicate predicate = criteriaBuilder.and(in);
               predicateList.add(predicate);
             });
@@ -551,6 +553,13 @@ public class UnifiedAssetService {
       Predicate[] predicateListArray = predicateList.toArray(new Predicate[0]);
       return query.where(predicateListArray).getRestriction();
     };
+  }
+
+  static Object realValue(Tuple2 tuple2) {
+    if (tuple2.field().equals(AssetsConstants.FIELD_ID)) {
+      return UUID.fromString(tuple2.value());
+    }
+    return tuple2.value();
   }
 
   @Transactional(readOnly = true)
