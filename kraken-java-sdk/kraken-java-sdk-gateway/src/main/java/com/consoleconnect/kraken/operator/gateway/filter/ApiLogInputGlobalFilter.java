@@ -3,12 +3,15 @@ package com.consoleconnect.kraken.operator.gateway.filter;
 import static com.consoleconnect.kraken.operator.gateway.filter.KrakenFilterConstants.GATEWAY_SERVICE;
 import static org.springframework.core.io.buffer.DataBufferUtils.join;
 
+import com.consoleconnect.kraken.operator.auth.jwt.JwtDecoderToolkit;
+import com.consoleconnect.kraken.operator.auth.model.AuthDataProperty;
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
 import com.consoleconnect.kraken.operator.core.toolkit.IpUtils;
 import com.consoleconnect.kraken.operator.gateway.service.FilterHeaderService;
 import java.nio.charset.Charset;
+import java.util.Map;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -24,11 +27,15 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class ApiLogInputGlobalFilter extends AbstractGlobalFilter {
 
+  private final AuthDataProperty.ResourceServer resourceServer;
+
   public ApiLogInputGlobalFilter(
       AppProperty appProperty,
+      AuthDataProperty.ResourceServer resourceServer,
       ApiActivityLogRepository apiActivityLogRepository,
       FilterHeaderService filterHeaderService) {
     super(appProperty, apiActivityLogRepository, filterHeaderService);
+    this.resourceServer = resourceServer;
   }
 
   @Override
@@ -52,11 +59,12 @@ public class ApiLogInputGlobalFilter extends AbstractGlobalFilter {
     try {
       ApiActivityLogEntity entity = generateHttpRequestEntity(exchange);
       entity.setQueryParameters(exchange.getRequest().getQueryParams().toSingleValueMap());
-      entity.setHeaders(
-          filterHeaderService.filterHeaders(exchange.getRequest().getHeaders().toSingleValueMap()));
+      Map<String, String> headers = exchange.getRequest().getHeaders().toSingleValueMap();
+      entity.setHeaders(filterHeaderService.filterHeaders(headers));
       entity.setQueryParameters(exchange.getRequest().getQueryParams().toSingleValueMap());
       entity.setRequestIp(IpUtils.getIP(exchange.getRequest()));
       entity.setResponseIp(GATEWAY_SERVICE);
+      entity.setBuyer(readBuyer(headers));
       apiActivityLogRepository.save(entity);
       log.info("createdEntity:{}", entity.getId());
       exchange
@@ -65,6 +73,13 @@ public class ApiLogInputGlobalFilter extends AbstractGlobalFilter {
     } catch (Exception e) {
       log.error(" tracing original request,error ", e);
     }
+  }
+
+  private String readBuyer(Map<String, String> headers) {
+    String token = headers.getOrDefault(resourceServer.getBearerTokenHeaderName(), "");
+    return JwtDecoderToolkit.decodeJWTToken(token)
+        .map(dto -> dto.getPayload().getSub())
+        .orElse(null);
   }
 
   private void recordRequestBody(ServerWebExchange exchange, DataBuffer db) {
