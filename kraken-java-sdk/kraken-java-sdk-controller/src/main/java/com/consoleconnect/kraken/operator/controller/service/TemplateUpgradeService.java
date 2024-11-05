@@ -1095,11 +1095,12 @@ public class TemplateUpgradeService {
             .anyMatch(
                 t -> t.getMappingStatus().equalsIgnoreCase(MappingStatusEnum.INCOMPLETE.getDesc()));
     templateUpgradeCheckDTO.setMapperCompleted(!existedInCompleted);
+    boolean newTemplate = true;
     try {
       checkIsLatestUpgrade(templateUpgradeId);
-      templateUpgradeCheckDTO.setNewerTemplate(false);
-    } catch (Exception e) {
-      templateUpgradeCheckDTO.setNewerTemplate(true);
+      newTemplate = false;
+    } finally {
+      templateUpgradeCheckDTO.setNewerTemplate(newTemplate);
     }
     return templateUpgradeCheckDTO;
   }
@@ -1111,11 +1112,12 @@ public class TemplateUpgradeService {
       throw KrakenException.badRequest("error environment: not production environment");
     }
     templateUpgradeCheckDTO.setCompatible(checkStageCompatibility(templateUpgradeId));
+    boolean newTemplate = true;
     try {
       checkIsLatestUpgrade(templateUpgradeId);
-      templateUpgradeCheckDTO.setNewerTemplate(false);
-    } catch (Exception e) {
-      templateUpgradeCheckDTO.setNewerTemplate(true);
+      newTemplate = false;
+    } finally {
+      templateUpgradeCheckDTO.setNewerTemplate(newTemplate);
     }
     return templateUpgradeCheckDTO;
   }
