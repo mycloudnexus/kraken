@@ -124,7 +124,8 @@ class EnvAPIActivityControllerTest extends AbstractIntegrationTest
           log.info(bodyStr);
           assertThat(bodyStr, hasJsonPath("$.data", notNullValue()));
           assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(1)));
-          assertThat(bodyStr, hasJsonPath("$.data.data[0].buyerName", equalTo("console connect")));
+          assertThat(
+              bodyStr, hasJsonPath("$.data.data[0].buyerName", equalTo("testing-company-name")));
         });
   }
 
