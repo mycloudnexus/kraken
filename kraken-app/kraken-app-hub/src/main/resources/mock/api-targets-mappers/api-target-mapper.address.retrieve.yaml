@@ -1,0 +1,75 @@
+---
+kind: kraken.component.api-target-mapper
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target-mapper.address.retrieve
+  name: Mapper Of Retrieving Geographic Address
+  description: This operation retrieves a GeographicAddress entity
+  version: 3
+spec:
+  trigger:
+    path: /mefApi/sonata/geographicAddressManagement/v7/geographicAddress/{id}
+    method: get
+    addressType: FieldedAddress
+  endpoints:
+    - id: retrieve address
+      path: /v2/data-center-facility/{id}
+      method: get
+      serverKey: mef.sonata.api-target-spec.con1718940696857
+      mappers:
+        request:
+          - name: mapper.address.retrieve.id
+            title: "Identifier of the GeographicAddress"
+            description: address retrieve id mapping
+            source: "@{{id}}"
+            sourceLocation: PATH
+            target: "@{{id}}"
+            targetLocation: PATH
+            requiredMapping: true
+        response:
+          - name: mapper.address.validation.id
+            title: "Identifier of the GeographicAddress"
+            description: address validation id mapping
+            source: "@{{id}}"
+            sourceLocation: BODY
+            target: "@{{id}}"
+            targetType: string
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.address.validation.country
+            title: "The country of the Geographic Address"
+            description: address validation country mapping
+            source: "@{{company.addresses[*].country}}"
+            sourceLocation: BODY
+            target: "@{{associatedGeographicAddress.country}}"
+            targetType: string
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.address.validation.city
+            title: "The city of the Geographic Address"
+            description: address validation city mapping
+            source: "@{{company.addresses[*].city}}"
+            sourceLocation: BODY
+            target: "@{{associatedGeographicAddress.city}}"
+            targetType: string
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.address.validation.streetName
+            title: "The street of the Geographic Address"
+            description: address validation streetName mapping
+            source: "@{{company.addresses[*].address}}"
+            sourceLocation: BODY
+            target: "@{{associatedGeographicAddress.streetName}}"
+            targetType: string
+            targetLocation: BODY
+            requiredMapping: false
+          - name: address.validation.locality.mapper
+            title: "The metroId of the identified alternate Geographic Address"
+            description: ""
+            source: "@{{associatedGeographicAddress.locality}}"
+            sourceLocation: BODY
+            target: "@{{associatedGeographicAddress.locality}}"
+            targetType: string
+            targetLocation: BODY
+            requiredMapping: false
+            replaceStar: false
