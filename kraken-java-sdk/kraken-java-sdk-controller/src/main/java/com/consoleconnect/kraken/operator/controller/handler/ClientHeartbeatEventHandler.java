@@ -2,11 +2,13 @@ package com.consoleconnect.kraken.operator.controller.handler;
 
 import com.consoleconnect.kraken.operator.controller.entity.EnvironmentEntity;
 import com.consoleconnect.kraken.operator.controller.repo.EnvironmentRepository;
+import com.consoleconnect.kraken.operator.controller.service.SystemInfoService;
 import com.consoleconnect.kraken.operator.core.client.ClientEvent;
 import com.consoleconnect.kraken.operator.core.client.ClientEventTypeEnum;
 import com.consoleconnect.kraken.operator.core.client.ClientInstanceHeartbeat;
 import com.consoleconnect.kraken.operator.core.entity.EnvironmentClientEntity;
 import com.consoleconnect.kraken.operator.core.enums.ClientReportTypeEnum;
+import com.consoleconnect.kraken.operator.core.enums.EnvNameEnum;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import com.consoleconnect.kraken.operator.core.repo.EnvironmentClientRepository;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
@@ -29,6 +31,8 @@ public class ClientHeartbeatEventHandler extends ClientEventHandler {
   private final EnvironmentClientRepository environmentClientRepository;
 
   private final EnvironmentRepository environmentRepository;
+
+  private final SystemInfoService systemInfoService;
 
   @Override
   public ClientEventTypeEnum getEventType() {
@@ -71,6 +75,7 @@ public class ClientHeartbeatEventHandler extends ClientEventHandler {
       environmentClientEntity.setUpdatedAt(instance.getUpdatedAt());
       environmentClientEntity.setUpdatedBy(userId);
       environmentClientRepository.save(environmentClientEntity);
+      updateAppVersion(envId, instance.getAppVersion());
     }
     return HttpResponse.ok(null);
   }
@@ -82,5 +87,19 @@ public class ClientHeartbeatEventHandler extends ClientEventHandler {
       log.error("Failed to query env by id:{}", envId);
     }
     return Optional.empty();
+  }
+
+  private void updateAppVersion(String envId, String appVersion) {
+    environmentRepository
+        .findById(UUID.fromString(envId))
+        .ifPresent(
+            env -> {
+              if (EnvNameEnum.STAGE.name().equalsIgnoreCase(env.getName())) {
+                systemInfoService.updateAppVersion(null, appVersion, null);
+              }
+              if (EnvNameEnum.PRODUCTION.name().equalsIgnoreCase(env.getName())) {
+                systemInfoService.updateAppVersion(null, null, appVersion);
+              }
+            });
   }
 }

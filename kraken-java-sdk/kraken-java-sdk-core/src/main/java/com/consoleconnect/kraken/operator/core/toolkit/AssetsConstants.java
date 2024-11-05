@@ -8,6 +8,7 @@ public final class AssetsConstants {
   public static final String FIELD_CREATE_AT_ORIGINAL = "created_at";
   public static final String FIELD_UPDATE_AT_ORIGINAL = "updated_at";
   public static final String FIELD_PARENT_ID = "parentId";
+  public static final String FIELD_ID = "id";
   public static final String FIELD_STATUS = "status";
   public static final String FIELD_KIND = "kind";
   public static final String FIELD_LABELS = "labels";

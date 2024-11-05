@@ -141,6 +141,7 @@ class ClientPubSubControllerTest extends AbstractIntegrationTest implements APIT
     ClientInstanceHeartbeat instance2 = new ClientInstanceHeartbeat();
     instance2.setInstanceId("2");
     instance2.setUpdatedAt(DateTime.nowInUTC());
+    instance2.setAppVersion("1.1.0");
     event.setEventPayload(JsonToolkit.toJson(List.of(instance1, instance2)));
 
     Map<String, String> headers = new HashMap<>();

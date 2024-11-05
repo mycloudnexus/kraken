@@ -25,7 +25,7 @@ public class TestApplication {
     SpringApplication.run(TestApplication.class, args);
   }
 
-  public static final String ENV_NAME = "local_dev";
+  public static final String ENV_NAME = "stage";
   public static final String ENV_PRODUCTION_NAME = "production";
   public static String envId;
   public static String productionEnvId;
