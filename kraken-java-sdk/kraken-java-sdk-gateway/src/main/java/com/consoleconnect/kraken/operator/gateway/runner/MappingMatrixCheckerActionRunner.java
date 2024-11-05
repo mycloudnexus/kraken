@@ -147,7 +147,9 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner {
       realValue = documentContext.read(pathCheck.path());
     } catch (Exception e) {
       log.error("read json path error!");
-      throwException(pathCheck, String.format("path %s not exist in request.", pathCheck.name));
+      throwException(
+          pathCheck,
+          String.format("The parameter %s does not exist in the request.", pathCheck.name));
     }
     if (realValue instanceof JSONArray array) {
       return array.stream().allMatch(value -> checkExpect(pathCheck, value));
