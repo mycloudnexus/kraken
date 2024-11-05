@@ -239,7 +239,7 @@ class TemplateUpgradeControllerTest {
                   .build(TestContextConstants.PRODUCT_ID),
           body -> {
             assertThat(body, hasJsonPath("$.code", equalTo(200)));
-            assertThat(body, hasJsonPath("$.data", hasSize(0)));
+            assertThat(body, hasJsonPath("$.data.mapperCompleted", is(true)));
           });
     }
 
@@ -254,11 +254,11 @@ class TemplateUpgradeControllerTest {
               uriBuilder
                   .path(url)
                   .queryParam("templateUpgradeId", assetDto.getId())
-                  .queryParam("envId", TestApplication.envId)
+                  .queryParam("envId", TestApplication.productionEnvId)
                   .build(TestContextConstants.PRODUCT_ID),
           body -> {
             assertThat(body, hasJsonPath("$.code", equalTo(200)));
-            assertThat(body, hasJsonPath("$.data", hasSize(greaterThanOrEqualTo(1))));
+            assertThat(body, hasJsonPath("$.data.compatible", is(true)));
           });
     }
   }
