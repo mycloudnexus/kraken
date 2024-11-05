@@ -8,7 +8,6 @@ import com.consoleconnect.kraken.operator.controller.repo.SystemInfoRepository;
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
-import com.consoleconnect.kraken.operator.core.enums.DeployStatusEnum;
 import com.consoleconnect.kraken.operator.core.event.PlatformSettingCompletedEvent;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.model.Metadata;
@@ -27,6 +26,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
@@ -63,9 +63,7 @@ public class SystemInfoService {
             .findBySpecification(
                 Tuple2.ofList(
                     AssetsConstants.FIELD_KIND,
-                    AssetKindEnum.PRODUCT_TEMPLATE_DEPLOYMENT.getKind(),
-                    AssetsConstants.FIELD_STATUS,
-                    DeployStatusEnum.SUCCESS.name()),
+                    AssetKindEnum.PRODUCT_TEMPLATE_CONTROL_DEPLOYMENT.getKind()),
                 null,
                 null,
                 PageRequest.of(0, 1, Sort.Direction.DESC, AssetsConstants.FIELD_CREATE_AT),
@@ -73,8 +71,10 @@ public class SystemInfoService {
             .getData()
             .stream()
             .findFirst()
-            .map(t -> t.getMetadata().getLabels().get(LabelConstants.LABEL_PRODUCT_VERSION))
-            .map(t -> t.replaceFirst("[V|v]", ""))
+            .map(t -> t.getMetadata().getLabels().get(LabelConstants.LABEL_APP_TEMPLATE_UPGRADE_ID))
+            .map(unifiedAssetService::findOne)
+            .map(dto -> dto.getMetadata().getLabels().get(LabelConstants.LABEL_PRODUCT_VERSION))
+            .map(Constants::formatVersionUsingV)
             .orElse(Constants.INIT_VERSION);
     systemInfoRepository
         .findOneByKey(KEY)
@@ -87,7 +87,7 @@ public class SystemInfoService {
             })
         .ifPresent(
             systemInfoEntity -> {
-              systemInfoEntity.setKrakenAppVersion(buildVersion);
+              systemInfoEntity.setControlAppVersion(buildVersion);
               systemInfoEntity.setProductKey(productKey);
               systemInfoEntity.setProductSpec(productSpec);
               systemInfoEntity.setControlProductVersion(version);
@@ -97,6 +97,10 @@ public class SystemInfoService {
 
   @Transactional
   public void updateSystemStatus(SystemStateEnum systemStateEnum) {
+    internalUpdateSystemStatus(systemStateEnum);
+  }
+
+  private void internalUpdateSystemStatus(SystemStateEnum systemStateEnum) {
     systemInfoRepository
         .findOneByKey(KEY)
         .ifPresent(
@@ -106,8 +110,13 @@ public class SystemInfoService {
             });
   }
 
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public void updateSystemStatusImmediately(SystemStateEnum systemStateEnum) {
+    internalUpdateSystemStatus(systemStateEnum);
+  }
+
   @Transactional
-  public void update(
+  public void updateProductVersion(
       SystemStateEnum systemStateEnum,
       String controlVersion,
       String stageVersion,
@@ -127,6 +136,26 @@ public class SystemInfoService {
               }
               if (systemStateEnum != null) {
                 entity.setStatus(systemStateEnum.name());
+              }
+              systemInfoRepository.save(entity);
+            });
+  }
+
+  @Transactional
+  public void updateAppVersion(
+      String controlVersion, String stageVersion, String productionVersion) {
+    systemInfoRepository
+        .findOneByKey(KEY)
+        .ifPresent(
+            entity -> {
+              if (StringUtils.isNotBlank(controlVersion)) {
+                entity.setControlAppVersion(controlVersion);
+              }
+              if (StringUtils.isNotBlank(stageVersion)) {
+                entity.setStageAppVersion(stageVersion);
+              }
+              if (StringUtils.isNotBlank(productionVersion)) {
+                entity.setProductionAppVersion(productionVersion);
               }
               systemInfoRepository.save(entity);
             });

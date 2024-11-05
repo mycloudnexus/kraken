@@ -15,4 +15,5 @@ public class TemplateUpgradeDeploymentVO {
   private String envId;
   private String status;
   private String createdAt;
+  private String updatedAt;
 }

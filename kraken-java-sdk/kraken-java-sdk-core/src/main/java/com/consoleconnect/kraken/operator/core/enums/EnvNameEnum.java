@@ -3,5 +3,6 @@ package com.consoleconnect.kraken.operator.core.enums;
 public enum EnvNameEnum {
   STAGE,
   PRODUCTION,
-  UNDEFINED;
+  UNDEFINED,
+  CONTROL_PLANE;
 }
