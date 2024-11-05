@@ -141,7 +141,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner {
         facets.get(targetKey).stream()
             .filter(check -> CHECK_NAME_ENABLED.equalsIgnoreCase(check.name))
             .findFirst();
-    if (enabledOpt.isPresent() && enabledOpt.get().value.equals("false")) {
+    if (enabledOpt.isPresent() && "false".equals(enabledOpt.get().value)) {
       if (Objects.isNull(enabledOpt.get().errorMsg)) {
         throw KrakenException.badRequest(MESSAGE_ALERT.formatted(":disabled"));
       } else {
