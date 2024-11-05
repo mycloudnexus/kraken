@@ -16,4 +16,5 @@ public class SystemInfo extends AbstractModel {
   String status;
   String productionAppVersion;
   String stageAppVersion;
+  String productName;
 }
