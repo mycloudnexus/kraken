@@ -87,21 +87,21 @@ spec:
             valueMapping: {}
             requiredMapping: true
           - name: mapper.order.eline.add.bandwidth
-            title: "Bandwidth of the UNI"
+            title: "Bandwidth of the ELINE"
             source: "@{{productOrderItem[0].product.productConfiguration.bandwidth}}"
             target: ""
             sourceLocation: BODY
             targetLocation: BODY
             requiredMapping: true
           - name: mapper.order.eline.add.name
-            title: "The name of the UNI"
+            title: "The name of the ELINE"
             source: "@{{productOrderItem[0].product.productConfiguration.name}}"
             target: ""
             sourceLocation: BODY
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.order.eline.add.paymentType
-            title: "The payment type of the UNI"
+            title: "The payment type of the ELINE"
             source: "@{{productOrderItem[0].product.productConfiguration.paymentType}}"
             target: ""
             sourceLocation: BODY

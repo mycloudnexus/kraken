@@ -3,6 +3,7 @@ package com.consoleconnect.kraken.operator.controller.service;
 import com.consoleconnect.kraken.operator.controller.entity.SystemInfoEntity;
 import com.consoleconnect.kraken.operator.controller.enums.SystemStateEnum;
 import com.consoleconnect.kraken.operator.controller.mapper.SystemInfoMapper;
+import com.consoleconnect.kraken.operator.controller.model.MgmtProperty;
 import com.consoleconnect.kraken.operator.controller.model.SystemInfo;
 import com.consoleconnect.kraken.operator.controller.repo.SystemInfoRepository;
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
@@ -38,6 +39,7 @@ public class SystemInfoService {
 
   private final UnifiedAssetService unifiedAssetService;
   private final SystemInfoRepository systemInfoRepository;
+  private final MgmtProperty mgmtProperty;
 
   @Value("${spring.build.version}")
   private String buildVersion;
@@ -165,6 +167,11 @@ public class SystemInfoService {
     return systemInfoRepository
         .findOneByKey(KEY)
         .map(SystemInfoMapper.INSTANCE::toDto)
+        .map(
+            t -> {
+              t.setProductName(mgmtProperty.getProductName());
+              return t;
+            })
         .orElseThrow(() -> KrakenException.notFound("System info not found"));
   }
 }
