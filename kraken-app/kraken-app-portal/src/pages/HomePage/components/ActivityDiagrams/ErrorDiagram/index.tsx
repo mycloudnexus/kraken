@@ -2,7 +2,7 @@ import { Text } from "@/components/Text";
 import { useGetErrorBrakedown } from "@/hooks/homepage";
 import { useAppStore } from "@/stores/app.store";
 import { formatDiagramDate } from "@/utils/constants/format";
-import { ErrorBrakedown, IErrorBrakedown } from "@/utils/types/product.type";
+import { IErrorBrakedown } from "@/utils/types/product.type";
 import { Flex, Spin } from "antd";
 import { useEffect, useMemo } from "react";
 import {
