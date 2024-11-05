@@ -37,7 +37,7 @@ const { RangePicker } = DatePicker;
 
 const DiagramWrapper = ({ envs }: Props) => {
   const stageEnvId =
-    envs?.find((env: IEnv) => env.name?.toLowerCase() === "stage")?.id || "";
+    envs?.find((env: IEnv) => env.name?.toLowerCase() === "stage")?.id ?? "";
   const currentTime = getCurrentTimeWithZone();
   const [form] = Form.useForm();
   const [params, setParams] = useState({

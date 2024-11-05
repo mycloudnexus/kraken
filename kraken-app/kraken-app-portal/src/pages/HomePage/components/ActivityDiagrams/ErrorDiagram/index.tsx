@@ -2,7 +2,7 @@ import { Text } from "@/components/Text";
 import { useGetErrorBrakedown } from "@/hooks/homepage";
 import { useAppStore } from "@/stores/app.store";
 import { formatDiagramDate } from "@/utils/constants/format";
-import { IErrorBrakedown } from "@/utils/types/product.type";
+import { ErrorBrakedown, IErrorBrakedown } from "@/utils/types/product.type";
 import { Flex, Spin } from "antd";
 import { useEffect, useMemo } from "react";
 import {
@@ -21,6 +21,36 @@ import NoData from '../NoData';
 type Props = {
   props: DiagramProps;
 };
+
+const ErrorDiagram = ({ errorData }: { errorData: Array<unknown> }) => (
+  <ResponsiveContainer width="100%" height="100%">
+    <BarChart data={errorData}>
+      <XAxis
+        stroke="0px"
+        dataKey="date"
+        tick={{ fill: "#96A5B8" }}
+        tickFormatter={formatDiagramDate}
+      />
+      <YAxis stroke="0px" tick={{ fill: "#96A5B8" }} />
+      <Tooltip labelFormatter={formatDiagramDate} />
+      <Legend
+        formatter={(value: string) => (
+          <span className={styles.errorBrakedownLegend}>{value}</span>
+        )}
+      />
+      {["500", "404", "401", "400"].map((key, index) => (
+        <Bar
+          key={key}
+          barSize={10}
+          stackId="error"
+          dataKey={key}
+          fill={["#A8071A", "#F5222D", "#FF7875", "#FFF1F0"][index]}
+          radius={key === "400" ? [10, 10, 0, 0] : 0}
+        />
+      ))}
+    </BarChart>
+  </ResponsiveContainer>
+)
 
 const ErrorBrakedownDiagram = ({ props }: Props) => {
   const { currentProduct } = useAppStore();
@@ -54,34 +84,8 @@ const ErrorBrakedownDiagram = ({ props }: Props) => {
       </Flex>
       <Spin spinning={isLoading || isRefetching}>
         {!errorData.length
-          ? <NoData description='When errors occur, they will be displayed here.' /> :
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={errorData}>
-              <XAxis
-                stroke="0px"
-                dataKey="date"
-                tick={{ fill: "#96A5B8" }}
-                tickFormatter={formatDiagramDate}
-              />
-              <YAxis stroke="0px" tick={{ fill: "#96A5B8" }} />
-              <Tooltip labelFormatter={formatDiagramDate} />
-              <Legend
-                formatter={(value: string) => (
-                  <span className={styles.errorBrakedownLegend}>{value}</span>
-                )}
-              />
-              {["500", "404", "401", "400"].map((key, index) => (
-                <Bar
-                  key={key}
-                  barSize={10}
-                  stackId="error"
-                  dataKey={key}
-                  fill={["#A8071A", "#F5222D", "#FF7875", "#FFF1F0"][index]}
-                  radius={key === "400" ? [10, 10, 0, 0] : 0}
-                />
-              ))}
-            </BarChart>
-          </ResponsiveContainer>
+          ? <NoData description='When errors occur, they will be displayed here.' /> 
+          : <ErrorDiagram errorData={errorData} />
         }
       </Spin>
     </Flex>

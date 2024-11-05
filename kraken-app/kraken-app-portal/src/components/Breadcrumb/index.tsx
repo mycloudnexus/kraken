@@ -37,7 +37,7 @@ const BreadCrumb = ({
       </Flex>
       {items?.map((i, index) => (
         <Flex
-          key={index}
+          key={`${index}-${i.title}`}
           gap={8}
           align="center"
           style={{ cursor: "pointer" }}
