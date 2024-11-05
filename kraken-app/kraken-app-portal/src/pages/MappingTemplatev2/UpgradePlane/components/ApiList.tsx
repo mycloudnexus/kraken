@@ -27,12 +27,14 @@ export function ApiList({
   loading,
   details = [],
   statusIndicatorPosition,
+  clickable,
   onItemClick,
 }: Readonly<{
   title?: React.ReactNode;
   loading?: boolean;
   details?: IRunningMapping[];
   statusIndicatorPosition?: "left" | "right";
+  clickable?: boolean
   onItemClick?: (item: IRunningMapping) => void;
 }>) {
   return (
@@ -51,7 +53,7 @@ export function ApiList({
           key={item.path + "_" + index}
           apiInstance={item as any}
           className={classNames(
-            item.mappingStatus === "incomplete" && styles.incompleteMapping
+            clickable && item.mappingStatus === "incomplete" && styles.incompleteMapping
           )}
           prefix={
             statusIndicatorPosition === "left" &&

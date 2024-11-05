@@ -40,6 +40,7 @@ export function ApiCard({
         justify={mappingMatrixPosition === "right" ? "flex-end" : "flex-start"}
       >
         <MappingMatrix
+          style={{ justifyContent: 'flex-end' }}
           mappingMatrix={apiInstance?.mappingMatrix}
           extraKey={"item.path"}
           isItemActive={false}

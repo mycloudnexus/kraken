@@ -51,7 +51,7 @@ export function controlPlaneTemplateUpgrade(
 }
 
 // Shares between step 2's and step 3's panels
-// envId = stageEnvId or productionEnvId
+// envId = stageEnvId or productEnvId
 export function getListDataPlaneUseCase(productId: string, envId: string) {
   return request(`${PRODUCT_V3}/${productId}/running-api-mapper-deployments`, {
     params: {
@@ -77,7 +77,7 @@ export function productionTemplateUpgrade(
   data: {
     templateUpgradeId: string;
     stageEnvId: string;
-    productionEnvId: string;
+    productEnvId: string;
   }
 ) {
   return request(`${PRODUCT_V3}/${productId}/template-upgrade/production`, {

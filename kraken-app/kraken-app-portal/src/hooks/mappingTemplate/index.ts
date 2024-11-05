@@ -1,4 +1,5 @@
 import {
+  checkProductionUpgradeCheck,
   checkStageUpgradeCheck,
   controlPlaneTemplateUpgrade,
   getListApiUseCase,
@@ -59,7 +60,7 @@ export function useInfiniteReleaseHistoryQuery(
         "data"
       >;
 
-      if (page * size >= total) {
+      if ((page + 1) * size >= total) {
         return undefined;
       }
       return page + 1;
@@ -82,7 +83,6 @@ export function useGetTemplateMappingReleaseDetail(
     queryFn: () =>
       getTemplateMappingReleaseDetail(productId, templateUpgradeId),
     enabled: Boolean(templateUpgradeId),
-    staleTime: STALE_TIME,
     select: (data) => data.data?.data?.[0],
   });
 }
@@ -117,7 +117,7 @@ export function useGetListApiUseCases(productId: string) {
   });
 }
 
-// envId = stageEnvId or productionEnvId
+// envId = stageEnvId or productEnvId
 export function useGetDataPlaneApiUseCases(productId: string, envId: string) {
   return useQuery<AxiosResponse, Error, IRunningMapping[]>({
     queryKey: [MTQueryKey.LIST_DATA_PLANE_API_USE_CASE, productId, envId],
@@ -189,7 +189,7 @@ export function useProductionTemplateUpgrade(
   return useMutation<
     AxiosResponse,
     Error,
-    { templateUpgradeId: string; stageEnvId: string; productionEnvId: string }
+    { templateUpgradeId: string; stageEnvId: string; productEnvId: string }
   >({
     mutationKey: [MTQueryKey.PRODUCTION_TEMPLATE_UPGRADE, productId],
     mutationFn: (data) => productionTemplateUpgrade(productId, data),
@@ -208,9 +208,10 @@ export function useProductionTemplateUpgrade(
 export function useStageUpgradeCheck(
   productId: string,
   templateUpgradeId: string,
-  envId: string
+  envId: string,
+  config: Record<string, any> = {}
 ) {
-  return useQuery<AxiosResponse, Error, IRunningMapping[]>({
+  return useQuery<AxiosResponse, Error, string[]>({
     queryKey: [
       MTQueryKey.CHECK_STAGE_PRE_UPGRADE,
       productId,
@@ -221,24 +222,27 @@ export function useStageUpgradeCheck(
     staleTime: STALE_TIME,
     enabled: Boolean(productId) && Boolean(templateUpgradeId) && Boolean(envId),
     select: (data) => data.data,
+    ...config,
   });
 }
 
 export function useProductionUpgradeCheck(
   productId: string,
   templateUpgradeId: string,
-  envId: string
+  envId: string,
+  config: Record<string, any> = {}
 ) {
-  return useQuery<AxiosResponse, Error, IRunningMapping[]>({
+  return useQuery<AxiosResponse, Error, string[]>({
     queryKey: [
       MTQueryKey.CHECK_PRODUCTION_PRE_UPGRADE,
       productId,
       templateUpgradeId,
       envId,
     ],
-    queryFn: () => checkStageUpgradeCheck(productId, templateUpgradeId, envId),
+    queryFn: () => checkProductionUpgradeCheck(productId, templateUpgradeId, envId),
     staleTime: STALE_TIME,
     enabled: Boolean(productId) && Boolean(templateUpgradeId) && Boolean(envId),
     select: (data) => data.data,
+    ...config,
   });
 }

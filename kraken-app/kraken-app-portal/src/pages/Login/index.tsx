@@ -40,11 +40,7 @@ const Login = () => {
       setError(e.message || "Error on login!");
     }
   };
-  // const token = getData("token");
-  // if (token && !isTokenExpired()) {
-  //   window.location.href = window.location.origin;
-  //   return null;
-  // }
+
   return (
     <Flex
       className={styles.pageWrapper}

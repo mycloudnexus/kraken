@@ -14,7 +14,7 @@ type TemplateMappingState = {
 
 type TemplateMappingMutations = {
   setConfirmUpgrade(value: boolean): void;
-  pushNotification(noti: Noti): void;
+  pushNotification(...notis: Noti[]): void;
   removeNotification(noti: Noti): void;
   clearNotification(): void;
   setIsMappingIncomplete(value: boolean): void;
@@ -33,23 +33,14 @@ export const useMappingTemplateStoreV2 = create<
   ...initialState,
   // Mutations
   setConfirmUpgrade: (value) => set({ confirmUpgrade: value }),
-  pushNotification: (noti) =>
-    set((state) => {
-      state.notification.push(noti);
-      return state;
-    }),
+  pushNotification: (...notis) =>
+    set(state => ({ notification: [...state.notification, ...notis] })),
   removeNotification: (noti) =>
-    set((state) => {
-      state.notification = state.notification.filter(
-        (prev) => prev.id !== noti.id
-      );
-      return state;
-    }),
+    set((state) => ({ notification: state.notification.filter(
+      (prev) => prev.id !== noti.id
+    ) })),
   clearNotification: () =>
-    set((state) => {
-      state.notification = [];
-      return state;
-    }),
+    set(() => ({ notification: [] })),
   setIsMappingIncomplete: (value) => set({ isMappingIncomplete: value }),
   reset: () => set(initialState),
 }));
