@@ -93,4 +93,6 @@ and  ( (:tags) is null or cast( tags as jsonb) @> jsonb(:tags) or  cast( tags as
       Pageable pageable);
 
   boolean existsByKey(String key);
+
+  boolean existsByParentIdAndKind(String parentId, String kind);
 }
