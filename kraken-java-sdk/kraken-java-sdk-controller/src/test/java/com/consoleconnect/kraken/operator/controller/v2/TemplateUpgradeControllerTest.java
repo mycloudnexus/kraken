@@ -52,6 +52,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -245,6 +246,25 @@ class TemplateUpgradeControllerTest {
 
     @Test
     @Order(6)
+    void givenStageUpgradedAndErrorEnv_whenCheckStageUpgrade_thenReturnCode400() {
+      String url = "/v3/products/{productId}/template-upgrade/stage-upgrade-check";
+      UnifiedAssetDto assetDto =
+          unifiedAssetService.findByKind(AssetKindEnum.PRODUCT_TEMPLATE_UPGRADE.getKind()).get(0);
+      testClientHelper.getAndVerify(
+          uriBuilder ->
+              uriBuilder
+                  .path(url)
+                  .queryParam("templateUpgradeId", assetDto.getId())
+                  .queryParam("envId", TestApplication.productionEnvId)
+                  .build(TestContextConstants.PRODUCT_ID),
+          HttpStatus.BAD_REQUEST,
+          body -> {
+            assertThat(body, hasJsonPath("$.reason", containsString("not stage environment")));
+          });
+    }
+
+    @Test
+    @Order(6)
     void givenProductionUpgraded_whenCheckProductionUpgrade_thenReturnData() {
       String url = "/v3/products/{productId}/template-upgrade/production-upgrade-check";
       UnifiedAssetDto assetDto =
@@ -259,6 +279,25 @@ class TemplateUpgradeControllerTest {
           body -> {
             assertThat(body, hasJsonPath("$.code", equalTo(200)));
             assertThat(body, hasJsonPath("$.data.compatible", is(true)));
+          });
+    }
+
+    @Test
+    @Order(6)
+    void givenProductionUpgradedAndErrorEnv_whenCheckProductionUpgrade_thenReturnCode400() {
+      String url = "/v3/products/{productId}/template-upgrade/production-upgrade-check";
+      UnifiedAssetDto assetDto =
+          unifiedAssetService.findByKind(AssetKindEnum.PRODUCT_TEMPLATE_UPGRADE.getKind()).get(0);
+      testClientHelper.getAndVerify(
+          uriBuilder ->
+              uriBuilder
+                  .path(url)
+                  .queryParam("templateUpgradeId", assetDto.getId())
+                  .queryParam("envId", TestApplication.envId)
+                  .build(TestContextConstants.PRODUCT_ID),
+          HttpStatus.BAD_REQUEST,
+          body -> {
+            assertThat(body, hasJsonPath("$.reason", containsString("not production environment")));
           });
     }
   }
