@@ -15,8 +15,8 @@ import org.springframework.http.HttpStatus;
 public interface BuyerCreator {
   String PRODUCT_ID = "product.mef.sonata.api";
   String BUYER_BASE_URL = String.format("/products/%s/buyers", PRODUCT_ID);
-  String BUYER_ID = "consolecore-poping-company";
-  String COMPANY_NAME = "console connect";
+  String BUYER_ID = "testing-company";
+  String COMPANY_NAME = "testing-company-name";
 
   WebTestClientHelper getWebTestClient();
 
