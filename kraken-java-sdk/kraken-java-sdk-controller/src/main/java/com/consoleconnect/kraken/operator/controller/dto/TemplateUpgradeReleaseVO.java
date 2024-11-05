@@ -14,4 +14,5 @@ public class TemplateUpgradeReleaseVO {
   private List<TemplateUpgradeDeploymentVO> deployments;
   private boolean showStageUpgradeButton = false;
   private boolean showProductionUpgradeButton = false;
+  private String status;
 }

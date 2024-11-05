@@ -203,6 +203,7 @@ public class MgmtSourceUpgradeService extends AbstractUpgradeSourceService {
               .map(t -> YamlToolkit.parseYaml(t, UnifiedAsset.class))
               .map(t -> t.orElse(null))
               .filter(Objects::nonNull)
+              .filter(t -> t.getKind() != null)
               .filter(t -> CACHED_ASSET_KINDS.contains(t.getKind()))
               .map(this::fromUnifiedAsset)
               .toList();
