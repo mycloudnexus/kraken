@@ -1078,11 +1078,11 @@ public class TemplateUpgradeService {
     }
   }
 
-  public List<String> stageCheck(String templateUpgradeId, String stageEnvId) {
-    List<String> resultList = new ArrayList<>();
+  public TemplateUpgradeCheckDTO stageCheck(String templateUpgradeId, String stageEnvId) {
+    TemplateUpgradeCheckDTO templateUpgradeCheckDTO = new TemplateUpgradeCheckDTO();
     Environment environment = environmentService.findOne(stageEnvId);
     if (!environment.getName().equalsIgnoreCase(EnvNameEnum.STAGE.name())) {
-      resultList.add("error environment: not stage environment");
+      throw KrakenException.badRequest("error environment: not stage environment");
     }
     List<ApiMapperDeploymentDTO> stageRunningMappers =
         productDeploymentService.listRunningApiMapperDeploymentV3(stageEnvId);
@@ -1094,34 +1094,30 @@ public class TemplateUpgradeService {
             .filter(t -> runningMapperKeys.contains(t.getTargetMapperKey()))
             .anyMatch(
                 t -> t.getMappingStatus().equalsIgnoreCase(MappingStatusEnum.INCOMPLETE.getDesc()));
-    if (existedInCompleted) {
-      resultList.add(
-          "Please adjust and complete the incomplete mapping use cases that will be upgraded to data plane.");
-    }
+    templateUpgradeCheckDTO.setMapperCompleted(!existedInCompleted);
     try {
       checkIsLatestUpgrade(templateUpgradeId);
+      templateUpgradeCheckDTO.setNewerTemplate(false);
     } catch (Exception e) {
-      resultList.add(e.getMessage());
+      templateUpgradeCheckDTO.setNewerTemplate(true);
     }
-    return resultList;
+    return templateUpgradeCheckDTO;
   }
 
-  public List<String> productionCheck(String templateUpgradeId, String productionEnvId) {
-    List<String> resultList = new ArrayList<>();
+  public TemplateUpgradeCheckDTO productionCheck(String templateUpgradeId, String productionEnvId) {
+    TemplateUpgradeCheckDTO templateUpgradeCheckDTO = new TemplateUpgradeCheckDTO();
     Environment environment = environmentService.findOne(productionEnvId);
     if (!environment.getName().equalsIgnoreCase(EnvNameEnum.PRODUCTION.name())) {
-      resultList.add("error environment: not production environment");
+      throw KrakenException.badRequest("error environment: not production environment");
     }
-    if (!checkStageCompatibility(templateUpgradeId)) {
-      resultList.add(
-          "Kraken version running in stage data plane is not compatible with this mapping template. Please upgrade kraken in stage data plane and Start verification");
-    }
+    templateUpgradeCheckDTO.setCompatible(checkStageCompatibility(templateUpgradeId));
     try {
       checkIsLatestUpgrade(templateUpgradeId);
+      templateUpgradeCheckDTO.setNewerTemplate(false);
     } catch (Exception e) {
-      resultList.add(e.getMessage());
+      templateUpgradeCheckDTO.setNewerTemplate(true);
     }
-    return resultList;
+    return templateUpgradeCheckDTO;
   }
 
   public boolean checkStageCompatibility(String templateUpgradeId) {

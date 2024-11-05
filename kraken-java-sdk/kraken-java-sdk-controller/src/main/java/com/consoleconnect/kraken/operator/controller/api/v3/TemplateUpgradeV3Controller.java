@@ -138,7 +138,7 @@ public class TemplateUpgradeV3Controller {
 
   @Operation(summary = "stage environment upgrade check")
   @GetMapping("/stage-upgrade-check")
-  public HttpResponse<List<String>> checkStageUpgradeCondition(
+  public HttpResponse<TemplateUpgradeCheckDTO> checkStageUpgradeCondition(
       @PathVariable("productId") String productId,
       @RequestParam(value = "templateUpgradeId", required = false) String templateUpgradeId,
       @RequestParam String envId) {
@@ -147,7 +147,7 @@ public class TemplateUpgradeV3Controller {
 
   @Operation(summary = "product environment upgrade check")
   @GetMapping("/production-upgrade-check")
-  public HttpResponse<List<String>> checkProductionUpgradeCondition(
+  public HttpResponse<TemplateUpgradeCheckDTO> checkProductionUpgradeCondition(
       @PathVariable("productId") String productId,
       @RequestParam(value = "templateUpgradeId", required = false) String templateUpgradeId,
       @RequestParam String envId) {
