@@ -1,14 +1,19 @@
 package com.consoleconnect.kraken.operator.auth.jwt;
 
+import com.consoleconnect.kraken.operator.auth.dto.JwtTokenDto;
 import com.consoleconnect.kraken.operator.auth.model.AuthDataProperty;
 import com.consoleconnect.kraken.operator.auth.security.JwtTokenVerifier;
+import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.security.KeyFactory;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Optional;
 import javax.crypto.spec.SecretKeySpec;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
@@ -63,5 +68,35 @@ public class JwtDecoderToolkit {
     }
     log.info("jwtDecoderInstance created,issuer:{}", decodeConfig.getIssuer());
     return nimbusJwtDecoder;
+  }
+
+  public static Optional<JwtTokenDto> decodeJWTToken(String tokenStr) {
+    if (StringUtils.isBlank(tokenStr)) {
+      return Optional.empty();
+    }
+
+    String token = tokenStr.replaceAll("^.*\\s+", "");
+    String[] chunks = token.split("\\.");
+    if (chunks.length < 2) {
+      return Optional.empty();
+    }
+
+    java.util.Base64.Decoder decoder = java.util.Base64.getUrlDecoder();
+    try {
+      String headerStr = new String(decoder.decode(chunks[0]));
+      String payloadStr = new String(decoder.decode(chunks[1]));
+
+      JwtTokenDto.Header header =
+          JsonToolkit.fromJson(headerStr, new TypeReference<JwtTokenDto.Header>() {});
+      JwtTokenDto.Payload payload =
+          JsonToolkit.fromJson(payloadStr, new TypeReference<JwtTokenDto.Payload>() {});
+      JwtTokenDto jwtTokenDto = new JwtTokenDto();
+      jwtTokenDto.setHeader(header);
+      jwtTokenDto.setPayload(payload);
+      return Optional.of(jwtTokenDto);
+    } catch (Exception e) {
+      log.error("Failed to decode token", e);
+    }
+    return Optional.empty();
   }
 }

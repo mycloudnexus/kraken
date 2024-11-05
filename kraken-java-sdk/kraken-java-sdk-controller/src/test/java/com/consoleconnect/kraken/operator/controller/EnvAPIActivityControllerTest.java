@@ -1,123 +1,135 @@
 package com.consoleconnect.kraken.operator.controller;
 
+import static com.jayway.jsonassert.impl.matcher.IsCollectionWithSize.hasSize;
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 
 import com.consoleconnect.kraken.operator.config.TestApplication;
+import com.consoleconnect.kraken.operator.controller.dto.BuyerAssetDto;
+import com.consoleconnect.kraken.operator.controller.model.Environment;
+import com.consoleconnect.kraken.operator.controller.service.EnvironmentService;
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
-import com.consoleconnect.kraken.operator.core.model.AppProperty;
+import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
+import com.consoleconnect.kraken.operator.core.model.facet.BuyerOnboardFacets;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
 import com.consoleconnect.kraken.operator.core.toolkit.IpUtils;
+import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
-import com.google.common.collect.Maps;
-import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.*;
-import org.hamcrest.Matchers;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+@Slf4j
+@Getter
 @MockIntegrationTest
 @ContextConfiguration(classes = {TestApplication.class})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class EnvAPIActivityControllerTest extends AbstractIntegrationTest {
-  @Autowired WebTestClient webTestClient;
-  @Autowired AppProperty appProperty;
-  @Autowired ApiActivityLogRepository repository;
+@ActiveProfiles("test-rs256")
+class EnvAPIActivityControllerTest extends AbstractIntegrationTest
+    implements ApiActivityLogCreator, EnvCreator, BuyerCreator {
+  WebTestClientHelper webTestClient;
+  @Autowired ApiActivityLogRepository apiActivityLogRepository;
+  @Autowired EnvironmentService environmentService;
 
-  public static final String PRODUCT_ID = "mef.sonata";
-  public static final String DEV_ENV = "dev";
-  public static final String BASE_URL =
-      String.format("/products/%s/envs/%s/api-activities", PRODUCT_ID, DEV_ENV);
+  private String requestId;
 
-  @Test
-  void testSearch() {
-    webTestClient
-        .mutate()
-        .responseTimeout(Duration.ofSeconds(600))
-        .build()
-        .get()
-        .uri(
-            uriBuilder ->
-                uriBuilder
-                    .path(BASE_URL)
-                    .queryParam(
-                        "requestStartTime",
-                        ZonedDateTime.now().minusDays(1).toInstant().toEpochMilli())
-                    .queryParam(
-                        "requestEndTime",
-                        ZonedDateTime.now().plusDays(10).toInstant().toEpochMilli())
-                    .queryParam("requestId", "1001")
-                    .build())
-        .exchange()
-        .expectBody()
-        .consumeWith(
-            response -> {
-              String bodyStr = new String(Objects.requireNonNull(response.getResponseBody()));
-              System.out.println(bodyStr);
-              IpUtils.getIP(MockServerHttpRequest.get("/123").build());
-            });
+  @Autowired
+  public EnvAPIActivityControllerTest(WebTestClient webTestClient) {
+    this.webTestClient = new WebTestClientHelper(webTestClient);
   }
 
   @Test
-  void testSearchDetailEmpty() {
-    webTestClient
-        .mutate()
-        .responseTimeout(Duration.ofSeconds(600))
-        .build()
-        .get()
-        .uri(uriBuilder -> uriBuilder.path(BASE_URL + "/{activityId}").build("11"))
-        .exchange()
-        .expectBody()
-        .consumeWith(
-            response -> {
-              String bodyStr = new String(Objects.requireNonNull(response.getResponseBody()));
-              System.out.println(bodyStr);
-              IpUtils.getIP(MockServerHttpRequest.get("/123").build());
-            });
+  @Order(1)
+  void givenFakedActivityId_whenSearchActivityDetail_thenReturnEmpty() {
+    Environment envStage = createStage(PRODUCT_ID);
+    String activityBaseUrl =
+        String.format("/products/%s/envs/%s/api-activities", PRODUCT_ID, envStage.getId());
+    webTestClient.requestAndVerify(
+        HttpMethod.GET,
+        uriBuilder -> uriBuilder.path(activityBaseUrl + "/{activityId}").build("11"),
+        HttpStatus.OK.value(),
+        null,
+        bodyStr -> {
+          log.info(bodyStr);
+          assertThat(bodyStr, hasJsonPath("$.message", notNullValue()));
+          IpUtils.getIP(MockServerHttpRequest.get("/123").build());
+        });
   }
 
   @Test
-  void testSearchDetailExisted() {
-    ApiActivityLogEntity apiActivityLogEntity = new ApiActivityLogEntity();
-    apiActivityLogEntity.setRequestId(UUID.randomUUID().toString());
-    apiActivityLogEntity.setPath("/123");
-    apiActivityLogEntity.setUri("localhost");
-    apiActivityLogEntity.setMethod("GET");
-    apiActivityLogEntity.setEnv("dev");
-    Map<String, String> headers = Maps.newHashMap();
-    headers.put("acces_token", "2334");
-    apiActivityLogEntity.setHeaders(headers);
-    repository.save(apiActivityLogEntity);
-    webTestClient
-        .mutate()
-        .responseTimeout(Duration.ofSeconds(600))
-        .build()
-        .get()
-        .uri(
-            uriBuilder ->
-                uriBuilder
-                    .path(BASE_URL + "/{activityId}")
-                    .build(
-                        PRODUCT_ID,
-                        DEV_ENV,
-                        apiActivityLogEntity.getRequestId(),
-                        apiActivityLogEntity.getRequestId()))
-        .exchange()
-        .expectBody()
-        .consumeWith(
-            response -> {
-              String bodyStr = new String(Objects.requireNonNull(response.getResponseBody()));
-              System.out.println(bodyStr);
-              IpUtils.getIP(MockServerHttpRequest.get("/123").build());
-            });
+  @Order(2)
+  void givenExistedActivityId_whenSearchDetail_thenReturnOK() {
+    Environment envStage = createStage(PRODUCT_ID);
+    String activityBaseUrl =
+        String.format("/products/%s/envs/%s/api-activities", PRODUCT_ID, envStage.getId());
+    BuyerAssetDto buyerAssetDto =
+        createBuyer(BUYER_ID + "-" + System.currentTimeMillis(), envStage.getId(), COMPANY_NAME);
+    BuyerOnboardFacets buyerFacets =
+        UnifiedAsset.getFacets(buyerAssetDto, BuyerOnboardFacets.class);
+    ApiActivityLogEntity apiActivityLogEntity =
+        createApiActivityLog(buyerFacets.getBuyerInfo().getBuyerId(), envStage.getId());
+    log.info("activity log created:{}", JsonToolkit.toJson(apiActivityLogEntity));
+    requestId = apiActivityLogEntity.getRequestId();
+    webTestClient.requestAndVerify(
+        HttpMethod.GET,
+        uriBuilder ->
+            uriBuilder
+                .path(activityBaseUrl + "/{activityId}")
+                .build(apiActivityLogEntity.getRequestId()),
+        HttpStatus.OK.value(),
+        null,
+        bodyStr -> {
+          log.info(bodyStr);
+          assertThat(bodyStr, hasJsonPath("$.data", notNullValue()));
+          assertThat(bodyStr, hasJsonPath("$.data.main.buyer", notNullValue()));
+        });
   }
 
   @Test
+  @Order(3)
+  void givenTimeRange_whenSearchActivities_thenReturnOK() {
+    Environment envStage = createStage(PRODUCT_ID);
+    log.info("envId:{}", envStage.getId());
+    String activityBaseUrl =
+        String.format("/products/%s/envs/%s/api-activities", PRODUCT_ID, envStage.getId());
+    webTestClient.requestAndVerify(
+        HttpMethod.GET,
+        uriBuilder ->
+            uriBuilder
+                .path(activityBaseUrl)
+                .queryParam("envId", envStage.getId())
+                .queryParam("path", "/123")
+                .queryParam("method", "GET")
+                .queryParam(
+                    "requestStartTime", ZonedDateTime.now().minusDays(1).toInstant().toEpochMilli())
+                .queryParam(
+                    "requestEndTime", ZonedDateTime.now().plusDays(10).toInstant().toEpochMilli())
+                .build(),
+        HttpStatus.OK.value(),
+        null,
+        bodyStr -> {
+          log.info(bodyStr);
+          assertThat(bodyStr, hasJsonPath("$.data", notNullValue()));
+          assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(1)));
+          assertThat(bodyStr, hasJsonPath("$.data.data[0].buyerName", equalTo("console connect")));
+        });
+  }
+
+  @Test
+  @Order(4)
   void testGetIP() {
     MockServerHttpRequest mockServerHttpRequest = MockServerHttpRequest.get("/123").build();
     ServerHttpRequest serverHttpRequest =
@@ -126,6 +138,6 @@ class EnvAPIActivityControllerTest extends AbstractIntegrationTest {
             .header("x-forwarded-for", "192.168.1.11,192.16.1.10")
             .build();
     String ip = IpUtils.getIP(serverHttpRequest);
-    assertThat(ip, Matchers.notNullValue());
+    assertThat(ip, notNullValue());
   }
 }
