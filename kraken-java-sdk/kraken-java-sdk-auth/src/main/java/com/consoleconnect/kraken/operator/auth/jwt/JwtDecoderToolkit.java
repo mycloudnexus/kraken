@@ -74,13 +74,11 @@ public class JwtDecoderToolkit {
     if (StringUtils.isBlank(tokenStr)) {
       return Optional.empty();
     }
-
     String token = tokenStr.replaceAll("^.*\\s+", "");
     String[] chunks = token.split("\\.");
     if (chunks.length < 2) {
       return Optional.empty();
     }
-
     java.util.Base64.Decoder decoder = java.util.Base64.getUrlDecoder();
     try {
       String headerStr = new String(decoder.decode(chunks[0]));
