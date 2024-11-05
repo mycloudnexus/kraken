@@ -21,4 +21,6 @@ public class ApiActivityLog extends AbstractHttpModel {
   private SyncStatusEnum syncStatus;
 
   private String clientId;
+  private String buyer;
+  private String buyerName;
 }

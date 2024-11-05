@@ -69,7 +69,7 @@ public class BuyerService extends AssetStatusManager {
             PRODUCT_BUYER.getKind(),
             buyerOnboard.getEnvId(),
             buyerOnboard.getBuyerId(),
-            AssetStatusEnum.ACTIVATED.getKind(),
+            null,
             null,
             PageRequest.of(0, 1));
     if (CollectionUtils.isNotEmpty(exist.getContent())) {

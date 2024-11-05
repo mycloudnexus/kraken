@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Assertions;
 import org.springframework.data.domain.PageRequest;
 
 public interface EnvCreator {
-
   EnvironmentService getEnvironmentService();
 
   default Environment createStage(String productIdOrKey) {

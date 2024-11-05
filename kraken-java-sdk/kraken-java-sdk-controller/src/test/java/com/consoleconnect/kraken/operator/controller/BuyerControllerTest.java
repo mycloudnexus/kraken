@@ -12,14 +12,11 @@ import com.consoleconnect.kraken.operator.controller.service.EnvironmentService;
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
-import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants;
-import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.core.toolkit.LabelConstants;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
-import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.hamcrest.Matchers;
@@ -39,12 +36,9 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @ContextConfiguration(classes = {TestApplication.class})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ActiveProfiles("test-rs256")
-class BuyerControllerTest extends AbstractIntegrationTest implements EnvCreator {
-  private static final String PRODUCT_ID = "product.mef.sonata.api";
-  public static final String BASE_URL = String.format("/products/%s/buyers", PRODUCT_ID);
-  public static final String BUYER_ID = "consolecore-poping-company";
+class BuyerControllerTest extends AbstractIntegrationTest implements EnvCreator, BuyerCreator {
 
-  private final WebTestClientHelper webTestClient;
+  @Getter private final WebTestClientHelper webTestClient;
   @Autowired private UnifiedAssetService unifiedAssetService;
   @Getter @Autowired EnvironmentService environmentService;
 
@@ -57,26 +51,8 @@ class BuyerControllerTest extends AbstractIntegrationTest implements EnvCreator 
   @Order(2)
   void givenBuyer_whenCreate_thenOK() {
     Environment envStage = createStage(PRODUCT_ID);
-    CreateBuyerRequest requestEntity = new CreateBuyerRequest();
-    requestEntity.setBuyerId(BUYER_ID);
-    requestEntity.setEnvId(envStage.getId());
-    requestEntity.setCompanyName("console connect");
-
-    String resp =
-        webTestClient.requestAndVerify(
-            HttpMethod.POST,
-            uriBuilder -> uriBuilder.path(BASE_URL).build(),
-            HttpStatus.OK.value(),
-            requestEntity,
-            bodyStr -> {
-              assertThat(bodyStr, hasJsonPath("$.data", notNullValue()));
-              assertThat(bodyStr, hasJsonPath("$.data.buyerToken", notNullValue()));
-              assertThat(bodyStr, hasJsonPath("$.data.buyerToken.accessToken", notNullValue()));
-            });
-    HttpResponse<BuyerAssetDto> buyerCreatedResp =
-        JsonToolkit.fromJson(resp, new TypeReference<HttpResponse<BuyerAssetDto>>() {});
-    BuyerAssetDto buyerCreated = buyerCreatedResp.getData();
-    String refreshAccessTokenUrl = BASE_URL + "/" + buyerCreated.getId() + "/access-tokens";
+    BuyerAssetDto buyerCreated = createBuyer(BUYER_ID, envStage.getId(), COMPANY_NAME);
+    String refreshAccessTokenUrl = BUYER_BASE_URL + "/" + buyerCreated.getId() + "/access-tokens";
     webTestClient.requestAndVerify(
         HttpMethod.POST,
         uriBuilder ->
@@ -98,7 +74,7 @@ class BuyerControllerTest extends AbstractIntegrationTest implements EnvCreator 
   void givenBuyer_whenSearch_thenOK() {
     webTestClient.requestAndVerify(
         HttpMethod.GET,
-        uriBuilder -> uriBuilder.path(BASE_URL).build(),
+        uriBuilder -> uriBuilder.path(BUYER_BASE_URL).build(),
         HttpStatus.OK.value(),
         null,
         bodyStr -> {
@@ -118,10 +94,11 @@ class BuyerControllerTest extends AbstractIntegrationTest implements EnvCreator 
 
     webTestClient.requestAndVerify(
         HttpMethod.POST,
-        uriBuilder -> uriBuilder.path(BASE_URL).build(),
+        uriBuilder -> uriBuilder.path(BUYER_BASE_URL).build(),
         HttpStatus.BAD_REQUEST.value(),
         requestEntity,
         bodyStr -> {
+          log.info(bodyStr);
           assertThat(bodyStr, hasJsonPath("$.code", not(200)));
         });
   }
@@ -135,7 +112,7 @@ class BuyerControllerTest extends AbstractIntegrationTest implements EnvCreator 
     requestEntity.setCompanyName("console connect");
     webTestClient.requestAndVerify(
         HttpMethod.POST,
-        uriBuilder -> uriBuilder.path(BASE_URL).build(),
+        uriBuilder -> uriBuilder.path(BUYER_BASE_URL).build(),
         HttpStatus.BAD_REQUEST.value(),
         requestEntity,
         bodyStr -> {
@@ -152,7 +129,7 @@ class BuyerControllerTest extends AbstractIntegrationTest implements EnvCreator 
     requestEntity.setCompanyName("console connect");
     webTestClient.requestAndVerify(
         HttpMethod.POST,
-        uriBuilder -> uriBuilder.path(BASE_URL).build(),
+        uriBuilder -> uriBuilder.path(BUYER_BASE_URL).build(),
         HttpStatus.BAD_REQUEST.value(),
         requestEntity,
         bodyStr -> {

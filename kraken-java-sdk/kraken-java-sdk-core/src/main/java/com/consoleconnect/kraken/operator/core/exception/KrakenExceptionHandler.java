@@ -4,6 +4,7 @@ import com.consoleconnect.kraken.operator.core.event.ExceptionEvent;
 import com.consoleconnect.kraken.operator.core.toolkit.StringUtils;
 import java.util.*;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.function.TriConsumer;
 import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.boot.autoconfigure.web.reactive.error.AbstractErrorWebExceptionHandler;
@@ -22,6 +23,7 @@ import org.springframework.web.reactive.function.server.*;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
+@Slf4j
 @Component
 @Order(Integer.MIN_VALUE)
 public class KrakenExceptionHandler extends AbstractErrorWebExceptionHandler {
@@ -92,6 +94,7 @@ public class KrakenExceptionHandler extends AbstractErrorWebExceptionHandler {
     } else if (throwable instanceof KrakenException krakenException) {
       return HttpStatus.valueOf(krakenException.getCode());
     } else {
+      log.error("Internal Server Error", throwable);
       return HttpStatus.INTERNAL_SERVER_ERROR;
     }
   }
