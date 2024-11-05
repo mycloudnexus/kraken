@@ -38,4 +38,7 @@ public class ApiActivityLogEntity extends AbstractHttpEntity {
   @Enumerated(EnumType.STRING)
   @Column(name = "sync_status", nullable = true, unique = false)
   private SyncStatusEnum syncStatus;
+
+  @Column(name = "buyer", nullable = true, unique = false)
+  private String buyer;
 }

@@ -427,7 +427,7 @@ class UserMgmtControllerTest extends AbstractIntegrationTest {
           Assertions.assertNotNull(bodyStr);
           assertThat(bodyStr, hasJsonPath("$.data.data", notNullValue()));
           assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(greaterThanOrEqualTo(1))));
-          assertThat(bodyStr, hasJsonPath("$.data.data[0].email", is("abc@test.com")));
+          assertThat(bodyStr, hasJsonPath("$.data.data[0].email", equalTo("abc@test.com")));
         });
   }
 
