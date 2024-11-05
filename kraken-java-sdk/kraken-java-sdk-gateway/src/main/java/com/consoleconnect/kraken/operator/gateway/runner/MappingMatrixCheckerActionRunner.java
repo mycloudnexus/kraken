@@ -145,8 +145,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner {
       if (Objects.isNull(enabledOpt.get().errorMsg)) {
         throw KrakenException.badRequest(MESSAGE_ALERT.formatted(":disabled"));
       } else {
-        throw KrakenException.badRequest(
-            MESSAGE_ALERT.formatted(":disabled " + enabledOpt.get().errorMsg));
+        throw KrakenException.badRequest(enabledOpt.get().errorMsg);
       }
     }
   }

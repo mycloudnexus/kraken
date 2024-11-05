@@ -142,7 +142,8 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
   @Order(4)
   @SneakyThrows
   void givenErrorMsgInMatrixItem_whenChecking_thenThrowsExceptionMessageAsExpected() {
-    validateQuoteRequest("/mockData/quoteWithInstantSyncFalse.json", "instantSyncQuote==false");
+    String expected = "api use case is not supported : disabled : instantSyncQuote==false";
+    validateQuoteRequest("/mockData/quoteWithInstantSyncFalse.json", expected);
   }
 
   private void validateOrderRequest(String request, String matchedMsg) throws IOException {
