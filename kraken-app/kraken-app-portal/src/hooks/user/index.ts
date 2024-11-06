@@ -5,12 +5,14 @@ import {
   enableUser,
   getCurrentUser,
   getListUser,
+  getSystemInfo,
   resetPwdUser,
 } from "@/services/user";
 import { queryClient } from "@/utils/helpers/reactQuery";
 import { IPagingData } from "@/utils/types/common.type";
-import { IUser } from "@/utils/types/user.type";
+import { ISystemInfo, IUser } from "@/utils/types/user.type";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { AxiosResponse } from "axios";
 
 export const USER_CACHE_KEYS = {
   get_user: "get_user",
@@ -23,6 +25,7 @@ export const USER_CACHE_KEYS = {
   enable_user: "enable_user",
   disable_user: "disable_user",
   reset_password: "reset_password",
+  get_system_info: 'get_system_info',
 };
 export const useGetUserList = (params: Record<string, any>, options?: any) => {
   return useQuery<any, Error, IPagingData<IUser>>({
@@ -92,5 +95,14 @@ export const useResetPassword = () => {
   return useMutation<any, Error>({
     mutationKey: [USER_CACHE_KEYS.reset_password],
     mutationFn: (data: any) => resetPwdUser(data.id, data.password),
+  });
+};
+
+export const useGetSystemInfo = () => {
+  return useQuery<AxiosResponse, Error, ISystemInfo>({
+    queryKey: [USER_CACHE_KEYS.get_system_info],
+    queryFn: () => getSystemInfo(),
+    select: (data) => data?.data,
+    staleTime: 60 * 1000, // 1 min
   });
 };

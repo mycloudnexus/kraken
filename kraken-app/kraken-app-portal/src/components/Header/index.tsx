@@ -4,7 +4,7 @@ import {
   Divider,
   Dropdown,
   Flex,
-  Select,
+  Tag,
   Tooltip,
 } from "antd";
 import styles from "./index.module.scss";
@@ -15,13 +15,13 @@ import {
   LogoutOutlined,
   QuestionCircleOutlined,
 } from "@ant-design/icons";
-import { DEFAULT_PRODUCT } from "@/utils/constants/product";
-import { useAppStore } from "@/stores/app.store";
 import { useTutorialStore } from "@/stores/tutorial.store";
 import useUser from "@/hooks/user/useUser";
 import { Text } from "../Text";
 import { Link, useNavigate } from "react-router-dom";
 import { UserAvatar } from "./UserAvatar";
+import { ISystemInfo } from "@/utils/types/user.type";
+import UpgradingIcon from '@/assets/icon/upgrading.svg'
 
 const TooltipBody = (setTutorialCompleted: (value: boolean) => void) => (
   <div className={styles.tooltip}>
@@ -44,9 +44,8 @@ const TooltipBody = (setTutorialCompleted: (value: boolean) => void) => (
   </div>
 );
 
-const Header = () => {
+const Header = ({ info }: Readonly<{ info?: ISystemInfo }>) => {
   const { currentUser } = useUser();
-  const { currentProduct } = useAppStore();
   const { tutorialCompleted, setTutorialCompleted, setOpenTutorial } =
     useTutorialStore();
   const navigate = useNavigate();
@@ -101,21 +100,22 @@ const Header = () => {
 
         <Divider type="vertical" className={styles.divider} />
 
-        <Select
-          allowClear={false}
-          value={currentProduct}
-          className={styles.select}
-          options={[
-            {
-              value: DEFAULT_PRODUCT,
-              label: 'MEF Sonata API',
-            },
-          ]}
-          suffixIcon={<></>}
-        />
+        <Text.LightMedium data-testid="productName">{info?.productName || info?.productKey}</Text.LightMedium>
+        <Tag style={{ background: 'var(--bg)', color: 'var(--text-secondary)', border: 'none' }}>{info?.productSpec}</Tag>
       </Flex>
 
       <div className={styles.rightMenu}>
+        {/* This mean the template mapping is in Upgrading process */}
+        {info?.status && info.status !== 'RUNNING' && (
+          <>
+            <Link data-testid="mappingInProgress" to="/mapping-template-v2" className={styles.mappingInProgress}>
+              <UpgradingIcon />
+              Mapping template upgrading
+            </Link>
+            <Divider type="vertical" style={{ height: 16, padding: 0}} />
+          </>
+        )}
+
         <Tooltip
           align={{ offset: [12, 15] }}
           overlayInnerStyle={{ zIndex: 1 }}

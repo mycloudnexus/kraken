@@ -44,6 +44,7 @@
 .rightMenu {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
   gap: 14px;
 }
 
@@ -119,4 +120,14 @@
 
 .avatarLg {
   text-transform: uppercase;
+}
+
+.mappingInProgress {
+  color: var(--primary) !important;
+  text-decoration: none;
+  font-weight: 400;
+  font-size : 14px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }

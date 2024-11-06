@@ -46,10 +46,19 @@
 }
 
 .siderBottomVersion {
-  padding-bottom: 12px;
+  padding: 0 10px 12px 10px;
+  border-bottom: 1px solid var(--border);
 }
 
 .siderBottomCollapseWrapper {
   border-top: 1px solid var(--a-border);
   padding: 12px 24px;
+}
+
+.productionBy {
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-secondary);
 }
