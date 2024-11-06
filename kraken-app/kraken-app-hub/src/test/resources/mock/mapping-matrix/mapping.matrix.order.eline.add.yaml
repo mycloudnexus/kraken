@@ -48,13 +48,11 @@ spec:
         expectType: EXPECTED_EXIST
         value: true
         errorMsg: "requestedItemTerm.name should exist in request"
-      - name: productRelationship_relationshipType_0
+      - name: productOrderItem[0].product.productRelationship[0].relationshipType
         path: "$.body.productOrderItem[0].product.productRelationship[0].relationshipType"
-        expectType: EXPECTED_EXIST
-        value: true
-        errorMsg: "productRelationship[0].relationshipType should exist in request"
-      - name: productRelationship_relationshipType_1
+        expectType: EXPECTED
+        value: "CONNECTS_TO_ENNI"
+      - name: productOrderItem[0].product.productRelationship[1].relationshipType
         path: "$.body.productOrderItem[0].product.productRelationship[1].relationshipType"
-        expectType: EXPECTED_EXIST
-        value: true
-        errorMsg: "productRelationship[1].relationshipType should exist in request"
+        expectType: EXPECTED
+        value: "CONNECTS_TO_UNI"
