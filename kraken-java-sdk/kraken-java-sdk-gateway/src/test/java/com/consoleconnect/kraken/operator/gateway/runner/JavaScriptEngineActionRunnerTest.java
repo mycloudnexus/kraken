@@ -7,6 +7,7 @@ import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPIFacets;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.core.toolkit.YamlToolkit;
 import com.consoleconnect.kraken.operator.gateway.CustomConfig;
+import com.consoleconnect.kraken.operator.gateway.template.SpELEngine;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import java.util.HashMap;
@@ -36,9 +37,9 @@ class JavaScriptEngineActionRunnerTest extends AbstractIntegrationTest {
                 readFileToString("/mockData/api.order.mock.yaml"), ComponentAPIFacets.Action.class)
             .get();
     String code = (String) action.getWith().get("code");
-    Object request =
+    Map request =
         JsonToolkit.fromJson(
-            readFileToString("/mockData/create_order_miss_action_request.json"), Object.class);
+            readFileToString("/mockData/create_order_miss_action_request.json"), Map.class);
     ServerWebExchange exchange = Mockito.mock(ServerWebExchange.class);
     Assertions.assertThrowsExactly(
         KrakenException.class,
@@ -46,7 +47,13 @@ class JavaScriptEngineActionRunnerTest extends AbstractIntegrationTest {
             runner.runIt(
                 exchange,
                 action,
-                Map.of("mefRequestBody", request, INPUT_CODE, code),
+                Map.of(
+                    "body",
+                    request,
+                    INPUT_CODE,
+                    code,
+                    "productOrderItem",
+                    SpELEngine.evaluate("${productOrderItem[0]}", request, Object.class)),
                 Map.of("order", new HashMap<>())));
   }
 }

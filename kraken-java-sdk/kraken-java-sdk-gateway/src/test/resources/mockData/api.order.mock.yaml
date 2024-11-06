@@ -8,6 +8,7 @@ with:
       console.log("input: " + jsonStr);
       let input = JSON.parse(jsonStr);
       let targetAPIConfigKey = '';
+      let matrixConfigKey = '';
       let errorMsg = '';
       let type = input.productOrderItem['product']['productConfiguration']['@type'];
       let action = input.productOrderItem['action'];
