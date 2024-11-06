@@ -83,6 +83,9 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner {
       throw KrakenException.unProcessableEntity(
           String.format("%s should exist in request", componentKey.split(COLON)[0]));
     }
+    if (targetKey.contains(ResponseCodeTransform.TARGET_KEY_NOT_FOUND)) {
+      throw KrakenException.badRequest(MESSAGE_ALERT.formatted(":possibly product not supported"));
+    }
     Paging<UnifiedAssetDto> assetDtoPaging =
         unifiedAssetService.findBySpecification(
             Tuple2.ofList(
