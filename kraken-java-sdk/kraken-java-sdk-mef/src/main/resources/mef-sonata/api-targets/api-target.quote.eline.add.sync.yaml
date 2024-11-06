@@ -25,7 +25,7 @@ spec:
         {
           "id": "${entity.id}",
           "buyerRequestedQuoteLevel": "${mefRequestBody.buyerRequestedQuoteLevel}",
-          "relatedContactInformation": "${T(com.consoleconnect.kraken.operator.gateway.func.SpelFunc).appendSellerInformation('sellerContactInformation', env.seller.name, env.seller.emailAddress, env.seller.number, mefRequestBody.relatedContactInformation)}",
+          "relatedContactInformation": "${T(com.consoleconnect.kraken.operator.gateway.func.SpelFunc).appendSellerInformation('sellerContactInformation', env.seller.name, env.seller.emailAddress, env.seller.number, mefRequestBody[relatedContactInformation]?:'')}",
           "quoteItem": [{
              "requestedQuoteItemTerm": "${mefRequestBody.quoteItem[0].requestedQuoteItemTerm}",
              "product": "${mefRequestBody.quoteItem[0].product}",
