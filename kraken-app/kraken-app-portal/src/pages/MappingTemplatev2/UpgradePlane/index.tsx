@@ -7,8 +7,9 @@ import {
   useControlPlaneTemplateUpgrade,
   useGetTemplateMappingReleaseDetail,
   useProductionTemplateUpgrade,
-  useStageTemplateUpgrade, // useProductionUpgradeCheck,
-  // useStageUpgradeCheck,
+  useStageTemplateUpgrade,
+  useProductionUpgradeCheck,
+  useStageUpgradeCheck,
 } from "@/hooks/mappingTemplate";
 import { useLongPolling } from "@/hooks/useLongPolling";
 import { useAppStore } from "@/stores/app.store";
@@ -20,7 +21,7 @@ import { nanoid } from "nanoid";
 import { lazy, ReactNode, Suspense, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useMappingTemplateStoreV2 } from "../store";
-import { getUpgradeSteps } from "../utils";
+import { getUpgradeSteps, LONG_POLLING_TIME } from "../utils";
 import { DeprecatedModal } from "./components/DeprecatedModal";
 import { IncompatibleMappingModal } from "./components/IncompatibleMappingModal";
 import { StartUpgradeModal } from "./components/StartUpgradeModal";
@@ -40,17 +41,22 @@ function getStepStatus(
 }
 
 function getUpgradeButtonText(
-  isSendingUpgrade: boolean,
-  isUpgraded: boolean
+  isUpgrading: boolean,
+  isUpgraded: boolean,
+  currentStep: number
 ): ReactNode {
-  if (isSendingUpgrade)
+  if (isUpgrading)
     return (
       <>
         <ReloadOutlined /> Upgrading
       </>
     );
 
-  if (isUpgraded) return "Next";
+  if (isUpgraded) {
+    if (currentStep === 2) return 'Done'
+    return "Next";
+  }
+
   return "Upgrade now";
 }
 
@@ -61,16 +67,17 @@ export default function UpgradePlane() {
   const { currentProduct: productId } = useAppStore();
   const { findEnvByName } = useEnv(productId);
 
+  const [shouldRefetchTemplateDetail, setShouldRefetchTemplateDetail] = useState(false)
   // Fetch release detail and check for upgrade statuses
   const {
     data: templateDetail,
-    refetch: refetchTemplateDetail,
     isLoading: isLoadingTemplateDetail,
-    isFetching: isFetchingTemplateDetail,
+    refetch: refetchTemplateDetail,
   } = useLongPolling(
     useGetTemplateMappingReleaseDetail(productId, templateUpgradeId),
-    30 * 1000
-  ); // 30 secs
+    LONG_POLLING_TIME,
+    { active: shouldRefetchTemplateDetail }
+  );
 
   const {
     isMappingIncomplete,
@@ -94,34 +101,39 @@ export default function UpgradePlane() {
 
   // @TODO: Available environment name for now: stage | production
   const stageEnvId = useMemo(() => findEnvByName("stage")?.id, [findEnvByName]);
-  const productionEnvId = useMemo(
+  const productEnvId = useMemo(
     () => findEnvByName("production")?.id,
     [findEnvByName]
   );
 
   // Pre-condition check for upgrade compatibility
-  // const {
-  //   mutateAsync: checkStageUpgade,
-  //   isPending: isCheckingStageUpgrade,
-  // } = useStageUpgradeCheck(productId, templateUpgradeId, stageEnvId as any);
+  const {
+    data: stageUpgradeCheckResult,
+    isFetching: isCheckingStageUpgrade,
+    refetch: checkStageUpgrade,
+  } = useStageUpgradeCheck(productId, templateUpgradeId, stageEnvId as any, { enabled: false });
 
-  // const {
-  //   mutateAsync: checkProductionUpgade,
-  //   isPending: isCheckingProductionUpgrade,
-  // } = useProductionUpgradeCheck(productId, templateUpgradeId, stageEnvId as any);
+  const {
+    data: productionUpgradeCheckResult,
+    isFetching: isCheckingProductionUpgrade,
+    refetch: checkProductionUpgrade,
+  } = useProductionUpgradeCheck(productId, templateUpgradeId, productEnvId as any, { enabled: false });
 
   // Upgrade actions
   const {
     mutateAsync: controlPlaneUpgrade,
     isPending: isPendingControlPlaneUpgrade,
   } = useControlPlaneTemplateUpgrade(templateUpgradeId, onUpgradeFinished());
+
   const { mutateAsync: stageUpgrade, isPending: isPendingStageUpgrade } =
     useStageTemplateUpgrade(templateUpgradeId, onUpgradeFinished());
+
   const {
     mutateAsync: productionUpgrade,
     isPending: isPendingProductionUpgrade,
   } = useProductionTemplateUpgrade(templateUpgradeId, onUpgradeFinished());
 
+  // State
   const [currentStep, setCurrentStep] = useState(-1);
   const [currentUpgrade, setCurrentUpgrade] = useState<Deployment | undefined>(
     undefined
@@ -129,9 +141,6 @@ export default function UpgradePlane() {
   const [isTemplateDeprecated, setIsTemplateDeprecated] = useState(false);
 
   const handleUpgrade = async () => {
-    // Refetch template mapping
-    await refetchTemplateDetail();
-
     // Check for deprecated template mapping
     if (templateDetail?.status === "Deprecated") {
       setIsTemplateDeprecated(true);
@@ -141,28 +150,49 @@ export default function UpgradePlane() {
     switch (currentStep) {
       case 0:
         await controlPlaneUpgrade({ templateUpgradeId });
+        refetchTemplateDetail()
         break;
 
       case 1:
+        await checkStageUpgrade()
+        if (stageUpgradeCheckResult?.length) {
+          pushNotification(...stageUpgradeCheckResult.map(msg => ({
+            id: nanoid(),
+            type: 'warning',
+            message: msg
+          })) as any)
+          return
+        }
+
         await stageUpgrade({
           templateUpgradeId,
           stageEnvId: stageEnvId as any,
         });
+        refetchTemplateDetail()
         break;
 
       case 2:
+        await checkProductionUpgrade()
+        if (productionUpgradeCheckResult?.length) {
+          pushNotification(...productionUpgradeCheckResult.map(msg => ({
+            id: nanoid(),
+            type: 'warning',
+            message: msg
+          })) as any)
+          return
+        }
+
         await productionUpgrade({
           templateUpgradeId,
           stageEnvId: stageEnvId as any,
-          productionEnvId: productionEnvId as any,
+          productEnvId: productEnvId as any,
         });
+        refetchTemplateDetail()
         break;
 
       default:
         break;
     }
-
-    // if (currentStep < 2) setCurrentStep(currentStep + 1);
   };
 
   const handleCancel = () => navigate("/mapping-template-v2");
@@ -213,12 +243,17 @@ export default function UpgradePlane() {
     isPendingStageUpgrade ||
     isPendingProductionUpgrade;
 
+  const isUpgrading = currentUpgrade?.status === "IN_PROGRESS";
   const isUpgraded = currentUpgrade?.status === "SUCCESS";
+
+  useEffect(() => {
+    setShouldRefetchTemplateDetail(isUpgrading)
+  }, [isUpgrading, setShouldRefetchTemplateDetail])
 
   useEffect(() => {
     if (isUpgraded) {
       clearNotification();
-
+ 
       switch (currentStep) {
         case 0:
           pushNotification({
@@ -279,17 +314,17 @@ export default function UpgradePlane() {
             {
               title: "Control plane upgrade",
               status: currentStep > 0 ? "finish" : "process",
-              className: isPendingControlPlaneUpgrade ? "upgrading" : "",
+              className: isUpgrading || isPendingControlPlaneUpgrade ? "upgrading" : "",
             },
             {
               title: "Data plane upgrade: Stage",
               status: getStepStatus(1, currentStep),
-              className: isPendingStageUpgrade ? "upgrading" : "",
+              className: isUpgrading || isPendingStageUpgrade ? "upgrading" : "",
             },
             {
               title: "Data plane upgrade: Production",
               status: getStepStatus(2, currentStep),
-              className: isPendingProductionUpgrade ? "upgrading" : "",
+              className: isUpgrading || isPendingProductionUpgrade ? "upgrading" : "",
             },
           ]}
         />
@@ -314,14 +349,14 @@ export default function UpgradePlane() {
               <Suspense fallback={<Spin style={{ width: "100%" }} />}>
                 {currentStep === 0 && (
                   <ControlPlaneUpgrade
-                    isUpgrading={isPendingControlPlaneUpgrade}
+                    isUpgrading={isUpgrading || isPendingControlPlaneUpgrade}
                     isUpgraded={isUpgraded}
                   />
                 )}
                 {currentStep === 1 && (
                   <StageUpgrade
                     stageEnvId={stageEnvId}
-                    isUpgrading={isPendingStageUpgrade}
+                    isUpgrading={isUpgrading || isPendingStageUpgrade}
                     upgradeVersion={templateDetail?.productVersion}
                     isUpgraded={isUpgraded}
                   />
@@ -329,8 +364,8 @@ export default function UpgradePlane() {
                 {currentStep === 2 && (
                   <ProductionUpgrade
                     stageEnvId={stageEnvId}
-                    productionEnvId={productionEnvId}
-                    isUpgrading={isPendingProductionUpgrade}
+                    productEnvId={productEnvId}
+                    isUpgrading={isUpgrading || isPendingProductionUpgrade}
                     isUpgraded={isUpgraded}
                   />
                 )}
@@ -353,11 +388,11 @@ export default function UpgradePlane() {
           data-testid="btnUpgrade"
           type="primary"
           className={styles.btnUpgrade}
-          disabled={isMappingIncomplete || isSendingUpgrade || !templateDetail}
-          loading={isFetchingTemplateDetail}
+          disabled={isMappingIncomplete || isSendingUpgrade || !templateDetail || isUpgrading}
+          loading={isCheckingStageUpgrade || isCheckingProductionUpgrade}
           onClick={startUpgrade}
         >
-          {getUpgradeButtonText(isSendingUpgrade, isUpgraded)}
+          {getUpgradeButtonText(isSendingUpgrade || isUpgrading, isUpgraded, currentStep)}
         </Button>
       </Flex>
 

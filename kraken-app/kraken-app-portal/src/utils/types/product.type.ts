@@ -115,7 +115,7 @@ export interface IApiActivity {
   requestStatistics: Array<RequestStatistics>;
 }
 
-type ErrorBrakedown = {
+export type ErrorBrakedown = {
   date: string;
   errors: {
     400: number;

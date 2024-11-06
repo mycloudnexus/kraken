@@ -93,6 +93,7 @@ export default function StageUpgrade({
         loading={isFetchingControlPlaneApis}
         details={controlPlaneApis}
         statusIndicatorPosition="right"
+        clickable
         onItemClick={handleItemClick}
       />
 
@@ -102,7 +103,6 @@ export default function StageUpgrade({
         title={`Data plane: Stage API mappings (${stageApis?.length ?? 0})`}
         loading={isFetchingStageApis}
         details={stageApis}
-        statusIndicatorPosition="left"
       />
     </>
   );

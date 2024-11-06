@@ -1,6 +1,8 @@
 import { Tag, Flex, Typography } from "antd";
 import { toUpper } from "lodash";
 import styles from "./index.module.scss";
+import { HTMLAttributes } from "react";
+import classNames from "classnames";
 
 function beautifyCamelCase(text: string): string {
   return text.replace(/([a-z])(?=[A-Z])/g, "$1 ");
@@ -10,11 +12,13 @@ const MappingMatrix = ({
   extraKey = "",
   mappingMatrix,
   isItemActive = false,
-}: {
+  className,
+  ...props
+}: Readonly<{
   extraKey?: string;
   mappingMatrix: Record<string, string | boolean>;
   isItemActive?: boolean;
-}) => {
+} & HTMLAttributes<HTMLDivElement>>) => {
   if (!mappingMatrix) return null;
   const renderTextType = (type: string | boolean) => {
     switch (type) {
@@ -32,7 +36,7 @@ const MappingMatrix = ({
   });
 
   return (
-    <Flex className={styles.wrapper}>
+    <Flex className={classNames(className, styles.wrapper)} {...props}>
       {tagLabels.map(({ label, value }, index) => (
         <Tag
           key={`${extraKey}-${label}-${value}-${index}`}
