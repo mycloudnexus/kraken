@@ -1,0 +1,13 @@
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.1.5.3
+  name: V1.5.3
+  labels:
+    productSpec: grace
+    productVersion: V1.5.3
+    publishDate: 2024-11-06
+  description: |
+    Added type value checking for adding uni order.
+  version: 2

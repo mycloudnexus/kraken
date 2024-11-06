@@ -26,6 +26,10 @@ spec:
         path: "$.body.productOrderItem[0].product.place[0].@type"
         expectType: EXPECTED_EXIST
         value: true
+      - name: productOrderItem_product_place_@type_should_be
+        path: "$.body.productOrderItem[0].product.place[0].@type"
+        expectType: EXPECTED
+        value: "GeographicAddressRef"
       - name: relatedContactInformation_emailAddress
         path: "$.body.relatedContactInformation[*]"
         expectType: EXPECTED_TRUE
