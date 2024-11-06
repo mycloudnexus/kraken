@@ -17,13 +17,11 @@ import com.consoleconnect.kraken.operator.core.enums.EnvNameEnum;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants;
-import com.consoleconnect.kraken.operator.core.toolkit.LabelConstants;
 import com.consoleconnect.kraken.operator.core.toolkit.Paging;
 import com.consoleconnect.kraken.operator.core.toolkit.PagingHelper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
-import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -68,7 +66,9 @@ public class TemplateUpgradeController {
             getSearchPageRequest(page, size, direction, orderBy),
             null);
     List<TemplateUpgradeReleaseVO> list =
-        assetDtoPaging.getData().stream().map(this::toTemplateUpgradeReleaseVO).toList();
+        assetDtoPaging.getData().stream()
+            .map(templateUpgradeService::generateTemplateUpgradeReleaseVO)
+            .toList();
     // the latest can upgrade
     list.stream()
         .findFirst()
@@ -108,22 +108,6 @@ public class TemplateUpgradeController {
                       d -> vo.setShowProductionUpgradeButton(false),
                       () -> vo.setShowProductionUpgradeButton(true));
             });
-  }
-
-  protected TemplateUpgradeReleaseVO toTemplateUpgradeReleaseVO(UnifiedAssetDto assetDto) {
-    TemplateUpgradeReleaseVO templateUpgradeReleaseVO = new TemplateUpgradeReleaseVO();
-    Map<String, String> labels = assetDto.getMetadata().getLabels();
-    templateUpgradeReleaseVO.setPublishDate(labels.get(LabelConstants.LABEL_PUBLISH_DATE));
-    templateUpgradeReleaseVO.setProductVersion(labels.get(LabelConstants.LABEL_PRODUCT_VERSION));
-    templateUpgradeReleaseVO.setProductSpec(labels.get(LabelConstants.LABEL_PRODUCT_SPEC));
-    templateUpgradeReleaseVO.setName(assetDto.getMetadata().getName());
-    templateUpgradeReleaseVO.setDescription(assetDto.getMetadata().getDescription());
-    templateUpgradeReleaseVO.setTemplateUpgradeId(assetDto.getId());
-    Paging<TemplateUpgradeDeploymentVO> deploymentVOPaging =
-        templateUpgradeService.listTemplateDeployment(
-            templateUpgradeReleaseVO.getTemplateUpgradeId(), PageRequest.of(0, 10));
-    templateUpgradeReleaseVO.setDeployments(deploymentVOPaging.getData());
-    return templateUpgradeReleaseVO;
   }
 
   @Operation(summary = "list template upgrade deployments")

@@ -1,5 +1,6 @@
 {
   "id": "${entity.id}",
+  "relatedContactInformation": "${T(com.consoleconnect.kraken.operator.gateway.func.SpelFunc).appendSellerInformation('sellerContactInformation',env.seller.name,env.seller.emailAddress,env.seller.number,entity.request.relatedContactInformation)}",
   "buyerRequestedQuoteLevel": "${entity.request.buyerRequestedQuoteLevel}",
   "quoteItem": [
     {
@@ -10,7 +11,7 @@
       "quoteItemPrice": "${entity.renderedResponse.quoteItem[0].quoteItemPrice}"
     }
   ],
-  "quoteDate": "now",
+  "quoteDate": "${T(com.consoleconnect.kraken.operator.core.toolkit.DateTime).nowInUTCFormatted()}",
   "externalId": "${entity.request[externalId]?:''}",
   "instantSyncQuote": "${entity.request[instantSyncQuote]?:''}",
   "requestedQuoteCompletionDate": "${entity.request[requestedQuoteCompletionDate]?:''}"

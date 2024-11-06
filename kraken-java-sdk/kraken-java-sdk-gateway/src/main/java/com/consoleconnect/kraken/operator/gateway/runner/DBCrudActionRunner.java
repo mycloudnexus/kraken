@@ -22,6 +22,7 @@ import org.springframework.web.server.ServerWebExchange;
 @Slf4j
 public class DBCrudActionRunner extends AbstractActionRunner {
   private static final String ENTITY_NOT_FOUND_ERR = "DBCrudFilterFactory: entity not found";
+  private static final String ENTITY_ID_ERROR = ENTITY_NOT_FOUND_ERR + ", entityId:%s";
   private final HttpRequestRepository repository;
   private final FilterHeaderService filterHeaderService;
 
@@ -138,10 +139,16 @@ public class DBCrudActionRunner extends AbstractActionRunner {
   }
 
   private void onRead(ServerWebExchange exchange, Config config) {
+    if (StringUtils.isBlank(config.getId()) && StringUtils.isNotBlank(config.getBlankIdErrMsg())) {
+      throw KrakenException.badRequest(config.getBlankIdErrMsg());
+    }
     Optional<HttpRequestEntity> optionalEntity = readRequestEntity(config.getId());
     if (optionalEntity.isEmpty()) {
-      log.error(ENTITY_NOT_FOUND_ERR);
-      return;
+      if (StringUtils.isNotBlank(config.getNotExistedErrMsg())) {
+        throw KrakenException.notFound(config.getNotExistedErrMsg());
+      } else {
+        throw KrakenException.notFound(String.format(ENTITY_ID_ERROR, config.getId()));
+      }
     }
     HttpRequestEntity entity = optionalEntity.get();
     exchange.getAttributes().put(KrakenFilterConstants.X_ENTITY_ID, entity.getId().toString());
@@ -156,9 +163,9 @@ public class DBCrudActionRunner extends AbstractActionRunner {
     try {
       entityUUID = UUID.fromString(entityId);
     } catch (Exception e) {
-      String error = ENTITY_NOT_FOUND_ERR + ", entityId:" + entityId;
+      String error = String.format(ENTITY_ID_ERROR, entityId);
       log.error(error, e);
-      throw KrakenException.notFound(error);
+      return Optional.empty();
     }
     return repository.findById(entityUUID);
   }
@@ -171,6 +178,8 @@ public class DBCrudActionRunner extends AbstractActionRunner {
     private String id;
     private List<String> properties;
     private String externalId;
+    private String blankIdErrMsg;
+    private String notExistedErrMsg;
 
     public static Config of(ComponentAPIFacets.Action action, Map<String, Object> inputs) {
       Map<String, Object> with = action.getWith();
@@ -180,6 +189,12 @@ public class DBCrudActionRunner extends AbstractActionRunner {
       }
       if ("undefined".equalsIgnoreCase(config.getBizType())) {
         config.setBizType((String) inputs.get("bizType"));
+      }
+      if (config.getBlankIdErrMsg() == null) {
+        config.setBlankIdErrMsg((String) inputs.getOrDefault("blankIdErrMsg", ""));
+      }
+      if (config.getNotExistedErrMsg() == null) {
+        config.setNotExistedErrMsg((String) inputs.getOrDefault("notExistedErrMsg", ""));
       }
       return config;
     }

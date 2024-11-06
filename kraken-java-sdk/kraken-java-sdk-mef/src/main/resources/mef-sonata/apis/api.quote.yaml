@@ -150,6 +150,8 @@ spec:
           actionType: buildin@db
           env:
             id: ${segment}
+            blankIdErrMsg: "quote id cannot be blank"
+            notExistedErrMsg: "quote id does not exist"
           with:
             action: read
           preRequest: true

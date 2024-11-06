@@ -8,4 +8,12 @@ public class Constants {
   public static final String COMMA = ",";
   public static final String MAPPER_SIGN = "-mapper";
   public static final String INIT_VERSION = "1.0";
+
+  public static String formatVersion(String version) {
+    return version.replaceFirst("[V|v]", "");
+  }
+
+  public static String formatVersionUsingV(String version) {
+    return "V" + formatVersion(version);
+  }
 }

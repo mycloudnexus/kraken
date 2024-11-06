@@ -23,7 +23,7 @@ spec:
             description: ""
             source: "@{{id}}"
             sourceLocation: "PATH"
-            target: "}"
+            target: ""
             targetLocation: ""
             requiredMapping: true
         response:

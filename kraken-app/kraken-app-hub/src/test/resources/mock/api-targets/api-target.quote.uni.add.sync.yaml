@@ -18,16 +18,15 @@ spec:
     actionType: add
   endpoints:
     - id: create quote for port
-      url: ${env.target.url}
-      path: ""
-      method: ""
+      path:
+      method:
       requestBody: |
         {}
       responseBody: |
         {
           "id": "${entity.id}",
           "buyerRequestedQuoteLevel": "${mefRequestBody.buyerRequestedQuoteLevel}",
-          "relatedContactInformation": "${T(com.consoleconnect.kraken.operator.gateway.func.SpelFunc).appendSellerInformation('sellerContactInformation', env.seller.name, env.seller.emailAddress, env.seller.number, mefRequestBody.relatedContactInformation)}",
+          "relatedContactInformation": "${T(com.consoleconnect.kraken.operator.gateway.func.SpelFunc).appendSellerInformation('sellerContactInformation', env.seller.name, env.seller.emailAddress, env.seller.number, mefRequestBody[relatedContactInformation]?:'')}",
           "quoteItem": [
             {
               "requestedQuoteItemTerm": "${mefRequestBody.quoteItem[0].requestedQuoteItemTerm}",
@@ -56,7 +55,7 @@ spec:
               }]
             }
           ],
-          "quoteDate": "now",
+          "quoteDate": "${T(com.consoleconnect.kraken.operator.core.toolkit.DateTime).nowInUTCFormatted()}",
           "externalId":"${mefRequestBody[externalId]?:''}",
           "instantSyncQuote":"${mefRequestBody[instantSyncQuote]?:''}",
           "requestedQuoteCompletionDate": "${mefRequestBody[requestedQuoteCompletionDate]?:''}",

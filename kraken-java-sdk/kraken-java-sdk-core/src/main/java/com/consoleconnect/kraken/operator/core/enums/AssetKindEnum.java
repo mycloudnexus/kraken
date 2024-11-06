@@ -26,7 +26,8 @@ public enum AssetKindEnum {
   COMPONENT_WORKFLOW("kraken.component.workflow"),
   PRODUCT_MAPPING_MATRIX("kraken.product.mapping.matrix"),
   PRODUCT_RELEASE_DOWNLOAD("kraken.product.release.download"),
-  COMPONENT_API_SERVER("kraken.component.api-server");
+  COMPONENT_API_SERVER("kraken.component.api-server"),
+  PRODUCT_COMPATIBILITY("kraken.product.compatibility");
 
   private final String kind;
 }

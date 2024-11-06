@@ -1,5 +1,6 @@
 package com.consoleconnect.kraken.operator.controller.service;
 
+import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.PRODUCT_TEMPLATE_CONTROL_DEPLOYMENT;
 import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.PRODUCT_TEMPLATE_DEPLOYMENT;
 import static com.consoleconnect.kraken.operator.core.enums.AssetLinkKindEnum.IMPLEMENTATION_TARGET_MAPPER;
 
@@ -7,6 +8,7 @@ import com.consoleconnect.kraken.operator.auth.security.UserContext;
 import com.consoleconnect.kraken.operator.auth.service.UserService;
 import com.consoleconnect.kraken.operator.controller.dto.*;
 import com.consoleconnect.kraken.operator.controller.enums.SystemStateEnum;
+import com.consoleconnect.kraken.operator.controller.enums.TemplateViewStatus;
 import com.consoleconnect.kraken.operator.controller.event.TemplateSynCompletedEvent;
 import com.consoleconnect.kraken.operator.controller.event.TemplateUpgradeEvent;
 import com.consoleconnect.kraken.operator.controller.model.*;
@@ -16,10 +18,7 @@ import com.consoleconnect.kraken.operator.core.dto.Tuple2;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.entity.AssetLinkEntity;
 import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
-import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
-import com.consoleconnect.kraken.operator.core.enums.DeployStatusEnum;
-import com.consoleconnect.kraken.operator.core.enums.MappingStatusEnum;
-import com.consoleconnect.kraken.operator.core.enums.ReleaseKindEnum;
+import com.consoleconnect.kraken.operator.core.enums.*;
 import com.consoleconnect.kraken.operator.core.event.IngestDataEvent;
 import com.consoleconnect.kraken.operator.core.event.IngestionDataResult;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
@@ -30,6 +29,7 @@ import com.consoleconnect.kraken.operator.core.model.SyncMetadata;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
 import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
+import com.consoleconnect.kraken.operator.core.service.CompatibilityCheckService;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.*;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -70,6 +70,8 @@ public class TemplateUpgradeService {
 
   public static final int PAGE_SIZE = 200;
   private final ApiComponentService apiComponentService;
+  private final TransactionService transactionService;
+  private final CompatibilityCheckService compatibilityCheckService;
 
   protected String deployProduction(
       String templateUpgradeId, String stageEnvId, String productionEnvId, String userId) {
@@ -78,22 +80,37 @@ public class TemplateUpgradeService {
     UnifiedAssetDto productAsset = getProductAsset();
     TemplateUpgradeDeploymentFacets templateUpgradeDeploymentFacets4Stage =
         UnifiedAsset.getFacets(stageDeployment, TemplateUpgradeDeploymentFacets.class);
-    Environment environment = environmentService.findOne(productionEnvId);
+    Environment productionEnvironment = environmentService.findOne(productionEnvId);
+    List<ApiMapperDeploymentDTO> productionMappers =
+        productDeploymentService.listRunningApiMapperDeploymentV3(productionEnvId);
+    List<ApiMapperDeploymentDTO> stageMappers =
+        productDeploymentService.listRunningApiMapperDeploymentV3(stageEnvId);
+
     // new deployment for production
     UnifiedAsset templateUpgradeDeployment =
-        newTemplateUpgradeDeployment(environment, templateUpgradeId, PRODUCT_TEMPLATE_DEPLOYMENT);
+        newTemplateUpgradeDeployment(
+            productionEnvironment, templateUpgradeId, PRODUCT_TEMPLATE_DEPLOYMENT);
     TemplateUpgradeDeploymentFacets.EnvDeployment envDeployment =
         new TemplateUpgradeDeploymentFacets.EnvDeployment();
-    // clone
-    cloneMapperDeployment(
-        templateUpgradeDeploymentFacets4Stage, productAsset, envDeployment, environment);
     TemplateUpgradeDeploymentFacets templateUpgradeDeploymentFacets =
         new TemplateUpgradeDeploymentFacets();
     templateUpgradeDeploymentFacets.setEnvDeployment(envDeployment);
+
+    // clone
+    cloneSystemTemplateDeployment(
+        templateUpgradeDeploymentFacets4Stage, productAsset, envDeployment, productionEnvironment);
+    cloneMapperDeploymentV3(
+        productionMappers, stageMappers, productAsset, envDeployment, productionEnvironment);
     Map<String, Object> facets =
         JsonToolkit.fromJson(
             JsonToolkit.toJson(templateUpgradeDeploymentFacets), new TypeReference<>() {});
     templateUpgradeDeployment.setFacets(facets);
+    if (CollectionUtils.isEmpty(envDeployment.getSystemDeployments())
+        && CollectionUtils.isEmpty(envDeployment.getMapperDeployment())) {
+      templateUpgradeDeployment.getMetadata().setStatus(DeployStatusEnum.SUCCESS.name());
+    } else {
+      templateUpgradeDeployment.getMetadata().setStatus(DeployStatusEnum.IN_PROCESS.name());
+    }
     IngestionDataResult ingestionDataResult =
         unifiedAssetService.syncAsset(
             templateUpgradeId,
@@ -101,36 +118,45 @@ public class TemplateUpgradeService {
             new SyncMetadata("", "", DateTime.nowInUTCString(), userId),
             true);
     addLabels(envDeployment, ingestionDataResult.getData().getId().toString());
+
     return ingestionDataResult.getData().getId().toString();
   }
 
-  private void cloneMapperDeployment(
+  private void cloneMapperDeploymentV3(
+      List<ApiMapperDeploymentDTO> productionMappers,
+      List<ApiMapperDeploymentDTO> stageMappers,
+      UnifiedAssetDto productAsset,
+      TemplateUpgradeDeploymentFacets.EnvDeployment envDeployment,
+      Environment production) {
+    Map<String, ApiMapperDeploymentDTO> stageMapperMap =
+        stageMappers.stream()
+            .collect(Collectors.toMap(ApiMapperDeploymentDTO::getTargetMapperKey, t -> t));
+    for (ApiMapperDeploymentDTO productionMapper : productionMappers) {
+      String mapperKey = productionMapper.getTargetMapperKey();
+      ApiMapperDeploymentDTO stageMapper = stageMapperMap.get(mapperKey);
+      if (stageMapper.getTagId().equalsIgnoreCase(productionMapper.getTagId())) {
+        log.info("mapper {} deployed in stage is the same as production", mapperKey);
+        continue;
+      }
+      CreateProductDeploymentRequest request = new CreateProductDeploymentRequest();
+      request.setTagIds(List.of(stageMapper.getTagId()));
+      request.setEnvId(production.getId());
+      UnifiedAssetDto unifiedAssetDto =
+          productDeploymentService.create(
+              productAsset.getMetadata().getKey(),
+              request,
+              ReleaseKindEnum.API_LEVEL,
+              getSystemUpgradeUser(),
+              true);
+      envDeployment.getMapperDeployment().add(unifiedAssetDto.getId());
+    }
+  }
+
+  private void cloneSystemTemplateDeployment(
       TemplateUpgradeDeploymentFacets templateUpgradeDeploymentFacets4Stage,
       UnifiedAssetDto productAsset,
       TemplateUpgradeDeploymentFacets.EnvDeployment envDeployment,
       Environment production) {
-    templateUpgradeDeploymentFacets4Stage
-        .getEnvDeployment()
-        .getMapperDeployment()
-        .forEach(
-            deploymentId -> {
-              UnifiedAssetDto assetDto = unifiedAssetService.findOne(deploymentId);
-              DeploymentFacet deploymentFacet =
-                  UnifiedAsset.getFacets(assetDto, DeploymentFacet.class);
-              for (ComponentTag componentTag : deploymentFacet.getComponentTags()) {
-                CreateProductDeploymentRequest request = new CreateProductDeploymentRequest();
-                request.setTagIds(List.of(componentTag.getTagId()));
-                request.setEnvId(production.getId());
-                UnifiedAssetDto unifiedAssetDto =
-                    productDeploymentService.create(
-                        productAsset.getMetadata().getKey(),
-                        request,
-                        ReleaseKindEnum.API_LEVEL,
-                        getSystemUpgradeUser(),
-                        true);
-                envDeployment.getMapperDeployment().add(unifiedAssetDto.getId());
-              }
-            });
     templateUpgradeDeploymentFacets4Stage
         .getEnvDeployment()
         .getSystemDeployments()
@@ -155,13 +181,7 @@ public class TemplateUpgradeService {
             });
   }
 
-  /**
-   * May existed multiple stage template deployment
-   *
-   * @param templateUpgradeId
-   * @param stageEnvId
-   * @return
-   */
+  /** May existed multiple stage template deployment */
   private UnifiedAssetDto findStageDeployment(String templateUpgradeId, String stageEnvId) {
     List<UnifiedAssetDto> list =
         unifiedAssetService
@@ -234,14 +254,16 @@ public class TemplateUpgradeService {
       String templateUpgradeIdParam, PageRequest pageRequest) {
     Paging<UnifiedAssetDto> templateDeploymentsPaging =
         unifiedAssetService.findBySpecification(
-            Tuple2.ofList(
-                AssetsConstants.FIELD_KIND, AssetKindEnum.PRODUCT_TEMPLATE_DEPLOYMENT.getKind()),
+            null,
             Optional.ofNullable(templateUpgradeIdParam)
                 .map(t -> Tuple2.ofList(LabelConstants.LABEL_APP_TEMPLATE_UPGRADE_ID, t))
                 .orElse(null),
             null,
             pageRequest,
-            null);
+            Tuple2.ofList(
+                AssetsConstants.FIELD_KIND, AssetKindEnum.PRODUCT_TEMPLATE_DEPLOYMENT.getKind(),
+                AssetsConstants.FIELD_KIND,
+                    AssetKindEnum.PRODUCT_TEMPLATE_CONTROL_DEPLOYMENT.getKind()));
     List<String> templateUpgradeIds =
         templateDeploymentsPaging.getData().stream()
             .map(
@@ -268,12 +290,20 @@ public class TemplateUpgradeService {
                       new TemplateUpgradeDeploymentVO();
                   templateUpgradeDeploymentVO.setTemplateUpgradeId(templateUpgradeId);
                   templateUpgradeDeploymentVO.setUpgradeBy(dto.getCreatedBy());
-                  templateUpgradeDeploymentVO.setEnvName(envName);
+                  if (AssetKindEnum.PRODUCT_TEMPLATE_CONTROL_DEPLOYMENT
+                      .getKind()
+                      .equalsIgnoreCase(dto.getKind())) {
+                    templateUpgradeDeploymentVO.setEnvName(EnvNameEnum.CONTROL_PLANE.name());
+                    templateUpgradeDeploymentVO.setStatus(DeployStatusEnum.SUCCESS.name());
+                  } else {
+                    templateUpgradeDeploymentVO.setEnvName(envName);
+                  }
                   templateUpgradeDeploymentVO.setProductVersion(
                       templateUpgradeMap.get(templateUpgradeId));
                   templateUpgradeDeploymentVO.setStatus(dto.getMetadata().getStatus());
                   templateUpgradeDeploymentVO.setDeploymentId(dto.getId());
                   templateUpgradeDeploymentVO.setCreatedAt(dto.getCreatedAt());
+                  templateUpgradeDeploymentVO.setUpdatedAt(dto.getUpdatedAt());
                   return templateUpgradeDeploymentVO;
                 })
             .toList();
@@ -284,33 +314,45 @@ public class TemplateUpgradeService {
         templateDeploymentsPaging.getTotal());
   }
 
+  public List<MapperTagVO> templateDeploymentDetailsFromControlDeployment(
+      UnifiedAssetDto templateDeployment) {
+    Map<String, List<Tuple2>> apiUseCases = apiComponentService.findApiUseCase();
+    ControlDeploymentFacet controlDeploymentFacet =
+        UnifiedAsset.getFacets(templateDeployment, ControlDeploymentFacet.class);
+    UpgradeTuple upgradeTuple = controlDeploymentFacet.getUpgradeTuple();
+    return Stream.of(
+            upgradeTuple.enforceUpgradeTemplates(),
+            upgradeTuple.versionChangedTemplates(),
+            upgradeTuple.directSaves())
+        .filter(Objects::nonNull)
+        .flatMap(Collection::stream)
+        .map(
+            upgradeRecord ->
+                apiComponentService.findRelatedApiUse(upgradeRecord.key(), apiUseCases))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .map(ApiUseCaseDto::getMapperKey)
+        .distinct()
+        .map(this::getMapperTagVOFromDraft)
+        .toList();
+  }
+
   public List<MapperTagVO> templateDeploymentDetails(String templateDeploymentId) {
     UnifiedAssetDto templateDeployment = unifiedAssetService.findOne(templateDeploymentId);
+    if (templateDeployment.getKind().equalsIgnoreCase(PRODUCT_TEMPLATE_DEPLOYMENT.getKind())) {
+      return templateDeploymentDetailsFromDeployment(templateDeployment);
+    } else {
+      return templateDeploymentDetailsFromControlDeployment(templateDeployment);
+    }
+  }
+
+  public List<MapperTagVO> templateDeploymentDetailsFromDeployment(
+      UnifiedAssetDto templateDeployment) {
     TemplateUpgradeDeploymentFacets upgradeDeploymentFacets =
         UnifiedAsset.getFacets(templateDeployment, TemplateUpgradeDeploymentFacets.class);
     List<MapperTagVO> draftList =
         upgradeDeploymentFacets.getEnvDeployment().getMapperDraft().stream()
-            .map(
-                mapperKey -> {
-                  MapperTagVO mapperTagVO = new MapperTagVO();
-                  mapperTagVO.setMapperKey(mapperKey);
-                  List<AssetLinkEntity> assetLink =
-                      unifiedAssetService.findAssetLink(
-                          mapperKey, IMPLEMENTATION_TARGET_MAPPER.getKind());
-                  AssetLinkEntity assetLinkEntity = assetLink.get(0);
-                  mapperTagVO.setComponentKey(assetLinkEntity.getAsset().getKey());
-                  UnifiedAssetDto mapperAsset = unifiedAssetService.findOne(mapperKey);
-                  ComponentAPITargetFacets mapperFacets =
-                      UnifiedAsset.getFacets(mapperAsset, ComponentAPITargetFacets.class);
-                  ComponentExpandDTO.MappingMatrix mappingMatrix =
-                      new ComponentExpandDTO.MappingMatrix();
-                  BeanUtils.copyProperties(mapperFacets.getTrigger(), mappingMatrix);
-                  mapperTagVO.setMappingMatrix(mappingMatrix);
-                  mapperTagVO.setStatus(DeployStatusEnum.DRAFT.name());
-                  mapperTagVO.setPath(mapperFacets.getTrigger().getPath());
-                  mapperTagVO.setMethod(mapperFacets.getTrigger().getMethod());
-                  return mapperTagVO;
-                })
+            .map(this::getMapperTagVOFromDraft)
             .toList();
     List<MapperTagVO> deployedList =
         upgradeDeploymentFacets.getEnvDeployment().getMapperDeployment().stream()
@@ -364,6 +406,25 @@ public class TemplateUpgradeService {
     resultList.addAll(deployedList);
     resultList.addAll(draftList);
     return resultList;
+  }
+
+  private MapperTagVO getMapperTagVOFromDraft(String mapperKey) {
+    MapperTagVO mapperTagVO = new MapperTagVO();
+    mapperTagVO.setMapperKey(mapperKey);
+    List<AssetLinkEntity> assetLink =
+        unifiedAssetService.findAssetLink(mapperKey, IMPLEMENTATION_TARGET_MAPPER.getKind());
+    AssetLinkEntity assetLinkEntity = assetLink.get(0);
+    mapperTagVO.setComponentKey(assetLinkEntity.getAsset().getKey());
+    UnifiedAssetDto mapperAsset = unifiedAssetService.findOne(mapperKey);
+    ComponentAPITargetFacets mapperFacets =
+        UnifiedAsset.getFacets(mapperAsset, ComponentAPITargetFacets.class);
+    ComponentExpandDTO.MappingMatrix mappingMatrix = new ComponentExpandDTO.MappingMatrix();
+    BeanUtils.copyProperties(mapperFacets.getTrigger(), mappingMatrix);
+    mapperTagVO.setMappingMatrix(mappingMatrix);
+    mapperTagVO.setStatus(DeployStatusEnum.DRAFT.name());
+    mapperTagVO.setPath(mapperFacets.getTrigger().getPath());
+    mapperTagVO.setMethod(mapperFacets.getTrigger().getMethod());
+    return mapperTagVO;
   }
 
   public List<TemplateUpgradeDeploymentVO> currentUpgradeVersion() {
@@ -520,40 +581,64 @@ public class TemplateUpgradeService {
     if (!SystemStateEnum.CAN_UPGRADE_STATES.contains(systemInfo.getStatus())) {
       throw KrakenException.badRequest("Current system state is not allowed to upgrade");
     }
-    // upgrading
-    systemInfoService.updateSystemStatus(SystemStateEnum.CONTROL_PLANE_UPGRADING);
-    UpgradeSourceService upgradeSourceService =
-        upgradeSourceServiceFactory.getUpgradeSourceService(templateUpgradeId);
-    List<UpgradeTuple> upgradeTuples =
-        upgradeSourceService.getTemplateUpgradeRecords(templateUpgradeId);
     UnifiedAssetDto productAsset = this.getProductAsset();
-    UpgradeTuple upgradeTuple = upgradeTuples.get(0);
-    // direct save
-    upgradeTuple
-        .directSaves()
-        .forEach(directSaved -> ingestData(upgradeTuple.productKey(), directSaved, false));
-    // compare from version
-    upgradeTuple
-        .versionChangedTemplates()
-        .forEach(
-            versionRecord -> ingestData(productAsset.getMetadata().getKey(), versionRecord, false));
-    // config from template upgrade path
-    upgradeTuple
-        .enforceUpgradeTemplates()
-        .forEach(
-            upgradeRecord -> ingestData(productAsset.getMetadata().getKey(), upgradeRecord, true));
-    // update version
-    upgradeMapperVersion();
-    UnifiedAsset controlUpgradeDeployment =
-        this.newTemplateUpgradeDeployment(
-            null, templateUpgradeId, AssetKindEnum.PRODUCT_TEMPLATE_CONTROL_DEPLOYMENT);
-    controlUpgradeDeployment.setFacets(Map.of(ControlDeploymentFacet.KEY, upgradeTuple));
-    SyncMetadata syncMetadata = new SyncMetadata("", "", "");
-    syncMetadata.setSyncedBy(userId);
-    IngestionDataResult ingestionDataResult =
-        unifiedAssetService.syncAsset(
-            productAsset.getId(), controlUpgradeDeployment, syncMetadata, true);
-    systemInfoService.update(
+
+    String controlDeploymentId =
+        transactionService.execInNewTransaction(
+            nil -> {
+              // upgrading
+              systemInfoService.updateSystemStatus(SystemStateEnum.CONTROL_PLANE_UPGRADING);
+              UnifiedAsset controlUpgradeDeployment =
+                  TemplateUpgradeService.this.newTemplateUpgradeDeployment(
+                      null, templateUpgradeId, PRODUCT_TEMPLATE_CONTROL_DEPLOYMENT);
+              controlUpgradeDeployment.getMetadata().setStatus(DeployStatusEnum.IN_PROCESS.name());
+              SyncMetadata syncMetadata = new SyncMetadata("", "", "");
+              syncMetadata.setSyncedBy(userId);
+              IngestionDataResult ingestionDataResult =
+                  unifiedAssetService.syncAsset(
+                      productAsset.getId(), controlUpgradeDeployment, syncMetadata, true);
+              return ingestionDataResult.getData().getId().toString();
+            },
+            null);
+
+    IngestionDataResult ingestionDataResult;
+    try {
+      UpgradeSourceService upgradeSourceService =
+          upgradeSourceServiceFactory.getUpgradeSourceService(templateUpgradeId);
+      List<UpgradeTuple> upgradeTuples =
+          upgradeSourceService.getTemplateUpgradeRecords(templateUpgradeId);
+      UpgradeTuple upgradeTuple = upgradeTuples.get(0);
+      // direct save
+      upgradeTuple
+          .directSaves()
+          .forEach(directSaved -> ingestData(upgradeTuple.productKey(), directSaved, false));
+      // compare from version
+      upgradeTuple
+          .versionChangedTemplates()
+          .forEach(
+              versionRecord ->
+                  ingestData(productAsset.getMetadata().getKey(), versionRecord, false));
+      // config from template upgrade path
+      upgradeTuple
+          .enforceUpgradeTemplates()
+          .forEach(
+              upgradeRecord ->
+                  ingestData(productAsset.getMetadata().getKey(), upgradeRecord, true));
+      // update version
+      upgradeMapperVersion();
+      UnifiedAssetDto controlUpgradeDeployment = unifiedAssetService.findOne(controlDeploymentId);
+      controlUpgradeDeployment.getMetadata().setStatus(DeployStatusEnum.SUCCESS.name());
+      controlUpgradeDeployment.setFacets(Map.of(ControlDeploymentFacet.KEY, upgradeTuple));
+      SyncMetadata syncMetadata = new SyncMetadata("", "", "");
+      syncMetadata.setSyncedBy(userId);
+      ingestionDataResult =
+          unifiedAssetService.syncAsset(
+              productAsset.getId(), controlUpgradeDeployment, syncMetadata, true);
+    } catch (Exception e) {
+      systemInfoService.updateSystemStatusImmediately(SystemStateEnum.CONTROL_PLANE_UPGRADE_DONE);
+      throw KrakenException.internalError("Control plane upgraded failed:" + e.getMessage());
+    }
+    systemInfoService.updateProductVersion(
         SystemStateEnum.CONTROL_PLANE_UPGRADE_DONE,
         getTemplateVersion(templateUpgradeId),
         null,
@@ -616,11 +701,8 @@ public class TemplateUpgradeService {
 
   private String getTemplateVersion(String templateUpgradeId) {
     UnifiedAssetDto templateUpgrade = unifiedAssetService.findOne(templateUpgradeId);
-    return templateUpgrade
-        .getMetadata()
-        .getLabels()
-        .get(LabelConstants.LABEL_PRODUCT_VERSION)
-        .replaceFirst("[V|v]", "");
+    return Constants.formatVersionUsingV(
+        templateUpgrade.getMetadata().getLabels().get(LabelConstants.LABEL_PRODUCT_VERSION));
   }
 
   protected void ingestData(String parentKey, UpgradeRecord upgradeRecord, boolean enforce) {
@@ -656,9 +738,12 @@ public class TemplateUpgradeService {
     Set<String> dealSet = new HashSet<>();
 
     Map<String, List<Tuple2>> apiUseCase = apiComponentService.findApiUseCase();
-
+    Map<String, ApiMapperDeploymentDTO> stageMappers =
+        productDeploymentService.listRunningApiMapperDeploymentV3(event.getEnvId()).stream()
+            .collect(Collectors.toMap(ApiMapperDeploymentDTO::getTargetMapperKey, t -> t));
     keyList.forEach(
-        key ->
+        key -> {
+          if (stageMappers.containsKey(key)) {
             apiComponentService
                 .findRelatedApiUse(key, apiUseCase)
                 .ifPresent(
@@ -666,7 +751,18 @@ public class TemplateUpgradeService {
                       changedMappers.add(relatedApiUse.getMapperKey());
                       dealSet.add(relatedApiUse.getComponentApiKey());
                       dealSet.addAll(relatedApiUse.membersExcludeApiKey());
-                    }));
+                    });
+
+          } else {
+            apiComponentService
+                .findRelatedApiUse(key, apiUseCase)
+                .ifPresent(
+                    relatedApiUse -> {
+                      dealSet.add(relatedApiUse.getComponentApiKey());
+                      dealSet.addAll(relatedApiUse.membersExcludeApiKey());
+                    });
+          }
+        });
     keyList.removeIf(dealSet::contains);
     UnifiedAssetDto productAsset = this.getProductAsset();
     UnifiedAssetDto assetDto = unifiedAssetService.findOne(event.getTemplateUpgradeId());
@@ -794,6 +890,7 @@ public class TemplateUpgradeService {
     if (!SystemStateEnum.CAN_UPGRADE_STATES.contains(systemInfo.getStatus())) {
       throw KrakenException.badRequest("The current system status does not support upgrade");
     }
+    checkIsLatestUpgrade(event.getTemplateUpgradeId());
     List<ApiMapperDeploymentDTO> stageRunningMappers =
         productDeploymentService.listRunningApiMapperDeploymentV3(event.getEnvId());
     List<String> runningMapperKeys =
@@ -806,7 +903,7 @@ public class TemplateUpgradeService {
                 t -> t.getMappingStatus().equalsIgnoreCase(MappingStatusEnum.INCOMPLETE.getDesc()));
     if (existedInCompleted) {
       throw KrakenException.badRequest(
-          "Not allowed to upgrade:There is an incomplete mapping mapper");
+          "Please adjust and complete the incomplete mapping use cases that will be upgraded to data plane.");
     }
     systemInfoService.updateSystemStatus(SystemStateEnum.STAGE_UPGRADING);
     TemplateSynCompletedEvent templateSynCompletedEvent = new TemplateSynCompletedEvent();
@@ -914,10 +1011,11 @@ public class TemplateUpgradeService {
   public String deployProductionV3(
       String templateUpgradeId, String stageEnvId, String productionEnvId, String userId) {
     SystemInfo systemInfo = systemInfoService.find();
-    if (SystemStateEnum.STAGE_UPGRADE_DONE.name().equalsIgnoreCase(systemInfo.getStatus())) {
+    if (!SystemStateEnum.STAGE_UPGRADE_DONE.name().equalsIgnoreCase(systemInfo.getStatus())) {
       throw KrakenException.badRequest(
           "System state is:" + systemInfo.getStatus() + ". Not allowed to production upgrade");
     }
+    checkIsLatestUpgrade(templateUpgradeId);
     return deployProduction(templateUpgradeId, stageEnvId, productionEnvId, userId);
   }
 
@@ -931,5 +1029,124 @@ public class TemplateUpgradeService {
     return upgradeSourceServiceFactory
         .getUpgradeSourceService(templateUpgradeId)
         .listApiUseCases(templateUpgradeId);
+  }
+
+  public TemplateUpgradeReleaseVO generateTemplateUpgradeReleaseVO(
+      UnifiedAssetDto templateUpgradeDto) {
+    TemplateUpgradeReleaseVO templateUpgradeReleaseVO = new TemplateUpgradeReleaseVO();
+    Map<String, String> labels = templateUpgradeDto.getMetadata().getLabels();
+    templateUpgradeReleaseVO.setPublishDate(labels.get(LabelConstants.LABEL_PUBLISH_DATE));
+    templateUpgradeReleaseVO.setProductVersion(labels.get(LabelConstants.LABEL_PRODUCT_VERSION));
+    templateUpgradeReleaseVO.setProductSpec(labels.get(LabelConstants.LABEL_PRODUCT_SPEC));
+    templateUpgradeReleaseVO.setName(templateUpgradeDto.getMetadata().getName());
+    templateUpgradeReleaseVO.setDescription(templateUpgradeDto.getMetadata().getDescription());
+    templateUpgradeReleaseVO.setTemplateUpgradeId(templateUpgradeDto.getId());
+    Paging<TemplateUpgradeDeploymentVO> deploymentVOPaging =
+        this.listTemplateDeployment(
+            templateUpgradeReleaseVO.getTemplateUpgradeId(), PageRequest.of(0, 10));
+    templateUpgradeReleaseVO.setDeployments(deploymentVOPaging.getData());
+    Set<String> envSet = new HashSet<>();
+    List<TemplateUpgradeDeploymentVO> latestDeployments =
+        templateUpgradeReleaseVO.getDeployments().stream()
+            .sorted(Comparator.comparing(TemplateUpgradeDeploymentVO::getCreatedAt).reversed())
+            .filter(deployment -> envSet.add(deployment.getEnvName()))
+            .toList();
+    templateUpgradeReleaseVO.setDeployments(latestDeployments);
+    return templateUpgradeReleaseVO;
+  }
+
+  private void checkIsLatestUpgrade(String currentTemplateUpgradeId) {
+    UnifiedAssetDto latestControlPlaneDeployment =
+        unifiedAssetService
+            .findBySpecification(
+                Tuple2.ofList(
+                    AssetsConstants.FIELD_KIND, PRODUCT_TEMPLATE_CONTROL_DEPLOYMENT.getKind()),
+                null,
+                null,
+                PageRequest.of(0, 1, Sort.Direction.DESC, AssetsConstants.FIELD_CREATE_AT),
+                null)
+            .getData()
+            .get(0);
+    String expectedTemplateUpgradeId =
+        latestControlPlaneDeployment
+            .getMetadata()
+            .getLabels()
+            .get(LabelConstants.LABEL_APP_TEMPLATE_UPGRADE_ID);
+    if (!StringUtils.equals(expectedTemplateUpgradeId, currentTemplateUpgradeId)) {
+      throw KrakenException.badRequest(
+          "This mapping template is deprecated.A newer version mapping template started to upgrade.");
+    }
+  }
+
+  public TemplateUpgradeCheckDTO stageCheck(String templateUpgradeId, String stageEnvId) {
+    TemplateUpgradeCheckDTO templateUpgradeCheckDTO = new TemplateUpgradeCheckDTO();
+    Environment environment = environmentService.findOne(stageEnvId);
+    if (!environment.getName().equalsIgnoreCase(EnvNameEnum.STAGE.name())) {
+      throw KrakenException.badRequest("error environment: not stage environment");
+    }
+    List<ApiMapperDeploymentDTO> stageRunningMappers =
+        productDeploymentService.listRunningApiMapperDeploymentV3(stageEnvId);
+    List<String> runningMapperKeys =
+        stageRunningMappers.stream().map(ApiMapperDeploymentDTO::getTargetMapperKey).toList();
+    boolean existedInCompleted =
+        apiComponentService.listAllApiUseCase().stream()
+            .flatMap(t -> t.getDetails().stream())
+            .filter(t -> runningMapperKeys.contains(t.getTargetMapperKey()))
+            .anyMatch(
+                t -> t.getMappingStatus().equalsIgnoreCase(MappingStatusEnum.INCOMPLETE.getDesc()));
+    templateUpgradeCheckDTO.setMapperCompleted(!existedInCompleted);
+    boolean newTemplate = true;
+    try {
+      checkIsLatestUpgrade(templateUpgradeId);
+      newTemplate = false;
+    } finally {
+      templateUpgradeCheckDTO.setNewerTemplate(newTemplate);
+    }
+    return templateUpgradeCheckDTO;
+  }
+
+  public TemplateUpgradeCheckDTO productionCheck(String templateUpgradeId, String productionEnvId) {
+    TemplateUpgradeCheckDTO templateUpgradeCheckDTO = new TemplateUpgradeCheckDTO();
+    Environment environment = environmentService.findOne(productionEnvId);
+    if (!environment.getName().equalsIgnoreCase(EnvNameEnum.PRODUCTION.name())) {
+      throw KrakenException.badRequest("error environment: not production environment");
+    }
+    templateUpgradeCheckDTO.setCompatible(checkStageCompatibility(templateUpgradeId));
+    boolean newTemplate = true;
+    try {
+      checkIsLatestUpgrade(templateUpgradeId);
+      newTemplate = false;
+    } finally {
+      templateUpgradeCheckDTO.setNewerTemplate(newTemplate);
+    }
+    return templateUpgradeCheckDTO;
+  }
+
+  public boolean checkStageCompatibility(String templateUpgradeId) {
+    UnifiedAssetDto assetDto = unifiedAssetService.findOne(templateUpgradeId);
+    String productVersion =
+        assetDto.getMetadata().getLabels().get(LabelConstants.LABEL_PRODUCT_VERSION);
+    SystemInfo systemInfo = systemInfoService.find();
+    return compatibilityCheckService.check(systemInfo.getStageAppVersion(), productVersion);
+  }
+
+  public void calculateStatus(TemplateUpgradeReleaseVO vo, boolean first) {
+    boolean deployedProduction =
+        vo.getDeployments().stream()
+            .anyMatch(
+                deploy -> deploy.getEnvName().equalsIgnoreCase(EnvNameEnum.PRODUCTION.name()));
+    if (deployedProduction) {
+      vo.setStatus(TemplateViewStatus.UPGRADED.getStatus());
+      return;
+    }
+    if (first) {
+      if (CollectionUtils.isEmpty(vo.getDeployments())) {
+        vo.setStatus(TemplateViewStatus.NOT_UPGRADED.getStatus());
+        return;
+      }
+      vo.setStatus(TemplateViewStatus.UPGRADING.getStatus());
+    } else {
+      vo.setStatus(TemplateViewStatus.DEPRECATED.getStatus());
+    }
   }
 }

@@ -148,6 +148,3 @@ links:
   - targetAssetKey: mef.sonata.api-target-mapper.address.retrieve
     relationship: implementation.target-mapper
     group: mef.sonata.api-target.address.retrieve
-
-
-
