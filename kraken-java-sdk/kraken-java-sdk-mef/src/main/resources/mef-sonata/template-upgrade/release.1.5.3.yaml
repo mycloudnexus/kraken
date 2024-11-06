@@ -9,5 +9,5 @@ metadata:
     productVersion: V1.5.3
     publishDate: 2024-11-06
   description: |
-    Added type value checking for adding uni order.
+    Added value checking of type and role for adding uni order.
   version: 2
