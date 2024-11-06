@@ -10,7 +10,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 
 public interface ApiActivityLogRepository
     extends PagingAndSortingRepository<ApiActivityLogEntity, UUID>,
@@ -25,4 +27,21 @@ public interface ApiActivityLogRepository
 
   Page<ApiActivityLogEntity> findAllBySyncStatusAndCreatedAtBefore(
       SyncStatusEnum syncStatus, ZonedDateTime createdAt, Pageable pageable);
+
+  @Query(
+      "SELECT e.path, e.method , COUNT(e) FROM #{#entityName} e "
+          + "WHERE e.env = :env "
+          + "AND e.callSeq = :callSeq "
+          + "AND e.createdAt BETWEEN :startDate AND :endDate "
+          + "AND ( (:buyer) is null or  e.buyer = :buyer )"
+          + "GROUP BY e.path,  e.method "
+          + "ORDER BY COUNT(e) DESC "
+          + "LIMIT :limit ")
+  List<Object[]> findTopEndpoints(
+      @Param("env") String env,
+      @Param("startDate") ZonedDateTime startDate,
+      @Param("endDate") ZonedDateTime endDate,
+      @Param("callSeq") String callSeq,
+      @Param("buyer") String buyer,
+      @Param("limit") int limit);
 }
