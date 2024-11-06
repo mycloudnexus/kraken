@@ -13,7 +13,7 @@ import {
 import { STALE_TIME } from "@/utils/constants/common";
 import { queryClient } from "@/utils/helpers/reactQuery";
 import { IPagingData } from "@/utils/types/common.type";
-import { IRunningMapping } from "@/utils/types/env.type";
+import { DataPlaneUpgradeCheck, IRunningMapping } from "@/utils/types/env.type";
 import { IApiUseCase, IReleaseHistory } from "@/utils/types/product.type";
 import {
   InfiniteData,
@@ -211,7 +211,7 @@ export function useStageUpgradeCheck(
   envId: string,
   config: Record<string, any> = {}
 ) {
-  return useQuery<AxiosResponse, Error, string[]>({
+  return useQuery<AxiosResponse, Error, DataPlaneUpgradeCheck>({
     queryKey: [
       MTQueryKey.CHECK_STAGE_PRE_UPGRADE,
       productId,
@@ -232,7 +232,7 @@ export function useProductionUpgradeCheck(
   envId: string,
   config: Record<string, any> = {}
 ) {
-  return useQuery<AxiosResponse, Error, string[]>({
+  return useQuery<AxiosResponse, Error, DataPlaneUpgradeCheck>({
     queryKey: [
       MTQueryKey.CHECK_PRODUCTION_PRE_UPGRADE,
       productId,

@@ -6,7 +6,6 @@ import { useAppStore } from "@/stores/app.store";
 import { IRunningMapping } from "@/utils/types/env.type";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import { Tooltip } from "antd";
-import { nanoid } from "nanoid";
 import { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMappingTemplateStoreV2 } from "../store";
@@ -38,11 +37,9 @@ export default function StageUpgrade({
     useMappingTemplateStoreV2();
 
   const handleItemClick = (item: IRunningMapping) => {
-    if (isMappingIncomplete) {
-      navigate(
-        `/api-mapping/${item.componentKey}?targetMapperKey=${item.targetMapperKey}&version=${upgradeVersion}`
-      );
-    }
+    navigate(
+      `/api-mapping/${item.componentKey}?targetMapperKey=${item.targetMapperKey}&version=${upgradeVersion}`
+    );
   };
 
   const controlPlaneApis: IRunningMapping[] | undefined = useMemo(
@@ -65,7 +62,6 @@ export default function StageUpgrade({
       controlPlaneApis.some((mapping) => mapping.mappingStatus === "incomplete")
     ) {
       pushNotification({
-        id: nanoid(),
         type: "warning",
         message:
           "Please adjust and complete the incomplete mapping use cases that will be upgraded to data plane.",
@@ -75,25 +71,42 @@ export default function StageUpgrade({
     }
   }, [controlPlaneApis]);
 
+  // Updated: every control plane upgradeable use cases should be highlighted, even though are completed or not
+  const upgradeableControlPlaneMapperKeys = useMemo(() => {
+    if (controlPlaneApis && stageApis) {
+      const stageMapperKeyUseCases = new Set(stageApis.map(usecase => usecase.targetMapperKey))
+
+      return controlPlaneApis.reduce((acc: Record<string, boolean>, usecase) => {
+        if (stageMapperKeyUseCases.has(usecase.targetMapperKey)) {
+          acc[usecase.targetMapperKey] = true
+        }
+
+        return acc
+      }, {})
+    }
+
+    return {}
+  }, [controlPlaneApis, stageApis])
+
   return (
     <>
       <ApiList
         title={
           <>
             Control plane API mappings ({controlPlaneApis?.length ?? 0})
-            {isMappingIncomplete && (
-              <Tooltip title="Use cases highlighted are to be upgraded to data plane. Please ensure all of their mapping are correct and complete.">
-                <InfoCircleOutlined
-                  style={{ marginLeft: 8, color: "var(--text-secondary)" }}
-                />
-              </Tooltip>
-            )}
+            <Tooltip title="Use cases highlighted are to be upgraded to Stage data plane. Please ensure all of their mapping are correct and complete.">
+              <InfoCircleOutlined
+                style={{ marginLeft: 8, color: "var(--text-secondary)" }}
+              />
+            </Tooltip>
           </>
         }
         loading={isFetchingControlPlaneApis}
         details={controlPlaneApis}
         statusIndicatorPosition="right"
         clickable
+        highlights={upgradeableControlPlaneMapperKeys} // targetMapperKeys
+        indicators={['incomplete']}
         onItemClick={handleItemClick}
       />
 

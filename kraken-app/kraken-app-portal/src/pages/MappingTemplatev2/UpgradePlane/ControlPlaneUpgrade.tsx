@@ -57,6 +57,7 @@ export default function ControlPlaneUpgrade({
         title={`Control plane API mappings (${rightApis?.length ?? 0})`}
         loading={isLoadingControlPlaneApis}
         details={rightApis}
+        indicators={['incomplete']}
         statusIndicatorPosition="left"
       />
     </>
