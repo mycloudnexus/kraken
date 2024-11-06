@@ -1,5 +1,6 @@
 import { fireEvent, render } from "@/__test__/utils";
 import { ApiCard } from "@/components/ApiMapping";
+import { ApiList } from "@/pages/MappingTemplatev2/UpgradePlane/components/ApiList";
 import { ApiListSkeleton } from "@/pages/MappingTemplatev2/UpgradePlane/components/ApiListSkeleton";
 import { DeprecatedModal } from "@/pages/MappingTemplatev2/UpgradePlane/components/DeprecatedModal";
 import { IncompatibleMappingModal } from "@/pages/MappingTemplatev2/UpgradePlane/components/IncompatibleMappingModal";
@@ -29,9 +30,6 @@ describe("components used in mapping template v2 pages", () => {
     expect(buttons[1]).toHaveTextContent("Got it");
     fireEvent.click(buttons[1]);
     expect(handleOk).toHaveBeenCalledTimes(1);
-
-    fireEvent.click(buttons[0]);
-    expect(handleCancel).toHaveBeenCalledTimes(1);
   });
 
   it("should render stage version incompatible warning modal", () => {
@@ -55,9 +53,6 @@ describe("components used in mapping template v2 pages", () => {
     expect(buttons[1]).toHaveTextContent("Got it");
     fireEvent.click(buttons[1]);
     expect(handleOk).toHaveBeenCalledTimes(1);
-
-    fireEvent.click(buttons[0]);
-    expect(handleCancel).toHaveBeenCalledTimes(1);
   });
 
   it("should render upgrade confirm modal", () => {
@@ -149,4 +144,19 @@ describe("components used in mapping template v2 pages", () => {
     const { container } = render(<ListVersionSkeleton />);
     expect(container).toBeInTheDocument();
   });
+
+  it('should render api list', () => {
+    const handleClick = vi.fn()
+    const { getByTestId, getAllByTestId } = render(<ApiList loading title="mock_title" clickable highlights={{ 'mock_mapper_target': true }} indicators={['incomplete']} details={[{
+      targetMapperKey: 'mock_mapper_target',
+      mappingStatus: 'incomplete',
+      path: '/a/b/c/d'
+    }] as any}
+    statusIndicatorPosition='right' onItemClick={handleClick} />)
+    expect(getByTestId('mappingListTitle')).toHaveTextContent('mock_title')
+
+    const useCase = getAllByTestId('useCase')[0]
+    fireEvent.click(useCase)
+    expect(handleClick).toHaveBeenCalledTimes(1)
+  })
 });

@@ -46,10 +46,40 @@
 }
 
 .siderBottomVersion {
-  padding-bottom: 12px;
+  padding: 0 10px 12px 10px;
+  border-bottom: 1px solid var(--border);
+
+  &.collapsed {
+    flex-direction: column;
+  }
+}
+
+.appVersion {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 45%;
+
+  &.collapsed {
+    max-width: 100%;
+    width: 100%;
+  }
 }
 
 .siderBottomCollapseWrapper {
   border-top: 1px solid var(--a-border);
   padding: 12px 24px;
+}
+
+.productionBy {
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-secondary);
+}
+
+.envVersions {
+  padding-left: 30px;
+  margin-top: 2px;
 }

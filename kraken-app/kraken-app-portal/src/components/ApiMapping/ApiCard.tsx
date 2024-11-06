@@ -23,6 +23,7 @@ export function ApiCard({
 }>) {
   return (
     <Flex
+      data-testid="useCase"
       align="center"
       gap={10}
       className={classNames(className, styles.rowBorder)}

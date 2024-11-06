@@ -26,6 +26,8 @@ export function ApiList({
   title,
   loading,
   details = [],
+  highlights,
+  indicators = [],
   statusIndicatorPosition,
   clickable,
   onItemClick,
@@ -34,6 +36,8 @@ export function ApiList({
   loading?: boolean;
   details?: IRunningMapping[];
   statusIndicatorPosition?: "left" | "right";
+  highlights?: Record<string, any> // targetMapperKeys
+  indicators?: string[] // mapping status
   clickable?: boolean
   onItemClick?: (item: IRunningMapping) => void;
 }>) {
@@ -53,14 +57,16 @@ export function ApiList({
           key={item.path + "_" + index}
           apiInstance={item as any}
           className={classNames(
-            clickable && item.mappingStatus === "incomplete" && styles.incompleteMapping
+            clickable && highlights?.[item.targetMapperKey] && styles.incompleteMapping
           )}
           prefix={
             statusIndicatorPosition === "left" &&
+            indicators.includes(item.mappingStatus) &&
             getMappingStatusIcon(item.mappingStatus)
           }
           suffix={
             statusIndicatorPosition === "right" &&
+            indicators.includes(item.mappingStatus) &&
             getMappingStatusIcon(item.mappingStatus)
           }
           mappingMatrixPosition="right"

@@ -140,3 +140,10 @@ export interface ILogActivity {
   request: Record<string, any>;
   response: Record<string, any>;
 }
+
+export type DataPlaneUpgradeCheck = {
+  errorMessages: string[]
+  mapperCompleted: boolean
+  newerTemplate: boolean
+  compatible: boolean
+}

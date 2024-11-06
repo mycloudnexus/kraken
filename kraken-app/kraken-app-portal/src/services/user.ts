@@ -46,3 +46,7 @@ export const resetPwdUser = (id: string, password: string) => {
     },
   });
 };
+
+export function getSystemInfo() {
+  return request(`system-info`);
+};

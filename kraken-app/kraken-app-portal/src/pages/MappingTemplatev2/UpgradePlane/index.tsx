@@ -13,11 +13,9 @@ import {
 } from "@/hooks/mappingTemplate";
 import { useLongPolling } from "@/hooks/useLongPolling";
 import { useAppStore } from "@/stores/app.store";
-import { Deployment } from "@/utils/types/product.type";
 import { ReloadOutlined } from "@ant-design/icons";
 import { Button, Flex, Spin, StepsProps, Tag } from "antd";
 import classNames from "classnames";
-import { nanoid } from "nanoid";
 import { lazy, ReactNode, Suspense, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useMappingTemplateStoreV2 } from "../store";
@@ -26,6 +24,7 @@ import { DeprecatedModal } from "./components/DeprecatedModal";
 import { IncompatibleMappingModal } from "./components/IncompatibleMappingModal";
 import { StartUpgradeModal } from "./components/StartUpgradeModal";
 import styles from "./index.module.scss";
+import { DataPlaneUpgradeCheck } from "@/utils/types/env.type";
 
 const ControlPlaneUpgrade = lazy(() => import("./ControlPlaneUpgrade"));
 const StageUpgrade = lazy(() => import("./StageUpgrade"));
@@ -40,17 +39,25 @@ function getStepStatus(
   return "wait";
 }
 
-function getUpgradeButtonText(
+function getUpgradeButtonText({
+  isUpgraded,
+  isUpgrading,
+  currentStep,
+  isUpgradeIncompatible
+}: {
   isUpgrading: boolean,
   isUpgraded: boolean,
   currentStep: number
-): ReactNode {
+  isUpgradeIncompatible: boolean
+}): ReactNode {
   if (isUpgrading)
     return (
       <>
         <ReloadOutlined /> Upgrading
       </>
     );
+
+  if (isUpgradeIncompatible && currentStep === 2) return 'Done'
 
   if (isUpgraded) {
     if (currentStep === 2) return 'Done'
@@ -81,21 +88,22 @@ export default function UpgradePlane() {
 
   const {
     isMappingIncomplete,
+    isStageMappingIncompatible,
+    isProductionMappingIncompatible,
     confirmUpgrade,
     notification,
     setConfirmUpgrade,
     pushNotification,
     removeNotification,
     clearNotification,
+    setIsStageMappingIncompatible,
+    setIsProductionMappingIncompatible,
     reset,
   } = useMappingTemplateStoreV2();
 
   const onUpgradeFinished = () => ({
-    onSuccess(message: string) {
-      pushNotification({ id: nanoid(), message, type: "success" });
-    },
     onError(message: string) {
-      pushNotification({ id: nanoid(), message, type: "warning" });
+      pushNotification({ message, type: "warning" });
     },
   });
 
@@ -108,13 +116,11 @@ export default function UpgradePlane() {
 
   // Pre-condition check for upgrade compatibility
   const {
-    data: stageUpgradeCheckResult,
     isFetching: isCheckingStageUpgrade,
     refetch: checkStageUpgrade,
   } = useStageUpgradeCheck(productId, templateUpgradeId, stageEnvId as any, { enabled: false });
 
   const {
-    data: productionUpgradeCheckResult,
     isFetching: isCheckingProductionUpgrade,
     refetch: checkProductionUpgrade,
   } = useProductionUpgradeCheck(productId, templateUpgradeId, productEnvId as any, { enabled: false });
@@ -135,10 +141,44 @@ export default function UpgradePlane() {
 
   // State
   const [currentStep, setCurrentStep] = useState(-1);
-  const [currentUpgrade, setCurrentUpgrade] = useState<Deployment | undefined>(
-    undefined
-  );
   const [isTemplateDeprecated, setIsTemplateDeprecated] = useState(false);
+
+  const checkUpgrade = ({ newerTemplate: isDeprecated, compatible: isCompatible, errorMessages }: DataPlaneUpgradeCheck): boolean => {
+    // Version incompatible
+    if (isCompatible === false) {
+      // there is a difference in version incompatible check result at step 2 and 3
+      // Step 2 should show a popup and navigate back to mapping landing page
+      // while step 3 only shows an alert and change the action to Done -> back to mapping landing page
+      if (currentStep === 1) {
+        setIsStageMappingIncompatible(true)
+      } else if (currentStep === 2) {
+        pushNotification({
+          type: 'warning',
+          message: 'Mapping template upgrade successfully in production data plane but not compatible with Kraken version running in this plane. Please upgrade kraken to make this new mapping template effective.'
+        })
+        setIsProductionMappingIncompatible(true)
+      }
+      return false
+    }
+
+    // Template deprecated
+    if (isDeprecated) {
+      setIsTemplateDeprecated(true)
+      return false
+    }
+
+    // Any error occurs in BE
+    if (errorMessages?.length) {
+      pushNotification(...errorMessages.map(msg => ({
+        type: 'warning',
+        message: msg
+      })) as any)
+
+      return false
+    }
+
+    return true
+  }
 
   const handleUpgrade = async () => {
     // Check for deprecated template mapping
@@ -147,51 +187,56 @@ export default function UpgradePlane() {
       return;
     }
 
-    switch (currentStep) {
-      case 0:
-        await controlPlaneUpgrade({ templateUpgradeId });
-        refetchTemplateDetail()
-        break;
+    try {
+      switch (currentStep) {
+        case 0:
+          await controlPlaneUpgrade({ templateUpgradeId });
+          refetchTemplateDetail()
+          break;
 
-      case 1:
-        await checkStageUpgrade()
-        if (stageUpgradeCheckResult?.length) {
-          pushNotification(...stageUpgradeCheckResult.map(msg => ({
-            id: nanoid(),
-            type: 'warning',
-            message: msg
-          })) as any)
-          return
+        case 1: {
+          // Check for stage upgrade compatiblity
+          const { error, data } = await checkStageUpgrade()
+          if (error) throw error
+
+          if (!checkUpgrade(data! ?? {})) return
+
+          // Upgrade data plane: stage
+          await stageUpgrade({
+            templateUpgradeId,
+            stageEnvId: stageEnvId as any,
+          });
+
+          refetchTemplateDetail()
+          break;
         }
 
-        await stageUpgrade({
-          templateUpgradeId,
-          stageEnvId: stageEnvId as any,
-        });
-        refetchTemplateDetail()
-        break;
+        case 2: {
+          // Check for production upgrade compatiblity
+          const { error, data } = await checkProductionUpgrade()
+          if (error) throw error
 
-      case 2:
-        await checkProductionUpgrade()
-        if (productionUpgradeCheckResult?.length) {
-          pushNotification(...productionUpgradeCheckResult.map(msg => ({
-            id: nanoid(),
-            type: 'warning',
-            message: msg
-          })) as any)
-          return
+          if (!checkUpgrade(data! ?? {})) return
+
+          await productionUpgrade({
+            templateUpgradeId,
+            stageEnvId: stageEnvId as any,
+            productEnvId: productEnvId as any,
+          });
+
+          // Upgrade data plane: production
+          refetchTemplateDetail()
+          break;
         }
 
-        await productionUpgrade({
-          templateUpgradeId,
-          stageEnvId: stageEnvId as any,
-          productEnvId: productEnvId as any,
-        });
-        refetchTemplateDetail()
-        break;
-
-      default:
-        break;
+        default:
+          break;
+      }
+    } catch (error: any) {
+      pushNotification({
+        type: 'warning',
+        message: error?.reason
+      })
     }
   };
 
@@ -212,26 +257,22 @@ export default function UpgradePlane() {
     }
   };
 
+  // Determine step
+  const steps = useMemo(() => getUpgradeSteps(templateDetail?.deployments ?? []), [templateDetail?.deployments]);
+
   useEffect(() => {
-    if (templateDetail) {
+    if (templateDetail && currentStep === -1) {
       // Prevent processing if template is deprecated
       if (templateDetail.status === "Deprecated") {
         handleCancel();
         return;
       }
 
-      // Determine step
-      const steps = getUpgradeSteps(templateDetail.deployments);
-
       for (let i = 0; i < steps.length; i++) {
         // Either select first step whose status is not SUCCESS or select the last step
         // It's assured that the upgrade process is stopped at some step
         if (steps[i].status !== "SUCCESS" || i === steps.length - 1) {
-          if (currentStep === -1) {
-            setCurrentStep(i);
-          }
-
-          setCurrentUpgrade(steps[i]);
+          setCurrentStep(i);
           break;
         }
       }
@@ -243,7 +284,9 @@ export default function UpgradePlane() {
     isPendingStageUpgrade ||
     isPendingProductionUpgrade;
 
-  const isUpgrading = currentUpgrade?.status === "IN_PROGRESS";
+  const currentUpgrade = steps[currentStep]
+
+  const isUpgrading = currentUpgrade?.status === "IN_PROCESS";
   const isUpgraded = currentUpgrade?.status === "SUCCESS";
 
   useEffect(() => {
@@ -251,20 +294,18 @@ export default function UpgradePlane() {
   }, [isUpgrading, setShouldRefetchTemplateDetail])
 
   useEffect(() => {
-    if (isUpgraded) {
+    if (isUpgraded && !isUpgrading) {
       clearNotification();
- 
+
       switch (currentStep) {
         case 0:
           pushNotification({
-            id: nanoid(),
             type: "success",
             message: "Control plane upgrade successfully",
           });
           break;
         case 1:
           pushNotification({
-            id: nanoid(),
             type: "success",
             message:
               "Mapping template upgrade successfully and effective now in stage data plane. Please test offline and ensure they can work properly.",
@@ -272,7 +313,6 @@ export default function UpgradePlane() {
           break;
         case 2:
           pushNotification({
-            id: nanoid(),
             type: "success",
             message:
               "Mapping template upgrade successfully and effective now in production data plane. ",
@@ -282,10 +322,14 @@ export default function UpgradePlane() {
           break;
       }
     }
-  }, [currentStep, isUpgraded]);
+  }, [currentStep, isUpgraded, isUpgrading]);
 
   useEffect(() => {
     reset();
+
+    return () => {
+      reset();
+    }
   }, []);
 
   return (
@@ -366,6 +410,7 @@ export default function UpgradePlane() {
                     stageEnvId={stageEnvId}
                     productEnvId={productEnvId}
                     isUpgrading={isUpgrading || isPendingProductionUpgrade}
+                    upgradeVersion={templateDetail?.productVersion}
                     isUpgraded={isUpgraded}
                   />
                 )}
@@ -392,7 +437,12 @@ export default function UpgradePlane() {
           loading={isCheckingStageUpgrade || isCheckingProductionUpgrade}
           onClick={startUpgrade}
         >
-          {getUpgradeButtonText(isSendingUpgrade || isUpgrading, isUpgraded, currentStep)}
+          {getUpgradeButtonText({
+            isUpgrading: isSendingUpgrade || isUpgrading,
+            isUpgraded,
+            currentStep,
+            isUpgradeIncompatible: isProductionMappingIncompatible
+          })}
         </Button>
       </Flex>
 
@@ -404,8 +454,8 @@ export default function UpgradePlane() {
           handleUpgrade();
         }}
       />
-      <DeprecatedModal open={isTemplateDeprecated} onOk={() => handleCancel} />
-      <IncompatibleMappingModal onCancel={handleCancel} />
+      <DeprecatedModal open={isTemplateDeprecated} onOk={handleCancel} />
+      <IncompatibleMappingModal open={isStageMappingIncompatible} onOk={handleCancel} />
     </PageLayout>
   );
 }

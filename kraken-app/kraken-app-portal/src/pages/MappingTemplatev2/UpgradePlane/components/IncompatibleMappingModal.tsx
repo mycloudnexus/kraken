@@ -14,7 +14,8 @@ export function IncompatibleMappingModal({
       width={416}
       cancelButtonProps={{ style: { display: "none" } }}
       centered
-      onCancel={onCancel}
+      maskClosable={false}
+      closeIcon={<></>}
     >
       <Flex gap={16} align="flex-start">
         <CloseCircleOutlined className={styles.errorIcon} />
