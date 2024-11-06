@@ -18,19 +18,11 @@ spec:
         path: "$.body.productOrderItem[*].['action']"
         expectType: EXPECTED
         value: add
-      - name: productOrderItem_product_place_role
-        path: "$.body.productOrderItem[0].product.place[0].role"
-        expectType: EXPECTED_EXIST
-        value: true
-      - name: productOrderItem_product_place_role_should_be
+      - name: productOrderItem[0].product.place[0].role
         path: "$.body.productOrderItem[0].product.place[0].role"
         expectType: EXPECTED
         value: "INSTALL_LOCATION"
-      - name: productOrderItem_product_place_@type
-        path: "$.body.productOrderItem[0].product.place[0].@type"
-        expectType: EXPECTED_EXIST
-        value: true
-      - name: productOrderItem_product_place_@type_should_be
+      - name: productOrderItem[0].product.place[0].@type
         path: "$.body.productOrderItem[0].product.place[0].@type"
         expectType: EXPECTED
         value: "GeographicAddressRef"
