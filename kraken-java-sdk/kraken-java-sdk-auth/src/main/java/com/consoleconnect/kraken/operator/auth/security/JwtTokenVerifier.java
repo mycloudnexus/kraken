@@ -29,6 +29,6 @@ public class JwtTokenVerifier implements OAuth2TokenValidator<Jwt> {
         return OAuth2TokenValidatorResult.failure(error);
       }
     }
-    return null;
+    return OAuth2TokenValidatorResult.success();
   }
 }
