@@ -191,5 +191,14 @@ spec:
             targetLocation: BODY
             customizedField: false
             requiredMapping: true
+          - name: mapper.order.eline.add.product.id
+            title: product instance id
+            description: ""
+            source: ""
+            sourceLocation: BODY
+            target: "@{{productOrderItem[0].product.id}}"
+            targetLocation: BODY
+            customizedField: false
+            requiredMapping: false
 
 

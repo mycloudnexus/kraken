@@ -1,0 +1,97 @@
+{
+  "note": [],
+  "requestedQuoteCompletionDate": "2027-12-31T23:00:00Z",
+  "relatedContactInformation": [
+    {
+      "number": "111 222 333",
+      "emailAddress": "buyerContact@mef.com",
+      "role": "buyerContactInformation",
+      "postalAddress": null,
+      "organization": "MEF",
+      "name": "Joe Buyer",
+      "numberExtension": null
+    }
+  ],
+  "externalId": "ORDERABLE_ALTERNATE [8203] Sync Quote FIRM - ADD",
+  "buyerRequestedQuoteLevel": "firm",
+  "projectId": "MEF OIT",
+  "instantSyncQuote": false,
+  "quoteItem": [
+    {
+      "requestedQuoteItemTerm": {
+        "name": "UNI Item Term",
+        "duration": {
+          "amount": 1,
+          "units": "calendarMonths"
+        },
+        "endOfTermAction": "roll",
+        "description": "no description",
+        "rollInterval": {
+          "amount": 1,
+          "units": "calendarMonths"
+        }
+      },
+      "note": [],
+      "product": {
+        "id": null,
+        "href": null,
+        "place": [
+          {
+            "role": "INSTALL_LOCATION",
+            "href": null,
+            "id": "6356792a4806220015488631",
+            "@type": "GeographicAddressRef",
+            "@schemaLocation": null
+          }
+        ],
+        "productConfiguration": {
+          "@type": "UNI",
+          "bandwidth": 1000,
+          "bandwidthUnit": "MBPS",
+          "name" : "test-qc01",
+          "paymentType" : "invoice"
+        },
+        "productOffering": {
+          "id": "UNI",
+          "href": null
+        },
+        "productRelationship": []
+      },
+      "productOfferingQualificationItem": {
+        "productOfferingQualificationId": "",
+        "alternateProductProposalId": null,
+        "productOfferingQualificationHref": null,
+        "id": "UNI"
+      },
+      "relatedContactInformation": [
+        {
+          "number": "111 222 333",
+          "emailAddress": "quoteItemTechnicalContact@mef.com",
+          "role": "quoteItemTechnicalContact",
+          "postalAddress": null,
+          "organization": "MEF",
+          "name": "David Item",
+          "numberExtension": null
+        },
+        {
+          "number": "111 222 333",
+          "emailAddress": "quoteItemLocationContact@mef.com",
+          "role": "quoteItemLocationContact",
+          "postalAddress": null,
+          "organization": "MEF",
+          "name": "Konrad Item Location",
+          "numberExtension": null
+        }
+      ],
+      "agreementName": null,
+      "action": "add",
+      "dealReference": null,
+      "id": "UNI",
+      "requestedQuoteItemInstallationInterval": {
+        "amount": 10,
+        "units": "calendarDays"
+      },
+      "quoteItemRelationship": []
+    }
+  ]
+}
