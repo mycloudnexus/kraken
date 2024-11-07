@@ -89,14 +89,14 @@ public class SystemInfoService {
     List<EnvironmentEntity> environmentEntities = environmentRepository.findAll();
     String stageEnvId =
         environmentEntities.stream()
-            .filter(t -> EnvNameEnum.STAGE.name().equals(t.getName()))
+            .filter(t -> EnvNameEnum.STAGE.name().equalsIgnoreCase(t.getName()))
             .findFirst()
             .orElseThrow()
             .getId()
             .toString();
     String productionEnvId =
         environmentEntities.stream()
-            .filter(t -> EnvNameEnum.PRODUCTION.name().equals(t.getName()))
+            .filter(t -> EnvNameEnum.PRODUCTION.name().equalsIgnoreCase(t.getName()))
             .findFirst()
             .orElseThrow()
             .getId()
