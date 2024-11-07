@@ -3,9 +3,8 @@ import Flex from "@/components/Flex";
 import { Text } from "@/components/Text";
 import { useGetValidateServerName } from '@/hooks/product';
 import { useAppStore } from '@/stores/app.store';
-import { isURL } from "@/utils/helpers/url";
+import { validateServerName, validateURL } from '@/utils/helpers/validators';
 import { Form, Input } from "antd";
-import { isEmpty } from "lodash";
 
 const SelectAPIServer = () => {
   const { currentProduct } = useAppStore();
@@ -26,15 +25,8 @@ const SelectAPIServer = () => {
             message: "Please complete this field.",
           },
           {
-            validator: async (_, name) => {
-              const { data: isValid } = await validateName({ productId: currentProduct, name })
-              if (isValid) {
-                return Promise.resolve();
-              } else {
-                return Promise.reject(`The name ${name} is already taken`);
-              }
-             }
-           }
+            validator: (_, name) => validateServerName(validateName, currentProduct, name)
+          }
         ]}
         validateDebounce={1000}
         labelCol={{ span: 24 }}
@@ -53,12 +45,7 @@ const SelectAPIServer = () => {
             required: false,
           },
           {
-            validator: (_, value) => {
-              if (isURL(value) || isEmpty(value)) {
-                return Promise.resolve();
-              }
-              return Promise.reject(new Error("Please enter a valid URL"));
-            },
+            validator: validateURL
           },
         ]}
         labelCol={{ span: 24 }}
