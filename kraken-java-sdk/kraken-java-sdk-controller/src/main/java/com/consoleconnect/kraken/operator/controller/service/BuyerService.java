@@ -8,6 +8,7 @@ import com.consoleconnect.kraken.operator.auth.model.AuthDataProperty;
 import com.consoleconnect.kraken.operator.controller.dto.BuyerAssetDto;
 import com.consoleconnect.kraken.operator.controller.dto.CreateBuyerRequest;
 import com.consoleconnect.kraken.operator.controller.mapper.BuyerAssetDtoMapper;
+import com.consoleconnect.kraken.operator.controller.model.Environment;
 import com.consoleconnect.kraken.operator.controller.model.MgmtProperty;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
@@ -25,6 +26,7 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import lombok.AllArgsConstructor;
@@ -50,6 +52,7 @@ public class BuyerService extends AssetStatusManager {
   private final UnifiedAssetRepository unifiedAssetRepository;
   private final AuthDataProperty.AuthServer authServer;
   private final MgmtProperty appProperty;
+  private final EnvironmentService environmentService;
 
   @Transactional
   public BuyerAssetDto create(String productId, CreateBuyerRequest buyerOnboard, String createdBy) {
@@ -142,12 +145,16 @@ public class BuyerService extends AssetStatusManager {
   private BuyerAssetDto generateBuyer(
       UnifiedAssetDto unifiedAssetDto, String buyerId, Long tokenExpiredInSeconds) {
     BuyerAssetDto buyerAssetDto = BuyerAssetDtoMapper.INSTANCE.toBuyerAssetDto(unifiedAssetDto);
-    BuyerAssetDto.BuyerToken buyerToken = generateBuyerToken(buyerId, tokenExpiredInSeconds);
+    Map<String, String> labels = buyerAssetDto.getMetadata().getLabels();
+    String envId = (labels == null ? "" : labels.getOrDefault(LABEL_ENV_ID, ""));
+    BuyerAssetDto.BuyerToken buyerToken = generateBuyerToken(buyerId, tokenExpiredInSeconds, envId);
+
     buyerAssetDto.setBuyerToken(buyerToken);
     return buyerAssetDto;
   }
 
-  private BuyerAssetDto.BuyerToken generateBuyerToken(String buyerId, Long tokenExpiredInSeconds) {
+  private BuyerAssetDto.BuyerToken generateBuyerToken(
+      String buyerId, Long tokenExpiredInSeconds, String envId) {
     if (null == tokenExpiredInSeconds || tokenExpiredInSeconds <= 0) {
       tokenExpiredInSeconds =
           appProperty.getBuyerTokenExpiredSeconds() == null
@@ -155,10 +162,16 @@ public class BuyerService extends AssetStatusManager {
               : Long.valueOf(appProperty.getBuyerTokenExpiredSeconds());
     }
     BuyerAssetDto.BuyerToken buyerToken = new BuyerAssetDto.BuyerToken();
+    Map<String, Object> claims = new HashMap<>();
+    if (StringUtils.isNotBlank(envId)) {
+      Environment environment = environmentService.findOne(envId);
+      log.info("generateBuyerToken, envId:{}, envName:{}", envId, environment.getName());
+      claims.put("env", environment.getName());
+    }
     if (authServer.isEnabled()) {
       String token =
           JwtEncoderToolkit.get(authServer.getJwt())
-              .generateToken(buyerId, null, tokenExpiredInSeconds);
+              .generateToken(buyerId, claims, tokenExpiredInSeconds);
       buyerToken.setExpiredAt(
           Date.from(ZonedDateTime.now().plusSeconds(tokenExpiredInSeconds).toInstant()));
       buyerToken.setAccessToken(token);
