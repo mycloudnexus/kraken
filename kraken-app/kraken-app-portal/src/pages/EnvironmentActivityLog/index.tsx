@@ -183,6 +183,7 @@ const EnvironmentActivityLog = () => {
         <Flex align="center" className={styles.filterWrapper} ref={ref}>
           <Form
             initialValues={{ envId }}
+            style={{ gap: 5 }}
             form={form}
             layout="inline"
             colon={false}
@@ -194,7 +195,6 @@ const EnvironmentActivityLog = () => {
                 options={envOptions}
                 popupMatchSelectWidth={false}
                 style={{ minWidth: 100, maxWidth: 120 }}
-                size="small"
                 placeholder="All"
               />
             </Form.Item>
@@ -203,7 +203,6 @@ const EnvironmentActivityLog = () => {
                 options={statusCodeOptions}
                 placeholder="All"
                 popupMatchSelectWidth={false}
-                size="small"
                 style={{ minWidth: 100 }}
                 allowClear
               />
@@ -211,7 +210,6 @@ const EnvironmentActivityLog = () => {
 
             <Form.Item label="Time range from" name="requestTime">
               <RangePicker
-                size="small"
                 placeholder={["Select time", "Select time"]}
               />
             </Form.Item>
@@ -223,7 +221,6 @@ const EnvironmentActivityLog = () => {
                     options={methodOptions}
                     placeholder="All"
                     popupMatchSelectWidth={false}
-                    size="small"
                     allowClear
                   />
                 </Form.Item>
@@ -231,7 +228,6 @@ const EnvironmentActivityLog = () => {
                   <Input
                     className={styles.inputPath}
                     placeholder="Input path"
-                    size="small"
                     onChange={debounceFn}
                   />
                 </Form.Item>

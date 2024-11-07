@@ -2,20 +2,6 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-
-  > :global(.ant-collapse-item:not(:last-child)) {
-    margin-bottom: 16px;
-
-    > :global(.ant-collapse-header) {
-      padding: 0;
-    }
-
-    > :global(.ant-collapse-content) {
-      > :global(.ant-collapse-content-box) {
-        padding: 8px 0 0;
-      }
-    }
-  }
 }
 
 .title {
@@ -99,9 +85,14 @@
 }
 
 .container {
-  padding: 16px;
   flex: 1;
   overflow-y: auto;
+
+  :global {
+    .ant-collapse-header {
+      padding-bottom: 0 !important;
+    }
+  }
 }
 
 .footer {

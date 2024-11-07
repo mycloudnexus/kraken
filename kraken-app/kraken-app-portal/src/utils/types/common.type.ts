@@ -84,3 +84,9 @@ export enum EnumRightType {
 }
 
 export type ActiveTabType = "request" | "response";
+
+export interface IPagination {
+  page: number;
+  size: number;
+  total: number;
+}

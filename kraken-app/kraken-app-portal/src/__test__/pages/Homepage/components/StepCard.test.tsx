@@ -1,14 +1,14 @@
-import { render } from "@testing-library/react";
-import { QueryClientProvider } from "@tanstack/react-query";
+import QuickStartGuide from "@/pages/HomePage/components/QuickStartGuide";
 import { queryClient } from "@/utils/helpers/reactQuery";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { render } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
-import StepCard from "@/pages/HomePage/components/StepCard";
 
 test("StepCard test", () => {
   const { container } = render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <StepCard navigateApi={vi.fn()} navigateCreateAPI={vi.fn()} />
+        <QuickStartGuide />
       </BrowserRouter>
     </QueryClientProvider>
   );

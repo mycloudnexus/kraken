@@ -43,6 +43,7 @@ import {
   getAPIServers,
   getComponentDetailV2,
 } from "@/services/products";
+import { STALE_TIME } from "@/utils/constants/common";
 import {
   COMPONENT_KIND_API,
   COMPONENT_KIND_API_SPEC,
@@ -71,6 +72,10 @@ import {
   IRunningComponentItem,
 } from "@/utils/types/env.type";
 import { IEnvComponent } from "@/utils/types/envComponent.type";
+import {
+  IApiMapperDeployment,
+  IDeploymentHistory,
+} from "@/utils/types/product.type";
 import { useMutation, useQuery, useQueries } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { get } from "lodash";
@@ -227,6 +232,7 @@ export const useGetProductEnvs = (productId: string, enabled = true) => {
     queryFn: () => getListEnvs(productId),
     enabled: enabled && Boolean(productId),
     select: (data) => data.data,
+    staleTime: STALE_TIME,
   });
 };
 
@@ -539,11 +545,12 @@ export const useGetAPIDeployments = (
   productId: string,
   params: Record<string, any>
 ) => {
-  return useQuery<any, Error>({
+  return useQuery<any, Error, IPagingData<IDeploymentHistory>>({
     queryKey: [PRODUCT_CACHE_KEYS.get_list_api_deployments, productId, params],
     queryFn: () => getAPIMapperDeployments(productId, params),
     enabled: Boolean(productId),
     select: (data) => data?.data,
+    staleTime: STALE_TIME,
   });
 };
 
@@ -608,11 +615,12 @@ export const useGetLatestRunningList = (
   productId: string,
   mapperKey: string
 ) => {
-  return useQuery<any, Error>({
+  return useQuery<any, Error, IApiMapperDeployment[]>({
     queryKey: [PRODUCT_CACHE_KEYS.get_running_api_list, productId, mapperKey],
     queryFn: () => getLatestRunningAPI(productId, mapperKey),
     enabled: Boolean(productId) && Boolean(mapperKey),
     select: (data) => data?.data,
+    staleTime: STALE_TIME,
   });
 };
 

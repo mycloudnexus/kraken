@@ -1,0 +1,15 @@
+.customDrawer {
+  :global {
+    .ant-drawer-header-title .ant-drawer-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 16px;
+      font-weight: 500;
+
+      .anticon {
+        cursor: pointer;
+      }
+    }
+  }
+}
