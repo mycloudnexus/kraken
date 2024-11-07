@@ -1,0 +1,22 @@
+---
+kind: kraken.product.compatibility
+apiVersion: v1
+metadata:
+  key: mef.sonata.compatibility
+  name: MEF Sonata API Compatibility
+  labels:
+    mef-api-release: grace
+  version: 2
+spec:
+  compatibility:
+    1.1.0:
+      - 1.1.x
+    1.2.0-snapshot:
+      - 1.1.x
+      - 1.2.x
+      - 1.5.x
+    1.2.0:
+      - 1.1.x
+      - 1.2.x
+      - 1.5.x
+
