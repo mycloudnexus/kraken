@@ -22,6 +22,10 @@ type Props = {
   props: DiagramProps;
 };
 
+const legendFormatter = (value: string) => (
+  <span className={styles.errorBrakedownLegend}>{value}</span>
+);
+
 const ErrorDiagram = ({ errorData }: { errorData: Array<unknown> }) => (
   <ResponsiveContainer width="100%" height="100%">
     <BarChart data={errorData}>
@@ -33,11 +37,7 @@ const ErrorDiagram = ({ errorData }: { errorData: Array<unknown> }) => (
       />
       <YAxis stroke="0px" tick={{ fill: "#96A5B8" }} />
       <Tooltip labelFormatter={formatDiagramDate} />
-      <Legend
-        formatter={(value: string) => (
-          <span className={styles.errorBrakedownLegend}>{value}</span>
-        )}
-      />
+      <Legend formatter={legendFormatter} />
       {["500", "404", "401", "400"].map((key, index) => (
         <Bar
           key={key}

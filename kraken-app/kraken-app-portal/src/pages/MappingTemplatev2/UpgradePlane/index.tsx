@@ -107,7 +107,6 @@ export default function UpgradePlane() {
     },
   });
 
-  // @TODO: Available environment name for now: stage | production
   const stageEnvId = useMemo(() => findEnvByName("stage")?.id, [findEnvByName]);
   const productEnvId = useMemo(
     () => findEnvByName("production")?.id,

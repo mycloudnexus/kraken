@@ -5,14 +5,14 @@ import SelectAPI from "../SelectAPI";
 import SelectResponseProperty from "../SelectResponseProperty";
 import SonataResponseMapping from "../SonataResponseMapping";
 
-type RightSideProps = {
+type RightSideProps = Readonly<{
   rightSide: number;
   jsonSpec: any;
   method: string;
   handleSelectSonataProp: (value: any) => void;
   handleSelectSellerProp: (value: any) => void;
   isRequiredMapping: boolean;
-};
+}>;
 
 export function RightSide({
   rightSide,

@@ -38,7 +38,7 @@ const APIServerDrawer = ({ item, isOpen, onClose }: Props) => {
   const navigate = useNavigate();
   const { data: componentDetail, isLoading } = useGetComponentSpecDetails(
     currentProduct,
-    item?.metadata?.key || ""
+    item?.metadata?.key ?? ""
   );
 
   const columns = useMemo(
