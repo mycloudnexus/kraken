@@ -96,7 +96,7 @@ spec:
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.inventory.eline.read.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.inventory.uni.list.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.inventory.eline.list.yaml
-    - classpath:/mef-sonata/template-upgrade/release.1.5.1.yaml
+    - classpath:/mef-sonata/template-upgrade/release.1.5.5.yaml
 
 
   templateUpgradePaths:

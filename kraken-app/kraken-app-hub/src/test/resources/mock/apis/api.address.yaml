@@ -142,9 +142,12 @@ links:
   - targetAssetKey: mef.sonata.api-target-mapper.address.validate
     relationship: implementation.target-mapper
     group: mef.sonata.api-target.address.validate
-  - targetAssetKey: mef.sonata.api.matrix.address.validate
+  - targetAssetKey: mef.sonata.api.matrix.address.validation
     relationship: implementation.matrix
     group: mef.sonata.api-target.address.validate
   - targetAssetKey: mef.sonata.api-target-mapper.address.retrieve
     relationship: implementation.target-mapper
     group: mef.sonata.api-target.address.retrieve
+
+
+

@@ -2,10 +2,10 @@
 kind: kraken.component.api-target
 apiVersion: v1
 metadata:
-  key: mef.sonata.api-target.quote.uni.add.sync
+  key: mef.sonata.api-target.quote.uni.add
   name: Quote Management API
-  mapperKey: mef.sonata.api-target-mapper.quote.uni.add.sync
-  version: 4
+  mapperKey: mef.sonata.api-target-mapper.quote.uni.add
+  version: 1
 spec:
   inputs:
     - mefQuery
@@ -18,40 +18,27 @@ spec:
     actionType: add
   endpoints:
     - id: create quote for port
-      path:
-      method:
-      requestBody: |
-        {}
+      path: ""
+      method: ""
+      requestBody: ${mefRequestBody.quoteItem[0].product.productConfiguration.uni}
       responseBody: |
         {
           "id": "${entity.id}",
           "buyerRequestedQuoteLevel": "${mefRequestBody.buyerRequestedQuoteLevel}",
-          "relatedContactInformation": "${T(com.consoleconnect.kraken.operator.gateway.func.SpelFunc).appendSellerInformation('sellerContactInformation', env.seller.name, env.seller.emailAddress, env.seller.number, mefRequestBody[relatedContactInformation]?:'')}",
+          "relatedContactInformation": "${T(com.consoleconnect.kraken.operator.gateway.func.SpelFunc).appendSellerInformation('sellerContactInformation', env.seller.name, env.seller.emailAddress, env.seller.number, mefRequestBody.relatedContactInformation)}",
           "quoteItem": [
             {
-              "requestedQuoteItemTerm": "${mefRequestBody.quoteItem[0].requestedQuoteItemTerm}",
+              "quoteItem": "${mefRequestBody.quoteItem[0].requestedQuoteItemTerm}}",
+              "requestedQuoteItemTerm": "${mefRequestBody.quoteItem[0].requestedQuoteItemTerm}}",
               "product": "${mefRequestBody.quoteItem[0].product}",
-              "action": "add",
-              "id": "${mefRequestBody.quoteItem[0].id}",
-              "state": "((mefResponseBody.quoteItem[0].quoteItemPrice[0].price.dutyFreeAmount.value == '' ? 'unableToProvide': 'approved.orderable'))",
-              "quoteItemTerm": "${T(java.util.Arrays).asList(mefRequestBody.quoteItem[0].requestedQuoteItemTerm)}",
+              "state": "",
               "quoteItemPrice": [{
-                "unitOfMeasure":"",
                 "price": {
                   "dutyFreeAmount": {
-                     "unit": "",
-                     "value": ""
-                  },
-                  "taxRate":"",
-                  "taxIncludedAmount": {
                     "unit": "",
                     "value": ""
                   }
-                },
-                "name":"",
-                "priceType":"",
-                "description":"",
-                "recurringChargePeriod":""
+                }
               }]
             }
           ],

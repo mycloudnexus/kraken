@@ -31,6 +31,12 @@ spec:
             "externalId":"${entity.request[externalId]?:''}",
             "productRelationship":"${entity.request.productOrderItem[0].product.productRelationship}",
             "billingAccount":"${entity.request.productOrderItem[0].billingAccount}",
-            "productOrderItem":"${entity.renderedResponse.productOrderItem}"
+            "productOrderItem":[
+              {
+                "productOrderHref":"",
+                "productOrderItemId":"${entity.renderedResponse.productOrderItem[0]['id']}",
+                "productOrderId":"${entity.renderedResponse['orderId']}"
+              }
+            ]
           }
         ]

@@ -890,7 +890,7 @@ public class TemplateUpgradeService {
     if (!SystemStateEnum.CAN_UPGRADE_STATES.contains(systemInfo.getStatus())) {
       throw KrakenException.badRequest("The current system status does not support upgrade");
     }
-    checkIsLatestUpgrade(event.getTemplateUpgradeId());
+    checkIsLatestUpgrade(event.getTemplateUpgradeId(), true);
     List<ApiMapperDeploymentDTO> stageRunningMappers =
         productDeploymentService.listRunningApiMapperDeploymentV3(event.getEnvId());
     List<String> runningMapperKeys =
@@ -1015,7 +1015,7 @@ public class TemplateUpgradeService {
       throw KrakenException.badRequest(
           "System state is:" + systemInfo.getStatus() + ". Not allowed to production upgrade");
     }
-    checkIsLatestUpgrade(templateUpgradeId);
+    checkIsLatestUpgrade(templateUpgradeId, true);
     return deployProduction(templateUpgradeId, stageEnvId, productionEnvId, userId);
   }
 
@@ -1055,7 +1055,8 @@ public class TemplateUpgradeService {
     return templateUpgradeReleaseVO;
   }
 
-  private void checkIsLatestUpgrade(String currentTemplateUpgradeId) {
+  private boolean checkIsLatestUpgrade(
+      String currentTemplateUpgradeId, boolean shouldThrowException) {
     UnifiedAssetDto latestControlPlaneDeployment =
         unifiedAssetService
             .findBySpecification(
@@ -1073,16 +1074,21 @@ public class TemplateUpgradeService {
             .getLabels()
             .get(LabelConstants.LABEL_APP_TEMPLATE_UPGRADE_ID);
     if (!StringUtils.equals(expectedTemplateUpgradeId, currentTemplateUpgradeId)) {
-      throw KrakenException.badRequest(
-          "This mapping template is deprecated.A newer version mapping template started to upgrade.");
+      if (shouldThrowException) {
+        throw KrakenException.badRequest(
+            "This mapping template is deprecated.A newer version mapping template started to upgrade.");
+      } else {
+        return true;
+      }
     }
+    return false;
   }
 
-  public List<String> stageCheck(String templateUpgradeId, String stageEnvId) {
-    List<String> resultList = new ArrayList<>();
+  public TemplateUpgradeCheckDTO stageCheck(String templateUpgradeId, String stageEnvId) {
+    TemplateUpgradeCheckDTO templateUpgradeCheckDTO = new TemplateUpgradeCheckDTO();
     Environment environment = environmentService.findOne(stageEnvId);
     if (!environment.getName().equalsIgnoreCase(EnvNameEnum.STAGE.name())) {
-      resultList.add("error environment: not stage environment");
+      throw KrakenException.badRequest("error environment: not stage environment");
     }
     List<ApiMapperDeploymentDTO> stageRunningMappers =
         productDeploymentService.listRunningApiMapperDeploymentV3(stageEnvId);
@@ -1094,34 +1100,20 @@ public class TemplateUpgradeService {
             .filter(t -> runningMapperKeys.contains(t.getTargetMapperKey()))
             .anyMatch(
                 t -> t.getMappingStatus().equalsIgnoreCase(MappingStatusEnum.INCOMPLETE.getDesc()));
-    if (existedInCompleted) {
-      resultList.add(
-          "Please adjust and complete the incomplete mapping use cases that will be upgraded to data plane.");
-    }
-    try {
-      checkIsLatestUpgrade(templateUpgradeId);
-    } catch (Exception e) {
-      resultList.add(e.getMessage());
-    }
-    return resultList;
+    templateUpgradeCheckDTO.setMapperCompleted(!existedInCompleted);
+    templateUpgradeCheckDTO.setNewerTemplate(checkIsLatestUpgrade(templateUpgradeId, false));
+    return templateUpgradeCheckDTO;
   }
 
-  public List<String> productionCheck(String templateUpgradeId, String productionEnvId) {
-    List<String> resultList = new ArrayList<>();
+  public TemplateUpgradeCheckDTO productionCheck(String templateUpgradeId, String productionEnvId) {
+    TemplateUpgradeCheckDTO templateUpgradeCheckDTO = new TemplateUpgradeCheckDTO();
     Environment environment = environmentService.findOne(productionEnvId);
     if (!environment.getName().equalsIgnoreCase(EnvNameEnum.PRODUCTION.name())) {
-      resultList.add("error environment: not production environment");
+      throw KrakenException.badRequest("error environment: not production environment");
     }
-    if (!checkStageCompatibility(templateUpgradeId)) {
-      resultList.add(
-          "Kraken version running in stage data plane is not compatible with this mapping template. Please upgrade kraken in stage data plane and Start verification");
-    }
-    try {
-      checkIsLatestUpgrade(templateUpgradeId);
-    } catch (Exception e) {
-      resultList.add(e.getMessage());
-    }
-    return resultList;
+    templateUpgradeCheckDTO.setCompatible(checkStageCompatibility(templateUpgradeId));
+    templateUpgradeCheckDTO.setNewerTemplate(checkIsLatestUpgrade(templateUpgradeId, false));
+    return templateUpgradeCheckDTO;
   }
 
   public boolean checkStageCompatibility(String templateUpgradeId) {

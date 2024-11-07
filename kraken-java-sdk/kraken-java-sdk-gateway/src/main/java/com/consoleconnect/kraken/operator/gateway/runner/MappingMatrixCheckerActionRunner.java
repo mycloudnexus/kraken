@@ -107,13 +107,8 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner {
           MESSAGE_ALERT.formatted(":lack in check rules for target key: " + targetKey));
     }
     // check enable/disable
-    Optional<PathCheck> enabledOpt =
-        facets.get(targetKey).stream()
-            .filter(check -> CHECK_NAME_ENABLED.equalsIgnoreCase(check.name))
-            .findFirst();
-    if (enabledOpt.isPresent() && enabledOpt.get().value.equals("false")) {
-      throw KrakenException.badRequest(MESSAGE_ALERT.formatted(":disabled"));
-    }
+    enableChecking(facets, targetKey);
+
     if (unifiedAssetRepository.findOneByKey(targetKey).isEmpty()) {
       throw KrakenException.badRequest(MESSAGE_ALERT.formatted(":not deployed"));
     }
@@ -141,13 +136,29 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner {
     }
   }
 
+  public void enableChecking(Map<String, List<PathCheck>> facets, String targetKey) {
+    Optional<PathCheck> enabledOpt =
+        facets.get(targetKey).stream()
+            .filter(check -> CHECK_NAME_ENABLED.equalsIgnoreCase(check.name))
+            .findFirst();
+    if (enabledOpt.isPresent() && "false".equals(enabledOpt.get().value)) {
+      if (Objects.isNull(enabledOpt.get().errorMsg)) {
+        throw KrakenException.badRequest(MESSAGE_ALERT.formatted(":disabled"));
+      } else {
+        throw KrakenException.badRequest(enabledOpt.get().errorMsg);
+      }
+    }
+  }
+
   public boolean check(DocumentContext documentContext, PathCheck pathCheck) {
     Object realValue = null;
     try {
       realValue = documentContext.read(pathCheck.path());
     } catch (Exception e) {
       log.error("read json path error!");
-      throwException(pathCheck, String.format("path %s not exist in request.", pathCheck.name));
+      throwException(
+          pathCheck,
+          String.format("The parameter %s does not exist in the request.", pathCheck.name));
     }
     if (realValue instanceof JSONArray array) {
       return array.stream().allMatch(value -> checkExpect(pathCheck, value));

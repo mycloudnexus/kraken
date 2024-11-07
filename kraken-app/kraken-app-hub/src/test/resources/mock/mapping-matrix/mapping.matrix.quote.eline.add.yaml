@@ -13,6 +13,7 @@ spec:
       - name: enabled
         expectType: EXPECTED
         value: false
+        errorMsg: "api use case is not supported : disabled : instantSyncQuote==false"
       - name: product_type_eline
         path: "$.body.quoteItem[*].product.productConfiguration.['@type']"
         expectType: EXPECTED
