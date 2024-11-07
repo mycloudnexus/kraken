@@ -170,4 +170,13 @@ spec:
             sourceLocation: BODY
             targetLocation: BODY
             requiredMapping: false
+          - name: mapper.order.uni.add.product.id
+            title: product instance id
+            description: ""
+            source: ""
+            sourceLocation: BODY
+            target: "@{{productOrderItem[0].product.id}}"
+            targetLocation: BODY
+            customizedField: false
+            requiredMapping: false
 

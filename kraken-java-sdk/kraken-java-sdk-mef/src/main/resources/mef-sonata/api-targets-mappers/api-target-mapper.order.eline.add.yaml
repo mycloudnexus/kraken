@@ -16,6 +16,7 @@ spec:
     - id: create connection order
       path: ""
       method: ""
+      serverKey: ""
       mappers:
         request:
           - name: mapper.order.eline.add.buyerId
@@ -178,5 +179,14 @@ spec:
             targetLocation: BODY
             customizedField: false
             requiredMapping: false
-      serverKey: ""
+          - name: mapper.order.eline.add.product.id
+            title: product instance id
+            description: ""
+            source: ""
+            sourceLocation: BODY
+            target: "@{{productOrderItem[0].product.id}}"
+            targetLocation: BODY
+            customizedField: false
+            requiredMapping: false
+
 
