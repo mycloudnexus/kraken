@@ -11,6 +11,7 @@ export function StartUpgradeModal({
       width={416}
       okText="Yes, continue"
       centered
+      closeIcon={<></>}
       onCancel={onCancel}
     >
       <Flex vertical gap={8}>

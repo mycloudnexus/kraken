@@ -11,9 +11,8 @@ import {
   stageTemplateUpgrade,
 } from "@/services/mappingTemplate";
 import { STALE_TIME } from "@/utils/constants/common";
-import { queryClient } from "@/utils/helpers/reactQuery";
 import { IPagingData } from "@/utils/types/common.type";
-import { IRunningMapping } from "@/utils/types/env.type";
+import { DataPlaneUpgradeCheck, IRunningMapping } from "@/utils/types/env.type";
 import { IApiUseCase, IReleaseHistory } from "@/utils/types/product.type";
 import {
   InfiniteData,
@@ -132,24 +131,13 @@ export function useControlPlaneTemplateUpgrade(
   productId: string,
   {
     onError,
-    onSuccess,
-  }: { onSuccess(message: string): void; onError(message: string): void }
+  }: { onSuccess?: (message: string) => void; onError?: (message: string) => void }
 ) {
   return useMutation<AxiosResponse, Error, { templateUpgradeId: string }>({
     mutationKey: [MTQueryKey.CONTROL_PLANE_TEMPLATE_UPGRADE, productId],
     mutationFn: (data) => controlPlaneTemplateUpgrade(productId, data),
-    onSuccess() {
-      onSuccess("Control plane upgrade successfully");
-      queryClient.invalidateQueries({
-        queryKey: [
-          MTQueryKey.LIST_TEMPLATE_UPGRADE_API_USE_CASE,
-          MTQueryKey.LIST_API_USE_CASE,
-          productId,
-        ],
-      });
-    },
     onError(error: any) {
-      onError(error.reason);
+      onError?.(error.reason);
     },
   });
 }
@@ -158,8 +146,7 @@ export function useStageTemplateUpgrade(
   productId: string,
   {
     onError,
-    onSuccess,
-  }: { onSuccess(message: string): void; onError(message: string): void }
+  }: { onSuccess?: (message: string) => void; onError?: (message: string) => void }
 ) {
   return useMutation<
     AxiosResponse,
@@ -168,13 +155,8 @@ export function useStageTemplateUpgrade(
   >({
     mutationKey: [MTQueryKey.STAGE_TEMPLATE_UPGRADE, productId],
     mutationFn: (data) => stageTemplateUpgrade(productId, data),
-    onSuccess() {
-      onSuccess(
-        "Mapping template upgrade successfully and effective now in stage data plane. Please test offline and ensure they can work properly."
-      );
-    },
     onError(error: any) {
-      onError(error.reason);
+      onError?.(error.reason);
     },
   });
 }
@@ -183,8 +165,7 @@ export function useProductionTemplateUpgrade(
   productId: string,
   {
     onError,
-    onSuccess,
-  }: { onSuccess(message: string): void; onError(message: string): void }
+  }: { onSuccess?: (message: string) => void; onError?: (message: string) => void }
 ) {
   return useMutation<
     AxiosResponse,
@@ -193,13 +174,8 @@ export function useProductionTemplateUpgrade(
   >({
     mutationKey: [MTQueryKey.PRODUCTION_TEMPLATE_UPGRADE, productId],
     mutationFn: (data) => productionTemplateUpgrade(productId, data),
-    onSuccess() {
-      onSuccess(
-        "Mapping template upgrade successfully and effective now in production data plane. "
-      );
-    },
     onError(error: any) {
-      onError(error.reason);
+      onError?.(error.reason);
     },
   });
 }
@@ -211,7 +187,7 @@ export function useStageUpgradeCheck(
   envId: string,
   config: Record<string, any> = {}
 ) {
-  return useQuery<AxiosResponse, Error, string[]>({
+  return useQuery<AxiosResponse, Error, DataPlaneUpgradeCheck>({
     queryKey: [
       MTQueryKey.CHECK_STAGE_PRE_UPGRADE,
       productId,
@@ -232,7 +208,7 @@ export function useProductionUpgradeCheck(
   envId: string,
   config: Record<string, any> = {}
 ) {
-  return useQuery<AxiosResponse, Error, string[]>({
+  return useQuery<AxiosResponse, Error, DataPlaneUpgradeCheck>({
     queryKey: [
       MTQueryKey.CHECK_PRODUCTION_PRE_UPGRADE,
       productId,

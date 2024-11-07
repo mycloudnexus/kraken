@@ -104,12 +104,6 @@
 .incompleteMapping {
   background-color: var(--panel-hover-bg);
   cursor: pointer;
-
-  :global {
-    .ant-typography {
-      color: var(--primary);
-    }
-  }
 }
 
 .upgradeIcon {
