@@ -41,26 +41,41 @@ spec:
                 console.log("input: " + jsonStr);
                 let input = JSON.parse(jsonStr);
                 let targetAPIConfigKey = '';
-                if(input.productOrderItem['product']['productConfiguration']['@type'] == 'UNI' && input.productOrderItem['action'] == 'add') {
+                let matrixConfigKey = '';
+                let errorMsg = '';
+                let type = input.productOrderItem['product']['productConfiguration']['@type'];
+                let action = input.productOrderItem['action'];
+                let typeArr = ['UNI', 'ACCESS_E_LINE'];
+                let actionArr = ['add', 'delete'];
+                if(type == 'UNI' && action == 'add') {
                   targetAPIConfigKey = 'mef.sonata.api-target.order.uni.add';
                   matrixConfigKey = 'mef.sonata.api.matrix.order.uni.add'
-                } else if(input.productOrderItem['product']['productConfiguration']['@type'] == 'ACCESS_E_LINE' && input.productOrderItem['action'] == 'add') {
+                } else if(type == 'ACCESS_E_LINE' && action == 'add') {
                   targetAPIConfigKey = 'mef.sonata.api-target.order.eline.add';
                   matrixConfigKey = 'mef.sonata.api.matrix.order.eline.add'
-                } else if(input.productOrderItem['product']['productConfiguration']['@type'] == 'UNI' && input.productOrderItem['action'] == 'delete') {
+                } else if(type == 'UNI' && action == 'delete') {
                   targetAPIConfigKey = 'mef.sonata.api-target.order.uni.delete';
                   matrixConfigKey = 'mef.sonata.api.matrix.order.uni.delete'
-                } else if(input.productOrderItem['product']['productConfiguration']['@type'] == 'ACCESS_E_LINE' && input.productOrderItem['action'] == 'delete') {
+                } else if(type == 'ACCESS_E_LINE' && action == 'delete') {
                   targetAPIConfigKey = 'mef.sonata.api-target.order.eline.delete';
                   matrixConfigKey = 'mef.sonata.api.matrix.order.eline.delete'
                 } else {
+                  errorArr = ['api use case is not supported :'];
+                  if (!typeArr.includes(type)){
+                    errorArr.push(`expect productOrderItem.product.productConfiguration.@type in [ ${typeArr} ], but ${type}.`);
+                  }
+                  if (!actionArr.includes(action)) {
+                    errorArr.push(`expect productOrderItem.action in [ ${actionArr} ], but ${action}`)
+                  }
+                  errorMsg = errorArr.join(' ');
                   targetAPIConfigKey = 'targetKey:notFound';
                 }
                 let ret = {
                   orderType: input.productOrderItem['product']['productConfiguration']['@type'],
                   orderAction: input.productOrderItem['action'],
                   targetAPIConfigKey: targetAPIConfigKey,
-                  matrixConfigKey: matrixConfigKey
+                  matrixConfigKey: matrixConfigKey,
+                  errorMsg: errorMsg
                 };
                 return JSON.stringify(ret);
               }
@@ -98,7 +113,6 @@ spec:
           env:
             path: ${targetApiConfig.endpoints[0].path}
             method: ${targetApiConfig.endpoints[0].method}
-
         - id: modify-request-body
           actionType: buildin@modify-request-body
           env:
