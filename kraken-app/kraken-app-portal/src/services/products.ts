@@ -370,3 +370,15 @@ export const regenerateBuyerAccessToken = (productId: string, id: string) => {
     method: "POST",
   });
 };
+
+export const getValidateServerName = (
+  productId: string,
+  name: string
+) => {
+  return request(
+    `/v2${PRODUCT}/${productId}/components/${productId}/api-servers/${name}`,
+    {
+      method: "GET",
+    }
+  );
+};

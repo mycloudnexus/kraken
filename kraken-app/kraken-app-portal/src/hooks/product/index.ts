@@ -42,6 +42,7 @@ import {
   deleteAPIServer,
   getAPIServers,
   getComponentDetailV2,
+  getValidateServerName,
 } from "@/services/products";
 import { STALE_TIME } from "@/utils/constants/common";
 import {
@@ -75,6 +76,7 @@ import { IEnvComponent } from "@/utils/types/envComponent.type";
 import {
   IApiMapperDeployment,
   IDeploymentHistory,
+  IProductIdAndNameParams,
 } from "@/utils/types/product.type";
 import { useMutation, useQuery, useQueries } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
@@ -127,6 +129,7 @@ export const PRODUCT_CACHE_KEYS = {
   update_target_mapper: "update_target_mapper",
   upgrade_mapping_template_production: "upgrade_mapping_template_production",
   upgrade_mapping_template_stage: "upgrade_mapping_template_stage",
+  get_validate_api_server_name: "get_validate_api_server_name",
   verify_product: "verify_product",
 };
 
@@ -729,5 +732,18 @@ export const useRegenToken = () => {
         queryKey: [PRODUCT_CACHE_KEYS.get_buyer_list],
       });
     },
+  });
+};
+
+export const useGetValidateServerName = () => {
+  return useMutation<any, Error, IProductIdAndNameParams>({
+    mutationKey: [PRODUCT_CACHE_KEYS.get_validate_api_server_name],
+    mutationFn: ({ productId, name }: IProductIdAndNameParams) =>
+      getValidateServerName(productId, name),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [PRODUCT_CACHE_KEYS.get_validate_api_server_name],
+      });
+    }
   });
 };
