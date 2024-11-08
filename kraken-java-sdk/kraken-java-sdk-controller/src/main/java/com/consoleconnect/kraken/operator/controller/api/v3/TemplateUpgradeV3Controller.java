@@ -120,7 +120,7 @@ public class TemplateUpgradeV3Controller {
     TemplateUpgradeReleaseVO first =
         unifiedAssetService
             .findLatest(uuid, AssetKindEnum.PRODUCT_TEMPLATE_UPGRADE)
-            .map(t -> UnifiedAssetService.toAsset(t, false))
+            .map(t -> unifiedAssetService.findOne(t.getId().toString()))
             .map(templateUpgradeService::generateTemplateUpgradeReleaseVO)
             .orElse(null);
     List<Tuple2> tuple3s = Tuple2.ofList(LabelConstants.LABEL_FIRST_UPGRADE, CONDITION_NULL);
