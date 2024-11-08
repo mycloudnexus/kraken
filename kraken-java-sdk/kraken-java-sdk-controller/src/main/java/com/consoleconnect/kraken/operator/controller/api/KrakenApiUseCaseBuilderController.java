@@ -1,9 +1,6 @@
 package com.consoleconnect.kraken.operator.controller.api;
 
-import static com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants.*;
-
 import com.consoleconnect.kraken.operator.controller.service.KrakenVersionSpecificationBuildService;
-import com.consoleconnect.kraken.operator.core.toolkit.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
