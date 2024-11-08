@@ -41,8 +41,10 @@ spec:
           - name: mapper.order.eline.read.state
             title: ProductOrderState
             source: '@{{status}}'
+            sourceLocation: BODY
             target: '@{{state}}'
             targetType: enum
+            targetLocation: BODY
             description: ''
             replaceStar: true
             targetValues:
@@ -65,8 +67,6 @@ spec:
               ACCEPTED: acknowledged
               CREATING: inProgress
               DISABLED: completed
-            sourceLocation: BODY
-            targetLocation: BODY
             customizedField: false
             requiredMapping: true
           - name: mapper.order.eline.read.completionDate
