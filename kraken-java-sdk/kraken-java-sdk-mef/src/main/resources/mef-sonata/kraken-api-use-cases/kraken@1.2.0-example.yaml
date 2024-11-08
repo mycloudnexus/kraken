@@ -2,10 +2,10 @@
 kind: kraken.product.app.kraken
 apiVersion: v1
 metadata:
-  name: Kraken App 1.2.0-snapshot
-  key: kraken@1.2.0-snapshot
+  name: Kraken App 1.2.0-example
+  key: kraken@1.2.0-example
   labels:
-    appVersion: 1.2.0-snapshot
+    appVersion: 1.2.0-example
     productVersion: V1.4.10
     productKey: mef.sonata
     productSpec: grace
