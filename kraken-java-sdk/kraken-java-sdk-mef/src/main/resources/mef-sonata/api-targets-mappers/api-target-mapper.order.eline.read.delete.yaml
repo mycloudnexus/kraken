@@ -53,7 +53,7 @@ spec:
               - inProgress
               - partial
               - rejected
-            valueMapping: { }
+            valueMapping: {}
             source: ""
             sourceLocation: "BODY"
           - name: mapper.order.eline.read.delete.completionDate

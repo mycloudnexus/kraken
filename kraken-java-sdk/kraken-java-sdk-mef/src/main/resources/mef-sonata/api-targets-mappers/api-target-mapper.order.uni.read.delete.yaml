@@ -54,7 +54,7 @@ spec:
               - inProgress
               - partial
               - rejected
-            valueMapping: { }
+            valueMapping: {}
             source: ""
             sourceLocation: "BODY"
           - name: mapper.order.uni.read.delete.completionDate
