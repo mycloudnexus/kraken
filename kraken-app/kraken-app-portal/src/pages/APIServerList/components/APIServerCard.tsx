@@ -184,7 +184,7 @@ const APIServerCard = ({ item, refetchList }: Props) => {
             </Flex>
             <Flex vertical gap={8} align="flex-start" style={{ marginTop: 12 }}>
               {environmentData?.map((e) => (
-                <Flex gap={8} justify="flex-start" key={e.name} style={{ alignItems: 'center' }}>
+                <Flex gap={8} justify="flex-start" key={e.name} align="center">
                   <Text.LightMedium style={{ display: 'inline-block', width: 120, textAlign: 'left' }}>
                     {e.name}
                   </Text.LightMedium>
