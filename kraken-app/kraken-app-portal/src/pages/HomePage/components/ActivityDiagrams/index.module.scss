@@ -1,0 +1,40 @@
+.wrapper {
+  margin-top: 20px;
+  background: #fff;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.contentBox {
+  padding: 15px;
+  height: 30vh;
+  border: 1px solid rgba(221, 225, 229, 1);
+  border-radius: 8px;
+}
+
+.overflow {
+  overflow: scroll;
+}
+
+.errorBrakedownLegend {
+  border-right: 1px solid #e7e7e7;
+  padding-right: 8px;
+  color: #96a5b8;
+}
+
+.table {
+  :global {
+    .ant-table-thead .ant-table-cell {
+      background-color: transparent !important;
+      color: rgba(0, 0, 0, 0.45);
+      font-weight: 400;
+      border: none !important;
+      &::before {
+        background-color: transparent !important;
+      }
+    }
+    .ant-table-cell {
+      border: none !important;
+    }
+  }
+}

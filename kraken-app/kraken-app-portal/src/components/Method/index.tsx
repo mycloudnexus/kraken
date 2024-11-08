@@ -20,6 +20,7 @@ const RequestMethod = ({ method = "", noSpace = false, disabled = false }) => {
 
   return (
     <Tag
+      data-testid="method"
       className={disabled ? styles.disabled : ""}
       bordered={false}
       color={methodColor}

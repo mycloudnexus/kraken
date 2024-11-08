@@ -1,4 +1,5 @@
 import ExampleValueModal from "@/components/ExampleValueModal";
+import { Text } from "@/components/Text";
 import TypeTag from "@/components/TypeTag";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import {
@@ -161,7 +162,7 @@ export const useCommonAddProp = ({
                     });
                   }}
                 >
-                  {parameter.name}
+                  <Text.LightMedium ellipsis>{parameter.name}</Text.LightMedium>
                   <Flex justify="flex-end" align="center">
                     {parameter?.schema?.type?.toLowerCase?.() === "object" ? (
                       <Button
@@ -237,7 +238,7 @@ export const useCommonAddProp = ({
                     });
                   }}
                 >
-                  {parameter.name}
+                  <Text.LightMedium ellipsis>{parameter.name}</Text.LightMedium>
                   <Flex justify="flex-end" align="center">
                     {parameter?.schema?.type?.toLowerCase?.() === "object" ? (
                       <Button

@@ -1,4 +1,7 @@
+import { Tooltip } from "antd";
+import classNames from "classnames";
 import { HTMLAttributes, ReactNode, CSSProperties } from "react";
+import styles from "./index.module.scss";
 
 export interface TextProps extends HTMLAttributes<HTMLElement> {
   children?: ReactNode;
@@ -9,6 +12,7 @@ export interface TextProps extends HTMLAttributes<HTMLElement> {
   className?: string;
   lineHeight?: string;
   fontStyle?: "normal" | "italic" | "oblique" | "initial" | "inherit";
+  ellipsis?: boolean;
 }
 
 export const Custom = ({
@@ -18,24 +22,27 @@ export const Custom = ({
   color = "var(--gray-10)",
   style,
   className,
-  lineHeight,
   fontStyle = "normal",
+  ellipsis,
   ...props
 }: TextProps) => {
   return (
-    <span
-      {...props}
-      style={{
-        fontSize: size,
-        fontWeight: bold,
-        color,
-        lineHeight,
-        fontStyle,
-        ...style,
-      }}
-      className={className}
-    >
-      {children}
-    </span>
+    <Tooltip title={ellipsis && children}>
+      <span
+        {...props}
+        style={{
+          ...style,
+          fontSize: size,
+          fontWeight: bold,
+          color,
+          fontStyle,
+        }}
+        className={classNames(className, {
+          [styles.ellipsis]: ellipsis,
+        })}
+      >
+        {children}
+      </span>
+    </Tooltip>
   );
 };

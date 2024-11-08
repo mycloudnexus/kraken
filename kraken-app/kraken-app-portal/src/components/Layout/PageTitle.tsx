@@ -10,6 +10,7 @@ export function PageTitle({
   return (
     <Flex
       {...props}
+      data-testid="pageTitle"
       className={classNames(className, styles.pageTitle)}
       justify="space-between"
       align="center"

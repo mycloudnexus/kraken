@@ -1,0 +1,10 @@
+.deploymentSkeleton {
+  :global {
+    .ant-skeleton {
+      padding: 0;
+    }
+    .ant-skeleton-input {
+      min-width: fit-content !important;
+    }
+  }
+}

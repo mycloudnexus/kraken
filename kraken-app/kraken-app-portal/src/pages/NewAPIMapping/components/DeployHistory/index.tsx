@@ -1,22 +1,19 @@
-import DeployIcon from "@/assets/icon/deploy.svg";
 import DetailIcon from "@/assets/icon/detail.svg";
 import EmptyIcon from "@/assets/icon/empty.svg";
-import InformationModal from "@/components/DeployStage/InformationModal";
 import MappingMatrix from "@/components/MappingMatrix";
 import RequestMethod from "@/components/Method";
-import { Text } from "@/components/Text";
 import TrimmedPath from "@/components/TrimmedPath";
 import {
-  useDeployProduction,
+  PRODUCT_CACHE_KEYS,
   useGetAPIDeployments,
   useGetProductEnvs,
   useVerifyProduct,
 } from "@/hooks/product";
-import { useCommonListProps } from "@/hooks/useCommonListProps";
-import useUser from "@/hooks/user/useUser";
 import DeploymentStatus from "@/pages/EnvironmentOverview/components/DeploymentStatus";
 import { useAppStore } from "@/stores/app.store";
 import { DEFAULT_PAGING } from "@/utils/constants/common";
+import { queryClient } from "@/utils/helpers/reactQuery";
+import { IPagination } from "@/utils/types/common.type";
 import { IEnv } from "@/utils/types/env.type";
 import { IDeploymentHistory } from "@/utils/types/product.type";
 import {
@@ -31,81 +28,11 @@ import {
   Typography,
   notification,
 } from "antd";
-import dayjs from "dayjs";
-import { get, isEmpty, omit } from "lodash";
+import { get, omit } from "lodash";
 import { useEffect, useMemo, useState } from "react";
-import { useBoolean } from "usehooks-ts";
+import { ContentTime } from "./ContentTime";
+import { DeploymentBtn } from "./DeployBtn";
 import styles from "./index.module.scss";
-
-const initPagination = {
-  pageSize: DEFAULT_PAGING.size,
-  current: DEFAULT_PAGING.page,
-};
-
-export const ContentTime = ({ content = "", time = "" }) => {
-  const { findUserName } = useUser();
-  const userName = useMemo(() => findUserName(content), [findUserName]);
-  return (
-    <Flex vertical gap={2}>
-      <Text.LightMedium>{userName}</Text.LightMedium>
-      {!isEmpty(time) && (
-        <Text.LightSmall color="#00000073">
-          {dayjs.utc(time).local().format("YYYY-MM-DD HH:mm:ss")}
-        </Text.LightSmall>
-      )}
-    </Flex>
-  );
-};
-
-export const DeploymentBtn = ({
-  record,
-  env,
-}: {
-  record: IDeploymentHistory;
-  env: Record<string, string>;
-}) => {
-  const { currentProduct } = useAppStore();
-  const { value: isOpen, setTrue: open, setFalse: close } = useBoolean(false);
-  const [modalText, setModalText] = useState("");
-  const { mutateAsync: runDeploy, isPending } = useDeployProduction();
-  const handleClick = async () => {
-    try {
-      const res = await runDeploy({
-        productId: currentProduct,
-        data: {
-          tagInfos: [
-            {
-              tagId: record?.tagId,
-            },
-          ],
-          sourceEnvId: env?.stageId,
-          targetEnvId: env?.productionId,
-        },
-      } as any);
-
-      notification.success({ message: get(res, "message", "Success!") });
-    } catch (error) {
-      setModalText(get(error, "reason", "Error. Please try again"));
-      open();
-    }
-  };
-  return (
-    <>
-      <InformationModal modalText={modalText} open={isOpen} onClose={close} />
-      <Tooltip title="Deploy to Production">
-        <Button
-          loading={isPending}
-          disabled={!record?.verifiedStatus}
-          type="text"
-          className={styles.defaultBtn}
-          onClick={handleClick}
-        >
-          <DeployIcon />
-        </Button>
-      </Tooltip>
-    </>
-  );
-};
 
 const DeployHistory = ({
   scrollHeight,
@@ -116,24 +43,22 @@ const DeployHistory = ({
   selectedEnv?: IEnv;
   targetMapperKey?: string;
 }) => {
-  const {
-    tableData,
-    queryParams,
-    setQueryParams,
-    pagination,
-    setPagination,
-    setTableData,
-    handlePaginationChange,
-    handlePaginationShowSizeChange,
-  } = useCommonListProps({}, initPagination);
-
   const { currentProduct } = useAppStore();
   const { data: dataEnv } = useGetProductEnvs(currentProduct);
+
+  const [query, setQuery] = useState<IPagination & { envId?: string }>({
+    page: DEFAULT_PAGING.page,
+    size: DEFAULT_PAGING.size,
+    total: 0,
+    envId: undefined,
+  });
+
   const { data, isLoading } = useGetAPIDeployments(currentProduct, {
     mapperKey: targetMapperKey,
-    ...omit(queryParams, ["envId"]),
-    envId: selectedEnv?.id,
+    ...omit(query, "total"),
+    envId: selectedEnv?.id ?? query.envId,
   });
+
   const { mutateAsync: verify, isPending: isLoadingVerify } =
     useVerifyProduct();
 
@@ -168,150 +93,146 @@ const DeployHistory = ({
     }
   };
 
-  const columns: TableColumnsType<any> = useMemo(
-    () =>
-      [
-        selectedEnv
-          ? {
-              title: "API mapping",
-              dataIndex: "",
-              render: (item: any) => (
-                <Flex gap={10} align="center">
-                  <RequestMethod method={item?.method} />
-                  <Typography.Text
-                    style={{ color: "#2962FF" }}
-                    ellipsis={{ tooltip: item?.path }}
-                  >
-                    <TrimmedPath trimLevel={2} path={item?.path} />
-                  </Typography.Text>
-                  <MappingMatrix mappingMatrix={item.mappingMatrix} />
-                </Flex>
-              ),
-            }
-          : {},
-        {
-          title: "Version",
-          dataIndex: "version",
-          width: 90,
-          render: (text: string) => (
-            <Flex align="center" gap={8}>
-              {text}
-            </Flex>
-          ),
-        },
-        {
-          title: "Environment",
-          dataIndex: "",
-          width: selectedEnv ? 120 : undefined,
-          render: (record: IDeploymentHistory) => (
-            <div className={styles.capitalize}>{record?.envName}</div>
-          ),
-          filters: selectedEnv
-            ? undefined
-            : dataEnv?.data?.map((i) => ({ text: i.name, value: i.id })),
-        },
-        {
-          title: "Deployed by",
-          width: selectedEnv ? 150 : undefined,
-          dataIndex: "",
-          render: (record: IDeploymentHistory) => (
-            <ContentTime content={record?.createBy} time={record?.createAt} />
-          ),
-        },
-        {
-          title: "Deploy status",
-          dataIndex: "status",
-          width: selectedEnv ? 120 : undefined,
-          render: (status: string) => <DeploymentStatus status={status} />,
-        },
-        selectedEnv?.name?.toLowerCase() !== "production"
-          ? {
-              title: "Verified for Production",
-              dataIndex: "verifiedStatus",
-              width: selectedEnv ? 180 : 140,
-              render: (verifiedStatus: boolean, record: IDeploymentHistory) =>
-                record?.envName?.toLowerCase?.() === "stage" && (
-                  <Switch
-                    value={verifiedStatus}
-                    disabled={
-                      record?.status?.toLowerCase?.() === "failed" ||
-                      record.status === "in progress"
-                    }
-                    onChange={() => handleVerify(record)}
-                  />
-                ),
-            }
-          : {},
-        selectedEnv?.name?.toLowerCase() !== "production"
-          ? {
-              title: "Verified by",
-              dataIndex: "",
-              width: selectedEnv ? 130 : undefined,
-              render: (record: IDeploymentHistory) =>
-                record?.envName?.toLowerCase?.() === "stage" && (
-                  <ContentTime
-                    content={record?.verifiedBy}
-                    time={record?.verifiedAt}
-                  />
-                ),
-            }
-          : {},
-        {
-          title: "Actions",
-          dataIndex: "",
-          render: (record: IDeploymentHistory) => (
-            <Flex gap={12} align="center">
-              <Tooltip title="Check details and difference">
-                <Button type="text" className={styles.defaultBtn}>
-                  <DetailIcon />
-                </Button>
-              </Tooltip>
-              {record.envName !== "production" && (
-                <DeploymentBtn record={record} env={envItems} />
-              )}
-            </Flex>
-          ),
-        },
-      ].filter((value) => Object.keys(value).length !== 0),
-    [envItems, selectedEnv]
+  const isStage = useMemo(
+    () => selectedEnv?.name?.toLowerCase() !== "production",
+    [selectedEnv?.name]
   );
 
-  const onChange: TableProps<any>["onChange"] = (pagination, filters) => {
-    const envId: any = get(filters, "1.[0]");
-    if (filters[1]?.length === 1) {
-      setQueryParams({ envId: envId });
-      return;
-    }
-    setQueryParams({
-      envId: undefined,
-      page: Number(pagination?.current) - 1,
-      size: pagination.pageSize,
+  const columns = useMemo(() => {
+    const columns: TableColumnsType<any> = [];
+    if (selectedEnv)
+      columns.push({
+        title: "API mapping",
+        width: 200,
+        fixed: "left",
+        render: (item: any) => (
+          <Flex gap={10} align="center">
+            <RequestMethod method={item?.method} />
+            <Typography.Text
+              style={{ color: "#2962FF" }}
+              ellipsis={{ tooltip: item?.path }}
+            >
+              <TrimmedPath trimLevel={2} path={item?.path} />
+            </Typography.Text>
+            <MappingMatrix mappingMatrix={item.mappingMatrix} />
+          </Flex>
+        ),
+      });
+
+    columns.push(
+      {
+        title: "Version",
+        dataIndex: "version",
+        fixed: !selectedEnv && "left",
+        width: 90,
+        render: (text: string) => (
+          <Flex align="center" gap={8}>
+            {text}
+          </Flex>
+        ),
+      },
+      {
+        title: "Environment",
+        key: "environment",
+        width: 200,
+        render: (record: IDeploymentHistory) => (
+          <div className={styles.capitalize}>{record?.envName}</div>
+        ),
+        filters: selectedEnv
+          ? undefined
+          : dataEnv?.data?.map((i) => ({ text: i.name, value: i.id })),
+      },
+      {
+        title: "Deployed by",
+        width: 200,
+        render: (record: IDeploymentHistory) => (
+          <ContentTime content={record?.createBy} time={record?.createAt} />
+        ),
+      },
+      {
+        title: "Deploy status",
+        dataIndex: "status",
+        width: 200,
+        render: (status: string) => <DeploymentStatus status={status} />,
+      }
+    );
+
+    if (isStage)
+      columns.push(
+        {
+          title: "Verified for Production",
+          dataIndex: "verifiedStatus",
+          width: 160,
+          render: (verifiedStatus: boolean, record: IDeploymentHistory) =>
+            record?.envName?.toLowerCase?.() === "stage" && (
+              <Switch
+                value={verifiedStatus}
+                disabled={
+                  record?.status?.toLowerCase?.() === "failed" ||
+                  record.status === "in progress"
+                }
+                onChange={() => handleVerify(record)}
+              />
+            ),
+        },
+        {
+          title: "Verified by",
+          width: 200,
+          render: (record: IDeploymentHistory) =>
+            record?.envName?.toLowerCase?.() === "stage" && (
+              <ContentTime
+                content={record?.verifiedBy}
+                time={record?.verifiedAt}
+              />
+            ),
+        }
+      );
+
+    columns.push({
+      title: "Actions",
+      width: 120,
+      fixed: "right",
+      render: (record: IDeploymentHistory) => (
+        <Flex gap={12} align="center">
+          <Tooltip title="Check details and difference">
+            <Button type="text" className={styles.defaultBtn}>
+              <DetailIcon />
+            </Button>
+          </Tooltip>
+          {record.envName !== "production" && (
+            <DeploymentBtn record={record} env={envItems} />
+          )}
+        </Flex>
+      ),
     });
+
+    return columns;
+  }, [envItems, selectedEnv]);
+
+  const onChange: TableProps<any>["onChange"] = (_, filters) => {
+    const envIds: any = filters.environment as string[];
+
+    setQuery((prevQuery) => ({
+      ...prevQuery,
+      page: envIds ? 0 : prevQuery.page,
+      envId: envIds ? envIds.join(",") : undefined,
+    }));
   };
 
   useEffect(() => {
-    if (!isLoading) {
-      const updatedTableData = data?.data;
-      const updatedPagination = {
-        current: data?.page ?? initPagination.current,
-        pageSize: data?.size ?? initPagination.pageSize,
-        total: data?.total ?? 0,
-      };
-      setPagination(updatedPagination);
-      setTableData(updatedTableData);
+    if (data?.total !== undefined) {
+      setQuery((prevQuery) => ({
+        ...prevQuery,
+        total: data.total,
+      }));
     }
-  }, [data, isLoading]);
+  }, [data?.total, setQuery]);
 
   useEffect(() => {
-    if (selectedEnv) {
-      setQueryParams({ envId: selectedEnv });
-    }
-  }, [selectedEnv]);
-
-  useEffect(() => {
-    return () => {
-      setQueryParams({ ...initPagination });
-    };
+    // Making sure deployment version & status are in sync
+    queryClient.invalidateQueries({
+      queryKey: [PRODUCT_CACHE_KEYS.get_running_api_list],
+    });
   }, []);
 
   const scroll = scrollHeight
@@ -329,19 +250,23 @@ const DeployHistory = ({
           ),
         }}
         columns={columns}
-        dataSource={tableData}
+        dataSource={data?.data ?? []}
         getPopupContainer={() =>
           document.getElementById("deploy-history") as HTMLDivElement
         }
         rowKey="id"
         pagination={{
-          pageSize: pagination.pageSize,
-          current: pagination.current + 1,
-          onChange: handlePaginationChange,
-          total: pagination?.total || 0,
+          current: query.page + 1,
+          pageSize: query.size,
+          total: query?.total || 0,
           showSizeChanger: true,
-          onShowSizeChange: handlePaginationShowSizeChange,
           showTotal: (total) => `Total ${total} items`,
+          onChange: (current, pageSize) =>
+            setQuery((prevQuery) => ({
+              ...prevQuery,
+              page: current - 1,
+              size: pageSize,
+            })),
         }}
         onChange={onChange}
       />

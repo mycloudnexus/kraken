@@ -1,16 +1,16 @@
 import { useGetMappingTemplateUpgradeList } from "@/hooks/product";
+import useSize from "@/hooks/useSize";
+import DeploymentStatus from "@/pages/EnvironmentOverview/components/DeploymentStatus";
+import { ContentTime } from "@/pages/NewAPIMapping/components/DeployHistory/ContentTime";
 import { useAppStore } from "@/stores/app.store";
 import { defaultData, useMappingTemplateStore } from "@/stores/mappingTemplate";
+import { IUpgrade } from "@/utils/types/product.type";
 import { Button, Table } from "antd";
 import { get, upperFirst } from "lodash";
 import { useEffect, useMemo, useRef, useState } from "react";
-import styles from "./index.module.scss";
-import useSize from "@/hooks/useSize";
-import DeploymentStatus from "@/pages/EnvironmentOverview/components/DeploymentStatus";
-import { ContentTime } from "@/pages/NewAPIMapping/components/DeployHistory";
-import { IUpgrade } from "@/utils/types/product.type";
-import UpgradeHistoryDetail from "../UpgradeHistoryDetail";
 import { useBoolean } from "usehooks-ts";
+import UpgradeHistoryDetail from "../UpgradeHistoryDetail";
+import styles from "./index.module.scss";
 
 const UpgradeHistory = () => {
   const { currentProduct } = useAppStore();

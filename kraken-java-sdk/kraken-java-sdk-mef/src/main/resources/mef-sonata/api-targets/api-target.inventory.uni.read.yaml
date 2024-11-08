@@ -20,6 +20,6 @@ spec:
       responseBody: |
         { 
           "id": "${segment}",
-          "startDate": "@{{startDate}}",
-          "status": "@{{status}}"
+          "startDate": "",
+          "status": ""
         }

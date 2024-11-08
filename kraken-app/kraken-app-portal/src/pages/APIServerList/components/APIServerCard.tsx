@@ -104,8 +104,10 @@ const APIServerCard = ({ item, refetchList }: Props) => {
                     Check details
                   </Button>
                 ) : (
-                  <Tag color={isApiInUse ? "blue" : ""}>
+                  <Tag color={isApiInUse ? "blue" : ""} >
+                    <Text.LightSmall>
                     {isApiInUse ? "In use" : "Not in use"}
+                    </Text.LightSmall>
                   </Tag>
                 )}
               </div>

@@ -1,8 +1,8 @@
+import VersionBtn from "@/pages/MappingTemplate/components/VersionBtn";
+import { queryClient } from "@/utils/helpers/reactQuery";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { render } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient } from "@/utils/helpers/reactQuery";
-import VersionBtn from "@/pages/MappingTemplate/components/VersionBtn";
 
 test(`VersionBtn component`, async () => {
   const item = {
@@ -95,10 +95,10 @@ test(`VersionBtn component`, async () => {
   const { container } = render(
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
-        <VersionBtn item={item} />
-        <VersionBtn item={item1} />
-        <VersionBtn item={item2} />
-        <VersionBtn item={item3} />
+        <VersionBtn item={item as any} />
+        <VersionBtn item={item1 as any} />
+        <VersionBtn item={item2 as any} />
+        <VersionBtn item={item3 as any} />
       </QueryClientProvider>
     </BrowserRouter>
   );

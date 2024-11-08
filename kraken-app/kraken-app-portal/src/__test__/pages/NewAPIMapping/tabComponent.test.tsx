@@ -1,6 +1,5 @@
-import DeployHistory, {
-  ContentTime,
-} from "@/pages/NewAPIMapping/components/DeployHistory";
+import DeployHistory from "@/pages/NewAPIMapping/components/DeployHistory";
+import { ContentTime } from "@/pages/NewAPIMapping/components/DeployHistory/ContentTime";
 import { queryClient } from "@/utils/helpers/reactQuery";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { render } from "@testing-library/react";

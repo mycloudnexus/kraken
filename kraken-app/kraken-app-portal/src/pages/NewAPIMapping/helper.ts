@@ -71,3 +71,16 @@ export function locationMapping(
       return loc;
   }
 }
+
+export function renderDeployText(status: string): string {
+  switch (status) {
+    case "SUCCESS":
+      return "success.";
+    case "IN_PROCESS":
+      return "in process.";
+    case "FAILED":
+      return "failed.";
+    default:
+      return "";
+  }
+}

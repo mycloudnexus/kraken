@@ -1,5 +1,3 @@
-@import '../../variables.scss';
-
 .header {
   height: 57px;
   background: #fff;
@@ -7,7 +5,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 0 24px;
-  border-bottom: 1px solid $border;
+  border-bottom: 1px solid var(--border);
 
   .divider {
     height: 20px;
@@ -33,7 +31,7 @@
 }
 
 .logo {
-  color: $primary !important;
+  color: var(--primary) !important;
   display: flex;
   gap: 10px;
   align-items: center;
@@ -46,6 +44,7 @@
 .rightMenu {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
   gap: 14px;
 }
 
@@ -65,7 +64,7 @@
 }
 
 .select {
-  color: $text_85;
+  color: var(--text-85);
   font-weight: 400;
   font-size: 14px;
   line-height: 22px;
@@ -121,4 +120,14 @@
 
 .avatarLg {
   text-transform: uppercase;
+}
+
+.mappingInProgress {
+  color: var(--primary) !important;
+  text-decoration: none;
+  font-weight: 400;
+  font-size : 14px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }

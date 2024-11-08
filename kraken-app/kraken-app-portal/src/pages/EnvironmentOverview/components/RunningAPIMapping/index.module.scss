@@ -8,20 +8,3 @@
   align-items: center;
   color: #00000073 !important;
 }
-
-.rowBorder {
-  height: 64px;
-  &:not(:last-child) {
-    position: relative;
-    &::after {
-      content: '';
-      position: absolute;
-      left: -16px;
-      right: 0;
-      bottom: 0;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-      pointer-events: none;
-      width: calc(100% + 32px);
-    }
-  }
-}

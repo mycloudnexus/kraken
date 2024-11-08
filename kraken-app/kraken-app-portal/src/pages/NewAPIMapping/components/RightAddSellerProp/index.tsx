@@ -60,9 +60,9 @@ const RightAddSellerProp = ({ onSelect }: Readonly<Props>) => {
   return (
     <Flex vertical style={{ width: "100%", height: "100%" }}>
       <div className={styles.header}>
-        <Text.NormalLarge lineHeight="24px">
+        <Text.Custom size="15px" bold="500">
           Select Seller API mapping property
-        </Text.NormalLarge>
+        </Text.Custom>
       </div>
       <div className={styles.container}>
         {!isEmpty(collapseItems) ? (

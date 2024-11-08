@@ -1,14 +1,14 @@
-import RequestMethod from "@/components/Method";
+import { ApiCard } from "@/components/ApiMapping";
+import { Text } from "@/components/Text";
 import { useGetRunningAPIList } from "@/hooks/product";
+import { toDateTime } from "@/libs/dayjs";
 import { useAppStore } from "@/stores/app.store";
 import { IEnv, IRunningMapping } from "@/utils/types/env.type";
-import { Flex, Table, Tag, Tooltip, Typography } from "antd";
+import { Flex, Table, Tag, Typography } from "antd";
+import { isEmpty } from "lodash";
 import { useMemo, useState } from "react";
-import MappingMatrix from "@/components/MappingMatrix";
 import styles from "./index.module.scss";
-import { Text } from "@/components/Text";
-import { toDateTime } from "@/libs/dayjs";
-import { get, isEmpty, join, slice, split } from "lodash";
+
 type Props = {
   scrollHeight?: number;
   env?: IEnv;
@@ -95,26 +95,10 @@ const RunningAPIMapping = ({ scrollHeight, env }: Props) => {
       render: (items: Array<IRunningMapping>) => (
         <Flex vertical>
           {items.map((item: IRunningMapping, index: number) => (
-            <Flex
+            <ApiCard
               key={`${item.componentName}-${index}`}
-              align="center"
-              gap={10}
-              className={styles.rowBorder}
-            >
-              <RequestMethod method={item?.method} />
-              <Tooltip title={item?.path}>
-                <span>
-                  /{join(slice(split(get(item, "path", ""), "/"), -2), "/")}
-                </span>
-              </Tooltip>
-              <Flex gap={8} align="center" flex={1}>
-                <MappingMatrix
-                  mappingMatrix={item?.mappingMatrix}
-                  extraKey={"item.path"}
-                  isItemActive={false}
-                />
-              </Flex>
-            </Flex>
+              apiInstance={item}
+            />
           ))}
         </Flex>
       ),
