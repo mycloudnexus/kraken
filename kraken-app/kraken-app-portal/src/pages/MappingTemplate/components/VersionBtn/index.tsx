@@ -5,7 +5,7 @@ import {
   useDeployMappingTemplateStage,
   useGetProductEnvs,
 } from "@/hooks/product";
-import useUser from "@/hooks/user/useUser";
+import { useUser } from "@/hooks/user/useUser";
 import { useAppStore } from "@/stores/app.store";
 import { useMappingTemplateStore } from "@/stores/mappingTemplate";
 import { queryClient } from "@/utils/helpers/reactQuery";

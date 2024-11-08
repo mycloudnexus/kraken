@@ -1,5 +1,5 @@
 .root {
-  width: 240px;
+  width: 300px;
   border-right: 1px solid #f0f0f0;
   padding-right: 12px;
   height: 100%;
@@ -116,4 +116,8 @@
       width: 10px;
     }
   }
+}
+
+.noPadding {
+  padding: 0 !important;
 }
