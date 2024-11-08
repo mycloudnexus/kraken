@@ -1,6 +1,7 @@
 package com.consoleconnect.kraken.operator.core.service;
 
 import static com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants.MAPPER_KIND;
+import static com.consoleconnect.kraken.operator.core.toolkit.LabelConstants.FUNCTION_JSON_EXTRACT_PATH_TEXT;
 
 import com.consoleconnect.kraken.operator.core.dto.AssetLinkDto;
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
@@ -511,15 +512,26 @@ public class UnifiedAssetService {
       if (CollectionUtils.isNotEmpty(labelConditions)) {
         labelConditions.forEach(
             tuple3 -> {
-              Predicate predicate =
-                  criteriaBuilder.equal(
-                      criteriaBuilder.function(
-                          "json_extract_path_text",
-                          String.class,
-                          root.get(AssetsConstants.FIELD_LABELS),
-                          criteriaBuilder.literal(tuple3.field())),
-                      tuple3.value());
-              predicateList.add(predicate);
+              if (tuple3.value().equals(LabelConstants.CONDITION_NULL)) {
+                Predicate predicate =
+                    criteriaBuilder.isNull(
+                        criteriaBuilder.function(
+                            FUNCTION_JSON_EXTRACT_PATH_TEXT,
+                            String.class,
+                            root.get(AssetsConstants.FIELD_LABELS),
+                            criteriaBuilder.literal(tuple3.field())));
+                predicateList.add(predicate);
+              } else {
+                Predicate predicate =
+                    criteriaBuilder.equal(
+                        criteriaBuilder.function(
+                            FUNCTION_JSON_EXTRACT_PATH_TEXT,
+                            String.class,
+                            root.get(AssetsConstants.FIELD_LABELS),
+                            criteriaBuilder.literal(tuple3.field())),
+                        tuple3.value());
+                predicateList.add(predicate);
+              }
             });
       }
       if (CollectionUtils.isNotEmpty(inConditions)) {
