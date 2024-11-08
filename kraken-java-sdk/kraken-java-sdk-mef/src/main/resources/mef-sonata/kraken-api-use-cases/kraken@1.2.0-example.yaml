@@ -15,7 +15,7 @@ spec:
   use-cases:
     - name: Product Ordering Management
       key: mef.sonata.api.order
-      apiVersion: v1
+      apiVersion: v10
       endpoints:
         - path: /mefApi/sonata/productOrderingManagement/v10/productOrder
           method: post
@@ -47,7 +47,7 @@ spec:
             productType: access_e_line
     - name: Product Inventory Management
       key: mef.sonata.api.inventory
-      apiVersion: v1
+      apiVersion: v7
       endpoints:
         - path: "/mefApi/sonata/productInventory/v7/product/{id}"
           method: get
@@ -67,7 +67,7 @@ spec:
             productType: uni
     - name: Geographic Address Management
       key: mef.sonata.api.serviceability.address
-      apiVersion: v1
+      apiVersion: v7
       endpoints:
         - path: /mefApi/sonata/geographicAddressManagement/v7/geographicAddressValidation
           method: post
@@ -80,7 +80,7 @@ spec:
             addressType: FieldedAddress
     - name: Quote Management
       key: mef.sonata.api.quote
-      apiVersion: v1
+      apiVersion: v8
       endpoints:
         - path: "/mefApi/sonata/quoteManagement/v8/quote/{id}"
           method: get
