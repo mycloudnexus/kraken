@@ -179,10 +179,14 @@ public class SystemInfoService {
             .map(Constants::formatVersionUsingV)
             .orElse(Constants.INIT_VERSION);
     if (StringUtils.isBlank(controlVersion)) {
-      systemInfoEntity.setControlProductVersion(templateVersion);
-      systemInfoEntity.setStageProductVersion(templateVersion);
-      systemInfoEntity.setProductionProductVersion(templateVersion);
-      markFirstTemplateUpgraded(firstVersion.get());
+      Optional.ofNullable(templateVersion)
+          .ifPresent(
+              any -> {
+                systemInfoEntity.setControlProductVersion(templateVersion);
+                systemInfoEntity.setStageProductVersion(templateVersion);
+                systemInfoEntity.setProductionProductVersion(templateVersion);
+                markFirstTemplateUpgraded(firstVersion.get());
+              });
     } else {
       systemInfoEntity.setControlProductVersion(controlVersion);
       systemInfoEntity.setStageProductVersion(stageVersion);
