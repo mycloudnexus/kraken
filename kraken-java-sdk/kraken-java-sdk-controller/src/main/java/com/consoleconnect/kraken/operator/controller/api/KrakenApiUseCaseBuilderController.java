@@ -68,12 +68,13 @@ public class KrakenApiUseCaseBuilderController {
     String name = KRAKEN_APP_NAME_PREFIX + buildVersion;
     Map<String, Object> unifiedAsset = new LinkedHashMap<>();
 
-    unifiedAsset.put(AssetsConstants.FIELD_NAME, name);
-    unifiedAsset.put(AssetsConstants.FIELD_KEY, key);
     unifiedAsset.put(AssetsConstants.FIELD_KIND, AssetKindEnum.PRODUCT_APP_KRAKEN.getKind());
+    unifiedAsset.put(FIELD_API_VERSION, "v1");
     LinkedHashMap<Object, Object> metadata = new LinkedHashMap<>();
     unifiedAsset.put(FIELD_METADATA, metadata);
     Map<String, String> labels = new LinkedHashMap<>();
+    metadata.put(AssetsConstants.FIELD_NAME, name);
+    metadata.put(AssetsConstants.FIELD_KEY, key);
     metadata.put(AssetsConstants.FIELD_LABELS, labels);
 
     labels.put(LABEL_APP_VERSION, systemInfo.getControlAppVersion());
