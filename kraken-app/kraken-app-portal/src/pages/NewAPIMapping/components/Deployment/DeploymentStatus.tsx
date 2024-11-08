@@ -1,5 +1,5 @@
 import { Text } from "@/components/Text";
-import useUser from "@/hooks/user/useUser";
+import { useUser } from "@/hooks/user/useUser";
 import { IApiMapperDeployment } from "@/utils/types/product.type";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import { Flex, Skeleton, Tooltip } from "antd";
@@ -33,20 +33,19 @@ export function DeploymentStatus({
       >
         {deployment?.envName}
       </Text.LightSmall>
-      {deployment?.status && (<Tooltip
-        title={
+      <Tooltip
+        title={deployment?.status &&
           <>
             Deploy {renderDeployText(deployment.status as any)}
             <br />
-            <>
-              By {findUserName(deployment?.createBy as any)}{" "}
-              {dayjs(deployment?.createAt).format("YYYY-MM-DD HH:mm:ss")}
-            </>
+            By {findUserName(deployment?.createBy as any)}
+            <br />
+            {dayjs(deployment?.createAt).format("YYYY-MM-DD HH:mm:ss")}
           </>
         }
       >
-        <InfoCircleOutlined />
-      </Tooltip>)}
+        <InfoCircleOutlined data-testid={`${deployment?.envName}DeploymentInfo`} />
+      </Tooltip>
     </Flex>
   );
 }

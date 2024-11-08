@@ -19,7 +19,8 @@ const VersionDetail = ({ data }: Props) => {
   const { data: currentVer } =
     useGetMappingTemplateCurrentVersion(currentProduct);
 
-  const [upgradeDetail, setUpgradeDetail] = useState(false);
+  // To view details of upgrade history
+  const [deploymentId, setDeploymentId] = useState<string | null>(null);
 
   const currentData = useMemo(() => {
     const stage = currentVer?.find(
@@ -85,7 +86,8 @@ const VersionDetail = ({ data }: Props) => {
               </Flex>
               <UpgradeProcess
                 release={data}
-                onViewDetail={() => setUpgradeDetail(true)}
+              // To view details of upgrade history
+                onViewDetail={setDeploymentId}
               />
             </div>
           </>
@@ -93,8 +95,10 @@ const VersionDetail = ({ data }: Props) => {
       </div>
 
       <DetailDrawer
-        open={upgradeDetail}
-        onClose={() => setUpgradeDetail(false)}
+        open={Boolean(deploymentId)}
+        deploymentId={deploymentId}
+      // To view details of upgrade history
+        onClose={() => setDeploymentId(null)}
       />
     </>
   );

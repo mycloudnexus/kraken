@@ -1,5 +1,5 @@
 import { SecondaryText } from "@/components/Text";
-import useUser from "@/hooks/user/useUser";
+import { useUser } from "@/hooks/user/useUser";
 import { IApiMapperDeployment } from "@/utils/types/product.type";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import { Flex, Skeleton, Tooltip } from "antd";

@@ -1,4 +1,4 @@
-import { fireEvent, render } from "@/__test__/utils";
+import { fireEvent, render, waitFor } from "@/__test__/utils";
 import { ApiCard } from "@/components/ApiMapping";
 import { ApiList } from "@/pages/MappingTemplatev2/UpgradePlane/components/ApiList";
 import { ApiListSkeleton } from "@/pages/MappingTemplatev2/UpgradePlane/components/ApiListSkeleton";
@@ -7,6 +7,13 @@ import { IncompatibleMappingModal } from "@/pages/MappingTemplatev2/UpgradePlane
 import { StartUpgradeModal } from "@/pages/MappingTemplatev2/UpgradePlane/components/StartUpgradeModal";
 import { DetailDrawer } from "@/pages/MappingTemplatev2/components/VersionSelect/DetailDrawer";
 import { ListVersionSkeleton } from "@/pages/MappingTemplatev2/components/VersionSelect/ListVersionSkeleton";
+import * as productHooks from '@/hooks/product'
+import * as userHooks from '@/hooks/user/useUser'
+import { DeploymentStatus } from "@/pages/NewAPIMapping/components/Deployment/DeploymentStatus";
+
+afterEach(() => {
+  vi.clearAllMocks()
+})
 
 describe("components used in mapping template v2 pages", () => {
   it("should render deprecated warning modal", () => {
@@ -84,8 +91,14 @@ describe("components used in mapping template v2 pages", () => {
     expect(handleCancel).toHaveBeenCalledTimes(1);
   });
 
-  it("should render upgrade detail drawer", () => {
-    const { getByText, getByTestId } = render(<DetailDrawer open />);
+  it("should render blank upgrade detail drawer", () => {
+    vi.spyOn(productHooks, 'useGetMappingTemplateUpgradeDetail').mockReturnValue({
+      data: [],
+      isLoading: false,
+      isFetching: false,
+    } as any)
+
+    const { getByText, getByTestId } = render(<DetailDrawer open deploymentId="" />);
 
     expect(getByTestId("notification")).toHaveTextContent(
       "Following mapping use cases upgraded because of this template upgrade."
@@ -95,6 +108,40 @@ describe("components used in mapping template v2 pages", () => {
     expect(getByText("Mapping use case")).toBeInTheDocument();
     expect(getByText("Upgrade to")).toBeInTheDocument();
     expect(getByText("Upgrade status")).toBeInTheDocument();
+
+    expect(getByText('No data')).toBeInTheDocument()
+  });
+
+  it("should render upgrade detail drawer with upgrade history", () => {
+    vi.spyOn(productHooks, 'useGetMappingTemplateUpgradeDetail').mockReturnValue({
+      data: [
+        {
+          "tagId": "c1c3b614-e325-4f94-987d-36e5ad02210e",
+          "version": "2.1",
+          "mapperKey": "mef.sonata.api-target-mapper.address.validate",
+          "componentKey": "mef.sonata.api.serviceability.address",
+          "mappingMatrix": {
+            "provideAlternative": false,
+            "addressType": "FieldedAddress"
+          },
+          "status": "SUCCESS",
+          "method": "post",
+          "path": "/a/b/c/d/e"
+        }
+      ],
+      isLoading: false,
+      isFetching: false,
+    } as any)
+
+    const { getAllByTestId } = render(<DetailDrawer open deploymentId="" />);
+
+    expect(getAllByTestId('apiPath')[0]).toHaveTextContent('/d/e')
+    expect(getAllByTestId('mappingType')[0]).toHaveTextContent('provide Alternative')
+    expect(getAllByTestId('mappingValue')[0]).toHaveTextContent('FALSE')
+    expect(getAllByTestId('mappingType')[1]).toHaveTextContent('address Type')
+    expect(getAllByTestId('mappingValue')[1]).toHaveTextContent('FIELDEDADDRESS')
+    expect(getAllByTestId('upgradeToVersion')[0]).toHaveTextContent('2.1')
+    expect(getAllByTestId('deploymentStatus')[0]).toHaveTextContent('Success')
   });
 
   it("should render api mapping card", () => {
@@ -158,5 +205,27 @@ describe("components used in mapping template v2 pages", () => {
     const useCase = getAllByTestId('useCase')[0]
     fireEvent.click(useCase)
     expect(handleClick).toHaveBeenCalledTimes(1)
+  })
+
+  it('should render skeleton loading deployment status component', () => {
+    const { container } = render(<DeploymentStatus loading />)
+    expect(container).toBeInTheDocument()
+  })
+
+  it('should render success deployment status component', async () => {
+    vi.spyOn(userHooks, 'useUser').mockReturnValue({
+      findUserName: () => 'admin'
+    } as any)
+
+    const { getByTestId, getByRole } = render(<DeploymentStatus deployment={{
+      status: 'SUCCESS',
+      envName: 'stage',
+      createBy: 'admin',
+      createAt: '2024-10-3 10:33:32'
+    } as any} />)
+    expect(getByTestId('deploymentEnv')).toHaveTextContent('stage')
+    const infoIcon = getByTestId('stageDeploymentInfo')
+    fireEvent.mouseEnter(infoIcon)
+    await waitFor(() => expect(getByRole('tooltip')).toHaveTextContent('Deploy success.By admin2024-10-03 10:33:32'))
   })
 });
