@@ -1,0 +1,13 @@
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.1.5.7
+  name: V1.5.7
+  labels:
+    productSpec: grace
+    productVersion: V1.5.7
+    publishDate: 2024-11-08 15:08
+  description: |
+    Split the order reading by the action
+  version: 2
