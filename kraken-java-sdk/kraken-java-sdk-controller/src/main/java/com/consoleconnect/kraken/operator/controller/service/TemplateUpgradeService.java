@@ -1124,23 +1124,30 @@ public class TemplateUpgradeService {
     return compatibilityCheckService.check(systemInfo.getStageAppVersion(), productVersion);
   }
 
-  public void calculateStatus(TemplateUpgradeReleaseVO vo, boolean first) {
+  public void calculateStatus(TemplateUpgradeReleaseVO vo, TemplateUpgradeReleaseVO first) {
     boolean deployedProduction =
         vo.getDeployments().stream()
             .anyMatch(
-                deploy -> deploy.getEnvName().equalsIgnoreCase(EnvNameEnum.PRODUCTION.name()));
+                deploy ->
+                    deploy.getEnvName().equalsIgnoreCase(EnvNameEnum.PRODUCTION.name())
+                        && DeployStatusEnum.SUCCESS.name().equalsIgnoreCase(deploy.getStatus()));
     if (deployedProduction) {
       vo.setStatus(TemplateViewStatus.UPGRADED.getStatus());
       return;
     }
-    if (first) {
+    if (vo.getTemplateUpgradeId().equalsIgnoreCase(first.getTemplateUpgradeId())) {
       if (CollectionUtils.isEmpty(vo.getDeployments())) {
         vo.setStatus(TemplateViewStatus.NOT_UPGRADED.getStatus());
         return;
       }
       vo.setStatus(TemplateViewStatus.UPGRADING.getStatus());
     } else {
-      vo.setStatus(TemplateViewStatus.DEPRECATED.getStatus());
+      if (CollectionUtils.isEmpty(first.getDeployments())
+          && CollectionUtils.isNotEmpty(vo.getDeployments())) {
+        vo.setStatus(TemplateViewStatus.UPGRADING.getStatus());
+      } else {
+        vo.setStatus(TemplateViewStatus.DEPRECATED.getStatus());
+      }
     }
   }
 }
