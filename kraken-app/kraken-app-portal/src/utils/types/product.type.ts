@@ -39,6 +39,7 @@ export interface IDeploymentHistory {
   verifiedBy: string;
   verifiedAt: string;
   verifiedStatus: boolean;
+  mapperKey: string
 }
 
 export interface IMappingMatrix {

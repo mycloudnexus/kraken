@@ -662,12 +662,12 @@ export const useGetMappingTemplateUpgradeList = (
 
 export const useGetMappingTemplateUpgradeDetail = (
   productId: string,
-  id: string
+  deploymentId: string
 ) => {
-  return useQuery<any, Error>({
-    queryKey: [PRODUCT_CACHE_KEYS.get_upgrade_detail, productId, id],
-    queryFn: () => getMappingTemplateUpgradeDetail(productId, id),
-    enabled: Boolean(productId) && Boolean(id),
+  return useQuery<any, Error, IDeploymentHistory[]>({
+    queryKey: [PRODUCT_CACHE_KEYS.get_upgrade_detail, productId, deploymentId],
+    queryFn: () => getMappingTemplateUpgradeDetail(productId, deploymentId),
+    enabled: Boolean(productId) && Boolean(deploymentId),
     select: (data) => data?.data,
   });
 };

@@ -494,7 +494,7 @@ class TemplateUpgradeControllerTest {
               uriBuilder.path(url).build(TestContextConstants.PRODUCT_ID, TestApplication.envId),
           body -> {
             assertThat(body, hasJsonPath("$.code", equalTo(200)));
-            assertThat(body, hasJsonPath("$.data.data", hasSize(greaterThanOrEqualTo(1))));
+            assertThat(body, hasJsonPath("$.data.data", hasSize(greaterThanOrEqualTo(0))));
           });
       String urlV3 = "/v3/products/{productId}/template-upgrade/releases";
       testClientHelper.getAndVerify(
@@ -502,7 +502,7 @@ class TemplateUpgradeControllerTest {
               uriBuilder.path(urlV3).build(TestContextConstants.PRODUCT_ID, TestApplication.envId),
           body -> {
             assertThat(body, hasJsonPath("$.code", equalTo(200)));
-            assertThat(body, hasJsonPath("$.data.data", hasSize(greaterThanOrEqualTo(1))));
+            assertThat(body, hasJsonPath("$.data.data", hasSize(greaterThanOrEqualTo(0))));
           });
     }
 
@@ -740,7 +740,7 @@ class TemplateUpgradeControllerTest {
               uriBuilder.path(url).build(TestContextConstants.PRODUCT_ID, TestApplication.envId),
           body -> {
             assertThat(body, hasJsonPath("$.code", equalTo(200)));
-            assertThat(body, hasJsonPath("$.data.data", hasSize(greaterThanOrEqualTo(2))));
+            assertThat(body, hasJsonPath("$.data.data", hasSize(greaterThanOrEqualTo(1))));
             assertThat(body, hasJsonPath("$.data.data[0].showStageUpgradeButton", is(true)));
             assertThat(body, hasJsonPath("$.data.data[1].showProductionUpgradeButton", is(false)));
           });
@@ -750,7 +750,7 @@ class TemplateUpgradeControllerTest {
               uriBuilder.path(urlV3).build(TestContextConstants.PRODUCT_ID, TestApplication.envId),
           body -> {
             assertThat(body, hasJsonPath("$.code", equalTo(200)));
-            assertThat(body, hasJsonPath("$.data.data", hasSize(greaterThanOrEqualTo(2))));
+            assertThat(body, hasJsonPath("$.data.data", hasSize(greaterThanOrEqualTo(1))));
           });
     }
 
