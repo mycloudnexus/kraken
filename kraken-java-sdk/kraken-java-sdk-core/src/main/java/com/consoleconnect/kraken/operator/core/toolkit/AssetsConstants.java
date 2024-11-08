@@ -18,4 +18,13 @@ public final class AssetsConstants {
   public static final String VALUE_USER_SYSTEM = "system";
   public static final String SERVER_KIND = "kraken.component.api-target-spec";
   public static final String END_POINTS = "endpoints";
+  public static final String FIELD_NAME = "name";
+  public static final String FIELD_METADATA = "metadata";
+  public static final String FIELD_VERSION = "version";
+  public static final String FIELD_API_VERSION = "apiVersion";
+  public static final String PATH = "path";
+  public static final String METHOD = "method";
+  public static final String MAPPING_MATRIX = "mapping-matrix";
+  public static final String SPEC = "spec";
+  public static final String API_USE_CASES = "use-cases";
 }

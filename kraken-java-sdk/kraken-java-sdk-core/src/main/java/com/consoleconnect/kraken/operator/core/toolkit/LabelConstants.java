@@ -33,4 +33,8 @@ public class LabelConstants {
   public static final String LABEL_EXPIRED_AT = "expiredAt";
   public static final String LABEL_ISSUE_AT = "issueAt";
   public static final String MEF_API_RELEASE = "mef-api-release";
+  public static final String LABEL_APP_VERSION = "appVersion";
+  public static final String LABEL_FIRST_UPGRADE = "firstUpgraded";
+  public static final String CONDITION_NULL = "NULL";
+  public static final String FUNCTION_JSON_EXTRACT_PATH_TEXT = "json_extract_path_text";
 }

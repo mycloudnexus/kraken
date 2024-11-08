@@ -39,6 +39,7 @@ export interface IDeploymentHistory {
   verifiedBy: string;
   verifiedAt: string;
   verifiedStatus: boolean;
+  mapperKey: string
 }
 
 export interface IMappingMatrix {
@@ -142,4 +143,9 @@ export interface IApiUseCase {
   componentKey: string;
   componentName: string;
   details: IRunningMapping[];
+}
+
+export interface IProductIdAndNameParams {
+  productId: string;
+  name: string;
 }

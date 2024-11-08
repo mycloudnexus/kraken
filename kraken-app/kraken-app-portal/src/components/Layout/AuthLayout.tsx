@@ -1,4 +1,4 @@
-import useUser from "@/hooks/user/useUser";
+import { useUser } from "@/hooks/user/useUser";
 import { useEffect } from "react";
 
 const AuthLayout = ({ children }: any) => {
