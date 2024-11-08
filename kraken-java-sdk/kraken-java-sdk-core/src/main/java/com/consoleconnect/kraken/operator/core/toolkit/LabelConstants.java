@@ -33,4 +33,5 @@ public class LabelConstants {
   public static final String LABEL_EXPIRED_AT = "expiredAt";
   public static final String LABEL_ISSUE_AT = "issueAt";
   public static final String MEF_API_RELEASE = "mef-api-release";
+  public static final String LABEL_APP_VERSION = "appVersion";
 }
