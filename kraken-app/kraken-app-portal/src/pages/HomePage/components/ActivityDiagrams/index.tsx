@@ -54,10 +54,10 @@ const DiagramWrapper = ({ envs }: Props) => {
         envId: values.envId || params.envId,
         buyer: values.buyer || params.buyer,
         startTime: requestTime?.[0]
-          ? dayjs(requestTime[0]).format(TIME_ZONE_FORMAT)
+          ? dayjs(requestTime[0]).startOf("day").format(TIME_ZONE_FORMAT)
           : currentTime,
         endTime: requestTime?.[1]
-          ? dayjs(requestTime[1]).format(TIME_ZONE_FORMAT)
+          ? dayjs(requestTime[1]).endOf("day").format(TIME_ZONE_FORMAT)
           : currentTime,
       });
     },
