@@ -1,0 +1,153 @@
+---
+kind: kraken.component.api
+apiVersion: v1
+metadata:
+  key: mef.sonata.api.serviceability.address
+  name: Geographic Address Management
+  labels:
+    mef-api-release: grace
+    address-api-version: v7
+  version: 6
+spec:
+  supportedProductTypesAndActions:
+    - path: /mefApi/sonata/geographicAddressManagement/v7/geographicAddressValidation
+      method: post
+    - path: /mefApi/sonata/geographicAddressManagement/v7/geographicAddress/{id}
+      method: get
+  mappings:
+    - uri: ${env.target.url}
+      trigger:
+        path: /mefApi/sonata/geographicAddressManagement/v7/geographicAddressValidation
+        method: post
+      metadata:
+        cacheRequestBody: true
+      actions:
+        - id: persist_http_request_address_validate
+          actionType: buildin@db
+          env:
+            bizType: "address.validate"
+          with:
+            action: create
+            properties:
+              - headers
+              - queryParameters
+              - requestBody
+          preRequest: true
+        - id: calculate_address_type_and_action_via_javascript
+          actionType: engine@javascript
+          with:
+            code: |
+              (jsonstr) => {
+                        let ret = {
+                            targetAPIConfigKey: 'mef.sonata.api-target.address.validate'
+                         };
+                return JSON.stringify(ret);
+              }
+          outputKey: address
+        - id: mapping_matrix_check_address
+          actionType: buildin@mapping-matrix-checker
+          env:
+            mappingMatrixKey: mef.sonata.api.matrix.address.validation
+            targetKey: ${address.targetAPIConfigKey}
+        - id: load-downstream-api-config
+          actionType: buildin@load-target-api-config
+          env:
+            configKey: ${address.targetAPIConfigKey}
+            mefQuery: ${query}
+            mefRequestBody: ${body}
+            entity: ${entity}
+          with:
+            render: true
+          outputKey: targetApiConfig
+        - id: rewrite-path
+          actionType: buildin@rewrite-path
+          with:
+            engine: spel
+          env:
+            path: ${targetApiConfig.endpoints[0].path}
+            method: ${targetApiConfig.endpoints[0].method}
+
+        - id: modify-request-body
+          actionType: buildin@modify-request-body
+          env:
+            code: ${targetApiConfig.endpoints[0].requestBody}
+
+        - id: modify-response-body
+          actionType: buildin@modify-response-body
+          with:
+            engine: spel
+            listLoop: true
+          env:
+            code: ${targetApiConfig.endpoints[0].responseBody}
+            inputs: ${targetApiConfig.inputs}
+          postResultRender: true
+
+        - id: update-response-body
+          actionType: buildin@db
+          with:
+            action: update
+            properties:
+              - responseBody
+              - responseStatusCode
+          preRequest: false
+          postRequest: true
+          order: -4
+
+    - uri: ${env.target.url}
+      trigger:
+        path: /mefApi/sonata/geographicAddressManagement/v7/geographicAddress/**
+        method: get
+        queryParams:
+      metadata:
+        cacheRequestBody: true
+      actions:
+        - name: retrieve addressId from path
+          actionType: buildin@pattern
+          env:
+            input: ${path}
+            pattern: /mefApi/sonata/geographicAddressManagement/v7/geographicAddress/(?<segment>.*)
+
+        - id: load-downstream-api-config
+          actionType: buildin@load-target-api-config
+          env:
+            configKey: "mef.sonata.api-target.address.retrieve"
+            mefQuery: ${query}
+            id: ${segment}
+          with:
+            render: true
+          outputKey: targetApiConfig
+
+        - id: rewrite-path
+          actionType: buildin@rewrite-path
+          env:
+            path: ${targetApiConfig.endpoints[0].path}
+            method: ${targetApiConfig.endpoints[0].method}
+
+        - id: modify-response-body
+          actionType: buildin@modify-response-body
+          with:
+            engine: spel
+          env:
+            code: ${targetApiConfig.endpoints[0].responseBody}
+            inputs: ${targetApiConfig.inputs}
+links:
+  - targetAssetKey: mef.sonata.api-target.address.retrieve
+    relationship: implementation.target
+    group: mef.sonata.api-target.address.retrieve
+  - targetAssetKey: mef.sonata.api-target.address.validate
+    relationship: implementation.target
+    group: mef.sonata.api-target.address.validate
+  - targetAssetKey: mef.sonata.api-spec.serviceability.address
+    relationship: implementation.standard.api-spec
+  - targetAssetKey: mef.sonata.api-target-mapper.address.validate
+    relationship: implementation.target-mapper
+    group: mef.sonata.api-target.address.validate
+  - targetAssetKey: mef.sonata.api.matrix.address.validation
+    relationship: implementation.matrix
+    group: mef.sonata.api-target.address.validate
+  - targetAssetKey: mef.sonata.api-target-mapper.address.retrieve
+    relationship: implementation.target-mapper
+    group: mef.sonata.api-target.address.retrieve
+
+
+

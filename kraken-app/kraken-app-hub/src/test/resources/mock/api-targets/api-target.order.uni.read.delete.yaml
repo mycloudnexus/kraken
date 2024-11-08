@@ -2,8 +2,8 @@
 kind: kraken.component.api-target
 apiVersion: v1
 metadata:
-  key: mef.sonata.api-target.order.uni.read
-  mapperKey: mef.sonata.api-target-mapper.order.uni.read
+  key: mef.sonata.api-target.order.uni.read.delete
+  mapperKey: mef.sonata.api-target-mapper.order.uni.read.delete
   name: Order Connection API
   version: 8
 spec:
@@ -16,7 +16,7 @@ spec:
     method: get
     productType: uni
   endpoints:
-    - id: retrieve connection detail by id
+    - id: retrieve connection detail by id of uni delete order
       path: ""
       method: ""
       pathReferId: "mef.sonata.api-target-mapper.order.uni.add#mapper.order.uni.add.orderId"

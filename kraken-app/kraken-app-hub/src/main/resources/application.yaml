@@ -113,7 +113,7 @@ app:
     check-release: 0/20 * * * * *
   security:
     resource-server:
-      enabled: true
+      enabled: false
       jwt:
         - issuer: https://kraken.consoleconnect.com/issuer
           key-id: kraken

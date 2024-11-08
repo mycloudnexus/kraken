@@ -1,0 +1,61 @@
+---
+kind: kraken.component.api-target
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target.quote.eline.add.sync
+  name: Quote Connection API
+  mapperKey: mef.sonata.api-target-mapper.quote.eline.add.sync
+  version: 1
+spec:
+  inputs:
+    - mefQuery
+    - mefRequestBody
+  trigger:
+    path: /mefApi/sonata/quoteManagement/v8/quote
+    method: post
+    productType: access_e_line
+    actionType: add
+  endpoints:
+    - id: create quote for connection
+      path:
+      method:
+      requestBody: |
+        {}
+      responseBody: |
+        {
+          "id": "${entity.id}",
+          "buyerRequestedQuoteLevel": "${mefRequestBody.buyerRequestedQuoteLevel}",
+          "relatedContactInformation": "${T(com.consoleconnect.kraken.operator.gateway.func.SpelFunc).appendSellerInformation('sellerContactInformation', env.seller.name, env.seller.emailAddress, env.seller.number, mefRequestBody[relatedContactInformation]?:'')}",
+          "quoteItem": [{
+             "requestedQuoteItemTerm": "${mefRequestBody.quoteItem[0].requestedQuoteItemTerm}",
+             "product": "${mefRequestBody.quoteItem[0].product}",
+             "action": "add",
+             "id": "${mefRequestBody.quoteItem[0].id}",
+             "state": "((mefResponseBody.quoteItem[0].quoteItemPrice[0].price.dutyFreeAmount.value == '' ? 'unableToProvide': 'approved.orderable'))",
+             "quoteItemTerm": "${T(java.util.Arrays).asList(mefRequestBody.quoteItem[0].requestedQuoteItemTerm)}",
+             "quoteItemPrice": [{
+               "unitOfMeasure":"",
+               "price": {
+                 "dutyFreeAmount": {
+                   "unit": "",
+                   "value": ""
+                 },
+                 "taxRate":"",
+                 "taxIncludedAmount": {
+                   "unit": "",
+                   "value": ""
+                 }
+               },
+               "name":"",
+               "priceType":"",
+               "description":"",
+               "recurringChargePeriod":""
+             }]
+          }],
+          "quoteDate": "${T(com.consoleconnect.kraken.operator.core.toolkit.DateTime).nowInUTCFormatted()}",
+          "externalId":"${mefRequestBody[externalId]?:''}",
+          "instantSyncQuote":"${mefRequestBody[instantSyncQuote]?:''}",
+          "requestedQuoteCompletionDate": "${mefRequestBody[requestedQuoteCompletionDate]?:''}",
+          "quoteLevel": "${mefRequestBody.buyerRequestedQuoteLevel}",
+          "state": "((mefResponseBody.quoteItem[0].quoteItemPrice[0].price.dutyFreeAmount.value == '' ? 'unableToProvide': 'approved.orderable'))"
+        }
