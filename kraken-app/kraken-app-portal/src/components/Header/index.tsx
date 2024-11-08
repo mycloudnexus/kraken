@@ -16,7 +16,7 @@ import {
   QuestionCircleOutlined,
 } from "@ant-design/icons";
 import { useTutorialStore } from "@/stores/tutorial.store";
-import useUser from "@/hooks/user/useUser";
+import { useUser } from "@/hooks/user/useUser";
 import { Text } from "../Text";
 import { Link, useNavigate } from "react-router-dom";
 import { UserAvatar } from "./UserAvatar";

@@ -1,7 +1,7 @@
 import { PageLayout } from "@/components/Layout";
 import { ERole } from "@/components/Role";
 import { useDisableUser, useEnableUser, useGetUserList } from "@/hooks/user";
-import useUser from "@/hooks/user/useUser";
+import { useUser } from "@/hooks/user/useUser";
 import { useUserStore } from "@/stores/user.store";
 import { IUser } from "@/utils/types/user.type";
 import { Button, Flex, Input, Switch, Table, notification } from "antd";
