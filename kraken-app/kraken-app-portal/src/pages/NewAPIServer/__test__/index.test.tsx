@@ -96,13 +96,13 @@ it('should reject with an error if the URL is invalid', async () => {
 
 it('should resolve if the server name is valid', async () => {
   const validateNameMock = vi.fn().mockResolvedValue({ data: true });
-  const result = await validateServerName(validateNameMock, 'product-1', 'validName');
+  const result = await validateServerName(validateNameMock, 'product-1', 'validName', 'name1');
   expect(result).toBeUndefined(); // Promise resolves without rejection
   expect(validateNameMock).toHaveBeenCalledWith({ productId: 'product-1', name: 'validName' });
 });
 
 it('should reject with an error message if the server name is taken', async () => {
   const validateNameMock = vi.fn().mockResolvedValue({ data: false });
-  await expect(validateServerName(validateNameMock, 'product-1', 'takenName')).rejects.toThrow('The name takenName is already taken');
+  await expect(validateServerName(validateNameMock, 'product-1', 'takenName', 'name1')).rejects.toThrow('The name takenName is already taken');
   expect(validateNameMock).toHaveBeenCalledWith({ productId: 'product-1', name: 'takenName' });
 });
