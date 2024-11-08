@@ -19,7 +19,7 @@ const VersionDetail = ({ data }: Props) => {
   const { data: currentVer } =
     useGetMappingTemplateCurrentVersion(currentProduct);
 
-  const [upgradeDetail, setUpgradeDetail] = useState(false); // @TODO:
+  const [upgradeDetail, setUpgradeDetail] = useState(false);
 
   const currentData = useMemo(() => {
     const stage = currentVer?.find(
@@ -54,7 +54,7 @@ const VersionDetail = ({ data }: Props) => {
                   color="var(--panel-hover-bg)"
                   style={{ color: "var(--primary)" }}
                 >
-                  {get(currentData, "stage.productVersion")}
+                  {get(currentData, "stage.productVersion") ?? 'N/A'}
                 </Tag>
                 <Text.LightMedium lineHeight="20px">
                   Production
@@ -64,7 +64,7 @@ const VersionDetail = ({ data }: Props) => {
                   color="var(--panel-hover-bg)"
                   style={{ color: "var(--primary)" }}
                 >
-                  {get(currentData, "production.productVersion")}
+                  {get(currentData, "production.productVersion") ?? 'N/A'}
                 </Tag>
               </Flex>
             </Flex>

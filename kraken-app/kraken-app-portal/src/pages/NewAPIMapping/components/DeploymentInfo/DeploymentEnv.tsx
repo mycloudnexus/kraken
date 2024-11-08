@@ -15,7 +15,7 @@ export function DeploymentEnv({
 
   const renderVersionText = (version: string) => {
     if (isEmpty(version)) {
-      return "n/a";
+      return "N/A";
     }
     return `v${version}`;
   };

@@ -33,10 +33,10 @@ export function DeploymentStatus({
       >
         {deployment?.envName}
       </Text.LightSmall>
-      <Tooltip
+      {deployment?.status && (<Tooltip
         title={
           <>
-            Deploy {renderDeployText(deployment?.status as any)}
+            Deploy {renderDeployText(deployment.status as any)}
             <br />
             <>
               By {findUserName(deployment?.createBy as any)}{" "}
@@ -46,7 +46,7 @@ export function DeploymentStatus({
         }
       >
         <InfoCircleOutlined />
-      </Tooltip>
+      </Tooltip>)}
     </Flex>
   );
 }
