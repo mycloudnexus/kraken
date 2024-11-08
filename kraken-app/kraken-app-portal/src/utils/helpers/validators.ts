@@ -8,7 +8,7 @@ export const validateServerName = async (validateName: UseMutateAsyncFunction<an
   if (isValid) {
     return Promise.resolve();
   } else {
-    return Promise.reject(`The name ${name} is already taken`);
+    return Promise.reject(new Error(`The name ${name} is already taken`));
   }
 };
 
