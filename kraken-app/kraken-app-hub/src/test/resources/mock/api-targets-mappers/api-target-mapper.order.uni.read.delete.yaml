@@ -2,8 +2,8 @@
 kind: kraken.component.api-target-mapper
 apiVersion: v1
 metadata:
-  key: mef.sonata.api-target-mapper.order.uni.read
-  name: Mapper Of Reading Order Port
+  key: mef.sonata.api-target-mapper.order.uni.read.delete
+  name: Mapper Of Reading Order Port with Delete Action
   description: This operation retrieves a ProductOrder entity
 spec:
   trigger:
@@ -17,7 +17,7 @@ spec:
       serverKey: mef.sonata.api-target-spec.con1718940696857
       mappers:
         request:
-          - name: mapper.order.uni.read.buyerId
+          - name: mapper.order.uni.read.delete.buyerId
             title: The unique identifier of the organization that is acting as the a Buyer.
             source: '@{{buyerId}}'
             target: '@{{companyName}}'
@@ -27,7 +27,7 @@ spec:
             targetLocation: PATH
             customizedField: false
             requiredMapping: false
-          - name: mapper.order.uni.read.orderId
+          - name: mapper.order.uni.read.delete.orderId
             title: Order Unique Identifier.
             source: '@{{id}}'
             target: '@{{orderId}}'
@@ -38,17 +38,8 @@ spec:
             targetLocation: PATH
             customizedField: false
             requiredMapping: true
-          - title: Title of Property Mapping
-            source: '@{{itemRequestedCompletionDate.gt}}'
-            target: '@{{companyName}}'
-            description: description
-            replaceStar: true
-            sourceLocation: QUERY
-            targetLocation: BODY
-            customizedField: true
-            requiredMapping: false
         response:
-          - name: mapper.order.uni.read.state
+          - name: mapper.order.uni.read.delete.state
             title: ProductOrderState
             source: '@{{status}}'
             target: '@{{state}}'
@@ -78,7 +69,7 @@ spec:
             targetLocation: BODY
             customizedField: false
             requiredMapping: true
-          - name: mapper.order.uni.read.completionDate
+          - name: mapper.order.uni.read.delete.completionDate
             title: order complete date
             source: ''
             target: '@{{completionDate}}'
@@ -88,7 +79,7 @@ spec:
             targetLocation: BODY
             customizedField: false
             requiredMapping: false
-          - name: mapper.order.uni.read.instanceId
+          - name: mapper.order.uni.read.delete.instanceId
             title: instance id from seller
             source: '@{{createdPortId}}'
             target: '@{{productOrderItem[0].product.id}}'

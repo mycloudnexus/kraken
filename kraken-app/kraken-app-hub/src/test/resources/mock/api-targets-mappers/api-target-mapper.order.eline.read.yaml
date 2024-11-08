@@ -11,18 +11,42 @@ spec:
     method: get
     productType: access_e_line
   endpoints:
-    - path: ""
-      method: ""
+    - path: /api/v2/company/{username}/connections/{connectionId}
+      method: GET
       serverKey: mef.sonata.api-target-spec.con1718940696857
       mappers:
         request:
+          - name: mapper.order.eline.read.buyerId
+            title: The unique identifier of the organization that is acting as the a Buyer.
+            source: '@{{buyerId}}'
+            target: '@{{username}}'
+            description: ''
+            replaceStar: true
+            sourceLocation: QUERY
+            targetLocation: PATH
+            customizedField: false
+            requiredMapping: false
+          - name: mapper.order.eline.read.orderId
+            title: Order Unique Identifier.
+            source: '@{{id}}'
+            target: '@{{connectionId}}'
+            description: ''
+            replaceStar: true
+            convertValue: 'mef.sonata.api-target-mapper.order.eline.add#mapper.order.eline.add.orderId'
+            sourceLocation: PATH
+            targetLocation: PATH
+            customizedField: false
+            requiredMapping: true
         response:
           - name: mapper.order.eline.read.state
-            title: Order State Mapping
-            description: order state mapping
-            target: "@{{state}}"
+            title: ProductOrderState
+            source: '@{{status}}'
+            sourceLocation: BODY
+            target: '@{{state}}'
             targetType: enum
             targetLocation: BODY
+            description: ''
+            replaceStar: true
             targetValues:
               - acknowledged
               - assessingCancellation
@@ -35,6 +59,33 @@ spec:
               - inProgress
               - partial
               - rejected
-            valueMapping: {}
-            source: ""
-            sourceLocation: ""
+            valueMapping:
+              ERROR: failed
+              ACTIVE: completed
+              DENIED: rejected
+              DELETED: completed
+              ACCEPTED: acknowledged
+              CREATING: inProgress
+              DISABLED: completed
+            customizedField: false
+            requiredMapping: true
+          - name: mapper.order.eline.read.completionDate
+            title: order complete date
+            source: '@{{firstActiveAt}}'
+            target: '@{{completionDate}}'
+            description: ''
+            replaceStar: true
+            sourceLocation: BODY
+            targetLocation: BODY
+            customizedField: false
+            requiredMapping: false
+          - name: mapper.order.eline.read.instanceId
+            title: instance id from seller
+            source: '@{{id}}'
+            target: '@{{productOrderItem[0].product.id}}'
+            description: ''
+            replaceStar: true
+            sourceLocation: BODY
+            targetLocation: BODY
+            customizedField: false
+            requiredMapping: false
