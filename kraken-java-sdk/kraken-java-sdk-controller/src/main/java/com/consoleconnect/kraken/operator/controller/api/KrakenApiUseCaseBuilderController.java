@@ -46,6 +46,7 @@ public class KrakenApiUseCaseBuilderController {
   public static final String KRAKEN_PREFIX = "kraken@";
   public static final String KRAKEN_APP_NAME_PREFIX = "Kraken App ";
   public static final String FILE_NAME = KRAKEN_PREFIX + "%s.yaml";
+  public static final String SUFFIX_API_VERSION = "api-version";
 
   @Value("${spring.build.version}")
   private String buildVersion;
@@ -94,7 +95,11 @@ public class KrakenApiUseCaseBuilderController {
                   component.put(AssetsConstants.FIELD_KEY, dto.getComponentKey());
                   component.put(
                       AssetsConstants.FIELD_API_VERSION,
-                      componentEntityMap.get(dto.getComponentKey()).getApiVersion());
+                      componentEntityMap.get(dto.getComponentKey()).getLabels().entrySet().stream()
+                          .filter(entry -> entry.getKey().contains(SUFFIX_API_VERSION))
+                          .findFirst()
+                          .map(Map.Entry::getValue)
+                          .orElse(""));
                   List<Map<String, Object>> endPoints =
                       dto.getDetails().stream()
                           .map(
