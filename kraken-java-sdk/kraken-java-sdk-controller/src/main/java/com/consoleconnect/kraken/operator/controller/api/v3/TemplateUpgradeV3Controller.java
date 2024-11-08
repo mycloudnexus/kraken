@@ -1,6 +1,7 @@
 package com.consoleconnect.kraken.operator.controller.api.v3;
 
 import static com.consoleconnect.kraken.operator.core.service.UnifiedAssetService.getSearchPageRequest;
+import static com.consoleconnect.kraken.operator.core.toolkit.LabelConstants.CONDITION_NULL;
 
 import com.consoleconnect.kraken.operator.auth.security.UserContext;
 import com.consoleconnect.kraken.operator.controller.aspect.TemplateUpgradeBlockChecker;
@@ -13,6 +14,7 @@ import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants;
+import com.consoleconnect.kraken.operator.core.toolkit.LabelConstants;
 import com.consoleconnect.kraken.operator.core.toolkit.Paging;
 import com.consoleconnect.kraken.operator.core.toolkit.PagingHelper;
 import io.swagger.v3.oas.annotations.Operation;
@@ -112,7 +114,7 @@ public class TemplateUpgradeV3Controller {
           int page,
       @RequestParam(value = "size", required = false, defaultValue = PagingHelper.DEFAULT_SIZE_STR)
           int size) {
-    List<Tuple2> tuple3s = List.of();
+    List<Tuple2> tuple3s = Tuple2.ofList(LabelConstants.LABEL_FIRST_UPGRADE, CONDITION_NULL);
     Paging<UnifiedAssetDto> assetDtoPaging =
         unifiedAssetService.findBySpecification(
             Tuple2.ofList(

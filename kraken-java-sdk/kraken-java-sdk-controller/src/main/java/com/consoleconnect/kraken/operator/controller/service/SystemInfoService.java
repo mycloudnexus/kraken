@@ -10,17 +10,20 @@ import com.consoleconnect.kraken.operator.controller.repo.EnvironmentRepository;
 import com.consoleconnect.kraken.operator.controller.repo.SystemInfoRepository;
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
+import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
 import com.consoleconnect.kraken.operator.core.enums.EnvNameEnum;
 import com.consoleconnect.kraken.operator.core.event.PlatformSettingCompletedEvent;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.model.Metadata;
+import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants;
 import com.consoleconnect.kraken.operator.core.toolkit.Constants;
 import com.consoleconnect.kraken.operator.core.toolkit.LabelConstants;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -44,6 +47,7 @@ public class SystemInfoService {
   private final SystemInfoRepository systemInfoRepository;
   private final MgmtProperty mgmtProperty;
   private final EnvironmentRepository environmentRepository;
+  private final UnifiedAssetRepository unifiedAssetRepository;
 
   @Value("${spring.build.version}")
   private String buildVersion;
@@ -101,6 +105,7 @@ public class SystemInfoService {
             .orElseThrow()
             .getId()
             .toString();
+    AtomicReference<String> firstVersion = new AtomicReference<>();
     String templateVersion =
         unifiedAssetService
             .findBySpecification(
@@ -108,12 +113,16 @@ public class SystemInfoService {
                     AssetsConstants.FIELD_KIND, AssetKindEnum.PRODUCT_TEMPLATE_UPGRADE.getKind()),
                 null,
                 null,
-                PageRequest.of(0, 1, Sort.Direction.DESC, AssetsConstants.FIELD_CREATE_AT),
+                PageRequest.of(0, 1, Sort.Direction.ASC, AssetsConstants.FIELD_CREATE_AT),
                 null)
             .getData()
             .stream()
             .findFirst()
-            .map(t -> t.getMetadata().getLabels().get(LabelConstants.LABEL_PRODUCT_VERSION))
+            .map(
+                t -> {
+                  firstVersion.set(t.getId());
+                  return t.getMetadata().getLabels().get(LabelConstants.LABEL_PRODUCT_VERSION);
+                })
             .orElse(null);
     String controlVersion =
         unifiedAssetService
@@ -173,11 +182,18 @@ public class SystemInfoService {
       systemInfoEntity.setControlProductVersion(templateVersion);
       systemInfoEntity.setStageProductVersion(templateVersion);
       systemInfoEntity.setProductionProductVersion(templateVersion);
+      markFirstTemplateUpgraded(firstVersion.get());
     } else {
       systemInfoEntity.setControlProductVersion(controlVersion);
       systemInfoEntity.setStageProductVersion(stageVersion);
       systemInfoEntity.setProductionProductVersion(productionVersion);
     }
+  }
+
+  private void markFirstTemplateUpgraded(String id) {
+    UnifiedAssetEntity unifiedAssetEntity = unifiedAssetService.findOneByIdOrKey(id);
+    unifiedAssetEntity.getLabels().put(LabelConstants.LABEL_FIRST_UPGRADE, "true");
+    unifiedAssetRepository.save(unifiedAssetEntity);
   }
 
   @Transactional
