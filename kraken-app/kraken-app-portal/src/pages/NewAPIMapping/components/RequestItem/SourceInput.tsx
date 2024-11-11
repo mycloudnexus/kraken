@@ -1,20 +1,19 @@
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { EnumRightType } from "@/utils/types/common.type";
 import { IRequestMapping } from "@/utils/types/component.type";
-import { Flex, Tooltip, Input } from "antd";
+import { Flex, Tooltip } from "antd";
 import clsx from "clsx";
 import { isEqual, cloneDeep, set } from "lodash";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { locationMapping } from "../../helper";
 import { LocationSelector } from "../LocationSelector";
 import styles from "./index.module.scss";
+import { AutoGrowingInput } from "@/components/form";
 
 export function SourceInput({
   item,
   index,
 }: Readonly<{ item: IRequestMapping; index: number }>) {
-  const [value, setValue] = useState("");
-
   const {
     requestMapping,
     setRightSide,
@@ -45,23 +44,19 @@ export function SourceInput({
     setRequestMapping(newRequest);
   };
 
-  useEffect(() => {
-    setValue(item.source);
-  }, [item.source, setValue]);
-
   return (
     <Flex className={styles.flexColumn} gap={4}>
-      {item.source && (
+      {item.source ? (
         <LocationSelector
           type="request"
           disabled={!item.customizedField}
           value={locationMapping(item.sourceLocation, "request")}
           onChange={(value) => handleChange({ sourceLocation: value })}
         />
-      )}
+      ) : <div className={styles.bloater}></div>}
 
       <Tooltip title={item.source}>
-        <Input
+        <AutoGrowingInput
           data-testid="sourceInput"
           variant="filled"
           disabled={!item.customizedField}
@@ -71,7 +66,7 @@ export function SourceInput({
             [styles.error]:
               errors?.requestIds?.has(item.id as any) && !item.source,
           })}
-          value={value}
+          value={item.source}
           style={{ flex: 1 }}
           onClick={() => {
             if (item.requiredMapping) {
@@ -84,8 +79,7 @@ export function SourceInput({
               previousData: item,
             });
           }}
-          onChange={(e) => setValue(e.target.value)}
-          onBlur={() => {
+          onChange={(value) => {
             if (!value) {
               handleChange({ source: value, sourceLocation: undefined });
             } else {

@@ -81,10 +81,11 @@
 .flexColumn {
   flex-direction: column;
   flex: 1;
+  max-width: calc(50% - 22px);
 }
 
 .mappingIcon {
-  margin-bottom: 4px;
+  margin-top: 32px;
 }
 
 .btnRemoveValueMapping {
@@ -100,4 +101,8 @@
     background-color: --hover-bg !important;
     color: var(--primary) !important;
   }
+}
+
+.bloater {
+  height: 21px;
 }

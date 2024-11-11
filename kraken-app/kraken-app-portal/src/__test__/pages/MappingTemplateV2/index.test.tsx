@@ -44,6 +44,16 @@ describe("Mapping template v2 component testing", () => {
       isFetched: true,
     } as any);
 
+    vi.spyOn(userHooks, 'useGetSystemInfo').mockReturnValue({
+      data: {
+        controlProductVersion: 'V1.1.c',
+        stageProductVersion: 'V1.1.s',
+        productionProductVersion: 'V1.1.p'
+      },
+      isFetching: false,
+      isLoading: false,
+    } as any)
+
     const { getByTestId, getAllByTestId, getByText } = render(
       <MappingTemplateV2 />
     );
@@ -96,6 +106,13 @@ describe("Mapping template v2 component testing", () => {
       mappingTemplateRelease[0].description
     );
 
+    // Upgrade versions
+    await waitFor(() =>
+      expect(getByTestId('controlePlaneUpgradeVersion')).toHaveTextContent('V1.1.c')
+    )
+    expect(getByTestId('stageUpgradeVersion')).toHaveTextContent('V1.1.s')
+    expect(getByTestId('productionUpgradeVersion')).toHaveTextContent('V1.1.p')
+
     // Upgrade process
     expect(getByTestId("upgradeProcessTitle")).toHaveTextContent(
       "Upgrade status"
@@ -103,7 +120,7 @@ describe("Mapping template v2 component testing", () => {
     expect(getByText("No upgrade")).toBeInTheDocument();
 
     const btnUpgrade = getByTestId("btnCheckUpgrade");
-    expect(btnUpgrade).toHaveTextContent("Check and upgrade");
+    expect(btnUpgrade).toHaveTextContent("Start upgrading");
 
     // Simuate selecting another release version to view details
     const releaseItems = getAllByTestId("releaseVersionItem");
@@ -117,7 +134,7 @@ describe("Mapping template v2 component testing", () => {
       mappingTemplateRelease[1].description
     );
   });
-  
+
   it("should render controle plane upgrade step - happy case", async () => {
     vi.spyOn(
       mappingHooks,
@@ -569,7 +586,7 @@ describe("Mapping template v2 component testing", () => {
     await waitFor(() => expect(getByText('Yes, continue')).toBeInTheDocument())
 
     fireEvent.click(getByText('Yes, continue'))
-    
+
     await waitFor(() => expect(getByText('Mapping template upgrade successfully in production data plane but not compatible with Kraken version running in this plane. Please upgrade kraken to make this new mapping template effective.')).toBeInTheDocument())
   });
 
