@@ -924,7 +924,7 @@ public class TemplateUpgradeService {
         upgradeSourceServiceFactory
             .getUpgradeSourceService(event.getTemplateUpgradeId())
             .reportResult(event.getTemplateUpgradeId(), deploymentId);
-        log.info("Template upgrade  completed");
+        log.info("Template upgrade completed");
         return deploymentId;
       }
     } catch (Exception exception) {
