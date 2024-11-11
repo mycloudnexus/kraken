@@ -14,7 +14,7 @@ spec:
     actionType: add
   endpoints:
     - id: create connection order
-      path: /api/v2/company/{companyName}/connections/layer2
+      path: /api/v2/company/{username}/connections/layer2
       method: put
       serverKey: mef.sonata.api-target-spec.con1718940696857
       mappers:
@@ -136,6 +136,27 @@ spec:
             sourceLocation: BODY
             targetLocation: BODY
             requiredMapping: true
+          - name: mapper.order.eline.add.product.productConfiguration.type
+            title: "connection type"
+            source: "@{{productOrderItem[0].product.productConfiguration.type}}"
+            target: "@{{type}}"
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.order.eline.add.product.productConfiguration.destUNIMetroId
+            title: "connection destUNIMetroId"
+            source: "@{{productOrderItem[0].product.productConfiguration.destUNIMetroId}}"
+            target: "@{{destMetroId}}"
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.order.eline.add.product.productConfiguration.buyerCompanyId
+            title: "connection buyerCompanyId"
+            source: "@{{productOrderItem[0].product.productConfiguration.buyerCompanyId}}"
+            target: "@{{destCompany}}"
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: false
         response:
           - name: mapper.order.eline.add.state
             title: Order State Mapping
