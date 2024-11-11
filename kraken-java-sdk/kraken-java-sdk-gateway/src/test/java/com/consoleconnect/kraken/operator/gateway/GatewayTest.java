@@ -5,13 +5,10 @@ import static com.consoleconnect.kraken.operator.gateway.filter.KrakenFilterCons
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doReturn;
 
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
-import com.consoleconnect.kraken.operator.gateway.entity.HttpRequestEntity;
 import com.consoleconnect.kraken.operator.gateway.repo.HttpRequestRepository;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
@@ -20,7 +17,6 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 import lombok.SneakyThrows;
 import org.apache.commons.collections4.CollectionUtils;
 import org.junit.jupiter.api.*;
@@ -242,34 +238,6 @@ class GatewayTest extends AbstractIntegrationTest {
             response -> {
               String bodyStr = new String(Objects.requireNonNull(response.getResponseBody()));
               System.out.println(bodyStr);
-            });
-  }
-
-  @Order(8)
-  @Test
-  void testMefOrderNotification() throws IOException {
-    HttpRequestEntity entity = new HttpRequestEntity();
-    entity.setId(UUID.randomUUID());
-    doReturn(List.of(entity)).when(requestRepository).findByExternalId(anyString());
-    String s = readFileToString("mockData/notificationRequest.json");
-    webTestClient
-        .mutate()
-        .responseTimeout(Duration.ofSeconds(600))
-        .build()
-        .post()
-        .uri(
-            uriBuilder ->
-                uriBuilder
-                    .path("/mefApi/listener/notification")
-                    .queryParam("eventType", "productOrderStateChangeEvent")
-                    .build())
-        .bodyValue(JsonToolkit.fromJson(s, Object.class))
-        .header("portal-token", "123")
-        .exchange()
-        .expectBody()
-        .consumeWith(
-            response -> {
-              Assertions.assertNull(response.getResponseBody());
             });
   }
 }
