@@ -194,7 +194,7 @@ spec:
           - name: mapper.order.eline.add.product.id
             title: product instance id
             description: ""
-            source: ""
+            source: "@{{id}}"
             sourceLocation: BODY
             target: "@{{productOrderItem[0].product.id}}"
             targetLocation: BODY
