@@ -275,14 +275,8 @@ class TemplateUpgradeControllerTest {
                 .findByKindOrderByCreatedAtDesc(AssetKindEnum.PRODUCT_TEMPLATE_DEPLOYMENT.getKind())
                 .forEach(
                     entity -> {
-                      // when integration tests, not allowed two production deployment
-                      String envId = entity.getLabels().get(LabelConstants.LABEL_ENV_ID);
-                      if (TestApplication.productionEnvId.equalsIgnoreCase(envId)
-                          || TestApplication.envId.equalsIgnoreCase(envId)) {
-                      } else {
-                        entity.setStatus(DeployStatusEnum.SUCCESS.name());
-                        unifiedAssetRepository.save(entity);
-                      }
+                      entity.setStatus(DeployStatusEnum.SUCCESS.name());
+                      unifiedAssetRepository.save(entity);
                     });
             systemInfoService.updateSystemStatus(SystemStateEnum.RUNNING);
           });
