@@ -1,6 +1,7 @@
 package com.consoleconnect.kraken.operator.controller.api.v3;
 
 import static com.consoleconnect.kraken.operator.core.service.UnifiedAssetService.getSearchPageRequest;
+import static com.consoleconnect.kraken.operator.core.toolkit.LabelConstants.CONDITION_NULL;
 
 import com.consoleconnect.kraken.operator.auth.security.UserContext;
 import com.consoleconnect.kraken.operator.controller.aspect.TemplateUpgradeBlockChecker;
@@ -11,8 +12,10 @@ import com.consoleconnect.kraken.operator.core.dto.Tuple2;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
+import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants;
+import com.consoleconnect.kraken.operator.core.toolkit.LabelConstants;
 import com.consoleconnect.kraken.operator.core.toolkit.Paging;
 import com.consoleconnect.kraken.operator.core.toolkit.PagingHelper;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,6 +39,7 @@ import reactor.core.scheduler.Schedulers;
 public class TemplateUpgradeV3Controller {
   private final TemplateUpgradeService templateUpgradeService;
   private final UnifiedAssetService unifiedAssetService;
+  private final UnifiedAssetRepository unifiedAssetRepository;
 
   @Operation(summary = "control plane upgrade")
   @PostMapping("/control-plane")
@@ -112,7 +116,14 @@ public class TemplateUpgradeV3Controller {
           int page,
       @RequestParam(value = "size", required = false, defaultValue = PagingHelper.DEFAULT_SIZE_STR)
           int size) {
-    List<Tuple2> tuple3s = List.of();
+    String uuid = unifiedAssetRepository.findOneByKey(productId).orElseThrow().getId().toString();
+    TemplateUpgradeReleaseVO first =
+        unifiedAssetService
+            .findLatest(uuid, AssetKindEnum.PRODUCT_TEMPLATE_UPGRADE)
+            .map(t -> unifiedAssetService.findOne(t.getId().toString()))
+            .map(templateUpgradeService::generateTemplateUpgradeReleaseVO)
+            .orElse(null);
+    List<Tuple2> tuple3s = Tuple2.ofList(LabelConstants.LABEL_FIRST_UPGRADE, CONDITION_NULL);
     Paging<UnifiedAssetDto> assetDtoPaging =
         unifiedAssetService.findBySpecification(
             Tuple2.ofList(
@@ -129,8 +140,8 @@ public class TemplateUpgradeV3Controller {
             .map(templateUpgradeService::generateTemplateUpgradeReleaseVO)
             .toList();
     // the latest can upgrade
-    list.stream().findFirst().ifPresent(vo -> templateUpgradeService.calculateStatus(vo, true));
-    list.stream().skip(1).forEach(vo -> templateUpgradeService.calculateStatus(vo, false));
+    list.stream().findFirst().ifPresent(vo -> templateUpgradeService.calculateStatus(vo, first));
+    list.stream().skip(1).forEach(vo -> templateUpgradeService.calculateStatus(vo, first));
     return HttpResponse.ok(
         PagingHelper.toPageNoSubList(
             list, assetDtoPaging.getPage(), assetDtoPaging.getSize(), assetDtoPaging.getTotal()));

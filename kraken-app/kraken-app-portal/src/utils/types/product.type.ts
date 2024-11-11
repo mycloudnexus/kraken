@@ -144,3 +144,8 @@ export interface IApiUseCase {
   componentName: string;
   details: IRunningMapping[];
 }
+
+export interface IProductIdAndNameParams {
+  productId: string;
+  name: string;
+}

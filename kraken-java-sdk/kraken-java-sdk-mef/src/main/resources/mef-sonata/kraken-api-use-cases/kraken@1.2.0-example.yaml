@@ -1,0 +1,110 @@
+---
+kind: kraken.product.app.kraken
+apiVersion: v1
+metadata:
+  name: Kraken App 1.2.0-example
+  key: kraken@1.2.0-example
+  labels:
+    appVersion: 1.2.0-example
+    productVersion: V1.4.10
+    productKey: mef.sonata
+    productSpec: grace
+    publishDate: 2024-11-08
+  version: 1
+spec:
+  use-cases:
+    - name: Product Ordering Management
+      key: mef.sonata.api.order
+      apiVersion: v10
+      endpoints:
+        - path: /mefApi/sonata/productOrderingManagement/v10/productOrder
+          method: post
+          mapping-matrix:
+            productType: uni
+            actionType: delete
+        - path: "/mefApi/sonata/productOrderingManagement/v10/productOrder/{id}"
+          method: get
+          mapping-matrix:
+            productType: uni
+        - path: /mefApi/sonata/productOrderingManagement/v10/productOrder
+          method: post
+          mapping-matrix:
+            productType: access_e_line
+            actionType: delete
+        - path: /mefApi/sonata/productOrderingManagement/v10/productOrder
+          method: post
+          mapping-matrix:
+            productType: access_e_line
+            actionType: add
+        - path: /mefApi/sonata/productOrderingManagement/v10/productOrder
+          method: post
+          mapping-matrix:
+            productType: uni
+            actionType: add
+        - path: "/mefApi/sonata/productOrderingManagement/v10/productOrder/{id}"
+          method: get
+          mapping-matrix:
+            productType: access_e_line
+    - name: Product Inventory Management
+      key: mef.sonata.api.inventory
+      apiVersion: v7
+      endpoints:
+        - path: "/mefApi/sonata/productInventory/v7/product/{id}"
+          method: get
+          mapping-matrix:
+            productType: uni
+        - path: "/mefApi/sonata/productInventory/v7/product/{id}"
+          method: get
+          mapping-matrix:
+            productType: access_e_line
+        - path: /mefApi/sonata/productInventory/v7/product
+          method: get
+          mapping-matrix:
+            productType: access_e_line
+        - path: /mefApi/sonata/productInventory/v7/product
+          method: get
+          mapping-matrix:
+            productType: uni
+    - name: Geographic Address Management
+      key: mef.sonata.api.serviceability.address
+      apiVersion: v7
+      endpoints:
+        - path: /mefApi/sonata/geographicAddressManagement/v7/geographicAddressValidation
+          method: post
+          mapping-matrix:
+            provideAlternative: false
+            addressType: FieldedAddress
+        - path: "/mefApi/sonata/geographicAddressManagement/v7/geographicAddress/{id}"
+          method: get
+          mapping-matrix:
+            addressType: FieldedAddress
+    - name: Quote Management
+      key: mef.sonata.api.quote
+      apiVersion: v8
+      endpoints:
+        - path: "/mefApi/sonata/quoteManagement/v8/quote/{id}"
+          method: get
+          mapping-matrix:
+            productType: uni
+            quoteLevel: firm
+            syncMode: true
+        - path: /mefApi/sonata/quoteManagement/v8/quote
+          method: post
+          mapping-matrix:
+            productType: access_e_line
+            actionType: add
+            quoteLevel: firm
+            syncMode: true
+        - path: "/mefApi/sonata/quoteManagement/v8/quote/{id}"
+          method: get
+          mapping-matrix:
+            productType: access_e_line
+            quoteLevel: firm
+            syncMode: true
+        - path: /mefApi/sonata/quoteManagement/v8/quote
+          method: post
+          mapping-matrix:
+            productType: uni
+            actionType: add
+            quoteLevel: firm
+            syncMode: true
