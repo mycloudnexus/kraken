@@ -433,7 +433,7 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
       systemInfoService.updateProductVersion(
           SystemStateEnum.STAGE_UPGRADE_DONE,
           null,
-          Constants.formatVersion(
+          Constants.formatVersionUsingV(
               templateUpgrade.getMetadata().getLabels().get(LABEL_PRODUCT_VERSION)),
           null);
     } else {
@@ -441,7 +441,7 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
           SystemStateEnum.RUNNING,
           null,
           null,
-          Constants.formatVersion(
+          Constants.formatVersionUsingV(
               templateUpgrade.getMetadata().getLabels().get(LABEL_PRODUCT_VERSION)));
     }
   }
