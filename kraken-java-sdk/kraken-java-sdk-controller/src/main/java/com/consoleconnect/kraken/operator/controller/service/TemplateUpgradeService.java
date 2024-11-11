@@ -576,6 +576,7 @@ public class TemplateUpgradeService {
 
   @Transactional(rollbackFor = Exception.class)
   public String controlPlaneUpgradeV3(String templateUpgradeId, String userId) {
+    checkOnlyOneControlPlaneUpgrade(templateUpgradeId);
     return this.controlPlaneUpgrade(templateUpgradeId, userId);
   }
 
@@ -584,7 +585,6 @@ public class TemplateUpgradeService {
     if (!SystemStateEnum.CAN_CONTROL_UPGRADE_STATES.contains(systemInfo.getStatus())) {
       throw KrakenException.badRequest("Current system state is not allowed to upgrade");
     }
-    checkOnlyOneControlPlaneUpgrade(templateUpgradeId);
     UnifiedAssetDto productAsset = this.getProductAsset();
 
     String controlDeploymentId =

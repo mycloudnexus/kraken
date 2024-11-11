@@ -8,14 +8,12 @@ import static org.hamcrest.Matchers.*;
 import com.consoleconnect.kraken.operator.config.TestApplication;
 import com.consoleconnect.kraken.operator.config.TestContextConstants;
 import com.consoleconnect.kraken.operator.controller.ClientMapperVersionCreator;
-import com.consoleconnect.kraken.operator.controller.EnvCreator;
 import com.consoleconnect.kraken.operator.controller.WebTestClientHelper;
 import com.consoleconnect.kraken.operator.controller.dto.ClientMapperVersionPayloadDto;
 import com.consoleconnect.kraken.operator.controller.dto.CreateControlPlaneUpgradeRequest;
 import com.consoleconnect.kraken.operator.controller.dto.CreateProductionUpgradeRequest;
 import com.consoleconnect.kraken.operator.controller.dto.CreateUpgradeRequest;
 import com.consoleconnect.kraken.operator.controller.enums.SystemStateEnum;
-import com.consoleconnect.kraken.operator.controller.model.MgmtProperty;
 import com.consoleconnect.kraken.operator.controller.service.*;
 import com.consoleconnect.kraken.operator.controller.service.upgrade.MgmtSourceUpgradeService;
 import com.consoleconnect.kraken.operator.core.client.ClientEvent;
@@ -41,9 +39,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import java.nio.charset.Charset;
 import java.time.Duration;
 import java.util.*;
-import lombok.Getter;
 import org.apache.commons.io.IOUtils;
-import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
@@ -51,7 +47,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
@@ -72,6 +67,9 @@ class TemplateUpgradeControllerTest {
     @Autowired ComponentTagService componentTagService;
     @Autowired SystemInfoService systemInfoService;
     @Autowired ClientMapperVersionCreator clientMapperVersionCreator;
+    @Autowired ProductDeploymentService productDeploymentService;
+    @Autowired MgmtEventRepository mgmtEventRepository;
+    @Autowired MgmtSourceUpgradeService mgmtSourceUpgradeService;
 
     public static final String CONTROL_UPGRADE_URL =
         "/v3/products/{productId}/template-upgrade/control-plane";
@@ -79,11 +77,17 @@ class TemplateUpgradeControllerTest {
         "/v3/products/{productId}/template-upgrade/stage";
     public static final String PRODUCTION_UPGRADE_URL =
         "/v3/products/{productId}/template-upgrade/production";
+    public static final String MEF_SONATA_RELEASE_1_1_0_PUBLISHED =
+        "mef.sonata.release@1.1.0.published";
     @Autowired EnvironmentClientRepository envClientRepository;
 
     @Autowired EnvironmentService environmentService;
     @Autowired UnifiedAssetRepository unifiedAssetRepository;
     @Autowired AppProperty appProperty;
+    @Autowired EnvironmentClientRepository environmentClientRepository;
+
+    @Autowired ClientEventService clientEventService;
+
     Logger log = LoggerFactory.getLogger(TemplateUpgradeV3ControllerTest.class);
 
     @Autowired
@@ -156,6 +160,84 @@ class TemplateUpgradeControllerTest {
 
     @Test
     @Order(3)
+    void givenStageUpgraded_WhenReportClientMapperVersion_thenReturnOk() {
+      ClientMapperVersionPayloadDto clientMapperVersionPayloadDto =
+          new ClientMapperVersionPayloadDto();
+      clientMapperVersionPayloadDto.setMapperKey(MEF_SONATA_API_TARGET_MAPPER_ADDRESS_RETRIEVE);
+      ClientEvent clientEvent =
+          ClientEvent.of(
+              MEF_SONATA_API_TARGET_MAPPER_ADDRESS_RETRIEVE,
+              ClientEventTypeEnum.CLIENT_MAPPER_VERSION,
+              List.of(clientMapperVersionPayloadDto));
+      clientEventService.onEvent(TestApplication.envId, null, clientEvent);
+      Optional<EnvironmentClientEntity> oneByEnvIdAndClientKeyAndKind =
+          environmentClientRepository.findOneByEnvIdAndClientKeyAndKind(
+              TestApplication.envId,
+              MEF_SONATA_API_TARGET_MAPPER_ADDRESS_RETRIEVE,
+              ClientReportTypeEnum.CLIENT_MAPPER_VERSION.name());
+      assertThat(oneByEnvIdAndClientKeyAndKind.isPresent(), is(true));
+    }
+
+    @Test
+    @Order(5)
+    void givenUpgradeCompleted_whenQueryControlDeploymentDetails_thenReturnData() {
+      String url = "/v2/products/{productId}/template-upgrade/template-deployments/{deploymentId}";
+      UnifiedAssetDto assetDto =
+          unifiedAssetService
+              .findByKind(AssetKindEnum.PRODUCT_TEMPLATE_CONTROL_DEPLOYMENT.getKind())
+              .get(0);
+      testClientHelper.getAndVerify(
+          uriBuilder ->
+              uriBuilder.path(url).build(TestContextConstants.PRODUCT_ID, assetDto.getId()),
+          body -> {
+            assertThat(body, hasJsonPath("$.code", equalTo(200)));
+            assertThat(body, hasJsonPath("$.data", hasSize(greaterThanOrEqualTo(1))));
+          });
+    }
+
+    @Test
+    @Order(6)
+    void givenStageUpgraded_whenListTemplateDeployment_thenReturnData() {
+      String url = "/v2/products/{productId}/template-upgrade/template-deployments";
+      testClientHelper.getAndVerify(
+          uriBuilder ->
+              uriBuilder.path(url).build(TestContextConstants.PRODUCT_ID, TestApplication.envId),
+          body -> {
+            assertThat(body, hasJsonPath("$.code", equalTo(200)));
+            assertThat(body, hasJsonPath("$.data.data", hasSize(greaterThanOrEqualTo(1))));
+          });
+    }
+
+    @Test
+    @Order(6)
+    void givenStageUpgraded_whenGetDetail_thenReturnData() {
+      Paging<UnifiedAssetDto> assetDtoPaging =
+          unifiedAssetService.findBySpecification(
+              Tuple2.ofList(
+                  AssetsConstants.FIELD_KIND, AssetKindEnum.PRODUCT_TEMPLATE_DEPLOYMENT.getKind()),
+              null,
+              null,
+              null,
+              null);
+      String url = "/v2/products/{productId}/template-upgrade/template-deployments/{deploymentId}";
+      testClientHelper.getAndVerify(
+          uriBuilder ->
+              uriBuilder
+                  .path(url)
+                  .build(TestContextConstants.PRODUCT_ID, assetDtoPaging.getData().get(0).getId()),
+          body -> {
+            log.info("{}", body);
+            assertThat(body, hasJsonPath("$.code", equalTo(200)));
+            assertThat(body, hasJsonPath("$.data", hasSize(greaterThanOrEqualTo(1))));
+            assertThat(
+                body,
+                hasJsonPath(
+                    "$.data[0].mapperKey", containsString("mef.sonata.api-target-mapper.address")));
+          });
+    }
+
+    @Test
+    @Order(7)
     @Sql(
         statements = {
           "update kraken_mgmt_system_info set status='STAGE_UPGRADE_DONE'",
@@ -197,8 +279,6 @@ class TemplateUpgradeControllerTest {
                       String envId = entity.getLabels().get(LabelConstants.LABEL_ENV_ID);
                       if (TestApplication.productionEnvId.equalsIgnoreCase(envId)
                           || TestApplication.envId.equalsIgnoreCase(envId)) {
-                        entity.setKind("kraken.product.template-deployment-deleted");
-                        unifiedAssetRepository.save(entity);
                       } else {
                         entity.setStatus(DeployStatusEnum.SUCCESS.name());
                         unifiedAssetRepository.save(entity);
@@ -209,24 +289,7 @@ class TemplateUpgradeControllerTest {
     }
 
     @Test
-    @Order(5)
-    void givenUpgradeCompleted_whenQueryControlDeploymentDetails_thenReturnData() {
-      String url = "/v2/products/{productId}/template-upgrade/template-deployments/{deploymentId}";
-      UnifiedAssetDto assetDto =
-          unifiedAssetService
-              .findByKind(AssetKindEnum.PRODUCT_TEMPLATE_CONTROL_DEPLOYMENT.getKind())
-              .get(0);
-      testClientHelper.getAndVerify(
-          uriBuilder ->
-              uriBuilder.path(url).build(TestContextConstants.PRODUCT_ID, assetDto.getId()),
-          body -> {
-            assertThat(body, hasJsonPath("$.code", equalTo(200)));
-            assertThat(body, hasJsonPath("$.data", hasSize(greaterThanOrEqualTo(1))));
-          });
-    }
-
-    @Test
-    @Order(6)
+    @Order(7)
     void givenStageUpgraded_whenCheckStageUpgrade_thenReturnData() {
       String url = "/v3/products/{productId}/template-upgrade/stage-upgrade-check";
       UnifiedAssetDto assetDto =
@@ -245,7 +308,7 @@ class TemplateUpgradeControllerTest {
     }
 
     @Test
-    @Order(6)
+    @Order(8)
     void givenStageUpgradedAndErrorEnv_whenCheckStageUpgrade_thenReturnCode400() {
       String url = "/v3/products/{productId}/template-upgrade/stage-upgrade-check";
       UnifiedAssetDto assetDto =
@@ -264,7 +327,7 @@ class TemplateUpgradeControllerTest {
     }
 
     @Test
-    @Order(6)
+    @Order(9)
     void givenProductionUpgraded_whenCheckProductionUpgrade_thenReturnData() {
       String url = "/v3/products/{productId}/template-upgrade/production-upgrade-check";
       UnifiedAssetDto assetDto =
@@ -283,7 +346,7 @@ class TemplateUpgradeControllerTest {
     }
 
     @Test
-    @Order(6)
+    @Order(10)
     void givenProductionUpgradedAndErrorEnv_whenCheckProductionUpgrade_thenReturnCode400() {
       String url = "/v3/products/{productId}/template-upgrade/production-upgrade-check";
       UnifiedAssetDto assetDto =
@@ -300,214 +363,9 @@ class TemplateUpgradeControllerTest {
             assertThat(body, hasJsonPath("$.reason", containsString("not production environment")));
           });
     }
-  }
-
-  @MockIntegrationTest
-  @ContextConfiguration(classes = {TestApplication.class})
-  @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-  @Order(200)
-  @Nested
-  class TemplateUpgradeV2ControllerTest extends AbstractIntegrationTest implements EnvCreator {
-    public static final String MEF_SONATA_RELEASE_1_1_0_PUBLISHED =
-        "mef.sonata.release@1.1.0.published";
-    public static final String MEF_SONATA_API_TARGET_MAPPER_ADDRESS_RETRIEVE =
-        "mef.sonata.api-target-mapper.address.retrieve";
-    @Autowired UnifiedAssetService unifiedAssetService;
-    @Autowired MgmtProperty mgmtProperty;
-    @Autowired AppProperty appProperty;
-    WebTestClientHelper testClientHelper;
-    @Autowired ProductDeploymentService productDeploymentService;
-    @Getter @Autowired EnvironmentService environmentService;
-    @Autowired MgmtSourceUpgradeService mgmtSourceUpgradeService;
-    @Autowired MgmtEventRepository mgmtEventRepository;
-    @Autowired ClientEventService clientEventService;
-    @Autowired EnvironmentClientRepository environmentClientRepository;
-    @Autowired EvnClientMapperInfoService evnClientMapperInfoService;
-    @Autowired EnvironmentClientRepository envClientRepository;
-    @Autowired ComponentTagService componentTagService;
-    @Autowired ClientMapperVersionCreator clientMapperVersionCreator;
-    @Autowired private SystemInfoService systemInfoService;
-    Logger log = LoggerFactory.getLogger(TemplateUpgradeV2ControllerTest.class);
-
-    @Autowired
-    TemplateUpgradeV2ControllerTest(WebTestClient webTestClient) {
-      testClientHelper =
-          new WebTestClientHelper(
-              webTestClient.mutate().responseTimeout(Duration.ofSeconds(1000)).build());
-    }
 
     @Test
-    @Order(1)
-    void givenErrorTemplateUpgradeId_WhenProductionUpgrade_thenReturn400() {
-      String url = "/v2/products/{productId}/template-upgrade/production";
-      CreateProductionUpgradeRequest createUpgradeRequest = new CreateProductionUpgradeRequest();
-      createUpgradeRequest.setTemplateUpgradeId(UUID.randomUUID().toString());
-      createUpgradeRequest.setStageEnvId(TestApplication.envId);
-      createUpgradeRequest.setProductEnvId(TestApplication.envId);
-      testClientHelper.requestAndVerify(
-          HttpMethod.POST,
-          uriBuilder ->
-              uriBuilder.path(url).build(TestContextConstants.PRODUCT_ID, TestApplication.envId),
-          400,
-          createUpgradeRequest,
-          body -> {
-            assertThat(body, hasJsonPath("$.code", equalTo("invalidBody")));
-          });
-    }
-
-    @Test
-    @Order(1)
-    void givenErrorTemplateUpgradeId_WhenStageUpgrade_thenReturn400() {
-      String url = "/v2/products/{productId}/template-upgrade/stage";
-      CreateUpgradeRequest createUpgradeRequest = new CreateUpgradeRequest();
-      createUpgradeRequest.setTemplateUpgradeId(UUID.randomUUID().toString());
-      createUpgradeRequest.setStageEnvId(TestApplication.envId);
-      appProperty
-          .getTenant()
-          .setWorkspacePath("classpath:deployment-config/template-upgrade/kraken.yaml");
-      testClientHelper.requestAndVerify(
-          HttpMethod.POST,
-          uriBuilder ->
-              uriBuilder.path(url).build(TestContextConstants.PRODUCT_ID, TestApplication.envId),
-          400,
-          createUpgradeRequest,
-          body -> {
-            assertThat(body, hasJsonPath("$.code", equalTo("invalidBody")));
-          });
-    }
-
-    @Test
-    @Order(2)
-    void givenUpgradeId_WhenStageUpgrade_thenReturnOk() {
-      IngestionDataResult mappingTag =
-          componentTagService.createMappingTag(
-              "mef.sonata.api.serviceability.address",
-              MEF_SONATA_API_TARGET_MAPPER_ADDRESS_RETRIEVE,
-              null);
-      clientMapperVersionCreator.newClientMapperVersion(
-          mappingTag.getData().getId().toString(), TestApplication.envId);
-      clientMapperVersionCreator.newClientMapperVersion(
-          mappingTag.getData().getId().toString(), TestApplication.productionEnvId);
-      UnifiedAssetDto assetDto =
-          unifiedAssetService.findOne(MEF_SONATA_API_TARGET_MAPPER_ADDRESS_RETRIEVE);
-      assetDto.getMetadata().setLabels(new HashMap<>());
-      assetDto
-          .getMetadata()
-          .getLabels()
-          .put(LabelConstants.LABEL_DEPLOYED_STATUS, LabelConstants.VALUE_DEPLOYED_STATUS_DEPLOYED);
-      SyncMetadata syncMetadata = new SyncMetadata();
-      syncMetadata.setSyncedAt(DateTime.nowInUTCString());
-      unifiedAssetService.syncAsset(assetDto.getParentId(), assetDto, syncMetadata, true);
-      String url = "/v2/products/{productId}/template-upgrade/stage";
-      Paging<UnifiedAssetDto> assetDtoPaging =
-          unifiedAssetService.findBySpecification(
-              List.of(
-                  Tuple2.of(
-                      AssetsConstants.FIELD_KIND,
-                      AssetKindEnum.PRODUCT_TEMPLATE_UPGRADE.getKind())),
-              null,
-              null,
-              null,
-              null);
-      CreateUpgradeRequest createUpgradeRequest = new CreateUpgradeRequest();
-      createUpgradeRequest.setTemplateUpgradeId(assetDtoPaging.getData().get(0).getId());
-      createUpgradeRequest.setStageEnvId(TestApplication.envId);
-      appProperty
-          .getTenant()
-          .setWorkspacePath("classpath:deployment-config/template-upgrade/kraken.yaml");
-      testClientHelper.postAndVerify(
-          uriBuilder ->
-              uriBuilder.path(url).build(TestContextConstants.PRODUCT_ID, TestApplication.envId),
-          createUpgradeRequest,
-          body -> {
-            assertThat(body, hasJsonPath("$.code", equalTo(200)));
-          });
-    }
-
-    @Test
-    @Order(3)
-    @Sql(
-        statements = {
-          "update kraken_mgmt_system_info set status='STAGE_UPGRADE_DONE'",
-          "update  kraken_asset set  status='SUCCESS' where kind in ('kraken.product-deployment','kraken.product.template-deployment')"
-        })
-    void givenStageUpgradeId_WhenProductionUpgrade_thenReturnOk() {
-      String url = "/v2/products/{productId}/template-upgrade/production";
-      Paging<UnifiedAssetDto> assetDtoPaging =
-          unifiedAssetService.findBySpecification(
-              Tuple2.ofList(
-                  AssetsConstants.FIELD_KIND, AssetKindEnum.PRODUCT_TEMPLATE_UPGRADE.getKind()),
-              null,
-              null,
-              null,
-              null);
-      CreateProductionUpgradeRequest createUpgradeRequest = new CreateProductionUpgradeRequest();
-      createUpgradeRequest.setTemplateUpgradeId(assetDtoPaging.getData().get(0).getId());
-      createUpgradeRequest.setStageEnvId(TestApplication.envId);
-      createUpgradeRequest.setProductEnvId(TestApplication.productionEnvId);
-      testClientHelper.postAndVerify(
-          uriBuilder ->
-              uriBuilder.path(url).build(TestContextConstants.PRODUCT_ID, TestApplication.envId),
-          createUpgradeRequest,
-          body -> {
-            assertThat(body, hasJsonPath("$.code", equalTo(200)));
-            Paging<UnifiedAssetDto> assetDtoPaging1 =
-                unifiedAssetService.findBySpecification(
-                    Tuple2.ofList(
-                        AssetsConstants.FIELD_KIND,
-                        AssetKindEnum.PRODUCT_TEMPLATE_DEPLOYMENT.getKind()),
-                    null,
-                    null,
-                    PageRequest.of(0, 10),
-                    null);
-            MatcherAssert.assertThat(assetDtoPaging1.getData(), hasSize(2));
-            systemInfoService.updateSystemStatus(SystemStateEnum.RUNNING);
-          });
-    }
-
-    @Test
-    @Order(4)
-    void givenStageUpgraded_WhenReportClientMapperVersion_thenReturnOk() {
-      ClientMapperVersionPayloadDto clientMapperVersionPayloadDto =
-          new ClientMapperVersionPayloadDto();
-      clientMapperVersionPayloadDto.setMapperKey(MEF_SONATA_API_TARGET_MAPPER_ADDRESS_RETRIEVE);
-      ClientEvent clientEvent =
-          ClientEvent.of(
-              MEF_SONATA_API_TARGET_MAPPER_ADDRESS_RETRIEVE,
-              ClientEventTypeEnum.CLIENT_MAPPER_VERSION,
-              List.of(clientMapperVersionPayloadDto));
-      clientEventService.onEvent(TestApplication.envId, null, clientEvent);
-      Optional<EnvironmentClientEntity> oneByEnvIdAndClientKeyAndKind =
-          environmentClientRepository.findOneByEnvIdAndClientKeyAndKind(
-              TestApplication.envId,
-              MEF_SONATA_API_TARGET_MAPPER_ADDRESS_RETRIEVE,
-              ClientReportTypeEnum.CLIENT_MAPPER_VERSION.name());
-      assertThat(oneByEnvIdAndClientKeyAndKind.isPresent(), is(true));
-    }
-
-    @Test
-    @Order(5)
-    void givenProductId_whenListTemplateChangeLog_thenReturnData() {
-      String url = "/v2/products/{productId}/template-upgrade/releases";
-      testClientHelper.getAndVerify(
-          uriBuilder ->
-              uriBuilder.path(url).build(TestContextConstants.PRODUCT_ID, TestApplication.envId),
-          body -> {
-            assertThat(body, hasJsonPath("$.code", equalTo(200)));
-            assertThat(body, hasJsonPath("$.data.data", hasSize(greaterThanOrEqualTo(0))));
-          });
-      String urlV3 = "/v3/products/{productId}/template-upgrade/releases";
-      testClientHelper.getAndVerify(
-          uriBuilder ->
-              uriBuilder.path(urlV3).build(TestContextConstants.PRODUCT_ID, TestApplication.envId),
-          body -> {
-            assertThat(body, hasJsonPath("$.code", equalTo(200)));
-            assertThat(body, hasJsonPath("$.data.data", hasSize(greaterThanOrEqualTo(0))));
-          });
-    }
-
-    @Test
-    @Order(6)
+    @Order(11)
     void givenTemplateId_whenListApiUseCaseFromClasspath_thenReturnData() {
       Paging<UnifiedAssetDto> assetDtoPaging =
           unifiedAssetService.findBySpecification(
@@ -531,48 +389,7 @@ class TemplateUpgradeControllerTest {
     }
 
     @Test
-    @Order(7)
-    void givenStageUpgraded_whenListTemplateDeployment_thenReturnData() {
-      String url = "/v2/products/{productId}/template-upgrade/template-deployments";
-      testClientHelper.getAndVerify(
-          uriBuilder ->
-              uriBuilder.path(url).build(TestContextConstants.PRODUCT_ID, TestApplication.envId),
-          body -> {
-            assertThat(body, hasJsonPath("$.code", equalTo(200)));
-            assertThat(body, hasJsonPath("$.data.data", hasSize(greaterThanOrEqualTo(1))));
-          });
-    }
-
-    @Test
-    @Order(8)
-    void givenStageUpgraded_whenGetDetail_thenReturnData() {
-      Paging<UnifiedAssetDto> assetDtoPaging =
-          unifiedAssetService.findBySpecification(
-              Tuple2.ofList(
-                  AssetsConstants.FIELD_KIND, AssetKindEnum.PRODUCT_TEMPLATE_DEPLOYMENT.getKind()),
-              null,
-              null,
-              null,
-              null);
-      String url = "/v2/products/{productId}/template-upgrade/template-deployments/{deploymentId}";
-      testClientHelper.getAndVerify(
-          uriBuilder ->
-              uriBuilder
-                  .path(url)
-                  .build(TestContextConstants.PRODUCT_ID, assetDtoPaging.getData().get(0).getId()),
-          body -> {
-            log.info("{}", body);
-            assertThat(body, hasJsonPath("$.code", equalTo(200)));
-            assertThat(body, hasJsonPath("$.data", hasSize(greaterThanOrEqualTo(1))));
-            assertThat(
-                body,
-                hasJsonPath(
-                    "$.data[0].mapperKey", containsString("mef.sonata.api-target-mapper.address")));
-          });
-    }
-
-    @Test
-    @Order(9)
+    @Order(12)
     void givenStageDeployed_whenCurrentVersion_thenReturnData() {
       Paging<UnifiedAssetDto> assetDtoPaging =
           unifiedAssetService.findBySpecification(
@@ -601,7 +418,7 @@ class TemplateUpgradeControllerTest {
     }
 
     @Test
-    @Order(10)
+    @Order(13)
     void givenProductDeployInProcess_whenReportDeploymentStatus_thenOk() {
       Paging<UnifiedAssetDto> assetDtoPaging =
           unifiedAssetService.findBySpecification(
@@ -643,20 +460,7 @@ class TemplateUpgradeControllerTest {
     }
 
     @Test
-    @Order(11)
-    void givenCompletedDeployment_whenQueryCanUpdate_thenOk() {
-      String url = "/v2/products/{productId}/template-upgrade/allow-update-operations";
-      testClientHelper.getAndVerify(
-          uriBuilder -> uriBuilder.path(url).build(TestContextConstants.PRODUCT_ID),
-          body -> {
-            log.info("{}", body);
-            assertThat(body, hasJsonPath("$.code", equalTo(200)));
-            assertThat(body, hasJsonPath("$.data", equalTo(true)));
-          });
-    }
-
-    @Test
-    @Order(12)
+    @Order(14)
     @Sql(
         statements = {
           "update  kraken_asset set  status='SUCCESS' where kind in ('kraken.product-deployment','kraken.product.template-deployment')",
@@ -698,13 +502,24 @@ class TemplateUpgradeControllerTest {
           new SyncMetadata("", "", DateTime.nowInUTCString()),
           true);
 
-      String url = "/v2/products/{productId}/template-upgrade/stage";
+      // control plane upgrade
+      CreateControlPlaneUpgradeRequest planeUpgradeRequest = new CreateControlPlaneUpgradeRequest();
+      planeUpgradeRequest.setTemplateUpgradeId(releaseResult.getData().getId().toString());
+      testClientHelper.postAndVerify(
+          uriBuilder -> uriBuilder.path(CONTROL_UPGRADE_URL).build(TestContextConstants.PRODUCT_ID),
+          planeUpgradeRequest,
+          body -> {
+            assertThat(body, hasJsonPath("$.code", equalTo(200)));
+          });
+      // stage upgrade
       CreateUpgradeRequest createUpgradeRequest = new CreateUpgradeRequest();
       createUpgradeRequest.setTemplateUpgradeId(releaseResult.getData().getId().toString());
       createUpgradeRequest.setStageEnvId(TestApplication.envId);
       testClientHelper.postAndVerify(
           uriBuilder ->
-              uriBuilder.path(url).build(TestContextConstants.PRODUCT_ID, TestApplication.envId),
+              uriBuilder
+                  .path(STAGE_UPGRADE_URL)
+                  .build(TestContextConstants.PRODUCT_ID, TestApplication.envId),
           createUpgradeRequest,
           body -> {
             assertThat(body, hasJsonPath("$.code", equalTo(200)));
@@ -712,13 +527,12 @@ class TemplateUpgradeControllerTest {
     }
 
     @Test
-    @Order(13)
+    @Order(15)
     void givenStageUpgradeFromMgmtIn_Process_whenReport_thenOk() {
       mgmtEventRepository.findAll().stream()
           .filter(item -> MgmtEventType.TEMPLATE_UPGRADE_RESULT.equals(item.getEventType()))
           .filter(item -> item.getStatus().equalsIgnoreCase(EventStatusType.WAIT_TO_SEND.name()))
-          .sorted(Comparator.comparing(MgmtEventEntity::getCreatedAt))
-          .findFirst()
+          .min(Comparator.comparing(MgmtEventEntity::getCreatedAt))
           .ifPresent(
               entity -> {
                 TemplateUpgradeResultEvent resultEvent =
@@ -732,33 +546,11 @@ class TemplateUpgradeControllerTest {
     }
 
     @Test
-    @Order(14)
-    void givenStageUpgradeFromMgmtIn_Process_whenListRelease_thenReturnData() {
-      String url = "/v2/products/{productId}/template-upgrade/releases";
-      testClientHelper.getAndVerify(
-          uriBuilder ->
-              uriBuilder.path(url).build(TestContextConstants.PRODUCT_ID, TestApplication.envId),
-          body -> {
-            assertThat(body, hasJsonPath("$.code", equalTo(200)));
-            assertThat(body, hasJsonPath("$.data.data", hasSize(greaterThanOrEqualTo(1))));
-            assertThat(body, hasJsonPath("$.data.data[0].showStageUpgradeButton", is(true)));
-            assertThat(body, hasJsonPath("$.data.data[1].showProductionUpgradeButton", is(false)));
-          });
-      String urlV3 = "/v3/products/{productId}/template-upgrade/releases";
-      testClientHelper.getAndVerify(
-          uriBuilder ->
-              uriBuilder.path(urlV3).build(TestContextConstants.PRODUCT_ID, TestApplication.envId),
-          body -> {
-            assertThat(body, hasJsonPath("$.code", equalTo(200)));
-            assertThat(body, hasJsonPath("$.data.data", hasSize(greaterThanOrEqualTo(1))));
-          });
-    }
-
-    @Test
-    @Order(15)
+    @Order(16)
     @Sql(
         statements = {
-          "update  kraken_asset set  status='SUCCESS' where kind in ('kraken.product-deployment','kraken.product.template-deployment')"
+          "update  kraken_asset set  status='SUCCESS' where kind in ('kraken.product-deployment','kraken.product.template-deployment')",
+          "UPDATE kraken_mgmt_system_info set status='RUNNING' where key='CONTROL_PLANE'"
         })
     void givenStageUpgradeFromMgmtCompleted_whenReport_thenOk() {
       UnifiedAssetDto templateUpgrade =
