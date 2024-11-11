@@ -4,6 +4,7 @@ import com.consoleconnect.kraken.operator.controller.dto.ComponentExpandDTO;
 import com.consoleconnect.kraken.operator.controller.dto.UpgradeTuple;
 import com.consoleconnect.kraken.operator.controller.model.MgmtProperty;
 import com.consoleconnect.kraken.operator.controller.service.ApiComponentService;
+import com.consoleconnect.kraken.operator.controller.service.SystemInfoService;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.enums.UpgradeSourceEnum;
 import com.consoleconnect.kraken.operator.core.ingestion.ResourceLoaderFactory;
@@ -12,6 +13,8 @@ import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.ProductFacets;
 import com.consoleconnect.kraken.operator.core.model.facet.WorkspaceFacets;
 import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
+import com.consoleconnect.kraken.operator.core.service.EventSinkService;
+import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Objects;
@@ -29,13 +32,19 @@ public class ClasspathSourceUpgradeService extends AbstractUpgradeSourceService 
       ResourceLoaderFactory resourceLoaderFactory,
       UnifiedAssetRepository unifiedAssetRepository,
       MgmtProperty mgmtProperty,
+      UnifiedAssetService unifiedAssetService,
+      EventSinkService eventSinkService,
+      SystemInfoService systemInfoService,
       ApiComponentService apiComponentService) {
     super(
         appProperty,
         resourceLoaderFactory,
         unifiedAssetRepository,
         mgmtProperty,
-        apiComponentService);
+        apiComponentService,
+        unifiedAssetService,
+        systemInfoService,
+        eventSinkService);
   }
 
   @Override

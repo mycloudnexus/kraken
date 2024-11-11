@@ -14,5 +14,8 @@ public class TemplateUpgradeResultEvent {
   ZonedDateTime upgradeBeginAt;
   ZonedDateTime upgradeEndAt;
   EnvNameEnum envName;
+  String productKey;
+  String productSpec;
+  String productVersion;
   UpgradeResultEventEnum resultEventType;
 }
