@@ -38,7 +38,10 @@ public class PushMgmtEventService extends KrakenServerConnector {
   }
 
   protected static final List<MgmtEventType> QUERY_EVENT_TYPES =
-      List.of(MgmtEventType.TEMPLATE_UPGRADE_RESULT, MgmtEventType.CLIENT_HEART_BEAT);
+      List.of(
+          MgmtEventType.TEMPLATE_UPGRADE_RESULT,
+          MgmtEventType.CLIENT_HEART_BEAT,
+          MgmtEventType.CLIENT_SYSTEM_INFO);
 
   public PushMgmtEventService(
       SyncProperty appProperty, WebClient webClient, EventSinkService eventSinkService) {

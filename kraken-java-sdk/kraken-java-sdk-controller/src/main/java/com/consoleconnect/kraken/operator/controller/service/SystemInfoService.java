@@ -1,17 +1,17 @@
 package com.consoleconnect.kraken.operator.controller.service;
 
-import com.consoleconnect.kraken.operator.controller.entity.SystemInfoEntity;
 import com.consoleconnect.kraken.operator.controller.enums.SystemStateEnum;
 import com.consoleconnect.kraken.operator.controller.mapper.SystemInfoMapper;
 import com.consoleconnect.kraken.operator.controller.model.MgmtProperty;
 import com.consoleconnect.kraken.operator.controller.model.SystemInfo;
-import com.consoleconnect.kraken.operator.controller.repo.SystemInfoRepository;
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
+import com.consoleconnect.kraken.operator.core.entity.SystemInfoEntity;
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
 import com.consoleconnect.kraken.operator.core.event.PlatformSettingCompletedEvent;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.model.Metadata;
+import com.consoleconnect.kraken.operator.core.repo.SystemInfoRepository;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants;
 import com.consoleconnect.kraken.operator.core.toolkit.Constants;
