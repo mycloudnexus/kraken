@@ -1,6 +1,6 @@
 import { Steps } from "@/components/Steps";
 import { Text } from "@/components/Text";
-import useUser from "@/hooks/user/useUser";
+import { useUser } from "@/hooks/user/useUser";
 import { toDateTime } from "@/libs/dayjs";
 import { Deployment, IReleaseHistory } from "@/utils/types/product.type";
 import { Button, Empty, Flex, StepProps } from "antd";
@@ -51,7 +51,7 @@ function getUpgradeStatus(
 export function UpgradeProcess({
   release,
   onViewDetail,
-}: Readonly<{ release: IReleaseHistory; onViewDetail(): void }>) {
+}: Readonly<{ release: IReleaseHistory; onViewDetail(deploymentId: string): void }>) {
   const navigate = useNavigate();
   const { findUserName } = useUser();
 
@@ -78,7 +78,7 @@ export function UpgradeProcess({
             current={-1}
             size="small"
             items={data.map(
-              ({ envName, upgradeBy, createdAt, updatedAt }, index) => {
+              ({ deploymentId, envName, upgradeBy, createdAt, updatedAt }, index) => {
                 const status = getUpgradeStatus(release.status, data, index);
 
                 return {
@@ -107,7 +107,7 @@ export function UpgradeProcess({
                     </>
                   ),
                   status,
-                  onClick: () => status === "finish" && onViewDetail(),
+                  onClick: () => status === "finish" && onViewDetail(deploymentId),
                 };
               }
             )}

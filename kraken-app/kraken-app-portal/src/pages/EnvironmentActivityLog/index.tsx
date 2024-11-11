@@ -92,10 +92,10 @@ const EnvironmentActivityLog = () => {
       const { requestTime = [] } = values ?? {};
       const params = omit(values, ["requestTime"]);
       params.requestStartTime = requestTime?.[0]
-        ? dayjs(requestTime[0]).valueOf()
+        ? dayjs(requestTime[0]).startOf("day").valueOf()
         : undefined;
       params.requestEndTime = requestTime?.[1]
-        ? dayjs(requestTime[1]).valueOf()
+        ? dayjs(requestTime[1]).endOf("day").valueOf()
         : undefined;
 
       if (!params.path) {

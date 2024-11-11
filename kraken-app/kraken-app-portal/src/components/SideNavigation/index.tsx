@@ -179,10 +179,6 @@ const SideNavigation = ({ info }: Readonly<{ info?: ISystemInfo }>) => {
     return [activeKey];
   }, [activeKey]);
 
-  const isVersionsDifferent = useMemo(() =>
-    info?.productionAppVersion !== info?.controlAppVersion || info?.productionAppVersion !== info?.stageAppVersion
-    , [info?.productionAppVersion, info?.controlAppVersion, info?.stageAppVersion])
-
   return (
     <Sider
       width={240}
@@ -215,13 +211,10 @@ const SideNavigation = ({ info }: Readonly<{ info?: ISystemInfo }>) => {
               <Typography.Text data-testid="productionAppVersion" ellipsis style={{ color: 'var(--text-secondary)' }}>
                 {info.productionAppVersion}
               </Typography.Text>
-              {/* Show tooltip if 3 environment versions are different */}
-              {isVersionsDifferent && (
-                <Tooltip title={<KrakenVersion info={info} />}>
-                  <ExclamationCircleOutlined data-testid="appVersionsIndicator" style={{ color: 'var(--warning)' }} />
-                </Tooltip>
-              )}
-              {!collapsed && (<Divider type="vertical" />)}
+              <Tooltip title={<KrakenVersion info={info} />}>
+                <ExclamationCircleOutlined data-testid="appVersionsIndicator" style={{ color: 'var(--text-secondary)' }} />
+              </Tooltip>
+              {!collapsed && (<Divider type="vertical" style={{ margin: '0 6px' }} />)}
             </div>
           )}
             {!collapsed ? (

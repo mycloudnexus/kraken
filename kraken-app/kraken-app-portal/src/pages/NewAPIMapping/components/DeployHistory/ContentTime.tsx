@@ -1,5 +1,5 @@
 import { Text } from "@/components/Text";
-import useUser from "@/hooks/user/useUser";
+import { useUser } from "@/hooks/user/useUser";
 import { Flex } from "antd";
 import dayjs from "dayjs";
 import { isEmpty } from "lodash";
