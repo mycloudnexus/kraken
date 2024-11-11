@@ -7,19 +7,19 @@ metadata:
   version: 2
 spec:
   componentPaths:
-    - classpath:/mock/apis/api.order.yaml
-    - classpath:/mock/apis/api.quote.yaml
-    - classpath:/mock/apis/api.address.yaml
-    - classpath:/mock/apis/api.product.offering.yaml
-    - classpath:/mock/apis/api.inventory.yaml
-    - classpath:/mock/api-specs/api-spec.order.yaml
-    - classpath:/mock/api-specs/api-spec.address.yaml
-    - classpath:/mock/api-specs/api-spec.quote.yaml
-    - classpath:/mock/api-specs/api-spec.product.offering.yaml
-    - classpath:/mock/api-specs/api-spec.inventory.yaml
-    - classpath:/mock/api-targets/api-target.order.uni.add.yaml
-    - classpath:/mock/api-targets/api-target.order.eline.add.yaml
-    - classpath:/mock/api-targets/api-target.order.uni.read.yaml
+    #- classpath:/mock/apis/api.order.yaml
+    #- classpath:/mock/apis/api.quote.yaml
+    #- classpath:/mock/apis/api.address.yaml
+    #- classpath:/mock/apis/api.product.offering.yaml
+    #- classpath:/mock/apis/api.inventory.yaml
+    #- classpath:/mock/api-specs/api-spec.order.yaml
+    #- classpath:/mock/api-specs/api-spec.address.yaml
+    #- classpath:/mock/api-specs/api-spec.quote.yaml
+    #- classpath:/mock/api-specs/api-spec.product.offering.yaml
+    #- classpath:/mock/api-specs/api-spec.inventory.yaml
+    #- classpath:/mock/api-targets/api-target.order.uni.add.yaml
+    #- classpath:/mock/api-targets/api-target.order.eline.add.yaml
+    #- classpath:/mock/api-targets/api-target.order.uni.read.yaml
     #- classpath:/mock/api-targets/api-target.order.eline.read.yaml
     #- classpath:/mock/api-targets/api-target.order.uni.read.delete.yaml
     #- classpath:/mock/api-targets/api-target.order.eline.read.delete.yaml
