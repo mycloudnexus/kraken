@@ -1,7 +1,7 @@
 package com.consoleconnect.kraken.operator.controller.mapper;
 
-import com.consoleconnect.kraken.operator.controller.entity.SystemInfoEntity;
 import com.consoleconnect.kraken.operator.controller.model.SystemInfo;
+import com.consoleconnect.kraken.operator.core.entity.SystemInfoEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
