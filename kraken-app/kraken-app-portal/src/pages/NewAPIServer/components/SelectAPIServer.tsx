@@ -14,7 +14,7 @@ type Props = {
 const SelectAPIServer = ({ form }: Props) => {
   const { currentProduct } = useAppStore();
   const { mutateAsync: validateName } = useGetValidateServerName();
-  const originalName = useMemo(() => (form?.getFieldsValue(["name"]).name ?? null), [form]);
+  const originalName = useMemo(() => (form?.getFieldsValue(["name"])?.name ?? null), [form]);
   return (
     <>
       <Flex gap={8} justifyContent="flex-start">

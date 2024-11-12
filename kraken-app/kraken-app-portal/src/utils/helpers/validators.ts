@@ -10,7 +10,10 @@ export const validateServerName = async (
   originalName: string
 ) => {
 
+  if (name === originalName) return Promise.resolve()
+  
   const { data: isValid } = await validateName({ productId: currentProduct, name });
+
   if (name === originalName || isValid) {
     return Promise.resolve();
   } else {
