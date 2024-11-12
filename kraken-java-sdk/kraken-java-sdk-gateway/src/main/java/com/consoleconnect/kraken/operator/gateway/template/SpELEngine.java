@@ -66,13 +66,11 @@ public class SpELEngine implements BeanFactoryAware {
   }
 
   public <T> T evaluate(String expression, Class<T> clazz) {
-    log.info("Evaluating expression: {}", expression);
     try {
       return expressionParser
           .parseExpression(expression, parserContext)
           .getValue(evaluationContext, clazz);
     } catch (Exception ex) {
-      log.error("Error evaluating expression: {}", expression, ex);
       return null;
     }
   }
@@ -143,9 +141,9 @@ public class SpELEngine implements BeanFactoryAware {
         return expression;
       }
     } catch (Exception e) {
-      log.warn("spel parse object error!", e);
+      log.warn("spel parse object error: {}", e.getMessage());
     }
-    return evaluate(JsonToolkit.toJson(expression), context, String.class);
+    return evaluate(String.valueOf(expression), context, String.class);
   }
 
   private static Object parseStr(String str, Map<String, Object> context, Boolean postRequest) {
