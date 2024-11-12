@@ -1,6 +1,6 @@
-package com.consoleconnect.kraken.operator.controller.repo;
+package com.consoleconnect.kraken.operator.core.repo;
 
-import com.consoleconnect.kraken.operator.controller.entity.SystemInfoEntity;
+import com.consoleconnect.kraken.operator.core.entity.SystemInfoEntity;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
