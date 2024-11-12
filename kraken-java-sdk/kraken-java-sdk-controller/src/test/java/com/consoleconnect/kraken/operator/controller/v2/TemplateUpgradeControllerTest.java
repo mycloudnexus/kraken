@@ -14,6 +14,7 @@ import com.consoleconnect.kraken.operator.controller.dto.CreateControlPlaneUpgra
 import com.consoleconnect.kraken.operator.controller.dto.CreateProductionUpgradeRequest;
 import com.consoleconnect.kraken.operator.controller.dto.CreateUpgradeRequest;
 import com.consoleconnect.kraken.operator.controller.enums.SystemStateEnum;
+import com.consoleconnect.kraken.operator.controller.model.SystemInfo;
 import com.consoleconnect.kraken.operator.controller.service.*;
 import com.consoleconnect.kraken.operator.controller.service.upgrade.MgmtSourceUpgradeService;
 import com.consoleconnect.kraken.operator.core.client.ClientEvent;
@@ -22,6 +23,7 @@ import com.consoleconnect.kraken.operator.core.dto.Tuple2;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.entity.EnvironmentClientEntity;
 import com.consoleconnect.kraken.operator.core.entity.MgmtEventEntity;
+import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
 import com.consoleconnect.kraken.operator.core.enums.*;
 import com.consoleconnect.kraken.operator.core.event.IngestionDataResult;
 import com.consoleconnect.kraken.operator.core.event.TemplateUpgradeResultEvent;
@@ -179,7 +181,7 @@ class TemplateUpgradeControllerTest {
     }
 
     @Test
-    @Order(5)
+    @Order(4)
     void givenUpgradeCompleted_whenQueryControlDeploymentDetails_thenReturnData() {
       String url = "/v2/products/{productId}/template-upgrade/template-deployments/{deploymentId}";
       UnifiedAssetDto assetDto =
@@ -196,7 +198,7 @@ class TemplateUpgradeControllerTest {
     }
 
     @Test
-    @Order(6)
+    @Order(5)
     void givenStageUpgraded_whenListTemplateDeployment_thenReturnData() {
       String url = "/v2/products/{productId}/template-upgrade/template-deployments";
       testClientHelper.getAndVerify(
@@ -283,7 +285,7 @@ class TemplateUpgradeControllerTest {
     }
 
     @Test
-    @Order(7)
+    @Order(8)
     void givenStageUpgraded_whenCheckStageUpgrade_thenReturnData() {
       String url = "/v3/products/{productId}/template-upgrade/stage-upgrade-check";
       UnifiedAssetDto assetDto =
@@ -302,7 +304,7 @@ class TemplateUpgradeControllerTest {
     }
 
     @Test
-    @Order(8)
+    @Order(9)
     void givenStageUpgradedAndErrorEnv_whenCheckStageUpgrade_thenReturnCode400() {
       String url = "/v3/products/{productId}/template-upgrade/stage-upgrade-check";
       UnifiedAssetDto assetDto =
@@ -321,7 +323,7 @@ class TemplateUpgradeControllerTest {
     }
 
     @Test
-    @Order(9)
+    @Order(10)
     void givenProductionUpgraded_whenCheckProductionUpgrade_thenReturnData() {
       String url = "/v3/products/{productId}/template-upgrade/production-upgrade-check";
       UnifiedAssetDto assetDto =
@@ -340,7 +342,7 @@ class TemplateUpgradeControllerTest {
     }
 
     @Test
-    @Order(10)
+    @Order(11)
     void givenProductionUpgradedAndErrorEnv_whenCheckProductionUpgrade_thenReturnCode400() {
       String url = "/v3/products/{productId}/template-upgrade/production-upgrade-check";
       UnifiedAssetDto assetDto =
@@ -359,7 +361,7 @@ class TemplateUpgradeControllerTest {
     }
 
     @Test
-    @Order(11)
+    @Order(12)
     void givenTemplateId_whenListApiUseCaseFromClasspath_thenReturnData() {
       Paging<UnifiedAssetDto> assetDtoPaging =
           unifiedAssetService.findBySpecification(
@@ -383,7 +385,7 @@ class TemplateUpgradeControllerTest {
     }
 
     @Test
-    @Order(12)
+    @Order(13)
     void givenStageDeployed_whenCurrentVersion_thenReturnData() {
       Paging<UnifiedAssetDto> assetDtoPaging =
           unifiedAssetService.findBySpecification(
@@ -412,7 +414,7 @@ class TemplateUpgradeControllerTest {
     }
 
     @Test
-    @Order(13)
+    @Order(14)
     void givenProductDeployInProcess_whenReportDeploymentStatus_thenOk() {
       Paging<UnifiedAssetDto> assetDtoPaging =
           unifiedAssetService.findBySpecification(
@@ -454,7 +456,7 @@ class TemplateUpgradeControllerTest {
     }
 
     @Test
-    @Order(14)
+    @Order(15)
     @Sql(
         statements = {
           "update  kraken_asset set  status='SUCCESS' where kind in ('kraken.product-deployment','kraken.product.template-deployment')",
@@ -521,7 +523,7 @@ class TemplateUpgradeControllerTest {
     }
 
     @Test
-    @Order(15)
+    @Order(16)
     void givenStageUpgradeFromMgmtIn_Process_whenReport_thenOk() {
       mgmtEventRepository.findAll().stream()
           .filter(item -> MgmtEventType.TEMPLATE_UPGRADE_RESULT.equals(item.getEventType()))
@@ -540,7 +542,7 @@ class TemplateUpgradeControllerTest {
     }
 
     @Test
-    @Order(16)
+    @Order(17)
     @Sql(
         statements = {
           "update  kraken_asset set  status='SUCCESS' where kind in ('kraken.product-deployment','kraken.product.template-deployment')",
@@ -582,7 +584,7 @@ class TemplateUpgradeControllerTest {
     }
 
     @Test
-    @Order(16)
+    @Order(18)
     void givenTemplateId_whenListApiUseCaseFromMgmt_thenReturnData() {
       Paging<UnifiedAssetDto> assetDtoPaging =
           unifiedAssetService.findBySpecification(
@@ -603,6 +605,20 @@ class TemplateUpgradeControllerTest {
             assertThat(body, hasJsonPath("$.code", equalTo(200)));
             assertThat(body, hasJsonPath("$.data", hasSize(greaterThanOrEqualTo(1))));
           });
+    }
+
+    @Test
+    @Order(19)
+    void givenTemplateId_whenUpdateSystemStatus_thenReturnData() {
+      UnifiedAssetEntity unifiedAssetEntity =
+          unifiedAssetRepository
+              .findByKindOrderByCreatedAtDesc(
+                  AssetKindEnum.PRODUCT_TEMPLATE_CONTROL_DEPLOYMENT.getKind())
+              .get(0);
+      productDeploymentService.updateSystemStatus(unifiedAssetEntity);
+      SystemInfo systemInfo = systemInfoService.find();
+      assertThat(systemInfo.getStageProductVersion(), notNullValue());
+      assertThat(systemInfo.getProductionProductVersion(), notNullValue());
     }
   }
 }

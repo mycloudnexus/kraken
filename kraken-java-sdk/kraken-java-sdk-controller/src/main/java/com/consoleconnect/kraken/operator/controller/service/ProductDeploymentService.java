@@ -424,7 +424,7 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
         });
   }
 
-  private void updateSystemStatus(UnifiedAssetEntity templateDeployment) {
+  public void updateSystemStatus(UnifiedAssetEntity templateDeployment) {
     String templateUpgradeId =
         templateDeployment.getLabels().getOrDefault(LABEL_APP_TEMPLATE_UPGRADE_ID, "");
     UnifiedAssetDto templateUpgrade = unifiedAssetService.findOne(templateUpgradeId);
