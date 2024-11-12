@@ -4,7 +4,6 @@ import static com.consoleconnect.kraken.operator.core.service.UnifiedAssetServic
 import static com.consoleconnect.kraken.operator.core.toolkit.LabelConstants.CONDITION_NULL;
 
 import com.consoleconnect.kraken.operator.auth.security.UserContext;
-import com.consoleconnect.kraken.operator.controller.aspect.TemplateUpgradeBlockChecker;
 import com.consoleconnect.kraken.operator.controller.dto.*;
 import com.consoleconnect.kraken.operator.controller.event.TemplateUpgradeEvent;
 import com.consoleconnect.kraken.operator.controller.service.TemplateUpgradeService;
@@ -43,7 +42,6 @@ public class TemplateUpgradeV3Controller {
 
   @Operation(summary = "control plane upgrade")
   @PostMapping("/control-plane")
-  @TemplateUpgradeBlockChecker
   public Mono<HttpResponse<String>> controlPlaneUpgrade(
       @PathVariable("productId") String productId,
       @RequestBody CreateControlPlaneUpgradeRequest request) {
@@ -58,7 +56,6 @@ public class TemplateUpgradeV3Controller {
 
   @Operation(summary = "stage environment upgrade")
   @PostMapping("/stage")
-  @TemplateUpgradeBlockChecker
   public Mono<HttpResponse<String>> stageUpgrade(
       @PathVariable("productId") String productId,
       @RequestBody CreateUpgradeRequest createUpgradeRequest) {
@@ -78,7 +75,6 @@ public class TemplateUpgradeV3Controller {
 
   @Operation(summary = "product environment upgrade")
   @PostMapping("/production")
-  @TemplateUpgradeBlockChecker
   public Mono<HttpResponse<String>> productUpgrade(
       @PathVariable("productId") String productId,
       @RequestBody CreateProductionUpgradeRequest createProductionUpgradeRequest) {
