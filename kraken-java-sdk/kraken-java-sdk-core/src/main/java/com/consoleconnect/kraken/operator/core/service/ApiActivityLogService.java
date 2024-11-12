@@ -53,6 +53,7 @@ public class ApiActivityLogService {
           UnifiedAssetDto buyerAssetDto =
               buyerIdEntityMap.getOrDefault(apiActivityLog.getBuyer(), null);
           if (Objects.nonNull(buyerAssetDto)) {
+            apiActivityLog.setBuyerId(buyerAssetDto.getId());
             BuyerOnboardFacets facets =
                 UnifiedAsset.getFacets(buyerAssetDto, BuyerOnboardFacets.class);
             apiActivityLog.setBuyerName(
