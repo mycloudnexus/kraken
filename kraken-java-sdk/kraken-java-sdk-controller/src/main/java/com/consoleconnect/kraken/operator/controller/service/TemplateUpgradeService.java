@@ -660,12 +660,13 @@ public class TemplateUpgradeService {
         assetDto,
         UpgradeResultEventEnum.UPGRADE,
         event -> {
+          SystemInfo latestSystemInfo = systemInfoService.find();
           event.setUpgradeBeginAt(startTime);
           event.setUpgradeEndAt(endTime);
           event.setEnvName(EnvNameEnum.CONTROL_PLANE);
-          event.setProductKey(systemInfo.getProductKey());
-          event.setProductSpec(systemInfo.getProductSpec());
-          event.setProductVersion(systemInfo.getControlProductVersion());
+          event.setProductKey(latestSystemInfo.getProductKey());
+          event.setProductSpec(latestSystemInfo.getProductSpec());
+          event.setProductVersion(latestSystemInfo.getControlProductVersion());
         });
 
     return ingestionDataResult.getData().getId().toString();
