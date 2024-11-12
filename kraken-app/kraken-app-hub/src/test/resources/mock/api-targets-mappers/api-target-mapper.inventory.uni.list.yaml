@@ -45,7 +45,7 @@ spec:
             targetType: string
             targetLocation: BODY
             requiredMapping: true
-            checkPath: "$[0].id"
+            checkPath: "$[0]['id']"
             deletePath: "$[*]"
           - name:  mapper.inventory.uni.list.startDate
             title: "The date from which the product starts"
@@ -60,7 +60,7 @@ spec:
             title: "Possible values for the status of a MEF product"
             source: "@{{responseBody.port.status}}"
             sourceLocation: BODY
-            target: "@{{[*].status}}"
+            target: "@{{status}}"
             targetType: enum
             targetLocation: BODY
             requiredMapping: true
@@ -73,9 +73,10 @@ spec:
               - suspended
               - suspendedPendingTerminate
               - terminated
-            valueMappings:
+            valueMapping:
               ACTIVE: active,
               ACTIVATING: pendingActive
               DELETING: pendingTerminate
               DISABLED: suspended
               DELETED: terminated
+              CANCELED: cancelled

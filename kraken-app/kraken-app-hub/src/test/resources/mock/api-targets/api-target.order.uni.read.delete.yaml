@@ -15,6 +15,7 @@ spec:
     path: /mefApi/sonata/productOrderingManagement/v10/productOrder/{id}
     method: get
     productType: uni
+    actionType: delete
   endpoints:
     - id: retrieve connection detail by id of uni delete order
       path: ""
