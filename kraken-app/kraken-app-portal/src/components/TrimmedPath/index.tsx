@@ -1,3 +1,4 @@
+import { trimPath } from '@/utils/helpers/url';
 import { Typography } from 'antd';
 
 const TrimmedPath = ({ path, trimLevel, color }: { path: string, trimLevel?: number, color?: string }) => (
@@ -6,7 +7,7 @@ const TrimmedPath = ({ path, trimLevel, color }: { path: string, trimLevel?: num
       style={color ? { color } : undefined}
       ellipsis={{ tooltip: path }}
     >
-      {path.split('/').slice(trimLevel ? -trimLevel : 0).join('/')}
+      {trimPath(path, trimLevel)}
     </Typography.Text>
     : null
 )

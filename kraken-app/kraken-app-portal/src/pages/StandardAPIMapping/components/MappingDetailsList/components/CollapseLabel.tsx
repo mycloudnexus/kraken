@@ -1,5 +1,5 @@
 import RequestMethod from "@/components/Method";
-import { Flex } from "antd";
+import { Flex, Tooltip } from "antd";
 import styles from "../index.module.scss";
 import Dot from "./Dot";
 import { IMapperDetails } from "@/utils/types/env.type";
@@ -29,14 +29,15 @@ const CollapseLabel = ({
 
   return (
     <Flex
-      className={`${styles.labelWrapper} ${
-        highlighted ? styles.highlighted : ""
-      } ${isOneChild && highlighted ? "hightlight-one" : ""}`}
+      className={`${styles.labelWrapper} ${highlighted ? styles.highlighted : ""
+        } ${isOneChild && highlighted ? "hightlight-one" : ""}`}
       onClick={handleClick}
     >
       {isActive && !isOneChild && <Dot />}
       <RequestMethod method={labelProps.method} />
-      .../{pathSnippet} {size > 1 && `(${size})`}
+      <Tooltip title={labelProps.path}>
+        .../{pathSnippet} {size > 1 && `(${size})`}
+      </Tooltip>
     </Flex>
   );
 };

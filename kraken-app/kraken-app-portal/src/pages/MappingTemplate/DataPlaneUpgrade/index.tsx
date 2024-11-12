@@ -234,7 +234,7 @@ export default function UpgradePlane() {
     }
   };
 
-  const handleCancel = () => navigate("/mapping-template-v2");
+  const handleCancel = () => navigate("/mapping-template");
 
   const startUpgrade = () => {
     if (isUpgraded) {
@@ -336,8 +336,8 @@ export default function UpgradePlane() {
               <Tag>{templateDetail?.productSpec}</Tag>
             </span>
           }
-          mainTitle="Mapping template release & Upgrade v2"
-          mainUrl={`/mapping-template-v2`}
+          mainTitle="Mapping template release & Upgrade"
+          mainUrl={`/mapping-template`}
         />
       }
       flex
@@ -428,7 +428,7 @@ export default function UpgradePlane() {
           type="primary"
           className={styles.btnUpgrade}
           disabled={isMappingIncomplete || isSendingUpgrade || !templateDetail || isUpgrading}
-          loading={isCheckingStageUpgrade || isCheckingProductionUpgrade}
+          loading={isCheckingStageUpgrade || isCheckingProductionUpgrade || isUpgrading}
           onClick={startUpgrade}
         >
           {getUpgradeButtonText({

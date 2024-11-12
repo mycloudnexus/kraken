@@ -262,11 +262,11 @@ const ResponseItem = ({ item, index }: Props) => {
             ))}
           <Flex className={styles.itemContainer}>
             <Button
-              type="primary"
+              type="link"
               onClick={() => handleAdd(item?.name)}
               data-testid="btn-add-state"
             >
-              + Add Value Mapping
+              + Add value mapping
             </Button>
           </Flex>
         </Flex>
