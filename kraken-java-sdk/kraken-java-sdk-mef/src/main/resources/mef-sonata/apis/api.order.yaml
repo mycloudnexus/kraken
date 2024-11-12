@@ -126,6 +126,7 @@ spec:
           env:
             code: ${targetApiConfig.endpoints[0].responseBody}
             inputs: ${targetApiConfig.inputs}
+          postResultRender: true
 
         - id: persist_http_response
           actionType: buildin@db

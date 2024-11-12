@@ -1,0 +1,13 @@
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.1.5.9
+  name: V1.5.9
+  labels:
+    productSpec: grace
+    productVersion: V1.5.9
+    publishDate: 2024-11-11 13:12
+  description: |
+    Expanded order add target template to support adding 'productOrderItem[0].product.id'
+  version: 2
