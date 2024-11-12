@@ -429,20 +429,13 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
         templateDeployment.getLabels().getOrDefault(LABEL_APP_TEMPLATE_UPGRADE_ID, "");
     UnifiedAssetDto templateUpgrade = unifiedAssetService.findOne(templateUpgradeId);
     String envName = templateDeployment.getLabels().get(LABEL_ENV_NAME);
+    String version = templateUpgrade.getMetadata().getLabels().get(LABEL_PRODUCT_VERSION);
     if (EnvNameEnum.STAGE.name().equalsIgnoreCase(envName)) {
       systemInfoService.updateProductVersion(
-          SystemStateEnum.STAGE_UPGRADE_DONE,
-          null,
-          Constants.formatVersionUsingV(
-              templateUpgrade.getMetadata().getLabels().get(LABEL_PRODUCT_VERSION)),
-          null);
+          SystemStateEnum.STAGE_UPGRADE_DONE, null, Constants.formatVersionUsingV(version), null);
     } else {
       systemInfoService.updateProductVersion(
-          SystemStateEnum.RUNNING,
-          null,
-          null,
-          Constants.formatVersionUsingV(
-              templateUpgrade.getMetadata().getLabels().get(LABEL_PRODUCT_VERSION)));
+          SystemStateEnum.RUNNING, null, null, Constants.formatVersionUsingV(version));
     }
   }
 
