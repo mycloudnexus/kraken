@@ -1,5 +1,9 @@
 package com.consoleconnect.kraken.operator.gateway;
 
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
@@ -14,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -196,5 +201,15 @@ class SpELEngineTest implements MappingTransformer {
     SpELEngine.parseToList(o, context, new ArrayList<>());
     String s1 = calculateBasedOnResponseBody(JsonToolkit.toJson(o), context);
     Assertions.assertNotNull(s1);
+  }
+
+  @Test
+  @SneakyThrows
+  void givenMapExpression_whenEvaluate_thenReturnSuccess() {
+    String s = readFileToString("mockData/address.list.mock.json");
+    Object evaluate =
+        SpELEngine.evaluate(JsonToolkit.fromJson(s, Object.class), new HashMap<>(), true);
+    assertThat(
+        String.valueOf(evaluate), hasJsonPath("$.alternateGeographicAddress[0].tags", hasSize(1)));
   }
 }

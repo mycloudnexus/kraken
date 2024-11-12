@@ -1,0 +1,13 @@
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.1.5.8
+  name: V1.5.8
+  labels:
+    productSpec: grace
+    productVersion: V1.5.8
+    publishDate: 2024-11-08 18:18
+  description: |
+    Added error message in javascript for quote
+  version: 2
