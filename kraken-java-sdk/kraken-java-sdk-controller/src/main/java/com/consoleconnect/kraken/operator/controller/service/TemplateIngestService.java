@@ -3,6 +3,7 @@ package com.consoleconnect.kraken.operator.controller.service;
 import com.consoleconnect.kraken.operator.auth.service.UserService;
 import com.consoleconnect.kraken.operator.controller.dto.UpgradeTuple;
 import com.consoleconnect.kraken.operator.controller.model.MgmtProperty;
+import com.consoleconnect.kraken.operator.controller.model.SystemInfo;
 import com.consoleconnect.kraken.operator.controller.service.upgrade.UpgradeSourceServiceFactory;
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
@@ -39,6 +40,7 @@ public class TemplateIngestService {
   private final UpgradeSourceServiceFactory upgradeSourceServiceFactory;
   private final TemplateUpgradeService templateUpgradeService;
   private final EventSinkService eventSinkService;
+  private final SystemInfoService systemInfoService;
 
   @EventListener(ApplicationReadyEvent.class)
   public void onApplicationReady(Object event) {
@@ -97,6 +99,12 @@ public class TemplateIngestService {
     eventSinkService.reportTemplateUpgradeResult(
         unifiedAssetDto,
         UpgradeResultEventEnum.INSTALLED,
-        reportEvent -> reportEvent.setInstalledAt(ZonedDateTime.now()));
+        reportEvent -> {
+          SystemInfo systemInfo = systemInfoService.find();
+          reportEvent.setProductKey(systemInfo.getProductKey());
+          reportEvent.setProductSpec(systemInfo.getProductSpec());
+          reportEvent.setProductVersion(systemInfo.getControlProductVersion());
+          reportEvent.setInstalledAt(ZonedDateTime.now());
+        });
   }
 }

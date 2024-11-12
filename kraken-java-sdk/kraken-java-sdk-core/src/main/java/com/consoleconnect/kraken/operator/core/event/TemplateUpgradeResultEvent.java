@@ -7,8 +7,7 @@ import lombok.Data;
 
 @Data
 public class TemplateUpgradeResultEvent {
-  String publishAssetKey;
-  String productReleaseKey;
+  String templateKey;
   ZonedDateTime receivedAt;
   ZonedDateTime installedAt;
   ZonedDateTime upgradeBeginAt;

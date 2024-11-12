@@ -36,8 +36,7 @@ class PushMgmtEventServiceTest extends AbstractIntegrationTest {
   @Order(1)
   void givenMgmtEvent_whenPushMgmtEvent_thenReturnData() {
     TemplateUpgradeResultEvent receivedEvent = new TemplateUpgradeResultEvent();
-    receivedEvent.setProductReleaseKey(UUID.randomUUID().toString());
-    receivedEvent.setPublishAssetKey(MEF_SONATA_RELEASE_1_1_0);
+    receivedEvent.setTemplateKey(UUID.randomUUID().toString());
     receivedEvent.setReceivedAt(ZonedDateTime.now());
     MgmtEventEntity mgmtEvent = new MgmtEventEntity();
     mgmtEvent.setEventType(MgmtEventType.TEMPLATE_UPGRADE_RESULT.name());

@@ -30,6 +30,7 @@ import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
 import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
 import com.consoleconnect.kraken.operator.core.service.CompatibilityCheckService;
+import com.consoleconnect.kraken.operator.core.service.EventSinkService;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.*;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -71,6 +72,7 @@ public class TemplateUpgradeService {
   private final ApiComponentService apiComponentService;
   private final TransactionService transactionService;
   private final CompatibilityCheckService compatibilityCheckService;
+  private final EventSinkService eventSinkService;
 
   protected String deployProduction(
       String templateUpgradeId, String stageEnvId, String productionEnvId, String userId) {
@@ -586,7 +588,7 @@ public class TemplateUpgradeService {
       throw KrakenException.badRequest("Current system state is not allowed to upgrade");
     }
     UnifiedAssetDto productAsset = this.getProductAsset();
-
+    ZonedDateTime startTime = ZonedDateTime.now();
     String controlDeploymentId =
         transactionService.execInNewTransaction(
             nil -> {
@@ -642,6 +644,7 @@ public class TemplateUpgradeService {
       systemInfoService.updateSystemStatusImmediately(SystemStateEnum.CONTROL_PLANE_UPGRADE_DONE);
       throw KrakenException.internalError("Control plane upgraded failed:" + e.getMessage());
     }
+
     systemInfoService.updateProductVersion(
         SystemStateEnum.CONTROL_PLANE_UPGRADE_DONE,
         getTemplateVersion(templateUpgradeId),
@@ -651,6 +654,20 @@ public class TemplateUpgradeService {
       throw KrakenException.internalError(
           "Control plane upgraded failed:" + ingestionDataResult.getMessage());
     }
+    ZonedDateTime endTime = ZonedDateTime.now();
+    UnifiedAssetDto assetDto = unifiedAssetService.findOne(templateUpgradeId);
+    eventSinkService.reportTemplateUpgradeResult(
+        assetDto,
+        UpgradeResultEventEnum.UPGRADE,
+        event -> {
+          event.setUpgradeBeginAt(startTime);
+          event.setUpgradeEndAt(endTime);
+          event.setEnvName(EnvNameEnum.CONTROL_PLANE);
+          event.setProductKey(systemInfo.getProductKey());
+          event.setProductSpec(systemInfo.getProductSpec());
+          event.setProductVersion(systemInfo.getControlProductVersion());
+        });
+
     return ingestionDataResult.getData().getId().toString();
   }
 
