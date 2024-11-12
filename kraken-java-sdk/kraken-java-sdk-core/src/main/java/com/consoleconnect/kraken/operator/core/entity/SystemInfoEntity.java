@@ -1,6 +1,5 @@
-package com.consoleconnect.kraken.operator.controller.entity;
+package com.consoleconnect.kraken.operator.core.entity;
 
-import com.consoleconnect.kraken.operator.core.entity.AbstractEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
