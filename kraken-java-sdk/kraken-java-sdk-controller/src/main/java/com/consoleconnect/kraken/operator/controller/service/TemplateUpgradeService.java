@@ -118,6 +118,16 @@ public class TemplateUpgradeService {
             templateUpgradeDeployment,
             new SyncMetadata("", "", DateTime.nowInUTCString(), userId),
             true);
+    if (DeployStatusEnum.IN_PROCESS
+        .name()
+        .equalsIgnoreCase(templateUpgradeDeployment.getMetadata().getStatus())) {
+      // report result
+      String templateDeploymentId = ingestionDataResult.getData().getId().toString();
+      upgradeSourceServiceFactory
+          .getUpgradeSourceService(templateUpgradeId)
+          .reportResult(templateUpgradeId, templateDeploymentId);
+      log.info("report production upgrade begin  {}", templateDeploymentId);
+    }
     addLabels(envDeployment, ingestionDataResult.getData().getId().toString());
 
     return ingestionDataResult.getData().getId().toString();
