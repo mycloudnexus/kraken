@@ -50,7 +50,7 @@ const ResponseMapping = () => {
           <ResponseItem key={item.id} item={item} index={index} />
         ))}
         <Button
-          type="primary"
+          type="link"
           style={{ width: "fit-content" }}
           onClick={handleAdd}
         >

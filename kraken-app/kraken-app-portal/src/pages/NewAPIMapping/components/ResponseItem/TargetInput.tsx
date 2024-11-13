@@ -3,7 +3,6 @@ import { EnumRightType } from "@/utils/types/common.type";
 import { IResponseMapping } from "@/utils/types/component.type";
 import { Flex, Tooltip } from "antd";
 import clsx from "clsx";
-import { locationMapping } from "../../helper";
 import { LocationSelector } from "../LocationSelector";
 import styles from "./index.module.scss";
 import { AutoGrowingInput } from "@/components/form";
@@ -36,7 +35,7 @@ export function TargetInput({
         <LocationSelector
           type="response"
           disabled={!item.customizedField}
-          value={locationMapping(item.targetLocation, "response")}
+          value={item.targetLocation}
           onChange={(value) => onChange?.("targetLocation", value)}
         />
       ) : <div className={styles.bloater}></div>}

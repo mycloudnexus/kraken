@@ -3,9 +3,18 @@ import { isEmpty } from 'lodash';
 import { IProductIdAndNameParams } from '../types/product.type';
 import { isURL } from './url';
 
-export const validateServerName = async (validateName: UseMutateAsyncFunction<any, Error, IProductIdAndNameParams, unknown>, currentProduct: string, name: string) => {
+export const validateServerName = async (
+  validateName: UseMutateAsyncFunction<any, Error, IProductIdAndNameParams, unknown>,
+  currentProduct: string,
+  name: string,
+  originalName: string
+) => {
+
+  if (name === originalName) return Promise.resolve()
+  
   const { data: isValid } = await validateName({ productId: currentProduct, name });
-  if (isValid) {
+
+  if (name === originalName || isValid) {
     return Promise.resolve();
   } else {
     return Promise.reject(new Error(`The name ${name} is already taken`));

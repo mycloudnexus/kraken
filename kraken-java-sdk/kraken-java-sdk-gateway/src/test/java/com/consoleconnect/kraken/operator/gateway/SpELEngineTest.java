@@ -3,6 +3,7 @@ package com.consoleconnect.kraken.operator.gateway;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
@@ -27,6 +28,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
 class SpELEngineTest implements MappingTransformer {
+
   @Test
   void testIt() {
     Map<String, Object> data = new HashMap<>();
@@ -66,7 +68,7 @@ class SpELEngineTest implements MappingTransformer {
     mefQuery.put("buyerId", "100");
     variables.put("mefQuery", mefQuery);
 
-    Assertions.assertEquals(
+    assertEquals(
         "http://localhost:8080",
         SpELEngine.evaluate(facets.getServer().getUri(), variables, String.class));
 
@@ -143,8 +145,8 @@ class SpELEngineTest implements MappingTransformer {
         String variableName = groupNamesMatcher.group(1);
         String variableValue = m.group(variableName);
         System.out.println(variableName + ": " + variableValue);
-        Assertions.assertEquals("segment", variableName);
-        Assertions.assertEquals("123", variableValue);
+        assertEquals("segment", variableName);
+        assertEquals("123", variableValue);
       }
     } else {
       Assertions.fail("No match found");

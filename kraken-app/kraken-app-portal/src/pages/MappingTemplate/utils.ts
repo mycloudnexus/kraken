@@ -1,9 +1,9 @@
 import { Deployment } from "@/utils/types/product.type";
 
 export function getUpgradeSteps(deployments: Deployment[]): Deployment[] {
-  let controlPlane: Deployment = {} as Deployment,
-    stage: Deployment = {} as Deployment,
-    production: Deployment = {} as Deployment;
+  let controlPlane: Deployment = { envName: 'CONTROL_PLANE' } as Deployment,
+    stage: Deployment = { envName: 'stage' } as Deployment,
+    production: Deployment = { envName: 'production' } as Deployment;
 
   for (const dep of deployments) {
     if (dep.envName === "CONTROL_PLANE") {

@@ -71,6 +71,7 @@ import {
   IEnv,
   IMapperDetails,
   IRunningComponentItem,
+  IRunningMapping,
 } from "@/utils/types/env.type";
 import { IEnvComponent } from "@/utils/types/envComponent.type";
 import {
@@ -536,7 +537,7 @@ export const useGetRunningAPIList = (
   productId: string,
   params: Record<string, any>
 ) => {
-  return useQuery<any, Error>({
+  return useQuery<any, Error, IRunningMapping[]>({
     queryKey: [PRODUCT_CACHE_KEYS.get_running_api_list, productId, params],
     queryFn: () => getRunningAPIMappingList(productId, params),
     enabled: Boolean(productId) && Boolean(params.envId),

@@ -19,8 +19,8 @@ const MostPopularEndpoints = ({ props }: Props) => {
   const { data, isLoading, refetch, isRefetching } = useGetMostPopularEndpoints(
     currentProduct,
     props.envId,
-    props.startTime,
-    props.endTime
+    props.requestStartTime,
+    props.requestEndTime
   );
 
   useEffect(() => {

@@ -92,7 +92,7 @@ describe("NewAPIMapping > request mapping", () => {
     const btnSelectLoc = getByTestId("btnSelectLocation");
     expect(btnSelectLoc).toHaveTextContent("Please select location");
 
-    fireEvent.mouseEnter(btnSelectLoc!);
+    fireEvent.click(btnSelectLoc!);
 
     await waitFor(() => expect(getByRole("menu")).toBeInTheDocument());
 
@@ -156,7 +156,7 @@ describe("NewAPIMapping > response mapping", () => {
     const btnSelectLoc = getByTestId("btnSelectLocation");
     expect(btnSelectLoc!).toHaveTextContent("Please select location");
 
-    fireEvent.mouseEnter(btnSelectLoc!);
+    fireEvent.click(btnSelectLoc!);
 
     await waitFor(() => expect(getByRole("menu")).toBeInTheDocument());
 

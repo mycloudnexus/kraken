@@ -264,11 +264,11 @@ const RequestItem = ({ item, index }: Props) => {
           <Flex className={styles.itemContainer}>
             <Button
               style={{ marginBottom: 12 }}
-              onClick={() => handleAdd(item?.name)}
               data-testid="btn-add-state"
-              type="primary"
+              type="link"
+              onClick={() => handleAdd(item?.name)}
             >
-              + Add Value Mapping
+              + Add value mapping
             </Button>
           </Flex>
         </Flex>

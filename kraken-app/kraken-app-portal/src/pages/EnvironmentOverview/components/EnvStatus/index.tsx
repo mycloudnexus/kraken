@@ -83,13 +83,6 @@ const EnvStatus = ({
     }
   );
 
-  const runningComponents = useMemo(() => {
-    return (
-      (data?.data?.[0]?.components ?? null) ||
-      (Array.isArray(data) ? data : null)
-    );
-  }, [data]);
-
   const lastElement = useMemo(() => {
     if (!isLoading) {
       return deploymentsData?.data[0];
@@ -112,7 +105,7 @@ const EnvStatus = ({
           {loading || loadingRunningData ? (
             <Spin size="small" />
           ) : (
-            <Text.BoldMedium>{runningComponents?.length || 0}</Text.BoldMedium>
+            <Text.BoldMedium>{data?.length || 0}</Text.BoldMedium>
           )}
           <Text.LightMedium>Total running API mapping</Text.LightMedium>
         </Flex>

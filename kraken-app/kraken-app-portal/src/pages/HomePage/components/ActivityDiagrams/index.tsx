@@ -1,6 +1,7 @@
 import { Text } from "@/components/Text";
 import {
   getCurrentTimeWithZone,
+  recentXDays,
   TIME_ZONE_FORMAT,
 } from "@/utils/constants/format";
 import { IEnv } from "@/utils/types/env.type";
@@ -24,9 +25,9 @@ import { capitalize } from 'lodash';
 
 export type DiagramProps = {
   envId: string;
-  startTime: string;
-  endTime: string;
-  buyer: string;
+  requestStartTime: string;
+  requestEndTime: string;
+  buyer: string | undefined;
   requestTime?: any;
 };
 
@@ -41,11 +42,11 @@ const DiagramWrapper = ({ envs }: Props) => {
     envs?.find((env: IEnv) => env.name?.toLowerCase() === "stage")?.id ?? "";
   const currentTime = getCurrentTimeWithZone();
   const [form] = Form.useForm();
-  const [params, setParams] = useState({
+  const [params, setParams] = useState<DiagramProps>({
     envId: stageEnvId,
-    startTime: currentTime,
-    endTime: currentTime,
-    buyer: "all",
+    requestStartTime: currentTime,
+    requestEndTime: currentTime,
+    buyer: undefined,
   });
 
   const handleFormValues = useCallback(
@@ -54,10 +55,10 @@ const DiagramWrapper = ({ envs }: Props) => {
       setParams({
         envId: values.envId || params.envId,
         buyer: values.buyer || params.buyer,
-        startTime: requestTime?.[0]
+        requestStartTime: requestTime?.[0]
           ? dayjs(requestTime[0]).startOf("day").format(TIME_ZONE_FORMAT)
           : currentTime,
-        endTime: requestTime?.[1]
+        requestEndTime: requestTime?.[1]
           ? dayjs(requestTime[1]).endOf("day").format(TIME_ZONE_FORMAT)
           : currentTime,
       });
@@ -83,12 +84,8 @@ const DiagramWrapper = ({ envs }: Props) => {
   }, [envs]);
 
   const setRecentDate = (e: RadioChangeEvent) => {
-    const endTime = currentTime;
-    const startTime =
-      e.target.value === "7"
-        ? dayjs().subtract(7, "days").format(TIME_ZONE_FORMAT)
-        : dayjs().subtract(7, "months").format(TIME_ZONE_FORMAT);
-    setParams({ ...params, startTime, endTime });
+    const { requestStartTime, requestEndTime } = recentXDays(e);
+    setParams({ ...params, requestStartTime, requestEndTime });
   };
 
   return (
@@ -110,6 +107,7 @@ const DiagramWrapper = ({ envs }: Props) => {
 
             <Form.Item name="envId">
               <Select
+
                 value={params.envId}
                 options={envOptions}
                 popupMatchSelectWidth={false}
@@ -139,8 +137,8 @@ const DiagramWrapper = ({ envs }: Props) => {
           </Flex>
           <Flex align="center">
             <Form.Item>
-              <Radio.Group onChange={setRecentDate} size="middle">
-                <Radio.Button value="7">Recent 7 days</Radio.Button>
+              <Radio.Group onChange={setRecentDate} size="middle" >
+                <Radio.Button value="7" data-testid="recent-7-days">Recent 7 days</Radio.Button>
                 <Radio.Button value="90">Recent 3 months</Radio.Button>
               </Radio.Group>
             </Form.Item>
