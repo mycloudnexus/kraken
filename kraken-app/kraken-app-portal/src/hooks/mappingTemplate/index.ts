@@ -65,7 +65,7 @@ export function useInfiniteReleaseHistoryQuery(
       return page + 1;
     },
     enabled: Boolean(productId),
-    staleTime: STALE_TIME,
+    staleTime: 30 * 1000, // 30 seconds
   });
 }
 

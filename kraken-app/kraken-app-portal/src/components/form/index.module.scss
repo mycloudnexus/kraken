@@ -1,0 +1,40 @@
+.autoGrowingInput {
+  background: #ffffff;
+  border: 1px solid var(--light-gray);
+  padding: 0 7px;
+  border-radius: 4px;
+  font-size: 14px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+
+  &.focused {
+    border-color: var(--primary);
+
+    .content {
+      white-space: break-spaces;
+    }
+  }
+
+  &:focus-visible {
+    outline-color: var(--primary);
+    outline-style: solid;
+  }
+  
+  .content {
+    padding: 6px 7px;
+    flex: 1;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+
+    &:empty:before {
+      content: var(--placeholder);
+      color: var(--text-secondary);
+    }
+
+    &:focus-visible {
+      outline: none;
+    }
+  }
+}

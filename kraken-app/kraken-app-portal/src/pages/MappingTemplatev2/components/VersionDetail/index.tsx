@@ -1,39 +1,23 @@
 import RichTextViewer from "@/components/RichTextViewer";
 import { Text } from "@/components/Text";
-import { useGetMappingTemplateCurrentVersion } from "@/hooks/product";
-import { useAppStore } from "@/stores/app.store";
 import { IReleaseHistory } from "@/utils/types/product.type";
 import { Flex, Tag } from "antd";
-import { get, isEmpty } from "lodash";
-import { useMemo, useState } from "react";
+import { isEmpty } from "lodash";
+import { useState } from "react";
 import { DetailDrawer } from "../VersionSelect/DetailDrawer";
 import { UpgradeProcess } from "./UpgradeProcess";
 import styles from "./index.module.scss";
+import { useGetSystemInfo } from "@/hooks/user";
 
 type Props = {
   data: IReleaseHistory;
 };
 
 const VersionDetail = ({ data }: Props) => {
-  const { currentProduct } = useAppStore();
-  const { data: currentVer } =
-    useGetMappingTemplateCurrentVersion(currentProduct);
+  const { data: info } = useGetSystemInfo();
 
   // To view details of upgrade history
   const [deploymentId, setDeploymentId] = useState<string | null>(null);
-
-  const currentData = useMemo(() => {
-    const stage = currentVer?.find(
-      (d: any) => d.envName?.toUpperCase?.() === "STAGE"
-    );
-    const production = currentVer?.find(
-      (d: any) => d.envName?.toUpperCase?.() === "PRODUCTION"
-    );
-    return {
-      stage,
-      production,
-    };
-  }, [currentVer]);
 
   return (
     <>
@@ -51,21 +35,32 @@ const VersionDetail = ({ data }: Props) => {
                 </Text.LightMedium>
                 <Text.LightMedium lineHeight="20px">Stage</Text.LightMedium>
                 <Tag
+                  data-testid="controlePlaneUpgradeVersion"
                   bordered={false}
                   color="var(--panel-hover-bg)"
                   style={{ color: "var(--primary)" }}
                 >
-                  {get(currentData, "stage.productVersion") ?? 'N/A'}
+                  {info?.controlProductVersion ?? 'N/A'}
+                </Tag>
+                <Text.LightMedium lineHeight="20px">Stage</Text.LightMedium>
+                <Tag
+                  data-testid="stageUpgradeVersion"
+                  bordered={false}
+                  color="var(--panel-hover-bg)"
+                  style={{ color: "var(--primary)" }}
+                >
+                  {info?.stageProductVersion ?? 'N/A'}
                 </Tag>
                 <Text.LightMedium lineHeight="20px">
                   Production
                 </Text.LightMedium>
                 <Tag
+                  data-testid="productionUpgradeVersion"
                   bordered={false}
                   color="var(--panel-hover-bg)"
                   style={{ color: "var(--primary)" }}
                 >
-                  {get(currentData, "production.productVersion") ?? 'N/A'}
+                  {info?.productionProductVersion ?? 'N/A'}
                 </Tag>
               </Flex>
             </Flex>

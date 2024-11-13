@@ -132,6 +132,7 @@ spec:
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.order.uni.read.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.order.uni.read.delete.yaml
     - classpath:/mef-sonata/api-targets/api-target.order.uni.read.yaml
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.order.uni.read.delete.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.eline.read.sync.yaml
     - classpath:/mef-sonata/api-targets/api-target.quote.eline.read.sync.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.uni.add.sync.yaml

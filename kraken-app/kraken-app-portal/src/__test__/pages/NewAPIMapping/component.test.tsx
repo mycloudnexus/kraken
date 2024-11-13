@@ -1114,7 +1114,7 @@ test("parse fnc", () => {
 
 describe("select prop", () => {
   test("component new api map page", async () => {
-    const { container, getByTestId, getAllByTestId, getAllByPlaceholderText } =
+    const { container, getByTestId, getAllByTestId } =
       render(
         <QueryClientProvider client={queryClient}>
           <BrowserRouter>
@@ -1128,9 +1128,6 @@ describe("select prop", () => {
     fireEvent.click(element);
     const select = getAllByTestId("select-sonata-state");
     expect(select.length).toBeGreaterThanOrEqual(1);
-    const input = getAllByPlaceholderText("Select or input property");
-    fireEvent.change(input[0], { target: { value: "a" } });
-    fireEvent.keyDown(input[0], { key: "Enter", code: "Enter" });
   });
   test("test ok btn", async () => {
     const { result } = renderHook(() => useNewApiMappingStore());

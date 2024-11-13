@@ -30,6 +30,7 @@ export function ApiList({
   indicators = [],
   statusIndicatorPosition,
   clickable,
+  upgradeable,
   onItemClick,
 }: Readonly<{
   title?: React.ReactNode;
@@ -39,6 +40,7 @@ export function ApiList({
   highlights?: Record<string, any> // targetMapperKeys
   indicators?: string[] // mapping status
   clickable?: boolean
+  upgradeable?: Record<string, boolean>
   onItemClick?: (item: IRunningMapping) => void;
 }>) {
   return (
@@ -60,17 +62,19 @@ export function ApiList({
             clickable && highlights?.[item.targetMapperKey] && styles.incompleteMapping
           )}
           prefix={
+            upgradeable?.[item.targetMapperKey] &&
             statusIndicatorPosition === "left" &&
             indicators.includes(item.mappingStatus) &&
             getMappingStatusIcon(item.mappingStatus)
           }
           suffix={
+            upgradeable?.[item.targetMapperKey] &&
             statusIndicatorPosition === "right" &&
             indicators.includes(item.mappingStatus) &&
             getMappingStatusIcon(item.mappingStatus)
           }
           mappingMatrixPosition="right"
-          onClick={() => onItemClick?.(item)}
+          onClick={() => upgradeable?.[item.targetMapperKey] && onItemClick?.(item)}
         />
       ))}
     </Flex>
