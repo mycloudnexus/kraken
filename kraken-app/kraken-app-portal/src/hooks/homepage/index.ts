@@ -29,7 +29,7 @@ export const useGetActivityRequests = (
   buyer?: string
 ) => {
   return useQuery<any, Error, IApiActivity>({
-    queryKey: [USER_CACHE_KEYS.get_quick_start_guide],
+    queryKey: [USER_CACHE_KEYS.activity_requests],
     queryFn: () =>
       getApiActivityRequests(productId, envId, {
         requestStartTime,
