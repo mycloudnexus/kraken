@@ -13,7 +13,7 @@ test("Hompage test", () => {
           id: "32b4832f-fb2f-4c99-b89a-c5c995b18dfc",
           productId: "mef.sonata",
           createdAt: "2024-05-30T13:02:03.224486Z",
-          name: "production",
+          name: "stage",
         },
       ],
     },

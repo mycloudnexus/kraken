@@ -36,7 +36,7 @@ const ErrorDiagram = ({ errorData }: { errorData: Array<unknown> }) => (
         tickFormatter={formatDiagramDate}
       />
       <YAxis stroke="0px" tick={{ fill: "#96A5B8" }} />
-      <Tooltip labelFormatter={formatDiagramDate} />
+      <Tooltip cursor={{ fill: "transparent" }} labelFormatter={formatDiagramDate} />
       <Legend formatter={legendFormatter} />
       {["500", "404", "401", "400"].map((key, index) => (
         <Bar
@@ -57,8 +57,8 @@ const ErrorBrakedownDiagram = ({ props }: Props) => {
   const { data, isLoading, refetch, isRefetching } = useGetErrorBrakedown(
     currentProduct,
     props.envId,
-    props.startTime,
-    props.endTime
+    props.requestStartTime,
+    props.requestEndTime
   );
 
   useEffect(() => {
