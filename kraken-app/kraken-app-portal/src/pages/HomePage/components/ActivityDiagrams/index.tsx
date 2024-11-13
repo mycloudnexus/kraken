@@ -106,6 +106,7 @@ const DiagramWrapper = ({ envs }: Props) => {
 
             <Form.Item name="envId">
               <Select
+
                 value={params.envId}
                 options={envOptions}
                 popupMatchSelectWidth={false}
@@ -135,8 +136,8 @@ const DiagramWrapper = ({ envs }: Props) => {
           </Flex>
           <Flex align="center">
             <Form.Item>
-              <Radio.Group onChange={setRecentDate} size="middle">
-                <Radio.Button value="7">Recent 7 days</Radio.Button>
+              <Radio.Group onChange={setRecentDate} size="middle" >
+                <Radio.Button value="7" data-testid="recent-7-days">Recent 7 days</Radio.Button>
                 <Radio.Button value="90">Recent 3 months</Radio.Button>
               </Radio.Group>
             </Form.Item>

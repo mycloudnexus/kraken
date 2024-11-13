@@ -4,7 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { render } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 
-test("StepCard test", () => {
+test("QuickStartGuide test", () => {
   const { container } = render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
