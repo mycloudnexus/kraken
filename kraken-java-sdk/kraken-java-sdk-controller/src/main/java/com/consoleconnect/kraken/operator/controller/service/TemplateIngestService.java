@@ -8,6 +8,7 @@ import com.consoleconnect.kraken.operator.controller.service.upgrade.UpgradeSour
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
+import com.consoleconnect.kraken.operator.core.enums.EnvNameEnum;
 import com.consoleconnect.kraken.operator.core.enums.UpgradeResultEventEnum;
 import com.consoleconnect.kraken.operator.core.enums.UpgradeSourceEnum;
 import com.consoleconnect.kraken.operator.core.event.PlatformSettingCompletedEvent;
@@ -18,9 +19,10 @@ import com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants;
 import com.consoleconnect.kraken.operator.core.toolkit.Paging;
 import java.time.ZonedDateTime;
 import java.util.*;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
@@ -30,7 +32,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class TemplateIngestService {
   private final DataIngestionJob dataIngestionJob;
   private final ApplicationEventPublisher eventPublisher;
@@ -42,8 +44,13 @@ public class TemplateIngestService {
   private final EventSinkService eventSinkService;
   private final SystemInfoService systemInfoService;
 
+  @Value("${spring.build.version}")
+  private String buildVersion;
+
   @EventListener(ApplicationReadyEvent.class)
   public void onApplicationReady(Object event) {
+    // trigger  report kraken version upgrade
+    reportKrakenVersionUpgrade();
     userService.initSystemUpgradeUser();
     log.info("Platform Boot Up Event Received, event class:{}", event.getClass());
     Paging<UnifiedAssetDto> assetDtoPaging =
@@ -106,5 +113,17 @@ public class TemplateIngestService {
           reportEvent.setProductVersion(systemInfo.getControlProductVersion());
           reportEvent.setInstalledAt(ZonedDateTime.now());
         });
+  }
+
+  private void reportKrakenVersionUpgrade() {
+    SystemInfo systemInfo = systemInfoService.find();
+    if (buildVersion.compareTo(systemInfo.getControlProductVersion()) > 0) {
+      log.info(
+          "Kraken version upgrade report: old version {},current version {}",
+          systemInfo.getControlProductVersion(),
+          buildVersion);
+      eventSinkService.reportKrakenVersionUpgradeResult(
+          EnvNameEnum.CONTROL_PLANE, buildVersion, ZonedDateTime.now());
+    }
   }
 }

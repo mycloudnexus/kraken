@@ -1,13 +1,18 @@
 package com.consoleconnect.kraken.operator.core.service;
 
+import static com.consoleconnect.kraken.operator.core.enums.MgmtEventType.KRAKEN_APP_VERSION_UPGRADE_RESULT;
+
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.entity.MgmtEventEntity;
+import com.consoleconnect.kraken.operator.core.enums.EnvNameEnum;
 import com.consoleconnect.kraken.operator.core.enums.EventStatusType;
 import com.consoleconnect.kraken.operator.core.enums.MgmtEventType;
 import com.consoleconnect.kraken.operator.core.enums.UpgradeResultEventEnum;
+import com.consoleconnect.kraken.operator.core.event.AppVersionUpgradeResultEvent;
 import com.consoleconnect.kraken.operator.core.event.TemplateUpgradeResultEvent;
 import com.consoleconnect.kraken.operator.core.repo.MgmtEventRepository;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.function.Consumer;
 import lombok.AllArgsConstructor;
@@ -48,6 +53,19 @@ public class EventSinkService {
       consumer.accept(receivedEvent);
     }
     mgmtEventEntity.setPayload(JsonToolkit.toJson(receivedEvent));
+    mgmtEventEntity.setStatus(EventStatusType.WAIT_TO_SEND.name());
+    eventRepository.save(mgmtEventEntity);
+  }
+
+  public void reportKrakenVersionUpgradeResult(
+      EnvNameEnum envName, String appVersion, ZonedDateTime upgradeAt) {
+    MgmtEventEntity mgmtEventEntity = new MgmtEventEntity();
+    mgmtEventEntity.setEventType(KRAKEN_APP_VERSION_UPGRADE_RESULT.name());
+    AppVersionUpgradeResultEvent appVersionUpgradeResultEvent = new AppVersionUpgradeResultEvent();
+    mgmtEventEntity.setPayload(appVersionUpgradeResultEvent);
+    appVersionUpgradeResultEvent.setUpgradeAt(upgradeAt);
+    appVersionUpgradeResultEvent.setAppVersion(appVersion);
+    appVersionUpgradeResultEvent.setEnvName(envName);
     mgmtEventEntity.setStatus(EventStatusType.WAIT_TO_SEND.name());
     eventRepository.save(mgmtEventEntity);
   }
