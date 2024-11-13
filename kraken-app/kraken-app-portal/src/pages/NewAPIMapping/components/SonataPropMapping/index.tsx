@@ -118,7 +118,7 @@ const SonataPropMapping = ({ list, title }: Readonly<Props>) => {
             </Flex>
           )}
         <Button
-          type="primary"
+          type="link"
           onClick={() => {
             setRightSide(EnumRightType.AddSonataProp);
             setRightSideInfo({

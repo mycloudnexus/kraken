@@ -8,7 +8,6 @@ import EnvironmentActivityLog from "@/pages/EnvironmentActivityLog";
 import EnvironmentOverview from "@/pages/EnvironmentOverview";
 import HomePage from "@/pages/HomePage";
 import ApiComponents from "@/pages/HomePage/components/ApiComponents";
-import MappingTemplate from "@/pages/MappingTemplate";
 import NewAPIServer from "@/pages/NewAPIServer";
 import StandardAPIMapping from "@/pages/StandardAPIMapping";
 import UserManagement from "@/pages/UserManagement";
@@ -16,9 +15,9 @@ import { lazy } from "react";
 import { createBrowserRouter } from "react-router-dom";
 
 const Login = lazy(() => import("@/pages/Login"));
-const MappingTemplateV2 = lazy(() => import("@/pages/MappingTemplatev2"));
+const MappingTemplate = lazy(() => import("@/pages/MappingTemplate"));
 const UpgradePlane = lazy(
-  () => import("@/pages/MappingTemplatev2/UpgradePlane")
+  () => import("@/pages/MappingTemplate/DataPlaneUpgrade")
 );
 
 const router = createBrowserRouter([
@@ -102,14 +101,10 @@ const router = createBrowserRouter([
       },
       {
         path: "mapping-template",
-        element: <MappingTemplate />,
-      },
-      {
-        path: "mapping-template-v2",
         children: [
           {
             path: "",
-            element: <MappingTemplateV2 />,
+            element: <MappingTemplate />,
           },
           {
             path: "upgrade/:templateUpgradeId",
