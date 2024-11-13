@@ -13,7 +13,6 @@ import {
 } from "@/hooks/mappingTemplate";
 import { useLongPolling } from "@/hooks/useLongPolling";
 import { useAppStore } from "@/stores/app.store";
-import { ReloadOutlined } from "@ant-design/icons";
 import { Button, Flex, Spin, StepsProps, Tag } from "antd";
 import classNames from "classnames";
 import { lazy, ReactNode, Suspense, useEffect, useMemo, useState } from "react";
@@ -51,11 +50,7 @@ function getUpgradeButtonText({
   isUpgradeIncompatible: boolean
 }): ReactNode {
   if (isUpgrading)
-    return (
-      <>
-        <ReloadOutlined /> Upgrading
-      </>
-    );
+    return 'Upgrading';
 
   if (isUpgradeIncompatible && currentStep === 2) return 'Done'
 
@@ -239,7 +234,7 @@ export default function UpgradePlane() {
     }
   };
 
-  const handleCancel = () => navigate("/mapping-template-v2");
+  const handleCancel = () => navigate("/mapping-template");
 
   const startUpgrade = () => {
     if (isUpgraded) {
@@ -341,8 +336,8 @@ export default function UpgradePlane() {
               <Tag>{templateDetail?.productSpec}</Tag>
             </span>
           }
-          mainTitle="Mapping template release & Upgrade v2"
-          mainUrl={`/mapping-template-v2`}
+          mainTitle="Mapping template release & Upgrade"
+          mainUrl={`/mapping-template`}
         />
       }
       flex
@@ -433,7 +428,7 @@ export default function UpgradePlane() {
           type="primary"
           className={styles.btnUpgrade}
           disabled={isMappingIncomplete || isSendingUpgrade || !templateDetail || isUpgrading}
-          loading={isCheckingStageUpgrade || isCheckingProductionUpgrade}
+          loading={isCheckingStageUpgrade || isCheckingProductionUpgrade || isUpgrading}
           onClick={startUpgrade}
         >
           {getUpgradeButtonText({

@@ -1,12 +1,11 @@
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { EnumRightType } from "@/utils/types/common.type";
 import { IResponseMapping } from "@/utils/types/component.type";
-import { Flex, Tooltip, Input } from "antd";
+import { Flex, Tooltip } from "antd";
 import clsx from "clsx";
-import { useEffect, useState } from "react";
-import { locationMapping } from "../../helper";
 import { LocationSelector } from "../LocationSelector";
 import styles from "./index.module.scss";
+import { AutoGrowingInput } from "@/components/form";
 
 export function TargetInput({
   item,
@@ -25,12 +24,6 @@ export function TargetInput({
     setActiveSonataResponse,
   } = useNewApiMappingStore();
 
-  const [value, setValue] = useState("");
-
-  useEffect(() => {
-    setValue(item.target);
-  }, [item.target, setValue]);
-
   const id = `${index}-${item.name}`;
 
   const isFocused =
@@ -38,17 +31,17 @@ export function TargetInput({
 
   return (
     <Flex className={styles.flexColumn} gap={4}>
-      {item.target && (
+      {item.target ? (
         <LocationSelector
           type="response"
           disabled={!item.customizedField}
-          value={locationMapping(item.targetLocation, "response")}
+          value={item.targetLocation}
           onChange={(value) => onChange?.("targetLocation", value)}
         />
-      )}
+      ) : <div className={styles.bloater}></div>}
 
       <Tooltip title={item?.target}>
-        <Input
+        <AutoGrowingInput
           data-testid="targetInput"
           disabled={!item.customizedField}
           placeholder="Select or input property"
@@ -57,13 +50,12 @@ export function TargetInput({
             [styles.activeInput]: isFocused,
             [styles.error]: errors?.responseIds?.has(item.id!) && !item.target,
           })}
-          value={value}
+          value={item.target}
           onClick={() => {
             setActiveSonataResponse(id);
             setRightSide(EnumRightType.SonataResponse);
           }}
-          onChange={(e) => setValue(e.target.value)}
-          onBlur={() => {
+          onChange={(value) => {
             onChange?.("target", value);
             // setActiveSonataResponse(undefined);
           }}

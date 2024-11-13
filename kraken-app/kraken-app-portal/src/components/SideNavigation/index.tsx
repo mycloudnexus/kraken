@@ -123,14 +123,6 @@ const SideNavigation = ({ info }: Readonly<{ info?: ISystemInfo }>) => {
             ),
           },
           {
-            key: "mapping-template-v2",
-            label: (
-              <Link to="/mapping-template-v2">
-                Mapping template release & Upgrade v2
-              </Link>
-            ),
-          },
-          {
             key: "user-management",
             label: <Link to="/user-management">User management</Link>,
           },
@@ -197,7 +189,7 @@ const SideNavigation = ({ info }: Readonly<{ info?: ISystemInfo }>) => {
           onSelect={(e) => handleNavigationSet(e.key)}
           items={items}
           selectedKeys={selectedKeys}
-        ></Menu>
+        />
       </div>
       <Flex className={styles.siderBottom} vertical={true}>
         <Flex
@@ -250,9 +242,9 @@ function KrakenVersion({ info }: Readonly<{ info: ISystemInfo }>) {
   return <section>
     <Text.NormalMedium data-testid="headline">Kraken version</Text.NormalMedium>
     <ul className={styles.envVersions}>
-      <li data-testid="vProductionAppVersion">{info.productionAppVersion}</li>
-      <li data-testid="vStageAppVersion">{info.stageAppVersion}</li>
-      <li data-testid="vControlPlaneAppVersion">{info.controlAppVersion}</li>
+      <li data-testid="vProductionAppVersion">Production: {info.productionAppVersion}</li>
+      <li data-testid="vStageAppVersion">Stage: {info.stageAppVersion}</li>
+      <li data-testid="vControlPlaneAppVersion">Control plane: {info.controlAppVersion}</li>
     </ul>
   </section>
 }

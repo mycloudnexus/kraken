@@ -1,15 +1,60 @@
-.container {
+.info {
+  border-radius: 8px;
+  width: 100%;
+  padding: 16px 30px;
+  position: relative;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  background-image: linear-gradient(91deg, #789AF9 0.46%, #CAE4F9 103.62%);
+}
+
+.basicTag {
+  background: linear-gradient(
+    82.45deg,
+    rgba(72, 22, 236, 0.5) -15.65%,
+    rgba(24, 144, 255, 0.5) 130.32%
+  );
+  color: #fff;
+  margin-right: 0;
+  border: none;
+  padding: 2px 8px;
+}
+
+.specialTag {
+  background: linear-gradient(90deg, #d3adf7 0%, #adc6ff 100%);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  padding: 2px 8px;
+}
+
+.content {
+  margin-top: 12px;
+  flex: 1;
+  box-sizing: border-box;
+}
+
+.root {
+  height: 100%;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  padding: 4px 16px 20px;
+  overflow-y: auto;
+  padding: 16px 20px;
   background: #fff;
   border-radius: 4px;
-  box-sizing: border-box;
-  width: 100%;
+}
+
+.empty {
   height: 100%;
-  :global {
-    .ant-tabs-top > .ant-tabs-nav::before {
-      border-bottom: none;
-    }
-  }
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 4px;
+  background: #f6f7fa;
+  flex-direction: column;
 }

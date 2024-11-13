@@ -195,7 +195,7 @@ const NewAPIServer = () => {
         >
           <main id="12" className={styles.paper} style={{ flex: 1 }}>
             <div id="12" style={{ maxWidth: "60%", minWidth: 600 }}>
-              <SelectAPIServer />
+              <SelectAPIServer form={form}/>
               <AddEnv form={form} env={env} />
               <UploadYaml form={form} />
             </div>

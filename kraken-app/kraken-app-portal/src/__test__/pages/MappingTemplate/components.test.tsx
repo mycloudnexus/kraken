@@ -1,12 +1,12 @@
 import { fireEvent, render, waitFor } from "@/__test__/utils";
 import { ApiCard } from "@/components/ApiMapping";
-import { ApiList } from "@/pages/MappingTemplatev2/UpgradePlane/components/ApiList";
-import { ApiListSkeleton } from "@/pages/MappingTemplatev2/UpgradePlane/components/ApiListSkeleton";
-import { DeprecatedModal } from "@/pages/MappingTemplatev2/UpgradePlane/components/DeprecatedModal";
-import { IncompatibleMappingModal } from "@/pages/MappingTemplatev2/UpgradePlane/components/IncompatibleMappingModal";
-import { StartUpgradeModal } from "@/pages/MappingTemplatev2/UpgradePlane/components/StartUpgradeModal";
-import { DetailDrawer } from "@/pages/MappingTemplatev2/components/VersionSelect/DetailDrawer";
-import { ListVersionSkeleton } from "@/pages/MappingTemplatev2/components/VersionSelect/ListVersionSkeleton";
+import { ApiList } from "@/pages/MappingTemplate/DataPlaneUpgrade/components/ApiList";
+import { ApiListSkeleton } from "@/pages/MappingTemplate/DataPlaneUpgrade/components/ApiListSkeleton";
+import { DeprecatedModal } from "@/pages/MappingTemplate/DataPlaneUpgrade/components/DeprecatedModal";
+import { IncompatibleMappingModal } from "@/pages/MappingTemplate/DataPlaneUpgrade/components/IncompatibleMappingModal";
+import { StartUpgradeModal } from "@/pages/MappingTemplate/DataPlaneUpgrade/components/StartUpgradeModal";
+import { DetailDrawer } from "@/pages/MappingTemplate/components/VersionSelect/DetailDrawer";
+import { ListVersionSkeleton } from "@/pages/MappingTemplate/components/VersionSelect/ListVersionSkeleton";
 import * as productHooks from '@/hooks/product'
 import * as userHooks from '@/hooks/user/useUser'
 import { DeploymentStatus } from "@/pages/NewAPIMapping/components/Deployment/DeploymentStatus";
@@ -194,12 +194,19 @@ describe("components used in mapping template v2 pages", () => {
 
   it('should render api list', () => {
     const handleClick = vi.fn()
-    const { getByTestId, getAllByTestId } = render(<ApiList loading title="mock_title" clickable highlights={{ 'mock_mapper_target': true }} indicators={['incomplete']} details={[{
-      targetMapperKey: 'mock_mapper_target',
-      mappingStatus: 'incomplete',
-      path: '/a/b/c/d'
-    }] as any}
-    statusIndicatorPosition='right' onItemClick={handleClick} />)
+    const { getByTestId, getAllByTestId } = render(<ApiList
+      loading
+      title="mock_title"
+      clickable
+      highlights={{ 'mock_mapper_target': true }}
+      indicators={['incomplete']}
+      upgradeable={{ 'mock_mapper_target': true }}
+      details={[{
+        targetMapperKey: 'mock_mapper_target',
+        mappingStatus: 'incomplete',
+        path: '/a/b/c/d',
+      }] as any}
+      statusIndicatorPosition='right' onItemClick={handleClick} />)
     expect(getByTestId('mappingListTitle')).toHaveTextContent('mock_title')
 
     const useCase = getAllByTestId('useCase')[0]

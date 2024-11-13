@@ -32,10 +32,9 @@ import {
   reduce,
   uniqBy,
 } from "lodash";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSessionStorage } from "usehooks-ts";
-import DeployHistory from "./components/DeployHistory";
 import { Deployment } from "./components/Deployment";
 import DeploymentInfo from "./components/DeploymentInfo";
 import HeaderMapping from "./components/HeaderMapping";
@@ -47,6 +46,7 @@ import useGetApiSpec from "./components/useGetApiSpec";
 import useGetDefaultSellerApi from "./components/useGetDefaultSellerApi";
 // import { validateMappers } from "./helper";
 import styles from "./index.module.scss";
+import DeployHistory from "./components/DeployHistory";
 
 enum EMainTab {
   mapping = "mapping",
@@ -86,7 +86,7 @@ const NewAPIMapping = ({
     setRightSideInfo,
     // setErrors,
   } = useNewApiMappingStore();
-  const queryData = JSON.parse(query ?? "{}");
+  const queryData = useMemo(() => JSON.parse(query ?? "{}"), [query]);
 
   const [firstTimeLoad, setFirstTimeLoad] = useState(true);
   const [activeKey, setActiveKey] = useState<string | string[]>("0");
@@ -545,7 +545,7 @@ const NewAPIMapping = ({
               description={
                 <>
                   Upgrading to{" "}
-                  <Link to={`/mapping-template-v2?version=${upgradingVersion}`}>
+                  <Link to={`/mapping-template?version=${upgradingVersion}`}>
                     Api mapping template {upgradingVersion}
                   </Link>
                 </>
@@ -600,12 +600,10 @@ const NewAPIMapping = ({
               )}
             </Flex>
           ) : (
-            <div className={styles.history}>
               <DeployHistory
                 targetMapperKey={queryData.targetMapperKey}
                 scrollHeight={get(size, "height", 0) + 70}
               />
-            </div>
           )}
         </div>
       </Flex>
