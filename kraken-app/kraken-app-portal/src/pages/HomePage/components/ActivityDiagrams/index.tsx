@@ -23,9 +23,9 @@ import styles from "./index.module.scss";
 
 export type DiagramProps = {
   envId: string;
-  startTime: string;
-  endTime: string;
-  buyer: string;
+  requestStartTime: string;
+  requestEndTime: string;
+  buyer: string | undefined;
   requestTime?: any;
 };
 
@@ -40,11 +40,11 @@ const DiagramWrapper = ({ envs }: Props) => {
     envs?.find((env: IEnv) => env.name?.toLowerCase() === "stage")?.id ?? "";
   const currentTime = getCurrentTimeWithZone();
   const [form] = Form.useForm();
-  const [params, setParams] = useState({
+  const [params, setParams] = useState<DiagramProps>({
     envId: stageEnvId,
-    startTime: currentTime,
-    endTime: currentTime,
-    buyer: "all",
+    requestStartTime: currentTime,
+    requestEndTime: currentTime,
+    buyer: undefined,
   });
 
   const handleFormValues = useCallback(
@@ -53,10 +53,10 @@ const DiagramWrapper = ({ envs }: Props) => {
       setParams({
         envId: values.envId || params.envId,
         buyer: values.buyer || params.buyer,
-        startTime: requestTime?.[0]
+        requestStartTime: requestTime?.[0]
           ? dayjs(requestTime[0]).startOf("day").format(TIME_ZONE_FORMAT)
           : currentTime,
-        endTime: requestTime?.[1]
+        requestEndTime: requestTime?.[1]
           ? dayjs(requestTime[1]).endOf("day").format(TIME_ZONE_FORMAT)
           : currentTime,
       });
@@ -82,12 +82,12 @@ const DiagramWrapper = ({ envs }: Props) => {
   }, [envs]);
 
   const setRecentDate = (e: RadioChangeEvent) => {
-    const endTime = currentTime;
-    const startTime =
+    const requestEndTime = currentTime;
+    const requestStartTime =
       e.target.value === "7"
         ? dayjs().subtract(7, "days").format(TIME_ZONE_FORMAT)
         : dayjs().subtract(7, "months").format(TIME_ZONE_FORMAT);
-    setParams({ ...params, startTime, endTime });
+    setParams({ ...params, requestStartTime, requestEndTime });
   };
 
   return (

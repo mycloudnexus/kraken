@@ -57,8 +57,8 @@ const ErrorBrakedownDiagram = ({ props }: Props) => {
   const { data, isLoading, refetch, isRefetching } = useGetErrorBrakedown(
     currentProduct,
     props.envId,
-    props.startTime,
-    props.endTime
+    props.requestStartTime,
+    props.requestEndTime
   );
 
   useEffect(() => {

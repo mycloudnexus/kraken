@@ -28,8 +28,8 @@ const ApiActivityDiagram = ({ props }: Props) => {
   const { data, isLoading, refetch, isRefetching } = useGetActivityRequests(
     currentProduct,
     props.envId,
-    props.startTime,
-    props.endTime,
+    props.requestStartTime,
+    props.requestEndTime,
     props.buyer
   );
 
