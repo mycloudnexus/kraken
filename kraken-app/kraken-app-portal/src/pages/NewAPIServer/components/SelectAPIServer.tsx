@@ -4,11 +4,17 @@ import { Text } from "@/components/Text";
 import { useGetValidateServerName } from '@/hooks/product';
 import { useAppStore } from '@/stores/app.store';
 import { validateServerName, validateURL } from '@/utils/helpers/validators';
-import { Form, Input } from "antd";
+import { Form, FormInstance, Input } from "antd";
+import { useMemo } from 'react';
 
-const SelectAPIServer = () => {
+type Props = {
+  form?: FormInstance<any>;
+};
+
+const SelectAPIServer = ({ form }: Props) => {
   const { currentProduct } = useAppStore();
   const { mutateAsync: validateName } = useGetValidateServerName();
+  const originalName = useMemo(() => (form?.getFieldsValue(["name"])?.name ?? null), [form]);
   return (
     <>
       <Flex gap={8} justifyContent="flex-start">
@@ -25,12 +31,11 @@ const SelectAPIServer = () => {
             message: "Please complete this field.",
           },
           {
-            validator: (_, name) => validateServerName(validateName, currentProduct, name)
+            validator: (_, name) => validateServerName(validateName, currentProduct, name, originalName)
           }
         ]}
         validateDebounce={1000}
         labelCol={{ span: 24 }}
-
       >
         <Input data-testid="api-seller-name-input" placeholder="Add API Server Name" style={{ width: "100%" }} />
       </Form.Item>
