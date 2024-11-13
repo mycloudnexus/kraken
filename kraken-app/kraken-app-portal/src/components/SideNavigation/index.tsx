@@ -123,14 +123,6 @@ const SideNavigation = ({ info }: Readonly<{ info?: ISystemInfo }>) => {
             ),
           },
           {
-            key: "mapping-template-v2",
-            label: (
-              <Link to="/mapping-template-v2">
-                Mapping template release & Upgrade v2
-              </Link>
-            ),
-          },
-          {
             key: "user-management",
             label: <Link to="/user-management">User management</Link>,
           },
