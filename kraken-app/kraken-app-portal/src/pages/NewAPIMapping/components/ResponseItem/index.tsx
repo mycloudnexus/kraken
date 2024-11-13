@@ -194,7 +194,7 @@ const ResponseItem = ({ item, index }: Props) => {
           </Flex>
         )}
       </Flex>
-      <Flex className={styles.container} gap={8} wrap="wrap" align="flex-end">
+      <Flex className={styles.container} gap={8} wrap="wrap" align="flex-start">
         {/* Sonata side Target response input */}
         <TargetInput
           item={item}

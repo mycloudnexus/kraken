@@ -11,7 +11,6 @@ export function ApiCard({
   prefix,
   suffix,
   className,
-  mappingMatrixPosition = "left",
   onClick,
 }: Readonly<{
   apiInstance: IRunningMapping;
@@ -38,10 +37,8 @@ export function ApiCard({
         gap={8}
         align="center"
         flex={1}
-        justify={mappingMatrixPosition === "right" ? "flex-end" : "flex-start"}
       >
         <MappingMatrix
-          style={{ justifyContent: 'flex-end' }}
           mappingMatrix={apiInstance?.mappingMatrix}
           extraKey={"item.path"}
           isItemActive={false}

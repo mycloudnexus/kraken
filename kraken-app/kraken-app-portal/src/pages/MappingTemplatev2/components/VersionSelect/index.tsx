@@ -1,7 +1,7 @@
 import { SecondaryText, Text } from "@/components/Text";
 import { IReleaseHistory } from "@/utils/types/product.type";
 import { DownOutlined } from "@ant-design/icons";
-import { Dropdown, Flex, MenuProps, Spin, Tag } from "antd";
+import { Dropdown, Empty, Flex, MenuProps, Spin, Tag } from "antd";
 import classNames from "classnames";
 import clsx from "clsx";
 import dayjs from "dayjs";
@@ -150,6 +150,12 @@ const VersionSelect = ({
       <Flex vertical className={styles.versionList} ref={listRef}>
         {loading && <ListVersionSkeleton />}
 
+        {!listRelease.length && (
+          <Empty
+            className={styles.emptyRelease}
+            description={<SecondaryText.LightNormal>No matched release</SecondaryText.LightNormal>} />
+        )}
+
         {listRelease.map((d) => (
           <Flex
             key={d.templateUpgradeId}
@@ -191,7 +197,7 @@ const VersionSelect = ({
           </Flex>
         ))}
 
-        <Flex
+        {listRelease.length > 0 && (<Flex
           justify="center"
           style={{
             marginTop: 12,
@@ -204,7 +210,7 @@ const VersionSelect = ({
             hasNextPage={hasNextPage}
             onFetchNext={onFetchNext}
           />
-        </Flex>
+        </Flex>)}
       </Flex>
     </div>
   );

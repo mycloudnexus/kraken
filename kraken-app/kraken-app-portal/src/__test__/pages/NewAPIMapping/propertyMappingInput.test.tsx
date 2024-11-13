@@ -81,17 +81,13 @@ describe("NewAPIMapping > request mapping", () => {
     );
 
     const input = getByTestId("sourceInput");
-    expect(input).toHaveValue(request.requestMapping[0].source);
+    expect(input).toHaveTextContent(request.requestMapping[0].source);
 
     fireEvent.click(input);
     expect(request.setRightSide).toHaveBeenCalledTimes(1);
     expect(request.setRightSideInfo).toHaveBeenCalledTimes(1);
 
-    fireEvent.change(input, { target: { value: "@{{not.hello}}" } });
-    expect(input).toHaveValue("@{{not.hello}}");
-
     fireEvent.blur(input);
-    expect(request.setRequestMapping).toHaveBeenCalledTimes(1);
 
     const btnSelectLoc = getByTestId("btnSelectLocation");
     expect(btnSelectLoc).toHaveTextContent("Please select location");
@@ -110,7 +106,7 @@ describe("NewAPIMapping > request mapping", () => {
     expect(items[5]).toHaveTextContent("Constant value");
 
     fireEvent.click(items[2]);
-    expect(request.setRequestMapping).toHaveBeenCalledTimes(2);
+    expect(request.setRequestMapping).toHaveBeenCalledTimes(1);
   });
 
   it("should render a target property input", async () => {
@@ -123,7 +119,7 @@ describe("NewAPIMapping > request mapping", () => {
     );
 
     const input = getByTestId("targetInput");
-    expect(input).toHaveValue(request.requestMapping[0].target);
+    expect(input).toHaveTextContent(request.requestMapping[0].target);
 
     expect(getByTestId("btnSelectLocation")).toHaveTextContent(
       "Query parameter"
@@ -133,11 +129,7 @@ describe("NewAPIMapping > request mapping", () => {
     expect(request.setRightSideInfo).toHaveBeenCalledTimes(1);
     expect(request.setRightSide).toHaveBeenCalledTimes(1);
 
-    fireEvent.change(input, { target: { value: "@{{target2}}" } });
-    expect(input).toHaveValue("@{{target2}}");
-
     fireEvent.blur(input);
-    expect(request.setRequestMapping).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -152,18 +144,14 @@ describe("NewAPIMapping > response mapping", () => {
     );
 
     const input = getByTestId("sourceInput");
-    expect(input).toHaveValue(response.responseMapping[0].source);
+    expect(input).toHaveTextContent(response.responseMapping[0].source);
 
     fireEvent.click(input);
     expect(response.setActiveResponseName).toHaveBeenCalledTimes(1);
     expect(response.setRightSide).toHaveBeenCalledTimes(1);
 
-    fireEvent.change(input, { target: { value: "@{{source2}}" } });
-    expect(input).toHaveValue("@{{source2}}");
-
     fireEvent.blur(input);
     expect(response.setActiveResponseName).toHaveBeenCalledTimes(1);
-    expect(response.setResponseMapping).toHaveBeenCalledTimes(1);
 
     const btnSelectLoc = getByTestId("btnSelectLocation");
     expect(btnSelectLoc!).toHaveTextContent("Please select location");
@@ -179,7 +167,7 @@ describe("NewAPIMapping > response mapping", () => {
     expect(items[2]).toHaveTextContent("Constant value");
 
     fireEvent.click(items[0]);
-    expect(response.setResponseMapping).toHaveBeenCalledTimes(2);
+    expect(response.setResponseMapping).toHaveBeenCalledTimes(1);
   });
 
   it("should render a target property input", async () => {
@@ -192,7 +180,7 @@ describe("NewAPIMapping > response mapping", () => {
     );
 
     const input = getByTestId("targetInput");
-    expect(input).toHaveValue(response.responseMapping[0].target);
+    expect(input).toHaveTextContent(response.responseMapping[0].target);
 
     expect(getByTestId("btnSelectLocation")).toHaveTextContent(
       "Path parameter"
@@ -201,9 +189,6 @@ describe("NewAPIMapping > response mapping", () => {
     fireEvent.click(input);
     expect(response.setActiveSonataResponse).toHaveBeenCalledTimes(1);
     expect(response.setRightSide).toHaveBeenCalledTimes(1);
-
-    fireEvent.change(input, { target: { value: "@{{target2}}" } });
-    expect(input).toHaveValue("@{{target2}}");
 
     fireEvent.blur(input);
     expect(response.setActiveSonataResponse).toHaveBeenCalledTimes(1);

@@ -4,23 +4,38 @@ import com.consoleconnect.kraken.operator.controller.dto.ComponentExpandDTO;
 import com.consoleconnect.kraken.operator.controller.dto.UpgradeRecord;
 import com.consoleconnect.kraken.operator.controller.dto.UpgradeTuple;
 import com.consoleconnect.kraken.operator.controller.model.MgmtProperty;
+import com.consoleconnect.kraken.operator.controller.model.SystemInfo;
+import com.consoleconnect.kraken.operator.controller.model.TemplateUpgradeDeploymentFacets;
 import com.consoleconnect.kraken.operator.controller.service.ApiComponentService;
+import com.consoleconnect.kraken.operator.controller.service.SystemInfoService;
+import com.consoleconnect.kraken.operator.core.dto.Tuple2;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
+import com.consoleconnect.kraken.operator.core.enums.DeployStatusEnum;
+import com.consoleconnect.kraken.operator.core.enums.EnvNameEnum;
+import com.consoleconnect.kraken.operator.core.enums.UpgradeResultEventEnum;
+import com.consoleconnect.kraken.operator.core.event.TemplateUpgradeResultEvent;
 import com.consoleconnect.kraken.operator.core.ingestion.ResourceLoaderFactory;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.core.model.FileContentDescriptor;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.ProductFacets;
 import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
+import com.consoleconnect.kraken.operator.core.service.EventSinkService;
+import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
+import com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants;
+import com.consoleconnect.kraken.operator.core.toolkit.LabelConstants;
+import com.consoleconnect.kraken.operator.core.toolkit.Paging;
 import com.consoleconnect.kraken.operator.core.toolkit.YamlToolkit;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 
 @AllArgsConstructor
@@ -31,6 +46,9 @@ public abstract class AbstractUpgradeSourceService implements UpgradeSourceServi
   private final UnifiedAssetRepository unifiedAssetRepository;
   private final MgmtProperty mgmtProperty;
   private final ApiComponentService apiComponentService;
+  private final UnifiedAssetService unifiedAssetService;
+  private final SystemInfoService systemInfoService;
+  private final EventSinkService eventSinkService;
   protected static final List<String> CACHED_ASSET_KINDS =
       List.of(
           AssetKindEnum.COMPONENT_API_TARGET_MAPPER.getKind(),
@@ -134,5 +152,83 @@ public abstract class AbstractUpgradeSourceService implements UpgradeSourceServi
         appProperty.getQueryExcludeAssetKeys(),
         componentList,
         assetMap.get(AssetKindEnum.COMPONENT_API_TARGET_MAPPER.getKind()));
+  }
+
+  @Override
+  public void reportResult(String templateUpgradeId, String templateDeploymentId) {
+    UnifiedAssetDto unifiedAssetDto = unifiedAssetService.findOne(templateUpgradeId);
+    Paging<UnifiedAssetDto> assetDtoPaging =
+        unifiedAssetService.findBySpecification(
+            Tuple2.ofList(
+                AssetsConstants.FIELD_KIND, AssetKindEnum.PRODUCT_TEMPLATE_DEPLOYMENT.getKind()),
+            Tuple2.ofList(LabelConstants.LABEL_APP_TEMPLATE_UPGRADE_ID, templateUpgradeId),
+            null,
+            null,
+            null);
+    List<UnifiedAssetDto> list = assetDtoPaging.getData();
+    if (CollectionUtils.isEmpty(list)) {
+      return;
+    }
+    if (StringUtils.isNotBlank(templateDeploymentId)) {
+      UnifiedAssetDto templateDeployment = unifiedAssetService.findOne(templateDeploymentId);
+      Optional.ofNullable(templateDeployment).ifPresent(dto -> report(dto, unifiedAssetDto));
+    }
+  }
+
+  private void report(UnifiedAssetDto deploymentDto, UnifiedAssetDto templateDto) {
+    boolean isStage =
+        deploymentDto
+            .getMetadata()
+            .getLabels()
+            .getOrDefault(LabelConstants.LABEL_ENV_NAME, "")
+            .equalsIgnoreCase(EnvNameEnum.STAGE.name());
+    EnvNameEnum envName = isStage ? EnvNameEnum.STAGE : EnvNameEnum.PRODUCTION;
+    SystemInfo systemInfo = systemInfoService.find();
+    String productVersion =
+        templateDto.getMetadata().getLabels().get(LabelConstants.LABEL_PRODUCT_VERSION);
+    if (DeployStatusEnum.SUCCESS.name().equalsIgnoreCase(deploymentDto.getMetadata().getStatus())) {
+      TemplateUpgradeDeploymentFacets facets =
+          UnifiedAsset.getFacets(deploymentDto, TemplateUpgradeDeploymentFacets.class);
+      TemplateUpgradeDeploymentFacets.EnvDeployment envDeployment = facets.getEnvDeployment();
+
+      if (CollectionUtils.isEmpty(envDeployment.getSystemDeployments())
+          && CollectionUtils.isEmpty(envDeployment.getMapperDeployment())) {
+        eventSinkService.reportTemplateUpgradeResult(
+            templateDto,
+            UpgradeResultEventEnum.UPGRADE,
+            event -> {
+              event.setEnvName(envName);
+              event.setUpgradeBeginAt(ZonedDateTime.now());
+              event.setUpgradeEndAt(ZonedDateTime.now().plusSeconds(5L));
+              fillProductInfo(systemInfo, productVersion, event);
+            });
+      } else {
+        eventSinkService.reportTemplateUpgradeResult(
+            templateDto,
+            UpgradeResultEventEnum.UPGRADE,
+            event -> {
+              event.setEnvName(envName);
+              event.setUpgradeEndAt(ZonedDateTime.now().plusSeconds(5L));
+              fillProductInfo(systemInfo, productVersion, event);
+            });
+      }
+
+    } else {
+      eventSinkService.reportTemplateUpgradeResult(
+          templateDto,
+          UpgradeResultEventEnum.UPGRADE,
+          event -> {
+            event.setEnvName(envName);
+            event.setUpgradeBeginAt(ZonedDateTime.now());
+            fillProductInfo(systemInfo, productVersion, event);
+          });
+    }
+  }
+
+  private void fillProductInfo(
+      SystemInfo systemInfo, String productVersion, TemplateUpgradeResultEvent event) {
+    event.setProductKey(systemInfo.getProductKey());
+    event.setProductSpec(systemInfo.getProductSpec());
+    event.setProductVersion(productVersion);
   }
 }

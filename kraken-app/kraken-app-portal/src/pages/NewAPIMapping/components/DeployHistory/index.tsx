@@ -53,7 +53,7 @@ const DeployHistory = ({
     envId: undefined,
   });
 
-  const { data, isLoading } = useGetAPIDeployments(currentProduct, {
+  const { data, isLoading, isFetching } = useGetAPIDeployments(currentProduct, {
     mapperKey: targetMapperKey,
     ...omit(query, "total"),
     envId: selectedEnv?.id ?? query.envId,
@@ -243,7 +243,7 @@ const DeployHistory = ({
     <div className={styles.root} id="deploy-history">
       <Table
         scroll={scroll}
-        loading={isLoading || isLoadingVerify}
+        loading={isLoading || isFetching || isLoadingVerify}
         locale={{
           emptyText: (
             <Result subTitle="No deploy history" icon={<EmptyIcon />} />

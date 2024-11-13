@@ -121,3 +121,10 @@
 .noPadding {
   padding: 0 !important;
 }
+
+.emptyRelease {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+}

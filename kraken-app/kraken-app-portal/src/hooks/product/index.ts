@@ -553,7 +553,6 @@ export const useGetAPIDeployments = (
     queryFn: () => getAPIMapperDeployments(productId, params),
     enabled: Boolean(productId),
     select: (data) => data?.data,
-    staleTime: STALE_TIME,
   });
 };
 
