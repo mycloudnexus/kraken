@@ -1,6 +1,6 @@
 package com.consoleconnect.kraken.operator.core.service;
 
-import static com.consoleconnect.kraken.operator.core.enums.MgmtEventType.KRAKEN_APP_VERSION_UPGRADE_RESULT;
+import static com.consoleconnect.kraken.operator.core.enums.MgmtEventType.CLIENT_APP_VERSION_UPGRADE_RESULT;
 
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.entity.MgmtEventEntity;
@@ -60,7 +60,7 @@ public class EventSinkService {
   public void reportKrakenVersionUpgradeResult(
       EnvNameEnum envName, String appVersion, ZonedDateTime upgradeAt) {
     MgmtEventEntity mgmtEventEntity = new MgmtEventEntity();
-    mgmtEventEntity.setEventType(KRAKEN_APP_VERSION_UPGRADE_RESULT.name());
+    mgmtEventEntity.setEventType(CLIENT_APP_VERSION_UPGRADE_RESULT.name());
     AppVersionUpgradeResultEvent appVersionUpgradeResultEvent = new AppVersionUpgradeResultEvent();
     mgmtEventEntity.setPayload(appVersionUpgradeResultEvent);
     appVersionUpgradeResultEvent.setUpgradeAt(upgradeAt);
