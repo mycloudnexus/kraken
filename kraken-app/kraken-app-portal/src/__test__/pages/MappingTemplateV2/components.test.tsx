@@ -194,12 +194,19 @@ describe("components used in mapping template v2 pages", () => {
 
   it('should render api list', () => {
     const handleClick = vi.fn()
-    const { getByTestId, getAllByTestId } = render(<ApiList loading title="mock_title" clickable highlights={{ 'mock_mapper_target': true }} indicators={['incomplete']} details={[{
-      targetMapperKey: 'mock_mapper_target',
-      mappingStatus: 'incomplete',
-      path: '/a/b/c/d'
-    }] as any}
-    statusIndicatorPosition='right' onItemClick={handleClick} />)
+    const { getByTestId, getAllByTestId } = render(<ApiList
+      loading
+      title="mock_title"
+      clickable
+      highlights={{ 'mock_mapper_target': true }}
+      indicators={['incomplete']}
+      upgradeable={{ 'mock_mapper_target': true }}
+      details={[{
+        targetMapperKey: 'mock_mapper_target',
+        mappingStatus: 'incomplete',
+        path: '/a/b/c/d',
+      }] as any}
+      statusIndicatorPosition='right' onItemClick={handleClick} />)
     expect(getByTestId('mappingListTitle')).toHaveTextContent('mock_title')
 
     const useCase = getAllByTestId('useCase')[0]

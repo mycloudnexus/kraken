@@ -2,7 +2,7 @@ import { Steps } from "@/components/Steps";
 import { Text } from "@/components/Text";
 import { useUser } from "@/hooks/user/useUser";
 import { toDateTime } from "@/libs/dayjs";
-import { Deployment, IReleaseHistory } from "@/utils/types/product.type";
+import { IReleaseHistory } from "@/utils/types/product.type";
 import { Button, Empty, Flex, StepProps } from "antd";
 import classNames from "classnames";
 import { useMemo } from "react";
@@ -24,27 +24,18 @@ function getUpgradeEnv(envName: string): string {
 }
 
 function getUpgradeStatus(
-  upgradeStatus: string,
-  process: Deployment[],
-  index: number
+  status: string
 ): StepProps["status"] {
-  if (
-    upgradeStatus === "Upgrading" &&
-    index > 0 &&
-    process[index - 1].status === "SUCCESS" &&
-    !process[index].status
-  )
-    return "process";
 
-  if (!process[index].createdAt) return "wait";
-
-  switch (process[index].status) {
+  switch (status) {
+    case 'SUCCESS':
+      return 'finish'
     case "IN_PROCESS":
       return "process";
     case "ERROR":
       return "error";
     default:
-      return "finish";
+      return "wait";
   }
 }
 
@@ -78,8 +69,8 @@ export function UpgradeProcess({
             current={-1}
             size="small"
             items={data.map(
-              ({ deploymentId, envName, upgradeBy, createdAt, updatedAt }, index) => {
-                const status = getUpgradeStatus(release.status, data, index);
+              ({ deploymentId, envName, upgradeBy, createdAt, updatedAt, status }) => {
+                const upgradeStatus = getUpgradeStatus(status);
 
                 return {
                   title: getUpgradeEnv(envName),
@@ -106,8 +97,8 @@ export function UpgradeProcess({
                       </p>
                     </>
                   ),
-                  status,
-                  onClick: () => status === "finish" && onViewDetail(deploymentId),
+                  status: upgradeStatus,
+                  onClick: () => upgradeStatus === "finish" && onViewDetail(deploymentId),
                 };
               }
             )}
@@ -123,7 +114,7 @@ export function UpgradeProcess({
         >
           {release.status === "Upgrading"
             ? "Continue upgrading"
-            : "Check and upgrade"}
+            : "Start upgrading"}
         </Button>
       )}
     </Flex>
