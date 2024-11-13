@@ -38,7 +38,11 @@ const ApiActivityDiagram = ({ props }: Props) => {
   }, [props]);
 
   const activityData = useMemo(
-    () => data?.requestStatistics,
+    () => data?.requestStatistics.map(entry => ({
+        ...entry,
+        error: entry.error || 0,
+        success: entry.success || 0,
+      })),
     [isLoading, data]
   );
 
@@ -49,7 +53,7 @@ const ApiActivityDiagram = ({ props }: Props) => {
       </Flex>
       <Spin spinning={isLoading || isRefetching}>
         {!isLoading && !activityData
-          ? <NoData icon={EmptyBin}/>
+          ? <NoData icon={EmptyBin} />
           : <ResponsiveContainer width="100%" height="100%">
             <LineChart width={500} height={300} data={activityData}>
               <XAxis
@@ -74,14 +78,14 @@ const ApiActivityDiagram = ({ props }: Props) => {
               />
               <Legend align="right" formatter={(value) => capitalize(value)} />
               <Line
-                type="monotone"
+                type="bumpX"
                 dot={false}
                 dataKey="success"
                 strokeWidth={5}
                 stroke="#7AD6BE"
               />
               <Line
-                type="natural"
+                type="bumpX"
                 dot={false}
                 dataKey="error"
                 strokeWidth={5}
