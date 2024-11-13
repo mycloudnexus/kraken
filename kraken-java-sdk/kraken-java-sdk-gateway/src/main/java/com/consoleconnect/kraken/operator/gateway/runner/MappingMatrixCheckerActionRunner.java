@@ -106,12 +106,12 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner {
       throw KrakenException.badRequest(
           MESSAGE_ALERT.formatted(":lack in check rules for target key: " + targetKey));
     }
-    // check enable/disable
-    enableChecking(facets, targetKey);
-
     if (unifiedAssetRepository.findOneByKey(targetKey).isEmpty()) {
       throw KrakenException.badRequest(MESSAGE_ALERT.formatted(":not deployed"));
     }
+    // check enable/disable
+    enableChecking(facets, targetKey);
+
     checkRequestConstraints(targetKey, inputs);
     DocumentContext documentContext = JsonPath.parse(inputs);
     StringBuilder builder = new StringBuilder();

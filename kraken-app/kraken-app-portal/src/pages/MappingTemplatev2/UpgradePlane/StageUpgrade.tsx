@@ -53,23 +53,6 @@ export default function StageUpgrade({
     [controlPlaneApiUseCases]
   );
 
-  useEffect(() => {
-    // Check for any incomplete mapping use cases derived from control plane upgrade
-    if (
-      controlPlaneApis &&
-      !isMappingIncomplete &&
-      controlPlaneApis.some((mapping) => mapping.mappingStatus === "incomplete")
-    ) {
-      pushNotification({
-        type: "warning",
-        message:
-          "Please adjust and complete the incomplete mapping use cases that will be upgraded to data plane.",
-      });
-
-      setIsMappingIncomplete(true);
-    }
-  }, [controlPlaneApis]);
-
   // Updated: every control plane upgradeable use cases should be highlighted, even though are completed or not
   const upgradeableControlPlaneMapperKeys = useMemo(() => {
     if (controlPlaneApis && stageApiUseCases) {
@@ -86,6 +69,23 @@ export default function StageUpgrade({
 
     return {}
   }, [controlPlaneApis, stageApiUseCases])
+
+  useEffect(() => {
+    // Check for any incomplete mapping use cases derived from control plane upgrade
+    if (
+      controlPlaneApis &&
+      !isMappingIncomplete &&
+      controlPlaneApis.some((usecase) => upgradeableControlPlaneMapperKeys?.[usecase.targetMapperKey] && usecase.mappingStatus === "incomplete")
+    ) {
+      pushNotification({
+        type: "warning",
+        message:
+          "Please adjust and complete the incomplete mapping use cases that will be upgraded to data plane.",
+      });
+
+      setIsMappingIncomplete(true);
+    }
+  }, [controlPlaneApis, upgradeableControlPlaneMapperKeys]);
 
   return (
     <>
@@ -106,6 +106,7 @@ export default function StageUpgrade({
         clickable
         highlights={upgradeableControlPlaneMapperKeys} // targetMapperKeys
         indicators={['incomplete']}
+        upgradeable={upgradeableControlPlaneMapperKeys}
         onItemClick={handleItemClick}
       />
 
