@@ -3,8 +3,8 @@ package com.consoleconnect.kraken.operator.controller.service.upgrade;
 import com.consoleconnect.kraken.operator.controller.dto.ComponentExpandDTO;
 import com.consoleconnect.kraken.operator.controller.dto.UpgradeTuple;
 import com.consoleconnect.kraken.operator.controller.model.MgmtProperty;
-import com.consoleconnect.kraken.operator.controller.model.TemplateUpgradeDeploymentFacets;
 import com.consoleconnect.kraken.operator.controller.service.ApiComponentService;
+import com.consoleconnect.kraken.operator.controller.service.SystemInfoService;
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.enums.*;
@@ -23,12 +23,9 @@ import com.consoleconnect.kraken.operator.core.toolkit.LabelConstants;
 import com.consoleconnect.kraken.operator.core.toolkit.Paging;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.lang.ref.WeakReference;
-import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,7 +35,6 @@ public class MgmtSourceUpgradeService extends AbstractUpgradeSourceService {
 
   private final UnifiedAssetService unifiedAssetService;
   private final ResourceCacheHolder resourceCacheHolder;
-  private final EventSinkService eventSinkService;
   private final Map<String, WeakReference<List<UnifiedAssetDto>>> cache = new HashMap<>();
 
   @Autowired
@@ -49,6 +45,7 @@ public class MgmtSourceUpgradeService extends AbstractUpgradeSourceService {
       MgmtProperty mgmtProperty,
       UnifiedAssetService unifiedAssetService,
       EventSinkService eventSinkService,
+      SystemInfoService systemInfoService,
       ResourceCacheHolder resourceCacheHolder,
       ApiComponentService apiComponentService) {
     super(
@@ -56,10 +53,12 @@ public class MgmtSourceUpgradeService extends AbstractUpgradeSourceService {
         resourceLoaderFactory,
         unifiedAssetRepository,
         mgmtProperty,
-        apiComponentService);
+        apiComponentService,
+        unifiedAssetService,
+        systemInfoService,
+        eventSinkService);
     this.unifiedAssetService = unifiedAssetService;
     this.resourceCacheHolder = resourceCacheHolder;
-    this.eventSinkService = eventSinkService;
   }
 
   @Override
@@ -115,69 +114,6 @@ public class MgmtSourceUpgradeService extends AbstractUpgradeSourceService {
   @Override
   public String supportedUpgradeSource() {
     return UpgradeSourceEnum.MGMT.name();
-  }
-
-  @Override
-  public void reportResult(String templateUpgradeId, String templateDeploymentId) {
-    UnifiedAssetDto unifiedAssetDto = unifiedAssetService.findOne(templateUpgradeId);
-    Paging<UnifiedAssetDto> assetDtoPaging =
-        unifiedAssetService.findBySpecification(
-            Tuple2.ofList(
-                AssetsConstants.FIELD_KIND, AssetKindEnum.PRODUCT_TEMPLATE_DEPLOYMENT.getKind()),
-            Tuple2.ofList(LabelConstants.LABEL_APP_TEMPLATE_UPGRADE_ID, templateUpgradeId),
-            null,
-            null,
-            null);
-    List<UnifiedAssetDto> list = assetDtoPaging.getData();
-    if (CollectionUtils.isEmpty(list)) {
-      return;
-    }
-    if (StringUtils.isNotBlank(templateDeploymentId)) {
-      UnifiedAssetDto templateDeployment = unifiedAssetService.findOne(templateDeploymentId);
-      Optional.ofNullable(templateDeployment).ifPresent(dto -> report(dto, unifiedAssetDto));
-    }
-  }
-
-  private void report(UnifiedAssetDto dto, UnifiedAssetDto unifiedAssetDto) {
-    boolean isStage =
-        dto.getMetadata()
-            .getLabels()
-            .getOrDefault(LabelConstants.LABEL_ENV_NAME, "")
-            .equalsIgnoreCase(EnvNameEnum.STAGE.name());
-    EnvNameEnum envName = isStage ? EnvNameEnum.STAGE : EnvNameEnum.PRODUCTION;
-    if (DeployStatusEnum.SUCCESS.name().equalsIgnoreCase(dto.getMetadata().getStatus())) {
-      TemplateUpgradeDeploymentFacets facets =
-          UnifiedAsset.getFacets(dto, TemplateUpgradeDeploymentFacets.class);
-      TemplateUpgradeDeploymentFacets.EnvDeployment envDeployment = facets.getEnvDeployment();
-      if (CollectionUtils.isEmpty(envDeployment.getSystemDeployments())
-          && CollectionUtils.isEmpty(envDeployment.getMapperDeployment())) {
-        eventSinkService.reportTemplateUpgradeResult(
-            unifiedAssetDto,
-            UpgradeResultEventEnum.UPGRADE,
-            event -> {
-              event.setEnvName(envName);
-              event.setUpgradeBeginAt(ZonedDateTime.now());
-              event.setUpgradeEndAt(ZonedDateTime.now().plusSeconds(5L));
-            });
-      } else {
-        eventSinkService.reportTemplateUpgradeResult(
-            unifiedAssetDto,
-            UpgradeResultEventEnum.UPGRADE,
-            event -> {
-              event.setEnvName(envName);
-              event.setUpgradeEndAt(ZonedDateTime.now().plusSeconds(5L));
-            });
-      }
-
-    } else {
-      eventSinkService.reportTemplateUpgradeResult(
-          unifiedAssetDto,
-          UpgradeResultEventEnum.UPGRADE,
-          event -> {
-            event.setEnvName(envName);
-            event.setUpgradeBeginAt(ZonedDateTime.now());
-          });
-    }
   }
 
   @Override

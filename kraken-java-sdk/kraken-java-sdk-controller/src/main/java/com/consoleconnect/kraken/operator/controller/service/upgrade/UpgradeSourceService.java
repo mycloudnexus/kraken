@@ -9,7 +9,7 @@ public interface UpgradeSourceService {
 
   String supportedUpgradeSource();
 
-  default void reportResult(String templateUpgradeId, String deploymentId) {}
+  void reportResult(String templateUpgradeId, String templateDeploymentId);
 
   List<ComponentExpandDTO> listApiUseCases(String templateId);
 }
