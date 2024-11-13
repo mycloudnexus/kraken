@@ -1,6 +1,7 @@
 import { Text } from "@/components/Text";
 import {
   getCurrentTimeWithZone,
+  recentXDays,
   TIME_ZONE_FORMAT,
 } from "@/utils/constants/format";
 import { IEnv } from "@/utils/types/env.type";
@@ -82,11 +83,7 @@ const DiagramWrapper = ({ envs }: Props) => {
   }, [envs]);
 
   const setRecentDate = (e: RadioChangeEvent) => {
-    const requestEndTime = currentTime;
-    const requestStartTime =
-      e.target.value === "7"
-        ? dayjs().subtract(7, "days").format(TIME_ZONE_FORMAT)
-        : dayjs().subtract(7, "months").format(TIME_ZONE_FORMAT);
+    const { requestStartTime, requestEndTime } = recentXDays(e);
     setParams({ ...params, requestStartTime, requestEndTime });
   };
 
