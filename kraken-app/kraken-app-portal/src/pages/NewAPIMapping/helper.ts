@@ -1,4 +1,6 @@
 import { IMappers } from "@/utils/types/component.type";
+import { chain, flatMap } from "lodash";
+import { IMapping } from "./components/ResponseMapping";
 
 /**
  *  Returns properties id whose source/target/location data is missing (applicable for seller apis, and sonata's custom fields only)
@@ -84,3 +86,21 @@ export function renderDeployText(status: string): string {
       return "";
   }
 }
+
+export function transformListMappingItem(
+  item: IMapping[],
+  type: "request" | "response"
+) {
+  return chain(item)
+    .groupBy("name")
+    .map((items, name) => ({
+      name,
+      valueMapping: flatMap(items, (item) =>
+        // item?.to?.map((to) => ({ [to]: item.from }))
+        type === "request"
+          ? [{ [item.from as string]: item.to?.[0] }]
+          : item?.to?.map((to) => ({ [to]: item.from }))
+      ),
+    }))
+    .value();
+};

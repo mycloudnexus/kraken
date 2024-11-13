@@ -106,7 +106,7 @@ const APIServerCard = ({ item, refetchList }: Props) => {
                 ) : (
                   <Tag color={isApiInUse ? "blue" : ""} >
                     <Text.LightSmall>
-                    {isApiInUse ? "In use" : "Not in use"}
+                      {isApiInUse ? "In use" : "Not in use"}
                     </Text.LightSmall>
                   </Tag>
                 )}
@@ -184,8 +184,8 @@ const APIServerCard = ({ item, refetchList }: Props) => {
             </Flex>
             <Flex vertical gap={8} align="flex-start" style={{ marginTop: 12 }}>
               {environmentData?.map((e) => (
-                <Flex gap={8} justify="flex-start" key={e.name}>
-                  <Text.LightMedium style={{ width: 120 }}>
+                <Flex gap={8} justify="flex-start" key={e.name} align="center">
+                  <Text.LightMedium style={{ display: 'inline-block', width: 120, textAlign: 'left' }}>
                     {e.name}
                   </Text.LightMedium>
                   <Typography.Text style={{ whiteSpace: "break-spaces" }}>

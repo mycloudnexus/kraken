@@ -109,7 +109,7 @@ const Header = ({ info }: Readonly<{ info?: ISystemInfo }>) => {
         {/* This mean the template mapping is in Upgrading process */}
         {info?.status && info.status !== 'RUNNING' && (
           <>
-            <Link data-testid="mappingInProgress" to="/mapping-template-v2" className={styles.mappingInProgress}>
+            <Link data-testid="mappingInProgress" to="/mapping-template" className={styles.mappingInProgress}>
               <UpgradingIcon />
               Mapping template upgrading
             </Link>

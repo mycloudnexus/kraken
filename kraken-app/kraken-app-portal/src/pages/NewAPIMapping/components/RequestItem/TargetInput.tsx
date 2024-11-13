@@ -6,7 +6,6 @@ import { Flex, Tooltip } from "antd";
 import clsx from "clsx";
 import { isEqual, cloneDeep, set } from "lodash";
 import { useMemo } from "react";
-import { locationMapping } from "../../helper";
 import { LocationSelector } from "../LocationSelector";
 import styles from "./index.module.scss";
 import { AutoGrowingInput } from "@/components/form";
@@ -53,7 +52,7 @@ export function TargetInput({
         <LocationSelector
           type="request"
           // disabled={!item.customizedField}
-          value={locationMapping(item.targetLocation, "request")}
+          value={item.targetLocation}
           onChange={(value) => handleChange({ targetLocation: value })}
         />
       ) : <div className={styles.bloater}></div>}

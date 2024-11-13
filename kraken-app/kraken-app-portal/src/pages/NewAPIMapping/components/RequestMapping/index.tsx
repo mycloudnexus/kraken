@@ -23,7 +23,7 @@ const RequestMapping = () => {
         <RequestItem key={it.id} item={it} index={index} />
       ))}
       <Button
-        type="primary"
+        type="link"
         style={{ width: "fit-content" }}
         onClick={handleAdd}
       >

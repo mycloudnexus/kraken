@@ -5,7 +5,6 @@ import { RightOutlined } from "@ant-design/icons";
 import { Flex, Tooltip } from "antd";
 import clsx from "clsx";
 import { cloneDeep, set } from "lodash";
-import { locationMapping } from "../../helper";
 import { LocationSelector } from "../LocationSelector";
 import styles from "./index.module.scss";
 import { AutoGrowingInput } from "@/components/form";
@@ -45,7 +44,7 @@ export function SourceInput({
         <LocationSelector
           type="response"
           // disabled={!item.customizedField}
-          value={locationMapping(item.sourceLocation, "response")}
+          value={item.sourceLocation}
           onChange={(value) => handleChange("sourceLocation", value)}
         />
       ) : <div className={styles.bloater}></div>}
