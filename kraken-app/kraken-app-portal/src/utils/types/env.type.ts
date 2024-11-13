@@ -18,6 +18,7 @@ export interface IActivityLog {
   uri: string;
   path: string;
   method: string;
+  buyerName: string;
   queryParameters: Record<string, any>;
   headers: Record<string, any>;
   request: Record<string, any>;
