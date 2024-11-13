@@ -8,7 +8,6 @@ import com.consoleconnect.kraken.operator.core.enums.UpgradeResultEventEnum;
 import com.consoleconnect.kraken.operator.core.event.TemplateUpgradeResultEvent;
 import com.consoleconnect.kraken.operator.core.repo.MgmtEventRepository;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
-import com.consoleconnect.kraken.operator.core.toolkit.LabelConstants;
 import java.util.List;
 import java.util.function.Consumer;
 import lombok.AllArgsConstructor;
@@ -37,18 +36,13 @@ public class EventSinkService {
   }
 
   public void reportTemplateUpgradeResult(
-      UnifiedAssetDto unifiedAssetDto,
+      UnifiedAssetDto templateDto,
       UpgradeResultEventEnum resultEventEnum,
       Consumer<TemplateUpgradeResultEvent> consumer) {
     MgmtEventEntity mgmtEventEntity = new MgmtEventEntity();
     mgmtEventEntity.setEventType(MgmtEventType.TEMPLATE_UPGRADE_RESULT.name());
     TemplateUpgradeResultEvent receivedEvent = new TemplateUpgradeResultEvent();
-    receivedEvent.setProductReleaseKey(
-        unifiedAssetDto
-            .getMetadata()
-            .getLabels()
-            .getOrDefault(LabelConstants.LABEL_RELEASE_KEY, ""));
-    receivedEvent.setPublishAssetKey(unifiedAssetDto.getMetadata().getKey());
+    receivedEvent.setTemplateKey(templateDto.getMetadata().getKey());
     receivedEvent.setResultEventType(resultEventEnum);
     if (consumer != null) {
       consumer.accept(receivedEvent);

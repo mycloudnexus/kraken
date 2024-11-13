@@ -10,6 +10,7 @@ spec:
     path: /mefApi/sonata/productOrderingManagement/v10/productOrder/{id}
     method: get
     productType: access_e_line
+    actionType: delete
   endpoints:
     - path: /api/v2/company/{username}/connections/{connectionId}
       method: GET

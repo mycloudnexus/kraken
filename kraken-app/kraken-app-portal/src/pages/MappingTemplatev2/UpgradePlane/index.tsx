@@ -13,7 +13,6 @@ import {
 } from "@/hooks/mappingTemplate";
 import { useLongPolling } from "@/hooks/useLongPolling";
 import { useAppStore } from "@/stores/app.store";
-import { ReloadOutlined } from "@ant-design/icons";
 import { Button, Flex, Spin, StepsProps, Tag } from "antd";
 import classNames from "classnames";
 import { lazy, ReactNode, Suspense, useEffect, useMemo, useState } from "react";
@@ -51,11 +50,7 @@ function getUpgradeButtonText({
   isUpgradeIncompatible: boolean
 }): ReactNode {
   if (isUpgrading)
-    return (
-      <>
-        <ReloadOutlined /> Upgrading
-      </>
-    );
+    return 'Upgrading';
 
   if (isUpgradeIncompatible && currentStep === 2) return 'Done'
 

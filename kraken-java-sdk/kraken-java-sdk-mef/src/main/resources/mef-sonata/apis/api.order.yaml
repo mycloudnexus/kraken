@@ -20,6 +20,9 @@ spec:
         - ACCESS_E_LINE
     - path: /mefApi/sonata/productOrderingManagement/v10/productOrder/{id}
       method: get
+      actionTypes:
+        - add
+        - delete
       productTypes:
         - UNI
         - ACCESS_E_LINE

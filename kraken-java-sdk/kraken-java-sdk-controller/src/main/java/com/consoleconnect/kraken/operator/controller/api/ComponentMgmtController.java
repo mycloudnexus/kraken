@@ -1,7 +1,6 @@
 package com.consoleconnect.kraken.operator.controller.api;
 
 import com.consoleconnect.kraken.operator.auth.security.UserContext;
-import com.consoleconnect.kraken.operator.controller.aspect.TemplateUpgradeBlockChecker;
 import com.consoleconnect.kraken.operator.controller.dto.*;
 import com.consoleconnect.kraken.operator.controller.model.ComponentTagFacet;
 import com.consoleconnect.kraken.operator.controller.service.ApiComponentService;
@@ -113,7 +112,6 @@ public class ComponentMgmtController {
       resource = AuditConstants.API_MAPPING,
       resourceId = "#pathVariable['id']",
       description = "update target api mapper")
-  @TemplateUpgradeBlockChecker
   public Mono<IngestionDataResult> updateMapper(
       @PathVariable String productId, @PathVariable String id, @RequestBody UnifiedAsset asset) {
     return UserContext.getUserId()

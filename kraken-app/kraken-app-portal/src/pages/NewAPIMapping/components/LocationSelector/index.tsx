@@ -6,7 +6,7 @@ import styles from "./index.module.scss";
 const requestItems: ItemType[] = [
   {
     label: "Hybrid",
-    key: "Hybrid",
+    key: "HYBRID",
   },
   {
     label: "Path parameter",

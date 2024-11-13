@@ -15,6 +15,7 @@ spec:
     path: /mefApi/sonata/productOrderingManagement/v10/productOrder/{id}
     method: get
     productType: access_e_line
+    actionType: delete
   endpoints:
     - id: retrieve connection detail by id of eline delete order
       path: ""
