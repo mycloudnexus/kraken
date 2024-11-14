@@ -1,3 +1,5 @@
+import { IRunningMapping } from "./env.type";
+
 export interface IMetadata {
   id: string;
   name: string;
@@ -37,11 +39,14 @@ export interface IDeploymentHistory {
   verifiedBy: string;
   verifiedAt: string;
   verifiedStatus: boolean;
+  mapperKey: string
 }
 
 export interface IMappingMatrix {
   provideAlternative: boolean;
   addressType: string;
+  productType?: string;
+  actionType?: string;
 }
 
 export interface IReleaseHistory {
@@ -53,7 +58,8 @@ export interface IReleaseHistory {
   deployments: Deployment[];
   showStageUpgradeButton: boolean;
   showProductionUpgradeButton: boolean;
-  productSpec?: string;
+  productSpec: string;
+  status: string;
 }
 
 export interface Deployment {
@@ -64,6 +70,7 @@ export interface Deployment {
   upgradeBy: string;
   status: string;
   createdAt: string;
+  updatedAt: string;
 }
 
 export interface IUpgrade {
@@ -74,4 +81,71 @@ export interface IUpgrade {
   upgradeBy: string;
   status: string;
   createdAt: string;
+}
+
+export interface IApiMapperDeployment {
+  envId: string;
+  envName: string;
+  mapperKey: string;
+  runningVersion: string;
+  status: string;
+  createAt: string;
+  createBy: string;
+}
+
+export interface IQuickStartGuideObject {
+  sellerApiServerRegistrationInfo: {
+    atLeastOneSellerApiRegistered: boolean;
+  };
+  apiMappingInfo: {
+    atLeastOneMappingCompleted: boolean;
+  };
+  deploymentInfo: {
+    atLeastOneApiDeployedToStage: boolean;
+    atLeastOneBuyerRegistered: boolean;
+    atLeastOneApiDeployedToProduction: boolean;
+  };
+}
+
+type RequestStatistics = {
+  date: string;
+  success: number;
+  error: number;
+};
+export interface IApiActivity {
+  requestStatistics: Array<RequestStatistics>;
+}
+
+export type ErrorBrakedown = {
+  date: string;
+  errors: {
+    400: number;
+    401: number;
+    404: number;
+    500: number;
+  };
+};
+export interface IErrorBrakedown {
+  errorBreakdowns: Array<ErrorBrakedown>;
+}
+
+type MostPopularEndpoints = {
+  method: string;
+  endpoint: string;
+  usage: number;
+  popularity: number;
+};
+export interface IMostPopularEndpoints {
+  endpointUsages: Array<MostPopularEndpoints>;
+}
+
+export interface IApiUseCase {
+  componentKey: string;
+  componentName: string;
+  details: IRunningMapping[];
+}
+
+export interface IProductIdAndNameParams {
+  productId: string;
+  name: string;
 }

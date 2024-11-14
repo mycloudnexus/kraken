@@ -8,6 +8,7 @@ import { APIItem } from "@/pages/NewAPIMapping/components/SelectAPI";
 import SelectResponseProperty from "@/pages/NewAPIMapping/components/SelectResponseProperty";
 import SonataPropMapping from "@/pages/NewAPIMapping/components/SonataPropMapping";
 import SonataResponseMapping from "@/pages/NewAPIMapping/components/SonataResponseMapping";
+import StatusIcon from "@/pages/NewAPIMapping/components/StatusIcon";
 import { useMappingUiStore } from "@/stores/mappingUi.store";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import buildInitListMapping from "@/utils/helpers/buildInitListMapping";
@@ -1113,7 +1114,7 @@ test("parse fnc", () => {
 
 describe("select prop", () => {
   test("component new api map page", async () => {
-    const { container, getByTestId, getAllByTestId, getAllByPlaceholderText } =
+    const { container, getByTestId, getAllByTestId } =
       render(
         <QueryClientProvider client={queryClient}>
           <BrowserRouter>
@@ -1127,9 +1128,6 @@ describe("select prop", () => {
     fireEvent.click(element);
     const select = getAllByTestId("select-sonata-state");
     expect(select.length).toBeGreaterThanOrEqual(1);
-    const input = getAllByPlaceholderText("Select or input property");
-    fireEvent.change(input[0], { target: { value: "a" } });
-    fireEvent.keyDown(input[0], { key: "Enter", code: "Enter" });
   });
   test("test ok btn", async () => {
     const { result } = renderHook(() => useNewApiMappingStore());
@@ -1298,3 +1296,22 @@ test("requestItem render", () => {
   const btnAdd = getByTestId("btn-add-state");
   fireEvent.click(btnAdd);
 });
+
+describe('should render status icon component', () => {
+  it('should render success status icon', () => {
+    const { getByTestId } = render(<StatusIcon status="SUCCESS" />)
+    const icon = getByTestId('deploymentStatus')
+    expect(icon).toHaveStyle({ color: '#389E0D'})
+  })
+
+  it('should render failed status icon', () => {
+    const { getByTestId } = render(<StatusIcon status="FAILED" />)
+    const icon = getByTestId('deploymentStatus')
+    expect(icon).toHaveStyle({ color: '#CF1322'})
+  })
+
+  it('should render loading status icon', () => {
+    const { container } = render(<StatusIcon status="IN_PROGRESS" />)
+    expect(container).toBeInTheDocument()
+  })
+})

@@ -1,0 +1,13 @@
+.rowBorder {
+  padding: 8px 12px;
+  &:not(:last-child) {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    position: relative;
+  }
+
+  :global {
+    .ant-typography {
+      font-weight: 400;
+    }
+  }
+}

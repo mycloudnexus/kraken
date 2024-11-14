@@ -1,38 +1,26 @@
-import RequestMethod from "@/components/Method";
+import { ApiCard } from "@/components/ApiMapping";
+import { Text } from "@/components/Text";
 import { useGetRunningAPIList } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
 import { IEnv, IRunningMapping } from "@/utils/types/env.type";
-import { Flex, Table, Tag, Tooltip, Typography } from "antd";
+import { Flex, Table, Tag, Typography } from "antd";
 import { useMemo, useState } from "react";
-import MappingMatrix from "@/components/MappingMatrix";
-import styles from "./index.module.scss";
-import { Text } from "@/components/Text";
+import { ColumnsType } from "antd/es/table";
 import { toDateTime } from "@/libs/dayjs";
-import { get, isEmpty, join, slice, split } from "lodash";
+import styles from './index.module.scss'
+
 type Props = {
   scrollHeight?: number;
   env?: IEnv;
 };
 
-interface GroupedItem {
-  componentName?: string;
-  items: IRunningMapping[];
-}
 
 const defaultPage = {
   size: 20,
   page: 0,
 };
-export const ContentTime = ({ content = "", time = "" }) => {
-  return (
-    <Flex vertical gap={2}>
-      <Text.LightMedium>{content}</Text.LightMedium>
-      {!isEmpty(time) && (
-        <Text.LightSmall color="#00000073">{time}</Text.LightSmall>
-      )}
-    </Flex>
-  );
-};
+
+type GroupedMapping = IRunningMapping & { mappingCount: number }
 
 const RunningAPIMapping = ({ scrollHeight, env }: Props) => {
   const { currentProduct } = useAppStore();
@@ -44,120 +32,65 @@ const RunningAPIMapping = ({ scrollHeight, env }: Props) => {
     ...pageInfo,
   });
 
-  const columnData = useMemo((): GroupedItem[] => {
-    const result = data as IRunningMapping[];
-    if (!data)
-      return [
-        {
-          componentName: "",
-          items: [],
-        },
-      ];
-    const grouped = result.reduce((acc, item) => {
-      const { componentName } = item;
-      const group = acc.find((g) => g.componentName === componentName);
+  const mappings = useMemo(() => {
+    if (!data) return []
 
-      if (group) {
-        group?.items?.push(item);
-      } else {
-        acc.push({
-          componentName,
-          items: [item],
-        });
+    const grouped: Record<string, GroupedMapping[]> = {}
+    for (const mapping of data) {
+      if (grouped[mapping.componentName] === undefined) {
+        grouped[mapping.componentName] = []
       }
 
-      return acc;
-    }, [] as GroupedItem[]);
+      grouped[mapping.componentName].push({ ...mapping, mappingCount: 0 })
+    }
 
-    return grouped;
+    return Object.values(grouped).flatMap(m => {
+      m[0].mappingCount = m.length
+      return m
+    })
   }, [data]);
 
-  const columns = [
+  const columns: ColumnsType<GroupedMapping> = [
     {
       title: "Component",
-      dataIndex: "",
-      render: (item: GroupedItem) => (
+      width: 240,
+      onCell: (item) => ({
+        rowSpan: item.mappingCount,
+      }),
+      render: (item: GroupedMapping) => (
         <Flex gap={10}>
-          <Typography.Text>{item.componentName}</Typography.Text>
-          {item.items.length > 0 && (
-            <Tag>
-              <Text.LightMedium style={{ color: "rgba(145, 86, 228, 1)" }}>
-                {item?.items?.length}
-              </Text.LightMedium>
+          <Typography.Text data-testid="componentName">{item.componentName}</Typography.Text>
+          {item.mappingCount > 0 && (
+            <Tag data-testid="componentCount" style={{ color: "var(--inprogress-text)", height: 'fit-content' }}>
+              {item.mappingCount}
             </Tag>
           )}
         </Flex>
       ),
     },
     {
-      dataIndex: "items",
       title: "API mappings",
-      render: (items: Array<IRunningMapping>) => (
-        <Flex vertical>
-          {items.map((item: IRunningMapping, index: number) => (
-            <Flex
-              key={`${item.componentName}-${index}`}
-              align="center"
-              gap={10}
-              className={styles.rowBorder}
-            >
-              <RequestMethod method={item?.method} />
-              <Tooltip title={item?.path}>
-                <span>
-                  /{join(slice(split(get(item, "path", ""), "/"), -2), "/")}
-                </span>
-              </Tooltip>
-              <Flex gap={8} align="center" flex={1}>
-                <MappingMatrix
-                  mappingMatrix={item?.mappingMatrix}
-                  extraKey={"item.path"}
-                  isItemActive={false}
-                />
-              </Flex>
-            </Flex>
-          ))}
-        </Flex>
+      render: (_, item) => (
+        <ApiCard
+          style={{ padding: 0 }}
+          apiInstance={item}
+        />
       ),
     },
     {
       title: "Version",
-      dataIndex: "items",
-      width: 90,
-      render: (items: Array<IRunningMapping>) => (
-        <Flex vertical>
-          {items.map((item: IRunningMapping, index: number) => (
-            <Flex
-              key={`${item.version}-${index}`}
-              justify="center"
-              align="center"
-              className={styles.rowBorder}
-            >
-              {item.version}
-            </Flex>
-          ))}
-        </Flex>
+      width: 120,
+      render: (item: GroupedMapping) => (
+        <span data-testid="mappingVersion">{item.version}</span>
       ),
     },
     {
-      title: "Create By",
-      dataIndex: "items",
-      render: (items: Array<IRunningMapping>) => (
-        <Flex vertical>
-          {items.map((item: IRunningMapping, index: number) => (
-            <Flex
-              key={`${item.componentName}-${index}`}
-              className={styles.rowBorder}
-              justify="center"
-              align="start"
-              vertical
-            >
-              <ContentTime
-                key={`${item.componentName}-${index}`}
-                content={item?.userName}
-                time={toDateTime(item?.createAt)}
-              />
-            </Flex>
-          ))}
+      title: "Created By",
+      width: 200,
+      render: (item: GroupedMapping) => (
+        <Flex vertical gap={2}>
+          <Text.LightMedium data-testid="createdBy">{item.userName}</Text.LightMedium>
+          <Text.LightSmall data-testid="createdAt" color="#00000073">{toDateTime(item?.createAt)}</Text.LightSmall>
         </Flex>
       ),
     },
@@ -166,13 +99,15 @@ const RunningAPIMapping = ({ scrollHeight, env }: Props) => {
   const scroll = scrollHeight
     ? { y: scrollHeight - 144, x: "max-content" }
     : undefined;
+
   return (
     <Table
       scroll={scroll}
       columns={columns}
       loading={isLoading}
-      dataSource={columnData}
+      dataSource={mappings}
       pagination={false}
+      rowClassName={styles.mappingRow}
       rowKey={(item) => JSON.stringify(item)}
     />
   );

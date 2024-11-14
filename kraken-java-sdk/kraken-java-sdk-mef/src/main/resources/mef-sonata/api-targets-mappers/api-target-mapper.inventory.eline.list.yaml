@@ -74,4 +74,4 @@ spec:
               - suspended
               - suspendedPendingTerminate
               - terminated
-            valueMappings: {}
+            valueMapping: {}

@@ -1,7 +1,7 @@
 <svg width="206" height="250" viewBox="0 0 206 250" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g filter="url(#filter0_i_925_132204)">
 <rect x="0.397949" width="205.204" height="250" rx="4.46095" fill="white"/>
-<rect x="0.397949" width="205.204" height="250" rx="4.46095" fill="url(#paint0_linear_925_132204)" fill-opacity="0.2"/>
+<rect x="0.397949" width="205.204" height="250" rx="4.46095" fill="url(#paint0_linear_925_132204)" fillOpacity="0.2"/>
 <g opacity="0.8" filter="url(#filter1_di_925_132204)">
 <rect x="21.8105" y="28.5508" width="71.3753" height="8.15717" rx="4.07859" fill="#9584FF"/>
 </g>

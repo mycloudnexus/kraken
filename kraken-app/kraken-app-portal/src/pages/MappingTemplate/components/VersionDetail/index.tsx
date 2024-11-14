@@ -1,49 +1,101 @@
-import { IReleaseHistory } from "@/utils/types/product.type";
-import styles from "./index.module.scss";
-import { Flex, Input } from "antd";
-import { Text } from "@/components/Text";
-import { isEmpty } from "lodash";
-import VersionBtn from "../VersionBtn";
 import RichTextViewer from "@/components/RichTextViewer";
+import { SecondaryText, Text } from "@/components/Text";
+import { IReleaseHistory } from "@/utils/types/product.type";
+import { Flex, Tag } from "antd";
+import { useState } from "react";
+import { DetailDrawer } from "../VersionSelect/DetailDrawer";
+import { UpgradeProcess } from "./UpgradeProcess";
+import styles from "./index.module.scss";
+import { useGetSystemInfo } from "@/hooks/user";
 
-type Props = {
-  data: IReleaseHistory;
-};
+export function VersionDetail({ data }: Readonly<{
+  data?: IReleaseHistory;
+}>) {
+  const { data: info } = useGetSystemInfo();
 
-const VersionDetail = ({ data }: Props) => {
+  // To view details of upgrade history
+  const [deploymentId, setDeploymentId] = useState<string | null>(null);
+
   return (
-    <div className={styles.root}>
-      {isEmpty(data) ? (
-        <></>
-      ) : (
-        <>
-          <Flex justify="space-between" align="center">
-            <Flex align="center" gap={16}>
-              <Text.Custom size="20px" bold="500" lineHeight="28px">
-                {data?.productVersion}
-              </Text.Custom>
-              <Text.LightMedium lineHeight="22px" color="#00000073">
-                Released on {data?.publishDate}
-              </Text.LightMedium>
-            </Flex>
-            <VersionBtn item={data} />
+    <>
+      <div className={styles.root}>
+        <Flex justify="space-between" align="center">
+          <Text.NormalLarge data-testid="detailVersion">
+            {data?.productVersion}
+          </Text.NormalLarge>
+
+          <Flex align="center" gap={12}>
+            <Text.LightMedium lineHeight="20px" color="#00000073">
+              Current version
+            </Text.LightMedium>
+            <Text.LightMedium lineHeight="20px">Control plane</Text.LightMedium>
+            <Tag
+              data-testid="controlePlaneUpgradeVersion"
+              bordered={false}
+              color="var(--panel-hover-bg)"
+              style={{ color: "var(--primary)" }}
+            >
+              {info?.controlProductVersion ?? 'N/A'}
+            </Tag>
+            <Text.LightMedium lineHeight="20px">Stage</Text.LightMedium>
+            <Tag
+              data-testid="stageUpgradeVersion"
+              bordered={false}
+              color="var(--panel-hover-bg)"
+              style={{ color: "var(--primary)" }}
+            >
+              {info?.stageProductVersion ?? 'N/A'}
+            </Tag>
+            <Text.LightMedium lineHeight="20px">
+              Production
+            </Text.LightMedium>
+            <Tag
+              data-testid="productionUpgradeVersion"
+              bordered={false}
+              color="var(--panel-hover-bg)"
+              style={{ color: "var(--primary)" }}
+            >
+              {info?.productionProductVersion ?? 'N/A'}
+            </Tag>
           </Flex>
-          <div className={styles.container}>
-            <Flex justify="space-between" align="center">
-              <Text.NormalLarge className={styles.title}>
-                What’s new in this version
-              </Text.NormalLarge>
-              <Input.Search style={{ width: 264 }} placeholder="Search" />
-            </Flex>
-            <RichTextViewer
-              className={styles.content}
-              text={data?.description}
-            />
-          </div>
-        </>
-      )}
-    </div>
+        </Flex>
+
+        <div className={styles.container}>
+          {!data ? (
+            <div className={styles.blank}>
+              <SecondaryText.LightNormal data-testid="releaseBlank">No release selected</SecondaryText.LightNormal>
+            </div>
+          ) : (
+            <>
+              <Flex vertical className={styles.flexOne}>
+                <Text.NormalLarge
+                  data-testid="releaseNoteTitle"
+                  className={styles.title}
+                >
+                  Release note
+                </Text.NormalLarge>
+                <RichTextViewer
+                  data-testid="releaseNote"
+                  className={styles.content}
+                  text={data.description}
+                />
+              </Flex>
+              <UpgradeProcess
+                release={data}
+                // To view details of upgrade history
+                onViewDetail={setDeploymentId}
+              />
+            </>
+          )}
+        </div>
+      </div>
+
+      <DetailDrawer
+        open={Boolean(deploymentId)}
+        deploymentId={deploymentId}
+        // To view details of upgrade history
+        onClose={() => setDeploymentId(null)}
+      />
+    </>
   );
 };
-
-export default VersionDetail;

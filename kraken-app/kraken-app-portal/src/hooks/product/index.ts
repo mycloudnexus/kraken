@@ -42,7 +42,9 @@ import {
   deleteAPIServer,
   getAPIServers,
   getComponentDetailV2,
+  getValidateServerName,
 } from "@/services/products";
+import { STALE_TIME } from "@/utils/constants/common";
 import {
   COMPONENT_KIND_API,
   COMPONENT_KIND_API_SPEC,
@@ -69,8 +71,14 @@ import {
   IEnv,
   IMapperDetails,
   IRunningComponentItem,
+  IRunningMapping,
 } from "@/utils/types/env.type";
 import { IEnvComponent } from "@/utils/types/envComponent.type";
+import {
+  IApiMapperDeployment,
+  IDeploymentHistory,
+  IProductIdAndNameParams,
+} from "@/utils/types/product.type";
 import { useMutation, useQuery, useQueries } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { get } from "lodash";
@@ -122,6 +130,7 @@ export const PRODUCT_CACHE_KEYS = {
   update_target_mapper: "update_target_mapper",
   upgrade_mapping_template_production: "upgrade_mapping_template_production",
   upgrade_mapping_template_stage: "upgrade_mapping_template_stage",
+  get_validate_api_server_name: "get_validate_api_server_name",
   verify_product: "verify_product",
 };
 
@@ -227,6 +236,7 @@ export const useGetProductEnvs = (productId: string, enabled = true) => {
     queryFn: () => getListEnvs(productId),
     enabled: enabled && Boolean(productId),
     select: (data) => data.data,
+    staleTime: STALE_TIME,
   });
 };
 
@@ -527,7 +537,7 @@ export const useGetRunningAPIList = (
   productId: string,
   params: Record<string, any>
 ) => {
-  return useQuery<any, Error>({
+  return useQuery<any, Error, IRunningMapping[]>({
     queryKey: [PRODUCT_CACHE_KEYS.get_running_api_list, productId, params],
     queryFn: () => getRunningAPIMappingList(productId, params),
     enabled: Boolean(productId) && Boolean(params.envId),
@@ -539,7 +549,7 @@ export const useGetAPIDeployments = (
   productId: string,
   params: Record<string, any>
 ) => {
-  return useQuery<any, Error>({
+  return useQuery<any, Error, IPagingData<IDeploymentHistory>>({
     queryKey: [PRODUCT_CACHE_KEYS.get_list_api_deployments, productId, params],
     queryFn: () => getAPIMapperDeployments(productId, params),
     enabled: Boolean(productId),
@@ -608,11 +618,12 @@ export const useGetLatestRunningList = (
   productId: string,
   mapperKey: string
 ) => {
-  return useQuery<any, Error>({
+  return useQuery<any, Error, IApiMapperDeployment[]>({
     queryKey: [PRODUCT_CACHE_KEYS.get_running_api_list, productId, mapperKey],
     queryFn: () => getLatestRunningAPI(productId, mapperKey),
     enabled: Boolean(productId) && Boolean(mapperKey),
     select: (data) => data?.data,
+    staleTime: STALE_TIME,
   });
 };
 
@@ -651,12 +662,12 @@ export const useGetMappingTemplateUpgradeList = (
 
 export const useGetMappingTemplateUpgradeDetail = (
   productId: string,
-  id: string
+  deploymentId: string
 ) => {
-  return useQuery<any, Error>({
-    queryKey: [PRODUCT_CACHE_KEYS.get_upgrade_detail, productId, id],
-    queryFn: () => getMappingTemplateUpgradeDetail(productId, id),
-    enabled: Boolean(productId) && Boolean(id),
+  return useQuery<any, Error, IDeploymentHistory[]>({
+    queryKey: [PRODUCT_CACHE_KEYS.get_upgrade_detail, productId, deploymentId],
+    queryFn: () => getMappingTemplateUpgradeDetail(productId, deploymentId),
+    enabled: Boolean(productId) && Boolean(deploymentId),
     select: (data) => data?.data,
   });
 };
@@ -721,5 +732,18 @@ export const useRegenToken = () => {
         queryKey: [PRODUCT_CACHE_KEYS.get_buyer_list],
       });
     },
+  });
+};
+
+export const useGetValidateServerName = () => {
+  return useMutation<any, Error, IProductIdAndNameParams>({
+    mutationKey: [PRODUCT_CACHE_KEYS.get_validate_api_server_name],
+    mutationFn: ({ productId, name }: IProductIdAndNameParams) =>
+      getValidateServerName(productId, name),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [PRODUCT_CACHE_KEYS.get_validate_api_server_name],
+      });
+    }
   });
 };

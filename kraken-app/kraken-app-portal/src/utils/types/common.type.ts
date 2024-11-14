@@ -1,3 +1,5 @@
+import { IComponent } from "./component.type";
+
 export interface IPagingData<T> {
   data: T[];
   total: number;
@@ -54,24 +56,11 @@ export interface IUnifiedAsset {
   syncMetadata: ISyncMetadata;
 }
 
-interface ControlPlane {
-  kind: string;
-  apiVersion: string;
-  metadata: IMetadata;
-  facets: Record<string, any>;
-  links: any[];
-  id: string;
-  parentId: string;
-  createdAt: string;
-  updatedAt: string;
-  syncMetadata: ISyncMetadata;
-}
-
 export interface IEndpointUsageAsset {
   endpointUsage: {
-    controlPlane: ControlPlane[];
-    dataPlaneProduction: any[];
-    dataPlaneStage: any[];
+    controlPlane: IComponent[];
+    dataPlaneProduction: IComponent[];
+    dataPlaneStage: IComponent[];
   };
 }
 
@@ -84,3 +73,9 @@ export enum EnumRightType {
 }
 
 export type ActiveTabType = "request" | "response";
+
+export interface IPagination {
+  page: number;
+  size: number;
+  total: number;
+}

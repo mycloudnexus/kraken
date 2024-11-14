@@ -80,7 +80,7 @@ spec:
           - name: mapper.address.validation.streetName
             title: "The street of the identified alternate Geographic Address"
             description: address validation streetName mapping
-            source: "@{{[*].company.addresses[0].address}}"
+            source: "@{{[*].company.addresses[0].street}}"
             sourceLocation: BODY
             target: "@{{alternateGeographicAddress[*].streetName}}"
             targetType: string
@@ -138,4 +138,14 @@ spec:
             target: "@{{bestMatchGeographicAddress.streetName}}"
             targetType: string
             targetLocation: BODY
+            replaceStar: false
+          - name: mapper.address.validation.tags
+            title: "tags of the identified alternate Geographic Address"
+            description: ""
+            source: "@{{[*].tags}}"
+            sourceLocation: BODY
+            target: "@{{alternateGeographicAddress[*].tags}}"
+            targetType: string
+            targetLocation: BODY
+            requiredMapping: false
             replaceStar: false

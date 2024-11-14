@@ -1,5 +1,10 @@
 package com.consoleconnect.kraken.operator.gateway;
 
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
@@ -14,6 +19,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -22,6 +28,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
 class SpELEngineTest implements MappingTransformer {
+
   @Test
   void testIt() {
     Map<String, Object> data = new HashMap<>();
@@ -61,7 +68,7 @@ class SpELEngineTest implements MappingTransformer {
     mefQuery.put("buyerId", "100");
     variables.put("mefQuery", mefQuery);
 
-    Assertions.assertEquals(
+    assertEquals(
         "http://localhost:8080",
         SpELEngine.evaluate(facets.getServer().getUri(), variables, String.class));
 
@@ -138,8 +145,8 @@ class SpELEngineTest implements MappingTransformer {
         String variableName = groupNamesMatcher.group(1);
         String variableValue = m.group(variableName);
         System.out.println(variableName + ": " + variableValue);
-        Assertions.assertEquals("segment", variableName);
-        Assertions.assertEquals("123", variableValue);
+        assertEquals("segment", variableName);
+        assertEquals("123", variableValue);
       }
     } else {
       Assertions.fail("No match found");
@@ -196,5 +203,15 @@ class SpELEngineTest implements MappingTransformer {
     SpELEngine.parseToList(o, context, new ArrayList<>());
     String s1 = calculateBasedOnResponseBody(JsonToolkit.toJson(o), context);
     Assertions.assertNotNull(s1);
+  }
+
+  @Test
+  @SneakyThrows
+  void givenMapExpression_whenEvaluate_thenReturnSuccess() {
+    String s = readFileToString("mockData/address.list.mock.json");
+    Object evaluate =
+        SpELEngine.evaluate(JsonToolkit.fromJson(s, Object.class), new HashMap<>(), true);
+    assertThat(
+        String.valueOf(evaluate), hasJsonPath("$.alternateGeographicAddress[0].tags", hasSize(1)));
   }
 }

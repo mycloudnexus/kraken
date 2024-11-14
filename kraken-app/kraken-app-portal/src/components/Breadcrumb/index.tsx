@@ -31,10 +31,13 @@ const BreadCrumb = ({
         className={styles.canClick}
       >
         <LeftOutlined style={{ fontSize: 10 }} />
-        <Text.LightLarge>{mainTitle}</Text.LightLarge>
+        <Text.LightLarge data-testid="breadcrumItem">
+          {mainTitle}
+        </Text.LightLarge>
       </Flex>
-      {items?.map((i) => (
+      {items?.map((i, index) => (
         <Flex
+          key={`${index}-${i.title}`}
           gap={8}
           align="center"
           style={{ cursor: "pointer" }}
@@ -42,12 +45,16 @@ const BreadCrumb = ({
           className={styles.canClick}
         >
           <Text.LightLarge>/</Text.LightLarge>
-          <Text.LightLarge>{i.title}</Text.LightLarge>
+          <Text.LightLarge data-testid="breadcrumItem">
+            {i.title}
+          </Text.LightLarge>
         </Flex>
       ))}
       <Flex gap={8} align="center">
         <Text.LightLarge>/</Text.LightLarge>
-        <Text.LightLarge color="#00000073">{lastItem}</Text.LightLarge>
+        <Text.LightLarge data-testid="breadcrumItem" color="#00000073">
+          {lastItem}
+        </Text.LightLarge>
       </Flex>
     </Flex>
   );

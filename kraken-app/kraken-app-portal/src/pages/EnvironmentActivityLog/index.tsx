@@ -92,10 +92,10 @@ const EnvironmentActivityLog = () => {
       const { requestTime = [] } = values ?? {};
       const params = omit(values, ["requestTime"]);
       params.requestStartTime = requestTime?.[0]
-        ? dayjs(requestTime[0]).valueOf()
+        ? dayjs(requestTime[0]).startOf("day").valueOf()
         : undefined;
       params.requestEndTime = requestTime?.[1]
-        ? dayjs(requestTime[1]).valueOf()
+        ? dayjs(requestTime[1]).endOf("day").valueOf()
         : undefined;
 
       if (!params.path) {
@@ -136,7 +136,7 @@ const EnvironmentActivityLog = () => {
   const [modalActivityId, setModalActivityId] = useState<string | undefined>();
   const [modalOpen, setModalOpen] = useState(false);
 
-  const columns: ColumnsType<IActivityLog> = [
+  const   columns: ColumnsType<IActivityLog> = [
     {
       key: "name",
       title: "Method",
@@ -147,6 +147,11 @@ const EnvironmentActivityLog = () => {
       key: "name",
       title: "Path",
       render: (log: IActivityLog) => log.path,
+    },
+    {
+      key: "buyerName",
+      title: "Buyer name",
+      render: (log: IActivityLog) => log.buyerName,
     },
     {
       key: "status",
@@ -183,6 +188,7 @@ const EnvironmentActivityLog = () => {
         <Flex align="center" className={styles.filterWrapper} ref={ref}>
           <Form
             initialValues={{ envId }}
+            style={{ gap: 5 }}
             form={form}
             layout="inline"
             colon={false}
@@ -194,7 +200,6 @@ const EnvironmentActivityLog = () => {
                 options={envOptions}
                 popupMatchSelectWidth={false}
                 style={{ minWidth: 100, maxWidth: 120 }}
-                size="small"
                 placeholder="All"
               />
             </Form.Item>
@@ -203,7 +208,6 @@ const EnvironmentActivityLog = () => {
                 options={statusCodeOptions}
                 placeholder="All"
                 popupMatchSelectWidth={false}
-                size="small"
                 style={{ minWidth: 100 }}
                 allowClear
               />
@@ -211,7 +215,6 @@ const EnvironmentActivityLog = () => {
 
             <Form.Item label="Time range from" name="requestTime">
               <RangePicker
-                size="small"
                 placeholder={["Select time", "Select time"]}
               />
             </Form.Item>
@@ -223,7 +226,6 @@ const EnvironmentActivityLog = () => {
                     options={methodOptions}
                     placeholder="All"
                     popupMatchSelectWidth={false}
-                    size="small"
                     allowClear
                   />
                 </Form.Item>
@@ -231,7 +233,6 @@ const EnvironmentActivityLog = () => {
                   <Input
                     className={styles.inputPath}
                     placeholder="Input path"
-                    size="small"
                     onChange={debounceFn}
                   />
                 </Form.Item>

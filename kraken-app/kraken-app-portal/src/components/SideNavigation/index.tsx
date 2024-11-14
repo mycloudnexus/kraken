@@ -10,8 +10,9 @@ import {
   ApiOutlined,
   SettingOutlined,
   DoubleLeftOutlined,
+  ExclamationCircleOutlined,
 } from "@ant-design/icons";
-import { Button, Flex, Menu, Typography } from "antd";
+import { Button, Divider, Flex, Menu, Tooltip, Typography } from "antd";
 import Sider from "antd/es/layout/Sider";
 import { last } from "lodash";
 import { useEffect, useMemo, useState } from "react";
@@ -19,6 +20,9 @@ import { Link, useLocation } from "react-router-dom";
 import { useSessionStorage } from "usehooks-ts";
 import ETIcon from "../../assets/et.svg";
 import styles from "./index.module.scss";
+import { ISystemInfo } from "@/utils/types/user.type";
+import { Text } from "../Text";
+import classNames from "classnames";
 
 const flattenMenu = (
   menuArr: any[],
@@ -46,7 +50,7 @@ const flattenMenu = (
   }, []);
 };
 
-const SideNavigation = () => {
+const SideNavigation = ({ info }: Readonly<{ info?: ISystemInfo }>) => {
   const location = useLocation();
   const [collapsed, setCollapsed] = useSessionStorage("collapsed", false);
   const [activeKey, setActiveKey] = useState<string>(location.pathname);
@@ -103,6 +107,7 @@ const SideNavigation = () => {
           "audit-log",
           "mapping-template",
           "user-management",
+          "user-management-v2",
         ],
         children: [
           {
@@ -184,30 +189,32 @@ const SideNavigation = () => {
           onSelect={(e) => handleNavigationSet(e.key)}
           items={items}
           selectedKeys={selectedKeys}
-        ></Menu>
+        />
       </div>
       <Flex className={styles.siderBottom} vertical={true}>
-        {!collapsed ? (
-          <Flex
-            justify="center"
-            align="center"
-            className={styles.siderBottomVersion}
-            gap={4}
-          >
-            <Typography.Text>A product by&nbsp;</Typography.Text>
-            <ETIcon />
-          </Flex>
-        ) : (
-          <Flex
-            justify="center"
-            align="center"
-            vertical
-            gap={4}
-            style={{ marginBottom: 12 }}
-          >
-            <ETIcon />
-          </Flex>
-        )}
+        <Flex
+          justify="center"
+          align="center"
+          className={classNames(styles.siderBottomVersion, collapsed && styles.collapsed)}
+          gap={4}
+        >
+          {info?.productionAppVersion && (
+            <div className={classNames(styles.appVersion, collapsed && styles.collapsed)}>
+              <Typography.Text data-testid="productionAppVersion" ellipsis style={{ color: 'var(--text-secondary)' }}>
+                {info.productionAppVersion}
+              </Typography.Text>
+              <Tooltip title={<KrakenVersion info={info} />}>
+                <ExclamationCircleOutlined data-testid="appVersionsIndicator" style={{ color: 'var(--text-secondary)' }} />
+              </Tooltip>
+              {!collapsed && (<Divider type="vertical" style={{ margin: '0 6px' }} />)}
+            </div>
+          )}
+            {!collapsed ? (
+              <span className={styles.productionBy}>A product by <ETIcon /></span>
+            ) : <ETIcon />}
+            
+        </Flex>
+
         <Flex
           align="center"
           justify="flex-end"
@@ -230,5 +237,16 @@ const SideNavigation = () => {
     </Sider>
   );
 };
+
+function KrakenVersion({ info }: Readonly<{ info: ISystemInfo }>) {
+  return <section>
+    <Text.NormalMedium data-testid="headline">Kraken version</Text.NormalMedium>
+    <ul className={styles.envVersions}>
+      <li data-testid="vProductionAppVersion">Production: {info.productionAppVersion}</li>
+      <li data-testid="vStageAppVersion">Stage: {info.stageAppVersion}</li>
+      <li data-testid="vControlPlaneAppVersion">Control plane: {info.controlAppVersion}</li>
+    </ul>
+  </section>
+}
 
 export default SideNavigation;

@@ -5,7 +5,7 @@ metadata:
   key: mef.sonata.api-target.order.eline.read
   name: Order Connection API
   mapperKey: mef.sonata.api-target-mapper.order.eline.read
-  version: 4
+  version: 6
 spec:
   inputs:
     - mefQuery

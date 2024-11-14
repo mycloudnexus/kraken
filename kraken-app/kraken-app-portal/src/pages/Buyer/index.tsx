@@ -16,7 +16,7 @@ import { Button, Flex, Popconfirm, Table, notification } from "antd";
 import { get, isEmpty, omitBy } from "lodash";
 import { useEffect, useMemo, useRef } from "react";
 import { useBoolean } from "usehooks-ts";
-import { ContentTime } from "../NewAPIMapping/components/DeployHistory";
+import { ContentTime } from "../NewAPIMapping/components/DeployHistory/ContentTime";
 import NewBuyerModal from "./components/NewBuyerModal";
 import RegenToken from "./components/RegenToken";
 import styles from "./index.module.scss";

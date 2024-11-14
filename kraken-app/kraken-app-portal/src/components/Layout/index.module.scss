@@ -1,5 +1,3 @@
-@import "../../variables.scss";
-
 .content {
   display: flex;
   height: calc(100vh - 58px);
@@ -18,7 +16,7 @@
   display: flex;
   flex-direction: column;
   overflow: auto;
-  background-color: $bg;
+  background-color: var(--bg);
   padding: 0 20px 20px;
 
   .pageTitle {
@@ -37,6 +35,14 @@
   .pageContent {
     flex: 1;
     overflow: auto !important;
+
+    &.flex {
+      display: flex;
+    }
+
+    &.vertical {
+      flex-direction: column;
+    }
 
     :global {
       .ant-spin-nested-loading,

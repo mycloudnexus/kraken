@@ -1,21 +1,7 @@
-import { fireEvent, render } from "@testing-library/react";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient } from "@/utils/helpers/reactQuery";
-import { BrowserRouter } from "react-router-dom";
+import { fireEvent, render } from "@/__test__/utils";
 import Login from "@/pages/Login";
 
 describe("test login", () => {
-  test("Login page", () => {
-    const { container } = render(
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <Login />
-        </BrowserRouter>
-      </QueryClientProvider>
-    );
-    expect(container).toBeInTheDocument();
-  });
-
   test("Login page", async () => {
     vi.mock("@/hooks/login", async () => {
       const actual = await vi.importActual("@/hooks/login");
@@ -34,13 +20,7 @@ describe("test login", () => {
         }),
       };
     });
-    const { getByTestId, getByPlaceholderText } = render(
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <Login />
-        </BrowserRouter>
-      </QueryClientProvider>
-    );
+    const { getByTestId, getByPlaceholderText } = render(<Login />);
     const userInput = getByPlaceholderText("User Name");
     const passwordInput = getByPlaceholderText("Password");
     fireEvent.change(userInput, { target: { value: "admin" } });

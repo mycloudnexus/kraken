@@ -1,12 +1,71 @@
 .root {
   flex: 1;
   padding-left: 12px;
+  display: flex;
+  flex-direction: column;
 }
 
 .container {
   margin-top: 12px;
   border-top: 1px solid #0000000f;
-  padding-top: 12px;
+  display: flex;
+  flex: 1;
+
+  .blank {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .flexOne {
+    flex: 1;
+  }
+
+  .upgradeStatuses {
+    width: 240px;
+    height: 100%;
+    border-left: 1px solid var(--bg);
+    padding-left: 12px;
+
+    .tabTitle {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--bg);
+    }
+
+    .statuses {
+      flex: 1;
+      padding: 12px 0;
+
+      .empty {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+
+        :global {
+          .ant-empty-description {
+            color: var(--disabled);
+          }
+        }
+      }
+
+      .stepInfo {
+        font-size: 12px;
+        margin: 0 0 4px 0;
+
+        span {
+          color: var(--text-secondary);
+        }
+
+        span:first-child {
+          min-width: 30px;
+          margin-right: 8px;
+          display: inline-block;
+        }
+      }
+    }
+  }
 }
 
 .title {
@@ -15,6 +74,7 @@
   margin-bottom: 10px !important;
   margin-top: 10px;
   gap: 8px;
+
   &:before {
     content: "";
     display: block;

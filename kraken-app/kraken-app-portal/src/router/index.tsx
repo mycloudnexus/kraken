@@ -2,18 +2,23 @@ import AuthLayout from "@/components/Layout/AuthLayout";
 import BasicLayout from "@/components/Layout/BasicLayout";
 import APIServerEditSelection from "@/pages/APIServerEditSelection";
 import APIServerList from "@/pages/APIServerList";
-import Buyer from "@/pages/Buyer";
 import AuditLog from "@/pages/AuditLog";
+import Buyer from "@/pages/Buyer";
 import EnvironmentActivityLog from "@/pages/EnvironmentActivityLog";
 import EnvironmentOverview from "@/pages/EnvironmentOverview";
 import HomePage from "@/pages/HomePage";
 import ApiComponents from "@/pages/HomePage/components/ApiComponents";
-import Login from "@/pages/Login";
 import NewAPIServer from "@/pages/NewAPIServer";
 import StandardAPIMapping from "@/pages/StandardAPIMapping";
-import { createBrowserRouter } from "react-router-dom";
-import MappingTemplate from "@/pages/MappingTemplate";
 import UserManagement from "@/pages/UserManagement";
+import { lazy } from "react";
+import { createBrowserRouter } from "react-router-dom";
+
+const Login = lazy(() => import("@/pages/Login"));
+const MappingTemplate = lazy(() => import("@/pages/MappingTemplate"));
+const UpgradePlane = lazy(
+  () => import("@/pages/MappingTemplate/DataPlaneUpgrade")
+);
 
 const router = createBrowserRouter([
   {
@@ -96,7 +101,16 @@ const router = createBrowserRouter([
       },
       {
         path: "mapping-template",
-        element: <MappingTemplate />,
+        children: [
+          {
+            path: "",
+            element: <MappingTemplate />,
+          },
+          {
+            path: "upgrade/:templateUpgradeId",
+            element: <UpgradePlane />,
+          },
+        ],
       },
       {
         path: "user-management",

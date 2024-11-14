@@ -1,26 +1,28 @@
 package com.consoleconnect.kraken.operator.controller.service;
 
 import com.consoleconnect.kraken.operator.controller.entity.EnvironmentEntity;
-import com.consoleconnect.kraken.operator.controller.entity.SystemInfoEntity;
 import com.consoleconnect.kraken.operator.controller.enums.SystemStateEnum;
 import com.consoleconnect.kraken.operator.controller.mapper.SystemInfoMapper;
 import com.consoleconnect.kraken.operator.controller.model.MgmtProperty;
 import com.consoleconnect.kraken.operator.controller.model.SystemInfo;
 import com.consoleconnect.kraken.operator.controller.repo.EnvironmentRepository;
-import com.consoleconnect.kraken.operator.controller.repo.SystemInfoRepository;
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
+import com.consoleconnect.kraken.operator.core.entity.SystemInfoEntity;
+import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
 import com.consoleconnect.kraken.operator.core.enums.EnvNameEnum;
 import com.consoleconnect.kraken.operator.core.event.PlatformSettingCompletedEvent;
-import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.model.Metadata;
+import com.consoleconnect.kraken.operator.core.repo.SystemInfoRepository;
+import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants;
 import com.consoleconnect.kraken.operator.core.toolkit.Constants;
 import com.consoleconnect.kraken.operator.core.toolkit.LabelConstants;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -44,6 +46,7 @@ public class SystemInfoService {
   private final SystemInfoRepository systemInfoRepository;
   private final MgmtProperty mgmtProperty;
   private final EnvironmentRepository environmentRepository;
+  private final UnifiedAssetRepository unifiedAssetRepository;
 
   @Value("${spring.build.version}")
   private String buildVersion;
@@ -89,18 +92,19 @@ public class SystemInfoService {
     List<EnvironmentEntity> environmentEntities = environmentRepository.findAll();
     String stageEnvId =
         environmentEntities.stream()
-            .filter(t -> EnvNameEnum.STAGE.name().equals(t.getName()))
+            .filter(t -> EnvNameEnum.STAGE.name().equalsIgnoreCase(t.getName()))
             .findFirst()
             .orElseThrow()
             .getId()
             .toString();
     String productionEnvId =
         environmentEntities.stream()
-            .filter(t -> EnvNameEnum.PRODUCTION.name().equals(t.getName()))
+            .filter(t -> EnvNameEnum.PRODUCTION.name().equalsIgnoreCase(t.getName()))
             .findFirst()
             .orElseThrow()
             .getId()
             .toString();
+    AtomicReference<String> firstVersion = new AtomicReference<>();
     String templateVersion =
         unifiedAssetService
             .findBySpecification(
@@ -108,12 +112,16 @@ public class SystemInfoService {
                     AssetsConstants.FIELD_KIND, AssetKindEnum.PRODUCT_TEMPLATE_UPGRADE.getKind()),
                 null,
                 null,
-                PageRequest.of(0, 1, Sort.Direction.DESC, AssetsConstants.FIELD_CREATE_AT),
+                PageRequest.of(0, 1, Sort.Direction.ASC, AssetsConstants.FIELD_CREATE_AT),
                 null)
             .getData()
             .stream()
             .findFirst()
-            .map(t -> t.getMetadata().getLabels().get(LabelConstants.LABEL_PRODUCT_VERSION))
+            .map(
+                t -> {
+                  firstVersion.set(t.getId());
+                  return t.getMetadata().getLabels().get(LabelConstants.LABEL_PRODUCT_VERSION);
+                })
             .orElse(null);
     String controlVersion =
         unifiedAssetService
@@ -170,14 +178,25 @@ public class SystemInfoService {
             .map(Constants::formatVersionUsingV)
             .orElse(Constants.INIT_VERSION);
     if (StringUtils.isBlank(controlVersion)) {
-      systemInfoEntity.setControlProductVersion(templateVersion);
-      systemInfoEntity.setStageProductVersion(templateVersion);
-      systemInfoEntity.setProductionProductVersion(templateVersion);
+      Optional.ofNullable(templateVersion)
+          .ifPresent(
+              any -> {
+                systemInfoEntity.setControlProductVersion(templateVersion);
+                systemInfoEntity.setStageProductVersion(templateVersion);
+                systemInfoEntity.setProductionProductVersion(templateVersion);
+                markFirstTemplateUpgraded(firstVersion.get());
+              });
     } else {
       systemInfoEntity.setControlProductVersion(controlVersion);
       systemInfoEntity.setStageProductVersion(stageVersion);
       systemInfoEntity.setProductionProductVersion(productionVersion);
     }
+  }
+
+  private void markFirstTemplateUpgraded(String id) {
+    UnifiedAssetEntity unifiedAssetEntity = unifiedAssetService.findOneByIdOrKey(id);
+    unifiedAssetEntity.getLabels().put(LabelConstants.LABEL_FIRST_UPGRADE, "true");
+    unifiedAssetRepository.save(unifiedAssetEntity);
   }
 
   @Transactional
@@ -255,6 +274,6 @@ public class SystemInfoService {
               t.setProductName(mgmtProperty.getProductName());
               return t;
             })
-        .orElseThrow(() -> KrakenException.notFound("System info not found"));
+        .orElse(new SystemInfo());
   }
 }

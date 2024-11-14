@@ -2,13 +2,12 @@ import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { EnumRightType } from "@/utils/types/common.type";
 import { IResponseMapping } from "@/utils/types/component.type";
 import { RightOutlined } from "@ant-design/icons";
-import { Flex, Input, Tooltip } from "antd";
+import { Flex, Tooltip } from "antd";
 import clsx from "clsx";
 import { cloneDeep, set } from "lodash";
-import { useEffect, useState } from "react";
-import { locationMapping } from "../../helper";
 import { LocationSelector } from "../LocationSelector";
 import styles from "./index.module.scss";
+import { AutoGrowingInput } from "@/components/form";
 
 export function SourceInput({
   item,
@@ -26,9 +25,6 @@ export function SourceInput({
     setActiveResponseName,
     errors,
   } = useNewApiMappingStore();
-
-  const [value, setValue] = useState("");
-
   const handleChange = (field: keyof typeof item, value: any) => {
     const cloneObj = cloneDeep(responseMapping);
     const itemIndex = cloneObj?.findIndex(
@@ -38,27 +34,23 @@ export function SourceInput({
     setResponseMapping(cloneObj);
   };
 
-  useEffect(() => {
-    setValue(item.source);
-  }, [item.source, setValue]);
-
   const id = `${index}-${item?.name}`;
   const isFocused =
     rightSide === EnumRightType.AddSellerResponse && activeResponseName === id;
 
   return (
     <Flex className={styles.flexColumn} gap={4}>
-      {item.source && (
+      {item.source ? (
         <LocationSelector
           type="response"
           // disabled={!item.customizedField}
-          value={locationMapping(item.sourceLocation, "response")}
+          value={item.sourceLocation}
           onChange={(value) => handleChange("sourceLocation", value)}
         />
-      )}
+      ) : <div className={styles.bloater}></div>}
 
       <Tooltip title={item?.source}>
-        <Input
+        <AutoGrowingInput
           data-testid="sourceInput"
           id={id}
           variant="filled"
@@ -67,17 +59,13 @@ export function SourceInput({
             [styles.activeInput]: isFocused,
             [styles.error]: errors?.responseIds?.has(item.id!) && !item.source,
           })}
-          value={value}
+          value={item.source}
           suffix={<RightOutlined style={{ fontSize: 12, color: "#C9CDD4" }} />}
           onClick={() => {
             setActiveResponseName(id);
             setRightSide(EnumRightType.AddSellerResponse);
           }}
-          onChange={(e) => setValue(e.target.value)}
-          onBlur={() => {
-            handleChange("source", value);
-            // setActiveResponseName(undefined);
-          }}
+          onChange={(value) => handleChange("source", value)}
         />
       </Tooltip>
     </Flex>

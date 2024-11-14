@@ -1,0 +1,33 @@
+{
+  "validationResult": "partial",
+  "alternateGeographicAddress": [
+    {
+      "id": "mock-id",
+      "@type": "FieldedAddress",
+      "country": "AU",
+      "city": "Sydney",
+      "locality": "12345",
+      "name": "Sydney location",
+      "tags": [
+        "offnet"
+      ]
+    }
+  ],
+  "provideAlternative": true,
+  "submittedGeographicAddress": {
+    "@type": "FieldedAddress",
+    "country": "AU",
+    "city": "Sydney",
+    "postcode": "60027",
+    "postcodeExtension": "string",
+    "streetName": "string",
+    "streetType": "VIA",
+    "streetSuffix": "string",
+    "streetNr": "12",
+    "streetNrSuffix": "string",
+    "streetNrLast": "string",
+    "streetNrLastSuffix": "string",
+    "locality": "e7539c5fe66f9e4ce5b08ab7",
+    "stateOrProvince": "ANKONA"
+  }
+}

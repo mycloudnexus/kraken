@@ -95,6 +95,7 @@ spec:
           env:
             code: ${targetApiConfig.endpoints[0].responseBody}
             inputs: ${targetApiConfig.inputs}
+          postResultRender: true
     - uri: ${env.target.url}
       trigger:
         path: /mefApi/sonata/productInventory/v7/product/**

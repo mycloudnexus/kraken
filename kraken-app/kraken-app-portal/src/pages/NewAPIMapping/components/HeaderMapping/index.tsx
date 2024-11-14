@@ -106,6 +106,7 @@ const HeaderMapping = ({
   const handleClick = () => {
     Modal.confirm({
       className: styles.confirm,
+      centered: true,
       content:
         "Are you sure to remove this API? All the related properties will be removed as well. Continue?",
       okButtonProps: {
@@ -137,19 +138,16 @@ const HeaderMapping = ({
           style={{
             boxSizing: "border-box",
             flex: "0 0 calc(50% - 30px)",
-            padding: "10px 5.5px",
+            padding: 10,
             display: "flex",
             gap: 8,
           }}
-          lineHeight="24px"
         >
           Seller API
           <Typography.Text
             style={{
               color: "#00000073",
               fontSize: 12,
-              maxWidth: `calc(100% - 80px)`,
-              lineHeight: "24px",
             }}
             ellipsis={{ tooltip: true }}
           >

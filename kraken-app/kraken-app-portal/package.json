@@ -1,7 +1,7 @@
 {
   "name": "kraken-app-portal",
   "private": true,
-  "version": "1.2.0-snapshot",
+  "version": "1.0.0-snapshot",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -39,6 +39,7 @@
     "react-dom": "^18.2.0",
     "react-draggable": "^4.4.6",
     "react-router-dom": "^6.23.1",
+    "recharts": "^2.13.1",
     "rollup-plugin-node-polyfills": "^0.2.1",
     "stream-browserify": "^3.0.0",
     "swagger-client": "^3.28.2",

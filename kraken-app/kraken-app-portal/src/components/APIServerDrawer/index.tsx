@@ -1,8 +1,13 @@
 import TitleIcon from "@/assets/title-icon.svg";
-import { useGetComponentSpecDetails } from "@/hooks/product";
+import {
+  useGetComponentListAPI,
+  useGetComponentSpecDetails,
+} from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
+import { IUnifiedAsset } from "@/utils/types/common.type";
+import { IComponent } from "@/utils/types/component.type";
 import { CloseOutlined } from "@ant-design/icons";
-import { Flex, Drawer, Spin, Table } from "antd";
+import { Flex, Drawer, Spin, Table, Button, Tooltip } from "antd";
 import { omit, startCase } from "lodash";
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
@@ -10,19 +15,30 @@ import MappingMatrix from "../MappingMatrix";
 import RequestMethod from "../Method";
 import { Text } from "../Text";
 import TrimmedPath from "../TrimmedPath";
+import styles from "./index.module.scss";
 
 type Props = {
   isOpen: boolean;
   onClose?: () => void;
-  componentId: string;
+  item: IComponent | IUnifiedAsset | undefined;
 };
 
-const APIServerDrawer = ({ componentId, isOpen, onClose }: Props) => {
+const APIServerDrawer = ({ item, isOpen, onClose }: Props) => {
   const { currentProduct } = useAppStore();
+  const { data: componentList } = useGetComponentListAPI(currentProduct);
+
+  const findLinkedComponent = (targetAssetKey: string): string | null => {
+    const item = componentList?.data?.find(
+      (item: { links: { targetAssetKey: string }[] }) =>
+        item.links?.some((link) => link.targetAssetKey === targetAssetKey)
+    );
+    return item?.metadata?.key || null;
+  };
+
   const navigate = useNavigate();
   const { data: componentDetail, isLoading } = useGetComponentSpecDetails(
     currentProduct,
-    componentId
+    item?.metadata?.key ?? ""
   );
 
   const columns = useMemo(
@@ -40,30 +56,37 @@ const APIServerDrawer = ({ componentId, isOpen, onClose }: Props) => {
       },
       {
         title: "Mapping use case",
-        render: (item: Record<string, any>) => (
-          <Flex justify="start">
-            <RequestMethod method={item.facets.trigger?.method} />
-            <Text.LightMedium
-              role="none"
-              color="#2962FF"
-              style={{ cursor: "pointer" }}
-              onClick={() => navigate(`/api-mapping/${item.metadata.key}`)}
-            >
-              <TrimmedPath
-                path={item.facets.trigger.path}
-                trimLevel={2}
-                color="blue"
-              />
-            </Text.LightMedium>
+        render: (item: Record<string, any>) => {
+          const linkKey = findLinkedComponent(item.metadata.key);
+          return (
+            <Flex justify="start" align="center">
+              <RequestMethod method={item.facets.trigger?.method} />
 
-            <MappingMatrix
-              mappingMatrix={omit(item.facets.trigger, ["method", "path"])}
-            />
-          </Flex>
-        ),
+              <Tooltip title={linkKey ? null : "This use case does not exist."}>
+                <Button
+                  role="none"
+                  type="link"
+                  onClick={() =>
+                    linkKey ? navigate(`/api-mapping/${linkKey}`) : null
+                  }
+                >
+                  <TrimmedPath
+                    path={item.facets.trigger.path}
+                    trimLevel={2}
+                    color={linkKey ? "#2962FF" : "rgba(0,0,0,0.45)"}
+                  />
+                </Button>
+              </Tooltip>
+
+              <MappingMatrix
+                mappingMatrix={omit(item.facets.trigger, ["method", "path"])}
+              />
+            </Flex>
+          );
+        },
       },
     ],
-    []
+    [navigate, findLinkedComponent]
   );
 
   return (
@@ -80,29 +103,20 @@ const APIServerDrawer = ({ componentId, isOpen, onClose }: Props) => {
       }
     >
       <Spin spinning={isLoading}>
-        <div
-          style={{
-            flex: 1,
-            display: "flex",
-            flexDirection: "column",
-            gap: 24,
-            width: "100%",
-            boxSizing: "border-box",
-          }}
-        >
+        <div className={styles.wrapper}>
           <Flex align="flex-start" vertical gap={12}>
             <Flex
               vertical
               gap={30}
               align="flex-start"
-              style={{ width: "100%" }}
+              className={styles.fullWidth}
             >
               {componentDetail &&
                 Object.keys(componentDetail.endpointUsage).map((key, index) => (
                   <Flex
                     key={`${key}-${index}`}
                     vertical
-                    style={{ width: "100%" }}
+                    className={styles.fullWidth}
                     gap={20}
                   >
                     <Flex gap={12} justify="flex-start" align="center">
@@ -116,6 +130,7 @@ const APIServerDrawer = ({ componentId, isOpen, onClose }: Props) => {
                     ].length > 0 ? (
                       <Table
                         columns={columns}
+                        rowKey='id'
                         dataSource={
                           componentDetail.endpointUsage[
                             key as keyof typeof componentDetail.endpointUsage

@@ -2,7 +2,7 @@ import EmptyIcon from "@/assets/icon/empty.svg";
 import { PageLayout } from "@/components/Layout";
 import { useGetAuditLogs } from "@/hooks/product";
 import { useCommonListProps } from "@/hooks/useCommonListProps";
-import useUser from "@/hooks/user/useUser";
+import { useUser } from "@/hooks/user/useUser";
 import { toDateTime } from "@/libs/dayjs";
 import { DEFAULT_PAGING } from "@/utils/constants/common";
 import { ILogActivity } from "@/utils/types/env.type";

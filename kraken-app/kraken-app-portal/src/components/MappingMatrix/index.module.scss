@@ -1,8 +1,7 @@
 .wrapper {
-  margin-left: 20px;
-  max-width: calc(100% - 35px);
   flex-wrap: wrap;
-  gap: 7px;
+  gap: 4px;
+  margin-left: 20px;
 }
 
 .tag {
@@ -22,11 +21,12 @@
 
 .tagLabel {
   font-size: 8px;
-  color: rgba(0, 0, 0, 0.45);
+  color: rgba(0, 0, 0, 0.45) !important;
   line-height: 12px;
+  text-transform: capitalize;
 }
 
 .tagActive {
-  color:#2962FF !important;
+  color: #2962ff !important;
   font-weight: 500;
 }

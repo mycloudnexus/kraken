@@ -11,6 +11,7 @@ spec:
     path: /mefApi/sonata/productOrderingManagement/v10/productOrder/{id}
     method: get
     productType: access_e_line
+    actionType: add
   endpoints:
     - path: ""
       method: ""
@@ -71,5 +72,21 @@ spec:
             source: ""
             sourceLocation: "BODY"
             target: "@{{productOrderItem[0].product.id}}"
+            targetLocation: "BODY"
+            requiredMapping: false
+          - name: mapper.order.eline.read.productOrderItem.completionDate
+            title: "order item complete date"
+            description: ""
+            source: ""
+            sourceLocation: "BODY"
+            target: "@{{productOrderItem[0].completeDate}}"
+            targetLocation: "BODY"
+            requiredMapping: false
+          - name: mapper.order.eline.read.productOrderItem.expectedCompleteDate
+            title: "order item complete date"
+            description: ""
+            source: ""
+            sourceLocation: "BODY"
+            target: "@{{productOrderItem[0].expectedCompleteDate}}"
             targetLocation: "BODY"
             requiredMapping: false

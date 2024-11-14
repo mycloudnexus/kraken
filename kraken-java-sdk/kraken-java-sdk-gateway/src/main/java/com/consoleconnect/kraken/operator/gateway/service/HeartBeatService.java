@@ -8,6 +8,8 @@ import com.consoleconnect.kraken.operator.data.repo.HeartbeatRepository;
 import java.time.ZonedDateTime;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +33,11 @@ public class HeartBeatService {
   @Scheduled(cron = "${app.cron-job.push-heartbeat:-}")
   @Transactional
   public void heartBeat() {
+    InstanceHeartbeatEntity entity = builInstanceHeartbeatEntity();
+    heartbeatRepository.save(entity);
+  }
+
+  private InstanceHeartbeatEntity builInstanceHeartbeatEntity() {
     ZonedDateTime now = DateTime.nowInUTC();
     log.debug("Heartbeat at {}", now);
     InstanceHeartbeatEntity entity =
@@ -47,6 +54,14 @@ public class HeartBeatService {
                 });
     entity.setAppVersion(buildVersion);
     entity.setUpdatedAt(now);
-    heartbeatRepository.save(entity);
+    return entity;
+  }
+
+  @EventListener(classes = ApplicationReadyEvent.class)
+  public void onPlatformBootUp(Object event) {
+    log.info("Application started up, report start up event");
+    InstanceHeartbeatEntity instanceHeartbeatEntity = builInstanceHeartbeatEntity();
+    instanceHeartbeatEntity.setStartUpAt(ZonedDateTime.now());
+    heartbeatRepository.save(instanceHeartbeatEntity);
   }
 }

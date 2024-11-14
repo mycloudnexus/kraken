@@ -30,6 +30,7 @@ import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
 import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
 import com.consoleconnect.kraken.operator.core.service.CompatibilityCheckService;
+import com.consoleconnect.kraken.operator.core.service.EventSinkService;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.*;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -44,7 +45,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
@@ -72,6 +72,7 @@ public class TemplateUpgradeService {
   private final ApiComponentService apiComponentService;
   private final TransactionService transactionService;
   private final CompatibilityCheckService compatibilityCheckService;
+  private final EventSinkService eventSinkService;
 
   protected String deployProduction(
       String templateUpgradeId, String stageEnvId, String productionEnvId, String userId) {
@@ -117,6 +118,16 @@ public class TemplateUpgradeService {
             templateUpgradeDeployment,
             new SyncMetadata("", "", DateTime.nowInUTCString(), userId),
             true);
+    if (DeployStatusEnum.IN_PROCESS
+        .name()
+        .equalsIgnoreCase(templateUpgradeDeployment.getMetadata().getStatus())) {
+      // report result
+      String templateDeploymentId = ingestionDataResult.getData().getId().toString();
+      upgradeSourceServiceFactory
+          .getUpgradeSourceService(templateUpgradeId)
+          .reportResult(templateUpgradeId, templateDeploymentId);
+      log.info("report production upgrade begin  {}", templateDeploymentId);
+    }
     addLabels(envDeployment, ingestionDataResult.getData().getId().toString());
 
     return ingestionDataResult.getData().getId().toString();
@@ -303,7 +314,11 @@ public class TemplateUpgradeService {
                   templateUpgradeDeploymentVO.setStatus(dto.getMetadata().getStatus());
                   templateUpgradeDeploymentVO.setDeploymentId(dto.getId());
                   templateUpgradeDeploymentVO.setCreatedAt(dto.getCreatedAt());
-                  templateUpgradeDeploymentVO.setUpdatedAt(dto.getUpdatedAt());
+                  if (DeployStatusEnum.SUCCESS
+                      .name()
+                      .equalsIgnoreCase(templateUpgradeDeploymentVO.getStatus())) {
+                    templateUpgradeDeploymentVO.setUpdatedAt(dto.getUpdatedAt());
+                  }
                   return templateUpgradeDeploymentVO;
                 })
             .toList();
@@ -573,16 +588,17 @@ public class TemplateUpgradeService {
 
   @Transactional(rollbackFor = Exception.class)
   public String controlPlaneUpgradeV3(String templateUpgradeId, String userId) {
+    checkOnlyOneControlPlaneUpgrade(templateUpgradeId);
     return this.controlPlaneUpgrade(templateUpgradeId, userId);
   }
 
   public String controlPlaneUpgrade(String templateUpgradeId, String userId) {
     SystemInfo systemInfo = systemInfoService.find();
-    if (!SystemStateEnum.CAN_UPGRADE_STATES.contains(systemInfo.getStatus())) {
+    if (!SystemStateEnum.CAN_CONTROL_UPGRADE_STATES.contains(systemInfo.getStatus())) {
       throw KrakenException.badRequest("Current system state is not allowed to upgrade");
     }
     UnifiedAssetDto productAsset = this.getProductAsset();
-
+    ZonedDateTime startTime = ZonedDateTime.now();
     String controlDeploymentId =
         transactionService.execInNewTransaction(
             nil -> {
@@ -638,6 +654,7 @@ public class TemplateUpgradeService {
       systemInfoService.updateSystemStatusImmediately(SystemStateEnum.CONTROL_PLANE_UPGRADE_DONE);
       throw KrakenException.internalError("Control plane upgraded failed:" + e.getMessage());
     }
+
     systemInfoService.updateProductVersion(
         SystemStateEnum.CONTROL_PLANE_UPGRADE_DONE,
         getTemplateVersion(templateUpgradeId),
@@ -647,7 +664,36 @@ public class TemplateUpgradeService {
       throw KrakenException.internalError(
           "Control plane upgraded failed:" + ingestionDataResult.getMessage());
     }
+    ZonedDateTime endTime = ZonedDateTime.now();
+    UnifiedAssetDto assetDto = unifiedAssetService.findOne(templateUpgradeId);
+    eventSinkService.reportTemplateUpgradeResult(
+        assetDto,
+        UpgradeResultEventEnum.UPGRADE,
+        event -> {
+          SystemInfo latestSystemInfo = systemInfoService.find();
+          event.setUpgradeBeginAt(startTime);
+          event.setUpgradeEndAt(endTime);
+          event.setEnvName(EnvNameEnum.CONTROL_PLANE);
+          event.setProductKey(latestSystemInfo.getProductKey());
+          event.setProductSpec(latestSystemInfo.getProductSpec());
+          event.setProductVersion(latestSystemInfo.getControlProductVersion());
+        });
+
     return ingestionDataResult.getData().getId().toString();
+  }
+
+  private void checkOnlyOneControlPlaneUpgrade(String templateUpgradeId) {
+    Paging<UnifiedAssetDto> assetDtoPaging =
+        unifiedAssetService.findBySpecification(
+            Tuple2.ofList(
+                AssetsConstants.FIELD_KIND, PRODUCT_TEMPLATE_CONTROL_DEPLOYMENT.getKind()),
+            Tuple2.ofList(LabelConstants.LABEL_APP_TEMPLATE_UPGRADE_ID, templateUpgradeId),
+            null,
+            PageRequest.of(0, 1),
+            null);
+    if (CollectionUtils.isNotEmpty(assetDtoPaging.getData())) {
+      throw KrakenException.internalError("Control plane upgrade already exists");
+    }
   }
 
   @Transactional
@@ -843,11 +889,6 @@ public class TemplateUpgradeService {
     List<UnifiedAssetDto> byAllKeysIn =
         unifiedAssetService.findByAllKeysIn(new ArrayList<>(changedMappers), false);
     byAllKeysIn.stream()
-        .filter(
-            ent ->
-                MapUtils.isNotEmpty(ent.getMetadata().getLabels())
-                    && LabelConstants.VALUE_DEPLOYED_STATUS_DEPLOYED.equalsIgnoreCase(
-                        ent.getMetadata().getLabels().get(LabelConstants.LABEL_DEPLOYED_STATUS)))
         .map(UnifiedAssetDto::getMetadata)
         .map(Metadata::getKey)
         .forEach(
@@ -868,26 +909,11 @@ public class TemplateUpgradeService {
     if (CollectionUtils.isNotEmpty(deploymentIds)) {
       envDeployment.setMapperDeployment(deploymentIds);
     }
-    List<String> draftMappers =
-        byAllKeysIn.stream()
-            .filter(
-                ent ->
-                    !(MapUtils.isNotEmpty(ent.getMetadata().getLabels())
-                        && LabelConstants.VALUE_DEPLOYED_STATUS_DEPLOYED.equalsIgnoreCase(
-                            ent.getMetadata()
-                                .getLabels()
-                                .get(LabelConstants.LABEL_DEPLOYED_STATUS))))
-            .map(UnifiedAssetDto::getMetadata)
-            .map(Metadata::getKey)
-            .toList();
-    if (CollectionUtils.isNotEmpty(draftMappers)) {
-      envDeployment.setMapperDraft(draftMappers);
-    }
   }
 
   public String stageUpgradeV3(TemplateUpgradeEvent event) {
     SystemInfo systemInfo = systemInfoService.find();
-    if (!SystemStateEnum.CAN_UPGRADE_STATES.contains(systemInfo.getStatus())) {
+    if (!SystemStateEnum.CAN_STAGE_UPGRADE_STATES.contains(systemInfo.getStatus())) {
       throw KrakenException.badRequest("The current system status does not support upgrade");
     }
     checkIsLatestUpgrade(event.getTemplateUpgradeId(), true);
@@ -917,6 +943,7 @@ public class TemplateUpgradeService {
     templateSynCompletedEvent.setTemplateUpgradeRecords(upgradeRecords);
     templateSynCompletedEvent.setEnvId(event.getEnvId());
     templateSynCompletedEvent.setTemplateUpgradeId(event.getTemplateUpgradeId());
+    templateSynCompletedEvent.setUserId(event.getUserId());
     try {
       IngestionDataResult ingestionDataResult = this.deployStageV3(templateSynCompletedEvent);
       String deploymentId = ingestionDataResult.getData().getId().toString();
@@ -925,7 +952,7 @@ public class TemplateUpgradeService {
         upgradeSourceServiceFactory
             .getUpgradeSourceService(event.getTemplateUpgradeId())
             .reportResult(event.getTemplateUpgradeId(), deploymentId);
-        log.info("Template upgrade  completed");
+        log.info("Template upgrade completed");
         return deploymentId;
       }
     } catch (Exception exception) {
@@ -1124,23 +1151,30 @@ public class TemplateUpgradeService {
     return compatibilityCheckService.check(systemInfo.getStageAppVersion(), productVersion);
   }
 
-  public void calculateStatus(TemplateUpgradeReleaseVO vo, boolean first) {
+  public void calculateStatus(TemplateUpgradeReleaseVO vo, TemplateUpgradeReleaseVO first) {
     boolean deployedProduction =
         vo.getDeployments().stream()
             .anyMatch(
-                deploy -> deploy.getEnvName().equalsIgnoreCase(EnvNameEnum.PRODUCTION.name()));
+                deploy ->
+                    deploy.getEnvName().equalsIgnoreCase(EnvNameEnum.PRODUCTION.name())
+                        && DeployStatusEnum.SUCCESS.name().equalsIgnoreCase(deploy.getStatus()));
     if (deployedProduction) {
       vo.setStatus(TemplateViewStatus.UPGRADED.getStatus());
       return;
     }
-    if (first) {
+    if (vo.getTemplateUpgradeId().equalsIgnoreCase(first.getTemplateUpgradeId())) {
       if (CollectionUtils.isEmpty(vo.getDeployments())) {
         vo.setStatus(TemplateViewStatus.NOT_UPGRADED.getStatus());
         return;
       }
       vo.setStatus(TemplateViewStatus.UPGRADING.getStatus());
     } else {
-      vo.setStatus(TemplateViewStatus.DEPRECATED.getStatus());
+      if (CollectionUtils.isEmpty(first.getDeployments())
+          && CollectionUtils.isNotEmpty(vo.getDeployments())) {
+        vo.setStatus(TemplateViewStatus.UPGRADING.getStatus());
+      } else {
+        vo.setStatus(TemplateViewStatus.DEPRECATED.getStatus());
+      }
     }
   }
 }

@@ -2,13 +2,13 @@ import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { EnumRightType } from "@/utils/types/common.type";
 import { IRequestMapping } from "@/utils/types/component.type";
 import { RightOutlined } from "@ant-design/icons";
-import { Flex, Tooltip, Input } from "antd";
+import { Flex, Tooltip } from "antd";
 import clsx from "clsx";
 import { isEqual, cloneDeep, set } from "lodash";
-import { useEffect, useMemo, useState } from "react";
-import { locationMapping } from "../../helper";
+import { useMemo } from "react";
 import { LocationSelector } from "../LocationSelector";
 import styles from "./index.module.scss";
+import { AutoGrowingInput } from "@/components/form";
 
 export function TargetInput({
   item,
@@ -26,13 +26,11 @@ export function TargetInput({
     rightSide,
     errors,
   } = useNewApiMappingStore();
-  const [value, setValue] = useState("");
-
   const isFocused = useMemo(
     () =>
       rightSide === EnumRightType.AddSellerProp &&
-      isEqual(item, rightSideInfo?.previousData),
-    [rightSide, item, rightSideInfo]
+      isEqual(item.id, rightSideInfo?.previousData?.id),
+    [rightSide, item.id, rightSideInfo?.previousData?.id]
   );
 
   const handleChange = (changes: { [field in keyof typeof item]?: any }) => {
@@ -48,23 +46,19 @@ export function TargetInput({
     setRequestMapping(newRequest);
   };
 
-  useEffect(() => {
-    setValue(item.target);
-  }, [item.target, setValue]);
-
   return (
     <Flex className={styles.flexColumn} gap={4}>
-      {item.target && (
+      {item.target ? (
         <LocationSelector
           type="request"
           // disabled={!item.customizedField}
-          value={locationMapping(item.targetLocation, "request")}
+          value={item.targetLocation}
           onChange={(value) => handleChange({ targetLocation: value })}
         />
-      )}
+      ) : <div className={styles.bloater}></div>}
 
       <Tooltip title={item.target}>
-        <Input
+        <AutoGrowingInput
           data-testid="targetInput"
           id={JSON.stringify(item)}
           variant="filled"
@@ -74,7 +68,7 @@ export function TargetInput({
             [styles.error]:
               errors?.requestIds?.has(item.id as any) && !item.target,
           })}
-          value={value}
+          value={item.target}
           placeholder="Select or input property"
           suffix={<RightOutlined style={{ fontSize: 12, color: "#C9CDD4" }} />}
           onClick={() => {
@@ -85,8 +79,7 @@ export function TargetInput({
               title: item.title,
             });
           }}
-          onChange={(e) => setValue(e.target.value)}
-          onBlur={() => {
+          onChange={(value) => {
             if (!value) {
               handleChange({ target: value, targetLocation: undefined });
             } else {

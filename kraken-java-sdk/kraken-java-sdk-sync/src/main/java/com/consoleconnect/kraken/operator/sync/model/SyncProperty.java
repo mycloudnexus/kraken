@@ -9,6 +9,7 @@ public class SyncProperty {
   private MgmtPlane mgmtPlane = new MgmtPlane();
   private List<String> acceptAssetKinds = List.of();
   private boolean assetConfigOverwriteFlag = false;
+  private long synDelaySeconds = 60;
 
   @Data
   public static class ControlPlane {

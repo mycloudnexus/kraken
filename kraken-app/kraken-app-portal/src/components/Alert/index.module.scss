@@ -1,0 +1,13 @@
+.customAlert {
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: none;
+  align-items: center;
+
+  :global {
+    .anticon svg {
+      width: 14px;
+      height: 14px;
+    }
+  }
+}

@@ -4,17 +4,20 @@ interface Props {
   status: string | number;
 }
 
-const DeploymentStatus = ({ status }: Readonly<Props>) => {
-  if (status === "SUCCESS" || status === 200) {
-    return <Tag color="success">Success</Tag>;
+export const DeploymentStatus = ({ status }: Readonly<Props>) => {
+  switch (status) {
+    case "SUCCESS":
+      return <Tag data-testid="deploymentStatus" color="success">Success</Tag>;
+
+    case "IN_PROCESS":
+      return <Tag data-testid="deploymentStatus" color="purple">In process</Tag>;
+
+    case "FAILED":
+      return <Tag data-testid="deploymentStatus" color="error">Failed</Tag>;
+
+    default:
+      return <Tag data-testid="deploymentStatus">{status}</Tag>
   }
-  if (status === "IN_PROCESS") {
-    return <Tag color="purple">In process</Tag>;
-  }
-  if (status === "FAILED" || Number(status) >= 400) {
-    return <Tag color="error">Failed</Tag>;
-  }
-  return null;
 };
 
 export default DeploymentStatus;

@@ -77,7 +77,7 @@ public interface MappingTransformer {
           "converted source:{}, converted target:{},", convertedSource, convertedTarget);
       compactedResponseBody =
           JsonToolkit.generateJson(
-              convertToJsonPointer(mapper.getTarget().replace(REQUEST_BODY, StringUtils.EMPTY)),
+              convertToJsonPointer(mapper.getTarget().replace(RESPONSE_BODY, StringUtils.EMPTY)),
               convertedSource,
               compactedResponseBody);
     }
@@ -130,8 +130,11 @@ public interface MappingTransformer {
           try {
             obj = doc.read(key);
           } catch (Exception e) {
-            String err = String.format("Json Path read key error, key:%s", key);
+            String err =
+                String.format(
+                    "Json Path read key error, key:%s, value:%s will be deleted", key, value);
             LogHolder.log.error(err, e);
+            doc.delete(value);
             return;
           }
           if (null == obj || (obj instanceof String str && (StringUtils.isBlank(str)))) {

@@ -194,7 +194,7 @@ const ResponseItem = ({ item, index }: Props) => {
           </Flex>
         )}
       </Flex>
-      <Flex className={styles.container} gap={8} wrap="wrap" align="flex-end">
+      <Flex className={styles.container} gap={8} wrap="wrap" align="flex-start">
         {/* Sonata side Target response input */}
         <TargetInput
           item={item}
@@ -262,11 +262,11 @@ const ResponseItem = ({ item, index }: Props) => {
             ))}
           <Flex className={styles.itemContainer}>
             <Button
-              type="primary"
+              type="link"
               onClick={() => handleAdd(item?.name)}
               data-testid="btn-add-state"
             >
-              + Add Value Mapping
+              + Add value mapping
             </Button>
           </Flex>
         </Flex>

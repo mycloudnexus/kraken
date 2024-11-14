@@ -1,18 +1,18 @@
-import { Flex, Spin, Typography } from "antd";
-import styles from "./index.module.scss";
-import classes from "classnames";
 import { Text } from "@/components/Text";
+import { useGetAPIDeployments, useGetRunningAPIList } from "@/hooks/product";
+import { useAppStore } from "@/stores/app.store";
+import { IEnv } from "@/utils/types/env.type";
 import {
   ApiOutlined,
   CheckCircleFilled,
   InfoCircleOutlined,
 } from "@ant-design/icons";
-import { useMemo } from "react";
-import { useAppStore } from "@/stores/app.store";
-import { useGetAPIDeployments, useGetRunningAPIList } from "@/hooks/product";
-import { IEnv } from "@/utils/types/env.type";
-import { upperFirst } from "lodash";
+import { Flex, Spin, Typography } from "antd";
+import classes from "classnames";
 import dayjs from "dayjs";
+import { upperFirst } from "lodash";
+import { useMemo } from "react";
+import styles from "./index.module.scss";
 
 interface Props {
   env: IEnv;
@@ -83,16 +83,9 @@ const EnvStatus = ({
     }
   );
 
-  const runningComponents = useMemo(() => {
-    return (
-      (data?.data?.[0]?.components ?? null) ||
-      (Array.isArray(data) ? data : null)
-    );
-  }, [data]);
-
   const lastElement = useMemo(() => {
     if (!isLoading) {
-      return deploymentsData.data[0];
+      return deploymentsData?.data[0];
     } else {
       return null;
     }
@@ -112,7 +105,7 @@ const EnvStatus = ({
           {loading || loadingRunningData ? (
             <Spin size="small" />
           ) : (
-            <Text.BoldMedium>{runningComponents?.length || 0}</Text.BoldMedium>
+            <Text.BoldMedium>{data?.length || 0}</Text.BoldMedium>
           )}
           <Text.LightMedium>Total running API mapping</Text.LightMedium>
         </Flex>

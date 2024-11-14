@@ -71,6 +71,14 @@ spec:
             title: >-
               the id of the place where the products' installation must be done.
             source: '@{{productOrderItem[0].product.place[0].id}}'
+            target: '@{{dataCenterFacilityId}}'
+            description: ''
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.order.uni.add.place.name
+            title: the keyName of the place where the products' installation must be done.
+            source: '@{{productOrderItem[0].product.place[0].keyName}}'
             target: '@{{dataCenterFacility}}'
             description: ''
             sourceLocation: BODY
@@ -169,5 +177,14 @@ spec:
             description: order instanceId mapping
             sourceLocation: BODY
             targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.order.uni.add.product.id
+            title: product instance id
+            description: ""
+            source: "@{{id}}"
+            sourceLocation: BODY
+            target: "@{{productOrderItem[0].product.id}}"
+            targetLocation: BODY
+            customizedField: false
             requiredMapping: false
 

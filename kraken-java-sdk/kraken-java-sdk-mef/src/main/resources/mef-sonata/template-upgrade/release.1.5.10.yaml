@@ -1,0 +1,13 @@
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.1.5.10
+  name: V1.5.10
+  labels:
+    productSpec: grace
+    productVersion: V1.5.10
+    publishDate: 2024-11-13 16:14
+  description: |
+    Fixed the status value always empty in the inventory list, and added a built-in process for empty value of id in response from downstream.
+  version: 2

@@ -1,0 +1,92 @@
+---
+kind: kraken.component.api-target-mapper
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target-mapper.order.eline.read.delete
+  name:  Mapper Of Reading Order Connection with Delete Action
+  description: This operation retrieves a ProductOrder entity
+spec:
+  trigger:
+    path: /mefApi/sonata/productOrderingManagement/v10/productOrder/{id}
+    method: get
+    productType: access_e_line
+    actionType: delete
+  endpoints:
+    - path: /api/v2/company/{username}/connections/{connectionId}
+      method: GET
+      serverKey: mef.sonata.api-target-spec.con1718940696857
+      mappers:
+        request:
+          - name: mapper.order.eline.read.delete.buyerId
+            title: The unique identifier of the organization that is acting as the a Buyer.
+            source: '@{{buyerId}}'
+            target: '@{{username}}'
+            description: ''
+            replaceStar: true
+            sourceLocation: QUERY
+            targetLocation: PATH
+            customizedField: false
+            requiredMapping: false
+          - name: mapper.order.eline.read.delete.orderId
+            title: Order Unique Identifier.
+            source: '@{{id}}'
+            target: '@{{connectionId}}'
+            description: ''
+            replaceStar: true
+            convertValue: 'mef.sonata.api-target-mapper.order.eline.add#mapper.order.eline.add.orderId'
+            sourceLocation: PATH
+            targetLocation: PATH
+            customizedField: false
+            requiredMapping: true
+        response:
+          - name: mapper.order.eline.read.delete.state
+            title: ProductOrderState
+            source: '@{{status}}'
+            target: '@{{state}}'
+            targetType: enum
+            description: ''
+            replaceStar: true
+            targetValues:
+              - acknowledged
+              - assessingCancellation
+              - held.assessingCharge
+              - pending.assessingModification
+              - cancelled
+              - pendingCancellation
+              - completed
+              - failed
+              - inProgress
+              - partial
+              - rejected
+            valueMapping:
+              ERROR: failed
+              ACTIVE: completed
+              DENIED: rejected
+              DELETED: completed
+              ACCEPTED: acknowledged
+              CREATING: inProgress
+              DISABLED: completed
+            sourceLocation: BODY
+            targetLocation: BODY
+            customizedField: false
+            requiredMapping: true
+          - name: mapper.order.eline.read.delete.completionDate
+            title: order complete date
+            source: '@{{firstActiveAt}}'
+            target: '@{{completionDate}}'
+            description: ''
+            replaceStar: true
+            sourceLocation: BODY
+            targetLocation: BODY
+            customizedField: false
+            requiredMapping: false
+          - name: mapper.order.eline.read.delete.instanceId
+            title: instance id from seller
+            source: '@{{id}}'
+            target: '@{{productOrderItem[0].product.id}}'
+            description: ''
+            replaceStar: true
+            sourceLocation: BODY
+            targetLocation: BODY
+            customizedField: false
+            requiredMapping: false

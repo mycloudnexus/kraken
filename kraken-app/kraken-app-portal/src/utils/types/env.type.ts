@@ -18,6 +18,7 @@ export interface IActivityLog {
   uri: string;
   path: string;
   method: string;
+  buyerName: string;
   queryParameters: Record<string, any>;
   headers: Record<string, any>;
   request: Record<string, any>;
@@ -79,6 +80,7 @@ export interface IRunningMapping {
   userName?: string;
   version: string;
   status: string;
+  mappingStatus: string;
 }
 
 export interface IRunningComponentItem {
@@ -115,9 +117,8 @@ export interface IMapperDetails {
   diffWithStage?: boolean;
   requiredMapping: boolean;
   orderBy: string;
-  order?: number
+  order?: number;
 }
-
 
 export interface ILogActivity {
   id: string;
@@ -139,4 +140,11 @@ export interface ILogActivity {
   ignoreRequestParams: any[];
   request: Record<string, any>;
   response: Record<string, any>;
+}
+
+export type DataPlaneUpgradeCheck = {
+  errorMessages: string[]
+  mapperCompleted: boolean
+  newerTemplate: boolean
+  compatible: boolean
 }

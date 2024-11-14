@@ -2,11 +2,12 @@ import { DownOutlined } from "@ant-design/icons";
 import { Button, Divider, Dropdown } from "antd";
 import { ItemType } from "antd/es/menu/interface";
 import styles from "./index.module.scss";
+import { locationMapping } from "../../helper";
 
 const requestItems: ItemType[] = [
   {
     label: "Hybrid",
-    key: "Hybrid",
+    key: "HYBRID",
   },
   {
     label: "Path parameter",
@@ -67,7 +68,8 @@ export function LocationSelector({
       data-testid="locationSelector"
       className={styles.locationDropdown}
       disabled={disabled}
-      menu={{ items: menuItems, onClick: (info) => onChange(info.key) }}
+      trigger={['click']}
+      menu={{ items: menuItems, selectable: true, selectedKeys: value ? [value] : [], onClick: (info) => onChange(info.key) }}
     >
       <Button
         data-testid="btnSelectLocation"
@@ -78,7 +80,7 @@ export function LocationSelector({
         iconPosition="end"
         onClick={(e) => e.preventDefault()}
       >
-        {value || "Please select location"}
+        {value ? locationMapping(value, type) : "Please select location"}
       </Button>
     </Dropdown>
   );

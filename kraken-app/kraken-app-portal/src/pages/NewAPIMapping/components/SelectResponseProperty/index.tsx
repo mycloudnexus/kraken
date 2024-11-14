@@ -140,7 +140,9 @@ const SelectResponseProperty = () => {
   return (
     <div className={styles.root}>
       <div className={styles.header}>
-        <Text.NormalLarge>Select Seller API response property</Text.NormalLarge>
+        <Text.Custom size="15px" bold="500">
+          Select Seller API response property
+        </Text.Custom>
       </div>
       <div className={styles.container}>
         <div>

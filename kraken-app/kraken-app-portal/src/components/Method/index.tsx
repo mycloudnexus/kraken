@@ -1,6 +1,7 @@
 import { Tag } from "antd";
 import { useMemo } from "react";
 import styles from "./index.module.scss";
+import classNames from "classnames";
 
 const RequestMethod = ({ method = "", noSpace = false, disabled = false }) => {
   const methodColor = useMemo(() => {
@@ -20,7 +21,8 @@ const RequestMethod = ({ method = "", noSpace = false, disabled = false }) => {
 
   return (
     <Tag
-      className={disabled ? styles.disabled : ""}
+      data-testid="method"
+      className={classNames(styles.requestMethod, disabled && styles.disabled)}
       bordered={false}
       color={methodColor}
       style={noSpace ? { marginRight: 0 } : {}}
