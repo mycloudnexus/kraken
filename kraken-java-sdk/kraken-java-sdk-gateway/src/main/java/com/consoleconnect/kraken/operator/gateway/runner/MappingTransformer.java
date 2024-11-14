@@ -113,7 +113,6 @@ public interface MappingTransformer {
         String targetPath = entry.getKey();
         Map<String, String> valueMapping = entry.getValue();
         LogHolder.log.info("render state targetPath:{}, valueMapping:{}", targetPath, valueMapping);
-        // todo
         String pathExpression = JSON_PATH_EXPRESSION_PREFIX + targetPath;
         responseBody = rewriteValueByJsonPath(pathExpression, responseBody, valueMapping);
       } catch (Exception e) {

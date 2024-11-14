@@ -79,11 +79,4 @@ public class ConstructExpressionUtil {
     String patternStr = "\\{(.*?)\\}";
     return extractParam(path, patternStr);
   }
-
-  public static void main(String[] args) {
-    String target = "@{{[*].status}}";
-    String result = convertToJsonPointer(target);
-    String expected = "/status";
-    System.out.println(result);
-  }
 }
