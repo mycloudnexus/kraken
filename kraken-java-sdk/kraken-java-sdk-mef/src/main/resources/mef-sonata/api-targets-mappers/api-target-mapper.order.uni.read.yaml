@@ -75,3 +75,19 @@ spec:
             target: "@{{productOrderItem[0].product.id}}"
             targetLocation: "BODY"
             requiredMapping: false
+          - name: mapper.order.uni.read.productOrderItem.completionDate
+            title: "order item complete date"
+            description: ""
+            source: ""
+            sourceLocation: "BODY"
+            target: "@{{productOrderItem[0].completeDate}}"
+            targetLocation: "BODY"
+            requiredMapping: false
+          - name: mapper.order.uni.read.productOrderItem.expectedCompleteDate
+            title: "order item complete date"
+            description: ""
+            source: ""
+            sourceLocation: "BODY"
+            target: "@{{productOrderItem[0].expectedCompleteDate}}"
+            targetLocation: "BODY"
+            requiredMapping: false

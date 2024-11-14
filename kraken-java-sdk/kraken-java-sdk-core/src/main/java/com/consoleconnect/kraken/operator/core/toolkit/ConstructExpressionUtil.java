@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringUtils;
 
 public class ConstructExpressionUtil {
+
+  public static final String ARRAY_ROOT_PREFIX = "[*].";
 
   private ConstructExpressionUtil() {}
 
@@ -26,9 +29,12 @@ public class ConstructExpressionUtil {
 
   public static String convertToJsonPointer(String path) {
     List<String> params = extractMapperParam(path);
+    String param = params.get(0);
+    if (StringUtils.isNotBlank(param) && param.startsWith(ARRAY_ROOT_PREFIX)) {
+      param = param.substring(ARRAY_ROOT_PREFIX.length(), param.length());
+    }
     return "/"
-        + params
-            .get(0)
+        + param
             .replaceAll("\\[(\\*)\\]", "[0]")
             .replaceAll("(?)\\[", "\\/")
             .replaceAll("(?)\\].", "\\/")
