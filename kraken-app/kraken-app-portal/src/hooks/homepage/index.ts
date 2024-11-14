@@ -24,16 +24,16 @@ export const useGetQuickStartGuide = (productId: string, kind: string) => {
 export const useGetActivityRequests = (
   productId: string,
   envId: string,
-  startTime?: string,
-  endTime?: string,
+  requestStartTime?: string,
+  requestEndTime?: string,
   buyer?: string
 ) => {
   return useQuery<any, Error, IApiActivity>({
-    queryKey: [USER_CACHE_KEYS.get_quick_start_guide],
+    queryKey: [USER_CACHE_KEYS.activity_requests],
     queryFn: () =>
       getApiActivityRequests(productId, envId, {
-        startTime,
-        endTime,
+        requestStartTime,
+        requestEndTime,
         buyer,
       }),
     select: (data) => data?.data,
@@ -43,15 +43,15 @@ export const useGetActivityRequests = (
 export const useGetErrorBrakedown = (
   productId: string,
   envId: string,
-  startTime: undefined | string,
-  endTime: undefined | string
+  requestStartTime: undefined | string,
+  requestEndTime: undefined | string
 ) => {
   return useQuery<any, Error, IErrorBrakedown>({
     queryKey: [USER_CACHE_KEYS.get_error_brakedown],
     queryFn: () =>
       getErrorBrakedownRequests(productId, envId, {
-        startTime,
-        endTime,
+        requestStartTime,
+        requestEndTime,
       }),
     select: (data) => data?.data,
   });
@@ -60,15 +60,15 @@ export const useGetErrorBrakedown = (
 export const useGetMostPopularEndpoints = (
   productId: string,
   envId: string,
-  startTime: undefined | string,
-  endTime: undefined | string
+  requestStartTime: undefined | string,
+  requestEndTime: undefined | string
 ) => {
   return useQuery<any, Error, IMostPopularEndpoints>({
     queryKey: [USER_CACHE_KEYS.get_most_popular_endpoints],
     queryFn: () =>
       getMostPopularEndpointsRequests(productId, envId, {
-        startTime,
-        endTime,
+        requestStartTime,
+        requestEndTime,
       }),
     select: (data) => data?.data,
   });

@@ -28,8 +28,8 @@ const ApiActivityDiagram = ({ props }: Props) => {
   const { data, isLoading, refetch, isRefetching } = useGetActivityRequests(
     currentProduct,
     props.envId,
-    props.startTime,
-    props.endTime,
+    props.requestStartTime,
+    props.requestEndTime,
     props.buyer
   );
 
@@ -69,7 +69,7 @@ const ApiActivityDiagram = ({ props }: Props) => {
                 }}
               />
               <Tooltip
-                cursor={{ stroke: "#A3B5D6", strokeWidth: 4 }}
+                cursor={{ stroke: "#A3B5D6", fill: "transparent", strokeWidth: 4 }}
                 labelFormatter={formatDiagramDate}
               />
               <Legend align="right" formatter={(value) => capitalize(value)} />

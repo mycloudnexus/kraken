@@ -15,6 +15,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 
 export const USER_CACHE_KEYS = {
+  activity_requests: "activity_requests",
   get_user: "get_user",
   get_current_user: "get_current_user",
   get_quick_start_guide: "get_quick_start_guide",
