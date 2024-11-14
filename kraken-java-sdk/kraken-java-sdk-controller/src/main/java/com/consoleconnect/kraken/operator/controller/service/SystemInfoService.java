@@ -13,7 +13,6 @@ import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
 import com.consoleconnect.kraken.operator.core.enums.EnvNameEnum;
 import com.consoleconnect.kraken.operator.core.event.PlatformSettingCompletedEvent;
-import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.model.Metadata;
 import com.consoleconnect.kraken.operator.core.repo.SystemInfoRepository;
 import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
@@ -275,6 +274,6 @@ public class SystemInfoService {
               t.setProductName(mgmtProperty.getProductName());
               return t;
             })
-        .orElseThrow(() -> KrakenException.notFound("System info not found"));
+        .orElse(new SystemInfo());
   }
 }

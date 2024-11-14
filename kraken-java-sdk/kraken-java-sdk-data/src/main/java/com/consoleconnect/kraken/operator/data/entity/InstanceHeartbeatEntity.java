@@ -2,6 +2,7 @@ package com.consoleconnect.kraken.operator.data.entity;
 
 import com.consoleconnect.kraken.operator.core.entity.AbstractEntity;
 import jakarta.persistence.*;
+import java.time.ZonedDateTime;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,4 +25,7 @@ public class InstanceHeartbeatEntity extends AbstractEntity {
 
   @Column(name = "app_version", nullable = true)
   private String appVersion;
+
+  @Column(name = "start_up_at", nullable = true, unique = false)
+  private ZonedDateTime startUpAt;
 }
