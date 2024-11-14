@@ -61,7 +61,7 @@ spec:
             title: "Possible values for the status of a MEF product"
             source: "@{{responseBody.status}}"
             sourceLocation: BODY
-            target: "@{{status}}"
+            target: "@{{[*].status}}"
             targetType: enum
             targetLocation: BODY
             requiredMapping: true
@@ -75,8 +75,8 @@ spec:
               - suspendedPendingTerminate
               - terminated
             valueMapping:
-              ACTIVE: active,
-              CANCELLED: canceled,
+              ACTIVE: active
+              CANCELLED: canceled
               PENDING: pendingActive
               DELETING: pendingTerminate
               DISABLED: suspended
