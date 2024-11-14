@@ -7,8 +7,8 @@ import { IReleaseHistory } from "@/utils/types/product.type";
 import { RightOutlined } from "@ant-design/icons";
 import { Flex, Tag, Empty } from "antd";
 import { omit } from "lodash";
-import VersionDetail from "./components/VersionDetail";
-import VersionSelect from "./components/VersionSelect";
+import { VersionDetail } from "./components/VersionDetail";
+import { VersionSelect } from "./components/VersionSelect";
 import { Text } from "@/components/Text";
 import DoneIcon from "@/assets/icon/upgrade-done.svg";
 import ReleaseIcon from "@/assets/release-bg.svg";
@@ -39,12 +39,12 @@ export default function MappingTemplate() {
     })
   );
 
-  const [selectedVersion, setSelectedVersion] = useState("");
+  const [selectedVersion, setSelectedVersion] = useState<string | null | undefined>(undefined);
 
   const releases = releaseData?.pages?.flatMap((page) => page.data.data);
 
   useEffect(() => {
-    if (releases?.length && !selectedVersion) {
+    if (releases?.length && selectedVersion === undefined) {
       // Select latest version as default
       setSelectedVersion(releases[0].templateUpgradeId);
     }

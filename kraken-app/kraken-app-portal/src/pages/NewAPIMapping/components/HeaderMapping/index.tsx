@@ -106,6 +106,7 @@ const HeaderMapping = ({
   const handleClick = () => {
     Modal.confirm({
       className: styles.confirm,
+      centered: true,
       content:
         "Are you sure to remove this API? All the related properties will be removed as well. Continue?",
       okButtonProps: {
