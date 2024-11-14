@@ -75,8 +75,8 @@ spec:
               - suspendedPendingTerminate
               - terminated
             valueMapping:
-              ACTIVE: active,
-              CANCELLED: canceled,
+              ACTIVE: active
+              CANCELLED: canceled
               PENDING: pendingActive
               DELETING: pendingTerminate
               DISABLED: suspended

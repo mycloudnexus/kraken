@@ -8,6 +8,8 @@ import org.apache.commons.lang3.StringUtils;
 
 public class ConstructExpressionUtil {
 
+  public static final String ARRAY_ROOT_PREFIX = "[*].";
+
   private ConstructExpressionUtil() {}
 
   public static List<String> extractMapperParam(String param) {
@@ -28,8 +30,8 @@ public class ConstructExpressionUtil {
   public static String convertToJsonPointer(String path) {
     List<String> params = extractMapperParam(path);
     String param = params.get(0);
-    if (StringUtils.isNotBlank(param) && param.startsWith("[*].")) {
-      param = param.substring(4, param.length());
+    if (StringUtils.isNotBlank(param) && param.startsWith(ARRAY_ROOT_PREFIX)) {
+      param = param.substring(ARRAY_ROOT_PREFIX.length(), param.length());
     }
     return "/"
         + param
