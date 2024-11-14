@@ -6,8 +6,9 @@
       "@type": "FieldedAddress",
       "country": "${responseBody[*].company.addresses[0].country}",
       "city": "${responseBody[*].company.addresses[0].city}",
-      "streetName": "${responseBody[*].company.addresses[0].address}",
-      "locality": "${responseBody[*].dataCenterFacility.metroId}"
+      "streetName": "${responseBody[*].company.addresses[0].street}",
+      "locality": "${responseBody[*].dataCenterFacility.metroId}",
+      "tags": "${responseBody[*].tags}"
     }
   ],
   "provideAlternative": "${mefRequestBody.provideAlternative}",

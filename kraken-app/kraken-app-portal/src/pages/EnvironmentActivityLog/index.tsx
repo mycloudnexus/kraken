@@ -136,7 +136,7 @@ const EnvironmentActivityLog = () => {
   const [modalActivityId, setModalActivityId] = useState<string | undefined>();
   const [modalOpen, setModalOpen] = useState(false);
 
-  const columns: ColumnsType<IActivityLog> = [
+  const   columns: ColumnsType<IActivityLog> = [
     {
       key: "name",
       title: "Method",
@@ -147,6 +147,11 @@ const EnvironmentActivityLog = () => {
       key: "name",
       title: "Path",
       render: (log: IActivityLog) => log.path,
+    },
+    {
+      key: "buyerName",
+      title: "Buyer name",
+      render: (log: IActivityLog) => log.buyerName,
     },
     {
       key: "status",

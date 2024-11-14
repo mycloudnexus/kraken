@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.consoleconnect.kraken.operator.core.enums.ExpectTypeEnum;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 @Slf4j
@@ -36,5 +37,13 @@ class ConstructExpressionUtilTest {
     ExpectTypeEnum expectedTrue = ExpectTypeEnum.EXPECTED_TRUE;
     log.info(
         "expected: {}, expectedExist: {}, expectedTrue: {}", expected, expectedExist, expectedTrue);
+  }
+
+  @Test
+  void givenStatusInArray_whenConvert_thenOK() {
+    String target = "@{{[*].status}}";
+    String result = ConstructExpressionUtil.convertToJsonPointer(target);
+    String expected = "/status";
+    Assertions.assertEquals(expected, result);
   }
 }
