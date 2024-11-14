@@ -118,7 +118,7 @@ class ApiActivityStatisticsServiceTest extends AbstractIntegrationTest {
     assertThat(result.getRequestStatistics()).hasSize(1);
     var statsFor1Day = result.getRequestStatistics().get(0);
     assertThat(statsFor1Day.getError()).isEqualTo(1);
-    assertThat(statsFor1Day.getSuccess()).isEqualTo(0);
+    assertThat(statsFor1Day.getSuccess()).isZero();
   }
 
   @Test
