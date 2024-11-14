@@ -83,7 +83,7 @@ class PushAPIActivityLogSchedulerTest extends AbstractIntegrationTest {
 
   private void verifyPage0(PushExternalSystemPayload page0, MgmtEventEntity logEvent) {
     assertThat(page0.getData().getTotal()).isEqualTo(40);
-    assertThat(page0.getData().getPage()).isEqualTo(0);
+    assertThat(page0.getData().getPage()).isZero();
     assertThat(page0.getData().getSize()).isEqualTo(30);
     assertThat(page0.getData().getData()).hasSize(30);
     verifyData(page0, logEvent);

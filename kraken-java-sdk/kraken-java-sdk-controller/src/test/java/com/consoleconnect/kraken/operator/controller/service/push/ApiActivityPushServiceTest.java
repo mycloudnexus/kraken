@@ -19,7 +19,6 @@ import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -74,7 +73,7 @@ class ApiActivityPushServiceTest extends AbstractIntegrationTest {
     var result = sut.searchHistory(PushLogSearchRequest.builder().build(), pageRequest);
     // then
     var logs = result.getData();
-    assertThat(logs.size()).isGreaterThan(2);
+    assertThat(logs).hasSizeGreaterThan(2);
     verifyIfLogsOrderedByCreatedAtDesc(logs);
   }
 
@@ -84,11 +83,9 @@ class ApiActivityPushServiceTest extends AbstractIntegrationTest {
     }
   }
 
-  @SneakyThrows
   private void givenPushApiActivityLogs() {
     var env = environmentService.findAll().get(0);
     for (int i = 0; i < 3; i++) {
-      Thread.sleep(10);
       var request = pushApiActivityRequest(env);
       sut.createPushApiActivityLogInfo(request, "userId1");
     }
