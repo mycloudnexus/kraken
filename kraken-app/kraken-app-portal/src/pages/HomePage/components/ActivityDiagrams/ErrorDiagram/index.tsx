@@ -77,8 +77,6 @@ const ErrorBrakedownDiagram = ({ props }: Props) => {
     [data, isLoading]
   );
 
-  console.log(errorData)
-
   return (
     <Flex vertical className={styles.contentBox}>
       <Flex style={{ paddingBottom: "12px" }}>

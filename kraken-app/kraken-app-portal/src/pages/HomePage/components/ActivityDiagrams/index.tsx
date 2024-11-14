@@ -24,9 +24,9 @@ import styles from "./index.module.scss";
 
 export type DiagramProps = {
   envId: string;
-  requestStartTime: string;
-  requestEndTime: string;
-  buyer: string | undefined;
+  requestStartTime?: string;
+  requestEndTime?: string;
+  buyer?: string;
   requestTime?: any;
 };
 
@@ -36,31 +36,37 @@ type Props = {
 
 const { RangePicker } = DatePicker;
 
-const DiagramWrapper = ({ envs }: Props) => {
+const ActivityDiagrams = ({ envs }: Props) => {
   const stageEnvId =
     envs?.find((env: IEnv) => env.name?.toLowerCase() === "stage")?.id ?? "";
   const currentTime = getCurrentTimeWithZone();
   const [form] = Form.useForm();
+  const [selectedRecentDate, setSelectedRecentDate] = useState<number | undefined>(7);
+  const { requestStartTime, requestEndTime } = recentXDays(selectedRecentDate);
+
   const [params, setParams] = useState<DiagramProps>({
     envId: stageEnvId,
-    requestStartTime: currentTime,
-    requestEndTime: currentTime,
+    requestStartTime,
+    requestEndTime,
     buyer: undefined,
   });
 
   const handleFormValues = useCallback(
     (values: DiagramProps) => {
       const { requestTime = [] } = values ?? {};
-      setParams({
-        envId: values.envId || params.envId,
-        buyer: values.buyer || params.buyer,
-        requestStartTime: requestTime?.[0]
-          ? dayjs(requestTime[0]).startOf("day").format(TIME_ZONE_FORMAT)
-          : currentTime,
-        requestEndTime: requestTime?.[1]
-          ? dayjs(requestTime[1]).endOf("day").format(TIME_ZONE_FORMAT)
-          : currentTime,
-      });
+      if(requestTime?.[0]) {
+        setSelectedRecentDate(undefined);
+        setParams({
+          envId: values.envId || params.envId,
+          buyer: values.buyer || params.buyer,
+          requestStartTime: requestTime?.[0]
+            ? dayjs(requestTime[0]).startOf("day").format(TIME_ZONE_FORMAT)
+            : currentTime,
+          requestEndTime: requestTime?.[1]
+            ? dayjs(requestTime[1]).endOf("day").format(TIME_ZONE_FORMAT)
+            : currentTime,
+        });
+      }
     },
     [setParams, params]
   );
@@ -83,7 +89,8 @@ const DiagramWrapper = ({ envs }: Props) => {
   }, [envs]);
 
   const setRecentDate = (e: RadioChangeEvent) => {
-    const { requestStartTime, requestEndTime } = recentXDays(e);
+    const { requestStartTime, requestEndTime } = recentXDays(e.target.value);
+    setSelectedRecentDate(Number(e.target.value));
     setParams({ ...params, requestStartTime, requestEndTime });
   };
 
@@ -103,10 +110,8 @@ const DiagramWrapper = ({ envs }: Props) => {
         >
           <Flex gap={12} align="center">
             <Text.BoldMedium>Activity diagrams</Text.BoldMedium>
-
             <Form.Item name="envId">
               <Select
-
                 value={params.envId}
                 options={envOptions}
                 popupMatchSelectWidth={false}
@@ -115,7 +120,6 @@ const DiagramWrapper = ({ envs }: Props) => {
                 placeholder="Stage"
               />
             </Form.Item>
-
             <Form.Item name="buyer">
               <Select
                 options={[
@@ -136,13 +140,14 @@ const DiagramWrapper = ({ envs }: Props) => {
           </Flex>
           <Flex align="center">
             <Form.Item>
-              <Radio.Group onChange={setRecentDate} size="middle" >
-                <Radio.Button value="7" data-testid="recent-7-days">Recent 7 days</Radio.Button>
-                <Radio.Button value="90">Recent 3 months</Radio.Button>
+              <Radio.Group onChange={setRecentDate} value={selectedRecentDate} size="middle" >
+                <Radio.Button value={7} data-testid="recent-7-days">Recent 7 days</Radio.Button>
+                <Radio.Button value={90}>Recent 3 months</Radio.Button>
               </Radio.Group>
             </Form.Item>
             <Form.Item name="requestTime">
               <RangePicker
+                value={[dayjs(params.requestStartTime), dayjs(params.requestEndTime)]}
                 size="middle"
                 placeholder={["Select time", "Select time"]}
               />
@@ -165,4 +170,4 @@ const DiagramWrapper = ({ envs }: Props) => {
   );
 };
 
-export default DiagramWrapper;
+export default ActivityDiagrams;
