@@ -50,7 +50,7 @@ public class PushHeartbeatService extends KrakenServerConnector {
                   heartbeat.setRole(entity.getRole());
                   heartbeat.setAppVersion(entity.getAppVersion());
                   heartbeat.setUpdatedAt(entity.getUpdatedAt());
-                  heartbeat.setStartUpAt(entity.getStartUpTAt());
+                  heartbeat.setStartUpAt(entity.getStartUpAt());
                   return heartbeat;
                 })
             .toList();

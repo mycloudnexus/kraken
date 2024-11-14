@@ -27,5 +27,5 @@ public class InstanceHeartbeatEntity extends AbstractEntity {
   private String appVersion;
 
   @Column(name = "start_up_at", nullable = true, unique = false)
-  private ZonedDateTime startUpTAt;
+  private ZonedDateTime startUpAt;
 }

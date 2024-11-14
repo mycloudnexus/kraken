@@ -61,7 +61,7 @@ public class HeartBeatService {
   public void onPlatformBootUp(Object event) {
     log.info("Application started up, report start up event");
     InstanceHeartbeatEntity instanceHeartbeatEntity = builInstanceHeartbeatEntity();
-    instanceHeartbeatEntity.setStartUpTAt(ZonedDateTime.now());
+    instanceHeartbeatEntity.setStartUpAt(ZonedDateTime.now());
     heartbeatRepository.save(instanceHeartbeatEntity);
   }
 }
