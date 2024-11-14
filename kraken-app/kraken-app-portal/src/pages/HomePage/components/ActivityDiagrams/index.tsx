@@ -89,6 +89,7 @@ const ActivityDiagrams = ({ envs }: Props) => {
   }, [envs]);
 
   const setRecentDate = (e: RadioChangeEvent) => {
+    form.setFieldsValue({ requestTime: null });
     const { requestStartTime, requestEndTime } = recentXDays(e.target.value);
     setSelectedRecentDate(Number(e.target.value));
     setParams({ ...params, requestStartTime, requestEndTime });
