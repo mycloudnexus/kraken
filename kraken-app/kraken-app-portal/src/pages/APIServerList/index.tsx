@@ -39,7 +39,7 @@ const APIServerList = () => {
           <Flex
             flexDirection="column"
             alignItems="flex-start"
-            gap={26}
+            gap={16}
             style={{ width: "100%" }}
           >
             {dataList?.data?.map((item: IComponent) => (

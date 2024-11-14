@@ -6,7 +6,6 @@ import com.consoleconnect.kraken.operator.controller.dto.statistics.ErrorApiRequ
 import com.consoleconnect.kraken.operator.controller.dto.statistics.ErrorBreakdown;
 import com.consoleconnect.kraken.operator.controller.dto.statistics.MostPopularEndpointStatistics;
 import com.consoleconnect.kraken.operator.controller.dto.statistics.RequestStatistics;
-import com.consoleconnect.kraken.operator.core.entity.AbstractHttpEntity;
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
 import com.consoleconnect.kraken.operator.core.request.ApiStatisticsSearchRequest;
@@ -39,6 +38,7 @@ public class ApiActivityStatisticsService {
   public static final String CALL_SEQ_ZERO = "0";
   public static final String BUYER = "buyer";
   public static final int NUMBER_OF_MOST_POPULAR_ENDPOINT_LIMIT = 7;
+  public static final String NO_STATUS_CODE = "No Status Code";
 
   private final ApiActivityLogRepository repository;
 
@@ -79,20 +79,23 @@ public class ApiActivityStatisticsService {
     var stats =
         logsGroupedByDayAndHttpStatus.entrySet().stream()
             .map(
-                dateEntry ->
-                    new RequestStatistics(
-                        dateEntry.getKey().toLocalDate(),
-                        dateEntry.getValue().get(RequestStatus.SUCCESS),
-                        dateEntry.getValue().get(RequestStatus.ERROR)))
+                dateEntry -> {
+                  Long success = dateEntry.getValue().get(RequestStatus.SUCCESS);
+                  Long error = dateEntry.getValue().get(RequestStatus.ERROR);
+                  return new RequestStatistics(
+                      dateEntry.getKey().toLocalDate(),
+                      (success != null) ? success : 0,
+                      (error != null) ? error : 0);
+                })
             .sorted(Comparator.comparing(RequestStatistics::getDate))
             .toList();
     return new ApiRequestActivityStatistics(stats);
   }
 
   private RequestStatus status(Integer statusCode) {
-    return (HttpStatus.valueOf(statusCode).is2xxSuccessful())
-        ? RequestStatus.SUCCESS
-        : RequestStatus.ERROR;
+    return (statusCode == null || !HttpStatus.valueOf(statusCode).is2xxSuccessful())
+        ? RequestStatus.ERROR
+        : RequestStatus.SUCCESS;
   }
 
   public ErrorApiRequestStatistics loadErrorsStatistics(ApiStatisticsSearchRequest searchRequest) {
@@ -110,14 +113,19 @@ public class ApiActivityStatisticsService {
           if (searchRequest.getBuyerId() != null) {
             predicateList.add(criteriaBuilder.equal(root.get(BUYER), searchRequest.getBuyerId()));
           }
-          predicateList.add(criteriaBuilder.greaterThanOrEqualTo(root.get(HTTP_STATUS_CODE), 400));
-          predicateList.add(criteriaBuilder.lessThan(root.get(HTTP_STATUS_CODE), 600));
+          var statusIsNull = criteriaBuilder.isNull(root.get(HTTP_STATUS_CODE));
+          var statusInRange =
+              criteriaBuilder.and(
+                  criteriaBuilder.greaterThanOrEqualTo(root.get(HTTP_STATUS_CODE), 400),
+                  criteriaBuilder.lessThan(root.get(HTTP_STATUS_CODE), 600));
+          predicateList.add(criteriaBuilder.or(statusIsNull, statusInRange));
+
           return query.where(predicateList.toArray(new Predicate[0])).getRestriction();
         };
     return repository.findAll(spec);
   }
 
-  private Map<ZonedDateTime, Map<Integer, Long>> groupByDayAndStatus(
+  private Map<ZonedDateTime, Map<String, Long>> groupByDayAndStatus(
       ZoneId zoneId, List<ApiActivityLogEntity> logs) {
     return logs.stream()
         .collect(
@@ -125,11 +133,15 @@ public class ApiActivityStatisticsService {
                 entity ->
                     entity.getCreatedAt().withZoneSameInstant(zoneId).truncatedTo(ChronoUnit.DAYS),
                 Collectors.groupingBy(
-                    AbstractHttpEntity::getHttpStatusCode, Collectors.counting())));
+                    apiActivityLogEntity ->
+                        (apiActivityLogEntity.getHttpStatusCode() != null)
+                            ? apiActivityLogEntity.getHttpStatusCode().toString()
+                            : NO_STATUS_CODE,
+                    Collectors.counting())));
   }
 
   private ErrorApiRequestStatistics createErrorApiRequestStatistics(
-      Map<ZonedDateTime, Map<Integer, Long>> stats) {
+      Map<ZonedDateTime, Map<String, Long>> stats) {
     var data =
         stats.entrySet().stream()
             .map(

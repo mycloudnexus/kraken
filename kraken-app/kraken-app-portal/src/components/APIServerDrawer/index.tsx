@@ -59,7 +59,7 @@ const APIServerDrawer = ({ item, isOpen, onClose }: Props) => {
         render: (item: Record<string, any>) => {
           const linkKey = findLinkedComponent(item.metadata.key);
           return (
-            <Flex justify="start">
+            <Flex justify="start" align="center">
               <RequestMethod method={item.facets.trigger?.method} />
 
               <Tooltip title={linkKey ? null : "This use case does not exist."}>
@@ -130,6 +130,7 @@ const APIServerDrawer = ({ item, isOpen, onClose }: Props) => {
                     ].length > 0 ? (
                       <Table
                         columns={columns}
+                        rowKey='id'
                         dataSource={
                           componentDetail.endpointUsage[
                             key as keyof typeof componentDetail.endpointUsage
