@@ -35,13 +35,14 @@ public class PushMgmtEventService extends KrakenServerConnector {
     TYPE_MAPPING.put(
         MgmtEventType.TEMPLATE_UPGRADE_RESULT, ClientEventTypeEnum.CLIENT_TEMPLATE_UPGRADE_RESULT);
     TYPE_MAPPING.put(MgmtEventType.CLIENT_HEART_BEAT, ClientEventTypeEnum.CLIENT_HEARTBEAT);
+    TYPE_MAPPING.put(
+        MgmtEventType.CLIENT_APP_VERSION_UPGRADE_RESULT,
+        ClientEventTypeEnum.CLIENT_APP_VERSION_UPGRADE_RESULT);
+    TYPE_MAPPING.put(MgmtEventType.CLIENT_SYSTEM_INFO, ClientEventTypeEnum.CLIENT_SYSTEM_INFO);
   }
 
   protected static final List<MgmtEventType> QUERY_EVENT_TYPES =
-      List.of(
-          MgmtEventType.TEMPLATE_UPGRADE_RESULT,
-          MgmtEventType.CLIENT_HEART_BEAT,
-          MgmtEventType.CLIENT_SYSTEM_INFO);
+      TYPE_MAPPING.keySet().stream().toList();
 
   public PushMgmtEventService(
       SyncProperty appProperty, WebClient webClient, EventSinkService eventSinkService) {

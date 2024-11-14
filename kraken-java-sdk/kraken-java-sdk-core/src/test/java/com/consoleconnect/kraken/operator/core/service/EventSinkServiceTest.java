@@ -57,6 +57,21 @@ public class EventSinkServiceTest extends AbstractIntegrationTest {
             EventStatusType.WAIT_TO_SEND,
             PageRequest.of(0, 10));
     MatcherAssert.assertThat(mgmtEventEntities, Matchers.hasSize(Matchers.greaterThanOrEqualTo(1)));
-    mgmtEventEntities.forEach(event -> mgmtEventRepository.delete(event));
+    mgmtEventRepository.deleteAll(mgmtEventEntities);
+  }
+
+  @Test
+  @Order(2)
+  void givenAppStartUp_whenReportKrakenVersion_thenOk() {
+    eventSinkService.reportKrakenVersionUpgradeResult(
+        EnvNameEnum.CONTROL_PLANE, "1.0.0", ZonedDateTime.now());
+    List<MgmtEventEntity> krakenVersionEntities =
+        eventSinkService.findByPage(
+            List.of(MgmtEventType.CLIENT_APP_VERSION_UPGRADE_RESULT),
+            EventStatusType.WAIT_TO_SEND,
+            PageRequest.of(0, 10));
+    MatcherAssert.assertThat(
+        krakenVersionEntities, Matchers.hasSize(Matchers.greaterThanOrEqualTo(1)));
+    mgmtEventRepository.deleteAll(krakenVersionEntities);
   }
 }
