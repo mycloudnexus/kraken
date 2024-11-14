@@ -10,6 +10,7 @@ public class SyncProperty {
   private List<String> acceptAssetKinds = List.of();
   private boolean assetConfigOverwriteFlag = false;
   private long synDelaySeconds = 60;
+  private ExternalSystem externalSystem = new ExternalSystem();
 
   @Data
   public static class ControlPlane {
@@ -36,5 +37,13 @@ public class SyncProperty {
     private String retrieveProductReleaseEndpoint = "/callback/agent/latest-release-subscription";
     private String downloadMappingTemplateEndpoint = "/callback/agent/mapping-template-download";
     private String mgmtPushEventEndpoint = "/callback/agent/events";
+  }
+
+  @Data
+  public static class ExternalSystem {
+    private boolean enabled;
+    private String url;
+    private String token;
+    private int batchSize = 200;
   }
 }

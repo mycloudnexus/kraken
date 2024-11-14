@@ -2,6 +2,7 @@ package com.consoleconnect.kraken.operator.core.repo;
 
 import com.consoleconnect.kraken.operator.core.entity.MgmtEventEntity;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,4 +27,6 @@ public interface MgmtEventRepository
 
   Page<MgmtEventEntity> findByEventTypeInAndStatus(
       List<String> mgmtEventTypeList, String eventStatusType, Pageable pageable);
+
+  Optional<MgmtEventEntity> findFirstByEventTypeAndStatus(String eventType, String status);
 }
