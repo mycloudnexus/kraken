@@ -61,7 +61,7 @@ spec:
             title: "Possible values for the status of a MEF product"
             source: "@{{responseBody.status}}"
             sourceLocation: BODY
-            target: "@{{status}}"
+            target: "@{{[*].status}}"
             targetType: enum
             targetLocation: BODY
             requiredMapping: true

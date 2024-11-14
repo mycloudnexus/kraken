@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringUtils;
 
 public class ConstructExpressionUtil {
 
@@ -26,9 +27,12 @@ public class ConstructExpressionUtil {
 
   public static String convertToJsonPointer(String path) {
     List<String> params = extractMapperParam(path);
+    String param = params.get(0);
+    if (StringUtils.isNotBlank(param) && param.startsWith("[*].")) {
+      param = param.substring(4, param.length());
+    }
     return "/"
-        + params
-            .get(0)
+        + param
             .replaceAll("\\[(\\*)\\]", "[0]")
             .replaceAll("(?)\\[", "\\/")
             .replaceAll("(?)\\].", "\\/")
@@ -74,5 +78,12 @@ public class ConstructExpressionUtil {
   public static List<String> extractOriginalPathParam(String path) {
     String patternStr = "\\{(.*?)\\}";
     return extractParam(path, patternStr);
+  }
+
+  public static void main(String[] args) {
+    String target = "@{{[*].status}}";
+    String result = convertToJsonPointer(target);
+    String expected = "/status";
+    System.out.println(result);
   }
 }
