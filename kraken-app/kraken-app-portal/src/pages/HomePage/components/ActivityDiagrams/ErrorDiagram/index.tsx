@@ -44,7 +44,7 @@ const ErrorDiagram = ({ errorData }: { errorData: Array<unknown> }) => (
           barSize={10}
           stackId="error"
           dataKey={key}
-          fill={["#A8071A", "#F5222D", "#FF7875", "#FFF1F0"][index]}
+          fill={["#A8071A", "#F5222D", "#FF7875", "#FFA39E"][index]}
           radius={key === "400" ? [10, 10, 0, 0] : 0}
         />
       ))}
@@ -76,6 +76,8 @@ const ErrorBrakedownDiagram = ({ props }: Props) => {
     () => processErrorData(data),
     [data, isLoading]
   );
+
+  console.log(errorData)
 
   return (
     <Flex vertical className={styles.contentBox}>

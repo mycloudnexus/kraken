@@ -38,7 +38,7 @@ const ApiActivityDiagram = ({ props }: Props) => {
   }, [props]);
 
   const activityData = useMemo(
-    () => data?.requestStatistics.map(entry => ({
+    () => (data?.requestStatistics || []).map(entry => ({
         ...entry,
         error: entry.error || 0,
         success: entry.success || 0,
