@@ -41,6 +41,7 @@ spec:
                 console.log("input: " + jsonStr);
                 let input = JSON.parse(jsonStr);
                 let errorMsg = '';
+                let errorArr = [''];
                 let targetAPIConfigKey = '';
                 let matrixConfigKey = '';
                 let forwardDownstream = true;
@@ -73,9 +74,9 @@ spec:
                   if (!syncQuote) {
                     errorArr.push('disabled : instantSyncQuote==false');
                   }
-                  errorMsg = errorArr.join(' ');
                   targetAPIConfigKey = 'targetKey:notFound';
                 }
+                errorMsg = errorArr.join(' ');
                 let ret = {
                   quoteType: input.quoteItem['product']['productConfiguration']['@type'],
                   instantSyncQuote: input.instantSyncQuote,
@@ -183,6 +184,7 @@ spec:
                 console.log("input: " + jsonStr);
                 let input = JSON.parse(jsonStr);
                 let errorMsg = '';
+                let errorArr = [''];
                 let targetAPIConfigKey = '';
                 let forwardDownstream = true;
                 let typeArr = ['UNI', 'ACCESS_E_LINE'];
@@ -212,8 +214,8 @@ spec:
                   if (!syncQuote) {
                     errorArr.push('disabled : instantSyncQuote==false');
                   }
-                  errorMsg = errorArr.join(' ');
                 }
+                errorMsg = errorArr.join(' ');
                 let ret = {
                   quoteType: input.bizType,
                   instantSyncQuote: input.instantSyncQuote,
