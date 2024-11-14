@@ -22,6 +22,7 @@ import java.util.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationEventPublisher;
@@ -117,10 +118,10 @@ public class TemplateIngestService {
 
   private void reportKrakenVersionUpgrade() {
     SystemInfo systemInfo = systemInfoService.find();
-    if (buildVersion.compareTo(systemInfo.getControlProductVersion()) > 0) {
+    if (!StringUtils.equalsIgnoreCase(buildVersion, systemInfo.getControlAppVersion())) {
       log.info(
           "Kraken version upgrade report: old version {},current version {}",
-          systemInfo.getControlProductVersion(),
+          systemInfo.getControlAppVersion(),
           buildVersion);
       eventSinkService.reportKrakenVersionUpgradeResult(
           EnvNameEnum.CONTROL_PLANE, buildVersion, ZonedDateTime.now());

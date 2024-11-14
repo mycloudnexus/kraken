@@ -20,6 +20,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -98,17 +99,18 @@ public class ClientHeartbeatEventHandler extends ClientEventHandler {
         .findById(UUID.fromString(envId))
         .ifPresent(
             env -> {
-              if (EnvNameEnum.STAGE.name().equalsIgnoreCase(env.getName())) {
-                if (heartbeat.getAppVersion().compareTo(systemInfo.getStageAppVersion()) > 0) {
-                  reportKrakenVersionUpgrade(EnvNameEnum.STAGE, heartbeat);
-                  systemInfoService.updateAppVersion(null, heartbeat.getAppVersion(), null);
-                }
+              if (EnvNameEnum.STAGE.name().equalsIgnoreCase(env.getName())
+                  && !StringUtils.equalsIgnoreCase(
+                      heartbeat.getAppVersion(), systemInfo.getStageAppVersion())) {
+                reportKrakenVersionUpgrade(EnvNameEnum.STAGE, heartbeat);
+                systemInfoService.updateAppVersion(null, heartbeat.getAppVersion(), null);
               }
-              if (EnvNameEnum.PRODUCTION.name().equalsIgnoreCase(env.getName())) {
-                if (heartbeat.getAppVersion().compareTo(systemInfo.getProductionAppVersion()) > 0) {
-                  reportKrakenVersionUpgrade(EnvNameEnum.PRODUCTION, heartbeat);
-                  systemInfoService.updateAppVersion(null, null, heartbeat.getAppVersion());
-                }
+
+              if (EnvNameEnum.PRODUCTION.name().equalsIgnoreCase(env.getName())
+                  && !StringUtils.equalsIgnoreCase(
+                      heartbeat.getAppVersion(), systemInfo.getProductionAppVersion())) {
+                reportKrakenVersionUpgrade(EnvNameEnum.PRODUCTION, heartbeat);
+                systemInfoService.updateAppVersion(null, null, heartbeat.getAppVersion());
               }
             });
   }
