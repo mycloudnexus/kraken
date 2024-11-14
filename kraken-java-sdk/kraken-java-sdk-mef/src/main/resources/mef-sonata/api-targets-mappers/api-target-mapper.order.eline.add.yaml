@@ -216,7 +216,7 @@ spec:
               - businessDays
               - businessHours
               - businessMinutes
-            valueMapping: { }
+            valueMapping: {}
           - name: mapper.order.eline.add.term.endOfTermAction
             title: MEFEndOfTermAction
             description: ""
