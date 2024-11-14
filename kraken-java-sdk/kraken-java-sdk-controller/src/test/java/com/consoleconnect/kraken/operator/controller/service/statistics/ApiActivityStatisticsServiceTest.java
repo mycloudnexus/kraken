@@ -1,5 +1,6 @@
 package com.consoleconnect.kraken.operator.controller.service.statistics;
 
+import static com.consoleconnect.kraken.operator.controller.service.statistics.ApiActivityStatisticsService.NO_STATUS_CODE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.consoleconnect.kraken.operator.config.TestApplication;
@@ -99,6 +100,28 @@ class ApiActivityStatisticsServiceTest extends AbstractIntegrationTest {
   }
 
   @Test
+  void
+      givenApiActivityLogWithStatusCodeNull_whenLoadRequestStatistics_thenStatusCodeNullShouldBePutItToError() {
+    // given
+    var envId = UUID.randomUUID();
+    var now = ZonedDateTime.parse(NOW_WITH_TIMEZONE);
+    addApiLogActivity(envId.toString(), createPayloadsWithNullStatus(toUTC(now)));
+    var searchRequest =
+        ApiStatisticsSearchRequest.builder()
+            .env(envId.toString())
+            .queryStart(now.minusDays(2))
+            .queryEnd(now)
+            .build();
+    // when
+    var result = sut.loadRequestStatistics(searchRequest);
+    // then
+    assertThat(result.getRequestStatistics()).hasSize(1);
+    var statsFor1Day = result.getRequestStatistics().get(0);
+    assertThat(statsFor1Day.getError()).isEqualTo(1);
+    assertThat(statsFor1Day.getSuccess()).isZero();
+  }
+
+  @Test
   void givenApiActivityLogs_whenLoadRequestStatisticsByBuyerId_thenReturnsApiRequestsStatistics() {
     // given
     var envId = UUID.randomUUID();
@@ -177,8 +200,8 @@ class ApiActivityStatisticsServiceTest extends AbstractIntegrationTest {
     var errorBreakdown0 = result.getErrorBreakdowns().get(0);
     var errorBreakdown1 = result.getErrorBreakdowns().get(1);
     assertThat(errorBreakdown0.getDate()).isBefore(errorBreakdown1.getDate());
-    assertThat(errorBreakdown0.getErrors()).containsEntry(401, 4L).containsEntry(500, 4L);
-    assertThat(errorBreakdown1.getErrors()).containsEntry(401, 6L).containsEntry(500, 6L);
+    assertThat(errorBreakdown0.getErrors()).containsEntry("401", 4L).containsEntry("500", 4L);
+    assertThat(errorBreakdown1.getErrors()).containsEntry("401", 6L).containsEntry("500", 6L);
   }
 
   @Test
@@ -198,8 +221,29 @@ class ApiActivityStatisticsServiceTest extends AbstractIntegrationTest {
     var result = sut.loadErrorsStatistics(searchRequest);
     // then
     assertThat(result.getErrorBreakdowns()).hasSize(2);
-    assertThat(result.getErrorBreakdowns().get(0).getErrors()).containsEntry(401, 4L);
-    assertThat(result.getErrorBreakdowns().get(1).getErrors()).containsEntry(401, 6L);
+    assertThat(result.getErrorBreakdowns().get(0).getErrors()).containsEntry("401", 4L);
+    assertThat(result.getErrorBreakdowns().get(1).getErrors()).containsEntry("401", 6L);
+  }
+
+  @Test
+  void
+      givenErrorApiActivityLogsWithNoStatusCode_whenLoadErrorsStatistics_thenReturnsErrorStatistics() {
+    // given
+    var envId = UUID.randomUUID();
+    var now = ZonedDateTime.parse(NOW_WITH_TIMEZONE);
+    addApiLogActivity(envId.toString(), createPayloadsWithNullStatus(toUTC(now)));
+    var searchRequest =
+        ApiStatisticsSearchRequest.builder()
+            .env(envId.toString())
+            .queryStart(now.minusDays(2))
+            .queryEnd(now)
+            .build();
+    // when
+    var result = sut.loadErrorsStatistics(searchRequest);
+    // then
+    assertThat(result.getErrorBreakdowns()).hasSize(1);
+    var errorBreakdown0 = result.getErrorBreakdowns().get(0);
+    assertThat(errorBreakdown0.getErrors()).containsEntry(NO_STATUS_CODE, 1L);
   }
 
   @Test
@@ -415,6 +459,20 @@ class ApiActivityStatisticsServiceTest extends AbstractIntegrationTest {
         });
   }
 
+  private List<String> createPayloadsWithNullStatus(ZonedDateTime now) {
+    return new ArrayList<>(
+        PayloadBuilder.builder()
+            .method("GET")
+            .path0("/mefApi/sonata/product/123")
+            .path1("/hub/product/123")
+            .now(now)
+            .httpStatus(null)
+            .number(1)
+            .buyerId(BUYER_ID_1)
+            .build()
+            .createPayload());
+  }
+
   private List<String> createPayloads(ZonedDateTime now) {
     var payload = new ArrayList<String>();
     payload.addAll(
@@ -477,7 +535,7 @@ class ApiActivityStatisticsServiceTest extends AbstractIntegrationTest {
     private String method;
     private String path0;
     private String path1;
-    private int httpStatus;
+    private Integer httpStatus;
     private ZonedDateTime now;
     private int number;
     private String buyerId;

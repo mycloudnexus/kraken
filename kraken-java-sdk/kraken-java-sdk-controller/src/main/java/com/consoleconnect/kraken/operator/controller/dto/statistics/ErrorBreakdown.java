@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ErrorBreakdown {
   private LocalDate date;
-  private Map<Integer, Long> errors;
+  private Map<String, Long> errors;
 }
