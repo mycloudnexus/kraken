@@ -5,7 +5,7 @@ import { fireEvent, render } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import * as homepageHooks from '@/hooks/homepage'
 
-test("ActivityDiagrams test", () => {
+test("ActivityDiagrams test with data", () => {
   const envs = {
     data: [
       {
@@ -61,4 +61,44 @@ test("ActivityDiagrams test", () => {
   expect(container).toBeInTheDocument();
   const recentButton = getByTestId('recent-7-days');
   fireEvent.click(recentButton);
+});
+
+test("ActivityDiagrams test with no data", () => {
+  const envs = {
+    data: [
+      {
+        id: "32b4832f-fb2f-4c99-b89a-c5c995b18dfc",
+        productId: "mef.sonata",
+        createdAt: "2024-05-30T13:02:03.224486Z",
+        name: "stage",
+      },
+    ],
+  };
+
+  vi.spyOn(homepageHooks, "useGetErrorBrakedown").mockReturnValue({
+    data: {
+      errorBreakdowns: [],
+    },
+    isLoading: false,
+    refetch: vi.fn()
+  } as any);
+
+
+  vi.spyOn(homepageHooks, "useGetActivityRequests").mockReturnValue({
+    data: {
+      requestStatistics: [],
+    },
+    isLoading: false,
+    refetch: vi.fn(),
+    isRefetching: false
+  } as any);
+
+  const { container } = render(
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <ActivityDiagrams envs={envs.data} />
+      </BrowserRouter>
+    </QueryClientProvider>
+  );
+  expect(container).toBeInTheDocument();
 });
