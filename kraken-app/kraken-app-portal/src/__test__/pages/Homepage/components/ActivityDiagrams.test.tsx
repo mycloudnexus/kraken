@@ -35,6 +35,22 @@ test("ActivityDiagrams test", () => {
     refetch: vi.fn()
   } as any);
 
+
+  vi.spyOn(homepageHooks, "useGetActivityRequests").mockReturnValue({
+    data: {
+      requestStatistics: [
+        {
+          date: "2024-05-30T13:02:03.224486Z",
+          success: 1,
+          error: 2,
+        },
+      ],
+    },
+    isLoading: false,
+    refetch: vi.fn(),
+    isRefetching: false
+  } as any);
+
   const { container, getByTestId } = render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
