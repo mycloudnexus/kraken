@@ -53,7 +53,7 @@ const ActivityDiagrams = ({ envs }: Props) => {
   });
 
   const handleFormValues = useCallback(
-    (values: DiagramProps) => {
+    (_: unknown, values: DiagramProps) => {
       const { requestTime = [] } = values ?? {};
       if(requestTime?.[0]) {
         setSelectedRecentDate(undefined);
@@ -70,14 +70,6 @@ const ActivityDiagrams = ({ envs }: Props) => {
       }
     },
     [setParams, params]
-  );
-
-  const handleFormValuesChange = useCallback(
-    (t: any, values: any) => {
-      if (t.path) return;
-      handleFormValues(values);
-    },
-    [setParams]
   );
 
   const envOptions = useMemo(() => {
@@ -103,7 +95,7 @@ const ActivityDiagrams = ({ envs }: Props) => {
         form={form}
         layout="inline"
         colon={false}
-        onValuesChange={handleFormValuesChange}
+        onValuesChange={handleFormValues}
       >
         <Flex
           style={{ width: "100%", paddingBottom: "16px" }}
