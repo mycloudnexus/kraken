@@ -86,9 +86,7 @@ test("ActivityDiagrams test with no data", () => {
 
 
   vi.spyOn(homepageHooks, "useGetActivityRequests").mockReturnValue({
-    data: {
-      requestStatistics: [],
-    },
+    data: {},
     isLoading: false,
     refetch: vi.fn(),
     isRefetching: false
