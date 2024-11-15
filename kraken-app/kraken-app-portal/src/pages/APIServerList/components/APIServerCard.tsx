@@ -1,7 +1,7 @@
 import TitleIcon from "@/assets/title-icon.svg";
 import DeleteApiButton from "@/components/DeleteApiButton";
 import SpecDrawer from "@/components/SpecDrawer";
-import { Text } from "@/components/Text";
+import { SecondaryText, Text } from "@/components/Text";
 import { useDeleteApiServer } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
 import { IComponent } from "@/utils/types/component.type";
@@ -87,19 +87,15 @@ const APIServerCard = ({ item, refetchList }: Props) => {
         title={
           <Flex justify="space-between" gap={12} align="center">
             <Flex gap={8}>
-              <Flex align="center">
-                <Text.NormalLarge>
-                  {get(item, "metadata.name", "")}
-                </Text.NormalLarge>
-              </Flex>
+              <Text.NormalLarge>
+                {get(item, "metadata.name", "")}
+              </Text.NormalLarge>
               <div onMouseEnter={trueHover} onMouseLeave={falseHover}>
                 {isHover && isApiInUse ? (
                   <Button
                     style={{ padding: "0px" }}
                     type="link"
-                    onClick={() => {
-                      setOpenMappingDrawer(true);
-                    }}
+                    onClick={() => setOpenMappingDrawer(true)}
                   >
                     Check details
                   </Button>
@@ -112,7 +108,7 @@ const APIServerCard = ({ item, refetchList }: Props) => {
                 )}
               </div>
             </Flex>
-            <Flex gap={12}>
+            <Flex>
               <Button type="link" onClick={handleEdit}>
                 Edit
               </Button>
@@ -127,98 +123,77 @@ const APIServerCard = ({ item, refetchList }: Props) => {
           </Flex>
         }
       >
-        <Row>
-          <Col lg={8} md={12}>
-            <Flex gap={8} justify="flex-start" align="center">
-              <TitleIcon />
-              <Text.NormalLarge>Seller API Server basics</Text.NormalLarge>
+        <Row gutter={[16, 16]}>
+          <Group title="Seller API Server basics">
+            <Flex vertical align="flex-start" gap={8}>
+              <Text.LightMedium color="#00000073">
+                Application name
+              </Text.LightMedium>
+              <Typography.Text
+                ellipsis={{
+                  tooltip: { title: get(item, "metadata.name") },
+                }}
+              >
+                {get(item, "metadata.name")}
+              </Typography.Text>
             </Flex>
-            <Flex vertical gap={12} style={{ marginTop: 12 }}>
-              <Flex vertical align="flex-start" gap={8}>
-                <Text.LightMedium color="#00000073">
-                  Application name
-                </Text.LightMedium>
-                <Typography.Text
-                  ellipsis={{
-                    tooltip: { title: get(item, "metadata.name") },
-                  }}
-                >
-                  {get(item, "metadata.name")}
+            <Flex vertical align="flex-start" gap={8}>
+              <Text.LightMedium color="#00000073">
+                Online API document link
+              </Text.LightMedium>
+              <Typography.Text
+                ellipsis={{
+                  tooltip: { title: get(item, "facets.baseSpec.path", "-") },
+                }}
+              >
+                {get(item, "facets.baseSpec.path", "-")}
+              </Typography.Text>
+            </Flex>
+            <Flex vertical align="flex-start" gap={8}>
+              <Text.LightMedium color="#00000073">
+                Description
+              </Text.LightMedium>
+              <Typography.Text
+                ellipsis={{
+                  tooltip: {
+                    title: get(item, "metadata.description", "description"),
+                  },
+                }}
+              >
+                {get(item, "metadata.description", "description")}
+              </Typography.Text>
+            </Flex>
+          </Group>
+
+          <Group title="Base URL for environment variables">
+            {environmentData?.map((e) => (
+              <Flex gap={8} vertical justify="flex-start" key={e.name}>
+                <SecondaryText.LightNormal style={{ textTransform: 'capitalize' }}>
+                  {e.name} URL
+                </SecondaryText.LightNormal>
+                <Typography.Text style={{ whiteSpace: "break-spaces" }}>
+                  {e.url}
                 </Typography.Text>
-                <Text.LightMedium></Text.LightMedium>
               </Flex>
-              <Flex vertical align="flex-start" gap={8}>
-                <Text.LightMedium color="#00000073">
-                  Online API document link
-                </Text.LightMedium>
-                <Typography.Text
-                  ellipsis={{
-                    tooltip: { title: get(item, "facets.baseSpec.path", "-") },
-                  }}
-                >
-                  {get(item, "facets.baseSpec.path", "-")}
-                </Typography.Text>
-              </Flex>
-              <Flex vertical align="flex-start" gap={8}>
-                <Text.LightMedium color="#00000073">
-                  Description
-                </Text.LightMedium>
-                <Typography.Text
-                  ellipsis={{
-                    tooltip: {
-                      title: get(item, "metadata.description", "description"),
-                    },
-                  }}
-                >
-                  {get(item, "metadata.description", "description")}
-                </Typography.Text>
-              </Flex>
+            ))}
+          </Group>
+
+          <Group title="API spec">
+            <Flex vertical gap={8}>
+              <Text.NormalMedium color="#000000D9">
+                API spec in yaml format
+              </Text.NormalMedium>
+
+              <Text.LightMedium
+                color="#2962FF"
+                style={{ cursor: "pointer" }}
+                role="none"
+                onClick={openDrawer}
+              >
+                <PaperClipOutlined style={{ color: "#000000D9" }} /> {fileName}
+              </Text.LightMedium>
             </Flex>
-          </Col>
-          <Col lg={8} md={12}>
-            <Flex gap={8} justify="flex-start" align="center">
-              <TitleIcon />
-              <Text.NormalLarge>
-                Base URL for environment variables
-              </Text.NormalLarge>
-            </Flex>
-            <Flex vertical gap={8} align="flex-start" style={{ marginTop: 12 }}>
-              {environmentData?.map((e) => (
-                <Flex gap={8} justify="flex-start" key={e.name} align="center">
-                  <Text.LightMedium style={{ display: 'inline-block', width: 120, textAlign: 'left' }}>
-                    {e.name}
-                  </Text.LightMedium>
-                  <Typography.Text style={{ whiteSpace: "break-spaces" }}>
-                    URL: {e.url}
-                  </Typography.Text>
-                </Flex>
-              ))}
-            </Flex>
-          </Col>
-          <Col lg={8} md={24}>
-            <Flex gap={8} justify="flex-start" align="center">
-              <TitleIcon />
-              <Text.NormalLarge>API spec</Text.NormalLarge>
-            </Flex>
-            <Flex vertical align="flex-start" gap={6} style={{ marginTop: 12 }}>
-              <Flex gap={8}>
-                <Text.NormalMedium color="#000000D9">
-                  API spec in yaml format
-                </Text.NormalMedium>
-              </Flex>
-              <Flex gap={9} justify="flex-start">
-                <PaperClipOutlined />
-                <Text.LightMedium
-                  color="#2962FF"
-                  style={{ cursor: "pointer" }}
-                  role="none"
-                  onClick={openDrawer}
-                >
-                  {fileName}
-                </Text.LightMedium>
-              </Flex>
-            </Flex>
-          </Col>
+          </Group>
         </Row>
       </Card>
     </Spin>
@@ -226,3 +201,17 @@ const APIServerCard = ({ item, refetchList }: Props) => {
 };
 
 export default APIServerCard;
+
+function Group({ title, children }: Readonly<React.PropsWithChildren<{ title?: React.ReactNode }>>) {
+  return (
+    <Col lg={8} md={24}>
+      <Flex gap={8} justify="flex-start" align="center">
+        <TitleIcon />
+        <Text.NormalLarge>{title}</Text.NormalLarge>
+      </Flex>
+      <Flex vertical align="flex-start" gap={20} style={{ marginTop: 12 }}>
+        {children}
+      </Flex>
+    </Col>
+  )
+}

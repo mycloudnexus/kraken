@@ -67,7 +67,7 @@ function LoadMoreContent({
   return "Nothing more to load";
 }
 
-const VersionSelect = ({
+export const VersionSelect = ({
   isFetchingNextPage,
   hasNextPage,
   data,
@@ -77,8 +77,8 @@ const VersionSelect = ({
   onFetchNext,
 }: Readonly<{
   data: IReleaseHistory[];
-  selectedVersion: string;
-  setSelectedVersion: (version: string) => void;
+  selectedVersion: string | null | undefined;
+  setSelectedVersion: (templateUpgradeId: string) => void;
   // Inifinite scroll
   loading?: boolean;
   isFetchingNextPage?: boolean;
@@ -119,6 +119,10 @@ const VersionSelect = ({
 
   const listRelease =
     filterBy === "All" ? data : data.filter((item) => item.status === filterBy);
+
+  useEffect(() => {
+    setSelectedVersion(listRelease[0]?.templateUpgradeId ?? null)
+  }, [filterBy])
 
   return (
     <div className={styles.root}>
@@ -216,5 +220,3 @@ const VersionSelect = ({
     </div>
   );
 };
-
-export default VersionSelect;

@@ -414,6 +414,8 @@ const NewAPIMapping = ({
     setListMappingStateResponse(
       buildInitListMapping(mappers?.response as any, "response")
     );
+    // Store to default seller api?
+    setSellerApi(defaultSellerApi);
     setActiveTab("request");
   };
 
