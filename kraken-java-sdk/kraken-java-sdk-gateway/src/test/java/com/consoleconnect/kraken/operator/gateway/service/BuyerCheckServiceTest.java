@@ -60,8 +60,6 @@ public class BuyerCheckServiceTest extends AbstractIntegrationTest {
             .issuedAt(Instant.now().minusSeconds(60))
             .claim("env", "stage")
             .build();
-    ;
-
     Instant instant = jwt.getIssuedAt();
     unifiedAsset
         .getMetadata()
