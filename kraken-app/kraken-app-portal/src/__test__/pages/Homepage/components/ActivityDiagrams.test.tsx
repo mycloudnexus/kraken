@@ -53,9 +53,8 @@ test("ActivityDiagrams test with data", () => {
     <ActivityDiagrams envs={envs.data} />
   );
   expect(container).toBeInTheDocument();
-  const recentButton = getByTestId('recent-7-days');
-  fireEvent.change(recentButton, { target: { value: 90 } });
-  fireEvent.blur(recentButton);
+  const recentButton = getByTestId('recent-90-days');
+  fireEvent.click(recentButton);
 });
 
 test("ActivityDiagrams test with no data", () => {

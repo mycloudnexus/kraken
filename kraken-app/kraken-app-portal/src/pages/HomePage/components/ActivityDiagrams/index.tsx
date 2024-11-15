@@ -123,8 +123,8 @@ const ActivityDiagrams = ({ envs }: Props) => {
           <Flex align="center">
             <Form.Item>
               <Radio.Group onChange={setRecentDate} value={selectedRecentDate} size="middle" >
-                <Radio.Button value={7} data-testid="recent-7-days">Recent 7 days</Radio.Button>
-                <Radio.Button value={90}>Recent 3 months</Radio.Button>
+                <Radio.Button value={7}>Recent 7 days</Radio.Button>
+                <Radio.Button value={90} data-testid="recent-90-days">Recent 3 months</Radio.Button>
               </Radio.Group>
             </Form.Item>
             <Form.Item name="requestTime">
