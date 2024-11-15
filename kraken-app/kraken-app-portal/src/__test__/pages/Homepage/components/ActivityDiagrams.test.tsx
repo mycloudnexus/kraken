@@ -60,7 +60,8 @@ test("ActivityDiagrams test with data", () => {
   );
   expect(container).toBeInTheDocument();
   const recentButton = getByTestId('recent-7-days');
-  fireEvent.click(recentButton);
+  fireEvent.change(recentButton, { target: { value: 90 } });
+  fireEvent.blur(recentButton);
 });
 
 test("ActivityDiagrams test with no data", () => {
