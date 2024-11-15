@@ -330,7 +330,6 @@ public class TemplateUpgradeService {
   public List<MapperTagVO> templateDeploymentDetailsFromControlDeployment(
       UnifiedAssetDto templateDeployment) {
     Map<String, List<Tuple2>> apiUseCases = apiComponentService.findApiUseCase();
-    log.info("apiUseCases : {}", JsonToolkit.toJson(apiUseCases));
     ControlDeploymentFacet controlDeploymentFacet =
         UnifiedAsset.getFacets(templateDeployment, ControlDeploymentFacet.class);
     UpgradeTuple upgradeTuple = controlDeploymentFacet.getUpgradeTuple();
@@ -347,6 +346,7 @@ public class TemplateUpgradeService {
         .map(Optional::get)
         .map(ApiUseCaseDto::getMapperKey)
         .filter(t -> !appProperty.getQueryExcludeAssetKeys().contains(t))
+        .filter(unifiedAssetRepository::existsByKey)
         .distinct()
         .map(this::getMapperTagVOFromDraft)
         .toList();
