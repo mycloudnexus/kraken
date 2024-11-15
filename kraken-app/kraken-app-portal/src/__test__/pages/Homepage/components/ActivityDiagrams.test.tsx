@@ -103,3 +103,18 @@ test("ActivityDiagrams test with no data", () => {
   );
   expect(container).toBeInTheDocument();
 });
+
+test("ActivityDiagrams test with no data", () => {
+  const envs = {
+    data: [],
+  };
+
+  const { container } = render(
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <ActivityDiagrams envs={envs.data} />
+      </BrowserRouter>
+    </QueryClientProvider>
+  );
+  expect(container).toBeInTheDocument();
+});
