@@ -37,6 +37,8 @@ type Props = {
 
 const { RangePicker } = DatePicker;
 
+
+
 const ActivityDiagrams = ({ envs }: Props) => {
   const stageEnvId =
     envs?.find((env: IEnv) => env.name?.toLowerCase() === "stage")?.id ?? "";
@@ -52,19 +54,20 @@ const ActivityDiagrams = ({ envs }: Props) => {
     buyer: undefined,
   });
 
+  const parseDate = (date: string | undefined, type: "start" | "end") =>
+    date
+      ? dayjs(date)[type === "start" ? "startOf" : "endOf"]("day").format(TIME_ZONE_FORMAT)
+      : currentTime;
+
   const handleFormValues = useCallback(
     (values: DiagramProps) => {
       const { requestTime = [] } = values ?? {};
-      if(requestTime?.[0]) {
+      if (requestTime?.[0]) {
         setSelectedRecentDate(undefined);
         setParams({
           ...params,
-          requestStartTime: requestTime?.[0]
-            ? dayjs(requestTime[0]).startOf("day").format(TIME_ZONE_FORMAT)
-            : currentTime,
-          requestEndTime: requestTime?.[1]
-            ? dayjs(requestTime[1]).endOf("day").format(TIME_ZONE_FORMAT)
-            : currentTime,
+          requestStartTime: parseDate(requestTime?.[0], "start"),
+          requestEndTime: parseDate(requestTime?.[1], "end")
         });
       }
       setParams({
@@ -72,7 +75,7 @@ const ActivityDiagrams = ({ envs }: Props) => {
         envId: values.envId || params.envId,
         buyer: values.buyer || params.buyer,
       })
-      
+
     },
     [setParams, params]
   );
