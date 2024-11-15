@@ -36,7 +36,8 @@ public class PushLogService extends KrakenServerConnector {
 
   @Scheduled(cron = "${app.cron-job.push-log:-}")
   public void runIt() {
-    ZonedDateTime createdAt = ZonedDateTime.now().minusSeconds(10);
+    ZonedDateTime createdAt =
+        ZonedDateTime.now().minusSeconds(getAppProperty().getSynDelaySeconds());
     List<ApiActivityLogEntity> logEntities =
         apiActivityLogRepository
             .findAllBySyncStatusAndCreatedAtBefore(

@@ -10,4 +10,5 @@ public class ClientInstanceHeartbeat {
   private String role;
   private String appVersion;
   private ZonedDateTime updatedAt;
+  private ZonedDateTime startUpAt;
 }
