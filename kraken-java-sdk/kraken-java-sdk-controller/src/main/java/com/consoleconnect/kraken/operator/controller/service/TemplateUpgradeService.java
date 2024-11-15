@@ -345,7 +345,7 @@ public class TemplateUpgradeService {
         .filter(Optional::isPresent)
         .map(Optional::get)
         .map(ApiUseCaseDto::getMapperKey)
-        .filter(t -> !appProperty.getQueryExcludeAssetKeys().contains(t))
+        .filter(t -> t != null && !appProperty.getQueryExcludeAssetKeys().contains(t))
         .filter(unifiedAssetRepository::existsByKey)
         .distinct()
         .map(this::getMapperTagVOFromDraft)
