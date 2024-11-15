@@ -21,6 +21,7 @@ import ApiActivityDiagram from "./ApiActivityDiagram";
 import ErrorBrakedownDiagram from "./ErrorDiagram";
 import MostPopularEndpoints from "./MostPopularEndpoints";
 import styles from "./index.module.scss";
+import { capitalize } from 'lodash';
 
 export type DiagramProps = {
   envId: string;
@@ -77,7 +78,7 @@ const DiagramWrapper = ({ envs }: Props) => {
     return (
       envs?.map((env) => ({
         value: env.id,
-        label: env.name,
+        label: capitalize(env.name),
       })) ?? []
     );
   }, [envs]);
