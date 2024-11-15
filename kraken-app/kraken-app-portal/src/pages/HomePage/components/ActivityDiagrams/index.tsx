@@ -1,8 +1,7 @@
 import { Text } from "@/components/Text";
 import {
-  getCurrentTimeWithZone,
+  parseDateStartOrEnd,
   recentXDays,
-  TIME_ZONE_FORMAT,
 } from "@/utils/constants/format";
 import { IEnv } from "@/utils/types/env.type";
 import {
@@ -16,7 +15,7 @@ import {
   Select,
 } from "antd";
 import dayjs from "dayjs";
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import ApiActivityDiagram from "./ApiActivityDiagram";
 import ErrorBrakedownDiagram from "./ErrorDiagram";
 import MostPopularEndpoints from "./MostPopularEndpoints";
@@ -40,7 +39,6 @@ const { RangePicker } = DatePicker;
 const ActivityDiagrams = ({ envs }: Props) => {
   const stageEnvId =
     envs?.find((env: IEnv) => env.name?.toLowerCase() === "stage")?.id ?? "";
-  const currentTime = getCurrentTimeWithZone();
   const [form] = Form.useForm();
   const [selectedRecentDate, setSelectedRecentDate] = useState<number | undefined>(7);
   const { requestStartTime, requestEndTime } = recentXDays(selectedRecentDate);
@@ -52,38 +50,16 @@ const ActivityDiagrams = ({ envs }: Props) => {
     buyer: undefined,
   });
 
-  const parseDate = (date: string | undefined, type: "start" | "end") =>
-    date
-      ? dayjs(date)[type === "start" ? "startOf" : "endOf"]("day").format(TIME_ZONE_FORMAT)
-      : currentTime;
-
-  const handleFormValues = useCallback(
-    (values: DiagramProps) => {
-      const { requestTime = [] } = values ?? {};
-      if (requestTime?.[0]) {
-        setSelectedRecentDate(undefined);
-        setParams({
-          ...params,
-          requestStartTime: parseDate(requestTime?.[0], "start"),
-          requestEndTime: parseDate(requestTime?.[1], "end")
-        });
-      }
-      setParams({
-        ...params,
-        envId: values.envId || params.envId,
-        buyer: values.buyer || params.buyer,
-      })
-    },
-    [setParams, params]
-  );
-
-  const handleFormValuesChange = useCallback(
-    (t: any, values: any) => {
-      if (t.path) return;
-      handleFormValues(values);
-    },
-    [setParams]
-  );
+  const handleFormValues = (_: unknown, values: DiagramProps) => {
+    const { requestTime = [] } = values ?? {};
+    if(requestTime?.[0]) setSelectedRecentDate(undefined);
+    setParams({
+      envId: values.envId || params.envId,
+      buyer: values.buyer || params.buyer,
+      requestStartTime: parseDateStartOrEnd(requestTime?.[0], "start") || params.requestStartTime,
+      requestEndTime: parseDateStartOrEnd(requestTime?.[1], "end") || params.requestEndTime
+    });
+  }
 
   const envOptions = useMemo(() => {
     return (
@@ -113,7 +89,7 @@ const ActivityDiagrams = ({ envs }: Props) => {
         form={form}
         layout="inline"
         colon={false}
-        onValuesChange={handleFormValuesChange}
+        onValuesChange={handleFormValues}
       >
         <Flex
           style={{ width: "100%", paddingBottom: "16px" }}
