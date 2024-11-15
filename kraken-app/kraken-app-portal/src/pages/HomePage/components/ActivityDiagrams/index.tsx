@@ -53,13 +53,12 @@ const ActivityDiagrams = ({ envs }: Props) => {
   });
 
   const handleFormValues = useCallback(
-    (_: unknown, values: DiagramProps) => {
+    (values: DiagramProps) => {
       const { requestTime = [] } = values ?? {};
       if(requestTime?.[0]) {
         setSelectedRecentDate(undefined);
         setParams({
-          envId: values.envId || params.envId,
-          buyer: values.buyer || params.buyer,
+          ...params,
           requestStartTime: requestTime?.[0]
             ? dayjs(requestTime[0]).startOf("day").format(TIME_ZONE_FORMAT)
             : currentTime,
@@ -68,8 +67,22 @@ const ActivityDiagrams = ({ envs }: Props) => {
             : currentTime,
         });
       }
+      setParams({
+        ...params,
+        envId: values.envId || params.envId,
+        buyer: values.buyer || params.buyer,
+      })
+      
     },
     [setParams, params]
+  );
+
+  const handleFormValuesChange = useCallback(
+    (t: any, values: any) => {
+      if (t.path) return;
+      handleFormValues(values);
+    },
+    [setParams]
   );
 
   const envOptions = useMemo(() => {
@@ -81,11 +94,16 @@ const ActivityDiagrams = ({ envs }: Props) => {
     );
   }, [envs]);
 
-  const setRecentDate = (e: RadioChangeEvent) => {
+  const setRecentDate = ({ target: { value } }: RadioChangeEvent) => {
     form.setFieldsValue({ requestTime: null });
-    const { requestStartTime, requestEndTime } = recentXDays(e.target.value);
-    setSelectedRecentDate(Number(e.target.value));
-    setParams({ ...params, requestStartTime, requestEndTime });
+    const { requestStartTime, requestEndTime } = recentXDays(value);
+
+    setSelectedRecentDate(Number(value));
+    setParams({
+      ...params,
+      requestStartTime,
+      requestEndTime,
+    });
   };
 
   return (
@@ -95,7 +113,7 @@ const ActivityDiagrams = ({ envs }: Props) => {
         form={form}
         layout="inline"
         colon={false}
-        onValuesChange={handleFormValues}
+        onValuesChange={handleFormValuesChange}
       >
         <Flex
           style={{ width: "100%", paddingBottom: "16px" }}
@@ -106,7 +124,7 @@ const ActivityDiagrams = ({ envs }: Props) => {
             <Text.BoldMedium>Activity diagrams</Text.BoldMedium>
             <Form.Item name="envId">
               <Select
-                value={params.envId}
+                value={form.getFieldValue("envId")}
                 options={envOptions}
                 popupMatchSelectWidth={false}
                 size="middle"
@@ -116,13 +134,7 @@ const ActivityDiagrams = ({ envs }: Props) => {
             </Form.Item>
             <Form.Item name="buyer">
               <Select
-                options={[
-                  {
-                    value: "all",
-                    label: "All buyers",
-                  },
-                ]}
-                value={params.buyer}
+                options={[{ value: "all", label: "All buyers" }]}
                 placeholder="All buyers"
                 popupMatchSelectWidth={false}
                 size="middle"
