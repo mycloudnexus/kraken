@@ -112,7 +112,9 @@ const QuickStartGuide = () => {
                             goal as keyof (typeof quickStartGuideData)[keyof IQuickStartGuideObject]
                           ] ? (
                             <Flex key={goal} gap={10}>
-                              <CheckFilled />
+                              <div className={styles.iconContainer}>
+                                <CheckFilled />
+                              </div>
                               <Text.LightMedium>
                                 {i.goals[goal as keyof typeof i.goals]}
                               </Text.LightMedium>
