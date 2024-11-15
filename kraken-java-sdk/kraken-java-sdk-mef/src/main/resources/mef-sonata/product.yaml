@@ -103,6 +103,7 @@ spec:
     - classpath:/mef-sonata/template-upgrade/release.1.5.11.yaml
     - classpath:/mef-sonata/template-upgrade/release.1.5.12.yaml
     - classpath:/mef-sonata/template-upgrade/release.1.5.13.yaml
+    - classpath:/mef-sonata/template-upgrade/release.1.5.14.yaml
 
 
   templateUpgradePaths:

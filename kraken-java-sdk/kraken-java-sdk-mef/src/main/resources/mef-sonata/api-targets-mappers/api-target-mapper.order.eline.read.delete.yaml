@@ -82,7 +82,7 @@ spec:
             targetLocation: "BODY"
             requiredMapping: false
           - name: mapper.order.eline.read.delete.productOrderItem.expectedCompleteDate
-            title: "order item complete date"
+            title: "order item expected complete date"
             description: ""
             source: ""
             sourceLocation: "BODY"
