@@ -37,8 +37,6 @@ type Props = {
 
 const { RangePicker } = DatePicker;
 
-
-
 const ActivityDiagrams = ({ envs }: Props) => {
   const stageEnvId =
     envs?.find((env: IEnv) => env.name?.toLowerCase() === "stage")?.id ?? "";
@@ -75,7 +73,6 @@ const ActivityDiagrams = ({ envs }: Props) => {
         envId: values.envId || params.envId,
         buyer: values.buyer || params.buyer,
       })
-
     },
     [setParams, params]
   );

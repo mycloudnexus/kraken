@@ -1,9 +1,7 @@
 import ActivityDiagrams from '@/pages/HomePage/components/ActivityDiagrams';
-import { queryClient } from "@/utils/helpers/reactQuery";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { fireEvent, render } from "@testing-library/react";
-import { BrowserRouter } from "react-router-dom";
+import { fireEvent } from "@testing-library/react";
 import * as homepageHooks from '@/hooks/homepage'
+import { render } from "@/__test__/utils";
 
 test("ActivityDiagrams test with data", () => {
   const envs = {
@@ -52,11 +50,7 @@ test("ActivityDiagrams test with data", () => {
   } as any);
 
   const { container, getByTestId } = render(
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <ActivityDiagrams envs={envs.data} />
-      </BrowserRouter>
-    </QueryClientProvider>
+    <ActivityDiagrams envs={envs.data} />
   );
   expect(container).toBeInTheDocument();
   const recentButton = getByTestId('recent-7-days');
@@ -93,11 +87,7 @@ test("ActivityDiagrams test with no data", () => {
   } as any);
 
   const { container } = render(
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <ActivityDiagrams envs={envs.data} />
-      </BrowserRouter>
-    </QueryClientProvider>
+    <ActivityDiagrams envs={envs.data} />
   );
   expect(container).toBeInTheDocument();
 });
@@ -108,11 +98,7 @@ test("ActivityDiagrams test with no data", () => {
   };
 
   const { container } = render(
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <ActivityDiagrams envs={envs.data} />
-      </BrowserRouter>
-    </QueryClientProvider>
+    <ActivityDiagrams envs={envs.data} />
   );
   expect(container).toBeInTheDocument();
 });
