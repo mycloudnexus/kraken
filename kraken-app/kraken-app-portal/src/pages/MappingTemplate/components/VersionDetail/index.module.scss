@@ -11,6 +11,13 @@
   display: flex;
   flex: 1;
 
+  .blank {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
   .flexOne {
     flex: 1;
   }
