@@ -70,6 +70,7 @@ public class AuthDataProperty {
     private String bearerTokenHeaderName = "Authorization";
     private String userId = "x-kraken-userId";
     private SecurityFilter securityFilter = new SecurityFilter();
+    private Verifier verifier = new Verifier();
   }
 
   @Data
@@ -129,5 +130,10 @@ public class AuthDataProperty {
   public static class FilterConfig {
     private List<String> paths = List.of();
     private String filterName;
+  }
+
+  @Data
+  public static class Verifier {
+    private String env;
   }
 }
