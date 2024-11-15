@@ -238,16 +238,16 @@ const EnvironmentOverview = () => {
               </Radio.Group>
             </Flex>
 
-            <Suspense fallback={<Spin spinning />}>
-              {activeTab === "running_api" && selectedEnv && (
-                <RunningAPIMapping env={selectedEnv} />
-              )}
-              {activeTab === "deployment_history" && (
-                <div style={{ marginTop: -12 }}>
+            <main className={styles.pageContent}>
+              <Suspense fallback={<Spin spinning />}>
+                {activeTab === "running_api" && selectedEnv && (
+                  <RunningAPIMapping env={selectedEnv} />
+                )}
+                {activeTab === "deployment_history" && (
                   <DeployHistory selectedEnv={selectedEnv} />
-                </div>
-              )}
-            </Suspense>
+                )}
+              </Suspense>
+            </main>
           </Flex>
         )}
         <ModalNewDeployment
