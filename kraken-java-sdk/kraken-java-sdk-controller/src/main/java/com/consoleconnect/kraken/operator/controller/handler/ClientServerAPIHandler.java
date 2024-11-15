@@ -11,6 +11,8 @@ import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -38,30 +40,31 @@ public class ClientServerAPIHandler extends ClientEventHandler {
     if (CollectionUtils.isEmpty(serverAPIDtos)) {
       return HttpResponse.ok(null);
     }
-    serverAPIDtos.forEach(
-        serverAPIDto -> {
-          EnvironmentClientEntity environmentClientEntity =
-              environmentClientRepository
-                  .findOneByEnvIdAndClientKeyAndKind(
-                      envId,
-                      serverAPIDto.getServerKey(),
-                      ClientReportTypeEnum.CLIENT_SERVER_API.name())
-                  .orElseGet(
-                      () -> {
-                        EnvironmentClientEntity entity = new EnvironmentClientEntity();
-                        entity.setEnvId(envId);
-                        entity.setKind(ClientReportTypeEnum.CLIENT_SERVER_API.name());
-                        entity.setClientKey(serverAPIDto.getServerKey());
-                        entity.setCreatedAt(ZonedDateTime.now());
-                        entity.setCreatedBy(userId);
-                        return entity;
-                      });
-          environmentClientEntity.setUpdatedAt(ZonedDateTime.now());
-          environmentClientEntity.setUpdatedBy(userId);
-          environmentClientEntity.setPayload(serverAPIDto);
-          environmentClientRepository.save(environmentClientEntity);
-        });
-
+    Map<String, List<ServerAPIDto>> serverKeyMap =
+        serverAPIDtos.stream().collect(Collectors.groupingBy(ServerAPIDto::getServerKey));
+    serverKeyMap
+        .entrySet()
+        .forEach(
+            entry -> {
+              EnvironmentClientEntity environmentClientEntity =
+                  environmentClientRepository
+                      .findOneByEnvIdAndClientKeyAndKind(
+                          envId, entry.getKey(), ClientReportTypeEnum.CLIENT_SERVER_API.name())
+                      .orElseGet(
+                          () -> {
+                            EnvironmentClientEntity entity = new EnvironmentClientEntity();
+                            entity.setEnvId(envId);
+                            entity.setKind(ClientReportTypeEnum.CLIENT_SERVER_API.name());
+                            entity.setClientKey(entry.getKey());
+                            entity.setCreatedAt(ZonedDateTime.now());
+                            entity.setCreatedBy(userId);
+                            return entity;
+                          });
+              environmentClientEntity.setUpdatedAt(ZonedDateTime.now());
+              environmentClientEntity.setUpdatedBy(userId);
+              environmentClientEntity.setPayload(entry.getValue());
+              environmentClientRepository.save(environmentClientEntity);
+            });
     return HttpResponse.ok(null);
   }
 }
