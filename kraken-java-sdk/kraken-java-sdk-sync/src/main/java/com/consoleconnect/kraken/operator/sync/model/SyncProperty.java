@@ -10,7 +10,6 @@ public class SyncProperty {
   private List<String> acceptAssetKinds = List.of();
   private boolean assetConfigOverwriteFlag = false;
   private long synDelaySeconds = 60;
-  private ExternalSystem externalSystem = new ExternalSystem();
 
   @Data
   public static class ControlPlane {
@@ -30,6 +29,8 @@ public class SyncProperty {
     private String pushEventEndpoint = "/client/events";
 
     private String triggerInstallationEndpoint = "/v2/callback/triggers/installation";
+
+    private PushActivityLogExternal pushActivityLogExternal;
   }
 
   @Data
@@ -40,10 +41,8 @@ public class SyncProperty {
   }
 
   @Data
-  public static class ExternalSystem {
+  public static class PushActivityLogExternal {
     private boolean enabled;
-    private String url;
-    private String token;
     private int batchSize = 200;
   }
 }

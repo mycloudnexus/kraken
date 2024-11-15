@@ -85,11 +85,9 @@ app:
   controlPlane:
     url: http://localhost:4567
     token: 123456
-  external-system:
-    url: http://localhost:23456
-    token: 123456
-    batch-size: 30
-    enabled: true
+    push-activity-log-external:
+      batch-size: 30
+      enabled: true
   accept-asset-kinds:
     - kraken.component.api-target
   task:

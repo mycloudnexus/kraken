@@ -48,7 +48,7 @@ class PushAPIActivityLogSchedulerTest extends AbstractIntegrationTest {
   @BeforeAll
   @SneakyThrows
   static void setUp() {
-    mockWebServer.start(23456);
+    mockWebServer.start(4567);
   }
 
   @AfterAll

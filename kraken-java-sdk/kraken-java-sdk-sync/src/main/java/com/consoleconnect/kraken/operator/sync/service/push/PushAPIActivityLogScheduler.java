@@ -46,7 +46,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-@ConditionalOnProperty(value = "app.external-system.enabled", havingValue = "true")
+@ConditionalOnProperty(
+    value = "app.control-plane.push-activity-log-external.enabled",
+    havingValue = "true")
 public class PushAPIActivityLogScheduler {
 
   public static final String CALL_SEQ = "callSeq";
@@ -100,7 +102,9 @@ public class PushAPIActivityLogScheduler {
     int page = 0;
     var sent = new ArrayList<PushExternalSystemPayload>();
     while (true) {
-      var pageable = PageRequest.of(page, appProperty.getExternalSystem().getBatchSize());
+      var pageable =
+          PageRequest.of(
+              page, appProperty.getControlPlane().getPushActivityLogExternal().getBatchSize());
       var entities = getApiActivityLogRequestIds(logInfo, pageable);
       var composedLogs = getComposedHttpRequests(entities.get());
       if (composedLogs.isEmpty()) {
@@ -132,12 +136,12 @@ public class PushAPIActivityLogScheduler {
   private HttpResponse<String> sendLogsToExternalSystem(PushExternalSystemPayload payload) {
     return webClient
         .method(HttpMethod.POST)
-        .uri(appProperty.getExternalSystem().getUrl())
+        .uri(appProperty.getControlPlane().getUrl())
         .accept(MediaType.APPLICATION_JSON)
         .contentType(MediaType.APPLICATION_JSON)
         .header(
             appProperty.getControlPlane().getTokenHeader(),
-            appProperty.getExternalSystem().getToken())
+            appProperty.getControlPlane().getToken())
         .bodyValue(payload)
         .retrieve()
         .bodyToMono(new ParameterizedTypeReference<HttpResponse<String>>() {})

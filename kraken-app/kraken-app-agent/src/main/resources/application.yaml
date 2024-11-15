@@ -92,11 +92,9 @@ app:
   controlPlane:
     url: http://localhost:8001
     token: Bearer ${KRAKEN_MGMT_API_ACCESS_TOKEN:FAKE_TOKEN}
-  external-system:
-    enabled: false
-    url: ${EXTERNAL_SYSTEM_PUSH_LOG_URL:http://localhost:8888}
-    token: Bearer ${EXTERNAL_SYSTEM_PUSH_LOG_TOKEN:FAKE_TOKEN}
-    batch-size: ${EXTERNAL_SYSTEM_PUSH_LOG_BATCH_SIZE:200}
+    push-activity-log-external:
+      enabled: false
+      batch-size: ${EXTERNAL_SYSTEM_PUSH_LOG_BATCH_SIZE:200}
   cron-job:
     pull-api-server-info: 0/20 * * * * *
     pull-server-assets: 0 0/1 * * * *
