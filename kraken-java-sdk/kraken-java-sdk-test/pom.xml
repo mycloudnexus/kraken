@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.consoleconnect.kraken</groupId>
         <artifactId>kraken-java-sdk</artifactId>
-        <version>1.0.0-snapshot</version>
+        <version>1.0.0-rc.0</version>
     </parent>
     <artifactId>kraken-java-sdk-test</artifactId>
     <name>kraken-java-sdk-test</name>
