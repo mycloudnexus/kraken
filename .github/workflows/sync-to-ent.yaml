@@ -33,16 +33,16 @@ jobs:
           token: '${{steps.github-auth.outputs.github-token }}'
           fetch-depth: 0
 
-      - name: Sync to target repo
-        env:
-          GITHUB_TOKEN: '${{ steps.github-auth.outputs.github-token }}'
-          ENV: dev
-          INFRA: kraken
-        run: |      
-          git remote add target git@github.com:zqdou/kraken-ent.git
-          git push target HEAD:main
+      #- name: Sync to target repo
+      #  env:
+      #    GITHUB_TOKEN: '${{ steps.github-auth.outputs.github-token }}'
+      #    ENV: dev
+      #    INFRA: kraken
+      #  run: |      
+      #    git remote add target git@github.com:zqdou/kraken-ent.git
+      #    git push target HEAD:main
 
-      - name: Sync to target repo
+      - name: Sync to target repo with PAT
         env:
           GITHUB_TOKEN: '${{ secrets.SYNC_GITHUB_PAT }}'
         run: |      
