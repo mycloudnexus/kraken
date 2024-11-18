@@ -6,11 +6,38 @@ on:
       - 'main'
 
 jobs:
-  sync:
+  update-manifests:
+    name: Update Deployment Manifests for Dev env in Cloudnexus
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+  
     steps:
-      - uses: actions/checkout@v4
+      - name: Auth as Github App
+        id: github-auth
+        uses: zqdou/kraken/.github/actions/github-app-get-token@main
+        with:
+          repositoryNames: '${{ github.event.repository.name }}'
+          codePermission: write
+          pullRequestPermission: write
+          appID: '${{ secrets.K_GITHUB_APP_ID }}'
+          privateKey: '${{ secrets.K_GITHUB_APP_PRIVATE_KEY }}'
+          installationId: '${{ secrets.K_GITHUB_APP_INSTALLATION_ID }}'
+
+      - name: Checkout deployment config
+        uses: actions/checkout@v4
+        with:
+          token: '${{steps.github-auth.outputs.github-token }}'
+          fetch-depth: 0
+
       - name: Sync to target repo
-        run: |
+        env:
+          GITHUB_TOKEN: '${{ steps.github-auth.outputs.github-token }}'
+          ENV: dev
+          INFRA: kraken
+        run: |      
           git remote add target git@github.com:zqdou/kraken-ent.git
           git push target HEAD:main
