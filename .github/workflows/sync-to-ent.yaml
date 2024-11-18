@@ -14,7 +14,6 @@ jobs:
       contents: 'read'
       id-token: 'write'
 
-  
     steps:
       - name: Auth as Github App
         id: github-auth
@@ -26,6 +25,7 @@ jobs:
           appID: '${{ secrets.SYNC_GITHUB_APP_ID }}'
           privateKey: '${{ secrets.SYNC_GITHUB_APP_PRIVATE_KEY }}'
           installationId: '${{ secrets.SYNC_GITHUB_APP_INSTALLATION_ID }}'
+          
 
       - name: Checkout deployment config
         uses: actions/checkout@v4
@@ -38,6 +38,13 @@ jobs:
           GITHUB_TOKEN: '${{ steps.github-auth.outputs.github-token }}'
           ENV: dev
           INFRA: kraken
+        run: |      
+          git remote add target git@github.com:zqdou/kraken-ent.git
+          git push target HEAD:main
+
+      - name: Sync to target repo
+        env:
+          GITHUB_TOKEN: '${{ secrets.SYNC_GITHUB_PAT }}'
         run: |      
           git remote add target git@github.com:zqdou/kraken-ent.git
           git push target HEAD:main
