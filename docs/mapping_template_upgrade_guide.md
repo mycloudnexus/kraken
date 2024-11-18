@@ -55,7 +55,7 @@
    * productVersion: Release version of mapping tempalte release.
    * publishDate: Release date of mapping template.
    * description: Description of all changes in the current release.
-2. Add path the release file to product.yaml
+2. Add path of the release file to product.yaml
 
    ```yaml
    spec:
