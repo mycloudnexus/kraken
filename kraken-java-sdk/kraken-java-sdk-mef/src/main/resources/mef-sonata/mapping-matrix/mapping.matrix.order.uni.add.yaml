@@ -24,8 +24,8 @@ spec:
         value: "INSTALL_LOCATION"
       - name: productOrderItem[0].product.place[0].@type
         path: "$.body.productOrderItem[0].product.place[0].@type"
-        expectType: EXPECTED
-        value: "GeographicAddressRef"
+        expectType: EXPECTED_EXIST
+        value: true
       - name: relatedContactInformation_emailAddress
         path: "$.body.relatedContactInformation[*]"
         expectType: EXPECTED_TRUE
