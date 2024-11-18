@@ -1,0 +1,68 @@
+name: 'github-app-auth'
+description: 'Action to generate a repo scoped token using the given Github App details'
+
+inputs:
+  appID:
+    required: true
+    description: 'Github App ID'
+    type: number
+  privateKey:
+    required: true
+    type: string
+  installationId:
+    required: true
+    type: number
+  repositoryNames:
+    required: true
+    description: 'Comma separated list of reposistory names to get access to'
+    type: string
+  codePermission:
+    default: 'read'
+    type: string
+  pullRequestPermission:
+    default: 'read'
+    type: string
+  checksPermission:
+    type: string
+  deplomentsPermission:
+    type: string
+  environmentsPermission:
+    type: string
+  packagesPermission:
+    type: string
+  adminPermission:
+    type: string
+  workflowPermission:
+    type: string
+  actionsPermission:
+    type: string
+
+outputs:
+  github-token:
+    description: "Scoped Github App access token"
+    value: ${{ steps.get-token.outputs.github-token }}
+
+runs:
+  using: "composite"
+  steps:
+    # https://docs.github.com/en/actions/learn-github-actions/contexts#github-context
+    - run: echo "${{ github.action_path }}" >> $GITHUB_PATH
+      shell: bash
+
+    - run: get-token.sh
+      shell: bash
+      id: get-token
+      env:
+        APP_ID: ${{ inputs.appID }}
+        INSTALLATION_ID: ${{ inputs.installationId }}
+        APP_PRIVATE_KEY: ${{ inputs.privateKey }}
+        REPO_NAMES: ${{ inputs.repositoryNames }}
+        CODE_PERMISSION: ${{ inputs.codePermission }}
+        PR_PERMISSION: ${{ inputs.pullRequestPermission }}
+        CHECKS_PERMISSION: ${{ inputs.checksPermission }}
+        DEPLOYMENTS_PERMISSION: ${{ inputs.deplomentsPermission }}
+        ENVIRONMENTS_PERMISSION: ${{ inputs.environmentsPermission }}
+        PACKAGES_PERMISSION: ${{ inputs.packagesPermission }}
+        ADMIN_PERMISSION: ${{ inputs.adminPermission }}
+        WORKFLOW_PERMISSION: ${{ inputs.workflowPermission }}
+        ACTIONS_PERMISSION: ${{ inputs.actionsPermission }}
