@@ -11,8 +11,10 @@
 
 ### Release phase
 
-* Remove all development and test versions to the final release version
+* create the the final release version
 * Merge all change notes (since the last release) into the final release note
+* Remove all development and test versions in directory of mef-soanta/template-upgrade
+
 
 ## When to add a new mapping template release
 
