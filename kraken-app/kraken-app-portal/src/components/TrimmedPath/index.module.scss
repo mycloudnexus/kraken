@@ -1,0 +1,15 @@
+.path {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  direction: rtl;
+  min-width: 100px;
+  flex: 1;
+  max-width: fit-content !important;
+
+  span {
+    direction: ltr;
+    unicode-bidi: bidi-override;
+    /* or isolate, isolate-override, embed */
+  }
+}

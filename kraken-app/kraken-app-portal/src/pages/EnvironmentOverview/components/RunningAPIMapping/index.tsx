@@ -70,6 +70,7 @@ const RunningAPIMapping = ({ scrollHeight, env }: Props) => {
     },
     {
       title: "API mappings",
+      width: 400,
       render: (_, item) => (
         <ApiCard
           style={{ padding: 0 }}
@@ -97,8 +98,8 @@ const RunningAPIMapping = ({ scrollHeight, env }: Props) => {
   ];
 
   const scroll = scrollHeight
-    ? { y: scrollHeight - 144, x: "max-content" }
-    : undefined;
+    ? { y: scrollHeight - 144, x: 800 }
+    : { x: 800, y: 400 } as any;
 
   return (
     <Table
@@ -106,6 +107,7 @@ const RunningAPIMapping = ({ scrollHeight, env }: Props) => {
       columns={columns}
       loading={isLoading}
       dataSource={mappings}
+      tableLayout="fixed"
       pagination={false}
       rowClassName={styles.mappingRow}
       rowKey={(item) => JSON.stringify(item)}
