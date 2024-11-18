@@ -1,7 +1,7 @@
 {
   "name": "kraken-app-portal",
   "private": true,
-  "version": "1.0.0-snapshot",
+  "version": "1.0.0-rc.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -102,6 +102,7 @@
     "@esbuild/win32-ia32": "^0.24.0",
     "@esbuild/win32-x64": "^0.24.0",
     "@esbuild/aix-ppc64": "^0.24.0",
-    "fsevents": "2.3.2"
+    "fsevents": "2.3.2",
+    "cross-spawn": "7.0.5"
   }
 }
