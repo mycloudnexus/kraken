@@ -7,13 +7,13 @@
 ### Development phase
 
 * Allow multiple versions in development phase.
-* Add release note(functional changes from the previous patch version) with each patch version.
+* Each development version only records the functional changes compared to the previous development version.
 
 ### Release phase
 
-* create the the final release version
-* Merge all change notes (since the last release) into the final release note
-* Remove all development and test versions in directory of mef-soanta/template-upgrade
+* create the the final release version.
+* Merge all change notes (since the last release) into the final release.
+* Remove all development and test versions in directory of mef-sonata/template-upgrade.
 
 
 ## When to add a new mapping template release
@@ -54,10 +54,10 @@
    **Important fields explanation**
 
    * productSpec: Standard version of one product.Such as grace,haley in LSO SONATA.
-   * productVersion: Release version of mapping tempalte release.
+   * productVersion: Release version of mapping template release.
    * publishDate: Release date of mapping template.
    * description: Description of all changes in the current release.
-2. Add path of the release file to product.yaml
+2. Add path of the release file to mef-sonata/product.yaml
 
    ```yaml
    spec:
