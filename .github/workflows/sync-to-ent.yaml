@@ -42,9 +42,22 @@ jobs:
       #    git remote add target git@github.com:zqdou/kraken-ent.git
       #    git push target HEAD:main
 
-      - name: Sync to target repo with PAT
-        env:
-          GITHUB_TOKEN: '${{ secrets.SYNC_GITHUB_PAT }}'
-        run: |      
-          git remote add target git@github.com:zqdou/kraken-ent.git
-          git push target HEAD:main
+      #- name: Sync to target repo with PAT
+      #  env:
+      #    GITHUB_TOKEN: '${{ secrets.SYNC_GITHUB_PAT }}'
+      #  run: |      
+      #    git remote add target git@github.com:zqdou/kraken-ent.git
+      #    git push target HEAD:main
+      - name: Commit files
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git commit -a -m "Add changes"
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.SYNC_GITHUB_PAT }}
+          branch: main
+          repository: git@github.com:zqdou/kraken-ent.git
+          force_with_lease: true
