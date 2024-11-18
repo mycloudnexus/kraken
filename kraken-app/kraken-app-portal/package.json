@@ -102,6 +102,7 @@
     "@esbuild/win32-ia32": "^0.24.0",
     "@esbuild/win32-x64": "^0.24.0",
     "@esbuild/aix-ppc64": "^0.24.0",
-    "fsevents": "2.3.2"
+    "fsevents": "2.3.2",
+    "cross-spawn": "7.0.5"
   }
 }
