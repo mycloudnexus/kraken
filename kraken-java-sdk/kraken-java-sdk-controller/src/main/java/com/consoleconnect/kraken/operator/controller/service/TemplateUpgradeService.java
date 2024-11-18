@@ -23,10 +23,7 @@ import com.consoleconnect.kraken.operator.core.event.IngestDataEvent;
 import com.consoleconnect.kraken.operator.core.event.IngestionDataResult;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.ingestion.DataIngestionJob;
-import com.consoleconnect.kraken.operator.core.model.AssetLink;
-import com.consoleconnect.kraken.operator.core.model.Metadata;
-import com.consoleconnect.kraken.operator.core.model.SyncMetadata;
-import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
+import com.consoleconnect.kraken.operator.core.model.*;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
 import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
 import com.consoleconnect.kraken.operator.core.service.CompatibilityCheckService;
@@ -73,6 +70,7 @@ public class TemplateUpgradeService {
   private final TransactionService transactionService;
   private final CompatibilityCheckService compatibilityCheckService;
   private final EventSinkService eventSinkService;
+  private final AppProperty appProperty;
 
   protected String deployProduction(
       String templateUpgradeId, String stageEnvId, String productionEnvId, String userId) {
@@ -347,6 +345,8 @@ public class TemplateUpgradeService {
         .filter(Optional::isPresent)
         .map(Optional::get)
         .map(ApiUseCaseDto::getMapperKey)
+        .filter(t -> t != null && !appProperty.getQueryExcludeAssetKeys().contains(t))
+        .filter(unifiedAssetRepository::existsByKey)
         .distinct()
         .map(this::getMapperTagVOFromDraft)
         .toList();

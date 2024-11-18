@@ -47,6 +47,7 @@ public class BuyerService extends AssetStatusManager {
   private static final String BUYER_KEY_PREFIX = "mef.sonata.buyer";
   private static final String BUYER_NAME = "Buyer";
   private static final String BUYER_DESC = "Onboard buyer information";
+  public static final String ENV = "env";
 
   @Getter private final UnifiedAssetService unifiedAssetService;
   private final UnifiedAssetRepository unifiedAssetRepository;
@@ -166,7 +167,7 @@ public class BuyerService extends AssetStatusManager {
     if (StringUtils.isNotBlank(envId)) {
       Environment environment = environmentService.findOne(envId);
       log.info("generateBuyerToken, envId:{}, envName:{}", envId, environment.getName());
-      claims.put("env", environment.getName());
+      claims.put(ENV, environment.getName());
     }
     if (authServer.isEnabled()) {
       String token =

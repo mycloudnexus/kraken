@@ -1,8 +1,7 @@
 import { Text } from "@/components/Text";
 import {
-  getCurrentTimeWithZone,
+  parseDateStartOrEnd,
   recentXDays,
-  TIME_ZONE_FORMAT,
 } from "@/utils/constants/format";
 import { IEnv } from "@/utils/types/env.type";
 import {
@@ -16,17 +15,18 @@ import {
   Select,
 } from "antd";
 import dayjs from "dayjs";
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import ApiActivityDiagram from "./ApiActivityDiagram";
 import ErrorBrakedownDiagram from "./ErrorDiagram";
 import MostPopularEndpoints from "./MostPopularEndpoints";
 import styles from "./index.module.scss";
+import { capitalize } from 'lodash';
 
 export type DiagramProps = {
   envId: string;
-  requestStartTime: string;
-  requestEndTime: string;
-  buyer: string | undefined;
+  requestStartTime?: string;
+  requestEndTime?: string;
+  buyer?: string;
   requestTime?: any;
 };
 
@@ -36,55 +36,50 @@ type Props = {
 
 const { RangePicker } = DatePicker;
 
-const DiagramWrapper = ({ envs }: Props) => {
+const ActivityDiagrams = ({ envs }: Props) => {
   const stageEnvId =
     envs?.find((env: IEnv) => env.name?.toLowerCase() === "stage")?.id ?? "";
-  const currentTime = getCurrentTimeWithZone();
   const [form] = Form.useForm();
+  const [selectedRecentDate, setSelectedRecentDate] = useState<number | undefined>(7);
+  const { requestStartTime, requestEndTime } = recentXDays(selectedRecentDate);
+
   const [params, setParams] = useState<DiagramProps>({
     envId: stageEnvId,
-    requestStartTime: currentTime,
-    requestEndTime: currentTime,
+    requestStartTime,
+    requestEndTime,
     buyer: undefined,
   });
 
-  const handleFormValues = useCallback(
-    (values: DiagramProps) => {
-      const { requestTime = [] } = values ?? {};
-      setParams({
-        envId: values.envId || params.envId,
-        buyer: values.buyer || params.buyer,
-        requestStartTime: requestTime?.[0]
-          ? dayjs(requestTime[0]).startOf("day").format(TIME_ZONE_FORMAT)
-          : currentTime,
-        requestEndTime: requestTime?.[1]
-          ? dayjs(requestTime[1]).endOf("day").format(TIME_ZONE_FORMAT)
-          : currentTime,
-      });
-    },
-    [setParams, params]
-  );
-
-  const handleFormValuesChange = useCallback(
-    (t: any, values: any) => {
-      if (t.path) return;
-      handleFormValues(values);
-    },
-    [setParams]
-  );
+  const handleFormValues = (_: unknown, values: DiagramProps) => {
+    const { requestTime = [] } = values ?? {};
+    if(requestTime?.[0]) setSelectedRecentDate(undefined);
+    setParams({
+      envId: values.envId || params.envId,
+      buyer: values.buyer || params.buyer,
+      requestStartTime: parseDateStartOrEnd(requestTime?.[0], "start") || params.requestStartTime,
+      requestEndTime: parseDateStartOrEnd(requestTime?.[1], "end") || params.requestEndTime
+    });
+  }
 
   const envOptions = useMemo(() => {
     return (
       envs?.map((env) => ({
         value: env.id,
-        label: env.name,
+        label: capitalize(env.name),
       })) ?? []
     );
   }, [envs]);
 
-  const setRecentDate = (e: RadioChangeEvent) => {
-    const { requestStartTime, requestEndTime } = recentXDays(e);
-    setParams({ ...params, requestStartTime, requestEndTime });
+  const setRecentDate = ({ target: { value } }: RadioChangeEvent) => {
+    form.setFieldsValue({ requestTime: null });
+    const { requestStartTime, requestEndTime } = recentXDays(value);
+
+    setSelectedRecentDate(Number(value));
+    setParams({
+      ...params,
+      requestStartTime,
+      requestEndTime,
+    });
   };
 
   return (
@@ -94,7 +89,7 @@ const DiagramWrapper = ({ envs }: Props) => {
         form={form}
         layout="inline"
         colon={false}
-        onValuesChange={handleFormValuesChange}
+        onValuesChange={handleFormValues}
       >
         <Flex
           style={{ width: "100%", paddingBottom: "16px" }}
@@ -103,11 +98,9 @@ const DiagramWrapper = ({ envs }: Props) => {
         >
           <Flex gap={12} align="center">
             <Text.BoldMedium>Activity diagrams</Text.BoldMedium>
-
             <Form.Item name="envId">
               <Select
-
-                value={params.envId}
+                value={form.getFieldValue("envId")}
                 options={envOptions}
                 popupMatchSelectWidth={false}
                 size="middle"
@@ -115,16 +108,9 @@ const DiagramWrapper = ({ envs }: Props) => {
                 placeholder="Stage"
               />
             </Form.Item>
-
             <Form.Item name="buyer">
               <Select
-                options={[
-                  {
-                    value: "all",
-                    label: "All buyers",
-                  },
-                ]}
-                value={params.buyer}
+                options={[{ value: "all", label: "All buyers" }]}
                 placeholder="All buyers"
                 popupMatchSelectWidth={false}
                 size="middle"
@@ -136,13 +122,14 @@ const DiagramWrapper = ({ envs }: Props) => {
           </Flex>
           <Flex align="center">
             <Form.Item>
-              <Radio.Group onChange={setRecentDate} size="middle" >
-                <Radio.Button value="7" data-testid="recent-7-days">Recent 7 days</Radio.Button>
-                <Radio.Button value="90">Recent 3 months</Radio.Button>
+              <Radio.Group onChange={setRecentDate} value={selectedRecentDate} size="middle" >
+                <Radio.Button value={7}>Recent 7 days</Radio.Button>
+                <Radio.Button value={90} data-testid="recent-90-days">Recent 3 months</Radio.Button>
               </Radio.Group>
             </Form.Item>
             <Form.Item name="requestTime">
               <RangePicker
+                value={[dayjs(params.requestStartTime), dayjs(params.requestEndTime)]}
                 size="middle"
                 placeholder={["Select time", "Select time"]}
               />
@@ -165,4 +152,4 @@ const DiagramWrapper = ({ envs }: Props) => {
   );
 };
 
-export default DiagramWrapper;
+export default ActivityDiagrams;
