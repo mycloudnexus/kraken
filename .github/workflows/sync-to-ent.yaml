@@ -1,0 +1,16 @@
+name: Sync to Ent Repo
+
+on:
+push:
+  branches:
+    - main
+
+jobs:
+sync:
+  runs-on: ubuntu-latest
+  steps:
+  - uses: actions/checkout@v2
+  - name: Sync to target repo
+    run: |
+      git remote add target git@github.com:zqdou/kraken-ent.git
+      git push target HEAD:main
