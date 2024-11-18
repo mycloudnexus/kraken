@@ -23,9 +23,9 @@ jobs:
           repositoryNames: '${{ github.event.repository.name }}'
           codePermission: write
           pullRequestPermission: write
-          appID: '${{ secrets.K_GITHUB_APP_ID }}'
-          privateKey: '${{ secrets.K_GITHUB_APP_PRIVATE_KEY }}'
-          installationId: '${{ secrets.K_GITHUB_APP_INSTALLATION_ID }}'
+          appID: '${{ secrets.SYNC_GITHUB_APP_ID }}'
+          privateKey: '${{ secrets.SYNC_GITHUB_APP_PRIVATE_KEY }}'
+          installationId: '${{ secrets.SYNC_GITHUB_APP_INSTALLATION_ID }}'
 
       - name: Checkout deployment config
         uses: actions/checkout@v4
