@@ -16,6 +16,7 @@ import {
   Select,
   Table,
   Space,
+  Tabs,
 } from "antd";
 import { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
@@ -24,6 +25,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import ActivityDetailModal from "./components/ActivityDetailModal";
 import styles from "./index.module.scss";
+import { useGetPushActivityLogHistory } from '@/hooks/pushApiEvent';
+import PushHistoryModal from './components/PushHistoryModal';
+import { useBoolean } from 'usehooks-ts';
 
 const { RangePicker } = DatePicker;
 
@@ -52,11 +56,19 @@ const EnvironmentActivityLog = () => {
   const { currentProduct } = useAppStore();
   const { data: envData, isLoading: loadingEnv } =
     useGetProductEnvs(currentProduct);
+  const { data: pushData, isLoading: loadingPushHistory } =
+    useGetPushActivityLogHistory();
   const [form] = Form.useForm();
   const ref = useRef<any>();
   const size = useSize(ref);
   const refWrapper = useRef<any>();
   const sizeWrapper = useSize(refWrapper);
+  const [mainTabKey, setMainTabKey] = useState<string>('activityLog');
+  const { value: isOpen, setTrue: open, setFalse: close } = useBoolean(false);
+
+  useEffect(() => {
+    console.log(pushData)
+  }, [loadingPushHistory])
 
   const {
     tableData,
@@ -68,10 +80,15 @@ const EnvironmentActivityLog = () => {
     handlePaginationChange,
     handlePaginationShowSizeChange,
   } = useCommonListProps({}, initPagination);
+  const envActivityParams = {
+    productId: currentProduct,
+    envId: queryParams?.envId || String(envId),
+    params: omit(queryParams, ["envId"])
+  }
   const { data, isLoading } = useGetProductEnvActivities(
-    currentProduct,
-    queryParams?.envId || String(envId),
-    omit(queryParams, ["envId"])
+    envActivityParams.productId,
+    envActivityParams.envId,
+    envActivityParams.params
   );
 
   useEffect(() => {
@@ -135,8 +152,9 @@ const EnvironmentActivityLog = () => {
 
   const [modalActivityId, setModalActivityId] = useState<string | undefined>();
   const [modalOpen, setModalOpen] = useState(false);
+  const isActivityLogActive = useMemo(() => mainTabKey === 'activityLog', [mainTabKey])
 
-  const   columns: ColumnsType<IActivityLog> = [
+  const columns: ColumnsType<IActivityLog> = [
     {
       key: "name",
       title: "Method",
@@ -185,6 +203,36 @@ const EnvironmentActivityLog = () => {
   return (
     <PageLayout title="API activity log">
       <div className={styles.contentWrapper} ref={refWrapper}>
+        {isOpen && (
+          <PushHistoryModal
+            isOpen={isOpen}
+            queryParams={envActivityParams}
+            envOptions={envOptions}
+            onClose={close}
+            onOK={() => alert('OK')}
+          />
+        )}
+        <Flex align="center" justify="space-between">
+          <Tabs
+            id="tab-mapping"
+            activeKey={mainTabKey}
+            onChange={setMainTabKey}
+            items={[
+              {
+                label: 'Activity log',
+                key: 'activityLog',
+              },
+              {
+                label: "Push history",
+                key: 'pushHistory'
+              },
+            ]}
+          />
+          {isActivityLogActive && <Button type='primary' onClick={open}>
+            Push log
+          </Button>}
+        </Flex>
+
         <Flex align="center" className={styles.filterWrapper} ref={ref}>
           <Form
             initialValues={{ envId }}
@@ -241,7 +289,7 @@ const EnvironmentActivityLog = () => {
           </Form>
         </Flex>
         <div className={styles.tableWrapper}>
-          <Table
+          {!isLoading && isActivityLogActive ? <Table
             dataSource={[...tableData]?.sort(
               (a: any, b: any) =>
                 dayjs(b.createdAt).valueOf() - dayjs(a.createdAt).valueOf()
@@ -266,6 +314,8 @@ const EnvironmentActivityLog = () => {
               y: (sizeWrapper?.height ?? 0) - (size?.height ?? 0) - 120,
             }}
           />
+            : <div></div>
+          }
         </div>
       </div>
 

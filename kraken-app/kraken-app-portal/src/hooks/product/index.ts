@@ -118,6 +118,7 @@ export const PRODUCT_CACHE_KEYS = {
   get_product_env_activity_detail: "get_product_env_activity_detail",
   get_product_env_activity_list: "get_product_env_activity_list",
   get_product_env_list: "get_product_env_list",
+  get_product_push_history_log: "get_product_push_history_log",
   get_release_list: "get_release_list",
   get_running_api_list: "get_running_api_list",
   get_running_component: "get_running_component",
@@ -243,11 +244,12 @@ export const useGetProductEnvs = (productId: string, enabled = true) => {
 export const useGetProductEnvActivities = (
   productId: string,
   envId: string,
-  params: unknown
+  params: unknown,
+  cacheKey?: string
 ) => {
   return useQuery<AxiosResponse, Error, IPagingData<IActivityLog>>({
     queryKey: [
-      PRODUCT_CACHE_KEYS.get_product_env_activity_list,
+      PRODUCT_CACHE_KEYS.get_product_env_activity_list + cacheKey,
       productId,
       envId,
       params,
