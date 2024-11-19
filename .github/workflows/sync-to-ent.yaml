@@ -6,13 +6,8 @@ on:
       - 'main'
 
 jobs:
-  update-manifests:
-    name: Update Deployment Manifests for Dev env in Cloudnexus
+  sync:
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: 'read'
-      id-token: 'write'
 
     steps:
       - name: Auth as Github App
@@ -27,11 +22,10 @@ jobs:
           installationId: '${{ secrets.SYNC_GITHUB_APP_INSTALLATION_ID }}'
           
 
-      - name: Checkout deployment config
+      - name: Checkout source repository        
         uses: actions/checkout@v4
         with:
           token: '${{steps.github-auth.outputs.github-token }}'
-          ref: ${{ github.head_ref }}
           fetch-depth: 0
 
       #- name: Sync to target repo
@@ -50,10 +44,8 @@ jobs:
       #    git remote add target git@github.com:zqdou/kraken-ent.git
       #    git push target HEAD:main
 
-      - name: Push changes
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: '${{steps.github-auth.outputs.github-token }}'
-          #branch: main
-          repository: 'git@github.com:zqdou/kraken-ent.git'
-          force_with_lease: true
+      - name: Push to destination repository
+        run: |
+          git config --global user.name "cloudnexus-gha-actions[bot]"
+          git config --global user.email "57290432+cloudnexus-gha-actions[bot]@users.noreply.github.com"
+          ls -al
