@@ -25,6 +25,10 @@
             <groupId>com.consoleconnect.kraken</groupId>
             <artifactId>kraken-java-sdk-mef</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.consoleconnect.kraken</groupId>
+            <artifactId>kraken-java-sdk-data</artifactId>
+        </dependency>
     </dependencies>
 
 </project>
