@@ -4,16 +4,17 @@ import { Text } from "@/components/Text";
 import { useGetValidateServerName } from '@/hooks/product';
 import { useAppStore } from '@/stores/app.store';
 import { validateServerName, validateURL } from '@/utils/helpers/validators';
-import { Form, FormInstance, Input } from "antd";
+import { Form, Input } from "antd";
+import { useMemo } from 'react';
 
 type Props = {
-  form?: FormInstance<any>;
+  name?: string;
 };
 
-const SelectAPIServer = ({ form }: Props) => {
+const SelectAPIServer = ({ name }: Props) => {
   const { currentProduct } = useAppStore();
   const { mutateAsync: validateName } = useGetValidateServerName();
-  const originalName = form?.getFieldsValue(["name"])?.name ?? null;
+  const originalName = useMemo(() => name ?? "", [name])
 
   return (
     <>
