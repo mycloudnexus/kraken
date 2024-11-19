@@ -16,7 +16,6 @@ import com.consoleconnect.kraken.operator.core.repo.MgmtEventRepository;
 import com.consoleconnect.kraken.operator.core.request.PushLogSearchRequest;
 import com.consoleconnect.kraken.operator.core.toolkit.Paging;
 import com.consoleconnect.kraken.operator.core.toolkit.PagingHelper;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.criteria.Predicate;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -38,7 +37,6 @@ public class ApiActivityPushService {
 
   private final MgmtEventRepository mgmtEventRepository;
   private final EnvironmentService environmentService;
-  private final ObjectMapper objectMapper;
 
   public ApiRequestActivityPushResult createPushApiActivityLogInfo(
       CreatePushApiActivityRequest request, String userId) {
