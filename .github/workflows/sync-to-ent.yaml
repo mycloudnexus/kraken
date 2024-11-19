@@ -49,3 +49,8 @@ jobs:
           git config --global user.name "cloudnexus-gha-actions[bot]"
           git config --global user.email "57290432+cloudnexus-gha-actions[bot]@users.noreply.github.com"
           ls -al
+          git remote add target git@github.com:zqdou/kraken-ent.git
+          cat .git/config
+          git push target HEAD:main
+          env:
+            GITHUB_TOKEN: '${{ secrets.SYNC_GITHUB_PAT }}'
