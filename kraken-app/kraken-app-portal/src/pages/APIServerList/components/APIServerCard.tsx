@@ -156,11 +156,11 @@ const APIServerCard = ({ item, refetchList }: Props) => {
               <Typography.Text
                 ellipsis={{
                   tooltip: {
-                    title: get(item, "metadata.description", "description"),
+                    title: get(item, "metadata.description", "-"),
                   },
                 }}
               >
-                {get(item, "metadata.description", "description")}
+                {get(item, "metadata.description", "-")}
               </Typography.Text>
             </Flex>
           </Group>
