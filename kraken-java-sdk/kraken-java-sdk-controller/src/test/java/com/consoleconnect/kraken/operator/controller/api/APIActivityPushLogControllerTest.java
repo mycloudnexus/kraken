@@ -1,6 +1,7 @@
 package com.consoleconnect.kraken.operator.controller.api;
 
 import static com.consoleconnect.kraken.operator.core.service.UnifiedAssetService.getSearchPageRequest;
+import static java.time.ZonedDateTime.parse;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
@@ -19,7 +20,6 @@ import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 import lombok.SneakyThrows;
@@ -49,11 +49,18 @@ class APIActivityPushLogControllerTest extends AbstractIntegrationTest {
   void givenApiActivityLogs_whenCreatingApiLogsPushRequest_thenReturnsOk() {
     // given
     var envId = UUID.randomUUID();
-    var now = ZonedDateTime.now(ZoneOffset.UTC);
-    var request = new CreatePushApiActivityRequest(now.minusDays(10), now, envId.toString());
+    var endTime = parse("2024-10-10T00:00:00+01:00");
+    var startTime = endTime.minusDays(1);
+    var request = new CreatePushApiActivityRequest(startTime, endTime, envId.toString());
 
     var pushResult = new ApiRequestActivityPushResult(UUID.randomUUID());
-    when(service.createPushApiActivityLogInfo(request, "anonymous")).thenReturn(pushResult);
+    when(service.createPushApiActivityLogInfo(
+            new CreatePushApiActivityRequest(
+                startTime.withZoneSameInstant(ZoneOffset.UTC),
+                endTime.withZoneSameInstant(ZoneOffset.UTC),
+                envId.toString()),
+            "anonymous"))
+        .thenReturn(pushResult);
     // when
     var path = "/push-api-activity-log";
     testClientHelper.postAndVerify(

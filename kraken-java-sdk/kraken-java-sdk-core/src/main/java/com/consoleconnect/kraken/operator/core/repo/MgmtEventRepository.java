@@ -29,4 +29,22 @@ public interface MgmtEventRepository
       List<String> mgmtEventTypeList, String eventStatusType, Pageable pageable);
 
   Optional<MgmtEventEntity> findFirstByEventTypeAndStatus(String eventType, String status);
+
+  @Query(
+      value =
+          "SELECT EXISTS ("
+              + "select * from kraken_mgmt_event e WHERE"
+              + " e.status in :status "
+              + " AND e.event_type = :eventType "
+              + " AND e.payload->>'envId' = :envId "
+              + " AND e.payload->>'startTime' = :startTime "
+              + " AND e.payload->>'endTime' = :endTime "
+              + ")",
+      nativeQuery = true)
+  boolean existsBy(
+      @Param("status") List<String> status,
+      @Param("envId") String envId,
+      @Param("startTime") String startTime,
+      @Param("endTime") String endTime,
+      @Param("eventType") String eventType);
 }
