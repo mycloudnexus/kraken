@@ -5,7 +5,6 @@ import com.consoleconnect.kraken.operator.core.enums.EventStatusType;
 import com.consoleconnect.kraken.operator.core.enums.MgmtEventType;
 import com.consoleconnect.kraken.operator.core.repo.MgmtEventRepository;
 import com.consoleconnect.kraken.operator.core.repo.SystemInfoRepository;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,8 +28,8 @@ public class PushKrakenVersionService {
         .ifPresent(
             systemInfoEntity -> {
               Page<MgmtEventEntity> mgmtEventEntities =
-                  mgmtEventRepository.findByEventTypeInAndStatus(
-                      List.of(MgmtEventType.CLIENT_SYSTEM_INFO.name()), null, Pageable.ofSize(1));
+                  mgmtEventRepository.search(
+                      MgmtEventType.CLIENT_SYSTEM_INFO.name(), null, Pageable.ofSize(1));
               if (CollectionUtils.isEmpty(mgmtEventEntities.getContent())) {
                 MgmtEventEntity entity = new MgmtEventEntity();
                 entity.setStatus(EventStatusType.WAIT_TO_SEND.name());
