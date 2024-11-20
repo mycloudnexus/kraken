@@ -86,27 +86,27 @@ const APIServerCard = ({ item, refetchList }: Props) => {
         style={{ borderRadius: 4, width: "100%" }}
         title={
           <Flex justify="space-between" gap={12} align="center">
-            <Flex gap={8} align="center">
+            <Flex gap={8}>
               <Text.NormalLarge>
                 {get(item, "metadata.name", "")}
               </Text.NormalLarge>
-              <Flex onMouseEnter={trueHover} onMouseLeave={falseHover}>
+              <div onMouseEnter={trueHover} onMouseLeave={falseHover}>
                 {isHover && isApiInUse ? (
                   <Button
-                    style={{ padding: "5px 0" }}
+                    style={{ padding: "0px" }}
                     type="link"
                     onClick={() => setOpenMappingDrawer(true)}
                   >
                     Check details
                   </Button>
                 ) : (
-                  <Tag color={isApiInUse ? "blue" : ""}>
+                  <Tag color={isApiInUse ? "blue" : ""} >
                     <Text.LightSmall>
                       {isApiInUse ? "In use" : "Not in use"}
                     </Text.LightSmall>
                   </Tag>
                 )}
-              </Flex>
+              </div>
             </Flex>
             <Flex>
               <Button type="link" onClick={handleEdit}>
