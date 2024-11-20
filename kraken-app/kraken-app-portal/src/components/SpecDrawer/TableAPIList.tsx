@@ -5,6 +5,7 @@ import RequestMethod from "../Method";
 import styles from "./index.module.scss";
 import { Text } from "../Text";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
+import TrimmedPath from "../TrimmedPath";
 
 type Props = {
   data: IItem[];
@@ -24,6 +25,7 @@ const TableAPIList = ({ data, onSelect, selected }: Props) => {
       {
         title: "Path",
         dataIndex: "path",
+        render: (path) => <TrimmedPath path={path} />
       },
     ],
     []
