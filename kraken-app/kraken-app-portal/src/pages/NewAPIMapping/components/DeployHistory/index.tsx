@@ -1,8 +1,5 @@
 import DetailIcon from "@/assets/icon/detail.svg";
 import EmptyIcon from "@/assets/icon/empty.svg";
-import MappingMatrix from "@/components/MappingMatrix";
-import RequestMethod from "@/components/Method";
-import TrimmedPath from "@/components/TrimmedPath";
 import {
   PRODUCT_CACHE_KEYS,
   useGetAPIDeployments,
@@ -25,7 +22,6 @@ import {
   TableColumnsType,
   TableProps,
   Tooltip,
-  Typography,
   notification,
 } from "antd";
 import { get, omit } from "lodash";
@@ -33,6 +29,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ContentTime } from "./ContentTime";
 import { DeploymentBtn } from "./DeployBtn";
 import styles from "./index.module.scss";
+import { ApiCard } from "@/components/ApiMapping";
 
 const DeployHistory = ({
   scrollHeight,
@@ -103,19 +100,10 @@ const DeployHistory = ({
     if (selectedEnv)
       columns.push({
         title: "API mapping",
-        width: 200,
+        width: 400,
         fixed: "left",
         render: (item: any) => (
-          <Flex gap={10} align="center">
-            <RequestMethod method={item?.method} />
-            <Typography.Text
-              style={{ color: "#2962FF" }}
-              ellipsis={{ tooltip: item?.path }}
-            >
-              <TrimmedPath trimLevel={2} path={item?.path} />
-            </Typography.Text>
-            <MappingMatrix mappingMatrix={item.mappingMatrix} />
-          </Flex>
+          <ApiCard apiInstance={item} />
         ),
       });
 
@@ -236,8 +224,8 @@ const DeployHistory = ({
   }, []);
 
   const scroll = scrollHeight
-    ? { y: scrollHeight - 215, x: "max-content" }
-    : undefined;
+    ? { y: scrollHeight - 215, x: 800 }
+    : { y: 400, x: 800 };
 
   return (
     <div className={styles.root} id="deploy-history">
@@ -255,6 +243,7 @@ const DeployHistory = ({
           document.getElementById("deploy-history") as HTMLDivElement
         }
         rowKey="id"
+        tableLayout="fixed"
         pagination={{
           current: query.page + 1,
           pageSize: query.size,

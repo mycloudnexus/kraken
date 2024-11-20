@@ -1,0 +1,13 @@
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.1.5.16
+  name: V1.5.16
+  labels:
+    productSpec: grace
+    productVersion: V1.5.16
+    publishDate: 2024-11-18
+  description: |
+    Removed the constant validation of the place.@type for creating UNI order
+  version: 2
