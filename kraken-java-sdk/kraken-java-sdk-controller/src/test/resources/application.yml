@@ -115,7 +115,8 @@ app:
     endpoints:
       exposure:
         include: asset, component, product, ingestion, component-operation, component-mapper
-
+  push-activity-log-external:
+    enabled: true
   security:
     resource-server:
       enabled: false

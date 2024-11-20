@@ -9,6 +9,7 @@ import com.consoleconnect.kraken.operator.config.TestApplication;
 import com.consoleconnect.kraken.operator.controller.WebTestClientHelper;
 import com.consoleconnect.kraken.operator.controller.dto.push.ApiRequestActivityPushResult;
 import com.consoleconnect.kraken.operator.controller.dto.push.CreatePushApiActivityRequest;
+import com.consoleconnect.kraken.operator.controller.dto.push.PushApiActivityLogEnabled;
 import com.consoleconnect.kraken.operator.controller.dto.push.PushApiActivityLogHistory;
 import com.consoleconnect.kraken.operator.controller.service.push.ApiActivityPushService;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
@@ -93,6 +94,22 @@ class APIActivityPushLogControllerTest extends AbstractIntegrationTest {
               content(
                   bodyStr, new TypeReference<HttpResponse<Paging<PushApiActivityLogHistory>>>() {});
           assertThat(result.getData().getData()).isEqualTo(historyList);
+        });
+  }
+
+  @Test
+  void givenPushApiLogEnabled_whenEnabled_thenReturnsTrue() {
+    // given
+    when(service.isPushApiActivityLogEnabled()).thenReturn(new PushApiActivityLogEnabled(true));
+    // when
+    var path = "/push-api-activity-log/enabled";
+    testClientHelper.getAndVerify(
+        (uriBuilder -> uriBuilder.path(path).build()),
+        bodyStr -> {
+          // then
+          var result =
+              content(bodyStr, new TypeReference<HttpResponse<PushApiActivityLogEnabled>>() {});
+          assertThat(result.getData().isEnabled()).isEqualTo(true);
         });
   }
 

@@ -5,6 +5,7 @@ import static com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit.toJson
 
 import com.consoleconnect.kraken.operator.controller.dto.push.ApiRequestActivityPushResult;
 import com.consoleconnect.kraken.operator.controller.dto.push.CreatePushApiActivityRequest;
+import com.consoleconnect.kraken.operator.controller.dto.push.PushApiActivityLogEnabled;
 import com.consoleconnect.kraken.operator.controller.dto.push.PushApiActivityLogHistory;
 import com.consoleconnect.kraken.operator.controller.model.Environment;
 import com.consoleconnect.kraken.operator.controller.service.EnvironmentService;
@@ -23,6 +24,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
@@ -37,6 +39,9 @@ public class ApiActivityPushService {
 
   private final MgmtEventRepository mgmtEventRepository;
   private final EnvironmentService environmentService;
+
+  @Value("${app.push-activity-log-external.enabled}")
+  private boolean pushActivityLogExternalEnabled;
 
   public ApiRequestActivityPushResult createPushApiActivityLogInfo(
       CreatePushApiActivityRequest request, String userId) {
@@ -119,5 +124,9 @@ public class ApiActivityPushService {
       }
       return query.where(predicateList.toArray(new Predicate[0])).getRestriction();
     };
+  }
+
+  public PushApiActivityLogEnabled isPushApiActivityLogEnabled() {
+    return new PushApiActivityLogEnabled(pushActivityLogExternalEnabled);
   }
 }

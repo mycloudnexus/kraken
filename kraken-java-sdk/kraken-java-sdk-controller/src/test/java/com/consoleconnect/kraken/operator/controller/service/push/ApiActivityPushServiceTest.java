@@ -122,6 +122,15 @@ class ApiActivityPushServiceTest extends AbstractIntegrationTest {
     verifyIfLogsOrderedByCreatedAtDesc(logs);
   }
 
+  @Test
+  void givenPushApiActivityLogEnabled_whenIsPushApiActivityLogEnabled_thenReturnTrue() {
+    // given
+    // when
+    var result = sut.isPushApiActivityLogEnabled();
+    // then
+    assertThat(result.isEnabled()).isTrue();
+  }
+
   private void verifyIfLogsOrderedByCreatedAtDesc(List<PushApiActivityLogHistory> logs) {
     for (int i = 0; i < logs.size() - 1; i++) {
       assertThat(logs.get(i).getCreatedAt().isAfter(logs.get(i + 1).getCreatedAt())).isTrue();

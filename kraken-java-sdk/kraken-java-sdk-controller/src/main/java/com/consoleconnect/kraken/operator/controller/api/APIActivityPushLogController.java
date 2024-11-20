@@ -5,6 +5,7 @@ import static com.consoleconnect.kraken.operator.core.service.UnifiedAssetServic
 import com.consoleconnect.kraken.operator.auth.security.UserContext;
 import com.consoleconnect.kraken.operator.controller.dto.push.ApiRequestActivityPushResult;
 import com.consoleconnect.kraken.operator.controller.dto.push.CreatePushApiActivityRequest;
+import com.consoleconnect.kraken.operator.controller.dto.push.PushApiActivityLogEnabled;
 import com.consoleconnect.kraken.operator.controller.dto.push.PushApiActivityLogHistory;
 import com.consoleconnect.kraken.operator.controller.service.push.ApiActivityPushService;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
@@ -63,5 +64,11 @@ public class APIActivityPushLogController {
                 .queryEnd(requestEndTime)
                 .build(),
             getSearchPageRequest(page, size, direction, orderBy)));
+  }
+
+  @Operation(summary = "check if push log enabled")
+  @GetMapping("/enabled")
+  public HttpResponse<PushApiActivityLogEnabled> isPushApiActivityLogEnabled() {
+    return HttpResponse.ok(this.apiActivityPushService.isPushApiActivityLogEnabled());
   }
 }
