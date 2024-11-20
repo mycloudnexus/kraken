@@ -109,7 +109,7 @@ class APIActivityPushLogControllerTest extends AbstractIntegrationTest {
           // then
           var result =
               content(bodyStr, new TypeReference<HttpResponse<PushApiActivityLogEnabled>>() {});
-          assertThat(result.getData().isEnabled()).isEqualTo(true);
+          assertThat(result.getData().isEnabled()).isTrue();
         });
   }
 
