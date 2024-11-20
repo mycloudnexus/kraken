@@ -1,0 +1,13 @@
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.1.5.17
+  name: V1.5.17
+  labels:
+    productSpec: grace
+    productVersion: V1.5.17
+    publishDate: 2024-11-20
+  description: |
+    Added negative validation for price value in quote list
+  version: 2
