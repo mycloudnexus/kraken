@@ -1,0 +1,13 @@
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.1.5.18
+  name: V1.5.18
+  labels:
+    productSpec: grace
+    productVersion: V1.5.18
+    publishDate: 2024-11-20
+  description: |
+    Added recurringChargePeriod for quote eline creating
+  version: 2
