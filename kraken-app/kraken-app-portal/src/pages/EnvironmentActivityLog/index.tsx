@@ -148,7 +148,7 @@ const EnvironmentActivityLog = () => {
       key: "name",
       title: "Path",
       width: 300,
-      render: (log: IActivityLog) => <TrimmedPath path={log.path} />,
+      render: (log: IActivityLog) => <Flex><TrimmedPath path={log.path} /></Flex>,
     },
     {
       key: "buyerName",

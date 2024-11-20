@@ -435,6 +435,7 @@ const NewAPIMapping = ({
 
   return (
     <Flex className={styles.container}>
+      {/* User guide */}
       <StepBar
         type={EStep.MAPPING}
         currentStep={step}
