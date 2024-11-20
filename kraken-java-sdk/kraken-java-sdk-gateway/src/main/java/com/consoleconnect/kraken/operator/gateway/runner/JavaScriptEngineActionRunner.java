@@ -6,6 +6,7 @@ import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPIFacets;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.gateway.template.JavaScriptEngine;
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.Map;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +48,8 @@ public class JavaScriptEngineActionRunner extends AbstractActionRunner {
   }
 
   private void handleErrorMsg(String resultJson) {
-    Map<String, Object> map = JsonToolkit.fromJson(resultJson, Map.class);
+    Map<String, Object> map =
+        JsonToolkit.fromJson(resultJson, new TypeReference<Map<String, Object>>() {});
     String errorMsg = (String) map.get(ERROR_MSG_VAR);
     if (StringUtils.isNotBlank(errorMsg)) {
       throw KrakenException.badRequest(errorMsg);
