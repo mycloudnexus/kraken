@@ -117,6 +117,7 @@ export const PRODUCT_CACHE_KEYS = {
   get_product_deployment_list: "get_product_deployment_list",
   get_product_env_activity_detail: "get_product_env_activity_detail",
   get_product_env_activity_list: "get_product_env_activity_list",
+  get_product_env_activity_list_mutation: "get_product_env_activity_list_mutation",
   get_product_env_list: "get_product_env_list",
   get_product_push_history_log: "get_product_push_history_log",
   get_release_list: "get_release_list",
@@ -245,11 +246,10 @@ export const useGetProductEnvActivities = (
   productId: string,
   envId: string,
   params: unknown,
-  cacheKey?: string
 ) => {
   return useQuery<AxiosResponse, Error, IPagingData<IActivityLog>>({
     queryKey: [
-      PRODUCT_CACHE_KEYS.get_product_env_activity_list + cacheKey,
+      PRODUCT_CACHE_KEYS.get_product_env_activity_list,
       productId,
       envId,
       params,
@@ -257,6 +257,19 @@ export const useGetProductEnvActivities = (
     queryFn: () => getListEnvActivities(productId, envId, params),
     enabled: Boolean(productId && envId),
     select: (data) => data.data,
+  });
+};
+
+export const useGetProductEnvActivitiesMutation = () => {
+  return useMutation<AxiosResponse, Error, any>({
+    mutationKey: [PRODUCT_CACHE_KEYS.get_product_env_activity_list_mutation],
+    mutationFn: ({ productId, envId, params }: any) =>
+      getListEnvActivities(productId, envId, params),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [PRODUCT_CACHE_KEYS.get_product_env_activity_list_mutation],
+      });
+    },
   });
 };
 

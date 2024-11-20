@@ -1,10 +1,11 @@
-import { DatePicker, Flex, Form, Modal, Radio } from "antd";
+import { DatePicker, Flex, Form, Modal, Radio, Spin } from "antd";
 import styles from "./index.module.scss";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { capitalize } from 'lodash';
 import dayjs from 'dayjs';
-import { useGetProductEnvActivities } from '@/hooks/product';
+import { useGetProductEnvActivitiesMutation } from '@/hooks/product';
 import { disabled7DaysDate } from '@/utils/helpers/date';
+import { useAppStore } from "@/stores/app.store";
 
 const { RangePicker } = DatePicker;
 
@@ -16,11 +17,6 @@ type Props = {
     value: string;
     label: string;
   }>;
-  queryParams: {
-    productId: string,
-    envId: string,
-    params: Omit<Record<string, any>, "envId">,
-  };
 };
 
 const PushHistoryModal = ({
@@ -28,45 +24,40 @@ const PushHistoryModal = ({
   onClose,
   onOK,
   envOptions,
-  queryParams,
 }: Props) => {
   const [form] = Form.useForm();
+  const { currentProduct } = useAppStore();
 
   const handleOK = () => {
     // TODO:
     onOK(form.getFieldsValue());
   };
 
-  const { productId, envId, params: { requestStartTime, requestEndTime } } = queryParams;
-  const [params, setParams] = useState({
-    envId,
-    requestStartTime,
-    requestEndTime,
-  });
-
-  const { data, isLoading } = useGetProductEnvActivities(
-    productId,
-    params.envId,
-    { requestStartTime: params.requestStartTime, requestEndTime: params.requestEndTime },
-    'modal-cache'
-  );
+  const { data: responseData, mutateAsync, isPending, isSuccess } = useGetProductEnvActivitiesMutation();
 
   const handleFormValuesChange = useCallback(
     (t: any, values: any) => {
       if (t.path) return;
       const { requestTime = [] } = values ?? {};
 
-      const params = values;
-      params.requestStartTime = requestTime?.[0]
-        ? dayjs(requestTime[0]).startOf("day").valueOf()
-        : undefined;
-      params.requestEndTime = requestTime?.[1]
-        ? dayjs(requestTime[1]).endOf("day").valueOf()
-        : undefined;
-      
-      setParams(params)
+      const params = {
+        requestStartTime: requestTime?.[0]
+          ? dayjs(requestTime[0]).startOf("day").valueOf()
+          : undefined,
+        requestEndTime: requestTime?.[1]
+          ? dayjs(requestTime[1]).endOf("day").valueOf()
+          : undefined
+      }
+
+      if (values.envId && !!params.requestStartTime) {
+        mutateAsync({
+          productId: currentProduct,
+          envId: values.envId,
+          params
+        })
+      }
     },
-    [setParams]
+    []
   );
 
   return (
@@ -76,7 +67,7 @@ const PushHistoryModal = ({
       onOk={handleOK}
       title="Push log"
       className={styles.modal}
-      okButtonProps={{ "data-testid": "pushLog-btn" }}
+      okButtonProps={{ disabled: !isSuccess, "data-testid": "pushLog-btn" }}
     >
       <Form
         form={form}
@@ -100,7 +91,7 @@ const PushHistoryModal = ({
           label="Environment"
           required
         >
-          <Radio.Group defaultValue={params.envId} size="middle" name="Environment" >
+          <Radio.Group size="middle" name="Environment" >
             {envOptions.map((key) => (
               <Radio value={key.value}>{capitalize(key.label)}</Radio>
             ))}
@@ -114,17 +105,22 @@ const PushHistoryModal = ({
         >
           <RangePicker placeholder={["Select time", "Select time"]} disabledDate={disabled7DaysDate} />
         </Form.Item>
-   
-        {!isLoading && <Flex vertical className={styles.numberContainer} gap={5}>
-          <div>
-            Number of activity logs filtered
-          </div>
-          <div className={Number(data?.total) > 0 ? styles.greaterThanZero : styles.equalToZero}>
-            {data?.total}
-          </div>
 
+        <Flex justify={isPending ?  "center" : "start"}>
+          <Spin spinning={isPending}>
+            {responseData?.data?.total && <Flex vertical className={styles.numberContainer} gap={5}>
+              <div>
+                Number of activity logs filtered
+              </div>
+              <div className={Number(responseData?.data?.total) > 0 ? styles.greaterThanZero : styles.equalToZero}>
+                {responseData?.data?.total}
+              </div>
+            </Flex>
+            }
+          </Spin>
         </Flex>
-        }
+
+
       </Form>
     </Modal>
   );
