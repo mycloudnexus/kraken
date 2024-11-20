@@ -9,7 +9,7 @@
 }
 .sellerAPIBasicInfoWrapper {
   flex: 0 0 calc(50% - 30px);
-  width: calc(50% - 30px);
+  width: calc(50% - 30px) !important;
   box-sizing: border-box;
   padding: 18px 20px;
   border-radius: 6px;
