@@ -6,7 +6,6 @@
     <artifactId>kraken-java-sdk</artifactId>
     <name>kraken-java-sdk</name>
     <version>1.0.0-rc.0</version>
-
     <packaging>pom</packaging>
     <parent>
         <groupId>com.consoleconnect.kraken</groupId>
