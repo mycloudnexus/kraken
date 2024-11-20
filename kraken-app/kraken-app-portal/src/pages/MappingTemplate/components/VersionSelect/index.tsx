@@ -78,7 +78,7 @@ export const VersionSelect = ({
 }: Readonly<{
   data: IReleaseHistory[];
   selectedVersion: string | null | undefined;
-  setSelectedVersion: (templateUpgradeId: string) => void;
+  setSelectedVersion: (templateUpgradeId: string | null) => void;
   // Inifinite scroll
   loading?: boolean;
   isFetchingNextPage?: boolean;
@@ -121,8 +121,10 @@ export const VersionSelect = ({
     filterBy === "All" ? data : data.filter((item) => item.status === filterBy);
 
   useEffect(() => {
-    setSelectedVersion(listRelease[0]?.templateUpgradeId ?? null)
-  }, [filterBy])
+    if (!selectedVersion) {
+      setSelectedVersion(listRelease[0]?.templateUpgradeId ?? null)
+    }
+  }, [selectedVersion, listRelease, filterBy])
 
   return (
     <div className={styles.root}>
@@ -134,7 +136,10 @@ export const VersionSelect = ({
         <Dropdown
           menu={{
             items: statusItems,
-            onClick: (info) => setFilterBy(info.key),
+            onClick: (info) => {
+              setFilterBy(info.key)
+              setSelectedVersion(null)
+            },
           }}
         >
           <span className={styles.releaseFilter}>
@@ -171,8 +176,8 @@ export const VersionSelect = ({
             className={clsx([
               styles.item,
               !isEmpty(selectedVersion) &&
-                d.templateUpgradeId === selectedVersion &&
-                styles.selected,
+              d.templateUpgradeId === selectedVersion &&
+              styles.selected,
             ])}
             onClick={() => setSelectedVersion(d.templateUpgradeId)}
           >

@@ -24,6 +24,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import ActivityDetailModal from "./components/ActivityDetailModal";
 import styles from "./index.module.scss";
+import TrimmedPath from "@/components/TrimmedPath";
 
 const { RangePicker } = DatePicker;
 
@@ -136,27 +137,29 @@ const EnvironmentActivityLog = () => {
   const [modalActivityId, setModalActivityId] = useState<string | undefined>();
   const [modalOpen, setModalOpen] = useState(false);
 
-  const   columns: ColumnsType<IActivityLog> = [
+  const columns: ColumnsType<IActivityLog> = [
     {
       key: "name",
       title: "Method",
       render: (log: IActivityLog) => <LogMethodTag method={log.method} />,
-      width: 120,
+      width: 100,
     },
     {
       key: "name",
       title: "Path",
-      render: (log: IActivityLog) => log.path,
+      width: 300,
+      render: (log: IActivityLog) => <TrimmedPath path={log.path} />,
     },
     {
       key: "buyerName",
       title: "Buyer name",
+      width: 200,
       render: (log: IActivityLog) => log.buyerName,
     },
     {
       key: "status",
       title: "Status code",
-      width: 160,
+      width: 140,
       render: (log: IActivityLog) => log.httpStatusCode,
     },
     {
@@ -168,7 +171,8 @@ const EnvironmentActivityLog = () => {
     {
       key: "action",
       title: "Action",
-      width: 200,
+      width: 160,
+      fixed: 'right',
       render: (log: IActivityLog) => (
         <Button
           type="link"
@@ -264,6 +268,7 @@ const EnvironmentActivityLog = () => {
             }}
             scroll={{
               y: (sizeWrapper?.height ?? 0) - (size?.height ?? 0) - 120,
+              x: 800,
             }}
           />
         </div>

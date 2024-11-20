@@ -31,4 +31,4 @@ export const recentXDays = (value?: number) => {
 export const parseDateStartOrEnd = (date: string | undefined, type: "start" | "end") =>
   date
     ? dayjs(date)[type === "start" ? "startOf" : "endOf"]("day").format(TIME_ZONE_FORMAT)
-    : getCurrentTimeWithZone();
+    : null;

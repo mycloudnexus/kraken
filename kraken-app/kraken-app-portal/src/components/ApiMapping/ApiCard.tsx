@@ -1,11 +1,11 @@
 import { IRunningMapping } from "@/utils/types/env.type";
-import { Flex, Tooltip } from "antd";
+import { Flex } from "antd";
 import classNames from "classnames";
 import { ReactNode } from "react";
 import MappingMatrix from "../MappingMatrix";
 import RequestMethod from "../Method";
 import styles from "./index.module.scss";
-import { trimPath } from "@/utils/helpers/url";
+import TrimmedPath from "../TrimmedPath";
 
 export function ApiCard({
   apiInstance,
@@ -34,22 +34,17 @@ export function ApiCard({
     >
       {prefix}
       <RequestMethod method={apiInstance?.method} />
-      <Tooltip title={apiInstance.path}>
-        <span data-testid="apiPath">
-          {".../" + trimPath(apiInstance.path, 2)}
-        </span>
-      </Tooltip>
-      <Flex
-        gap={8}
-        align="center"
+
+      <TrimmedPath path={apiInstance.path} />
+
+      <MappingMatrix
+        align='center'
         flex={1}
-      >
-        <MappingMatrix
-          mappingMatrix={apiInstance?.mappingMatrix}
-          extraKey={"item.path"}
-          isItemActive={false}
-        />
-      </Flex>
+        mappingMatrix={apiInstance?.mappingMatrix}
+        extraKey={"item.path"}
+        isItemActive={false}
+      />
+
       {suffix}
     </Flex>
   );
