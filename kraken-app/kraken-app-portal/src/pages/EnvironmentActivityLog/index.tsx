@@ -25,9 +25,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import ActivityDetailModal from "./components/ActivityDetailModal";
 import styles from "./index.module.scss";
-import { useGetPushActivityLogHistory } from '@/hooks/pushApiEvent';
 import PushHistoryModal from './components/PushHistoryModal';
 import { useBoolean } from 'usehooks-ts';
+import PushHistoryList from './components/PushHistoryList';
 
 const { RangePicker } = DatePicker;
 
@@ -56,8 +56,6 @@ const EnvironmentActivityLog = () => {
   const { currentProduct } = useAppStore();
   const { data: envData, isLoading: loadingEnv } =
     useGetProductEnvs(currentProduct);
-  const { data: pushData, isLoading: loadingPushHistory } =
-    useGetPushActivityLogHistory();
   const [form] = Form.useForm();
   const ref = useRef<any>();
   const size = useSize(ref);
@@ -65,10 +63,6 @@ const EnvironmentActivityLog = () => {
   const sizeWrapper = useSize(refWrapper);
   const [mainTabKey, setMainTabKey] = useState<string>('activityLog');
   const { value: isOpen, setTrue: open, setFalse: close } = useBoolean(false);
-
-  useEffect(() => {
-    console.log(pushData)
-  }, [loadingPushHistory])
 
   const {
     tableData,
@@ -206,7 +200,6 @@ const EnvironmentActivityLog = () => {
         {isOpen && (
           <PushHistoryModal
             isOpen={isOpen}
-            queryParams={envActivityParams}
             envOptions={envOptions}
             onClose={close}
             onOK={() => alert('OK')}
@@ -214,8 +207,8 @@ const EnvironmentActivityLog = () => {
         )}
         <Flex align="center" justify="space-between">
           <Tabs
-            id="tab-mapping"
             activeKey={mainTabKey}
+            hideAdd
             onChange={setMainTabKey}
             items={[
               {
@@ -233,7 +226,7 @@ const EnvironmentActivityLog = () => {
           </Button>}
         </Flex>
 
-        <Flex align="center" className={styles.filterWrapper} ref={ref}>
+        {isActivityLogActive && <Flex align="center" className={styles.filterWrapper} ref={ref}>
           <Form
             initialValues={{ envId }}
             style={{ gap: 5 }}
@@ -288,6 +281,7 @@ const EnvironmentActivityLog = () => {
             </Form.Item>
           </Form>
         </Flex>
+        }
         <div className={styles.tableWrapper}>
           {!isLoading && isActivityLogActive ? <Table
             dataSource={[...tableData]?.sort(
@@ -314,7 +308,7 @@ const EnvironmentActivityLog = () => {
               y: (sizeWrapper?.height ?? 0) - (size?.height ?? 0) - 120,
             }}
           />
-            : <div></div>
+            : <PushHistoryList />
           }
         </div>
       </div>
