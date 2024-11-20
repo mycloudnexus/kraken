@@ -17,6 +17,7 @@ import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
 import com.consoleconnect.kraken.operator.core.repo.MgmtEventRepository;
 import com.consoleconnect.kraken.operator.sync.model.SyncProperty;
+import com.consoleconnect.kraken.operator.sync.service.KrakenServerConnector;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
@@ -29,7 +30,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.ParameterizedTypeReference;
@@ -38,18 +38,17 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriBuilder;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 @ConditionalOnProperty(
     value = "app.control-plane.push-activity-log-external.enabled",
     havingValue = "true")
-public class PushAPIActivityLogScheduler {
+public class PushAPIActivityLogScheduler extends KrakenServerConnector {
 
   public static final String CALL_SEQ = "callSeq";
   public static final String CALL_SEQ_ZERO = "0";
@@ -58,8 +57,16 @@ public class PushAPIActivityLogScheduler {
 
   private final MgmtEventRepository mgmtEventRepository;
   private final ApiActivityLogRepository apiActivityLogRepository;
-  private final SyncProperty appProperty;
-  private final WebClient webClient;
+
+  public PushAPIActivityLogScheduler(
+      SyncProperty appProperty,
+      WebClient webClient,
+      MgmtEventRepository mgmtEventRepository,
+      ApiActivityLogRepository apiActivityLogRepository) {
+    super(appProperty, webClient);
+    this.mgmtEventRepository = mgmtEventRepository;
+    this.apiActivityLogRepository = apiActivityLogRepository;
+  }
 
   @Scheduled(cron = "${app.cron-job.push-log-external-system:-}")
   List<PushExternalSystemPayload> pushApiActivityLogToExternalSystem() {
@@ -104,7 +111,7 @@ public class PushAPIActivityLogScheduler {
     while (true) {
       var pageable =
           PageRequest.of(
-              page, appProperty.getControlPlane().getPushActivityLogExternal().getBatchSize());
+              page, getAppProperty().getControlPlane().getPushActivityLogExternal().getBatchSize());
       var entities = getApiActivityLogRequestIds(logInfo, pageable);
       var composedLogs = getComposedHttpRequests(entities.get());
       if (composedLogs.isEmpty()) {
@@ -134,18 +141,8 @@ public class PushAPIActivityLogScheduler {
   }
 
   private HttpResponse<String> sendLogsToExternalSystem(PushExternalSystemPayload payload) {
-    return webClient
-        .method(HttpMethod.POST)
-        .uri(appProperty.getControlPlane().getUrl())
-        .accept(MediaType.APPLICATION_JSON)
-        .contentType(MediaType.APPLICATION_JSON)
-        .header(
-            appProperty.getControlPlane().getTokenHeader(),
-            appProperty.getControlPlane().getToken())
-        .bodyValue(payload)
-        .retrieve()
-        .bodyToMono(new ParameterizedTypeReference<HttpResponse<String>>() {})
-        .block();
+    return blockCurl(
+        HttpMethod.POST, UriBuilder::build, payload, new ParameterizedTypeReference<>() {});
   }
 
   private List<ComposedHttpRequest> getComposedHttpRequests(Stream<ApiActivityLogEntity> logs) {
