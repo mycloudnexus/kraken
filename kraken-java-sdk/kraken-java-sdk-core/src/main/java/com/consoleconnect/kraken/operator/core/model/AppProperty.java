@@ -19,4 +19,15 @@ public class AppProperty {
   private Map<String, String> apiSpecOrderBy = new HashMap<>();
   private Map<String, String> apiOrderBy = new HashMap<>();
   private Map<String, String> apiTargetMapperOrderBy = new HashMap<>();
+  private Features features;
+
+  @Data
+  public static class Features {
+    private PushActivityLogExternal pushActivityLogExternal;
+  }
+
+  @Data
+  public static class PushActivityLogExternal {
+    private boolean enabled;
+  }
 }

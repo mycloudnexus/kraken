@@ -13,6 +13,7 @@ import com.consoleconnect.kraken.operator.core.entity.MgmtEventEntity;
 import com.consoleconnect.kraken.operator.core.enums.EventStatusType;
 import com.consoleconnect.kraken.operator.core.enums.MgmtEventType;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
+import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.core.repo.MgmtEventRepository;
 import com.consoleconnect.kraken.operator.core.request.PushLogSearchRequest;
 import com.consoleconnect.kraken.operator.core.toolkit.Paging;
@@ -24,7 +25,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
@@ -36,12 +36,14 @@ public class ApiActivityPushService {
 
   public static final String CREATED_AT = "createdAt";
   public static final String EVENT_TYPE = "eventType";
+  public static final String PUSH_API_ACTIVITY_LOGS_IS_DISABLED =
+      "Push api activity logs is disabled.";
+  public static final String THE_SAME_PARAMETERS_ALREADY_EXISTS_ERROR =
+      "Push event with the same parameters already exists with status 'ack' or 'in_progress'.";
 
   private final MgmtEventRepository mgmtEventRepository;
   private final EnvironmentService environmentService;
-
-  @Value("${app.features.push-activity-log-external.enabled}")
-  private boolean pushActivityLogExternalEnabled;
+  private final AppProperty appProperty;
 
   public ApiRequestActivityPushResult createPushApiActivityLogInfo(
       CreatePushApiActivityRequest request, String userId) {
@@ -56,6 +58,17 @@ public class ApiActivityPushService {
   }
 
   private void validateRequest(CreatePushApiActivityRequest searchRequest) {
+    validateIfFeatureIsEnabled();
+    validatePushEventWithTheSameParameters(searchRequest);
+  }
+
+  private void validateIfFeatureIsEnabled() {
+    if (!appProperty.getFeatures().getPushActivityLogExternal().isEnabled()) {
+      throw new KrakenException(400, PUSH_API_ACTIVITY_LOGS_IS_DISABLED);
+    }
+  }
+
+  private void validatePushEventWithTheSameParameters(CreatePushApiActivityRequest searchRequest) {
     boolean exists =
         mgmtEventRepository.existsBy(
             List.of(EventStatusType.ACK.name(), EventStatusType.IN_PROGRESS.name()),
@@ -65,9 +78,7 @@ public class ApiActivityPushService {
             MgmtEventType.PUSH_API_ACTIVITY_LOG.name());
 
     if (exists) {
-      throw new KrakenException(
-          400,
-          "Push event with the same parameters already exists with status 'ack' or 'in_progress'.");
+      throw new KrakenException(400, THE_SAME_PARAMETERS_ALREADY_EXISTS_ERROR);
     }
   }
 
@@ -127,6 +138,7 @@ public class ApiActivityPushService {
   }
 
   public PushApiActivityLogEnabled isPushApiActivityLogEnabled() {
-    return new PushApiActivityLogEnabled(pushActivityLogExternalEnabled);
+    return new PushApiActivityLogEnabled(
+        appProperty.getFeatures().getPushActivityLogExternal().isEnabled());
   }
 }

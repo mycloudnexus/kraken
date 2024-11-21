@@ -1,8 +1,11 @@
 package com.consoleconnect.kraken.operator.controller.service.push;
 
+import static com.consoleconnect.kraken.operator.controller.service.push.ApiActivityPushService.PUSH_API_ACTIVITY_LOGS_IS_DISABLED;
+import static com.consoleconnect.kraken.operator.controller.service.push.ApiActivityPushService.THE_SAME_PARAMETERS_ALREADY_EXISTS_ERROR;
 import static com.consoleconnect.kraken.operator.core.service.UnifiedAssetService.getSearchPageRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doReturn;
 
 import com.consoleconnect.kraken.operator.config.TestApplication;
 import com.consoleconnect.kraken.operator.controller.dto.push.CreatePushApiActivityRequest;
@@ -12,6 +15,7 @@ import com.consoleconnect.kraken.operator.controller.service.EnvironmentService;
 import com.consoleconnect.kraken.operator.core.enums.EventStatusType;
 import com.consoleconnect.kraken.operator.core.enums.MgmtEventType;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
+import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.core.repo.MgmtEventRepository;
 import com.consoleconnect.kraken.operator.core.request.PushLogSearchRequest;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
@@ -24,6 +28,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -36,6 +41,7 @@ class ApiActivityPushServiceTest extends AbstractIntegrationTest {
   @Autowired private ApiActivityPushService sut;
   @Autowired private MgmtEventRepository mgmtEventRepository;
   @Autowired private EnvironmentService environmentService;
+  @SpyBean private AppProperty appProperty;
 
   @Test
   void givenApiLogSearchParam_whenCreatePushApiActivityLogInfo_thenSaveEvent() {
@@ -104,6 +110,7 @@ class ApiActivityPushServiceTest extends AbstractIntegrationTest {
             KrakenException.class, () -> sut.createPushApiActivityLogInfo(request, userId));
     // then
     assertThat(krakenException.getCode()).isEqualTo(400);
+    assertThat(krakenException.getMessage()).isEqualTo(THE_SAME_PARAMETERS_ALREADY_EXISTS_ERROR);
   }
 
   @Test
@@ -129,6 +136,43 @@ class ApiActivityPushServiceTest extends AbstractIntegrationTest {
     var result = sut.isPushApiActivityLogEnabled();
     // then
     assertThat(result.isEnabled()).isTrue();
+  }
+
+  @Test
+  void givenPushApiActivityLogDisabled_whenIsPushApiActivityLogEnabled_thenReturnFalse() {
+    // given
+    givenDisabledPushActivityLogExternal();
+    // when
+    var result = sut.isPushApiActivityLogEnabled();
+    // then
+    assertThat(result.isEnabled()).isFalse();
+  }
+
+  @Test
+  void givenPushApiActivityLogDisabled_createPushApiActivityLogInfo_thenReturnsError() {
+    // given
+    givenDisabledPushActivityLogExternal();
+    var env = environmentService.findAll().get(0);
+    var userId = "userId1";
+    var endTime = ZonedDateTime.parse("2024-10-10T00:00:00+01:00").minusDays(1);
+    var startTime = endTime.minusDays(3);
+    var request = new CreatePushApiActivityRequest(startTime, endTime, env.getId());
+    // when
+    var krakenException =
+        assertThrows(
+            KrakenException.class, () -> sut.createPushApiActivityLogInfo(request, userId));
+    // then
+    assertThat(krakenException.getCode()).isEqualTo(400);
+    assertThat(krakenException.getMessage()).isEqualTo(PUSH_API_ACTIVITY_LOGS_IS_DISABLED);
+  }
+
+  private void givenDisabledPushActivityLogExternal() {
+    AppProperty.PushActivityLogExternal pushActivityLogExternal =
+        new AppProperty.PushActivityLogExternal();
+    pushActivityLogExternal.setEnabled(false);
+    AppProperty.Features appFeatures = new AppProperty.Features();
+    appFeatures.setPushActivityLogExternal(pushActivityLogExternal);
+    doReturn(appFeatures).when(appProperty).getFeatures();
   }
 
   private void verifyIfLogsOrderedByCreatedAtDesc(List<PushApiActivityLogHistory> logs) {
