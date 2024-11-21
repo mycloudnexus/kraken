@@ -98,6 +98,10 @@ spec:
           - name: mapper.order.uni.add.bandwidth
             title: "Bandwidth of the UNI"
             source: "@{{productOrderItem[0].product.productConfiguration.bandwidth}}"
+            sourceType: customized_enum
+            sourceValues:
+              - 1000
+              - 10000
             target: "@{{speed}}"
             sourceLocation: BODY
             targetLocation: BODY
@@ -143,21 +147,21 @@ spec:
               - partial
               - rejected
             valueMapping:
-              progressing: inProgress,
-              created: acknowledged,
-              CREATING: acknowledged,
-              ACTIVATING: inProgress,
-              ACCEPTED: inProgress,
-              MANUAL: inProgress,
-              DELETING: inProgress,
-              DISABLING: inProgress,
-              DENIED: rejected,
-              ERROR: failed,
-              ACTIVE: completed,
-              DISABLED: disabled,
-              CANCELLED: disabled,
-              PENDING: pending,
-              PENDING_ACCEPTANCE: pending,
+              progressing: inProgress
+              created: acknowledged
+              CREATING: acknowledged
+              ACTIVATING: inProgress
+              ACCEPTED: inProgress
+              MANUAL: inProgress
+              DELETING: inProgress
+              DISABLING: inProgress
+              DENIED: rejected
+              ERROR: failed
+              ACTIVE: completed
+              DISABLED: disabled
+              CANCELLED: disabled
+              PENDING: pending
+              PENDING_ACCEPTANCE: pending
               DELETED: completed
             source: "@{{responseBody.status}}"
             sourceLocation: BODY
