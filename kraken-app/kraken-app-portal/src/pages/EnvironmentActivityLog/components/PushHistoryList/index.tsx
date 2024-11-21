@@ -15,33 +15,13 @@ import { useGetPushActivityLogHistory } from '@/hooks/pushApiEvent';
 import mockData from "./historyMockData.json"
 import { DAY_FORMAT, DAY_TIME_FORMAT_NORMAL } from '@/utils/constants/format';
 import { capitalize } from 'lodash';
-import { PresetStatusColorType } from 'antd/es/_util/colors';
 import { useUser } from '@/hooks/user/useUser';
-
+import { getStatusBadge } from '@/utils/helpers/ui';
 
 const initPagination = {
   pageSize: DEFAULT_PAGING.size,
   current: DEFAULT_PAGING.page,
 };
-
-const getStatusBadge = (value: string): PresetStatusColorType => {
-  let result;
-  switch (value) {
-    case "DONE":
-      result = "success"
-      break;
-    case "FAILED":
-      result = "error"
-      break;
-    case "IN PROGRESS":
-      result = "processing";
-      break;
-    default:
-      result = "default";
-      break;
-  }
-  return result as PresetStatusColorType;
-}
 
 const PushHistoryList = () => {
   const {
