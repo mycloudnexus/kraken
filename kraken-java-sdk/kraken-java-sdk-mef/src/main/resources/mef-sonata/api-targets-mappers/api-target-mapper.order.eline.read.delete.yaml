@@ -89,3 +89,37 @@ spec:
             target: "@{{productOrderItem[0].expectedCompletionDate}}"
             targetLocation: "BODY"
             requiredMapping: false
+          - name: mapper.order.uni.read.stateChange.state
+            title: state in state change history
+            description: ''
+            source: ""
+            target: '@{{productOrderItem[0].stateChange[*].state}}'
+            targetType: enum
+            targetValues:
+              - acknowledged
+              - assessingCancellation
+              - held.assessingCharge
+              - pending.assessingModification
+              - cancelled
+              - pendingCancellation
+              - completed
+              - failed
+              - inProgress
+              - partial
+              - rejected
+            valueMapping: {}
+            replaceStar: true
+            sourceLocation: BODY
+            targetLocation: BODY
+            customizedField: false
+            requiredMapping: false
+          - name: mapper.order.uni.read.stateChange.changeDate
+            title: change date in state change history
+            description: ''
+            source: ''
+            target: '@{{productOrderItem[0].stateChange[*].changeDate}}'
+            replaceStar: true
+            sourceLocation: BODY
+            targetLocation: BODY
+            customizedField: false
+            requiredMapping: false
