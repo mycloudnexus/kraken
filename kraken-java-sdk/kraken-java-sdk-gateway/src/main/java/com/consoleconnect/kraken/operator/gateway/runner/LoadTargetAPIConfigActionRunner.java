@@ -76,6 +76,7 @@ public class LoadTargetAPIConfigActionRunner extends AbstractActionRunner {
       String serverUrl = getServerUrl(serverKey);
       outputs.put("url", serverUrl);
     }
+
     StateValueMappingDto stateValueMappingDto = new StateValueMappingDto();
     renderRequestService.parseRequest(facets, stateValueMappingDto);
 
