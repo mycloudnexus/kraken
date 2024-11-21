@@ -8,5 +8,5 @@ import lombok.Getter;
 public enum MappingTypeEnum {
   ENUM("enum"),
   CUSTOMIZED_ENUM("customized_enum");
-  private final String name;
+  private final String kind;
 }
