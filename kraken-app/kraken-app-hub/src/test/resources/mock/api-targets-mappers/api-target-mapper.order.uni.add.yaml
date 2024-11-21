@@ -98,6 +98,10 @@ spec:
           - name: mapper.order.uni.add.bandwidth
             title: "Bandwidth of the UNI"
             source: "@{{productOrderItem[0].product.productConfiguration.bandwidth}}"
+            sourceType: discrete
+            sourceValues:
+              - 1000
+              - 10000
             target: "@{{speed}}"
             sourceLocation: BODY
             targetLocation: BODY

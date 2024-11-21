@@ -7,6 +7,7 @@ import com.consoleconnect.kraken.operator.core.dto.Tuple2;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.enums.ActionTypeEnum;
 import com.consoleconnect.kraken.operator.core.enums.ExpectTypeEnum;
+import com.consoleconnect.kraken.operator.core.enums.MappingTypeEnum;
 import com.consoleconnect.kraken.operator.core.enums.ParamLocationEnum;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
@@ -41,7 +42,6 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner {
   public static final String MESSAGE_ALERT = "api use case is not supported %s";
   public static final String CHECK_NAME_ENABLED = "enabled";
   public static final String PARAM_NAME = "param";
-  public static final String ENUM = "enum";
   public static final String NOT_FOUND = "notFound";
   public static final String COLON = ":";
   private final UnifiedAssetService unifiedAssetService;
@@ -217,7 +217,8 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner {
           || ParamLocationEnum.HYBRID.name().equals(mapper.getTargetLocation())) {
         continue;
       }
-      if (Objects.equals(mapper.getSourceType(), ENUM)) {
+      if (MappingTypeEnum.ENUM.getName().equals(mapper.getSourceType())
+          || MappingTypeEnum.DISCRETE.getName().equals(mapper.getSourceType())) {
         checkEnumValue(mapper.getSource(), mapper.getTarget(), inputs, mapper.getSourceValues());
       } else if (mapper.getTarget() != null && !mapper.getTarget().contains("@{{")) {
         checkConstantValue(mapper.getSource(), mapper.getTarget(), inputs);
