@@ -40,7 +40,7 @@ public class ApiActivityPushService {
   private final MgmtEventRepository mgmtEventRepository;
   private final EnvironmentService environmentService;
 
-  @Value("${app.push-activity-log-external.enabled}")
+  @Value("${app.features.push-activity-log-external.enabled}")
   private boolean pushActivityLogExternalEnabled;
 
   public ApiRequestActivityPushResult createPushApiActivityLogInfo(
