@@ -79,7 +79,7 @@ spec:
             description: ""
             source: ""
             sourceLocation: "BODY"
-            target: "@{{productOrderItem[0].completeDate}}"
+            target: "@{{productOrderItem[0].completionDate}}"
             targetLocation: "BODY"
             requiredMapping: false
           - name: mapper.order.eline.read.productOrderItem.expectedCompleteDate
@@ -87,6 +87,6 @@ spec:
             description: ""
             source: ""
             sourceLocation: "BODY"
-            target: "@{{productOrderItem[0].expectedCompleteDate}}"
+            target: "@{{productOrderItem[0].expectedCompletionDate}}"
             targetLocation: "BODY"
             requiredMapping: false

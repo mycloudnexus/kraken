@@ -73,7 +73,7 @@ export default function UpgradePlane() {
   // Fetch release detail and check for upgrade statuses
   const {
     data: templateDetail,
-    isLoading: isLoadingTemplateDetail,
+    // isLoading: isLoadingTemplateDetail,
     refetch: refetchTemplateDetail,
   } = useLongPolling(
     useGetTemplateMappingReleaseDetail(productId, templateUpgradeId),
@@ -368,50 +368,48 @@ export default function UpgradePlane() {
         />
       </Flex>
 
-      <Flex className={classNames(styles.card, styles.flexOne)}>
-        <Spin spinning={isLoadingTemplateDetail}>
-          <Flex vertical gap={8} style={{ height: "100%" }}>
-            {notification.map((noti) => (
-              <Alert
-                key={noti.id}
-                className={styles.notiBadge}
-                showIcon
-                type={noti.type}
-                closable
-                description={noti.message}
-                onClose={() => removeNotification(noti)}
-              />
-            ))}
+      <Flex vertical gap={8} className={classNames(styles.card, styles.flexOne)}>
+        {/* <Spin spinning={isLoadingTemplateDetail}> */}
+        {notification.map((noti) => (
+          <Alert
+            key={noti.id}
+            className={styles.notiBadge}
+            showIcon
+            type={noti.type}
+            closable
+            description={noti.message}
+            onClose={() => removeNotification(noti)}
+          />
+        ))}
 
-            <Flex className={styles.mapping}>
-              <Suspense fallback={<Spin style={{ width: "100%" }} />}>
-                {currentStep === 0 && (
-                  <ControlPlaneUpgrade
-                    isUpgrading={isUpgrading || isPendingControlPlaneUpgrade}
-                    isUpgraded={isUpgraded}
-                  />
-                )}
-                {currentStep === 1 && (
-                  <StageUpgrade
-                    stageEnvId={stageEnvId}
-                    isUpgrading={isUpgrading || isPendingStageUpgrade}
-                    upgradeVersion={templateDetail?.productVersion}
-                    isUpgraded={isUpgraded}
-                  />
-                )}
-                {currentStep === 2 && (
-                  <ProductionUpgrade
-                    stageEnvId={stageEnvId}
-                    productEnvId={productEnvId}
-                    isUpgrading={isUpgrading || isPendingProductionUpgrade}
-                    upgradeVersion={templateDetail?.productVersion}
-                    isUpgraded={isUpgraded}
-                  />
-                )}
-              </Suspense>
-            </Flex>
-          </Flex>
-        </Spin>
+        <Flex className={styles.mapping}>
+          <Suspense fallback={<Spin style={{ width: "100%" }} />}>
+            {currentStep === 0 && (
+              <ControlPlaneUpgrade
+                isUpgrading={isUpgrading || isPendingControlPlaneUpgrade}
+                isUpgraded={isUpgraded}
+              />
+            )}
+            {currentStep === 1 && (
+              <StageUpgrade
+                stageEnvId={stageEnvId}
+                isUpgrading={isUpgrading || isPendingStageUpgrade}
+                upgradeVersion={templateDetail?.productVersion}
+                isUpgraded={isUpgraded}
+              />
+            )}
+            {currentStep === 2 && (
+              <ProductionUpgrade
+                stageEnvId={stageEnvId}
+                productEnvId={productEnvId}
+                isUpgrading={isUpgrading || isPendingProductionUpgrade}
+                upgradeVersion={templateDetail?.productVersion}
+                isUpgraded={isUpgraded}
+              />
+            )}
+          </Suspense>
+        </Flex>
+        {/* </Spin> */}
       </Flex>
 
       <Flex justify="flex-end" gap={8}>

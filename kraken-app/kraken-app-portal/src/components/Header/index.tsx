@@ -5,12 +5,10 @@ import {
   Dropdown,
   Flex,
   Tag,
-  Tooltip,
 } from "antd";
 import styles from "./index.module.scss";
 import Logo from "@/assets/logo.svg";
 import {
-  CloseOutlined,
   EditTwoTone,
   LogoutOutlined,
   QuestionCircleOutlined,
@@ -18,36 +16,15 @@ import {
 import { useTutorialStore } from "@/stores/tutorial.store";
 import { useUser } from "@/hooks/user/useUser";
 import { Text } from "../Text";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { UserAvatar } from "./UserAvatar";
 import { ISystemInfo } from "@/utils/types/user.type";
 import UpgradingIcon from '@/assets/icon/upgrading.svg'
 
-const TooltipBody = (setTutorialCompleted: (value: boolean) => void) => (
-  <div className={styles.tooltip}>
-    <Flex justify="space-between">
-      <span>Open the guide here.</span>
-      <CloseOutlined
-        style={{ fontSize: 12 }}
-        onClick={() => setTutorialCompleted(false)}
-      />
-    </Flex>
-    <Flex justify="end">
-      <Button
-        onClick={() => {
-          setTutorialCompleted(false);
-        }}
-      >
-        Got it
-      </Button>
-    </Flex>
-  </div>
-);
-
 const Header = ({ info }: Readonly<{ info?: ISystemInfo }>) => {
+  const location = useLocation()
   const { currentUser } = useUser();
-  const { tutorialCompleted, setTutorialCompleted, setOpenTutorial } =
-    useTutorialStore();
+  const { toggleTutorial } = useTutorialStore();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -113,20 +90,16 @@ const Header = ({ info }: Readonly<{ info?: ISystemInfo }>) => {
               <UpgradingIcon />
               Mapping template upgrading
             </Link>
-            <Divider type="vertical" style={{ height: 16, padding: 0}} />
+            <Divider type="vertical" style={{ height: 16, padding: 0 }} />
           </>
         )}
 
-        <Tooltip
-          align={{ offset: [12, 15] }}
-          overlayInnerStyle={{ zIndex: 1 }}
-          placement="bottomLeft"
-          open={tutorialCompleted || undefined}
-          title={TooltipBody(setTutorialCompleted)}
-          rootClassName={styles.tooltipBlue}
-        >
-          <QuestionCircleOutlined onClick={() => setOpenTutorial(true)} />
-        </Tooltip>
+        {/^\/api-mapping/.test(location.pathname) && (
+          <Button
+            type="link"
+            style={{ color: 'var(--text)', padding: '0 4px' }}
+            onClick={toggleTutorial}><QuestionCircleOutlined /></Button>
+        )}
 
         <Dropdown
           placement="bottomRight"
