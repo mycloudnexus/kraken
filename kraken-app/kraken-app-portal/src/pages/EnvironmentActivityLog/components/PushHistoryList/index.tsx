@@ -16,6 +16,7 @@ import mockData from "./historyMockData.json"
 import { DAY_FORMAT, DAY_TIME_FORMAT_NORMAL } from '@/utils/constants/format';
 import { capitalize } from 'lodash';
 import { PresetStatusColorType } from 'antd/es/_util/colors';
+import { useUser } from '@/hooks/user/useUser';
 
 
 const initPagination = {
@@ -51,8 +52,9 @@ const PushHistoryList = () => {
     handlePaginationChange,
     handlePaginationShowSizeChange,
   } = useCommonListProps({}, initPagination);
-
+  const { findUserName } = useUser();
   const { data, isLoading } = useGetPushActivityLogHistory();
+
   useEffect(() => {
     if (!isLoading) {
       const updatedTableData = data?.data ?? mockData.data.data;
@@ -91,7 +93,7 @@ const PushHistoryList = () => {
     {
       key: "pushedBy",
       title: "Pushed by",
-      render: (log: IPushHistory) => log.pushedBy,
+      render: (log: IPushHistory) => findUserName(log.pushedBy),
     },
     {
       key: "status",

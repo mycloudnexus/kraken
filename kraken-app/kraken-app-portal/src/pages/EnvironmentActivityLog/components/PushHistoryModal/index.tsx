@@ -93,7 +93,7 @@ const PushHistoryModal = ({
         >
           <Radio.Group size="middle" name="Environment" >
             {envOptions.map((key) => (
-              <Radio value={key.value}>{capitalize(key.label)}</Radio>
+              <Radio key={key.value} value={key.value}>{capitalize(key.label)}</Radio>
             ))}
           </Radio.Group>
         </Form.Item>
