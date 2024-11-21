@@ -8,7 +8,7 @@ import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { extractOpenApiStrings } from "@/utils/helpers/schema";
 import { IComponent } from "@/utils/types/component.type";
 import { DownOutlined, RightOutlined } from "@ant-design/icons";
-import { Button, Input, Spin, Tooltip, Typography, notification } from "antd";
+import { Button, Input, Spin, Typography, notification } from "antd";
 import clsx from "clsx";
 import { decode } from "js-base64";
 import jsYaml from "js-yaml";
@@ -19,6 +19,7 @@ import swaggerClient from "swagger-client";
 import { useBoolean } from "usehooks-ts";
 import useGetApiSpec from "../useGetApiSpec";
 import styles from "./index.module.scss";
+import TrimmedPath from "@/components/TrimmedPath";
 
 type ItemProps = {
   item: IComponent;
@@ -201,11 +202,7 @@ export const APIItem = ({
                   style={{ marginBottom: 10 }}
                 >
                   <RequestMethod method={method} noSpace />
-                  <Tooltip title={url}>
-                    <Typography.Text ellipsis={{ tooltip: true }}>
-                      {url}
-                    </Typography.Text>
-                  </Tooltip>
+                  <TrimmedPath path={url} />
                 </Flex>
                 <Typography.Text
                   style={{ fontSize: 14, color: "#00000073" }}

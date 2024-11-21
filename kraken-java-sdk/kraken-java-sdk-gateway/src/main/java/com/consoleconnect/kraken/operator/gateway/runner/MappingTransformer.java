@@ -227,12 +227,10 @@ public interface MappingTransformer {
       }
     }
     if (loc > 0) {
-      if (Objects.equals(targetType, ENUM_KIND)) {
-        return String.format("${%s}", strippedValue);
-      }
       if (Boolean.TRUE.equals(replaceStar)) {
         return String.format("${%s}", replaceStar(strippedValue));
       }
+      return String.format("${%s}", strippedValue);
     }
     return "${" + strippedValue + "}";
   }

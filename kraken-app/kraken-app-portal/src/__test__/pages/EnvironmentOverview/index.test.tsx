@@ -1,9 +1,6 @@
-import { render } from "@testing-library/react";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient } from "@/utils/helpers/reactQuery";
-import { BrowserRouter } from "react-router-dom";
 import EnvironmentOverview from "@/pages/EnvironmentOverview";
 import * as productHooks from "@/hooks/product";
+import { fireEvent, render, waitFor } from "@/__test__/utils";
 
 const ResizeObserverMock = vi.fn(() => ({
   observe: vi.fn(),
@@ -14,20 +11,7 @@ const ResizeObserverMock = vi.fn(() => ({
 // Stub the global ResizeObserver
 vi.stubGlobal('ResizeObserver', ResizeObserverMock);
 
-
-
-test("EnvironmentOverview page", () => {
-  const { container } = render(
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <EnvironmentOverview />
-      </BrowserRouter>
-    </QueryClientProvider>
-  );
-  expect(container).toBeInTheDocument();
-});
-
-describe(" EnvironmentOverview   component list", () => {
+describe(" Environment Overview component list", () => {
   beforeAll(() => {
     vi.spyOn(productHooks, "useGetProductEnvs").mockReturnValue({
       data: {
@@ -77,62 +61,24 @@ describe(" EnvironmentOverview   component list", () => {
     } as any);
   });
 
-  it("running components list", () => {
-    const { getByText } = render(
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <EnvironmentOverview />
-        </BrowserRouter>
-      </QueryClientProvider>
+  it("running components list", async () => {
+    const { getByText, getAllByRole } = render(
+      <EnvironmentOverview />
     );
     const ele = getByText("production Environment");
     expect(ele).toBeInTheDocument();
-  });
-});
 
-describe(" EnvironmentOverview   component list stage", () => {
-  beforeAll(() => {
-    vi.spyOn(productHooks, "useGetProductEnvs").mockReturnValue({
-      data: {
-        data: [
-          {
-            id: "32b4832f-fb2f-4c99-b89a-c5c995b18dfc",
-            productId: "mef.sonata",
-            createdAt: "2024-05-30T13:02:03.224486Z",
-            name: "stage",
-          },
-        ],
-      },
-      isLoading: false,
-    } as any);
-    vi.spyOn(productHooks, "useGetRunningAPIList").mockReturnValue({
-      data: [
-        {
-          id: "32b4832f-fb2f-4c99-b89a-c5c995b18dfc",
-          createdAt: "2024-06-18T02:00:06.730627Z",
-          name: "stage",
-          status: "IN_PROCESS",
-          version: "1.0",
-          key: "mef.sonata.api.quote",
-          componentName: "testname",
-        },
-      ],
-      isLoading: false,
-    } as any);
-  });
+    const tabs = getAllByRole('radio')
 
-  afterAll(() => {
-    vi.clearAllMocks();
-  });
+    expect(tabs).toHaveLength(2)
+    expect(tabs[0].parentNode?.parentNode).toHaveTextContent('Running API mappings')
+    expect(tabs[1].parentNode?.parentNode).toHaveTextContent('Deployment history')
 
-  it("running components list", () => {
-    const { container } = render(
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <EnvironmentOverview />
-        </BrowserRouter>
-      </QueryClientProvider>
-    );
-    expect(container).toBeInTheDocument();
+    // Should default open running api mapping tab
+    await waitFor(() => expect(getByText('Component')).toBeInTheDocument())
+
+    // Open deployment history tab
+    fireEvent.click(tabs[1])
+    await waitFor(() => expect(getByText('API mapping')).toBeInTheDocument())
   });
 });
