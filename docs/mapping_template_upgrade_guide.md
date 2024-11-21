@@ -11,28 +11,59 @@
 
 ### Release phase
 
-* create the the final release version.
+* Create the final release version.
 * Merge all change notes (since the last release) into the final release.
 * Remove all development and test versions in directory of mef-sonata/template-upgrade.
 
+## Mapping Template Version Naming Convention
 
+### Version Pattern
+
+{Major}.{Minor}.{Patch}
+
+* Major
+  * Arabic numerals
+  * Consistent with the major version of the Kraken application
+* Minor
+  * Arabic numerals
+* Patch
+  * Letters or numbers
+
+### Version naming convention
+
+#### Development phase
+
+* version ends with suffix snapshot,for example
+  * 1.0.1-snapshot
+  * 1.2.0-snapshot
+
+#### Release phase
+
+Version should not contain letters,for example
+
+* 1.6.0
+* 1.6.1
+* 2.0.0
+
+The following picture explains the rules for version number changes during the development and release phases.
+![mapping-template-mode.png](img/mapping-template-mode.png)
 ## When to add a new mapping template release
 
-* Add Api Use Case
-* Modify existed Api Use Case
+* Add API Use Case
+* Modify existed API Use Case
   * Modify user mapping template
   * Modify mapping target file
-  * Modify Api orchestration file
-  * Modify APi request validation rule file
+  * Modify API orchestration file
+  * Modify API request validation rule file
 * Other changes
-  * Add/Modify  api spec file
-  * Add/Modify open api spec of supported product
+  * Add/Modify  API spec file
+  * Add/Modify open API spec of supported product
 
 ## How to create a mapping template release
 
-1. Create a mapping teplate release file(e.g. release.1.5.13.yaml)  under directory of mef-sonata/template-upgrade in the module of kraken-java-sdk-mef.
+1. Create a mapping template release file(e.g. release.1.5.13.yaml)  under directory of mef-sonata/template-upgrade in the module of kraken-java-sdk-mef.
 
-   Here show an example of mapping tempalte relase
+   Here show an example of mapping template release
 
    ```yaml
    ---
@@ -48,7 +79,7 @@
      description: |
        Make some improvements to order template:
          add itemTerm in add order template;
-         add expectedCompeletionDate in get order template;
+         add expectedCompletionDate in get order template;
      version: 1
    ```
    **Important fields explanation**
