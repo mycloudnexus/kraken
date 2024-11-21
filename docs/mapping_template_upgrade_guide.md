@@ -1,4 +1,4 @@
-# Mapping template upgrade guide
+# Mapping template release guide
 
 ## Workflow of mapping template release
 
