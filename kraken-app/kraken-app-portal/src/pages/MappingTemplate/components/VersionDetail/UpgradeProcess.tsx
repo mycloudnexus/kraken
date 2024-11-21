@@ -74,7 +74,7 @@ export function UpgradeProcess({
 
                 return {
                   title: getUpgradeEnv(envName),
-                  className: classNames(status === "process" && "upgrading"),
+                  className: classNames(status === "IN_PROCESS" && "upgrading"),
                   description: (
                     <>
                       <p className={styles.stepInfo}>
