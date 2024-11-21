@@ -218,7 +218,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner {
         continue;
       }
       if (MappingTypeEnum.ENUM.getName().equals(mapper.getSourceType())
-          || MappingTypeEnum.DISCRETE.getName().equals(mapper.getSourceType())) {
+          || MappingTypeEnum.CUSTOMIZED_ENUM.getName().equals(mapper.getSourceType())) {
         checkEnumValue(mapper.getSource(), mapper.getTarget(), inputs, mapper.getSourceValues());
       } else if (mapper.getTarget() != null && !mapper.getTarget().contains("@{{")) {
         checkConstantValue(mapper.getSource(), mapper.getTarget(), inputs);

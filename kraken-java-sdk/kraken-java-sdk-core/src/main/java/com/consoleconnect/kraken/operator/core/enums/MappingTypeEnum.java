@@ -7,6 +7,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum MappingTypeEnum {
   ENUM("enum"),
-  DISCRETE("discrete");
+  CUSTOMIZED_ENUM("customized_enum");
   private final String name;
 }
