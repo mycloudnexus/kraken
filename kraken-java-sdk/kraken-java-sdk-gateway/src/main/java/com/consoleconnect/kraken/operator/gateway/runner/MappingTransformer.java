@@ -11,6 +11,7 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
+import net.minidev.json.JSONArray;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -134,20 +135,30 @@ public interface MappingTransformer {
                 String.format(
                     "Json Path read key error, key:%s, value:%s will be deleted", key, value);
             LogHolder.log.error(err, e);
-            doc.delete(value);
+            deleteByPath(value, doc);
             return;
           }
           if (null == obj || (obj instanceof String str && (StringUtils.isBlank(str)))) {
-            doc.delete(value);
+            deleteByPath(value, doc);
           } else if (obj instanceof Integer i && i <= 0) {
-            doc.delete(value);
+            deleteByPath(value, doc);
           } else if (obj instanceof Boolean b && !b) {
-            doc.delete(value);
+            deleteByPath(value, doc);
+          } else if (obj instanceof JSONArray array && array.isEmpty()) {
+            deleteByPath(value, doc);
           } else {
             LogHolder.log.warn("Reserved key:{}, value:{}", key, value);
           }
         });
     return doc.jsonString();
+  }
+
+  default void deleteByPath(String path, DocumentContext doc) {
+    try {
+      doc.delete(path);
+    } catch (Exception e) {
+      LogHolder.log.warn("Delete path {} error: {}", path, e.getMessage());
+    }
   }
 
   default String calculateBasedOnResponseBody(String responseBody, Map<String, Object> context) {
