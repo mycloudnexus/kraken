@@ -92,6 +92,9 @@ app:
   controlPlane:
     url: http://localhost:8001
     token: Bearer ${KRAKEN_MGMT_API_ACCESS_TOKEN:FAKE_TOKEN}
+    push-activity-log-external:
+      enabled: false
+      batch-size: ${EXTERNAL_SYSTEM_PUSH_LOG_BATCH_SIZE:200}
   cron-job:
     pull-api-server-info: 0/20 * * * * *
     pull-server-assets: 0 0/1 * * * *
@@ -99,6 +102,7 @@ app:
     pull-reset-event: 0 0/1 * * * *
     push-heartbeat: 0/20 * * * * *
     push-log: 0/20 * * * * *
+    push-log-external-system: 0 0/1 * * * *
   accept-asset-kinds:
     - kraken.component.api
     - kraken.component.api-target

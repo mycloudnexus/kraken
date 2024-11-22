@@ -193,6 +193,9 @@ app:
     endpoints:
       exposure:
         include: asset, component, product, ingestion, component-operation, component-mapper
+  features:
+    push-activity-log-external:
+      enabled: false
 
   initialize-exclude-assets:
     - classpath:/mef-sonata/apis/api.product.offering.yaml
