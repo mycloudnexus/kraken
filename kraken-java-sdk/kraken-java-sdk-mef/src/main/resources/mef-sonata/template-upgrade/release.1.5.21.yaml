@@ -1,0 +1,13 @@
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.1.5.21
+  name: V1.5.21
+  labels:
+    productSpec: grace
+    productVersion: V1.5.21
+    publishDate: 2024-11-21
+  description: |
+    Added state and changeDate under the stateChange node for order detail query.
+  version: 2

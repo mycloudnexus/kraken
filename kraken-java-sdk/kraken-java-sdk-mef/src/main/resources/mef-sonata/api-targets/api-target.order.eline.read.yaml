@@ -56,7 +56,13 @@ spec:
               "itemTerm": "${entity.renderedResponse.productOrderItem[0].itemTerm}",
               "milestone": "${entity.renderedResponse.productOrderItem[0].milestone}",
               "state": "((mefResponseBody.state))",
-              "terminationError": "${entity.renderedResponse.productOrderItem[0].terminationError}"
+              "terminationError": "${entity.renderedResponse.productOrderItem[0].terminationError}",
+              "stateChange":[
+                {
+                  "state":"((mefResponseBody.state))",
+                  "changeDate":""
+                }
+              ]
             }
           ],
           "orderDate":"${entity.renderedResponse.orderDate}",

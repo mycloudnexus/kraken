@@ -143,21 +143,21 @@ spec:
               - partial
               - rejected
             valueMapping:
-              progressing: inProgress,
-              created: acknowledged,
-              CREATING: acknowledged,
-              ACTIVATING: inProgress,
-              ACCEPTED: inProgress,
-              MANUAL: inProgress,
-              DELETING: inProgress,
-              DISABLING: inProgress,
-              DENIED: rejected,
-              ERROR: failed,
-              ACTIVE: completed,
-              DISABLED: disabled,
-              CANCELLED: disabled,
-              PENDING: pending,
-              PENDING_ACCEPTANCE: pending,
+              progressing: inProgress
+              created: acknowledged
+              CREATING: acknowledged
+              ACTIVATING: inProgress
+              ACCEPTED: inProgress
+              MANUAL: inProgress
+              DELETING: inProgress
+              DISABLING: inProgress
+              DENIED: rejected
+              ERROR: failed
+              ACTIVE: completed
+              DISABLED: disabled
+              CANCELLED: disabled
+              PENDING: pending
+              PENDING_ACCEPTANCE: pending
               DELETED: completed
             source: "@{{responseBody.status}}"
             sourceLocation: BODY
