@@ -11,7 +11,6 @@ test("PushHistoryModal", () => {
         <PushHistoryModal
           isOpen={true}
           onClose={vi.fn()}
-          onOK={vi.fn()}
           envOptions={[{
             value: "testEnv",
             label: "Test Env"

@@ -202,7 +202,6 @@ const EnvironmentActivityLog = () => {
             isOpen={isOpen}
             envOptions={envOptions}
             onClose={close}
-            onOK={() => alert('OK')}
           />
         )}
         <Flex align="center" justify="space-between">

@@ -6,13 +6,15 @@ import dayjs from 'dayjs';
 import { useGetProductEnvActivitiesMutation } from '@/hooks/product';
 import { disabled7DaysDate } from '@/utils/helpers/date';
 import { useAppStore } from "@/stores/app.store";
+import { usePostPushActivityLog } from '@/hooks/pushApiEvent';
+import { ICreateActivityHistoryLogRequest } from '@/utils/types/common.type';
+import { TIME_ZONE_FORMAT } from '@/utils/constants/format';
 
 const { RangePicker } = DatePicker;
 
 type Props = {
   isOpen: boolean;
   onClose: () => void;
-  onOK: (value: string) => void;
   envOptions: Array<{
     value: string;
     label: string;
@@ -22,19 +24,32 @@ type Props = {
 const PushHistoryModal = ({
   isOpen,
   onClose,
-  onOK,
   envOptions,
 }: Props) => {
   const [form] = Form.useForm();
   const { currentProduct } = useAppStore();
 
+  const { data: responseData, mutateAsync: getProductEnvActivities, isPending, isSuccess } = useGetProductEnvActivitiesMutation();
+  const { mutateAsync: createPushActivityLog } = usePostPushActivityLog();
+
   const handleOK = () => {
-    // TODO:
-    onOK(form.getFieldsValue());
+    createPushActivityLog(parseParams())
+    onClose();
   };
 
-  const { data: responseData, mutateAsync, isPending, isSuccess } = useGetProductEnvActivitiesMutation();
-
+  const parseParams = () : ICreateActivityHistoryLogRequest => {
+    const { envId, requestTime } = form.getFieldsValue(); 
+    return {
+      startTime: requestTime?.[0]
+        ? dayjs(requestTime[0]).startOf("day").format(TIME_ZONE_FORMAT)
+        : undefined,
+      endTime: requestTime?.[1]
+        ? dayjs(requestTime[1]).endOf("day").format(TIME_ZONE_FORMAT)
+        : undefined,
+      envId
+    };
+  }
+ 
   const handleFormValuesChange = useCallback(
     (t: any, values: any) => {
       if (t.path) return;
@@ -42,15 +57,15 @@ const PushHistoryModal = ({
 
       const params = {
         requestStartTime: requestTime?.[0]
-          ? dayjs(requestTime[0]).startOf("day").valueOf()
+          ? dayjs(requestTime[0]).startOf("day").format(TIME_ZONE_FORMAT)
           : undefined,
         requestEndTime: requestTime?.[1]
-          ? dayjs(requestTime[1]).endOf("day").valueOf()
+          ? dayjs(requestTime[1]).endOf("day").format(TIME_ZONE_FORMAT)
           : undefined
       }
 
       if (values.envId && !!params.requestStartTime) {
-        mutateAsync({
+        getProductEnvActivities({
           productId: currentProduct,
           envId: values.envId,
           params

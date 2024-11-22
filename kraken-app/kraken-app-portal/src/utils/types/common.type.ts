@@ -64,6 +64,12 @@ export interface IEndpointUsageAsset {
   };
 }
 
+export interface ICreateActivityHistoryLogRequest {
+  startTime?: string;
+  endTime?: string;
+  envId?: string;
+};
+
 export enum EnumRightType {
   SelectSellerAPI,
   AddSonataProp,
