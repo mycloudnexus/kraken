@@ -64,6 +64,8 @@ spec:
             source: ""
             sourceLocation: "BODY"
             target: "@{{completionDate}}"
+            checkPath: "$[?(@.state == 'completed')]"
+            deletePath: "$.completionDate"
             targetLocation: "BODY"
             requiredMapping: false
           - name: mapper.order.uni.read.delete.instanceId
@@ -80,6 +82,8 @@ spec:
             source: ""
             sourceLocation: "BODY"
             target: "@{{productOrderItem[0].completionDate}}"
+            checkPath: "$.productOrderItem[?(@.state == 'completed')]"
+            deletePath: "$.productOrderItem[?(@.state != 'completed')].completionDate"
             targetLocation: "BODY"
             requiredMapping: false
           - name: mapper.order.uni.read.delete.productOrderItem.expectedCompleteDate
