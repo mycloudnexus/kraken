@@ -64,7 +64,7 @@ spec:
             source: ""
             sourceLocation: "BODY"
             target: "@{{completionDate}}"
-            checkPath: "$[?(@.state == 'completed')]"
+            checkPath: "$[?(@.state == 'completed'||@.state == 'failed'||@.state == 'partial'||@.state == 'rejected'||@.state == 'cancelled')]"
             deletePath: "$.completionDate"
             targetLocation: "BODY"
             requiredMapping: false

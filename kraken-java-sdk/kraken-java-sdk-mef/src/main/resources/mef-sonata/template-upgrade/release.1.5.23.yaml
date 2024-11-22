@@ -2,11 +2,11 @@
 kind: kraken.product.template-upgrade
 apiVersion: v1
 metadata:
-  key: kraken.product.template-upgrade.1.5.22
-  name: V1.5.22
+  key: kraken.product.template-upgrade.1.5.23
+  name: V1.5.23
   labels:
     productSpec: grace
-    productVersion: V1.5.22
+    productVersion: V1.5.23
     publishDate: 2024-11-22
   description: |
     Remove completionDate when state != completed.
