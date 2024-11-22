@@ -65,7 +65,7 @@ spec:
             sourceLocation: "BODY"
             target: "@{{completionDate}}"
             targetLocation: "BODY"
-            checkPath: "$[?(@.state == 'completed')]"
+            checkPath: "$[?(@.state == 'completed'||@.state == 'failed'||@.state == 'partial'||@.state == 'rejected'||@.state == 'cancelled')]"
             deletePath: "$.completionDate"
             requiredMapping: false
           - name: mapper.order.eline.read.instanceId
