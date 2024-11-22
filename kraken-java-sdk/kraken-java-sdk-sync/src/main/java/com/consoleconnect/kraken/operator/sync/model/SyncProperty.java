@@ -29,6 +29,8 @@ public class SyncProperty {
     private String pushEventEndpoint = "/client/events";
 
     private String triggerInstallationEndpoint = "/v2/callback/triggers/installation";
+
+    private PushActivityLogExternal pushActivityLogExternal;
   }
 
   @Data
@@ -36,5 +38,11 @@ public class SyncProperty {
     private String retrieveProductReleaseEndpoint = "/callback/agent/latest-release-subscription";
     private String downloadMappingTemplateEndpoint = "/callback/agent/mapping-template-download";
     private String mgmtPushEventEndpoint = "/callback/agent/events";
+  }
+
+  @Data
+  public static class PushActivityLogExternal {
+    private boolean enabled;
+    private int batchSize = 200;
   }
 }
