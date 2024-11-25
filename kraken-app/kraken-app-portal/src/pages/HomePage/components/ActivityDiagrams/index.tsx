@@ -110,7 +110,7 @@ const ActivityDiagrams = ({ envs }: Props) => {
             </Form.Item>
             <Form.Item name="buyer">
               <Select
-                options={[{ value: "all", label: "All buyers" }]}
+                options={[{ value: undefined, label: "All buyers" }]}
                 placeholder="All buyers"
                 popupMatchSelectWidth={false}
                 size="middle"

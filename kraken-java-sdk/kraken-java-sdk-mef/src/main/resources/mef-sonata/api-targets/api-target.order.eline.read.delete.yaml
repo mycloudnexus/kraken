@@ -53,18 +53,21 @@ spec:
               "requestedItemTerm": "${entity.renderedResponse.productOrderItem[0].requestedItemTerm}",
               "tspRestorationPriority": "${entity.renderedResponse.productOrderItem[0].tspRestorationPriority}",
               "charge": "${entity.renderedResponse.productOrderItem[0].charge}",
-              "completionDate": "((mefResponseBody.state=='completed'?mefResponseBody.completionDate:null))",
-              "expectedCompletionDate": "${entity.renderedResponse.productOrderItem[0].requestedCompletionDate}",
               "expediteAcceptedIndicator": "${entity.renderedResponse.productOrderItem[0].expediteIndicator}",
               "itemTerm": "${entity.renderedResponse.productOrderItem[0].itemTerm}",
               "milestone": "${entity.renderedResponse.productOrderItem[0].milestone}",
               "state": "((mefResponseBody.state))",
-              "terminationError": "${entity.renderedResponse.productOrderItem[0].terminationError}"
+              "terminationError": "${entity.renderedResponse.productOrderItem[0].terminationError}",
+              "stateChange":[
+                {
+                  "state":"((mefResponseBody.state))",
+                  "changeDate":""
+                }
+              ]
             }
           ],
           "orderDate":"${entity.renderedResponse.orderDate}",
           "state": "",
           "orderId": "${entity.renderedResponse.orderId}",
-          "completionDate": "((mefResponseBody.state=='completed'?mefResponseBody.completionDate:null))",
           "instanceId": ""
         }
