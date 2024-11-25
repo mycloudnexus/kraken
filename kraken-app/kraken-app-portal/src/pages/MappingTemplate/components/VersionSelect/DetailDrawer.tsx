@@ -20,6 +20,7 @@ export function DetailDrawer({ deploymentId, ...props }: Readonly<DrawerProps & 
       {...props}
       title="View details"
       width={760}
+      maskClosable
       className={styles.detailDrawer}
     >
       <Alert
