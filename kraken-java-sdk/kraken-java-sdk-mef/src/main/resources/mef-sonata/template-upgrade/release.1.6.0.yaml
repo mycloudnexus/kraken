@@ -15,7 +15,7 @@ metadata:
     - get UNI DELETE order by id
     - get Eline DELETE order by id
     update 4 get order by id template to support stateChange mapping
-    quote status will be "unableToProvide" when seller return a negative price value
+    quote status will be "unableToProvide" when seller API returns a negative price value
     add itemTerm in the response mapping of create UNI ADD order and create Eline ADD order
-    add productOrderItem[0].product.id in response mapping of create UNI add order and create Eline add order
+    add product id in response mapping of create UNI add order and create Eline add order
   version: 1
