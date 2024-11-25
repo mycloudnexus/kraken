@@ -1,7 +1,6 @@
-import { Tag, Flex, Typography } from "antd";
+import { Tag, Flex, Typography, FlexProps } from "antd";
 import { toUpper } from "lodash";
 import styles from "./index.module.scss";
-import { HTMLAttributes } from "react";
 import classNames from "classnames";
 
 function beautifyCamelCase(text: string): string {
@@ -18,7 +17,7 @@ const MappingMatrix = ({
   extraKey?: string;
   mappingMatrix: Record<string, string | boolean>;
   isItemActive?: boolean;
-} & HTMLAttributes<HTMLDivElement>>) => {
+} & Omit<FlexProps, 'children'>>) => {
   if (!mappingMatrix) return null;
   const renderTextType = (type: string | boolean) => {
     switch (type) {

@@ -575,6 +575,7 @@ export const useGetBuyerList = (
     queryFn: () => getBuyerList(productId, params),
     enabled: Boolean(productId) && Boolean(params.envId),
     select: (data) => data?.data,
+    staleTime: STALE_TIME,
   });
 };
 

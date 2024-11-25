@@ -1,12 +1,14 @@
-import { render, renderHook } from "@testing-library/react";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient } from "@/utils/helpers/reactQuery";
-import { BrowserRouter } from "react-router-dom";
 import NewAPIMapping from "@/pages/NewAPIMapping";
-import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
+import * as newApiMappingHooks from "@/stores/newApiMapping.store";
+import { render, renderHook } from "@/__test__/utils";
+import HeaderMapping from "@/pages/NewAPIMapping/components/HeaderMapping"
+
+beforeEach(() => {
+  vi.clearAllMocks()
+})
 
 beforeAll(() => {
-  const { result } = renderHook(() => useNewApiMappingStore());
+  const { result } = renderHook(() => newApiMappingHooks.useNewApiMappingStore());
   result.current.setResponseMapping([
     {
       name: "mapper.quote.uni.add.state",
@@ -110,12 +112,46 @@ beforeAll(() => {
 
 test("NewAPIMapping page", () => {
   const { container } = render(
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <NewAPIMapping isRequiredMapping={true} />
-        <NewAPIMapping isRequiredMapping={false} />
-      </BrowserRouter>
-    </QueryClientProvider>
+    <>
+      <NewAPIMapping isRequiredMapping={true} />
+      <NewAPIMapping isRequiredMapping={false} />
+    </>
   );
   expect(container).toBeInTheDocument();
 });
+
+describe('api mapping components tests', () => {
+  it('should render mapping header component', () => {
+    const setRightSide = vi.fn()
+    const setRequestMapping = vi.fn()
+    const setSellerApi = vi.fn()
+    const setServerKey = vi.fn()
+    const setListMappingStateResponse = vi.fn()
+
+    vi.spyOn(newApiMappingHooks, 'useNewApiMappingStore').mockReturnValue({
+      sellerApi: {
+        method: 'GET',
+        url: 'seller/a/b/c/d',
+
+      },
+      query: JSON.stringify({
+        method: 'POST',
+        path: 'query/path',
+      }),
+      rightSide: 0,
+      setRightSide,
+      setRequestMapping,
+      setSellerApi,
+      setServerKey,
+      setListMappingStateResponse
+    })
+
+    const { getByTestId } = render(<HeaderMapping mappers={{
+      request: [],
+      response: []
+    }} />)
+
+    expect(getByTestId('sonataApi')).toHaveTextContent('Sonata API')
+    expect(getByTestId('sellerApi')).toHaveTextContent('Seller API')
+  })
+})

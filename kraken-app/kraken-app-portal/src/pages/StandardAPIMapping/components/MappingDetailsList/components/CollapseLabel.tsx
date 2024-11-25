@@ -1,8 +1,9 @@
 import RequestMethod from "@/components/Method";
-import { Flex, Tooltip } from "antd";
+import { Flex } from "antd";
 import styles from "../index.module.scss";
 import Dot from "./Dot";
 import { IMapperDetails } from "@/utils/types/env.type";
+import TrimmedPath from "@/components/TrimmedPath";
 
 type CollapseLabelProps = {
   handleSelection: (mapItem: IMapperDetails) => void;
@@ -25,8 +26,6 @@ const CollapseLabel = ({
     handleSelection(labelProps);
   };
 
-  const pathSnippet = labelProps.path.split("/").slice(-2).join("/");
-
   return (
     <Flex
       className={`${styles.labelWrapper} ${highlighted ? styles.highlighted : ""
@@ -35,9 +34,8 @@ const CollapseLabel = ({
     >
       {isActive && !isOneChild && <Dot />}
       <RequestMethod method={labelProps.method} />
-      <Tooltip title={labelProps.path}>
-        .../{pathSnippet} {size > 1 && `(${size})`}
-      </Tooltip>
+
+      <TrimmedPath style={{ width: 160 }} path={`${labelProps.path}${size > 1 ? ` (${size})` : ''}`} />
     </Flex>
   );
 };

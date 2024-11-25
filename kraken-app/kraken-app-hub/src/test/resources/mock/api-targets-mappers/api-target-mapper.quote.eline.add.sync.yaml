@@ -142,10 +142,11 @@ spec:
           - name: mapper.quote.eline.add.price.value
             title: Quote Price Value Mapping
             description: quote price value mapping
-            source: "@{{responseBody.results[0].price}}"
+            source: "@{{responseBody.results[*].price}}"
             sourceLocation: ""
             target: "@{{quoteItem[0].quoteItemPrice[*].price.dutyFreeAmount.value}}"
             requiredMapping: true
+            replaceStar: true
           - name: mapper.quote.eline.add.sync.taxRate
             title: Quote taxRate Mapping
             description: quote taxRate mapping
@@ -203,16 +204,18 @@ spec:
           - name: mapper.quote.eline.add.sync.quoteItemPrice.recurringChargePeriod
             title: Quote quoteItemPrice recurringChargePeriod Mapping
             description: quote quoteItemPrice recurringChargePeriod mapping
-            source: "month"
+            source: "@{{results[*].entity.duration.unit}}"
             sourceLocation: BODY
             target: "@{{quoteItem[0].quoteItemPrice[*].recurringChargePeriod}}"
             targetType: enum
             targetLocation: BODY
             requiredMapping: false
+            replaceStar: true
             targetValues:
               - hour
               - day
               - week
               - month
               - year
-            valueMapping: {}
+            valueMapping:
+              m: month
