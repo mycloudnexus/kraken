@@ -1,0 +1,21 @@
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.1.6.0
+  name: V1.6.0
+  labels:
+    productSpec: grace
+    productVersion: V1.6.0
+    publishDate: 2024-11-25
+  description: |
+    split get order by id into 4 use cases
+    - get UNI ADD order by id
+    - get Eline ADD order by id
+    - get UNI DELETE order by id
+    - get Eline DELETE order by id
+    update 4 get order by id template to support stateChange mapping
+    quote status will be "unableToProvide" when seller return a negative price value
+    add itemTerm in the response mapping of create UNI ADD order and create Eline ADD order
+    add productOrderItem[0].product.id in response mapping of create UNI add order and create Eline add order
+  version: 1
