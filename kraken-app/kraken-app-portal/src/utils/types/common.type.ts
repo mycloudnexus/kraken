@@ -70,6 +70,16 @@ export interface ICreateActivityHistoryLogRequest {
   envId?: string;
 };
 
+export interface IActivityHistoryLog {
+  id: string;
+  createdAt: string;
+  envName: string;
+  startTime: string;
+  endTime: string;
+  pushedBy: string;
+  status: string;
+}
+
 export enum EnumRightType {
   SelectSellerAPI,
   AddSonataProp,

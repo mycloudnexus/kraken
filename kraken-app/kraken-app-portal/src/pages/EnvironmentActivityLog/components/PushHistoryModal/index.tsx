@@ -9,7 +9,7 @@ import { useAppStore } from "@/stores/app.store";
 import { usePostPushActivityLog } from '@/hooks/pushApiEvent';
 import { ICreateActivityHistoryLogRequest } from '@/utils/types/common.type';
 import { TIME_ZONE_FORMAT } from '@/utils/constants/format';
-import RequiredMark from '@/components/RequiredFormMark';
+import renderRequiredMark from '@/components/RequiredFormMark';
 
 const { RangePicker } = DatePicker;
 
@@ -34,7 +34,7 @@ const PushHistoryModal = ({
   const { mutateAsync: createPushActivityLog } = usePostPushActivityLog();
 
   const handleOK = () => {
-    createPushActivityLog(parseParams())
+    createPushActivityLog(parseParams());
     onClose();
   };
 
@@ -90,9 +90,7 @@ const PushHistoryModal = ({
         layout="vertical"
         onFinish={handleOK}
         onValuesChange={handleFormValuesChange}
-        requiredMark={(label, { required }) => (
-          <RequiredMark label={label} required={required} />
-        )}>
+        requiredMark={renderRequiredMark}>
         <Form.Item
           name="envId"
           label="Environment"

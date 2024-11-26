@@ -1,6 +1,6 @@
 import { createActivityHistoryLog, getPushEventHistory } from '@/services/pushApiActivity';
 import { STALE_TIME } from '@/utils/constants/common';
-import { ICreateActivityHistoryLogRequest, IPagingData } from '@/utils/types/common.type';
+import { ICreateActivityHistoryLogRequest, IActivityHistoryLog, IPagingData } from '@/utils/types/common.type';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { AxiosResponse } from 'axios';
 import { queryClient } from "@/utils/helpers/reactQuery";
@@ -11,7 +11,7 @@ const PUSH_API_EVENT_CACHE_KEYS = {
 };
 
 export const useGetPushActivityLogHistory = () => {
-  return useQuery<AxiosResponse, Error, IPagingData<any>>({
+  return useQuery<AxiosResponse, Error, IPagingData<IActivityHistoryLog>>({
     queryKey: [PUSH_API_EVENT_CACHE_KEYS.get_product_env_list],
     queryFn: () => getPushEventHistory(),
     select: (data) => data.data,

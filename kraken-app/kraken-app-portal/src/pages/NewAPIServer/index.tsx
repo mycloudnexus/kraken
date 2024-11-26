@@ -22,7 +22,7 @@ import BtnStep from "./components/BtnStep";
 import SelectAPIServer from "./components/SelectAPIServer";
 import UploadYaml from "./components/UploadYaml";
 import styles from "./index.module.scss";
-import RequiredMark from '@/components/RequiredFormMark';
+import renderRequiredMark from '@/components/RequiredFormMark';
 
 const NewAPIServer = () => {
   const { componentId } = useParams();
@@ -181,9 +181,7 @@ const NewAPIServer = () => {
           className={styles.container}
           form={form}
           onFinish={onFinish}
-          requiredMark={(label, { required }) => (
-            <RequiredMark label={label} required={required} />
-          )}
+          requiredMark={renderRequiredMark}
         >
           <main id="12" className={styles.paper} style={{ flex: 1 }}>
             <div id="12" style={{ maxWidth: "60%", minWidth: 600 }}>

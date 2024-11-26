@@ -1,26 +1,22 @@
-import { render, waitFor } from "@testing-library/react";
-import RequiredMark from "../index";
+import { render, } from "@testing-library/react";
+import renderRequiredMark from '../index';
 
-test("test RequiredMark component with required flag", () => {
-  const { container, findByText } = render(
-    <RequiredMark
-      label={<>TEST</>}
-      required={true}
-    />
+test("test RequiredMark component without required flag", () => {
+  const label = 'Name';
+  const { container } = render(
+    renderRequiredMark(label, { required: false }) as React.ReactElement
   );
-  expect(container).toBeInTheDocument();
-  const text = findByText("*");
-  waitFor(() => {
-    expect(text).toBeInTheDocument()
-  })
+
+  expect(container).toHaveTextContent(label);
+  expect(container).toHaveTextContent('Name');
 });
 
-test("test RequiredMark component with non-required flag", () => {
+test("test RequiredMark component with required flag", () => {
+  const label = 'Name';
   const { container } = render(
-    <RequiredMark
-      label={<>TEST</>}
-      required={false}
-    />
+    renderRequiredMark(label, { required: true }) as React.ReactElement
   );
-  expect(container).toBeInTheDocument();
+
+  expect(container).toHaveTextContent(label);
+  expect(container).toHaveTextContent('Name *');
 });

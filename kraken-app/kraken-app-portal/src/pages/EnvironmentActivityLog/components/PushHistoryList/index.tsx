@@ -17,13 +17,18 @@ import { DAY_FORMAT, DAY_TIME_FORMAT_NORMAL } from '@/utils/constants/format';
 import { capitalize } from 'lodash';
 import { useUser } from '@/hooks/user/useUser';
 import { getStatusBadge } from '@/utils/helpers/ui';
+import { IActivityHistoryLog } from '@/utils/types/common.type';
 
 const initPagination = {
   pageSize: DEFAULT_PAGING.size,
   current: DEFAULT_PAGING.page,
 };
 
-const PushHistoryList = () => {
+type Props = {
+  handleHistoryActivityClick: (record: IActivityHistoryLog) => void;
+}
+
+  const PushHistoryList = ({ handleHistoryActivityClick } : Props) => {
   const {
     tableData,
     pagination,
@@ -37,7 +42,7 @@ const PushHistoryList = () => {
 
   useEffect(() => {
     if (!isLoading) {
-      const updatedTableData = data?.data ?? mockData.data.data;
+      const updatedTableData = mockData.data.data;
       const updatedPagination = {
         current: data?.page ?? initPagination.current,
         pageSize: data?.size ?? initPagination.pageSize,
@@ -90,6 +95,11 @@ const PushHistoryList = () => {
         rowKey={(record) =>
           `${record.id}_${record.createdAt}`
         }
+        onRow={(record: IActivityHistoryLog) => {
+          return {
+            onClick: () => handleHistoryActivityClick(record),
+          };
+        }}
         loading={isLoading}
         className={styles.table}
         pagination={{

@@ -30,7 +30,7 @@ test("PushHistoryList", () => {
   const { container } = render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <PushHistoryList />
+        <PushHistoryList handleHistoryActivityClick={vi.fn()}/>
       </BrowserRouter>
     </QueryClientProvider>
   );

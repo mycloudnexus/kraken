@@ -29,6 +29,7 @@ import PushHistoryModal from './components/PushHistoryModal';
 import { useBoolean } from 'usehooks-ts';
 import PushHistoryList from './components/PushHistoryList';
 import TrimmedPath from "@/components/TrimmedPath";
+import { IActivityHistoryLog } from '@/utils/types/common.type';
 
 const { RangePicker } = DatePicker;
 
@@ -149,6 +150,15 @@ const EnvironmentActivityLog = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const isActivityLogActive = useMemo(() => mainTabKey === 'activityLog', [mainTabKey])
 
+  const handleHistoryActivityClick = useCallback((record: IActivityHistoryLog) => {
+    setMainTabKey('activityLog');
+    setQueryParams({
+      ...queryParams,
+      requestStartTime: dayjs(record.startTime).startOf("day").valueOf(),
+      requestEndTime: dayjs(record.endTime).endOf("day").valueOf()
+    });
+  }, [queryParams]);
+
   const columns: ColumnsType<IActivityLog> = [
     {
       key: "name",
@@ -198,6 +208,7 @@ const EnvironmentActivityLog = () => {
       ),
     },
   ];
+
   return (
     <PageLayout title="API activity log">
       <div className={styles.contentWrapper} ref={refWrapper}>
@@ -258,9 +269,7 @@ const EnvironmentActivityLog = () => {
             </Form.Item>
 
             <Form.Item label="Time range from" name="requestTime">
-              <RangePicker
-                placeholder={["Select time", "Select time"]}
-              />
+              <RangePicker placeholder={["Select time", "Select time"]} />
             </Form.Item>
 
             <Form.Item label="Method and path">
@@ -312,7 +321,7 @@ const EnvironmentActivityLog = () => {
               x: 800,
             }}
           />
-            : <PushHistoryList />
+            : <PushHistoryList handleHistoryActivityClick={handleHistoryActivityClick} />
           }
         </div>
       </div>
