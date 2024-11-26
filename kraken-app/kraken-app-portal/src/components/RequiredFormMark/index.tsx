@@ -1,15 +1,13 @@
 
-const RequiredMark: React.FC<{ label: React.ReactNode; required: boolean }> = ({
+const RequiredMark: React.FC<{ label: React.ReactNode; required?: boolean; suffix?: React.ReactNode }> = ({
   label,
-  required,
+  required = false,
+  suffix = required ? <span style={{ color: '#FF4D4F' }}>*</span> : null,
 }) => {
-  return required ? (
+  return (
     <span>
-      {label}{' '}
-      <span style={{ color: '#FF4D4F' }}>*</span>
+      {label} {suffix}
     </span>
-  ) : (
-    <span>{label}</span>
   );
 };
 
