@@ -42,6 +42,9 @@ class PushKrakenVersionServiceTest extends AbstractIntegrationTest {
     systemInfoRepository.save(entity);
     // when
     pushKrakenVersionService.runIt();
+    entity.setStageAppVersion("2.0.0");
+    systemInfoRepository.save(entity);
+    pushKrakenVersionService.runIt();
     // then
     Page<MgmtEventEntity> eventEntities =
         mgmtEventRepository.findByEventTypeInAndStatus(

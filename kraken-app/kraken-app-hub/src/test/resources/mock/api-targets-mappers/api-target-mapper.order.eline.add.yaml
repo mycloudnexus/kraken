@@ -177,7 +177,7 @@ spec:
               - partial
               - rejected
             valueMapping:
-              CREATING: acknowledged,
+              CREATING: acknowledged
               ACTIVATING: inProgress
               ACCEPTED: inProgress
               MANUAL: inProgress
