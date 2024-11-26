@@ -98,13 +98,7 @@ spec:
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.inventory.eline.read.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.inventory.uni.list.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.inventory.eline.list.yaml
-    - classpath:/mef-sonata/template-upgrade/release.1.5.9.yaml
-    - classpath:/mef-sonata/template-upgrade/release.1.5.10.yaml
-    - classpath:/mef-sonata/template-upgrade/release.1.5.11.yaml
-    - classpath:/mef-sonata/template-upgrade/release.1.5.12.yaml
-    - classpath:/mef-sonata/template-upgrade/release.1.5.13.yaml
-    - classpath:/mef-sonata/template-upgrade/release.1.5.14.yaml
-    - classpath:/mef-sonata/template-upgrade/release.1.5.15.yaml
+    - classpath:/mef-sonata/template-upgrade/release.1.6.0.yaml
 
 
   templateUpgradePaths:

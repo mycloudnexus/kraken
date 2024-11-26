@@ -70,7 +70,7 @@ describe("Mapping template v2 component testing", () => {
       "What’s new of each release"
     );
     expect(getByTestId("meta")).toHaveTextContent(
-      "Process to upgrade Kraken to new version"
+      "Process to upgrade Mapping template to new version"
     );
 
     // Guidance steps

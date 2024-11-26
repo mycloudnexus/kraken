@@ -28,6 +28,7 @@ import styles from "./index.module.scss";
 import PushHistoryModal from './components/PushHistoryModal';
 import { useBoolean } from 'usehooks-ts';
 import PushHistoryList from './components/PushHistoryList';
+import TrimmedPath from "@/components/TrimmedPath";
 
 const { RangePicker } = DatePicker;
 
@@ -153,22 +154,24 @@ const EnvironmentActivityLog = () => {
       key: "name",
       title: "Method",
       render: (log: IActivityLog) => <LogMethodTag method={log.method} />,
-      width: 120,
+      width: 100,
     },
     {
       key: "name",
       title: "Path",
-      render: (log: IActivityLog) => log.path,
+      width: 300,
+      render: (log: IActivityLog) => <Flex><TrimmedPath path={log.path} /></Flex>,
     },
     {
       key: "buyerName",
       title: "Buyer name",
+      width: 200,
       render: (log: IActivityLog) => log.buyerName,
     },
     {
       key: "status",
       title: "Status code",
-      width: 160,
+      width: 140,
       render: (log: IActivityLog) => log.httpStatusCode,
     },
     {
@@ -180,7 +183,8 @@ const EnvironmentActivityLog = () => {
     {
       key: "action",
       title: "Action",
-      width: 200,
+      width: 160,
+      fixed: 'right',
       render: (log: IActivityLog) => (
         <Button
           type="link"
@@ -305,6 +309,7 @@ const EnvironmentActivityLog = () => {
             }}
             scroll={{
               y: (sizeWrapper?.height ?? 0) - (size?.height ?? 0) - 120,
+              x: 800,
             }}
           />
             : <PushHistoryList />
