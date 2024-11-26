@@ -44,7 +44,7 @@ const PushHistoryList = () => {
         total: data?.total,
       };
       setPagination(updatedPagination);
-      setTableData(updatedTableData!);
+      setTableData(updatedTableData);
     }
   }, [data, isLoading]);
 
