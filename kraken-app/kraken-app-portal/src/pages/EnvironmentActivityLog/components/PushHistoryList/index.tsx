@@ -42,7 +42,7 @@ type Props = {
 
   useEffect(() => {
     if (!isLoading) {
-      const updatedTableData = mockData.data.data;
+      const updatedTableData = data?.data ?? mockData.data.data;
       const updatedPagination = {
         current: data?.page ?? initPagination.current,
         pageSize: data?.size ?? initPagination.pageSize,
