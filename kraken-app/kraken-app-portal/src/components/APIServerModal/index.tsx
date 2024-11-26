@@ -32,7 +32,9 @@ const APIServerModal = ({ id, isOpen, refresh, onClose }: Props) => {
       className={styles.drawer}
       width={"80vw"}
       closable={false}
+      maskClosable
       open={isOpen}
+      onClose={onClose}
       footer={
         <Flex justifyContent="flex-end" gap={12}>
           <Button onClick={onClose}>Cancel</Button>
