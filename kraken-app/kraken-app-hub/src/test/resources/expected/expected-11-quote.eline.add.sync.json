@@ -27,7 +27,7 @@
           "name": "name-here",
           "priceType": "recurring",
           "description": "",
-          "recurringChargePeriod": "month"
+          "recurringChargePeriod": "${responseBody.results[0].entity.duration.unit}"
         }
       ]
     }

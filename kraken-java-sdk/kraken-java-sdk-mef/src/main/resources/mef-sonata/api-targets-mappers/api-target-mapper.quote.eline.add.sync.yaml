@@ -163,6 +163,7 @@ spec:
             target: "@{{quoteItem[0].quoteItemPrice[*].price.dutyFreeAmount.value}}"
             targetLocation: BODY
             requiredMapping: true
+            replaceStar: true
             checkPath: "$['quoteItem'][0]['quoteItemPrice'][0]['price']['dutyFreeAmount']['unit']"
             deletePath: "$['quoteItem'][0]['quoteItemPrice']"
           - name: mapper.quote.eline.add.sync.taxRate
@@ -228,6 +229,7 @@ spec:
             targetType: enum
             targetLocation: BODY
             requiredMapping: false
+            replaceStar: true
             targetValues:
               - hour
               - day

@@ -77,7 +77,7 @@ export default function MappingTemplate() {
               What’s new of each release
             </Text.Custom>
             <Text.LightMedium data-testid="meta" color="#E6F7FF" lineHeight="22px">
-              Process to upgrade Kraken to new version
+              Process to upgrade Mapping template to new version
             </Text.LightMedium>
             <Flex align="center" gap={8} wrap="wrap">
               {steps.map((step, index) => (
