@@ -11,7 +11,7 @@ const PUSH_API_EVENT_CACHE_KEYS = {
 };
 
 export const useGetPushActivityLogHistory = () => {
-  return useQuery<AxiosResponse, Error, IPagingData<any>>({ // TODO: type push history
+  return useQuery<AxiosResponse, Error, IPagingData<any>>({
     queryKey: [PUSH_API_EVENT_CACHE_KEYS.get_product_env_list],
     queryFn: () => getPushEventHistory(),
     select: (data) => data.data,
