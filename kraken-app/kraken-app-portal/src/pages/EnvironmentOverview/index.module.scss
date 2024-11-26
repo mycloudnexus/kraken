@@ -50,7 +50,7 @@
   background-color: #fff;
   display: flex;
   flex: 1;
-  min-height: 600px;
+  min-height: 400px;
   overflow-y: auto;
 }
 .overviewContainer {
@@ -99,4 +99,9 @@
       background-color: #f7f7f7;
     }
   }
+}
+
+.pageContent {
+  flex: 1;
+  overflow-y: auto;
 }

@@ -9,7 +9,6 @@ import com.consoleconnect.kraken.operator.controller.model.SystemInfo;
 import com.consoleconnect.kraken.operator.controller.service.*;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
-import com.consoleconnect.kraken.operator.core.enums.AssetStatusEnum;
 import com.consoleconnect.kraken.operator.core.enums.EnvNameEnum;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
@@ -102,7 +101,7 @@ public class AuditCollectorV2Controller {
               null,
               envId,
               null,
-              AssetStatusEnum.ACTIVATED.getKind(),
+              null,
               lastUpdateTime,
               PageRequest.of(0, 100, Sort.Direction.ASC, FIELD_UPDATE_AT_ORIGINAL));
       log.info(

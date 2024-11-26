@@ -6,6 +6,7 @@ type TutorialStore = {
   openTutorial?: boolean
   setTutorialCompleted: (value: boolean) => void;
   setOpenTutorial: (value: boolean) => void;
+  toggleTutorial(): void
   reset: () => void;
 };
 
@@ -22,4 +23,5 @@ export const useTutorialStore = create<TutorialStore>()((set) => ({
   },
   setOpenTutorial: (openTutorial) => set({ openTutorial }),
   reset: () => set(defaultData),
+  toggleTutorial: () => set(state => ({ openTutorial: !state.openTutorial }))
 }));

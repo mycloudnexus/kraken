@@ -57,7 +57,6 @@ spec:
             "completionDate": "((mefResponseBody.state=='completed'?mefResponseBody.completionDate:null))",
             "expectedCompletionDate": "${mefRequestBody.productOrderItem[0].requestedCompletionDate}",
             "expediteAcceptedIndicator": "${mefRequestBody.productOrderItem[0].expediteIndicator}",
-            "itemTerm": "${mefRequestBody.productOrderItem[0].itemTerm}",
             "milestone": "${mefRequestBody.productOrderItem[0].milestone}",
             "state": "((mefResponseBody.state))",
             "terminationError": "${mefRequestBody.productOrderItem[0].terminationError}"

@@ -93,11 +93,12 @@ class ResponseMappingTest extends AbstractIntegrationTest implements MappingTran
             "/mock/api-targets-mappers/api-target-mapper.quote.uni.read.sync.yaml");
     validate(expected10, input10);
 
+    String expected11 = readCompactedFile("expected/expected-11-quote.eline.add.sync.json");
     String input11 =
         getTarget(
             "/mock/api-targets/api-target.quote.eline.add.sync.yaml",
             "/mock/api-targets-mappers/api-target-mapper.quote.eline.add.sync.yaml");
-    validate(expected9, input11);
+    validate(expected11, input11);
 
     String input12 =
         getTarget(

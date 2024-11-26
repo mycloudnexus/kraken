@@ -1,4 +1,3 @@
-import { RadioChangeEvent } from 'antd';
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
@@ -18,11 +17,18 @@ export const formatDiagramDate = (value: any): string => {
   return dayjs(value).format("D-M");
 };
 
-export const recentXDays = (e: RadioChangeEvent) => {
+export const recentXDays = (value?: number) => {
+  if(!value) return {}
+
   const requestEndTime = getCurrentTimeWithZone();
   const requestStartTime =
-    e.target.value === "7"
+   value === 7
       ? dayjs().subtract(7, "days").format(TIME_ZONE_FORMAT)
-      : dayjs().subtract(7, "months").format(TIME_ZONE_FORMAT);
+      : dayjs().subtract(3, "months").format(TIME_ZONE_FORMAT);
   return { requestStartTime, requestEndTime }
 };
+
+export const parseDateStartOrEnd = (date: string | undefined, type: "start" | "end") =>
+  date
+    ? dayjs(date)[type === "start" ? "startOf" : "endOf"]("day").format(TIME_ZONE_FORMAT)
+    : null;

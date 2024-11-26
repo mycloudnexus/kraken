@@ -94,9 +94,10 @@ public interface EndPointUsageCalculator {
                 return;
               }
               String json = JsonToolkit.toJson(environmentClientEntity.getPayload());
-              ServerAPIDto serverAPIDto =
-                  JsonToolkit.fromJson(json, new TypeReference<ServerAPIDto>() {});
-              List<String> mapperKeys = List.of(serverAPIDto.getMapperKey());
+              List<ServerAPIDto> serverAPIDtos =
+                  JsonToolkit.fromJson(json, new TypeReference<List<ServerAPIDto>>() {});
+              List<String> mapperKeys =
+                  serverAPIDtos.stream().map(ServerAPIDto::getMapperKey).toList();
               List<UnifiedAssetDto> list =
                   getUnifiedAssetService().findByAllKeysIn(mapperKeys, true);
               list.forEach(this::hiddenMappers);

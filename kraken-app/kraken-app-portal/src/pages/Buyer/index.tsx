@@ -13,7 +13,7 @@ import { useAppStore } from "@/stores/app.store";
 import { useBuyerStore } from "@/stores/buyer.store";
 import { IBuyer } from "@/utils/types/component.type";
 import { Button, Flex, Popconfirm, Table, notification } from "antd";
-import { get, isEmpty, omitBy } from "lodash";
+import { get } from "lodash";
 import { useEffect, useMemo, useRef } from "react";
 import { useBoolean } from "usehooks-ts";
 import { ContentTime } from "../NewAPIMapping/components/DeployHistory/ContentTime";
@@ -26,7 +26,7 @@ const Buyer = () => {
   const { params, setParams, resetParams } = useBuyerStore();
   const { data: dataList, isLoading } = useGetBuyerList(
     currentProduct,
-    omitBy(params, isEmpty)
+    params
   );
   const {
     value: isModalVisible,
@@ -180,18 +180,15 @@ const Buyer = () => {
         <div style={{ flex: 1, overflowY: "auto" }} ref={ref}>
           <Table
             loading={isLoading}
-            pagination={
-              dataList?.total < 50
-                ? false
-                : {
-                    current: dataList?.page + 1,
-                    total: dataList?.total,
-                    size: dataList?.size,
-                    onChange: (page, pageSize) => {
-                      setParams({ page: page - 1, size: pageSize });
-                    },
-                  }
-            }
+            pagination={{
+              current: dataList?.page + 1,
+              total: dataList?.total,
+              size: dataList?.size,
+              showSizeChanger: true,
+              onChange: (page, pageSize) => {
+                setParams({ page: page - 1, size: pageSize });
+              },
+            }}
             dataSource={dataList?.data}
             columns={columns}
             scroll={{ y: get(size, "height", 0) - 60, x: "auto" }}

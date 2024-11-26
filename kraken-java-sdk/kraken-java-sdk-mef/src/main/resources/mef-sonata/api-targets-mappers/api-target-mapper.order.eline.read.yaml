@@ -65,6 +65,8 @@ spec:
             sourceLocation: "BODY"
             target: "@{{completionDate}}"
             targetLocation: "BODY"
+            checkPath: "$[?(@.state == 'completed'||@.state == 'failed'||@.state == 'partial'||@.state == 'rejected'||@.state == 'cancelled')]"
+            deletePath: "$.completionDate"
             requiredMapping: false
           - name: mapper.order.eline.read.instanceId
             title: "instance id from seller"
@@ -79,14 +81,50 @@ spec:
             description: ""
             source: ""
             sourceLocation: "BODY"
-            target: "@{{productOrderItem[0].completeDate}}"
+            target: "@{{productOrderItem[0].completionDate}}"
             targetLocation: "BODY"
             requiredMapping: false
+            checkPath: "$.productOrderItem[?(@.state == 'completed')]"
+            deletePath: "$.productOrderItem[?(@.state != 'completed')].completionDate"
           - name: mapper.order.eline.read.productOrderItem.expectedCompleteDate
-            title: "order item complete date"
+            title: "order item expected complete date"
             description: ""
             source: ""
             sourceLocation: "BODY"
-            target: "@{{productOrderItem[0].expectedCompleteDate}}"
+            target: "@{{productOrderItem[0].expectedCompletionDate}}"
             targetLocation: "BODY"
+            requiredMapping: false
+          - name: mapper.order.uni.read.stateChange.state
+            title: state in state change history
+            description: ''
+            source: ""
+            target: '@{{productOrderItem[0].stateChange[*].state}}'
+            targetType: enum
+            targetValues:
+              - acknowledged
+              - assessingCancellation
+              - held.assessingCharge
+              - pending.assessingModification
+              - cancelled
+              - pendingCancellation
+              - completed
+              - failed
+              - inProgress
+              - partial
+              - rejected
+            valueMapping: {}
+            replaceStar: true
+            sourceLocation: BODY
+            targetLocation: BODY
+            customizedField: false
+            requiredMapping: false
+          - name: mapper.order.uni.read.stateChange.changeDate
+            title: change date in state change history
+            description: ''
+            source: ''
+            target: '@{{productOrderItem[0].stateChange[*].changeDate}}'
+            replaceStar: true
+            sourceLocation: BODY
+            targetLocation: BODY
+            customizedField: false
             requiredMapping: false

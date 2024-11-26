@@ -86,27 +86,27 @@ const APIServerCard = ({ item, refetchList }: Props) => {
         style={{ borderRadius: 4, width: "100%" }}
         title={
           <Flex justify="space-between" gap={12} align="center">
-            <Flex gap={8}>
+            <Flex gap={8} align="center">
               <Text.NormalLarge>
                 {get(item, "metadata.name", "")}
               </Text.NormalLarge>
-              <div onMouseEnter={trueHover} onMouseLeave={falseHover}>
+              <Flex onMouseEnter={trueHover} onMouseLeave={falseHover}>
                 {isHover && isApiInUse ? (
                   <Button
-                    style={{ padding: "0px" }}
+                    style={{ padding: "5px 0" }}
                     type="link"
                     onClick={() => setOpenMappingDrawer(true)}
                   >
                     Check details
                   </Button>
                 ) : (
-                  <Tag color={isApiInUse ? "blue" : ""} >
+                  <Tag color={isApiInUse ? "blue" : ""}>
                     <Text.LightSmall>
                       {isApiInUse ? "In use" : "Not in use"}
                     </Text.LightSmall>
                   </Tag>
                 )}
-              </div>
+              </Flex>
             </Flex>
             <Flex>
               <Button type="link" onClick={handleEdit}>
@@ -156,11 +156,11 @@ const APIServerCard = ({ item, refetchList }: Props) => {
               <Typography.Text
                 ellipsis={{
                   tooltip: {
-                    title: get(item, "metadata.description", "description"),
+                    title: get(item, "metadata.description", "-"),
                   },
                 }}
               >
-                {get(item, "metadata.description", "description")}
+                {get(item, "metadata.description", "-")}
               </Typography.Text>
             </Flex>
           </Group>
