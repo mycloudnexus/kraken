@@ -54,7 +54,7 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
 
   @Test
   @Order(3)
-  void givenTargetKeyNoRuls_whenOnCheck_thenReturnException() {
+  void givenTargetKeyNoRules_whenOnCheck_thenReturnException() {
     Map<String, Object> inputs = new HashMap<>();
     inputs.put("targetKey", "mef.sonata.api-target.order.eline.read");
     inputs.put("mappingMatrixKey", "mef.sonata.api.matrix.address.validation");
@@ -141,17 +141,36 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
   @Test
   @Order(4)
   @SneakyThrows
+  void givenOutOfRangeBandwidth_whenChecking_thenThrowsExceptionMessageAsExpected() {
+    String requestJson = "/mockData/productOrderRequestOutOfRangeBandwidth.json";
+    String expected = "interval";
+    String targetKey = "mef.sonata.api-target.order.uni.add";
+    String mappingMatrixKey = "mef.sonata.api.matrix.order";
+    validateOrderRequest(requestJson, expected, targetKey, mappingMatrixKey);
+  }
+
+  @Test
+  @Order(4)
+  @SneakyThrows
   void givenErrorMsgInMatrixItem_whenChecking_thenThrowsExceptionMessageAsExpected() {
     String expected = "api use case is not supported : disabled : instantSyncQuote==false";
     validateQuoteRequest("/mockData/quoteWithInstantSyncFalse.json", expected);
   }
 
   private void validateOrderRequest(String request, String matchedMsg) throws IOException {
+    String targetKey = "mef.sonata.api-target.order.eline.add";
+    String mappingMatrixKey = "mef.sonata.api.matrix.order";
+    validateOrderRequest(request, matchedMsg, targetKey, mappingMatrixKey);
+  }
+
+  private void validateOrderRequest(
+      String request, String matchedMsg, String targetKey, String mappingMatrixKey)
+      throws IOException {
     Map<String, Object> inputs = new HashMap<>();
     inputs.put("query", Map.of("buyerId", "test-company"));
     inputs.put("body", JsonToolkit.fromJson(readFileToString(request), Object.class));
-    inputs.put("targetKey", "mef.sonata.api-target.order.eline.add");
-    inputs.put("mappingMatrixKey", "mef.sonata.api.matrix.order");
+    inputs.put("targetKey", targetKey);
+    inputs.put("mappingMatrixKey", mappingMatrixKey);
     KrakenException krakenException =
         Assertions.assertThrowsExactly(
             KrakenException.class, () -> mappingMatrixCheckerActionRunner.onCheck(inputs));
@@ -172,7 +191,7 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
   }
 
   @Test
-  @Order(6)
+  @Order(5)
   void givenCheckPath_whenCheckExpect_thenReturnException() {
     MappingMatrixCheckerActionRunner.PathCheck pathCheck =
         new MappingMatrixCheckerActionRunner.PathCheck(
