@@ -98,7 +98,7 @@ spec:
           - name: mapper.order.uni.add.bandwidth
             title: "Bandwidth of the UNI"
             source: "@{{productOrderItem[0].product.productConfiguration.bandwidth}}"
-            sourceType: discreteVar
+            sourceType: continuousVar
             sourceValues:
               - 1000
               - 10000
