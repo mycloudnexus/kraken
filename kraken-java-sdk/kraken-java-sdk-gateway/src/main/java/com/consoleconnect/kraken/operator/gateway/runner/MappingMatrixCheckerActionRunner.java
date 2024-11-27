@@ -27,6 +27,7 @@ import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -219,8 +220,14 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner {
       }
       String source = replaceStar(mapper.getSource());
       if (MappingTypeEnum.ENUM.getKind().equals(mapper.getSourceType())
-          || MappingTypeEnum.CUSTOMIZED_ENUM.getKind().equals(mapper.getSourceType())) {
-        checkEnumValue(source, mapper.getTarget(), inputs, mapper.getSourceValues());
+          || MappingTypeEnum.DISCRETE_VAR.getKind().equals(mapper.getSourceType())
+          || MappingTypeEnum.CONTINUOUS_VAR.getKind().equals(mapper.getSourceType())) {
+        checkEnumValue(
+            mapper.getSource(),
+            mapper.getTarget(),
+            inputs,
+            mapper.getSourceValues(),
+            mapper.getSourceType());
       } else if (mapper.getTarget() != null && !mapper.getTarget().contains("@{{")) {
         checkConstantValue(source, mapper.getTarget(), inputs);
       } else {
@@ -229,21 +236,26 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner {
     }
   }
 
-  private void checkConstantValue(String expression, String value, Map<String, Object> inputs) {
-    if (String.valueOf(value).contains("{{")) {
+  private void checkConstantValue(
+      String expression, String expectedValue, Map<String, Object> inputs) {
+    if (String.valueOf(expectedValue).contains("{{")) {
       return;
     }
     String evaluateValue = SpELEngine.evaluate(constructBody(expression), inputs, String.class);
-    if (!Objects.equals(evaluateValue, value)) {
+    if (!Objects.equals(evaluateValue, expectedValue)) {
       throw KrakenException.unProcessableEntity(
           String.format(
               "can not process %s = %s, value should be %s",
-              expression.replace("@{{", "").replace("}}", ""), evaluateValue, value));
+              expression.replace("@{{", "").replace("}}", ""), evaluateValue, expectedValue));
     }
   }
 
   private void checkEnumValue(
-      String source, String target, Map<String, Object> inputs, List<String> valueList) {
+      String source,
+      String target,
+      Map<String, Object> inputs,
+      List<String> valueList,
+      String sourceType) {
     String constructedBody = constructBody(replaceStarToZero(source));
     List<String> params = extractMapperParam(source);
     if (CollectionUtils.isEmpty(params)) {
@@ -257,11 +269,27 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner {
           String.format(
               "can not process %s = %s, value should be %s", params.get(0), evaluateValue, target));
     }
-    if (!valueList.contains(evaluateValue)) {
+    if ((MappingTypeEnum.DISCRETE_VAR.getKind().equals(sourceType)
+            || (MappingTypeEnum.ENUM.getKind().equals(sourceType)))
+        && !valueList.contains(evaluateValue)) {
       throw KrakenException.unProcessableEntity(
           String.format(
               "can not process %s = %s, value should be in %s",
               params.get(0), evaluateValue, valueList));
+    }
+    if ((MappingTypeEnum.CONTINUOUS_VAR.getKind().equals(sourceType))) {
+      List<Double> values = valueList.stream().map(Double::parseDouble).toList();
+      double min = Collections.min(values);
+      double max = Collections.max(values);
+      if (StringUtils.isBlank(evaluateValue)
+          || !NumberUtils.isCreatable(evaluateValue)
+          || Double.parseDouble(evaluateValue) < min
+          || Double.parseDouble(evaluateValue) > max) {
+        throw KrakenException.unProcessableEntity(
+            String.format(
+                "can not process %s = %s, value should be in closed interval[%s, %s]",
+                params.get(0), evaluateValue, min, max));
+      }
     }
   }
 

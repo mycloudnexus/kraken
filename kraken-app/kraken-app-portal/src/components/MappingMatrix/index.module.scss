@@ -1,7 +1,9 @@
 .wrapper {
   flex-wrap: wrap;
   gap: 4px;
-  margin-left: 20px;
+  margin-left: 10px;
+  flex: auto !important;
+  max-width: fit-content;
 }
 
 .tag {

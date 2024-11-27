@@ -16,6 +16,7 @@ import {
   Select,
   Table,
   Space,
+  Tabs,
 } from "antd";
 import { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
@@ -24,6 +25,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import ActivityDetailModal from "./components/ActivityDetailModal";
 import styles from "./index.module.scss";
+import PushHistoryModal from './components/PushHistoryModal';
+import { useBoolean } from 'usehooks-ts';
+import PushHistoryList from './components/PushHistoryList';
+import TrimmedPath from "@/components/TrimmedPath";
+import { IActivityHistoryLog } from '@/utils/types/common.type';
 
 const { RangePicker } = DatePicker;
 
@@ -57,6 +63,8 @@ const EnvironmentActivityLog = () => {
   const size = useSize(ref);
   const refWrapper = useRef<any>();
   const sizeWrapper = useSize(refWrapper);
+  const [mainTabKey, setMainTabKey] = useState<string>('activityLog');
+  const { value: isOpen, setTrue: open, setFalse: close } = useBoolean(false);
 
   const {
     tableData,
@@ -68,10 +76,15 @@ const EnvironmentActivityLog = () => {
     handlePaginationChange,
     handlePaginationShowSizeChange,
   } = useCommonListProps({}, initPagination);
+  const envActivityParams = {
+    productId: currentProduct,
+    envId: queryParams?.envId || String(envId),
+    params: omit(queryParams, ["envId"])
+  }
   const { data, isLoading } = useGetProductEnvActivities(
-    currentProduct,
-    queryParams?.envId || String(envId),
-    omit(queryParams, ["envId"])
+    envActivityParams.productId,
+    envActivityParams.envId,
+    envActivityParams.params
   );
 
   useEffect(() => {
@@ -135,28 +148,40 @@ const EnvironmentActivityLog = () => {
 
   const [modalActivityId, setModalActivityId] = useState<string | undefined>();
   const [modalOpen, setModalOpen] = useState(false);
+  const isActivityLogActive = useMemo(() => mainTabKey === 'activityLog', [mainTabKey])
 
-  const   columns: ColumnsType<IActivityLog> = [
+  const handleHistoryActivityClick = useCallback((record: IActivityHistoryLog) => {
+    setMainTabKey('activityLog');
+    setQueryParams({
+      ...queryParams,
+      requestStartTime: dayjs(record.startTime).startOf("day").valueOf(),
+      requestEndTime: dayjs(record.endTime).endOf("day").valueOf()
+    });
+  }, [queryParams]);
+
+  const columns: ColumnsType<IActivityLog> = [
     {
       key: "name",
       title: "Method",
       render: (log: IActivityLog) => <LogMethodTag method={log.method} />,
-      width: 120,
+      width: 100,
     },
     {
       key: "name",
       title: "Path",
-      render: (log: IActivityLog) => log.path,
+      width: 300,
+      render: (log: IActivityLog) => <Flex><TrimmedPath path={log.path} /></Flex>,
     },
     {
       key: "buyerName",
       title: "Buyer name",
+      width: 200,
       render: (log: IActivityLog) => log.buyerName,
     },
     {
       key: "status",
       title: "Status code",
-      width: 160,
+      width: 140,
       render: (log: IActivityLog) => log.httpStatusCode,
     },
     {
@@ -168,7 +193,8 @@ const EnvironmentActivityLog = () => {
     {
       key: "action",
       title: "Action",
-      width: 200,
+      width: 160,
+      fixed: 'right',
       render: (log: IActivityLog) => (
         <Button
           type="link"
@@ -182,10 +208,39 @@ const EnvironmentActivityLog = () => {
       ),
     },
   ];
+
   return (
     <PageLayout title="API activity log">
       <div className={styles.contentWrapper} ref={refWrapper}>
-        <Flex align="center" className={styles.filterWrapper} ref={ref}>
+        {isOpen && (
+          <PushHistoryModal
+            isOpen={isOpen}
+            envOptions={envOptions}
+            onClose={close}
+          />
+        )}
+        <Flex align="center" justify="space-between">
+          <Tabs
+            activeKey={mainTabKey}
+            hideAdd
+            onChange={setMainTabKey}
+            items={[
+              {
+                label: 'Activity log',
+                key: 'activityLog',
+              },
+              {
+                label: "Push history",
+                key: 'pushHistory'
+              },
+            ]}
+          />
+          {isActivityLogActive && <Button type='primary' onClick={open}>
+            Push log
+          </Button>}
+        </Flex>
+
+        {isActivityLogActive && <Flex align="center" className={styles.filterWrapper} ref={ref}>
           <Form
             initialValues={{ envId }}
             style={{ gap: 5 }}
@@ -214,9 +269,7 @@ const EnvironmentActivityLog = () => {
             </Form.Item>
 
             <Form.Item label="Time range from" name="requestTime">
-              <RangePicker
-                placeholder={["Select time", "Select time"]}
-              />
+              <RangePicker placeholder={["Select time", "Select time"]} />
             </Form.Item>
 
             <Form.Item label="Method and path">
@@ -240,8 +293,9 @@ const EnvironmentActivityLog = () => {
             </Form.Item>
           </Form>
         </Flex>
+        }
         <div className={styles.tableWrapper}>
-          <Table
+          {!isLoading && isActivityLogActive ? <Table
             dataSource={[...tableData]?.sort(
               (a: any, b: any) =>
                 dayjs(b.createdAt).valueOf() - dayjs(a.createdAt).valueOf()
@@ -264,8 +318,11 @@ const EnvironmentActivityLog = () => {
             }}
             scroll={{
               y: (sizeWrapper?.height ?? 0) - (size?.height ?? 0) - 120,
+              x: 800,
             }}
           />
+            : <PushHistoryList handleHistoryActivityClick={handleHistoryActivityClick} />
+          }
         </div>
       </div>
 

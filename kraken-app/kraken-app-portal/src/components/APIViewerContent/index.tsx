@@ -10,6 +10,7 @@ import styles from "./index.module.scss";
 import { Col, Row, Table, notification } from "antd";
 import Flex from "../Flex";
 import RequestMethod from "../Method";
+import TrimmedPath from "../TrimmedPath";
 
 type Props = {
   selectedAPI?: string;
@@ -83,19 +84,19 @@ const APIViewerContent = ({ selectedAPI, content }: Props) => {
     <div className={styles.root}>
       <div className={styles.basicInfo}>
         <Row gutter={[12, 20]}>
-          <Col span={2}>
+          <Col span={4}>
             <Flex flexDirection="column" alignItems="flex-start" gap={8}>
               <Text.LightMedium color="#00000073">Method</Text.LightMedium>
               <RequestMethod method={basicData?.method} />
             </Flex>
           </Col>
-          <Col span={11}>
+          <Col span={10}>
             <Flex flexDirection="column" alignItems="flex-start" gap={8}>
               <Text.LightMedium color="#00000073">Path</Text.LightMedium>
-              <Text.LightMedium>{basicData?.name}</Text.LightMedium>
+              <TrimmedPath path={basicData?.name ?? ''} />
             </Flex>
           </Col>
-          <Col span={11}>
+          <Col span={10}>
             <Flex flexDirection="column" alignItems="flex-start" gap={8}>
               <Text.LightMedium color="#00000073">Description</Text.LightMedium>
               <Text.LightMedium>{basicData?.description}</Text.LightMedium>

@@ -31,6 +31,16 @@ export interface IActivityLog {
   callSeq: number;
 }
 
+export interface IPushHistory {
+  id: string;
+  createdAt: string;
+  envName: string;
+  startTime: string;
+  endTime: string;
+  pushedBy: string;
+  status: string
+};
+
 export interface IActivityDetail {
   main: IActivityLog;
   branches: IActivityLog[];

@@ -11,7 +11,7 @@ import {
 import { useAppStore } from "@/stores/app.store";
 import { COMPONENT_KIND_API_TARGET_SPEC } from "@/utils/constants/product";
 import { transformApiData } from "@/utils/helpers/swagger";
-import { Flex, Form, Spin, notification } from "antd";
+import { Form, Spin, notification } from "antd";
 import { decode } from "js-base64";
 import jsYaml from "js-yaml";
 import { get, isEmpty, set } from "lodash";
@@ -22,6 +22,7 @@ import BtnStep from "./components/BtnStep";
 import SelectAPIServer from "./components/SelectAPIServer";
 import UploadYaml from "./components/UploadYaml";
 import styles from "./index.module.scss";
+import renderRequiredMark from '@/components/RequiredFormMark';
 
 const NewAPIServer = () => {
   const { componentId } = useParams();
@@ -180,22 +181,11 @@ const NewAPIServer = () => {
           className={styles.container}
           form={form}
           onFinish={onFinish}
-          requiredMark={(label, { required }) =>
-            required ? (
-              <Flex align="center" gap={4}>
-                {label}{" "}
-                <span className="required-label" style={{ color: "#FF4D4F" }}>
-                  *
-                </span>
-              </Flex>
-            ) : (
-              <span>{label}</span>
-            )
-          }
+          requiredMark={renderRequiredMark}
         >
           <main id="12" className={styles.paper} style={{ flex: 1 }}>
             <div id="12" style={{ maxWidth: "60%", minWidth: 600 }}>
-              <SelectAPIServer form={form}/>
+              <SelectAPIServer name={get(componentDetail, "metadata.name")}/>
               <AddEnv form={form} env={env} />
               <UploadYaml form={form} />
             </div>
