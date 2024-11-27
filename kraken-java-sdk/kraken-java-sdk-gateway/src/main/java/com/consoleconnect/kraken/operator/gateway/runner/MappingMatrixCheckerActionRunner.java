@@ -235,16 +235,17 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner {
     }
   }
 
-  private void checkConstantValue(String expression, String value, Map<String, Object> inputs) {
-    if (String.valueOf(value).contains("{{")) {
+  private void checkConstantValue(
+      String expression, String expectedValue, Map<String, Object> inputs) {
+    if (String.valueOf(expectedValue).contains("{{")) {
       return;
     }
     String evaluateValue = SpELEngine.evaluate(constructBody(expression), inputs, String.class);
-    if (!Objects.equals(evaluateValue, value)) {
+    if (!Objects.equals(evaluateValue, expectedValue)) {
       throw KrakenException.unProcessableEntity(
           String.format(
               "can not process %s = %s, value should be %s",
-              expression.replace("@{{", "").replace("}}", ""), evaluateValue, value));
+              expression.replace("@{{", "").replace("}}", ""), evaluateValue, expectedValue));
     }
   }
 

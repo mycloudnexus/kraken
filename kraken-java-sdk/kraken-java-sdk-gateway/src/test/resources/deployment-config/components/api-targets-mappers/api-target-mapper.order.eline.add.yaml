@@ -16,6 +16,7 @@ spec:
     - id: create connection order
       path: "/api/v2/company/{username}/connections/layer2"
       method: put
+      serverKey: mef.sonata.api-target-spec.con1722215397621
       mappers:
         request:
           - name: mapper.order.eline.add.buyerId
@@ -81,20 +82,25 @@ spec:
             sourceLocation: BODY
             targetLocation: BODY
           - name: mapper.order.eline.add.bandwidth
-            title: "Bandwidth of the UNI"
+            title: "Bandwidth of the ELINE"
             source: "@{{productOrderItem[0].product.productConfiguration.bandwidth}}"
+            sourceType: discreteVar
+            sourceValues:
+              - 1000
+              - 10000
             target: "@{{speed}}"
             sourceLocation: BODY
             targetLocation: BODY
+            requiredMapping: true
           - name: mapper.order.eline.add.name
-            title: "The name of the UNI"
+            title: "The name of the ELINE"
             source: "@{{productOrderItem[0].product.productConfiguration.name}}"
             target: "@{{name}}"
             sourceLocation: BODY
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.order.eline.add.paymentType
-            title: "The payment type of the UNI"
+            title: "The payment type of the ELINE"
             source: "@{{productOrderItem[0].product.productConfiguration.paymentType}}"
             target: "@{{paymentType}}"
             sourceLocation: BODY
@@ -125,7 +131,6 @@ spec:
             target: "ACCESS_E_LINE"
             sourceLocation: BODY
             targetLocation: BODY
-#          --------------------------------------------------------------------------------------------------------------------
           - name: mapper.order.eline.add.buyerCompanyId
             title: "The Id of buyer Company"
             source: "@{{productOrderItem[0].product.productConfiguration.buyerCompanyId}}"
@@ -195,5 +200,3 @@ spec:
             targetLocation: BODY
             customizedField: false
             requiredMapping: false
-      serverKey: mef.sonata.api-target-spec.con1722215397621
-

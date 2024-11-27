@@ -7,8 +7,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum MappingTypeEnum {
   ENUM("enum", "normal enumeration"),
-  DISCRETE_VAR("discrete_var", "discrete variable"),
-  CONTINUOUS_VAR("continuous_var", "continuous variable");
+  DISCRETE_VAR("discreteVar", "discrete variable"),
+  CONTINUOUS_VAR("continuousVar", "continuous variable");
   private final String kind;
   private final String desc;
 }

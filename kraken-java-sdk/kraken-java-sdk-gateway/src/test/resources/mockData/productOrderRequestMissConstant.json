@@ -33,7 +33,7 @@
         },
         "productConfiguration": {
           "@type": "ACCESS_E_LINE",
-          "bandwidth": 1,
+          "bandwidth": 1000,
           "bandwidthUnit": "MBPS",
           "classOfService": "SILVER",
           "paymentType": "invoice",

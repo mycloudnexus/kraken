@@ -3,15 +3,6 @@
   "relatedContactInformation": [
     {
       "number": "111 222 333",
-      "emailAddress": null,
-      "role": "productOrderContact",
-      "postalAddress": null,
-      "organization": "MEF",
-      "name": "Joe Order",
-      "numberExtension": null
-    },
-    {
-      "number": "111 222 333",
       "emailAddress": "productOrderContact@mef.com",
       "role": "productOrderContact",
       "postalAddress": null,
@@ -28,34 +19,29 @@
       "note": [],
       "product": {
         "productOffering": {
-          "href": null
+          "href": null,
+          "id": "UNI"
         },
         "productConfiguration": {
-          "@type": "ACCESS_E_LINE",
-          "bandwidth": 1000,
+          "@type": "UNI",
+          "bandwidth": 10001,
           "bandwidthUnit": "MBPS",
-          "classOfService": "SILVER",
-          "paymentType": "invoice",
-          "name": "Qe 1 Company Connection 0904",
-          "buyerCompanyId": "qe1company",
-          "destUNIMetroId": "5db65dcf5d545c000bc6884b",
-          "type": "LAYER2"
+          "name" : "test-qc01",
+          "paymentType" : "invoice"
         },
-        "productRelationship": [
-          {
-            "relationshipType": "CONNECTS_TO_ENNI",
-            "id": "6371e5fa2fb2fa00155a3535",
-            "href": null
-          },
-          {
-            "relationshipType": "CONNECTS_TO_UNI",
-            "id": "63634cbf11ffdd00151fc6fb",
-            "href": null
-          }
-        ],
+        "productRelationship": [],
         "id": null,
         "href": null,
-        "place": []
+        "place": [
+          {
+            "role": "INSTALL_LOCATION",
+            "href": null,
+            "id": "6356792a4806220015488631",
+            "keyName":"qe-dcf-1",
+            "@type": "GeographicAddressRef",
+            "@schemaLocation": null
+          }
+        ]
       },
       "relatedContactInformation": [
         {
@@ -84,10 +70,19 @@
           "organization": null,
           "name": "Buyer Technical Contact ",
           "numberExtension": null
+        },
+        {
+          "number": "+12-345-678-90",
+          "emailAddress": "Buyer.ItemServiceSiteContact@mef.com",
+          "role": "orderItemServiceSiteContact",
+          "postalAddress": null,
+          "organization": null,
+          "name": "Buyer Technical Contact ",
+          "numberExtension": null
         }
       ],
       "requestedItemTerm": {
-        "name": "ELine Item Term",
+        "name": "UNI Item Term",
         "duration": {
           "amount": 1,
           "units": "calendarMonths"
@@ -101,24 +96,20 @@
       "billingAccount": {
         "id": "001"
       },
-
+      "productOrderItemRelationship": [],
       "tspRestorationPriority": null,
       "productOfferingQualificationItem": {
         "productOfferingQualificationId": "",
         "alternateProductProposalId": null,
         "productOfferingQualificationHref": null,
-        "id": "ELINE"
+        "id": "UNI"
       },
       "coordinatedAction": [],
       "action": "add",
-      "quoteItem": {
-        "quoteHref": null,
-        "id": "ELINE",
-        "quoteId": ""
-      },
+      "quoteItem": {"quoteHref":null,"id":"UNI","quoteId":"479645d9-1792-4916-9576-3400abd1b361"},
       "endCustomerName": null,
       "expediteIndicator": false,
-      "id": "ELINE",
+      "id": "UNI",
       "requestedCompletionDate": "2121-11-30T23:00:00Z"
     }
   ]
