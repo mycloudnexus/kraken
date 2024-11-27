@@ -218,8 +218,14 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner {
         continue;
       }
       if (MappingTypeEnum.ENUM.getKind().equals(mapper.getSourceType())
-          || MappingTypeEnum.CUSTOMIZED_ENUM.getKind().equals(mapper.getSourceType())) {
-        checkEnumValue(mapper.getSource(), mapper.getTarget(), inputs, mapper.getSourceValues());
+          || MappingTypeEnum.DISCRETE_VAR.getKind().equals(mapper.getSourceType())
+          || MappingTypeEnum.CONTINUOUS_VAR.getKind().equals(mapper.getSourceType())) {
+        checkEnumValue(
+            mapper.getSource(),
+            mapper.getTarget(),
+            inputs,
+            mapper.getSourceValues(),
+            mapper.getSourceType());
       } else if (mapper.getTarget() != null && !mapper.getTarget().contains("@{{")) {
         checkConstantValue(mapper.getSource(), mapper.getTarget(), inputs);
       } else {
@@ -243,7 +249,11 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner {
   }
 
   private void checkEnumValue(
-      String source, String target, Map<String, Object> inputs, List<String> valueList) {
+      String source,
+      String target,
+      Map<String, Object> inputs,
+      List<String> valueList,
+      String sourceType) {
     String constructedBody = constructBody(replaceStarToZero(source));
     List<String> params = extractMapperParam(source);
     if (CollectionUtils.isEmpty(params)) {
@@ -257,11 +267,26 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner {
           String.format(
               "can not process %s = %s, value should be %s", params.get(0), evaluateValue, target));
     }
-    if (!valueList.contains(evaluateValue)) {
+    if ((MappingTypeEnum.DISCRETE_VAR.getKind().equals(sourceType)
+            || (MappingTypeEnum.ENUM.getKind().equals(sourceType)))
+        && !valueList.contains(evaluateValue)) {
       throw KrakenException.unProcessableEntity(
           String.format(
               "can not process %s = %s, value should be in %s",
               params.get(0), evaluateValue, valueList));
+    }
+    if ((MappingTypeEnum.CONTINUOUS_VAR.getKind().equals(sourceType))) {
+      List<Integer> values = valueList.stream().map(Integer::parseInt).toList();
+      int min = Collections.min(values);
+      int max = Collections.max(values);
+      if (StringUtils.isBlank(evaluateValue)
+          || Integer.parseInt(evaluateValue) < min
+          || Integer.parseInt(evaluateValue) > max) {
+        throw KrakenException.unProcessableEntity(
+            String.format(
+                "can not process %s = %s, value should be in closed interval[%s, %s]",
+                params.get(0), evaluateValue, min, max));
+      }
     }
   }
 
