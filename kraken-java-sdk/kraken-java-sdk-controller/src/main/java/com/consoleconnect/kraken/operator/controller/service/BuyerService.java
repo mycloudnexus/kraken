@@ -75,10 +75,7 @@ public class BuyerService extends AssetStatusManager {
             PageRequest.of(0, 1));
     if (CollectionUtils.isNotEmpty(exist.getContent())) {
       throw KrakenException.badRequest(
-          "The buyer has existed in the current environment, buyerId:"
-              + buyerOnboard.getBuyerId()
-              + ", envId:"
-              + buyerOnboard.getEnvId());
+          "buyer with same company ID has been created in this environment");
     }
 
     UnifiedAsset buyer =
