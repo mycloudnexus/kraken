@@ -27,6 +27,7 @@ import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -277,12 +278,13 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner {
               params.get(0), evaluateValue, valueList));
     }
     if ((MappingTypeEnum.CONTINUOUS_VAR.getKind().equals(sourceType))) {
-      List<Integer> values = valueList.stream().map(Integer::parseInt).toList();
-      int min = Collections.min(values);
-      int max = Collections.max(values);
+      List<Double> values = valueList.stream().map(Double::parseDouble).toList();
+      double min = Collections.min(values);
+      double max = Collections.max(values);
       if (StringUtils.isBlank(evaluateValue)
-          || Integer.parseInt(evaluateValue) < min
-          || Integer.parseInt(evaluateValue) > max) {
+          || !NumberUtils.isCreatable(evaluateValue)
+          || Double.parseDouble(evaluateValue) < min
+          || Double.parseDouble(evaluateValue) > max) {
         throw KrakenException.unProcessableEntity(
             String.format(
                 "can not process %s = %s, value should be in closed interval[%s, %s]",
