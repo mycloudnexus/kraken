@@ -11,7 +11,7 @@ describe("tab", () => {
     const { container } = render(
       <BrowserRouter>
         <QueryClientProvider client={queryClient}>
-          <DeployHistory />
+          <DeployHistory scrollHeight={1000} />
         </QueryClientProvider>
       </BrowserRouter>
     );
