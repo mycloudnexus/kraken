@@ -19,13 +19,14 @@ spec:
       mappers:
         request:
           - name: mapper.quote.uni.add.sync.duration.amount
-            source: "@{{quoteItem[0].requestedQuoteItemTerm.duration.amount}}"
+            source: "@{{quoteItem[*].requestedQuoteItemTerm.duration.amount}}"
             sourceLocation: BODY
             target: "1"
             targetLocation: BODY
             requiredMapping: true
+            mappingType: array
           - name: mapper.quote.uni.add.sync.duration.units
-            source: "@{{quoteItem[0].requestedQuoteItemTerm.duration.units}}"
+            source: "@{{quoteItem[*].requestedQuoteItemTerm.duration.units}}"
             sourceLocation: BODY
             sourceType: enum
             sourceValues:
@@ -41,8 +42,9 @@ spec:
             target: "@{{ports[*].durationUnit}}"
             targetLocation: BODY
             requiredMapping: true
+            mappingType: array
           - name: mapper.quote.uni.add.sync.endOfTermAction
-            source: "@{{quoteItem[0].requestedQuoteItemTerm.endOfTermAction}}"
+            source: "@{{quoteItem[*].requestedQuoteItemTerm.endOfTermAction}}"
             sourceLocation: BODY
             sourceType: enum
             sourceValues:
@@ -53,14 +55,16 @@ spec:
             target: "roll"
             targetLocation: BODY
             requiredMapping: true
+            mappingType: array
           - name: mapper.quote.uni.add.sync.rollInterval.amount
-            source: "@{{quoteItem[0].requestedQuoteItemTerm.rollInterval.amount}}"
+            source: "@{{quoteItem[*].requestedQuoteItemTerm.rollInterval.amount}}"
             sourceLocation: BODY
             target: "1"
             targetLocation: BODY
             requiredMapping: false
+            mappingType: array
           - name: mapper.quote.uni.add.sync.rollInterval.units
-            source: "@{{quoteItem[0].requestedQuoteItemTerm.rollInterval.units}}"
+            source: "@{{quoteItem[*].requestedQuoteItemTerm.rollInterval.units}}"
             sourceLocation: BODY
             sourceType: enum
             sourceValues:
@@ -75,20 +79,23 @@ spec:
             target: "calendarMonths"
             targetLocation: BODY
             requiredMapping: false
+            mappingType: array
           - name: mapper.quote.uni.add.sync.place.id
-            source: "@{{quoteItem[0].product.place[0].id}}"
+            source: "@{{quoteItem[*].product.place[0].id}}"
             sourceLocation: BODY
             target: "@{{ports[*].dcf}}"
             targetLocation: BODY
             requiredMapping: true
+            mappingType: array
           - name: mapper.quote.uni.add.sync.productConfiguration.bandwidth
-            source: "@{{quoteItem[0].product.productConfiguration.bandwidth}}"
+            source: "@{{quoteItem[*].product.productConfiguration.bandwidth}}"
             sourceLocation: BODY
             target: "@{{ports[*].speed}}"
             targetLocation: BODY
             requiredMapping: true
+            mappingType: array
           - name: mapper.quote.uni.add.sync.productConfiguration.bandwidthUnit
-            source: "@{{quoteItem[0].product.productConfiguration.bandwidthUnit}}"
+            source: "@{{quoteItem[*].product.productConfiguration.bandwidthUnit}}"
             sourceLocation: BODY
             sourceType: enum
             sourceValues:
@@ -98,12 +105,14 @@ spec:
             target: "MBPS"
             targetLocation: BODY
             requiredMapping: true
+            mappingType: array
           - name: mapper.quote.uni.add.sync.productOffering.id
-            source: "@{{quoteItem[0].product.productOffering.id}}"
+            source: "@{{quoteItem[*].product.productOffering.id}}"
             sourceLocation: BODY
             target: "UNI"
             targetLocation: BODY
             requiredMapping: false
+            mappingType: array
         response:
           - name: mapper.quote.uni.add.sync.unitOfMeasure
             title: Quote unitOfMeasure Mapping

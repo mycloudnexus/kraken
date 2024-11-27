@@ -217,14 +217,14 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner {
           || ParamLocationEnum.HYBRID.name().equals(mapper.getTargetLocation())) {
         continue;
       }
+      String source = replaceStar(mapper.getSource());
       if (MappingTypeEnum.ENUM.getKind().equals(mapper.getSourceType())
           || MappingTypeEnum.CUSTOMIZED_ENUM.getKind().equals(mapper.getSourceType())) {
-        checkEnumValue(mapper.getSource(), mapper.getTarget(), inputs, mapper.getSourceValues());
+        checkEnumValue(source, mapper.getTarget(), inputs, mapper.getSourceValues());
       } else if (mapper.getTarget() != null && !mapper.getTarget().contains("@{{")) {
-        checkConstantValue(mapper.getSource(), mapper.getTarget(), inputs);
+        checkConstantValue(source, mapper.getTarget(), inputs);
       } else {
-        checkMappingValue(
-            mapper.getSource(), ParamLocationEnum.valueOf(mapper.getSourceLocation()), inputs);
+        checkMappingValue(source, ParamLocationEnum.valueOf(mapper.getSourceLocation()), inputs);
       }
     }
   }

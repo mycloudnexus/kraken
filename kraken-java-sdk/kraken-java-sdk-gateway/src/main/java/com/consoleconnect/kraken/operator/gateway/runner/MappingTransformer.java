@@ -189,6 +189,24 @@ public interface MappingTransformer {
     return doc.jsonString();
   }
 
+  default int lengthOfArrayNode(String pathExpression, Object jsonData) {
+    if (StringUtils.isEmpty(pathExpression) || Objects.isNull(jsonData)) {
+      return -1;
+    }
+    DocumentContext doc = JsonPath.parse(jsonData);
+    int idx = pathExpression.lastIndexOf(ARRAY_WILD_MASK);
+    if (idx > 0) {
+      String arrayRoot = pathExpression.substring(0, idx);
+      if (arrayRoot.endsWith(DOT)) {
+        arrayRoot = arrayRoot + LENGTH_FUNC;
+      } else {
+        arrayRoot = arrayRoot + DOT + LENGTH_FUNC;
+      }
+      return doc.read(arrayRoot);
+    }
+    return -1;
+  }
+
   default void overwritePathValue(
       DocumentContext doc, String pathExpression, Map<String, String> map) {
     String origin = doc.read(pathExpression);

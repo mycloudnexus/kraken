@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class RenderRequestService implements MappingTransformer {
 
+  private static final String MAPPING_TYPE = "array";
   private final UnifiedAssetService unifiedAssetService;
 
   public RenderRequestService(UnifiedAssetService unifiedAssetService) {
@@ -88,17 +89,20 @@ public class RenderRequestService implements MappingTransformer {
   public void parseRequest(
       ComponentAPITargetFacets facets, StateValueMappingDto stateValueMappingDto) {
     handlePath(facets);
-    handleBody(facets, stateValueMappingDto);
+    handleBody(facets, stateValueMappingDto, null);
   }
 
-  private void handleBody(
-      ComponentAPITargetFacets facets, StateValueMappingDto stateValueMappingDto) {
+  public void handleBody(
+      ComponentAPITargetFacets facets,
+      StateValueMappingDto stateValueMappingDto,
+      Map<String, Object> inputs) {
     String requestBody = facets.getEndpoints().get(0).getRequestBody();
     List<ComponentAPITargetFacets.Mapper> request =
         facets.getEndpoints().get(0).getMappers().getRequest();
     if (StringUtils.isBlank(requestBody) || CollectionUtils.isEmpty(request)) {
       return;
     }
+
     for (ComponentAPITargetFacets.Mapper mapper : request) {
       if (Objects.equals(BODY.name(), mapper.getTargetLocation())) {
         // Skipping constant target
@@ -107,17 +111,7 @@ public class RenderRequestService implements MappingTransformer {
           log.info("handleBody skip source:{}, target:{}", mapper.getSource(), mapper.getTarget());
           continue;
         }
-        String source = constructBody(mapper.getSource());
-        requestBody =
-            JsonToolkit.generateJson(
-                convertToJsonPointer(mapper.getTarget().replace(REQUEST_BODY, StringUtils.EMPTY)),
-                source,
-                requestBody);
-        log.info(
-            "handleBody inserted source:{}, target:{}, requestBody:{}",
-            source,
-            mapper.getTarget(),
-            requestBody);
+        requestBody = expandRequestBody(mapper, inputs, requestBody);
         if (ENUM_KIND.equalsIgnoreCase(mapper.getSourceType())
             && StringUtils.isNotBlank(mapper.getTarget())
             && MapUtils.isNotEmpty(mapper.getValueMapping())) {
@@ -134,6 +128,38 @@ public class RenderRequestService implements MappingTransformer {
     }
     facets.getEndpoints().get(0).setRequestBody(requestBody);
     log.info("handleBody rendered request body:{}", requestBody);
+  }
+
+  public String expandRequestBody(
+      ComponentAPITargetFacets.Mapper mapper, Map<String, Object> inputs, String requestBody) {
+    String source = "";
+    if (MAPPING_TYPE.equals(mapper.getMappingType())) {
+      int length = lengthOfArrayNode(constructJsonPath(mapper.getSource()), inputs);
+      int count = 0;
+      while (count < length) {
+        source = constructBodyOfArray(mapper.getSource(), count);
+        requestBody =
+            JsonToolkit.generateJson(
+                convertToJsonPointer(
+                    mapper.getTarget().replace(REQUEST_BODY, StringUtils.EMPTY), "[" + count + "]"),
+                source,
+                requestBody);
+        count++;
+      }
+    } else {
+      source = constructBody(mapper.getSource());
+      requestBody =
+          JsonToolkit.generateJson(
+              convertToJsonPointer(mapper.getTarget().replace(REQUEST_BODY, StringUtils.EMPTY)),
+              source,
+              requestBody);
+    }
+    log.info(
+        "handleBody inserted source:{}, target:{}, requestBody:{}",
+        source,
+        mapper.getTarget(),
+        requestBody);
+    return requestBody;
   }
 
   private void handlePathRefer(ComponentAPITargetFacets.Mapper mapper) {

@@ -18,4 +18,13 @@ class MappingTransformerTest implements MappingTransformer {
     String result = deleteNodeByPath(checkPathMap, input);
     Assertions.assertEquals("{\"key\":\"hello kraken\"}", result);
   }
+
+  @Test
+  void givenJsonArray_whenCounting_thenReturnOK() {
+    String pathExpression = "$.body.quoteItem[*].requestedQuoteItemTerm.duration.units";
+    String jsonData =
+        "{\"body\":{\"quoteItem\":[{\"requestedQuoteItemTerm\":{\"duration\":{\"amount\":1,\"units\":\"calendarMonths\"}}}]}}";
+    int result = lengthOfArrayNode(pathExpression, jsonData);
+    Assertions.assertTrue(result > -1);
+  }
 }
