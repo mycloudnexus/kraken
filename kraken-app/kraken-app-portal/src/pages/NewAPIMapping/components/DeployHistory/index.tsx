@@ -36,7 +36,7 @@ const DeployHistory = ({
   selectedEnv,
   targetMapperKey,
 }: {
-  scrollHeight?: number;
+  scrollHeight: number;
   selectedEnv?: IEnv;
   targetMapperKey?: string;
 }) => {
@@ -223,14 +223,10 @@ const DeployHistory = ({
     });
   }, []);
 
-  const scroll = scrollHeight
-    ? { y: scrollHeight - 215, x: 800 }
-    : { y: 400, x: 800 };
-
   return (
     <div className={styles.root} id="deploy-history">
       <Table
-        scroll={scroll}
+        scroll={{ y: scrollHeight - 144, x: 800 }}
         loading={isLoading || isFetching || isLoadingVerify}
         locale={{
           emptyText: (

@@ -26,4 +26,7 @@ export default defineConfig({
       },
     },
   },
+  optimizeDeps: {
+    exclude: ['node_modules/*']
+  }
 });
