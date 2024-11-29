@@ -34,6 +34,7 @@ public interface MappingTransformer {
   String RESPONSE_BODY = "responseBody";
   String MAPPING_TYPE = "array";
   String SLASH = "/";
+  String MEF_REQ_BODY_JSON_ROOT = "$.mefRequestBody.";
 
   @Slf4j
   final class LogHolder {}
@@ -96,15 +97,20 @@ public interface MappingTransformer {
       return compactedResponseBody;
     }
     if (MAPPING_TYPE.equals(mapper.getMappingType())) {
-      String jsonPath = constructJsonPath("$.mefRequestBody.", mapper.getTarget());
+      String jsonPath = constructJsonPath(MEF_REQ_BODY_JSON_ROOT, mapper.getTarget());
       int length = lengthOfArrayNode(jsonPath, inputs);
       LogHolder.log.info(
           "Transforming responseBody array length:{}, json path:{}", length, jsonPath);
-      int count = 0;
-      while (count < length) {
+      if (length < 0) {
         compactedResponseBody =
-            processMappingBody(mapper, responseTargetMapperDto, compactedResponseBody, count);
-        count++;
+            processMappingBody(mapper, responseTargetMapperDto, compactedResponseBody, 0);
+      } else {
+        int count = 0;
+        while (count < length) {
+          compactedResponseBody =
+              processMappingBody(mapper, responseTargetMapperDto, compactedResponseBody, count);
+          count++;
+        }
       }
     } else {
       compactedResponseBody =
@@ -243,9 +249,7 @@ public interface MappingTransformer {
 
   default String calculateBasedOnResponseBody(String responseBody, Map<String, Object> context) {
     String replace = responseBody.replace("((", "${").replace("))", "}");
-    LogHolder.log.info("calculateBasedOnResponseBody replace:{}", replace);
     Object obj = JsonToolkit.fromJson(replace, Object.class);
-    LogHolder.log.info("calculateBasedOnResponseBody obj:{}", obj);
     return SpELEngine.evaluate(obj, context, true);
   }
 
@@ -293,7 +297,12 @@ public interface MappingTransformer {
       } else {
         arrayRoot = arrayRoot + DOT + LENGTH_FUNC;
       }
-      return doc.read(arrayRoot);
+      try {
+        return doc.read(arrayRoot);
+      } catch (Exception e) {
+        String errMsg = "Failed to read json data:" + arrayRoot;
+        LogHolder.log.error(errMsg, e);
+      }
     }
     return -1;
   }
@@ -375,7 +384,8 @@ public interface MappingTransformer {
     if (StringUtils.isBlank(str)) {
       return str;
     }
-    String replacement = (index < 0 ? ARRAY_FIRST_ELE : "[" + index + "]");
+    String replacement =
+        (index < 0 ? ARRAY_FIRST_ELE : LEFT_SQUARE_BRACKET + index + RIGHT_SQUARE_BRACKET);
     return str.replace(ARRAY_WILD_MASK, replacement);
   }
 
