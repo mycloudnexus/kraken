@@ -57,7 +57,7 @@ public class IpUtils {
   public static String getFQDN() {
     try {
       ProcessBuilder builder = new ProcessBuilder();
-      builder.command("bash", "-c", "hostname -f");
+      builder.command("/usr/bin/bash", "-c", "hostname -f");
       Process process = builder.start();
       BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
       String line;
