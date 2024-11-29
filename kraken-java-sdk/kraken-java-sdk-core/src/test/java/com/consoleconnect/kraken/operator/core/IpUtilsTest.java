@@ -16,4 +16,10 @@ class IpUtilsTest {
     String ip = IpUtils.getIP(request);
     Assertions.assertNotNull(ip);
   }
+
+  @Test
+  void givenECS_whenQueryFQDN_thenReturnSuccess() {
+    String result = IpUtils.getFQDN();
+    Assertions.assertNotEquals("unknown", result);
+  }
 }
