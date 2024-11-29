@@ -1,5 +1,8 @@
 package com.consoleconnect.kraken.operator.core.toolkit;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
@@ -53,9 +56,17 @@ public class IpUtils {
 
   public static String getFQDN() {
     try {
-      InetAddress address = InetAddress.getLocalHost();
-      return address.getCanonicalHostName();
-    } catch (UnknownHostException e) {
+      ProcessBuilder builder = new ProcessBuilder();
+      builder.command("bash", "-c", "hostname -f");
+      Process process = builder.start();
+      BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+      String line;
+      StringBuilder result = new StringBuilder();
+      while ((line = reader.readLine()) != null) {
+        result.append(line);
+      }
+      return result.toString();
+    } catch (IOException e) {
       return IP_UNKNOWN;
     }
   }
