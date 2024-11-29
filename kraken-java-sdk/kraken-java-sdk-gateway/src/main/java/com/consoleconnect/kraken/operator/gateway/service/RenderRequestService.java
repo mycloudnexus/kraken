@@ -141,7 +141,7 @@ public class RenderRequestService implements MappingTransformer {
         source = constructBodyOfArray(mapper.getSource(), count);
         requestBody =
             JsonToolkit.generateJson(
-                convertToJsonPointer(
+                convertPathToJsonPointer(
                     mapper.getTarget().replace(REQUEST_BODY, StringUtils.EMPTY), "[" + count + "]"),
                 source,
                 requestBody);
@@ -151,7 +151,7 @@ public class RenderRequestService implements MappingTransformer {
       source = constructBody(mapper.getSource());
       requestBody =
           JsonToolkit.generateJson(
-              convertToJsonPointer(mapper.getTarget().replace(REQUEST_BODY, StringUtils.EMPTY)),
+              convertPathToJsonPointer(mapper.getTarget().replace(REQUEST_BODY, StringUtils.EMPTY)),
               source,
               requestBody);
     }

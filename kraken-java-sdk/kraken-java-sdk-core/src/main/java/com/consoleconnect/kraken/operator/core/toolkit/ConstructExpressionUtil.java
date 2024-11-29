@@ -27,11 +27,11 @@ public class ConstructExpressionUtil {
     return contents;
   }
 
-  public static String convertToJsonPointer(String path) {
-    return convertToJsonPointer(path, "[0]");
+  public static String convertPathToJsonPointer(String path) {
+    return convertPathToJsonPointer(path, "[0]");
   }
 
-  public static String convertToJsonPointer(String path, String arrayReplacement) {
+  public static String convertPathToJsonPointer(String path, String arrayReplacement) {
     List<String> params = extractMapperParam(path);
     String param = params.get(0);
     if (StringUtils.isNotBlank(param) && param.startsWith(ARRAY_ROOT_PREFIX)) {
