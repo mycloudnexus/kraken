@@ -70,7 +70,7 @@ public abstract class AbstractBodyTransformerFunc
       context.put("responseStatus", responseStatus);
     }
     String engine = (String) context.get(INPUT_ENGINE);
-    log.info("engine:{}", engine);
+    log.info("postRequest:{}, engine:{}", postRequest, engine);
     String retJsonString = null;
     if (ENGINE_JAVASCRIPT.equals(engine)) {
       String script = (String) context.get(SpelEngineActionRunner.INPUT_CODE);
@@ -88,7 +88,7 @@ public abstract class AbstractBodyTransformerFunc
         retJsonString = JsonToolkit.toJson(expression);
       }
     }
-    log.info("retJsonString:{}", retJsonString);
+    log.info("postRequest:{}, retJsonString:{}", postRequest, retJsonString);
 
     if (postRequest) {
       exchange.getAttributes().put(KrakenFilterConstants.X_KRAKEN_RESPONSE_BODY, s);

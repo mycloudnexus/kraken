@@ -1,0 +1,194 @@
+
+---
+kind: kraken.component.api-target-mapper
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target-mapper.order.uni.add
+  name: Mapper Of Creating Order Port
+  description: This operation creates a ProductOrder entity
+spec:
+  trigger:
+    path: /mefApi/sonata/productOrderingManagement/v10/productOrder
+    method: post
+    productType: uni
+    actionType: add
+  endpoints:
+    - id: create port order
+      path: /api/company/{companyName}/ports/orders
+      method: put
+      serverKey: mef.sonata.api-target-spec.con1718940696857
+      mappers:
+        request:
+          - name: mapper.order.uni.add.buyerId
+            title: >-
+              The unique identifier of the organization that is acting as the a
+              Buyer.
+            source: '@{{buyerId}}'
+            target: "@{{companyName}}"
+            description: ""
+            sourceLocation: QUERY
+            targetLocation: PATH
+            requiredMapping: false
+          - name: mapper.order.uni.add.duration.units
+            title: "order item Term unit"
+            source: "@{{productOrderItem[0].requestedItemTerm.duration.units}}"
+            target: "@{{durationUnit}}"
+            sourceType: enum
+            sourceValues:
+              - calendarMonths
+              - calendarDays
+              - calendarHours
+              - calendarMinutes
+              - businessDays
+              - businessHours
+            sourceLocation: BODY
+            targetLocation: BODY
+            valueMapping:
+              calendarMonths: m
+            requiredMapping: true
+          - name: mapper.order.eline.add.endOfTermAction
+            title: "MEFEndOfTermAction"
+            source: "@{{productOrderItem[0].requestedItemTerm.endOfTermAction}}"
+            target: "roll"
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.order.eline.add.rollInterval.amount
+            title: " quote item Term roll duration"
+            source: "@{{productOrderItem[0].requestedItemTerm.rollInterval.amount}}"
+            target: ""
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.order.eline.add.rollInterval.units
+            title: " quote item Term roll unit"
+            source: "@{{productOrderItem[0].requestedItemTerm.rollInterval.units}}"
+            target: ""
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.order.uni.add.place.id
+            title: >-
+              the id of the place where the products' installation must be done.
+            source: '@{{productOrderItem[0].product.place[0].id}}'
+            target: '@{{dataCenterFacilityId}}'
+            description: ''
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.order.uni.add.place.name
+            title: the keyName of the place where the products' installation must be done.
+            source: '@{{productOrderItem[0].product.place[0].keyName}}'
+            target: '@{{dataCenterFacility}}'
+            description: ''
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.order.uni.add.bandwidthUnit
+            title: "The unit of bandwidth"
+            source: "@{{productOrderItem[0].product.productConfiguration.bandwidthUnit}}"
+            sourceType: enum
+            sourceValues:
+              - MBPS
+              - GBPS
+            target: "MBPS"
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.order.uni.add.bandwidth
+            title: "Bandwidth of the UNI"
+            source: "@{{productOrderItem[0].product.productConfiguration.bandwidth}}"
+            sourceType: continuousVar
+            sourceValues:
+              - 1000
+              - 10000
+            target: "@{{speed}}"
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.order.uni.add.name
+            title: "The name of the UNI"
+            source: "@{{productOrderItem[0].product.productConfiguration.name}}"
+            target: "@{{portName}}"
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.order.uni.add.paymentType
+            title: "The payment type of the UNI"
+            source: "@{{productOrderItem[0].product.productConfiguration.paymentType}}"
+            target: "@{{paymentType}}"
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.order.uni.add.productOffering.id
+            title: "id of a Product Offering"
+            source: "@{{productOrderItem[0].product.productOffering.id}}"
+            target: "UNI"
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: true
+        response:
+          - name: mapper.order.uni.add.state
+            title: Order State Mapping
+            description: Please map order status between Sonata API and Seller API
+            target:  "@{{state}}"
+            targetType: enum
+            targetLocation: BODY
+            targetValues:
+              - acknowledged
+              - assessingCancellation
+              - held.assessingCharge
+              - pending.assessingModification
+              - cancelled
+              - pendingCancellation
+              - completed
+              - failed
+              - inProgress
+              - partial
+              - rejected
+            valueMapping:
+              progressing: inProgress
+              created: acknowledged
+              CREATING: acknowledged
+              ACTIVATING: inProgress
+              ACCEPTED: inProgress
+              MANUAL: inProgress
+              DELETING: inProgress
+              DISABLING: inProgress
+              DENIED: rejected
+              ERROR: failed
+              ACTIVE: completed
+              DISABLED: disabled
+              CANCELLED: disabled
+              PENDING: pending
+              PENDING_ACCEPTANCE: pending
+              DELETED: completed
+            source: "@{{responseBody.status}}"
+            sourceLocation: BODY
+            requiredMapping: true
+          - name: mapper.order.uni.add.orderId
+            title: order Id from seller
+            source: "@{{responseBody.id}}"
+            target: '@{{orderId}}'
+            description: orderId mapping
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.order.uni.add.instanceId
+            title: instance id from seller
+            source: "@{{responseBody.port.id}}"
+            target: '@{{instanceId}}'
+            description: order instanceId mapping
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.order.uni.add.product.id
+            title: product instance id
+            description: ""
+            source: "@{{id}}"
+            sourceLocation: BODY
+            target: "@{{productOrderItem[0].product.id}}"
+            targetLocation: BODY
+            customizedField: false
+            requiredMapping: false
+

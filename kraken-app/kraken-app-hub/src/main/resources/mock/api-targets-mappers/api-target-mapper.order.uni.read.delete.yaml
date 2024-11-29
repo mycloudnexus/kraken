@@ -1,0 +1,132 @@
+---
+kind: kraken.component.api-target-mapper
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target-mapper.order.uni.read.delete
+  name: Mapper Of Reading Order Port with Delete Action
+  description: This operation retrieves a ProductOrder entity
+spec:
+  trigger:
+    path: /mefApi/sonata/productOrderingManagement/v10/productOrder/{id}
+    method: get
+    productType: uni
+    actionType: delete
+  endpoints:
+    - id: retrieve connection detail by id
+      path: /api/company/{companyName}/ports/orders/{orderId}
+      method: GET
+      serverKey: mef.sonata.api-target-spec.con1718940696857
+      mappers:
+        request:
+          - name: mapper.order.uni.read.delete.buyerId
+            title: The unique identifier of the organization that is acting as the a Buyer.
+            source: '@{{buyerId}}'
+            target: '@{{companyName}}'
+            description: ''
+            replaceStar: true
+            sourceLocation: QUERY
+            targetLocation: PATH
+            customizedField: false
+            requiredMapping: false
+          - name: mapper.order.uni.read.delete.orderId
+            title: Order Unique Identifier.
+            source: '@{{id}}'
+            target: '@{{orderId}}'
+            description: ''
+            replaceStar: true
+            convertValue: 'mef.sonata.api-target-mapper.order.uni.add#mapper.order.uni.add.orderId'
+            sourceLocation: PATH
+            targetLocation: PATH
+            customizedField: false
+            requiredMapping: true
+        response:
+          - name: mapper.order.uni.read.delete.state
+            title: ProductOrderState
+            source: '@{{status}}'
+            target: '@{{state}}'
+            targetType: enum
+            description: ''
+            replaceStar: true
+            targetValues:
+              - acknowledged
+              - assessingCancellation
+              - held.assessingCharge
+              - pending.assessingModification
+              - cancelled
+              - pendingCancellation
+              - completed
+              - failed
+              - inProgress
+              - partial
+              - rejected
+            valueMapping:
+              done: completed
+              error: failed
+              allocated: acknowledged
+              cancelled: cancelled
+              activating: acknowledged
+              progressing: inProgress
+            sourceLocation: BODY
+            targetLocation: BODY
+            customizedField: false
+            requiredMapping: true
+          - name: mapper.order.uni.read.delete.completionDate
+            title: order complete date
+            source: ''
+            target: '@{{completionDate}}'
+            description: ''
+            replaceStar: true
+            sourceLocation: BODY
+            targetLocation: BODY
+            customizedField: false
+            requiredMapping: false
+          - name: mapper.order.uni.read.delete.instanceId
+            title: instance id from seller
+            source: '@{{createdPortId}}'
+            target: '@{{productOrderItem[0].product.id}}'
+            description: ''
+            replaceStar: true
+            sourceLocation: BODY
+            targetLocation: BODY
+            customizedField: false
+            requiredMapping: false
+          - name: mapper.order.uni.read.stateChange.state
+            title: state in state change history
+            description: ''
+            source: '@{{status}}'
+            target: '@{{productOrderItem[0].stateChange[*].state}}'
+            targetType: enum
+            targetValues:
+              - acknowledged
+              - assessingCancellation
+              - held.assessingCharge
+              - pending.assessingModification
+              - cancelled
+              - pendingCancellation
+              - completed
+              - failed
+              - inProgress
+              - partial
+              - rejected
+            valueMapping:
+              done: completed
+              error: failed
+              allocated: acknowledged
+              cancelled: cancelled
+              activating: acknowledged
+              progressing: inProgress
+            replaceStar: true
+            sourceLocation: BODY
+            targetLocation: BODY
+            customizedField: false
+            requiredMapping: false
+          - name: mapper.order.uni.read.stateChange.changeDate
+            title: change date in state change history
+            description: ''
+            source: '@{{updatedAt}}'
+            target: '@{{productOrderItem[0].stateChange[*].changeDate}}'
+            replaceStar: true
+            sourceLocation: BODY
+            targetLocation: BODY
+            customizedField: false
+            requiredMapping: false

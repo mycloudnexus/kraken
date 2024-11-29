@@ -66,14 +66,18 @@ public class ConstructExpressionUtil {
   }
 
   public static String constructBodyOfArray(String source, int indexOfArray) {
+    return constructBodyOfArray(source, indexOfArray, "${body.");
+  }
+
+  public static String constructBodyOfArray(String source, int indexOfArray, String arrayPrefix) {
     return source
-        .replace("@{{", "${body.")
+        .replace("@{{", arrayPrefix)
         .replace("}}", "}")
         .replace("[*]", "[" + indexOfArray + "]");
   }
 
-  public static String constructJsonPath(String source) {
-    return source.replace("@{{", "$.body.").replace("}}", "");
+  public static String constructJsonPath(String prefix, String source) {
+    return source.replace("@{{", prefix).replace("}}", "");
   }
 
   public static String constructQuery(String source) {

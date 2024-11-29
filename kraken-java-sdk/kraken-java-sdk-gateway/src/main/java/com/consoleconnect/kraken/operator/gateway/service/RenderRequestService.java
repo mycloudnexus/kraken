@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class RenderRequestService implements MappingTransformer {
 
-  private static final String MAPPING_TYPE = "array";
   private final UnifiedAssetService unifiedAssetService;
 
   public RenderRequestService(UnifiedAssetService unifiedAssetService) {
@@ -134,7 +133,9 @@ public class RenderRequestService implements MappingTransformer {
       ComponentAPITargetFacets.Mapper mapper, Map<String, Object> inputs, String requestBody) {
     String source = "";
     if (MAPPING_TYPE.equals(mapper.getMappingType())) {
-      int length = lengthOfArrayNode(constructJsonPath(mapper.getSource()), inputs);
+      String jsonPath = constructJsonPath("$.body.", mapper.getSource());
+      log.info("expandRequestBody json path:{}", jsonPath);
+      int length = lengthOfArrayNode(jsonPath, inputs);
       int count = 0;
       while (count < length) {
         source = constructBodyOfArray(mapper.getSource(), count);

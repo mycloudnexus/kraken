@@ -1,6 +1,6 @@
 package com.consoleconnect.kraken.operator.gateway.runner;
 
-import static com.consoleconnect.kraken.operator.core.toolkit.ConstructExpressionUtil.convertToJsonPointer;
+import static com.consoleconnect.kraken.operator.core.toolkit.ConstructExpressionUtil.*;
 
 import com.consoleconnect.kraken.operator.core.dto.StateValueMappingDto;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPIFacets;
@@ -31,6 +31,7 @@ public interface MappingTransformer {
   String FORWARD_DOWNSTREAM = "forwardDownstream";
   String REQUEST_BODY = "requestBody.";
   String RESPONSE_BODY = "responseBody";
+  String MAPPING_TYPE = "array";
 
   @Slf4j
   final class LogHolder {}
@@ -42,7 +43,9 @@ public interface MappingTransformer {
    * @return the response body replaced by mappers
    */
   default String transform(
-      ComponentAPITargetFacets.Endpoint endpoint, StateValueMappingDto responseTargetMapperDto) {
+      ComponentAPITargetFacets.Endpoint endpoint,
+      StateValueMappingDto responseTargetMapperDto,
+      Map<String, Object> inputs) {
     String responseBody = endpoint.getResponseBody();
     ComponentAPITargetFacets.Mappers mappers = endpoint.getMappers();
     if (Objects.isNull(mappers) || CollectionUtils.isEmpty(mappers.getResponse())) {
@@ -66,21 +69,42 @@ public interface MappingTransformer {
           && StringUtils.isBlank(mapper.getDefaultValue())) {
         continue;
       }
-      String convertedSource =
-          convertSource(
-              mapper.getSource(),
-              mapper.getDefaultValue(),
-              mapper.getTargetType(),
-              mapper.getReplaceStar());
-      String convertedTarget = convertTarget(mapper.getTarget());
-      addTargetValueMapping(mapper, responseTargetMapperDto, convertedTarget);
-      LogHolder.log.info(
-          "converted source:{}, converted target:{},", convertedSource, convertedTarget);
-      compactedResponseBody =
-          JsonToolkit.generateJson(
-              convertToJsonPointer(mapper.getTarget().replace(RESPONSE_BODY, StringUtils.EMPTY)),
-              convertedSource,
-              compactedResponseBody);
+      if (MAPPING_TYPE.equals(mapper.getMappingType())) {
+        String jsonPath = constructJsonPath("$.mefRequestBody.", mapper.getTarget());
+        LogHolder.log.info("Transforming responseBody json path:{}", jsonPath);
+        int length = lengthOfArrayNode(jsonPath, inputs);
+        LogHolder.log.info("Transforming responseBody array length:{}", length);
+        int count = 0;
+        while (count < length) {
+          String convertedSource =
+              convertSource(
+                  mapper.getSource(), mapper.getDefaultValue(), mapper.getReplaceStar(), count);
+          String convertedTarget =
+              convertTarget(mapper.getTarget(), mapper.getReplaceStar(), count);
+          addTargetValueMapping(mapper, responseTargetMapperDto, convertedTarget);
+          // Expanding array items
+          compactedResponseBody =
+              JsonToolkit.generateJson(
+                  convertToJsonPointer(
+                      mapper.getTarget().replace(RESPONSE_BODY, StringUtils.EMPTY),
+                      "[" + count + "]"),
+                  convertedSource,
+                  compactedResponseBody);
+          count++;
+        }
+      } else {
+        String convertedSource =
+            convertSource(mapper.getSource(), mapper.getDefaultValue(), mapper.getReplaceStar(), 0);
+        String convertedTarget = convertTarget(mapper.getTarget());
+        addTargetValueMapping(mapper, responseTargetMapperDto, convertedTarget);
+        LogHolder.log.info(
+            "converted source:{}, converted target:{},", convertedSource, convertedTarget);
+        compactedResponseBody =
+            JsonToolkit.generateJson(
+                convertToJsonPointer(mapper.getTarget().replace(RESPONSE_BODY, StringUtils.EMPTY)),
+                convertedSource,
+                compactedResponseBody);
+      }
     }
     LogHolder.log.info("response mapper transform result:{}", compactedResponseBody);
     return com.consoleconnect.kraken.operator.core.toolkit.StringUtils.compact(
@@ -237,8 +261,26 @@ public interface MappingTransformer {
         customizedExpress.length() - REPLACEMENT_KEY_SUFFIX.length());
   }
 
+  default String convertTarget(String target, Boolean replaceStar, int replaceIndex) {
+    if (null == target || !target.startsWith(REPLACEMENT_KEY_PREFIX)) {
+      return target;
+    }
+    String strippedValue = target.replace(REQUEST_BODY, StringUtils.EMPTY);
+    // Remove the leading "@" and double curly braces
+    strippedValue =
+        strippedValue.substring(
+            REPLACEMENT_KEY_PREFIX.length(),
+            strippedValue.length() - REPLACEMENT_KEY_SUFFIX.length());
+    LogHolder.log.info("target strippedValue:{}", strippedValue);
+    int loc = strippedValue.lastIndexOf(ARRAY_WILD_MASK);
+    if (loc > 0 && Boolean.TRUE.equals(replaceStar)) {
+      return replaceStar(strippedValue, replaceIndex);
+    }
+    return strippedValue;
+  }
+
   default String convertSource(
-      String source, String defaultValue, String targetType, Boolean replaceStar) {
+      String source, String defaultValue, Boolean replaceStar, int replaceIndex) {
     if (null == source || !source.startsWith(REPLACEMENT_KEY_PREFIX)) {
       return (StringUtils.isBlank(source) ? defaultValue : source);
     }
@@ -246,7 +288,7 @@ public interface MappingTransformer {
     String strippedValue =
         source.substring(
             REPLACEMENT_KEY_PREFIX.length(), source.length() - REPLACEMENT_KEY_SUFFIX.length());
-    LogHolder.log.info("source strippedValue:{}, targetType:{}", strippedValue, targetType);
+    LogHolder.log.info("source strippedValue:{}", strippedValue);
     int loc = strippedValue.lastIndexOf(ARRAY_WILD_MASK);
     if (!strippedValue.startsWith(RESPONSE_BODY)) {
       if (strippedValue.startsWith(ARRAY_FIRST_ELE) || strippedValue.startsWith(ARRAY_WILD_MASK)) {
@@ -257,7 +299,7 @@ public interface MappingTransformer {
     }
     if (loc > 0) {
       if (Boolean.TRUE.equals(replaceStar)) {
-        return String.format("${%s}", replaceStar(strippedValue));
+        return String.format("${%s}", replaceStar(strippedValue, replaceIndex));
       }
       return String.format("${%s}", strippedValue);
     }
@@ -277,10 +319,15 @@ public interface MappingTransformer {
   }
 
   default String replaceStar(String str) {
+    return replaceStar(str, 0);
+  }
+
+  default String replaceStar(String str, int index) {
     if (StringUtils.isBlank(str)) {
       return str;
     }
-    return str.replace(ARRAY_WILD_MASK, ARRAY_FIRST_ELE);
+    String replacement = (index < 0 ? ARRAY_FIRST_ELE : "[" + index + "]");
+    return str.replace(ARRAY_WILD_MASK, replacement);
   }
 
   default Boolean forwardDownstream(ComponentAPIFacets.Action config) {
