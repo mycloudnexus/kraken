@@ -1,0 +1,51 @@
+
+
+## Introduction 
+
+This document provides details about kraken versioing and release strategy.
+
+## Versioning
+
+Kraken project uses [semantic versioning](http://semver.org/) for all releases. 
+Semantic versions are comprised of three fields in the form:
+
+```
+MAJOR.MINOR.0
+```
+
+For examples: `1.0.0`, `1.1.0-snapshot`, and `1.1.0-rc.0`.
+
+Semantic versioning is used since the version number is able to convey clear 
+information about how a new version relates to the previous version. 
+For example, semantic versioning can also provide assurances to allow users to know 
+when they must upgrade compared with when they might want to upgrade:
+
+- When `MINOR` increases, the new release adds **new features, bug fixes, or
+  improvements** and *this new version of Kraken will be compatible with the mapping data which are created with previouse of Kraken minor releases with the same major release*.
+  For example, mapping data created based on Kraken 1.3.0 should be working with Kraken 1.4.0 by default.
+
+- When `MAJOR` increases, the new release adds **new features, bug fixes, or
+  improvements** and *this new version of Kraken will be incompatible with the mapping data which are created with previouse of Kraken major releases*.
+
+- There is no `PATCH` increases so it should be always 0 but the patch field can contain extra details after the number. Dashes denote pre-release versions.
+
+- There are 2 types of pre-release versions, one is snapshot version and another is release candiate(rc) version 
+
+  Snapshot version of one release will start right after previous release is made.  1.4.0-snapshot denotes the snapshot version of 1.4.0 which is created right after 1.3.0 release is made. 
+  That snapshot version is basically "1.4.0 under development and it marks that the code is unstable and active development is in progress, new features/bug fixes/improvements can be added to the branch going forward unitil rc.0 of 1.4.0 is made.
+
+  Release candicate version will start from rc.0, 1.4.0-rc.5 denotes the fifth release candidate of 1.4.0. The release candidate marks a feature freeze, Only bug fixes and any security issues are added to the branch going forward until release 1.4.0 is made.
+
+
+## Branch Management
+
+Kraken project is adopting trunk based development model, developers only commit to main branch and no stable release branch is maintained.
+As such all the release are based on main branch.
+
+## Release Strategy
+
+Any new features added since the last release will be available in the next minor
+or major release. These will include bug fixes as well. 
+
+Minor release will be running on a 2 to 4 weeks cadence.
+Major release will be depending on demand.
