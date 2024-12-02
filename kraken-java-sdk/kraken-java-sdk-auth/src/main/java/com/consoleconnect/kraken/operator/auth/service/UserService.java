@@ -77,7 +77,8 @@ public class UserService {
 
   public void initSystemUpgradeUser() {
     Paging<User> userPaging =
-        this.search(UserContext.SYSTEM_UPGRADE.toLowerCase(), PageRequest.of(0, 1), false);
+        this.search(
+            UserContext.SYSTEM_UPGRADE.toLowerCase(), PageRequest.of(0, 1), false, null, null);
     if (userPaging.getTotal() == 0) {
       CreateUserRequest request = new CreateUserRequest();
       request.setEmail(UserContext.SYSTEM_UPGRADE);
@@ -122,6 +123,7 @@ public class UserService {
     UserEntity userEntity = UserMapper.INSTANCE.toEntity(request);
     userEntity.setPassword(passwordEncoder.encode(request.getPassword()));
     userEntity.setState(UserStateEnum.ENABLED);
+    userEntity.setRole(request.getRole());
     userEntity.setCreatedAt(DateTime.nowInUTC());
     userEntity.setCreatedBy(createdBy);
     userEntity = userRepository.save(userEntity);
@@ -129,11 +131,16 @@ public class UserService {
     return UserMapper.INSTANCE.toUser(userEntity);
   }
 
-  public Paging<User> search(String q, PageRequest pageRequest, boolean filterInternalUser) {
+  public Paging<User> search(
+      String q, PageRequest pageRequest, boolean filterInternalUser, String state, String role) {
     log.info("Searching users, q:{}, pageRequest:{}", q, pageRequest);
     Page<UserEntity> userEntityPage =
         userRepository.search(
-            q, pageRequest, filterInternalUser ? List.of(UserRoleEnum.INTERNAL_USER.name()) : null);
+            q,
+            pageRequest,
+            filterInternalUser ? List.of(UserRoleEnum.INTERNAL_USER.name()) : null,
+            state,
+            role);
     log.info("Users found:{}", userEntityPage.getTotalElements());
     return PagingHelper.toPaging(userEntityPage, UserMapper.INSTANCE::toUser);
   }

@@ -4,7 +4,6 @@ import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
-import com.consoleconnect.kraken.operator.auth.enums.UserRoleEnum;
 import com.consoleconnect.kraken.operator.config.TestApplication;
 import com.consoleconnect.kraken.operator.controller.dto.BuyerAssetDto;
 import com.consoleconnect.kraken.operator.controller.dto.CreateBuyerRequest;
@@ -81,7 +80,6 @@ class BuyerControllerTest extends AbstractIntegrationTest implements EnvCreator,
             uriBuilder
                 .path(BUYER_BASE_URL)
                 .queryParam("status", AssetStatusEnum.ACTIVATED.getKind())
-                .queryParam("role", UserRoleEnum.USER.name())
                 .queryParam("buyerId", "testing-company")
                 .build(),
         HttpStatus.OK.value(),

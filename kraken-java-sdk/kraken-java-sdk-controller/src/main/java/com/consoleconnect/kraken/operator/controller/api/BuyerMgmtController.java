@@ -66,7 +66,6 @@ public class BuyerMgmtController {
       @RequestParam(value = "envId", required = false) String envId,
       @RequestParam(value = "buyerId", required = false) String buyerId,
       @RequestParam(value = "status", required = false) String status,
-      @RequestParam(value = "role", required = false) String role,
       @RequestParam(value = "orderBy", required = false, defaultValue = "createdAt") String orderBy,
       @RequestParam(value = "direction", required = false, defaultValue = "DESC")
           Sort.Direction direction,
@@ -80,7 +79,6 @@ public class BuyerMgmtController {
             envId,
             buyerId,
             status,
-            role,
             orderBy,
             PageRequest.of(page, size, direction, FIELD_CREATE_AT_ORIGINAL)));
   }

@@ -80,10 +80,7 @@ public class BuyerService extends AssetStatusManager {
 
     UnifiedAsset buyer =
         createBuyer(
-            buyerOnboard.getBuyerId(),
-            buyerOnboard.getEnvId(),
-            buyerOnboard.getCompanyName(),
-            buyerOnboard.getRole());
+            buyerOnboard.getBuyerId(), buyerOnboard.getEnvId(), buyerOnboard.getCompanyName());
     SyncMetadata syncMetadata = new SyncMetadata("", "", DateTime.nowInUTCString(), createdBy);
     IngestionDataResult syncResult =
         unifiedAssetService.syncAsset(productId, buyer, syncMetadata, true);
@@ -103,7 +100,6 @@ public class BuyerService extends AssetStatusManager {
       String envId,
       String buyerId,
       String status,
-      String role,
       String orderBy,
       PageRequest pageRequest) {
     if (parentId != null) {
@@ -126,9 +122,6 @@ public class BuyerService extends AssetStatusManager {
     }
     if (StringUtils.isNotBlank(buyerId)) {
       labelConditions.add(Tuple2.of(LABEL_BUYER_ID, buyerId));
-    }
-    if (StringUtils.isNotBlank(role)) {
-      labelConditions.add(Tuple2.of("role", role));
     }
     if (StringUtils.isNotBlank(orderBy)) {
       pageRequest =
@@ -224,13 +217,13 @@ public class BuyerService extends AssetStatusManager {
     return buyerToken;
   }
 
-  private UnifiedAsset createBuyer(String buyerId, String envId, String companyName, String role) {
+  private UnifiedAsset createBuyer(String buyerId, String envId, String companyName) {
     String key = BUYER_KEY_PREFIX + System.currentTimeMillis();
     UnifiedAsset unifiedAsset = UnifiedAsset.of(PRODUCT_BUYER.getKind(), key, BUYER_NAME);
     unifiedAsset.getMetadata().setDescription(BUYER_DESC);
     unifiedAsset.getMetadata().getLabels().put(LABEL_ENV_ID, envId);
     unifiedAsset.getMetadata().getLabels().put(LABEL_BUYER_ID, buyerId);
-    unifiedAsset.getMetadata().getLabels().put(ROLE, role);
+
     unifiedAsset
         .getMetadata()
         .getLabels()
@@ -241,7 +234,6 @@ public class BuyerService extends AssetStatusManager {
     buyerInfo.setBuyerId(buyerId);
     buyerInfo.setEnvId(envId);
     buyerInfo.setCompanyName(companyName);
-    buyerInfo.setRole(role);
     facets.setBuyerInfo(buyerInfo);
 
     unifiedAsset.setFacets(
