@@ -29,6 +29,7 @@ import ModalNewDeployment from "./components/ModalNewDeployment";
 import { showModalShowNew } from "./components/ModalShowAPIKey";
 import NoAPIKey from "./components/NoAPIKey";
 import styles from "./index.module.scss";
+import { useContainerHeight } from "@/hooks/useContainerHeight";
 
 const RunningAPIMapping = lazy(() => import("./components/RunningAPIMapping"));
 const DeployHistory = lazy(
@@ -43,6 +44,8 @@ const initPaginationParams = {
 const EnvironmentOverview = () => {
   const [searchParams] = useSearchParams();
   const { currentProduct } = useAppStore();
+  const contentRef = useRef<HTMLDivElement>(null)
+  const [scrollHeight] = useContainerHeight(contentRef)
 
   const envId = searchParams.get("envId") || "";
 
@@ -238,15 +241,17 @@ const EnvironmentOverview = () => {
               </Radio.Group>
             </Flex>
 
-            <main className={styles.pageContent}>
-              <Suspense fallback={<Spin spinning />}>
-                {activeTab === "running_api" && selectedEnv && (
-                  <RunningAPIMapping env={selectedEnv} />
-                )}
-                {activeTab === "deployment_history" && (
-                  <DeployHistory selectedEnv={selectedEnv} />
-                )}
-              </Suspense>
+            <main className={styles.pageContent} ref={contentRef}>
+              {scrollHeight > 0 && (
+                <Suspense fallback={<Spin spinning />}>
+                  {activeTab === "running_api" && selectedEnv && (
+                    <RunningAPIMapping env={selectedEnv} scrollHeight={scrollHeight ?? 800} />
+                  )}
+                  {activeTab === "deployment_history" && (
+                    <DeployHistory selectedEnv={selectedEnv} scrollHeight={scrollHeight ?? 800} />
+                  )}
+                </Suspense>
+              )}
             </main>
           </Flex>
         )}
