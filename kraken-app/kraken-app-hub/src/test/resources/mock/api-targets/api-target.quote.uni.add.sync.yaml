@@ -29,12 +29,12 @@ spec:
           "relatedContactInformation": "${T(com.consoleconnect.kraken.operator.gateway.func.SpelFunc).appendSellerInformation('sellerContactInformation', env.seller.name, env.seller.emailAddress, env.seller.number, mefRequestBody[relatedContactInformation]?:'')}",
           "quoteItem": [
             {
-              "requestedQuoteItemTerm": "${mefRequestBody.quoteItem[0].requestedQuoteItemTerm}",
-              "product": "${mefRequestBody.quoteItem[0].product}",
+              "requestedQuoteItemTerm": "${mefRequestBody.quoteItem[@{{0}}].requestedQuoteItemTerm}",
+              "product": "${mefRequestBody.quoteItem[@{{0}}].product}",
               "action": "add",
-              "id": "${mefRequestBody.quoteItem[0].id}",
-              "state": "(((mefResponseBody.quoteItem[0].quoteItemPrice[0].price.dutyFreeAmount.value == '') or (T(java.lang.Double).parseDouble(mefResponseBody.quoteItem[0].quoteItemPrice[0].price.dutyFreeAmount.value) < 0)? 'unableToProvide': 'approved.orderable'))",
-              "quoteItemTerm": "${T(java.util.Arrays).asList(mefRequestBody.quoteItem[0].requestedQuoteItemTerm)}",
+              "id": "${mefRequestBody.quoteItem[@{{0}}].id}",
+              "state": "(((mefResponseBody.quoteItem[@{{0}}].quoteItemPrice[0].price.dutyFreeAmount.value == '') or (T(java.lang.Double).parseDouble(mefResponseBody.quoteItem[@{{0}}].quoteItemPrice[0].price.dutyFreeAmount.value) < 0)? 'unableToProvide': 'approved.orderable'))",
+              "quoteItemTerm": "${T(java.util.Arrays).asList(mefRequestBody.quoteItem[@{{0}}].requestedQuoteItemTerm)}",
               "quoteItemPrice": [{
                 "unitOfMeasure":"",
                 "price": {

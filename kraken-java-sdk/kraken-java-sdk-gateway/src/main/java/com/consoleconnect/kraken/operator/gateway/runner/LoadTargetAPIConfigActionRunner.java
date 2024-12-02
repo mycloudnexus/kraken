@@ -23,7 +23,6 @@ import java.util.*;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ServerWebExchange;
 
@@ -67,7 +66,7 @@ public class LoadTargetAPIConfigActionRunner extends AbstractActionRunner {
     // merge mapper and base template file
     mergeMappers(asset, facets);
 
-    String serverKey = facets.getEndpoints().get(0).getServerKey();
+    /*String serverKey = facets.getEndpoints().get(0).getServerKey();
     if (StringUtils.isNotBlank(facets.getEndpoints().get(0).getUrl())) {
       outputs.put(
           "url", SpELEngine.evaluate(facets.getEndpoints().get(0).getUrl(), inputs, String.class));
@@ -75,7 +74,11 @@ public class LoadTargetAPIConfigActionRunner extends AbstractActionRunner {
       // serverKey
       String serverUrl = getServerUrl(serverKey);
       outputs.put("url", serverUrl);
-    }
+    }*/
+
+    // Mock codes
+    String serverUrl = "https://api.stage.consoleconnect.com";
+    outputs.put("url", serverUrl);
 
     StateValueMappingDto stateValueMappingDto = new StateValueMappingDto();
     renderRequestService.handlePath(facets);

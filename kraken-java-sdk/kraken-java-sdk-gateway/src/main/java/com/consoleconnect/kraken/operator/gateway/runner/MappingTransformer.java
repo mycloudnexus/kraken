@@ -11,6 +11,7 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import io.jsonwebtoken.lang.Strings;
 import java.util.*;
+import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
 import org.apache.commons.collections4.CollectionUtils;
@@ -35,6 +36,8 @@ public interface MappingTransformer {
   String MAPPING_TYPE = "array";
   String SLASH = "/";
   String MEF_REQ_BODY_JSON_ROOT = "$.mefRequestBody.";
+  String TARGET_PATTERN = "@\\{\\{([^}]+)\\}\\}";
+  Pattern pattern = Pattern.compile(TARGET_PATTERN);
 
   @Slf4j
   final class LogHolder {}
@@ -107,6 +110,7 @@ public interface MappingTransformer {
       } else {
         int count = 0;
         while (count < length) {
+          compactedResponseBody = replaceStableItems(compactedResponseBody, count);
           compactedResponseBody =
               processMappingBody(mapper, responseTargetMapperDto, compactedResponseBody, count);
           count++;
@@ -171,6 +175,10 @@ public interface MappingTransformer {
       }
     }
     return compactedResponseBody;
+  }
+
+  private String replaceStableItems(String inputString, int count) {
+    return inputString.replaceAll(TARGET_PATTERN, String.valueOf(count));
   }
 
   default void addTargetValueMapping(
