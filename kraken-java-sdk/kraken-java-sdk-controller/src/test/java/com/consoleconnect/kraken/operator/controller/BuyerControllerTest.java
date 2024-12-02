@@ -64,7 +64,6 @@ class BuyerControllerTest extends AbstractIntegrationTest implements EnvCreator,
         HttpStatus.OK.value(),
         null,
         bodyStr -> {
-          log.info(bodyStr);
           assertThat(bodyStr, hasJsonPath("$.data", notNullValue()));
           assertThat(bodyStr, hasJsonPath("$.data.buyerToken", notNullValue()));
           assertThat(bodyStr, hasJsonPath("$.data.buyerToken.accessToken", notNullValue()));
@@ -85,7 +84,6 @@ class BuyerControllerTest extends AbstractIntegrationTest implements EnvCreator,
         HttpStatus.OK.value(),
         null,
         bodyStr -> {
-          log.info(bodyStr);
           assertThat(bodyStr, Matchers.notNullValue());
           assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(1)));
         });
