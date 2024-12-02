@@ -47,7 +47,6 @@ public class BuyerService extends AssetStatusManager {
   private static final String BUYER_NAME = "Buyer";
   private static final String BUYER_DESC = "Onboard buyer information";
   public static final String ENV = "env";
-  private static final String ROLE = "role";
 
   @Getter private final UnifiedAssetService unifiedAssetService;
   private final UnifiedAssetRepository unifiedAssetRepository;
