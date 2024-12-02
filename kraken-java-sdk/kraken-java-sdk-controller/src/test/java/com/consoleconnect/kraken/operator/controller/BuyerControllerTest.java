@@ -82,6 +82,7 @@ class BuyerControllerTest extends AbstractIntegrationTest implements EnvCreator,
                 .path(BUYER_BASE_URL)
                 .queryParam("status", AssetStatusEnum.ACTIVATED.getKind())
                 .queryParam("role", UserRoleEnum.USER.name())
+                .queryParam("buyerId", "testing-company")
                 .build(),
         HttpStatus.OK.value(),
         null,
