@@ -11,5 +11,6 @@ public class BuyerOnboardFacets {
     private String buyerId;
     private String companyName;
     private String envId;
+    private String role;
   }
 }

@@ -4,6 +4,7 @@ import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
+import com.consoleconnect.kraken.operator.auth.enums.UserRoleEnum;
 import com.consoleconnect.kraken.operator.config.TestApplication;
 import com.consoleconnect.kraken.operator.controller.dto.BuyerAssetDto;
 import com.consoleconnect.kraken.operator.controller.dto.CreateBuyerRequest;
@@ -12,6 +13,7 @@ import com.consoleconnect.kraken.operator.controller.service.EnvironmentService;
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
+import com.consoleconnect.kraken.operator.core.enums.AssetStatusEnum;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants;
 import com.consoleconnect.kraken.operator.core.toolkit.LabelConstants;
@@ -63,6 +65,7 @@ class BuyerControllerTest extends AbstractIntegrationTest implements EnvCreator,
         HttpStatus.OK.value(),
         null,
         bodyStr -> {
+          log.info(bodyStr);
           assertThat(bodyStr, hasJsonPath("$.data", notNullValue()));
           assertThat(bodyStr, hasJsonPath("$.data.buyerToken", notNullValue()));
           assertThat(bodyStr, hasJsonPath("$.data.buyerToken.accessToken", notNullValue()));
@@ -74,10 +77,16 @@ class BuyerControllerTest extends AbstractIntegrationTest implements EnvCreator,
   void givenBuyer_whenSearch_thenOK() {
     webTestClient.requestAndVerify(
         HttpMethod.GET,
-        uriBuilder -> uriBuilder.path(BUYER_BASE_URL).build(),
+        uriBuilder ->
+            uriBuilder
+                .path(BUYER_BASE_URL)
+                .queryParam("status", AssetStatusEnum.ACTIVATED.getKind())
+                .queryParam("role", UserRoleEnum.USER.name())
+                .build(),
         HttpStatus.OK.value(),
         null,
         bodyStr -> {
+          log.info(bodyStr);
           assertThat(bodyStr, Matchers.notNullValue());
           assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(1)));
         });
