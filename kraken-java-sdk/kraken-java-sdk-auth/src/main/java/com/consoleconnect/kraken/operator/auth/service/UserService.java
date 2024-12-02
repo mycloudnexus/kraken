@@ -19,6 +19,7 @@ import jakarta.annotation.PostConstruct;
 import java.util.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -134,12 +135,14 @@ public class UserService {
   public Paging<User> search(
       String q, PageRequest pageRequest, boolean filterInternalUser, String state, String role) {
     log.info("Searching users, q:{}, pageRequest:{}", q, pageRequest);
+    UserStateEnum userStateEnum =
+        (StringUtils.isBlank(state) ? null : UserStateEnum.valueOf(state));
     Page<UserEntity> userEntityPage =
         userRepository.search(
             q,
             pageRequest,
             filterInternalUser ? List.of(UserRoleEnum.INTERNAL_USER.name()) : null,
-            state,
+            userStateEnum,
             role);
     log.info("Users found:{}", userEntityPage.getTotalElements());
     return PagingHelper.toPaging(userEntityPage, UserMapper.INSTANCE::toUser);

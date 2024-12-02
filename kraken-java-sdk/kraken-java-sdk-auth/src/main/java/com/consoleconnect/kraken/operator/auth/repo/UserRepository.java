@@ -1,6 +1,7 @@
 package com.consoleconnect.kraken.operator.auth.repo;
 
 import com.consoleconnect.kraken.operator.auth.entity.UserEntity;
+import com.consoleconnect.kraken.operator.auth.enums.UserStateEnum;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -24,5 +25,5 @@ public interface UserRepository
               + "  and  ((:role) is null or  e.role = :role)")
   @Transactional(readOnly = true)
   Page<UserEntity> search(
-      String q, Pageable pageable, List<String> filterRoles, String state, String role);
+      String q, Pageable pageable, List<String> filterRoles, UserStateEnum state, String role);
 }
