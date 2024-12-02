@@ -93,6 +93,25 @@ class BuyerControllerTest extends AbstractIntegrationTest implements EnvCreator,
   }
 
   @Test
+  @Order(3)
+  void givenBuyer_whenSearchInactive_thenReturnEmptyData() {
+    webTestClient.requestAndVerify(
+        HttpMethod.GET,
+        uriBuilder ->
+            uriBuilder
+                .path(BUYER_BASE_URL)
+                .queryParam("status", AssetStatusEnum.DEACTIVATED.getKind())
+                .build(),
+        HttpStatus.OK.value(),
+        null,
+        bodyStr -> {
+          log.info(bodyStr);
+          assertThat(bodyStr, Matchers.notNullValue());
+          assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(0)));
+        });
+  }
+
+  @Test
   @Order(4)
   void givenDuplicatedBuyer_whenCreate_thenNot200() {
     CreateBuyerRequest requestEntity = new CreateBuyerRequest();
