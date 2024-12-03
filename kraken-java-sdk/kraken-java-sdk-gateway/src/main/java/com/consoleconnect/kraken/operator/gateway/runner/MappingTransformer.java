@@ -11,7 +11,6 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import io.jsonwebtoken.lang.Strings;
 import java.util.*;
-import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
 import org.apache.commons.collections4.CollectionUtils;
@@ -23,6 +22,7 @@ public interface MappingTransformer {
   String REPLACEMENT_KEY_SUFFIX = "}}";
   String ARRAY_WILD_MASK = "[*]";
   String ARRAY_FIRST_ELE = "[0]";
+  String ARRAY_FIRST_REGEX = "\\[0\\]";
   String TARGET_VALUE_MAPPER_KEY = "targetValueMapping";
   String JSON_PATH_EXPRESSION_PREFIX = "$.";
   String DOT = ".";
@@ -36,8 +36,6 @@ public interface MappingTransformer {
   String MAPPING_TYPE = "array";
   String SLASH = "/";
   String MEF_REQ_BODY_JSON_ROOT = "$.mefRequestBody.";
-  String TARGET_PATTERN = "@\\{\\{([^}]+)\\}\\}";
-  Pattern pattern = Pattern.compile(TARGET_PATTERN);
 
   @Slf4j
   final class LogHolder {}
@@ -110,7 +108,6 @@ public interface MappingTransformer {
       } else {
         int count = 0;
         while (count < length) {
-          compactedResponseBody = replaceStableItems(compactedResponseBody, count);
           compactedResponseBody =
               processMappingBody(mapper, responseTargetMapperDto, compactedResponseBody, count);
           count++;
@@ -146,7 +143,7 @@ public interface MappingTransformer {
     compactedResponseBody =
         JsonToolkit.generateJson(jsonPointer, convertedSource, compactedResponseBody);
     // Expanding array items
-    if (replaceIndex > 0) {
+    if (replaceIndex >= 0) {
       return expandArrayItems(compactedResponseBody, mapper.getTarget(), replaceIndex, jsonPointer);
     }
     return compactedResponseBody;
@@ -170,15 +167,12 @@ public interface MappingTransformer {
         if (jsonPointer.startsWith(pointer)) {
           continue;
         }
+        String entryValue = replaceFirst(entry.getValue().toString(), arrayRoot, count);
         compactedResponseBody =
-            JsonToolkit.generateJson(pointer, entry.getValue().toString(), compactedResponseBody);
+            JsonToolkit.generateJson(pointer, entryValue, compactedResponseBody);
       }
     }
     return compactedResponseBody;
-  }
-
-  private String replaceStableItems(String inputString, int count) {
-    return inputString.replaceAll(TARGET_PATTERN, String.valueOf(count));
   }
 
   default void addTargetValueMapping(
@@ -386,6 +380,15 @@ public interface MappingTransformer {
 
   default String replaceStar(String str) {
     return replaceStar(str, 0);
+  }
+
+  default String replaceFirst(String str, String arrayRootPrefix, int index) {
+    if (StringUtils.isBlank(str)) {
+      return str;
+    }
+    return str.replaceFirst(
+        arrayRootPrefix + ARRAY_FIRST_REGEX,
+        arrayRootPrefix + LEFT_SQUARE_BRACKET + index + RIGHT_SQUARE_BRACKET);
   }
 
   default String replaceStar(String str, int index) {
