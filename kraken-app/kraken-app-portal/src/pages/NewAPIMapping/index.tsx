@@ -434,7 +434,7 @@ const NewAPIMapping = ({
   const upgradingVersion = pathQuery.get("version");
 
   return (
-    <Flex className={styles.container}>
+    <main className={styles.container}>
       {/* User guide */}
       <StepBar
         type={EStep.MAPPING}
@@ -610,7 +610,7 @@ const NewAPIMapping = ({
           )}
         </div>
       </Flex>
-    </Flex>
+    </main>
   );
 };
 

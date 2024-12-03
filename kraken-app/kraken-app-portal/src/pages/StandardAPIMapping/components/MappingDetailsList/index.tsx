@@ -45,8 +45,8 @@ const MappingDetailsList = ({
       // Auto select the corresponding api
       const initialMapItem = targetMapperKey
         ? (apis.find(
-            (mapping) => mapping.targetMapperKey === targetMapperKey
-          ) ?? apis[0])
+          (mapping) => mapping.targetMapperKey === targetMapperKey
+        ) ?? apis[0])
         : apis[0];
 
       setSelectedKey(initialMapItem.path);
@@ -106,17 +106,19 @@ const MappingDetailsList = ({
   }, []);
 
   return (
-    <Spin spinning={!groupedPaths}>
-      <Collapse
-        activeKey={activeLabel}
-        onChange={handleChange}
-        className={styles.collapseBox}
-        bordered
-        ghost
-        expandIconPosition="end"
-        items={listMapping}
-      />
-    </Spin>
+    <>
+      <Spin spinning={!groupedPaths}>
+        <Collapse
+          activeKey={activeLabel}
+          onChange={handleChange}
+          className={styles.collapseBox}
+          bordered
+          ghost
+          expandIconPosition="end"
+          items={listMapping}
+        />
+      </Spin>
+    </>
   );
 };
 
