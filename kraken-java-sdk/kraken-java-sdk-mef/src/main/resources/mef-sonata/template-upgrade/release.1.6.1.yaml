@@ -2,12 +2,12 @@
 kind: kraken.product.template-upgrade
 apiVersion: v1
 metadata:
-  key: kraken.product.template-upgrade.1.6.0
-  name: V1.6.0
+  key: kraken.product.template-upgrade.1.6.1
+  name: V1.6.1
   labels:
     productSpec: grace
-    productVersion: V1.6.0
-    publishDate: 2024-11-25
+    productVersion: V1.6.1
+    publishDate: 2024-12-03
   description: |
     Add empty matrix files for below use cases:
     - get UNI ADD order by id
