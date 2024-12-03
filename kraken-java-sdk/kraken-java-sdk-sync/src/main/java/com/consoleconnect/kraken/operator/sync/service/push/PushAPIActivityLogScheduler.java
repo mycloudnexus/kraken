@@ -45,7 +45,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.util.UriBuilder;
 
 @Service
 @Slf4j
@@ -149,8 +148,11 @@ public class PushAPIActivityLogScheduler extends KrakenServerConnector {
   }
 
   private HttpResponse<String> sendLogsToExternalSystem(ClientEvent payload) {
-    return blockCurl(
-        HttpMethod.POST, UriBuilder::build, payload, new ParameterizedTypeReference<>() {});
+    return curl(
+        HttpMethod.POST,
+        getAppProperty().getMgmtPlane().getMgmtPushEventEndpoint(),
+        payload,
+        new ParameterizedTypeReference<>() {});
   }
 
   private List<ComposedHttpRequest> getComposedHttpRequests(Stream<ApiActivityLogEntity> logs) {
