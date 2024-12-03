@@ -4,7 +4,9 @@ import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
 
+import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.gateway.runner.MappingTransformer;
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
@@ -25,10 +27,13 @@ class MappingTransformerTest implements MappingTransformer {
 
   @Test
   void givenJsonArray_whenCounting_thenReturnOK() {
-    String pathExpression = "$.body.quoteItem[*].requestedQuoteItemTerm.duration.units";
+    String pathExpression = "$.quoteItem[*].requestedQuoteItemTerm.duration.units";
     String jsonData =
-        "{\"body\":{\"quoteItem\":[{\"requestedQuoteItemTerm\":{\"duration\":{\"amount\":1,\"units\":\"calendarMonths\"}}}]}}";
-    int result = lengthOfArrayNode(pathExpression, jsonData);
+        "{\"quoteItem\":[{\"quoteItemTerm\":[{\"duration\":{\"amount\":1,\"units\":\"calendarMonths\"}}]}]}";
+    Map<String, Object> quoteItemMap =
+        JsonToolkit.fromJson(jsonData, new TypeReference<Map<String, Object>>() {});
+    int result = lengthOfArrayNode(pathExpression, quoteItemMap);
+    System.out.println(result);
     Assertions.assertTrue(result > -1);
   }
 
