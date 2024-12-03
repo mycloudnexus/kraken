@@ -1,0 +1,18 @@
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.1.6.0
+  name: V1.6.0
+  labels:
+    productSpec: grace
+    productVersion: V1.6.0
+    publishDate: 2024-11-25
+  description: |
+    Add empty matrix files for below use cases:
+    - get UNI ADD order by id
+    - get Eline ADD order by id
+    - get UNI DELETE order by id
+    - get Eline DELETE order by id
+    - retrieve address
+  version: 1
