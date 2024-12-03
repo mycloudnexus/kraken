@@ -1,6 +1,7 @@
 package com.consoleconnect.kraken.operator.auth.repo;
 
 import com.consoleconnect.kraken.operator.auth.entity.UserEntity;
+import com.consoleconnect.kraken.operator.auth.enums.UserStateEnum;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -19,7 +20,10 @@ public interface UserRepository
       value =
           "select e from #{#entityName} e "
               + " where  ( (:q) is null or LOWER(e.name) like %:q% or LOWER(e.email) like %:q% )"
-              + " and ( (:filterRoles) is null or e.role not in :filterRoles )")
+              + " and ( (:filterRoles) is null or e.role not in :filterRoles )"
+              + "  and  ((:state) is null or  e.state = :state)"
+              + "  and  ((:role) is null or  e.role = :role)")
   @Transactional(readOnly = true)
-  Page<UserEntity> search(String q, Pageable pageable, List<String> filterRoles);
+  Page<UserEntity> search(
+      String q, Pageable pageable, List<String> filterRoles, UserStateEnum state, String role);
 }
