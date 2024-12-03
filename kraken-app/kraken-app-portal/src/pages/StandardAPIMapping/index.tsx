@@ -141,7 +141,9 @@ const StandardAPIMapping = () => {
       }
     >
       <Spin spinning={isLoading}>
-        <Flex className={styles.pageBody}
+        <Flex
+          data-testid="leftPanel"
+          className={styles.pageBody}
           onMouseMove={handleMouseMove}
           onBlur={handleMouseUp}
           onMouseUp={handleMouseUp}>
@@ -158,6 +160,8 @@ const StandardAPIMapping = () => {
             )}
 
             <div
+              data-testid="resizableBar"
+              tabIndex={0}
               role="button"
               className={classNames(styles.draggableSide, isMouseDown && styles.interactive)}
               onMouseDown={handleMouseDown}

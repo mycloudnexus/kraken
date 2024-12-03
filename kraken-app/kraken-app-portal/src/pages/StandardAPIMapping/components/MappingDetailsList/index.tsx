@@ -106,19 +106,17 @@ const MappingDetailsList = ({
   }, []);
 
   return (
-    <>
-      <Spin spinning={!groupedPaths}>
-        <Collapse
-          activeKey={activeLabel}
-          onChange={handleChange}
-          className={styles.collapseBox}
-          bordered
-          ghost
-          expandIconPosition="end"
-          items={listMapping}
-        />
-      </Spin>
-    </>
+    <Spin spinning={!groupedPaths}>
+      <Collapse
+        activeKey={activeLabel}
+        onChange={handleChange}
+        className={styles.collapseBox}
+        bordered
+        ghost
+        expandIconPosition="end"
+        items={listMapping}
+      />
+    </Spin>
   );
 };
 

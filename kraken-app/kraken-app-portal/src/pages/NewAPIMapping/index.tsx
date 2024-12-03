@@ -44,7 +44,6 @@ import ResponseMapping, { IMapping } from "./components/ResponseMapping";
 import { RightSide } from "./components/RightSide";
 import useGetApiSpec from "./components/useGetApiSpec";
 import useGetDefaultSellerApi from "./components/useGetDefaultSellerApi";
-// import { validateMappers } from "./helper";
 import styles from "./index.module.scss";
 import DeployHistory from "./components/DeployHistory";
 
@@ -299,20 +298,6 @@ const NewAPIMapping = ({
 
   const handleSave = async (callback?: () => void) => {
     try {
-      // @TODO: temporarily remove for demo
-      // Validate properties name and location
-      // const { requestIds, responseIds, errorMessage } = validateMappers({
-      //   request: requestMapping,
-      //   response: responseMapping,
-      // });
-      // setErrors({ requestIds, responseIds });
-
-      // if (errorMessage) {
-      //   notification.error({ message: errorMessage });
-
-      //   return;
-      // }
-
       const newDataResponse = transformListMappingItem(
         listMappingStateResponse,
         "response"
