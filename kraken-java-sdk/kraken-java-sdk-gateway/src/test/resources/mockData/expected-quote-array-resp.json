@@ -1,0 +1,95 @@
+{
+  "id": "${entity.id}",
+  "buyerRequestedQuoteLevel": "${mefRequestBody.buyerRequestedQuoteLevel}",
+  "relatedContactInformation": "${T(com.consoleconnect.kraken.operator.gateway.func.SpelFunc).appendSellerInformation('sellerContactInformation',env.seller.name,env.seller.emailAddress,env.seller.number,mefRequestBody[relatedContactInformation]?:'')}",
+  "quoteItem": [
+    {
+      "requestedQuoteItemTerm": "${mefRequestBody.quoteItem[0].requestedQuoteItemTerm}",
+      "product": "${mefRequestBody.quoteItem[0].product}",
+      "action": "add",
+      "id": "${mefRequestBody.quoteItem[0].id}",
+      "state": "(((mefResponseBody.quoteItem[0].quoteItemPrice[0].price.dutyFreeAmount.value=='')or(T(java.lang.Double).parseDouble(mefResponseBody.quoteItem[0].quoteItemPrice[0].price.dutyFreeAmount.value)<0)?'unableToProvide':'approved.orderable'))",
+      "quoteItemTerm": "${T(java.util.Arrays).asList(mefRequestBody.quoteItem[0].requestedQuoteItemTerm)}",
+      "quoteItemPrice": [
+        {
+          "unitOfMeasure": "Gb",
+          "price": {
+            "dutyFreeAmount": {
+              "unit": "USD",
+              "value": "${responseBody.results[0].price}"
+            },
+            "taxRate": "16",
+            "taxIncludedAmount": {
+              "unit": "USD",
+              "value": "100"
+            }
+          },
+          "name": "name-here",
+          "priceType": "recurring",
+          "description": "",
+          "recurringChargePeriod": "month"
+        }
+      ]
+    },
+    {
+      "quoteItemPrice": [
+        {
+          "unitOfMeasure": "Gb",
+          "price": {
+            "dutyFreeAmount": {
+              "unit": "USD",
+              "value": "${responseBody.results[1].price}"
+            },
+            "taxRate": "16",
+            "taxIncludedAmount": {
+              "unit": "USD",
+              "value": "100"
+            }
+          },
+          "name": "name-here",
+          "priceType": "recurring",
+          "recurringChargePeriod": "month"
+        }
+      ],
+      "requestedQuoteItemTerm": "${mefRequestBody.quoteItem[1].requestedQuoteItemTerm}",
+      "product": "${mefRequestBody.quoteItem[1].product}",
+      "action": "add",
+      "id": "${mefRequestBody.quoteItem[1].id}",
+      "state": "(((mefResponseBody.quoteItem[1].quoteItemPrice[0].price.dutyFreeAmount.value=='')or(T(java.lang.Double).parseDouble(mefResponseBody.quoteItem[1].quoteItemPrice[0].price.dutyFreeAmount.value)<0)?'unableToProvide':'approved.orderable'))",
+      "quoteItemTerm": "${T(java.util.Arrays).asList(mefRequestBody.quoteItem[1].requestedQuoteItemTerm)}"
+    },
+    {
+      "quoteItemPrice": [
+        {
+          "unitOfMeasure": "Gb",
+          "price": {
+            "dutyFreeAmount": {
+              "unit": "USD",
+              "value": "${responseBody.results[2].price}"
+            },
+            "taxRate": "16",
+            "taxIncludedAmount": {
+              "unit": "USD",
+              "value": "100"
+            }
+          },
+          "name": "name-here",
+          "priceType": "recurring",
+          "recurringChargePeriod": "month"
+        }
+      ],
+      "requestedQuoteItemTerm": "${mefRequestBody.quoteItem[2].requestedQuoteItemTerm}",
+      "product": "${mefRequestBody.quoteItem[2].product}",
+      "action": "add",
+      "id": "${mefRequestBody.quoteItem[2].id}",
+      "state": "(((mefResponseBody.quoteItem[2].quoteItemPrice[0].price.dutyFreeAmount.value=='')or(T(java.lang.Double).parseDouble(mefResponseBody.quoteItem[2].quoteItemPrice[0].price.dutyFreeAmount.value)<0)?'unableToProvide':'approved.orderable'))",
+      "quoteItemTerm": "${T(java.util.Arrays).asList(mefRequestBody.quoteItem[2].requestedQuoteItemTerm)}"
+    }
+  ],
+  "quoteDate": "${T(com.consoleconnect.kraken.operator.core.toolkit.DateTime).nowInUTCFormatted()}",
+  "externalId": "${mefRequestBody[externalId]?:''}",
+  "instantSyncQuote": "${mefRequestBody[instantSyncQuote]?:''}",
+  "requestedQuoteCompletionDate": "${mefRequestBody[requestedQuoteCompletionDate]?:''}",
+  "quoteLevel": "${mefRequestBody.buyerRequestedQuoteLevel}",
+  "state": "(((mefResponseBody.quoteItem[0].quoteItemPrice[0].price.dutyFreeAmount.value=='')or(T(java.lang.Double).parseDouble(mefResponseBody.quoteItem[0].quoteItemPrice[0].price.dutyFreeAmount.value)<0)?'unableToProvide':'approved.orderable'))"
+}

@@ -167,7 +167,7 @@ public interface MappingTransformer {
         if (jsonPointer.startsWith(pointer)) {
           continue;
         }
-        String entryValue = replaceFirst(entry.getValue().toString(), arrayRoot, count);
+        String entryValue = replaceALL(entry.getValue().toString(), arrayRoot, count);
         compactedResponseBody =
             JsonToolkit.generateJson(pointer, entryValue, compactedResponseBody);
       }
@@ -382,11 +382,11 @@ public interface MappingTransformer {
     return replaceStar(str, 0);
   }
 
-  default String replaceFirst(String str, String arrayRootPrefix, int index) {
+  default String replaceALL(String str, String arrayRootPrefix, int index) {
     if (StringUtils.isBlank(str)) {
       return str;
     }
-    return str.replaceFirst(
+    return str.replaceAll(
         arrayRootPrefix + ARRAY_FIRST_REGEX,
         arrayRootPrefix + LEFT_SQUARE_BRACKET + index + RIGHT_SQUARE_BRACKET);
   }
