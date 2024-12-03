@@ -10,6 +10,7 @@ import com.consoleconnect.kraken.operator.controller.dto.CreateBuyerRequest;
 import com.consoleconnect.kraken.operator.controller.mapper.BuyerAssetDtoMapper;
 import com.consoleconnect.kraken.operator.controller.model.Environment;
 import com.consoleconnect.kraken.operator.controller.model.MgmtProperty;
+import com.consoleconnect.kraken.operator.core.dto.Tuple2;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
 import com.consoleconnect.kraken.operator.core.enums.AssetStatusEnum;
@@ -25,10 +26,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +34,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -92,6 +91,44 @@ public class BuyerService extends AssetStatusManager {
         unifiedAssetService.findOne(syncResult.getData().getId().toString());
     return generateBuyer(
         buyerCreated, buyerOnboard.getBuyerId(), buyerOnboard.getTokenExpiredInSeconds());
+  }
+
+  @Transactional(readOnly = true)
+  public Paging<UnifiedAssetDto> search(
+      String parentId,
+      String envId,
+      String buyerId,
+      String status,
+      String orderBy,
+      PageRequest pageRequest) {
+    if (parentId != null) {
+      parentId = unifiedAssetService.findOneByIdOrKey(parentId).getId().toString();
+    }
+    List<Tuple2> eqConditions = new ArrayList<>();
+    eqConditions.add(Tuple2.of("kind", PRODUCT_BUYER.getKind()));
+    if (StringUtils.isNotBlank(parentId)) {
+      eqConditions.add(Tuple2.of("parentId", parentId));
+    }
+
+    if (StringUtils.isNotBlank(status)
+        && (AssetStatusEnum.ACTIVATED.getKind().equals(status)
+            || AssetStatusEnum.DEACTIVATED.getKind().equals(status))) {
+      eqConditions.add(Tuple2.of("status", status));
+    }
+    List<Tuple2> labelConditions = new ArrayList<>();
+    if (StringUtils.isNotBlank(envId)) {
+      labelConditions.add(Tuple2.of(LABEL_ENV_ID, envId));
+    }
+    if (StringUtils.isNotBlank(buyerId)) {
+      labelConditions.add(Tuple2.of(LABEL_BUYER_ID, buyerId));
+    }
+    if (StringUtils.isNotBlank(orderBy)) {
+      pageRequest =
+          PageRequest.of(
+              pageRequest.getPageNumber(), pageRequest.getPageSize(), Sort.Direction.DESC, orderBy);
+    }
+    return unifiedAssetService.findBySpecification(
+        eqConditions, labelConditions, null, pageRequest, null);
   }
 
   @Transactional(readOnly = true)
@@ -185,6 +222,7 @@ public class BuyerService extends AssetStatusManager {
     unifiedAsset.getMetadata().setDescription(BUYER_DESC);
     unifiedAsset.getMetadata().getLabels().put(LABEL_ENV_ID, envId);
     unifiedAsset.getMetadata().getLabels().put(LABEL_BUYER_ID, buyerId);
+
     unifiedAsset
         .getMetadata()
         .getLabels()
