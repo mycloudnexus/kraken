@@ -34,7 +34,8 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
         Assertions.assertThrowsExactly(
             KrakenException.class, () -> mappingMatrixCheckerActionRunner.onCheck(inputs));
     MatcherAssert.assertThat(
-        krakenException.getMessage(), Matchers.containsString("possibly product not supported"));
+        krakenException.getMessage(),
+        Matchers.containsString("api use case is not supported :not deployed"));
   }
 
   @Test
@@ -49,7 +50,7 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
     MatcherAssert.assertThat(
         krakenException.getMessage(),
         Matchers.containsString("""
-            lack in check rules for target key"""));
+            api use case is not supported :not deployed"""));
   }
 
   @Test
