@@ -78,6 +78,9 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner {
     Assert.notNull(inputs.get(TARGET_KEY), "targetKey must not be null");
     String componentKey = inputs.get(MAPPING_MATRIX_KEY).toString();
     String targetKey = inputs.get(TARGET_KEY).toString();
+    if (unifiedAssetRepository.findOneByKey(targetKey).isEmpty()) {
+      throw KrakenException.badRequest(MESSAGE_ALERT.formatted(":not deployed"));
+    }
     if (StringUtils.isNotBlank(componentKey)
         && componentKey.endsWith(NOT_FOUND)
         && componentKey.contains(COLON)) {
@@ -106,9 +109,6 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner {
     if (Objects.isNull(facets) || !facets.containsKey(targetKey)) {
       throw KrakenException.badRequest(
           MESSAGE_ALERT.formatted(":lack in check rules for target key: " + targetKey));
-    }
-    if (unifiedAssetRepository.findOneByKey(targetKey).isEmpty()) {
-      throw KrakenException.badRequest(MESSAGE_ALERT.formatted(":not deployed"));
     }
     // check enable/disable
     enableChecking(facets, targetKey);
