@@ -143,7 +143,7 @@ public interface MappingTransformer {
     compactedResponseBody =
         JsonToolkit.generateJson(jsonPointer, convertedSource, compactedResponseBody);
     // Expanding array items
-    if (replaceIndex >= 0) {
+    if (replaceIndex > 0) {
       return expandArrayItems(compactedResponseBody, mapper.getTarget(), replaceIndex, jsonPointer);
     }
     return compactedResponseBody;
