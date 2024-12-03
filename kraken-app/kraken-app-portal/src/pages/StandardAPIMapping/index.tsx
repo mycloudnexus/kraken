@@ -12,13 +12,14 @@ import groupByPath from "@/utils/helpers/groupByPath";
 import { IMapperDetails } from "@/utils/types/env.type";
 import { Flex, Spin } from "antd";
 import { delay, get, isEmpty } from "lodash";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router";
 import { useBoolean } from "usehooks-ts";
 import NewAPIMapping from "../NewAPIMapping";
 import ComponentSelect from "./components/ComponentSelect";
 import MappingDetailsList from "./components/MappingDetailsList";
 import styles from "./index.module.scss";
+import classNames from "classnames";
 
 const StandardAPIMapping = () => {
   const { currentProduct } = useAppStore();
@@ -84,6 +85,40 @@ const StandardAPIMapping = () => {
     return { groupedPaths, isGroupedPathsEmpty };
   }, [detailDataMapping]);
 
+  const leftPanelRef = useRef<HTMLDivElement>(null)
+  const bar = useRef<HTMLDivElement>(null)
+  const [isMouseDown, setIsMouseDown] = useState(false)
+  const clientX = useRef(0)
+
+  const { left = 0 } = leftPanelRef.current?.getBoundingClientRect() ?? {}
+
+  const handleMouseDown: React.MouseEventHandler<HTMLDivElement> = (e) => {
+    setIsMouseDown(true)
+
+    if (bar.current) {
+      bar.current.style.left = e.clientX - left + 'px'
+    }
+  }
+
+  const handleMouseMove: React.MouseEventHandler<HTMLDivElement> = (e) => {
+    e.stopPropagation()
+    e.preventDefault()
+
+    if (isMouseDown) {
+      clientX.current = e.clientX
+      if (bar.current) {
+        bar.current.style.left = e.clientX - left + 'px'
+      }
+    }
+  }
+
+  const handleMouseUp = () => {
+    if (isMouseDown && leftPanelRef.current) {
+      leftPanelRef.current.style.width = (clientX.current ?? 0) - left + 'px'
+    }
+    setIsMouseDown(false)
+  }
+
   return (
     <PageLayout
       title={
@@ -106,11 +141,16 @@ const StandardAPIMapping = () => {
       }
     >
       <Spin spinning={isLoading}>
-        <Flex className={styles.pageBody}>
+        <Flex
+          data-testid="leftPanel"
+          className={styles.pageBody}
+          onMouseMove={handleMouseMove}
+          onBlur={handleMouseUp}
+          onMouseUp={handleMouseUp}>
           <Flex
-            vertical
             justify={isLoading ? "center" : "space-between"}
             className={styles.leftWrapper}
+            ref={leftPanelRef}
           >
             {!isGroupedPathsEmpty && (
               <MappingDetailsList
@@ -118,6 +158,14 @@ const StandardAPIMapping = () => {
                 setActiveSelected={handleDisplay}
               />
             )}
+
+            <div
+              data-testid="resizableBar"
+              tabIndex={0}
+              role="button"
+              className={classNames(styles.draggableSide, isMouseDown && styles.interactive)}
+              onMouseDown={handleMouseDown}
+              ref={bar} />
           </Flex>
 
           <Flex
