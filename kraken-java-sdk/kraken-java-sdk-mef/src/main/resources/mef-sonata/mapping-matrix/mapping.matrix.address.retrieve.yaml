@@ -1,0 +1,12 @@
+---
+kind: kraken.product.mapping.matrix
+apiVersion: v1
+metadata:
+  key: mef.sonata.api.matrix.address.retrieve
+  name: MEF Sonata API
+  labels:
+    mef-api-release: grace
+  version: 10
+spec:
+  matrix:
+    mef.sonata.api-target.address.retrieve:
