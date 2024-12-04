@@ -91,31 +91,21 @@ export const VersionSelect = ({
 
   const fetchNext = debounce(() => onFetchNext?.(), 100);
 
-  useEffect(() => {
-    if (!listRef.current) return;
+  const handleScroll = () => {
+    const {
+      scrollTop = 0,
+      scrollHeight = 0,
+      clientHeight = 0,
+    } = listRef.current ?? {};
 
-    const handleScroll = () => {
-      const {
-        scrollTop = 0,
-        scrollHeight = 0,
-        clientHeight = 0,
-      } = listRef.current ?? {};
-
-      if (
-        scrollTop + clientHeight >= scrollHeight &&
-        hasNextPage &&
-        !isFetchingNextPage
-      ) {
-        fetchNext();
-      }
-    };
-
-    listRef.current.addEventListener("scroll", handleScroll);
-
-    return () => {
-      listRef.current?.removeEventListener("scroll", handleScroll);
-    };
-  }, [listRef.current, filterBy]);
+    if (
+      scrollTop + clientHeight >= scrollHeight &&
+      hasNextPage &&
+      !isFetchingNextPage
+    ) {
+      fetchNext();
+    }
+  };
 
   const listRelease =
     filterBy === "All" ? data : data.filter((item) => item.status === filterBy);
@@ -157,10 +147,10 @@ export const VersionSelect = ({
         </Dropdown>
       </Flex>
 
-      <Flex vertical className={styles.versionList} ref={listRef}>
+      <Flex vertical className={styles.versionList} ref={listRef} onScroll={handleScroll}>
         {loading && <ListVersionSkeleton />}
 
-        {!listRelease.length && (
+        {!listRelease.length && !loading && (
           <Empty
             className={styles.emptyRelease}
             description={<SecondaryText.LightNormal>No matched release</SecondaryText.LightNormal>} />
