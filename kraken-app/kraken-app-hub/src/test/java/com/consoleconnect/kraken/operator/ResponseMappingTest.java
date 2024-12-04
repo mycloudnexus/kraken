@@ -113,7 +113,7 @@ class ResponseMappingTest extends AbstractIntegrationTest implements MappingTran
 
     StateValueMappingDto responseTargetMapperDto = new StateValueMappingDto();
     for (ComponentAPITargetFacets.Endpoint endpoint : facets.getEndpoints()) {
-      String transformedResp = transform(endpoint, responseTargetMapperDto);
+      String transformedResp = transform(endpoint, responseTargetMapperDto, new HashMap<>());
       log.info("expected    resp:{}", expected);
       log.info("transformed resp:{}", transformedResp);
       Assertions.assertEquals(expected, transformedResp);

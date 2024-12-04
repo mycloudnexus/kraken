@@ -28,7 +28,7 @@ class ConstructExpressionUtilTest {
     assertThat(s3).contains("body");
     List<String> pathParam = ConstructExpressionUtil.extractOriginalPathParam("/{path}/a/b/c");
     assertThat(pathParam).contains("path");
-    String s4 = ConstructExpressionUtil.convertToJsonPointer("@{{a[*].b.c[1]}}");
+    String s4 = ConstructExpressionUtil.convertPathToJsonPointer("@{{a[*].b.c[1]}}");
     String s5 = ConstructExpressionUtil.constructOriginalDBParam("abc");
     assertThat(s5).contains("entity");
     assertThat(s4).doesNotContain("*");
@@ -42,7 +42,7 @@ class ConstructExpressionUtilTest {
   @Test
   void givenStatusInArray_whenConvert_thenOK() {
     String target = "@{{[*].status}}";
-    String result = ConstructExpressionUtil.convertToJsonPointer(target);
+    String result = ConstructExpressionUtil.convertPathToJsonPointer(target);
     String expected = "/status";
     Assertions.assertEquals(expected, result);
   }

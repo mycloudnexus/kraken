@@ -1,6 +1,5 @@
 package com.consoleconnect.kraken.operator.gateway;
 
-import static com.consoleconnect.kraken.operator.core.toolkit.ConstructExpressionUtil.convertToJsonPointer;
 import static com.consoleconnect.kraken.operator.gateway.SpELEngineTest.readFileToString;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -13,6 +12,7 @@ import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
+import com.consoleconnect.kraken.operator.core.toolkit.ConstructExpressionUtil;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.core.toolkit.YamlToolkit;
 import com.consoleconnect.kraken.operator.gateway.runner.LoadTargetAPIConfigActionRunner;
@@ -91,13 +91,20 @@ class RequestMapperTest implements MappingTransformer {
   @Test
   void givenPathKey_whenGenerate_returnJson() {
     String s =
-        JsonToolkit.generateJson(convertToJsonPointer("@{{user.class[*].name}}"), "John", "{}");
+        JsonToolkit.generateJson(
+            ConstructExpressionUtil.convertPathToJsonPointer("@{{user.class[*].name}}"),
+            "John",
+            "{}");
     String s2 =
         JsonToolkit.generateJson(
-            convertToJsonPointer("@{{user.class[*].password}}"), "password", s);
+            ConstructExpressionUtil.convertPathToJsonPointer("@{{user.class[*].password}}"),
+            "password",
+            s);
     String s3 =
         JsonToolkit.generateJson(
-            convertToJsonPointer("@{{user.class[*].secret.key}}"), "secretKey", s2);
+            ConstructExpressionUtil.convertPathToJsonPointer("@{{user.class[*].secret.key}}"),
+            "secretKey",
+            s2);
     log.info("result: {}", s3);
     assertThat(s3, hasJsonPath("$.user.class[0].secret.key", equalTo("secretKey")));
     Map<String, String> params = new HashMap<>();
@@ -105,7 +112,8 @@ class RequestMapperTest implements MappingTransformer {
     params.put("key2", "value2");
     String s4 =
         JsonToolkit.generateJson(
-            convertToJsonPointer("@{{user.class[*].quoteItemPrice[*]}}"),
+            ConstructExpressionUtil.convertPathToJsonPointer(
+                "@{{user.class[*].quoteItemPrice[*]}}"),
             JsonToolkit.toJson(params),
             s3);
     log.info("s4:{}", s4);

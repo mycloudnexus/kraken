@@ -218,6 +218,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner {
           || ParamLocationEnum.HYBRID.name().equals(mapper.getTargetLocation())) {
         continue;
       }
+      String source = replaceStar(mapper.getSource());
       if (MappingTypeEnum.ENUM.getKind().equals(mapper.getSourceType())
           || MappingTypeEnum.DISCRETE_VAR.getKind().equals(mapper.getSourceType())
           || MappingTypeEnum.CONTINUOUS_VAR.getKind().equals(mapper.getSourceType())) {
@@ -228,10 +229,9 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner {
             mapper.getSourceValues(),
             mapper.getSourceType());
       } else if (mapper.getTarget() != null && !mapper.getTarget().contains("@{{")) {
-        checkConstantValue(mapper.getSource(), mapper.getTarget(), inputs);
+        checkConstantValue(source, mapper.getTarget(), inputs);
       } else {
-        checkMappingValue(
-            mapper.getSource(), ParamLocationEnum.valueOf(mapper.getSourceLocation()), inputs);
+        checkMappingValue(source, ParamLocationEnum.valueOf(mapper.getSourceLocation()), inputs);
       }
     }
   }
