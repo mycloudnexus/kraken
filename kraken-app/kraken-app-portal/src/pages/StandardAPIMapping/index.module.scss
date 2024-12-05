@@ -9,6 +9,8 @@
   border-bottom-left-radius: 4px;
   background-color: #fff;
   min-width: 201px;
+  width: 300px;
+  padding: 16px 0;
   overflow-y: scroll;
   &::-webkit-scrollbar {
     display: none;
@@ -22,9 +24,11 @@
   }
 
   .draggableSide {
-    height: 100%;
+    height: calc(100% + 32px);
+    margin-top: -16px;
+    margin-bottom: -16px;
     min-width: 1px;
-    background-color: lightgray;
+    background-color: var(--bg);
     cursor: ew-resize;
     z-index: 100;
   
@@ -92,7 +96,6 @@
 }
 .versionListWrapper {
   flex: 1;
-  border-left: 1px solid #f0f0f0;
   min-width: 840px;
 }
 

@@ -172,7 +172,7 @@ export const VersionSelect = ({
             onClick={() => setSelectedVersion(d.templateUpgradeId)}
           >
             <Flex align="center" gap={7}>
-              <Text.LightMedium data-testid="releaseVersion">
+              <Text.LightMedium data-testid="releaseVersion" className={styles.releaseVersion}>
                 {d.productVersion}
               </Text.LightMedium>
               <SecondaryText.LightSmall data-testid="productSpec" className={styles.productSpec}>
