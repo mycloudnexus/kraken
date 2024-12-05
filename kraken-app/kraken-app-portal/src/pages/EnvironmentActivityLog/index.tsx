@@ -30,6 +30,7 @@ import { useBoolean } from 'usehooks-ts';
 import PushHistoryList from './components/PushHistoryList';
 import TrimmedPath from "@/components/TrimmedPath";
 import { IActivityHistoryLog } from '@/utils/types/common.type';
+import { useGetPushButtonEnabled } from '@/hooks/pushApiEvent';
 
 const { RangePicker } = DatePicker;
 
@@ -56,8 +57,8 @@ const statusCodeOptions = [
 const EnvironmentActivityLog = () => {
   const { envId } = useParams();
   const { currentProduct } = useAppStore();
-  const { data: envData, isLoading: loadingEnv } =
-    useGetProductEnvs(currentProduct);
+  const { data: envData, isLoading: loadingEnv } = useGetProductEnvs(currentProduct);
+  const { data: isPushButtonEnabledResponse } = useGetPushButtonEnabled();
   const [form] = Form.useForm();
   const ref = useRef<any>();
   const size = useSize(ref);
@@ -235,7 +236,7 @@ const EnvironmentActivityLog = () => {
               },
             ]}
           />
-          {isActivityLogActive && <Button type='primary' onClick={open}>
+          {isActivityLogActive && !!isPushButtonEnabledResponse?.enabled && <Button type='primary' onClick={open}>
             Push log
           </Button>}
         </Flex>
