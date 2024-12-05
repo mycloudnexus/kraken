@@ -1,7 +1,7 @@
 package com.consoleconnect.kraken.operator.controller.service.start;
 
-import static com.consoleconnect.kraken.operator.controller.service.start.StartGuideService.KIND_CAN_NOT_BE_EMPTY_ERROR;
 import static com.consoleconnect.kraken.operator.controller.service.start.StartGuideService.PRODUCT_ID_CAN_NOT_BE_EMPTY_ERROR;
+import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.COMPONENT_API_TARGET_SPEC;
 import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.PRODUCT_BUYER;
 import static com.consoleconnect.kraken.operator.core.enums.MappingStatusEnum.COMPLETE;
 import static com.consoleconnect.kraken.operator.core.enums.MappingStatusEnum.INCOMPLETE;
@@ -39,7 +39,7 @@ class StartGuideServiceTest {
   public static final String STAGE_ENVIRONMENT_ID_1 = "eId1";
   public static final String PRODUCTION_ENVIRONMENT_ID_2 = "eId2";
   public static final String PRODUCT_ID = "productId1";
-  public static final String KIND = "kind1";
+  public static final String KIND = COMPONENT_API_TARGET_SPEC.getKind();
   public static final String ASSET_PRODUCT_ID_1 = "assetProductId1";
 
   private StartGuideService sut;
@@ -79,7 +79,7 @@ class StartGuideServiceTest {
     when(unifiedAssetRepositoryMock.existsByParentIdAndKind(product.getId(), KIND))
         .thenReturn(false);
     // when
-    var result = sut.getStartGuideInfo(PRODUCT_ID, KIND);
+    var result = sut.getStartGuideInfo(PRODUCT_ID);
     // then
     assertThat(result.getSellerApiServerRegistrationInfo().getAtLeastOneSellerApiRegistered())
         .isFalse();
@@ -95,8 +95,7 @@ class StartGuideServiceTest {
     when(unifiedAssetRepositoryMock.existsByParentIdAndKind(product.getId(), KIND))
         .thenReturn(true);
     // when
-    var result =
-        sut.getStartGuideInfo(StartGuideServiceTest.PRODUCT_ID, StartGuideServiceTest.KIND);
+    var result = sut.getStartGuideInfo(StartGuideServiceTest.PRODUCT_ID);
     // then
     assertThat(result.getSellerApiServerRegistrationInfo().getAtLeastOneSellerApiRegistered())
         .isTrue();
@@ -110,8 +109,7 @@ class StartGuideServiceTest {
     givenNoBuyer();
     when(apiComponentServiceMock.listAllApiUseCase()).thenReturn(Collections.emptyList());
     // when
-    var result =
-        sut.getStartGuideInfo(StartGuideServiceTest.PRODUCT_ID, StartGuideServiceTest.KIND);
+    var result = sut.getStartGuideInfo(StartGuideServiceTest.PRODUCT_ID);
     // then
     var apiMappingInfo = result.getApiMappingInfo();
     assertThat(apiMappingInfo.getAtLeastOneMappingCompleted()).isFalse();
@@ -133,7 +131,7 @@ class StartGuideServiceTest {
     when(apiComponentServiceMock.listAllApiUseCase())
         .thenReturn(of(componentExpandDTO1, componentExpandDTO2));
     // when
-    var result = sut.getStartGuideInfo(StartGuideServiceTest.PRODUCT_ID, KIND);
+    var result = sut.getStartGuideInfo(StartGuideServiceTest.PRODUCT_ID);
     // then
     var apiMappingInfo = result.getApiMappingInfo();
     assertThat(apiMappingInfo.getAtLeastOneMappingCompleted()).isFalse();
@@ -158,8 +156,7 @@ class StartGuideServiceTest {
     when(apiComponentServiceMock.listAllApiUseCase())
         .thenReturn(of(componentExpandDTO1, componentExpandDTO2));
     // when
-    var result =
-        sut.getStartGuideInfo(StartGuideServiceTest.PRODUCT_ID, StartGuideServiceTest.KIND);
+    var result = sut.getStartGuideInfo(StartGuideServiceTest.PRODUCT_ID);
     // then
     var apiMappingInfo = result.getApiMappingInfo();
     assertThat(apiMappingInfo.getAtLeastOneMappingCompleted()).isTrue();
@@ -180,8 +177,7 @@ class StartGuideServiceTest {
             parentId.toString(), PRODUCT_BUYER.getKind()))
         .thenReturn(false);
     // when
-    var result =
-        sut.getStartGuideInfo(StartGuideServiceTest.PRODUCT_ID, StartGuideServiceTest.KIND);
+    var result = sut.getStartGuideInfo(StartGuideServiceTest.PRODUCT_ID);
     // then
     assertThat(result.getDeploymentInfo().getAtLeastOneBuyerRegistered()).isFalse();
   }
@@ -200,8 +196,7 @@ class StartGuideServiceTest {
             parentId.toString(), PRODUCT_BUYER.getKind()))
         .thenReturn(true);
     // when
-    var result =
-        sut.getStartGuideInfo(StartGuideServiceTest.PRODUCT_ID, StartGuideServiceTest.KIND);
+    var result = sut.getStartGuideInfo(StartGuideServiceTest.PRODUCT_ID);
     // then
     assertThat(result.getDeploymentInfo().getAtLeastOneBuyerRegistered()).isTrue();
   }
@@ -215,8 +210,7 @@ class StartGuideServiceTest {
     givenNoApiDeployedOnEnvs();
 
     // when
-    var result =
-        sut.getStartGuideInfo(StartGuideServiceTest.PRODUCT_ID, StartGuideServiceTest.KIND);
+    var result = sut.getStartGuideInfo(StartGuideServiceTest.PRODUCT_ID);
     // then
     assertThat(result.getDeploymentInfo().getAtLeastOneApiDeployedToStage()).isFalse();
     assertThat(result.getDeploymentInfo().getAtLeastOneApiDeployedToProduction()).isFalse();
@@ -249,8 +243,7 @@ class StartGuideServiceTest {
                 0,
                 3));
     // when
-    var result =
-        sut.getStartGuideInfo(StartGuideServiceTest.PRODUCT_ID, StartGuideServiceTest.KIND);
+    var result = sut.getStartGuideInfo(StartGuideServiceTest.PRODUCT_ID);
     // then
     var deploymentInfo = result.getDeploymentInfo();
     assertThat(deploymentInfo.getAtLeastOneApiDeployedToStage()).isTrue();
@@ -265,28 +258,12 @@ class StartGuideServiceTest {
         assertThrows(
             KrakenException.class,
             () -> {
-              sut.getStartGuideInfo("", KIND);
+              sut.getStartGuideInfo("");
             });
 
     // then
     assertThat(ex.getCode()).isEqualTo(400);
     assertThat(ex.getMessage()).isEqualTo(PRODUCT_ID_CAN_NOT_BE_EMPTY_ERROR);
-  }
-
-  @Test
-  void givenNoKind_whenGetStartGuideInfo_thenReturnsError() {
-    // given
-    // when
-    var ex =
-        assertThrows(
-            KrakenException.class,
-            () -> {
-              sut.getStartGuideInfo(PRODUCT_ID, "");
-            });
-
-    // then
-    assertThat(ex.getCode()).isEqualTo(400);
-    assertThat(ex.getMessage()).isEqualTo(KIND_CAN_NOT_BE_EMPTY_ERROR);
   }
 
   private ApiMapperDeploymentDTO secondDefaultApiMapper() {
