@@ -510,7 +510,6 @@ const NewAPIMapping = ({
                       Save
                     </Button>
                   </Tooltip>
-                  <Button type="default">Compare</Button>
                 </>
               )}
               <DeployStage
