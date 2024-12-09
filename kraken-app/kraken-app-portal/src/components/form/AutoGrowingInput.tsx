@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { InputProps } from "antd";
 
 export function AutoGrowingInput({
-  prefix, suffix, className, value, placeholder, onChange, onBlur, ...rest
+  prefix, suffix, className, value, placeholder,disabled, onChange, onBlur, ...rest
 }: Readonly<{ value?: string; onChange?: (value: string) => void } & Omit<InputProps, 'value' | 'onChange'>>) {
   const [text, setText] = useState<string>('')
   const [isFocused, setIsFocused] = useState(false)
@@ -34,7 +34,7 @@ export function AutoGrowingInput({
           onBlur?.(e as any)
         }}
         onKeyDown={e => {
-          if (e.key === 'Enter') {
+          if (e.key === 'Enter' || disabled) {
             e.preventDefault()
           }
         }} />
