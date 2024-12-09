@@ -1,6 +1,6 @@
 import { DatePicker, Flex, Form, Modal, Radio, Spin } from "antd";
 import styles from "./index.module.scss";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { capitalize } from 'lodash';
 import dayjs from 'dayjs';
 import { useGetProductEnvActivitiesMutation } from '@/hooks/product';
@@ -76,6 +76,11 @@ const PushHistoryModal = ({
     []
   );
 
+  const isFormValid = useMemo(() => {
+    const { envId, requestTime } = form.getFieldsValue();
+    return !!(responseData && responseData.data.total > 0 && envId && requestTime)      
+  }, [responseData, form])
+
   return (
     <Modal
       open={isOpen}
@@ -83,7 +88,10 @@ const PushHistoryModal = ({
       onOk={handleOK}
       title="Push log"
       className={styles.modal}
-      okButtonProps={{ disabled: !isSuccess, "data-testid": "pushLog-btn" }}
+      okButtonProps={{
+        disabled: !isFormValid,
+        "data-testid": "pushLog-btn"
+      }}
     >
       <Form
         form={form}
@@ -108,12 +116,12 @@ const PushHistoryModal = ({
           required
           className={styles.rangePicker}
         >
-          <RangePicker placeholder={["Select time", "Select time"]} disabledDate={disabled7DaysDate} />
+          <RangePicker placeholder={["Select time", "Select time"]} disabledDate={disabled7DaysDate} maxDate={dayjs().endOf('day')} />
         </Form.Item>
 
         <Flex justify={isPending ?  "center" : "start"}>
           <Spin spinning={isPending}>
-            {responseData?.data?.total && <Flex vertical className={styles.numberContainer} gap={5}>
+            {responseData?.data && <Flex vertical className={styles.numberContainer} gap={5}>
               <div>
                 Number of activity logs filtered
               </div>
@@ -124,8 +132,6 @@ const PushHistoryModal = ({
             }
           </Spin>
         </Flex>
-
-
       </Form>
     </Modal>
   );
