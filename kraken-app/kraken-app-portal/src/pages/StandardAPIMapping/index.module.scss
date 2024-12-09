@@ -9,7 +9,10 @@
   border-bottom-left-radius: 4px;
   background-color: #fff;
   min-width: 201px;
+  width: 300px;
+  padding: 16px 0;
   overflow-y: scroll;
+
   &::-webkit-scrollbar {
     display: none;
   }
@@ -18,20 +21,43 @@
     .ant-spin-nested-loading {
       flex: 1;
       min-width: 0;
+
+      .ant-spin-container {
+        display: flex;
+        overflow-x: auto;
+
+
+        ::-webkit-scrollbar {
+          height: 18px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+          border: 6px solid rgba(0, 0, 0, 0);
+          background-clip: padding-box;
+          border-radius: 8px;
+          background-color: #dde1e5;
+
+          &:hover {
+            background-color: #f7f7f7;
+          }
+        }
+      }
     }
   }
 
   .draggableSide {
-    height: 100%;
+    height: calc(100% + 32px);
+    margin-top: -16px;
+    margin-bottom: -16px;
     min-width: 1px;
-    background-color: lightgray;
+    background-color: var(--bg);
     cursor: ew-resize;
     z-index: 100;
-  
+
     &:hover {
       background-color: var(--primary);
     }
-    
+
     &.interactive {
       position: absolute;
     }
@@ -42,15 +68,18 @@
   padding: 0 10px 10px 10px;
   border-bottom: 1px solid #dde1e5;
 }
+
 .componentIconWrapper {
   width: 17px;
   border-radius: 5px;
   padding: 4px;
   background-color: #91d5ff;
-  > svg {
+
+  >svg {
     display: block;
   }
 }
+
 .envItem {
   box-sizing: border-box;
   flex: 0 0 calc(50% - 4px);
@@ -59,40 +88,47 @@
   background-color: #f0f2f5;
   padding: 4px 8px;
 }
+
 .list {
   width: 100%;
+
   :global(.ant-list-items) {
     display: flex;
     flex-direction: column;
     gap: 8px;
   }
+
   :global(.ant-list-item) {
     padding: 0;
     border-block-end: unset;
   }
 }
+
 .item {
   padding: 2px 24px;
   cursor: pointer;
 }
+
 .activeItem {
   background-color: #e6f7ff;
   color: #096dd9;
   border-right: 3px solid #2962ff;
 }
+
 .modalCreate {
   :global {
     .ant-modal-confirm-btns {
       margin-top: 24px;
     }
+
     .ant-modal-content {
       padding: 32px !important;
     }
   }
 }
+
 .versionListWrapper {
   flex: 1;
-  border-left: 1px solid #f0f0f0;
   min-width: 840px;
 }
 

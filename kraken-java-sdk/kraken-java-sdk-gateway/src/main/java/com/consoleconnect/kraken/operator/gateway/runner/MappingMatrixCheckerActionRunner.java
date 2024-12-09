@@ -79,6 +79,9 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     Assert.notNull(inputs.get(TARGET_KEY), "targetKey must not be null");
     String componentKey = inputs.get(MAPPING_MATRIX_KEY).toString();
     String targetKey = inputs.get(TARGET_KEY).toString();
+    if (unifiedAssetRepository.findOneByKey(targetKey).isEmpty()) {
+      throw KrakenException.badRequest(API_CASE_NOT_SUPPORTED.formatted(":not deployed"));
+    }
     if (StringUtils.isNotBlank(componentKey)
         && componentKey.endsWith(NOT_FOUND)
         && componentKey.contains(COLON)) {

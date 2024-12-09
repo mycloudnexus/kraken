@@ -148,7 +148,6 @@ const StandardAPIMapping = () => {
           onBlur={handleMouseUp}
           onMouseUp={handleMouseUp}>
           <Flex
-            justify={isLoading ? "center" : "space-between"}
             className={styles.leftWrapper}
             ref={leftPanelRef}
           >
@@ -159,31 +158,27 @@ const StandardAPIMapping = () => {
               />
             )}
 
-            <div
+            {!isLoading && (<div
               data-testid="resizableBar"
               tabIndex={0}
               role="button"
               className={classNames(styles.draggableSide, isMouseDown && styles.interactive)}
               onMouseDown={handleMouseDown}
-              ref={bar} />
+              ref={bar} />)}
           </Flex>
 
-          <Flex
+          {!isGroupedPathsEmpty && (<Flex
             align="center"
             justify="center"
             className={styles.versionListWrapper}
           >
-            {activePath && !isChangeMappingKey ? (
+            {activePath && !isChangeMappingKey && (
               <NewAPIMapping
                 refetch={refetch}
                 isRequiredMapping={isRequiredMapping}
               />
-            ) : (
-              <div className={styles.empty}>
-                <Spin size="large" />
-              </div>
             )}
-          </Flex>
+          </Flex>)}
         </Flex>
       </Spin>
     </PageLayout>
