@@ -1,10 +1,12 @@
 package com.consoleconnect.kraken.operator.core.exception;
 
 import com.consoleconnect.kraken.operator.core.event.ExceptionEvent;
+import com.consoleconnect.kraken.operator.core.toolkit.ConstructExpressionUtil;
 import com.consoleconnect.kraken.operator.core.toolkit.StringUtils;
 import java.util.*;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.function.TriConsumer;
 import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.boot.autoconfigure.web.reactive.error.AbstractErrorWebExceptionHandler;
@@ -73,19 +75,30 @@ public class KrakenExceptionHandler extends AbstractErrorWebExceptionHandler {
 
   public Object generateBody(HttpStatusCode httpStatus, String message, Throwable throwable) {
     ErrorResponse errorResponse = new ErrorResponse();
-    String code = ErrorResponse.ErrorMapping.defaultMsg(httpStatus.value(), throwable.getMessage());
+    String code = ErrorResponse.ErrorMapping.defaultMsg(httpStatus.value(), throwable);
     errorResponse.setCode(code);
     // The max length of reason is 255.
     String reason = StringUtils.truncate(throwable.getMessage(), REASON_LENGTH_UPPER_LIMIT);
     errorResponse.setReason(reason);
 
-    errorResponse.setMessage(
-        (Objects.isNull(throwable.getCause()) ? message : throwable.getCause().getMessage()));
+    String rawMsg =
+        (Objects.isNull(throwable.getCause()) ? message : throwable.getCause().getMessage());
+    List<String> propertyPathList = ConstructExpressionUtil.extractMapperParam(rawMsg);
+    errorResponse.setMessage(rawMsg.replace("@{{", "").replace("}}", ""));
     errorResponse.setReferenceError(reason);
     if (httpStatus.value() != HttpStatus.UNPROCESSABLE_ENTITY.value()) {
       return errorResponse;
     }
+    fillPropertyPath(errorResponse, propertyPathList);
     return List.of(errorResponse);
+  }
+
+  private void fillPropertyPath(ErrorResponse errorResponse, List<String> propertyPathList) {
+    if (CollectionUtils.isNotEmpty(propertyPathList)) {
+      errorResponse.setPropertyPath(propertyPathList.get(0));
+    } else {
+      errorResponse.setPropertyPath("");
+    }
   }
 
   private HttpStatusCode determineHttpStatus(Throwable throwable) {

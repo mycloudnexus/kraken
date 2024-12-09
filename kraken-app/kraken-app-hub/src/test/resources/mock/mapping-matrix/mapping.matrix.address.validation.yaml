@@ -18,25 +18,22 @@ spec:
         path: "$.body.submittedGeographicAddress.['@type']"
         expectType: EXPECTED
         value: FieldedAddress
-        code: 400
+        code: 422
       - name: address_submittedGeographicAddress_country
         path: "$.body.submittedGeographicAddress.['country']"
         expectType: EXPECTED_TRUE
         value: "${param}"
-        errorMsg: "submittedGeographicAddress.country can not be null"
-        code: 400
+        code: 422
       - name: address_submittedGeographicAddress_city
         path: "$.body.submittedGeographicAddress.['city']"
         expectType: EXPECTED_TRUE
         value: "${param}"
-        code: 400
-        errorMsg: "submittedGeographicAddress.city can not be null"
+        code: 422
       - name: address_submittedGeographicAddress_streetName
         path: "$.body.submittedGeographicAddress.['streetName']"
         expectType: EXPECTED_TRUE
         value: "${param}"
-        errorMsg: "submittedGeographicAddress.streetName can not be null"
-        code: 400
+        code: 422
 
 
 

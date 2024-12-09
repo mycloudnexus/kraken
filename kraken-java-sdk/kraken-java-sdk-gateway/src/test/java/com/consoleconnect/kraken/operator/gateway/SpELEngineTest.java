@@ -28,7 +28,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
 class SpELEngineTest implements MappingTransformer {
-
   @Test
   void testIt() {
     Map<String, Object> data = new HashMap<>();
