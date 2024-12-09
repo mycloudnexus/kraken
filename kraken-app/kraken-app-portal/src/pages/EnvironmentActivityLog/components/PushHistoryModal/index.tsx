@@ -30,7 +30,7 @@ const PushHistoryModal = ({
   const [form] = Form.useForm();
   const { currentProduct } = useAppStore();
 
-  const { data: responseData, mutateAsync: getProductEnvActivities, isPending, isSuccess } = useGetProductEnvActivitiesMutation();
+  const { data: responseData, mutateAsync: getProductEnvActivities, isPending } = useGetProductEnvActivitiesMutation();
   const { mutateAsync: createPushActivityLog } = usePostPushActivityLog();
 
   const handleOK = () => {
