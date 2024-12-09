@@ -3,7 +3,6 @@ package com.consoleconnect.kraken.operator;
 import static com.consoleconnect.kraken.operator.core.toolkit.Constants.MAPPER_SIGN;
 
 import com.consoleconnect.kraken.operator.core.dto.StateValueMappingDto;
-import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
@@ -21,26 +20,6 @@ import org.junit.jupiter.api.Test;
 
 @Slf4j
 class ResponseMappingTest extends AbstractIntegrationTest implements MappingTransformer {
-
-  @Test
-  void testAllMatch() {
-    List<Integer> list = List.of(1, 2, 3);
-    boolean result =
-        list.stream()
-            .allMatch(
-                item -> {
-                  return check(item);
-                });
-    System.out.println(result);
-  }
-
-  public boolean check(Integer item) {
-    if (item > 2) {
-      throw KrakenException.unProcessableEntityInvalidFormat("test");
-    }
-    return true;
-  }
-
   @SneakyThrows
   @Test
   void testResponseMapper() {
