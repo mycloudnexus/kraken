@@ -11,7 +11,8 @@ class ErrorMappingTest {
   void test400Mapping() {
     int code = 400;
     String message = "API mapping is incomplete";
-    String result = ErrorResponse.ErrorMapping.defaultMsg(code, message);
+    String result =
+        ErrorResponse.ErrorMapping.defaultMsg(code, new IllegalArgumentException(message));
     Assertions.assertEquals("incompleteMapping", result);
   }
 
@@ -19,7 +20,11 @@ class ErrorMappingTest {
   void testDefaultMsg() {
     List<Integer> list = List.of(400, 404, 401, 403, 422, 500);
     List<String> result =
-        list.stream().map(item -> ErrorResponse.ErrorMapping.defaultMsg(item, "")).toList();
+        list.stream()
+            .map(
+                item ->
+                    ErrorResponse.ErrorMapping.defaultMsg(item, new IllegalArgumentException("")))
+            .toList();
     Assertions.assertEquals(6, result.size());
   }
 }

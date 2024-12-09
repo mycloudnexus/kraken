@@ -61,6 +61,10 @@ public class ConstructExpressionUtil {
     return source.replace("@{{", "${body.").replace("}}", "}");
   }
 
+  public static String constructJsonPathBody(String source) {
+    return source.replace("@{{", "$.body.").replace("}}", "");
+  }
+
   public static String constructQuery(String source) {
     return source.replace("@{{", "${query.").replace("}}", "}");
   }

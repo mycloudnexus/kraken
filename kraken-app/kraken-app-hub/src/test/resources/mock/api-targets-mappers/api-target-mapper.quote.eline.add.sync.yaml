@@ -93,6 +93,10 @@ spec:
             target: "@{{connections[*].bandwidth}}"
             targetLocation: BODY
             requiredMapping: true
+            sourceType: continuousInt
+            sourceValues:
+              - 1000
+              - 10000
           - name: mapper.quote.uni.add.sync.productConfiguration.bandwidthUnit
             source: "@{{quoteItem[0].product.productConfiguration.bandwidthUnit}}"
             sourceLocation: BODY
@@ -113,6 +117,7 @@ spec:
           - name: mapper.quote.uni.add.sync.productConfiguration.paymentType
             source: "@{{quoteItem[0].product.productConfiguration.paymentType}}"
             sourceLocation: BODY
+            sourceType: discreteStr
             target: "@{{connections[*].paymentMethod}}"
             targetLocation: BODY
             requiredMapping: false
