@@ -1,5 +1,6 @@
 package com.consoleconnect.kraken.operator.controller.service.push;
 
+import static com.consoleconnect.kraken.operator.controller.service.push.ApiActivityPushService.NO_API_ACTIVITIES_FOUND;
 import static com.consoleconnect.kraken.operator.controller.service.push.ApiActivityPushService.PUSH_API_ACTIVITY_LOGS_IS_DISABLED;
 import static com.consoleconnect.kraken.operator.controller.service.push.ApiActivityPushService.THE_SAME_PARAMETERS_ALREADY_EXISTS_ERROR;
 import static com.consoleconnect.kraken.operator.core.service.UnifiedAssetService.getSearchPageRequest;
@@ -12,10 +13,12 @@ import com.consoleconnect.kraken.operator.controller.dto.push.CreatePushApiActiv
 import com.consoleconnect.kraken.operator.controller.dto.push.PushApiActivityLogHistory;
 import com.consoleconnect.kraken.operator.controller.model.Environment;
 import com.consoleconnect.kraken.operator.controller.service.EnvironmentService;
+import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
 import com.consoleconnect.kraken.operator.core.enums.EventStatusType;
 import com.consoleconnect.kraken.operator.core.enums.MgmtEventType;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
+import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
 import com.consoleconnect.kraken.operator.core.repo.MgmtEventRepository;
 import com.consoleconnect.kraken.operator.core.request.PushLogSearchRequest;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
@@ -26,6 +29,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.SpyBean;
@@ -42,6 +46,7 @@ class ApiActivityPushServiceTest extends AbstractIntegrationTest {
   @Autowired private MgmtEventRepository mgmtEventRepository;
   @Autowired private EnvironmentService environmentService;
   @SpyBean private AppProperty appProperty;
+  @SpyBean private ApiActivityLogRepository apiActivityLogRepository;
 
   @Test
   void givenApiLogSearchParam_whenCreatePushApiActivityLogInfo_thenSaveEvent() {
@@ -50,6 +55,7 @@ class ApiActivityPushServiceTest extends AbstractIntegrationTest {
     var userId = "userId1";
     var endTime = ZonedDateTime.parse("2024-10-10T00:00:00+01:00");
     var startTime = endTime.minusDays(3);
+    givenApiActivityLogs(endTime, env);
     var request = new CreatePushApiActivityRequest(startTime, endTime, env.getId());
     // when
     var created = sut.createPushApiActivityLogInfo(request, userId);
@@ -78,6 +84,7 @@ class ApiActivityPushServiceTest extends AbstractIntegrationTest {
     var userId = "userId1";
     var endTime = ZonedDateTime.parse("2024-10-10T00:00:00+01:00").minusDays(1);
     var startTime = endTime.minusDays(3);
+    givenApiActivityLogs(endTime, env);
     var request = new CreatePushApiActivityRequest(startTime, endTime, env.getId());
     sut.createPushApiActivityLogInfo(request, userId);
     // when
@@ -96,6 +103,7 @@ class ApiActivityPushServiceTest extends AbstractIntegrationTest {
     var userId = "userId1";
     var endTime = ZonedDateTime.parse("2024-10-10T00:00:00+01:00").minusDays(2);
     var startTime = endTime.minusDays(3);
+    givenApiActivityLogs(endTime, env);
     var request = new CreatePushApiActivityRequest(startTime, endTime, env.getId());
     var pushApiActivityLogInfo = sut.createPushApiActivityLogInfo(request, userId);
     var mgmtEventEntity =
@@ -149,7 +157,7 @@ class ApiActivityPushServiceTest extends AbstractIntegrationTest {
   }
 
   @Test
-  void givenPushApiActivityLogDisabled_createPushApiActivityLogInfo_thenReturnsError() {
+  void givenPushApiActivityLogDisabled_whenCreatePushApiActivityLogInfo_thenReturnsError() {
     // given
     givenDisabledPushActivityLogExternal();
     var env = environmentService.findAll().get(0);
@@ -164,6 +172,23 @@ class ApiActivityPushServiceTest extends AbstractIntegrationTest {
     // then
     assertThat(krakenException.getCode()).isEqualTo(400);
     assertThat(krakenException.getMessage()).isEqualTo(PUSH_API_ACTIVITY_LOGS_IS_DISABLED);
+  }
+
+  @Test
+  void givenNoApiActivityLogsToPush_whenCreatePushApiActivityLogInfo_thenReturnsError() {
+    // given
+    var env = environmentService.findAll().get(0);
+    var userId = "userId1";
+    var endTime = ZonedDateTime.parse("2022-10-10T00:00:00+01:00").minusDays(1);
+    var startTime = endTime.minusDays(3);
+    var request = new CreatePushApiActivityRequest(startTime, endTime, env.getId());
+    // when
+    var krakenException =
+        assertThrows(
+            KrakenException.class, () -> sut.createPushApiActivityLogInfo(request, userId));
+    // then
+    assertThat(krakenException.getCode()).isEqualTo(400);
+    assertThat(krakenException.getMessage()).isEqualTo(NO_API_ACTIVITIES_FOUND);
   }
 
   private void givenDisabledPushActivityLogExternal() {
@@ -185,6 +210,7 @@ class ApiActivityPushServiceTest extends AbstractIntegrationTest {
     var env = environmentService.findAll().get(0);
     for (int i = 1; i < 4; i++) {
       var request = pushApiActivityRequest(env, i);
+      givenApiActivityLogs(request.getEndTime(), env);
       sut.createPushApiActivityLogInfo(request, "userId1");
     }
   }
@@ -199,5 +225,17 @@ class ApiActivityPushServiceTest extends AbstractIntegrationTest {
     return zonedDateTime
         .withZoneSameInstant(ZoneOffset.UTC)
         .format(DateTimeFormatter.ISO_ZONED_DATE_TIME);
+  }
+
+  private void givenApiActivityLogs(ZonedDateTime endTime, Environment env) {
+    var entity = new ApiActivityLogEntity();
+    entity.setEnv(env.getId());
+    entity.setCallSeq(0);
+    entity.setCreatedAt(endTime.minusHours(1));
+    entity.setMethod("POST");
+    entity.setPath("/path");
+    entity.setUri("/uri");
+    entity.setRequestId(UUID.randomUUID().toString());
+    apiActivityLogRepository.save(entity);
   }
 }
