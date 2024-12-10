@@ -1,5 +1,6 @@
 .collapseBox {
   flex: 1;
+
   &:global(> .ant-collapse-item) {
     &:global(> .ant-collapse-header) {
       padding-left: 15px;
@@ -20,6 +21,7 @@
   :global {
     .ant-collapse-item {
       border-radius: 0 !important;
+      min-width: fit-content;
     }
     .ant-collapse-item:has(.hightlight-one) {
       background-color: rgba(41, 98, 255, 0.2) !important;
