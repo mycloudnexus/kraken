@@ -1,0 +1,15 @@
+{
+  "ports" : [ {
+    "durationUnit" : "${body.quoteItem[0].requestedQuoteItemTerm.duration.units}",
+    "dcf" : "${body.quoteItem[0].product.place[0].id}",
+    "speed" : "${body.quoteItem[0].product.productConfiguration.bandwidth}"
+  }, {
+    "durationUnit" : "${body.quoteItem[1].requestedQuoteItemTerm.duration.units}",
+    "dcf" : "${body.quoteItem[1].product.place[0].id}",
+    "speed" : "${body.quoteItem[1].product.productConfiguration.bandwidth}"
+  }, {
+    "durationUnit" : "${body.quoteItem[2].requestedQuoteItemTerm.duration.units}",
+    "dcf" : "${body.quoteItem[2].product.place[0].id}",
+    "speed" : "${body.quoteItem[2].product.productConfiguration.bandwidth}"
+  } ]
+}
