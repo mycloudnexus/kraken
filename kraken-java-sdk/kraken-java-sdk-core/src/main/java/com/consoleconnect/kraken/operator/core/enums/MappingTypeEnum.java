@@ -7,7 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum MappingTypeEnum {
   ENUM("enum", "normal enumeration, can be shown repeated in front side UI"),
-  CONSTANT_VAL("constantVal", "constant value"),
+  CONSTANT_NUM("constantNumber", "constant number"),
   DISCRETE_STR(
       "discreteStr",
       "discrete string variable, similar with enum but only be shown at once in front side UI"),

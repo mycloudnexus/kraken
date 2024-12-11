@@ -1,13 +1,11 @@
 package com.consoleconnect.kraken.operator.gateway.runner;
 
 import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.PRODUCT_MAPPING_MATRIX;
-import static com.consoleconnect.kraken.operator.core.enums.ExpectTypeEnum.EXPECTED_INT;
 import static com.consoleconnect.kraken.operator.core.toolkit.ConstructExpressionUtil.*;
 
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.enums.ActionTypeEnum;
-import com.consoleconnect.kraken.operator.core.enums.ExpectTypeEnum;
 import com.consoleconnect.kraken.operator.core.enums.MappingTypeEnum;
 import com.consoleconnect.kraken.operator.core.enums.ParamLocationEnum;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
@@ -20,6 +18,7 @@ import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.core.toolkit.Paging;
+import com.consoleconnect.kraken.operator.gateway.dto.PathCheck;
 import com.consoleconnect.kraken.operator.gateway.template.SpELEngine;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.jayway.jsonpath.DocumentContext;
@@ -27,12 +26,12 @@ import com.jayway.jsonpath.JsonPath;
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ServerWebExchange;
 
 @Service
@@ -130,13 +129,14 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
   public void checkDisabled(Map<String, List<PathCheck>> facets, String targetKey) {
     facets.get(targetKey).stream()
         .filter(
-            check -> CHECK_NAME_ENABLED.equalsIgnoreCase(check.name) && "false".equals(check.value))
+            check ->
+                CHECK_NAME_ENABLED.equalsIgnoreCase(check.name()) && "false".equals(check.value()))
         .findFirst()
         .ifPresent(
             check -> {
               String errorMessage =
-                  (check.errorMsg != null
-                      ? check.errorMsg
+                  (check.errorMsg() != null
+                      ? check.errorMsg()
                       : API_CASE_NOT_SUPPORTED.formatted(":disabled"));
               throw KrakenException.badRequest(errorMessage);
             });
@@ -151,14 +151,15 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
             .allMatch(
                 pathCheckEntry -> {
                   boolean check = check(documentContext, pathCheckEntry);
-                  log.info("Evaluate {} : {}", pathCheckEntry.path, check);
+                  log.info("Evaluate {} : {}", pathCheckEntry.path(), check);
                   if (!check) {
                     builder.append(
-                        pathCheckEntry.errorMsg != null
-                            ? String.format(": %s", pathCheckEntry.errorMsg)
+                        pathCheckEntry.errorMsg() != null
+                            ? String.format(": %s", pathCheckEntry.errorMsg())
                             : String.format(
                                 "item:@{{%s}},expected:%s; ",
-                                extractCheckingPath(pathCheckEntry.path), pathCheckEntry.value));
+                                extractCheckingPath(pathCheckEntry.path()),
+                                pathCheckEntry.value()));
                   }
                   return check;
                 });
@@ -173,35 +174,40 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     if (realValue instanceof JSONArray array) {
       return array.stream().allMatch(value -> checkExpect(pathCheck, value));
     }
-    if (EXPECTED_INT == pathCheck.expectType) {
-      return checkExpectInteger(pathCheck, realValue);
-    }
-    String str = wrapAsString(realValue);
-    return checkExpect(pathCheck, str);
+    return checkExpect(pathCheck, realValue);
   }
 
   public boolean checkExpect(PathCheck pathCheck, Object value) {
-    switch (pathCheck.expectType) {
+    switch (pathCheck.expectType()) {
       case EXPECTED -> {
-        return pathCheck.value.equalsIgnoreCase(value.toString());
+        return pathCheck.value().equalsIgnoreCase(wrapAsString(value));
       }
       case EXPECTED_EXIST -> {
-        if (!Objects.equals(pathCheck.value, String.valueOf(Boolean.TRUE))) {
+        if (!Objects.equals(pathCheck.value(), String.valueOf(Boolean.TRUE))) {
           throwException(pathCheck, null);
         }
         return true;
       }
-      case EXPECTED_NON_NUMERIC_STR -> {
-        return checkExpectNonNumericStr(pathCheck, value);
-      }
       case EXPECTED_TRUE -> {
         try {
           SpELEngine.evaluateWithoutSuppressException(
-              pathCheck.value, Map.of(PARAM_NAME, value), Object.class);
+              pathCheck.value(), Map.of(PARAM_NAME, value), Object.class);
           return true;
         } catch (Exception e) {
           throwException(pathCheck, null);
         }
+      }
+      case EXPECTED_STR -> {
+        return checkExpectString(pathCheck, value);
+      }
+      case EXPECTED_INT -> {
+        return checkExpectInteger(pathCheck, value);
+      }
+      case EXPECTED_NUMERIC -> {
+        return checkExpectNumeric(pathCheck, value);
+      }
+      case EXPECTED_NOT_BLANK -> {
+        return checkExpectNotBlank(pathCheck, value);
       }
       default -> {
         return false;
@@ -209,14 +215,6 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     }
     return false;
   }
-
-  public record PathCheck(
-      String name,
-      String path,
-      ExpectTypeEnum expectType,
-      String value,
-      String errorMsg,
-      Integer code) {}
 
   public void checkMapperConstraints(String targetKey, Map<String, Object> inputs) {
     UnifiedAssetDto assetDto = unifiedAssetService.findOne(targetKey);
@@ -232,6 +230,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     for (ComponentAPITargetFacets.Mapper mapper : request) {
       if (StringUtils.isBlank(mapper.getTarget())
           || ParamLocationEnum.HYBRID.name().equals(mapper.getTargetLocation())) {
+        log.info("Skip mapper:{}", mapper.getSource());
         continue;
       }
       if (MappingTypeEnum.ENUM.getKind().equals(mapper.getSourceType())
@@ -239,47 +238,51 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
           || MappingTypeEnum.DISCRETE_INT.getKind().equals(mapper.getSourceType())
           || MappingTypeEnum.CONTINUOUS_DOUBLE.getKind().equals(mapper.getSourceType())
           || MappingTypeEnum.CONTINUOUS_INT.getKind().equals(mapper.getSourceType())) {
-        checkEnumValue(
-            mapper.getSource(),
-            mapper.getTarget(),
-            documentContext,
-            mapper.getSourceValues(),
-            mapper.getSourceType());
+        checkEnumValue(documentContext, mapper);
       } else if (mapper.getTarget() != null && !mapper.getTarget().contains("@{{")) {
-        checkConstantValue(mapper.getSource(), mapper.getTarget(), inputs);
+        checkConstantValue(documentContext, mapper, inputs);
       } else {
-        checkMappingValue(
-            mapper.getSource(), ParamLocationEnum.valueOf(mapper.getSourceLocation()), inputs);
+        checkMappingValue(documentContext, mapper, inputs);
       }
     }
   }
 
   private void checkConstantValue(
-      String expression, String expectedValue, Map<String, Object> inputs) {
+      DocumentContext documentContext,
+      ComponentAPITargetFacets.Mapper mapper,
+      Map<String, Object> inputs) {
+    String expectedValue = mapper.getTarget();
     if (String.valueOf(expectedValue).contains("{{")) {
       return;
     }
-    String evaluateValue = SpELEngine.evaluate(constructBody(expression), inputs, String.class);
+    List<String> params = extractMapperParam(mapper.getSource());
+    String constructedBody = constructJsonPathBody(replaceStarToZero(mapper.getSource()));
+    Object realValue = readByPathWithException(documentContext, constructedBody, 422, null);
+    validateConstantNumber(
+        realValue, mapper, CollectionUtils.isEmpty(params) ? mapper.getSource() : params.get(0));
+
+    String evaluateValue =
+        SpELEngine.evaluate(constructBody(mapper.getSource()), inputs, String.class);
     if (!Objects.equals(evaluateValue, expectedValue)) {
-      throw KrakenException.unProcessableEntityInvalidFormat(
-          String.format(SHOULD_BE_MSG, expression, evaluateValue, expectedValue));
+      throw KrakenException.unProcessableEntityInvalidValue(
+          String.format(SHOULD_BE_MSG, mapper.getSource(), evaluateValue, expectedValue));
     }
   }
 
   private void checkEnumValue(
-      String source,
-      String target,
-      DocumentContext documentContext,
-      List<String> valueList,
-      String sourceType) {
-    String constructedBody = constructJsonPathBody(replaceStarToZero(source));
-    List<String> params = extractMapperParam(source);
+      DocumentContext documentContext, ComponentAPITargetFacets.Mapper mapper) {
+    List<String> params = extractMapperParam(mapper.getSource());
     if (CollectionUtils.isEmpty(params)) {
       return;
     }
-    Object evaluateValue =
-        readByPathWithException(documentContext, constructedBody /*,params.get(0)*/, 422, null);
-    validateSourceValue(sourceType, evaluateValue, params.get(0), valueList, target);
+    String constructedBody = constructJsonPathBody(replaceStarToZero(mapper.getSource()));
+    Object realValue = readByPathWithException(documentContext, constructedBody, 422, null);
+    validateSourceValue(
+        mapper.getSourceType(),
+        realValue,
+        params.get(0),
+        mapper.getSourceValues(),
+        mapper.getTarget());
   }
 
   private void validateSourceValue(
@@ -289,7 +292,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
       List<String> valueList,
       String target) {
     // Constants checking
-    validateConstantValue(target, evaluateValue, paramName);
+    validateConstantValue(target, evaluateValue, paramName, sourceType);
 
     // Enumeration and discrete string variables checking
     validateEnumOrDiscreteString(evaluateValue, paramName, valueList, sourceType);
@@ -305,8 +308,12 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
   }
 
   private void checkMappingValue(
-      String expression, ParamLocationEnum location, Map<String, Object> inputs) {
+      DocumentContext documentContext,
+      ComponentAPITargetFacets.Mapper mapper,
+      Map<String, Object> inputs) {
     String target = null;
+    String expression = mapper.getSource();
+    ParamLocationEnum location = ParamLocationEnum.valueOf(mapper.getSourceLocation());
     switch (location) {
       case BODY -> target = constructBody(replaceStarToZero(expression));
       case QUERY -> target = constructQuery(replaceStarToZero(expression));
@@ -317,26 +324,34 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     if (CollectionUtils.isEmpty(params)) {
       return;
     }
+
+    String constructedBody = constructJsonPathBody(replaceStarToZero(mapper.getSource()));
+    Object realValue = readByPathWithException(documentContext, constructedBody, 422, null);
+    String paramName = params.get(0);
+    // check constant number
+    validateConstantNumber(realValue, mapper, paramName);
+    // check discrete string
+    validateEnumOrDiscreteString(
+        realValue, paramName, mapper.getSourceValues(), mapper.getSourceType());
     try {
-      // check param exist
       SpELEngine.evaluateWithoutSuppressException(target, inputs, String.class);
     } catch (Exception e) {
       throw KrakenException.unProcessableEntityInvalidFormat(
-          String.format(SHOULD_BE_EXIST, params.get(0), null));
+          String.format(SHOULD_BE_EXIST, paramName, null));
     }
   }
 
   @Override
   public void throwException(PathCheck pathCheck, String defaultMsg) {
-    String msg = pathCheck.errorMsg == null ? defaultMsg : pathCheck.errorMsg;
-    if (pathCheck.code != null && pathCheck.code != HttpStatus.UNPROCESSABLE_ENTITY.value()) {
-      throw new KrakenException(pathCheck.code, msg);
+    String msg = pathCheck.errorMsg() == null ? defaultMsg : pathCheck.errorMsg();
+    if (pathCheck.code() != null && pathCheck.code() != HttpStatus.UNPROCESSABLE_ENTITY.value()) {
+      throw new KrakenException(pathCheck.code(), msg);
     }
-    throw KrakenException.unProcessableEntityInvalidFormat(msg);
+    throw route422Exception(msg, "");
   }
 
   public Object readByPathCheckWithException(DocumentContext documentContext, PathCheck pathCheck) {
     return readByPathWithException(
-        documentContext, pathCheck.path, pathCheck.code, pathCheck.errorMsg);
+        documentContext, pathCheck.path(), pathCheck.code(), pathCheck.errorMsg());
   }
 }

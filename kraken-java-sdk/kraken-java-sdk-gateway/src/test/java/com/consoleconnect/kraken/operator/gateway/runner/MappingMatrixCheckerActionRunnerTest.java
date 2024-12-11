@@ -6,6 +6,7 @@ import com.consoleconnect.kraken.operator.core.enums.ExpectTypeEnum;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.gateway.CustomConfig;
+import com.consoleconnect.kraken.operator.gateway.dto.PathCheck;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import java.io.IOException;
@@ -194,19 +195,16 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
   @Test
   @Order(5)
   void givenCheckPath_whenCheckExpect_thenReturnException() {
-    MappingMatrixCheckerActionRunner.PathCheck pathCheck =
-        new MappingMatrixCheckerActionRunner.PathCheck(
-            "expect", "user", ExpectTypeEnum.EXPECTED, "user", "error", null);
+    PathCheck pathCheck =
+        new PathCheck("expect", "user", ExpectTypeEnum.EXPECTED, "user", "error", null);
     Assertions.assertFalse(mappingMatrixCheckerActionRunner.checkExpect(pathCheck, "user1"));
-    MappingMatrixCheckerActionRunner.PathCheck pathCheck1 =
-        new MappingMatrixCheckerActionRunner.PathCheck(
-            "expect", "user", ExpectTypeEnum.EXPECTED_EXIST, "user", "error", null);
+    PathCheck pathCheck1 =
+        new PathCheck("expect", "user", ExpectTypeEnum.EXPECTED_EXIST, "user", "error", null);
     Assertions.assertThrowsExactly(
         KrakenException.class,
         () -> mappingMatrixCheckerActionRunner.checkExpect(pathCheck1, "user1"));
-    MappingMatrixCheckerActionRunner.PathCheck pathCheck2 =
-        new MappingMatrixCheckerActionRunner.PathCheck(
-            "expect", "user", ExpectTypeEnum.EXPECTED_TRUE, "${param.id}", "error", 400);
+    PathCheck pathCheck2 =
+        new PathCheck("expect", "user", ExpectTypeEnum.EXPECTED_TRUE, "${param.id}", "error", 400);
     Assertions.assertThrowsExactly(
         KrakenException.class,
         () -> mappingMatrixCheckerActionRunner.checkExpect(pathCheck2, "user1"));

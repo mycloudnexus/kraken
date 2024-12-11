@@ -3,6 +3,8 @@ package com.consoleconnect.kraken.operator.gateway.runner;
 import com.consoleconnect.kraken.operator.core.enums.MappingTypeEnum;
 import com.consoleconnect.kraken.operator.core.exception.ErrorResponse;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
+import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
+import com.consoleconnect.kraken.operator.gateway.dto.PathCheck;
 import com.jayway.jsonpath.DocumentContext;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -14,12 +16,14 @@ import org.springframework.http.HttpStatus;
 
 public interface DataTypeChecker {
 
-  String API_CASE_NOT_SUPPORTED = "invalidValue, api use case is not supported %s";
+  String API_CASE_NOT_SUPPORTED = "api use case is not supported: %s";
   String EXPECT_INT_MSG = "invalidValue, can not process @{{%s}} = %s, %s found, %s expected";
   String PARAM_NOT_EXIST_MSG =
       "missingProperty, the parameter @{{%s}} does not exist in the request";
-  String SHOULD_BE_MSG = "invalidValue, can not process %s = %s, value should be %s";
+  String SHOULD_BE_MSG = "invalidValue, can not process @{{%s}} = %s, value should be %s";
   String SHOULD_BE_IN_MSG = "invalidValue, can not process @{{%s}} = %s, value should be in %s";
+  String SHOULD_NOT_BE_BLANK =
+      "invalidValue, can not process @{{%s}} = %s, value should not be blank";
   String SHOULD_BE_EXIST =
       "invalidValue, can not process @{{%s}} = %s, value should exist in request";
   String SHOULD_BE_INTERVAL =
@@ -29,20 +33,46 @@ public interface DataTypeChecker {
   @Slf4j
   final class LogHolder {}
 
-  default boolean checkExpectInteger(
-      MappingMatrixCheckerActionRunner.PathCheck pathCheck, Object variable) {
+  default boolean checkExpectInteger(PathCheck pathCheck, Object variable) {
     if (isNotInteger(variable)) {
       throwException(pathCheck, null);
     }
     return true;
   }
 
-  default boolean checkExpectNonNumericStr(
-      MappingMatrixCheckerActionRunner.PathCheck pathCheck, Object variable) {
-    if (Objects.nonNull(variable) && NumberUtils.isDigits(variable.toString())) {
+  default boolean checkExpectNumeric(PathCheck pathCheck, Object variable) {
+    if (isNotNumeric(variable)) {
       throwException(pathCheck, null);
     }
     return true;
+  }
+
+  default boolean checkExpectNotBlank(PathCheck pathCheck, Object variable) {
+    if (Objects.isNull(variable) || StringUtils.isBlank(String.valueOf(variable))) {
+      throwException(
+          pathCheck,
+          String.format(SHOULD_NOT_BE_BLANK, extractCheckingPath(pathCheck.path()), variable));
+    }
+    return true;
+  }
+
+  default boolean checkExpectString(PathCheck pathCheck, Object variable) {
+    Class<?> dataType = whichDataTypeClass(variable);
+    if (Objects.isNull(variable) || !String.class.equals(dataType)) {
+      throwException(
+          pathCheck,
+          String.format(
+              EXPECT_INT_MSG,
+              extractCheckingPath(pathCheck.path()),
+              variable,
+              (dataType == null ? null : dataType.getSimpleName()),
+              "String"));
+    }
+    return true;
+  }
+
+  default boolean isNotNumeric(Object variable) {
+    return !(variable instanceof Number);
   }
 
   default boolean isNotInteger(Object variable) {
@@ -71,22 +101,30 @@ public interface DataTypeChecker {
     if (code != null && code != HttpStatus.UNPROCESSABLE_ENTITY.value()) {
       throw new KrakenException(code, msg);
     }
-    throw routeException(msg);
+    throw route422Exception(msg);
   }
 
-  default KrakenException routeException(String detailMessage) {
-    if (StringUtils.isNotBlank(detailMessage)
-        && detailMessage.contains(ErrorResponse.ErrorMapping.ERROR_422_MISSING_PROPERTY.getMsg())) {
-      return KrakenException.unProcessableEntityMissingProperty(
-          API_CASE_NOT_SUPPORTED.formatted(detailMessage));
+  default KrakenException route422Exception(String detailMessage) {
+    return route422Exception(API_CASE_NOT_SUPPORTED, detailMessage);
+  }
+
+  default KrakenException route422Exception(String template, String detailMessage) {
+    if (Objects.isNull(template)) {
+      return KrakenException.unProcessableEntityInvalidFormat(detailMessage);
     }
-    if (StringUtils.isNotBlank(detailMessage)
-        && detailMessage.contains(ErrorResponse.ErrorMapping.ERROR_422_INVALID_VALUE.getMsg())) {
-      return KrakenException.unProcessableEntityInvalidValue(
-          API_CASE_NOT_SUPPORTED.formatted(detailMessage));
+    if (template.contains(ErrorResponse.ErrorMapping.ERROR_422_MISSING_PROPERTY.getMsg())
+        || (StringUtils.isNotBlank(detailMessage)
+            && detailMessage.contains(
+                ErrorResponse.ErrorMapping.ERROR_422_MISSING_PROPERTY.getMsg()))) {
+      return KrakenException.unProcessableEntityMissingProperty(template.formatted(detailMessage));
     }
-    return KrakenException.unProcessableEntityInvalidFormat(
-        API_CASE_NOT_SUPPORTED.formatted(detailMessage));
+    if (template.contains(ErrorResponse.ErrorMapping.ERROR_422_INVALID_VALUE.getMsg())
+        || (StringUtils.isNotBlank(detailMessage)
+            && detailMessage.contains(
+                ErrorResponse.ErrorMapping.ERROR_422_INVALID_VALUE.getMsg()))) {
+      return KrakenException.unProcessableEntityInvalidValue(template.formatted(detailMessage));
+    }
+    return KrakenException.unProcessableEntityInvalidFormat(template.formatted(detailMessage));
   }
 
   default String wrapAsString(Object realValue) {
@@ -99,17 +137,19 @@ public interface DataTypeChecker {
     return StringUtils.isNotBlank(target) && !target.contains("@{{");
   }
 
-  default void validateConstantValue(String target, Object evaluateValue, String paramName) {
-    if (isConstantType(target) && !target.equals(evaluateValue)) {
-      throw KrakenException.unProcessableEntityInvalidValue(
-          String.format(SHOULD_BE_IN_MSG, paramName, evaluateValue, target));
+  default void validateConstantValue(
+      String target, Object evaluateValue, String paramName, String sourceType) {
+    if (isConstantType(target)) {
+      validateDiscreteString(evaluateValue, paramName, sourceType);
+      if (!target.equals(evaluateValue)) {
+        throw KrakenException.unProcessableEntityInvalidValue(
+            String.format(SHOULD_BE_MSG, paramName, evaluateValue, target));
+      }
     }
   }
 
-  default void validateEnumOrDiscreteString(
-      Object evaluateValue, String paramName, List<String> valueList, String sourceType) {
-    if (MappingTypeEnum.DISCRETE_STR.getKind().equals(sourceType)
-        && Objects.nonNull(evaluateValue)) {
+  default void validateDiscreteString(Object evaluateValue, String paramName, String sourceType) {
+    if (MappingTypeEnum.DISCRETE_STR.getKind().equals(sourceType)) {
       Class<?> dataType = whichDataTypeClass(evaluateValue);
       if (!String.class.equals(dataType)) {
         throw KrakenException.unProcessableEntityInvalidValue(
@@ -121,6 +161,11 @@ public interface DataTypeChecker {
                 "String"));
       }
     }
+  }
+
+  default void validateEnumOrDiscreteString(
+      Object evaluateValue, String paramName, List<String> valueList, String sourceType) {
+    validateDiscreteString(evaluateValue, paramName, sourceType);
     if ((MappingTypeEnum.DISCRETE_STR.getKind().equals(sourceType)
             || (MappingTypeEnum.ENUM.getKind().equals(sourceType)))
         && Objects.nonNull(evaluateValue)
@@ -141,9 +186,8 @@ public interface DataTypeChecker {
 
   default void validateDiscreteInteger(
       Object evaluateValue, String paramName, List<String> valueList, String sourceType) {
-    if (MappingTypeEnum.DISCRETE_INT.getKind().equals(sourceType)
-        && Objects.nonNull(evaluateValue)) {
-      if (isNotInteger(evaluateValue)) {
+    if (MappingTypeEnum.DISCRETE_INT.getKind().equals(sourceType)) {
+      if (Objects.isNull(evaluateValue) || isNotInteger(evaluateValue)) {
         throw KrakenException.unProcessableEntityInvalidValue(
             String.format(
                 EXPECT_INT_MSG, paramName, evaluateValue, whichDataType(evaluateValue), "Integer"));
@@ -161,9 +205,8 @@ public interface DataTypeChecker {
 
   default void validateContinuousInteger(
       Object evaluateValue, String paramName, List<String> valueList, String sourceType) {
-    if (MappingTypeEnum.CONTINUOUS_INT.getKind().equals(sourceType)
-        && Objects.nonNull(evaluateValue)) {
-      if (isNotInteger(evaluateValue)) {
+    if (MappingTypeEnum.CONTINUOUS_INT.getKind().equals(sourceType)) {
+      if (Objects.isNull(evaluateValue) || isNotInteger(evaluateValue)) {
         throw KrakenException.unProcessableEntityInvalidValue(
             String.format(
                 EXPECT_INT_MSG, paramName, evaluateValue, whichDataType(evaluateValue), "Integer"));
@@ -174,12 +217,11 @@ public interface DataTypeChecker {
 
   default void validateContinuousDouble(
       Object evaluateValue, String paramName, List<String> valueList, String sourceType) {
-    if (MappingTypeEnum.CONTINUOUS_DOUBLE.getKind().equals(sourceType)
-        && Objects.nonNull(evaluateValue)) {
-      if (isNotDouble(evaluateValue)) {
+    if (MappingTypeEnum.CONTINUOUS_DOUBLE.getKind().equals(sourceType)) {
+      if (Objects.isNull(evaluateValue) || isNotDouble(evaluateValue)) {
         throw KrakenException.unProcessableEntityInvalidValue(
             String.format(
-                EXPECT_INT_MSG, paramName, evaluateValue, whichDataType(evaluateValue), "Integer"));
+                EXPECT_INT_MSG, paramName, evaluateValue, whichDataType(evaluateValue), "Double"));
       }
       validateContinuousDouble(evaluateValue, paramName, valueList);
     }
@@ -200,6 +242,22 @@ public interface DataTypeChecker {
     }
   }
 
+  default void validateConstantNumber(
+      Object evaluateValue, ComponentAPITargetFacets.Mapper mapper, String paramName) {
+    if (MappingTypeEnum.CONSTANT_NUM.getKind().equals(mapper.getSourceType())) {
+      Class<?> dataType = whichDataTypeClass(evaluateValue);
+      if (Objects.isNull(evaluateValue) || isNotNumeric(evaluateValue)) {
+        throw KrakenException.unProcessableEntityInvalidValue(
+            String.format(
+                EXPECT_INT_MSG,
+                paramName,
+                evaluateValue,
+                (dataType == null ? null : dataType.getSimpleName()),
+                "Number"));
+      }
+    }
+  }
+
   default void printJsonPathReadError() {
     LogHolder.log.error(JSON_PATH_READ_ERR);
   }
@@ -211,5 +269,5 @@ public interface DataTypeChecker {
     return path.replace("$.body.", "").replace("$.query.", "");
   }
 
-  void throwException(MappingMatrixCheckerActionRunner.PathCheck pathCheck, String defaultMsg);
+  void throwException(PathCheck pathCheck, String defaultMsg);
 }
