@@ -246,11 +246,65 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
   }
 
   @Test
-  void givenValueList_whenValueNotIn_thenThrowsException() {
+  void givenStringValueList_whenValueNotInDiscreteStr_thenThrowsException() {
     Assertions.assertThrowsExactly(
         KrakenException.class,
         () ->
             mappingMatrixCheckerActionRunner.validateEnumOrDiscreteString(
                 "4", "x", List.of("1", "2", "3"), MappingTypeEnum.DISCRETE_STR.getKind()));
+  }
+
+  @Test
+  void givenNotInteger_whenValidatingDiscreteInt_thenThrowsException() {
+    Assertions.assertThrowsExactly(
+        KrakenException.class,
+        () ->
+            mappingMatrixCheckerActionRunner.validateDiscreteInteger(
+                "4", "x", List.of(), MappingTypeEnum.DISCRETE_INT.getKind()));
+  }
+
+  @Test
+  void givenIntegerNotIn_whenValidatingDiscreteInt_thenThrowsException() {
+    Assertions.assertThrowsExactly(
+        KrakenException.class,
+        () ->
+            mappingMatrixCheckerActionRunner.validateDiscreteInteger(
+                4, "x", List.of("1", "2", "3"), MappingTypeEnum.DISCRETE_INT.getKind()));
+  }
+
+  @Test
+  void givenNotInteger_whenValidatingContinuousInt_thenThrowsException() {
+    Assertions.assertThrowsExactly(
+        KrakenException.class,
+        () ->
+            mappingMatrixCheckerActionRunner.validateContinuousInteger(
+                "4", "x", List.of(), MappingTypeEnum.CONTINUOUS_INT.getKind()));
+  }
+
+  @Test
+  void givenIntegerNotIn_whenValidatingContinuousInt_thenThrowsException() {
+    Assertions.assertThrowsExactly(
+        KrakenException.class,
+        () ->
+            mappingMatrixCheckerActionRunner.validateContinuousInteger(
+                4, "x", List.of("1", "3"), MappingTypeEnum.CONTINUOUS_INT.getKind()));
+  }
+
+  @Test
+  void givenNotDouble_whenValidatingContinuousDouble_thenThrowsException() {
+    Assertions.assertThrowsExactly(
+        KrakenException.class,
+        () ->
+            mappingMatrixCheckerActionRunner.validateContinuousDouble(
+                "4", "x", List.of(), MappingTypeEnum.CONTINUOUS_DOUBLE.getKind()));
+  }
+
+  @Test
+  void givenDoubleNotIn_whenValidatingContinuousDouble_thenThrowsException() {
+    Assertions.assertThrowsExactly(
+        KrakenException.class,
+        () ->
+            mappingMatrixCheckerActionRunner.validateContinuousDouble(
+                4.0, "x", List.of("1.0", "3.9"), MappingTypeEnum.CONTINUOUS_DOUBLE.getKind()));
   }
 }
