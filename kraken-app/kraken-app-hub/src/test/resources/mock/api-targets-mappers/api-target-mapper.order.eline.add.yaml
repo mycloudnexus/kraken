@@ -92,6 +92,10 @@ spec:
             source: "@{{productOrderItem[0].product.productConfiguration.bandwidth}}"
             target: "@{{speed}}"
             sourceLocation: BODY
+            sourceType: continuousInt
+            sourceValues:
+              - 1000
+              - 10000
             targetLocation: BODY
             requiredMapping: true
           - name: mapper.order.eline.add.name

@@ -65,10 +65,10 @@ spec:
                 } else {
                   errorArr = ['api use case is not supported :'];
                   if (!typeArr.includes(type)){
-                    errorArr.push(`expect productOrderItem.product.productConfiguration.@type in [ ${typeArr} ], but ${type}.`);
+                    errorArr.push(`expect @{{productOrderItem.product.productConfiguration.@type}} in [ ${typeArr} ], but ${type}.`);
                   }
                   if (!actionArr.includes(action)) {
-                    errorArr.push(`expect productOrderItem.action in [ ${actionArr} ], but ${action}`)
+                    errorArr.push(`expect @{{productOrderItem.action}} in [ ${actionArr} ], but ${action}`)
                   }
                   errorMsg = errorArr.join(' ');
                   targetAPIConfigKey = 'targetKey:notFound';

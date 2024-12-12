@@ -229,10 +229,8 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     List<ComponentAPITargetFacets.Mapper> request = mappers.getRequest();
     DocumentContext documentContext = JsonPath.parse(inputs);
     for (ComponentAPITargetFacets.Mapper mapper : request) {
-      if (StringUtils.isBlank(mapper.getTarget())
-          || ParamLocationEnum.HYBRID.name().equals(mapper.getTargetLocation())) {
-        // do some checking here
-        log.info("Skip mapper:{}", mapper.getSource());
+      if (StringUtils.isBlank(mapper.getTarget())) {
+        log.info("Skipped mapper due to blank target, source:{}", mapper.getSource());
         continue;
       }
       if (MappingTypeEnum.ENUM.getKind().equals(mapper.getSourceType())
