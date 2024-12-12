@@ -199,14 +199,38 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
         new PathCheck("expect", "user", ExpectTypeEnum.EXPECTED, "user", "error", null);
     Assertions.assertFalse(mappingMatrixCheckerActionRunner.checkExpect(pathCheck, "user1"));
     PathCheck pathCheck1 =
-        new PathCheck("expect", "user", ExpectTypeEnum.EXPECTED_EXIST, "user", "error", null);
+        new PathCheck("expect1", "user", ExpectTypeEnum.EXPECTED_EXIST, "user", "error", null);
     Assertions.assertThrowsExactly(
         KrakenException.class,
         () -> mappingMatrixCheckerActionRunner.checkExpect(pathCheck1, "user1"));
     PathCheck pathCheck2 =
-        new PathCheck("expect", "user", ExpectTypeEnum.EXPECTED_TRUE, "${param.id}", "error", 400);
+        new PathCheck("expect2", "user", ExpectTypeEnum.EXPECTED_TRUE, "${param.id}", "error", 400);
     Assertions.assertThrowsExactly(
         KrakenException.class,
         () -> mappingMatrixCheckerActionRunner.checkExpect(pathCheck2, "user1"));
+    PathCheck pathCheck3 =
+        new PathCheck("expect3", "user", ExpectTypeEnum.EXPECTED_STR, null, "error", 422);
+    Assertions.assertThrowsExactly(
+        KrakenException.class,
+        () -> mappingMatrixCheckerActionRunner.checkExpect(pathCheck3, null));
+    Assertions.assertThrowsExactly(
+        KrakenException.class, () -> mappingMatrixCheckerActionRunner.checkExpect(pathCheck3, 123));
+
+    PathCheck pathCheck4 =
+        new PathCheck("expect4", "user", ExpectTypeEnum.EXPECTED_INT, null, "error", 422);
+    Assertions.assertThrowsExactly(
+        KrakenException.class,
+        () -> mappingMatrixCheckerActionRunner.checkExpect(pathCheck4, "123"));
+
+    PathCheck pathCheck5 =
+        new PathCheck("expect5", "user", ExpectTypeEnum.EXPECTED_NUMERIC, null, "error", 422);
+    Assertions.assertThrowsExactly(
+        KrakenException.class,
+        () -> mappingMatrixCheckerActionRunner.checkExpect(pathCheck5, "123"));
+
+    PathCheck pathCheck6 =
+        new PathCheck("expect6", "user", ExpectTypeEnum.EXPECTED_NOT_BLANK, null, "error", 422);
+    Assertions.assertThrowsExactly(
+        KrakenException.class, () -> mappingMatrixCheckerActionRunner.checkExpect(pathCheck6, ""));
   }
 }
