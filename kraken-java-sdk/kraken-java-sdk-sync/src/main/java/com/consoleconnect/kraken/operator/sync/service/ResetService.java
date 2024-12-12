@@ -12,6 +12,7 @@ import com.consoleconnect.kraken.operator.sync.model.MgmtEvent;
 import com.consoleconnect.kraken.operator.sync.model.SyncProperty;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -35,6 +36,10 @@ public class ResetService extends KrakenServerConnector {
     this.unifiedAssetService = unifiedAssetService;
   }
 
+  @SchedulerLock(
+      name = "scanEventLock",
+      lockAtMostFor = "${app.cron-job.lock.at-most-for}",
+      lockAtLeastFor = "${app.cron-job.lock.at-least-for}")
   @Scheduled(cron = "${app.cron-job.pull-reset-event:-}")
   public void scanEvent() {
     // search event
