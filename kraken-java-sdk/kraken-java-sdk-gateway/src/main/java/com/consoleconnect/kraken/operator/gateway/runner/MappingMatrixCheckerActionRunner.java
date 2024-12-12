@@ -1,8 +1,7 @@
 package com.consoleconnect.kraken.operator.gateway.runner;
 
 import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.PRODUCT_MAPPING_MATRIX;
-import static com.consoleconnect.kraken.operator.core.enums.ParamLocationEnum.BODY;
-import static com.consoleconnect.kraken.operator.core.enums.ParamLocationEnum.PATH;
+import static com.consoleconnect.kraken.operator.core.enums.ParamLocationEnum.*;
 import static com.consoleconnect.kraken.operator.core.toolkit.ConstructExpressionUtil.*;
 
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
@@ -340,11 +339,13 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
       validateEnumOrDiscreteString(
           realValue, paramName, mapper.getSourceValues(), mapper.getSourceType());
     }
-    try {
-      SpELEngine.evaluateWithoutSuppressException(target, inputs, String.class);
-    } catch (Exception e) {
-      throw KrakenException.unProcessableEntityInvalidFormat(
-          String.format(SHOULD_BE_EXIST, paramName, null));
+    if (QUERY.equals(location) || BODY.equals(location)) {
+      try {
+        SpELEngine.evaluateWithoutSuppressException(target, inputs, String.class);
+      } catch (Exception e) {
+        throw KrakenException.unProcessableEntityInvalidFormat(
+            String.format(SHOULD_BE_EXIST, paramName, null));
+      }
     }
   }
 
