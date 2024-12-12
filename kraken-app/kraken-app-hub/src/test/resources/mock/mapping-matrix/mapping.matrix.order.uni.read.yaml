@@ -10,3 +10,7 @@ metadata:
 spec:
   matrix:
     mef.sonata.api-target.order.uni.read:
+      - name: segment_exist
+        path: "$.segment"
+        expectType: EXPECTED_EXIST
+        value: true

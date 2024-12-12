@@ -1,6 +1,8 @@
 package com.consoleconnect.kraken.operator.gateway.runner;
 
 import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.PRODUCT_MAPPING_MATRIX;
+import static com.consoleconnect.kraken.operator.core.enums.ParamLocationEnum.BODY;
+import static com.consoleconnect.kraken.operator.core.enums.ParamLocationEnum.PATH;
 import static com.consoleconnect.kraken.operator.core.toolkit.ConstructExpressionUtil.*;
 
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
@@ -79,7 +81,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     String componentKey = inputs.get(MAPPING_MATRIX_KEY).toString();
     String targetKey = inputs.get(TARGET_KEY).toString();
     if (unifiedAssetRepository.findOneByKey(targetKey).isEmpty()) {
-      throw KrakenException.badRequest(API_CASE_NOT_SUPPORTED.formatted(":not deployed"));
+      throw KrakenException.badRequest(API_CASE_NOT_SUPPORTED.formatted("not deployed"));
     }
     if (StringUtils.isNotBlank(componentKey)
         && componentKey.endsWith(NOT_FOUND)
@@ -230,6 +232,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     for (ComponentAPITargetFacets.Mapper mapper : request) {
       if (StringUtils.isBlank(mapper.getTarget())
           || ParamLocationEnum.HYBRID.name().equals(mapper.getTargetLocation())) {
+        // do some checking here
         log.info("Skip mapper:{}", mapper.getSource());
         continue;
       }
@@ -312,27 +315,31 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
       ComponentAPITargetFacets.Mapper mapper,
       Map<String, Object> inputs) {
     String target = null;
-    String expression = mapper.getSource();
+    String jsonPathExpression = null;
     ParamLocationEnum location = ParamLocationEnum.valueOf(mapper.getSourceLocation());
     switch (location) {
-      case BODY -> target = constructBody(replaceStarToZero(expression));
-      case QUERY -> target = constructQuery(replaceStarToZero(expression));
-      case PATH -> target = constructPath(replaceStarToZero(expression));
+      case BODY -> {
+        target = constructBody(replaceStarToZero(mapper.getSource()));
+        jsonPathExpression = constructJsonPathBody(replaceStarToZero(mapper.getSource()));
+      }
+      case QUERY -> target = constructQuery(replaceStarToZero(mapper.getSource()));
+      case PATH -> target = constructPath(replaceStarToZero(mapper.getSource()));
       default -> throw KrakenException.unProcessableEntityInvalidFormat("can not process request.");
     }
-    List<String> params = extractMapperParam(expression);
+    List<String> params = extractMapperParam(mapper.getSource());
     if (CollectionUtils.isEmpty(params)) {
       return;
     }
-
-    String constructedBody = constructJsonPathBody(replaceStarToZero(mapper.getSource()));
-    Object realValue = readByPathWithException(documentContext, constructedBody, 422, null);
     String paramName = params.get(0);
-    // check constant number
-    validateConstantNumber(realValue, mapper, paramName);
-    // check discrete string
-    validateEnumOrDiscreteString(
-        realValue, paramName, mapper.getSourceValues(), mapper.getSourceType());
+    if (BODY.equals(location)) {
+      log.info("jsonPathExpression:{}", jsonPathExpression);
+      Object realValue = readByPathWithException(documentContext, jsonPathExpression, 422, null);
+      // check constant number
+      validateConstantNumber(realValue, mapper, paramName);
+      // check discrete string
+      validateEnumOrDiscreteString(
+          realValue, paramName, mapper.getSourceValues(), mapper.getSourceType());
+    }
     try {
       SpELEngine.evaluateWithoutSuppressException(target, inputs, String.class);
     } catch (Exception e) {

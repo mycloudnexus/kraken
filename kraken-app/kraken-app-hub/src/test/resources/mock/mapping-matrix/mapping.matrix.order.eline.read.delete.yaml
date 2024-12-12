@@ -10,3 +10,7 @@ metadata:
 spec:
   matrix:
     mef.sonata.api-target.order.eline.read.delete:
+      - name: segment_exist
+        path: "$.segment"
+        expectType: EXPECTED_EXIST
+        value: true
