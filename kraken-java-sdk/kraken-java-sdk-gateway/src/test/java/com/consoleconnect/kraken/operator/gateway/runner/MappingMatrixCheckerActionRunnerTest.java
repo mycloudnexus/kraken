@@ -3,6 +3,7 @@ package com.consoleconnect.kraken.operator.gateway.runner;
 import static com.consoleconnect.kraken.operator.gateway.runner.ResponseCodeTransform.TARGET_KEY_NOT_FOUND;
 
 import com.consoleconnect.kraken.operator.core.enums.ExpectTypeEnum;
+import com.consoleconnect.kraken.operator.core.enums.MappingTypeEnum;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.gateway.CustomConfig;
@@ -11,6 +12,7 @@ import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import lombok.SneakyThrows;
 import org.hamcrest.MatcherAssert;
@@ -232,5 +234,23 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
         new PathCheck("expect6", "user", ExpectTypeEnum.EXPECTED_NOT_BLANK, null, "error", 422);
     Assertions.assertThrowsExactly(
         KrakenException.class, () -> mappingMatrixCheckerActionRunner.checkExpect(pathCheck6, ""));
+  }
+
+  @Test
+  void givenNonDiscreteString_whenValidating_thenThrowsException() {
+    Assertions.assertThrowsExactly(
+        KrakenException.class,
+        () ->
+            mappingMatrixCheckerActionRunner.validateDiscreteString(
+                123, "x", MappingTypeEnum.DISCRETE_STR.getKind()));
+  }
+
+  @Test
+  void givenValueList_whenValueNotIn_thenThrowsException() {
+    Assertions.assertThrowsExactly(
+        KrakenException.class,
+        () ->
+            mappingMatrixCheckerActionRunner.validateEnumOrDiscreteString(
+                "4", "x", List.of("1", "2", "3"), MappingTypeEnum.DISCRETE_STR.getKind()));
   }
 }
