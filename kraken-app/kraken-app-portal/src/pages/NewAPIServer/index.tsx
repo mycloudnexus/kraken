@@ -12,7 +12,6 @@ import { useAppStore } from "@/stores/app.store";
 import { COMPONENT_KIND_API_TARGET_SPEC } from "@/utils/constants/product";
 import { transformApiData } from "@/utils/helpers/swagger";
 import { Form, Spin, notification } from "antd";
-import { decode } from "js-base64";
 import jsYaml from "js-yaml";
 import { get, isEmpty, set } from "lodash";
 import { useEffect, useState } from "react";
@@ -23,6 +22,7 @@ import SelectAPIServer from "./components/SelectAPIServer";
 import UploadYaml from "./components/UploadYaml";
 import styles from "./index.module.scss";
 import renderRequiredMark from '@/components/RequiredFormMark';
+import { decodeFileContent } from "@/utils/helpers/base64";
 
 const NewAPIServer = () => {
   const { componentId } = useParams();
@@ -65,7 +65,7 @@ const NewAPIServer = () => {
         "data:application/octet-stream;base64",
         "data:application/x-yaml;base64"
       );
-      const yamlContent = jsYaml.load(decode(newSwaggerData));
+      const yamlContent = jsYaml.load(decodeFileContent(newSwaggerData));
       const result = transformApiData(get(yamlContent, "paths", {}));
 
       const data = {
@@ -131,7 +131,7 @@ const NewAPIServer = () => {
       let swaggerData;
       let fileDecode = "";
       if (base64data) {
-        fileDecode = decode(get(componentDetail, "facets.baseSpec.content"));
+        fileDecode = decodeFileContent(get(componentDetail, "facets.baseSpec.content"));
         swaggerData = jsYaml.load(fileDecode);
       }
       const environments = get(componentDetail, "facets.environments");

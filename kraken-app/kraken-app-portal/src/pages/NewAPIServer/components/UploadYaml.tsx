@@ -5,12 +5,12 @@ import { Text } from "@/components/Text";
 import { UploadOutlined, PaperClipOutlined } from "@ant-design/icons";
 import { Upload, notification, Button, Form, FormInstance } from "antd";
 import clsx from "clsx";
-import { decode } from "js-base64";
 import { get } from "lodash";
 import { useEffect, useState } from "react";
 import { useBoolean } from "usehooks-ts";
 import ReplaceFileModal from "./ReplaceFileModal";
 import styles from "./index.module.scss";
+import { decodeFileContent } from "@/utils/helpers/base64";
 
 type Props = {
   form: FormInstance<any>;
@@ -120,7 +120,7 @@ const UploadYaml = ({ form }: Props) => {
                 reader.onerror = reject;
                 reader.readAsDataURL(value.file);
               });
-              const swaggerText = decode(swaggerData as string);
+              const swaggerText = decodeFileContent(swaggerData as string);
               const idxOpenAPI = swaggerText?.indexOf("openapi:");
               const idxSwagger = swaggerText?.indexOf("swagger:");
               if (idxOpenAPI === -1 && idxSwagger === -1) {
