@@ -5,6 +5,7 @@ import static com.consoleconnect.kraken.operator.gateway.runner.ResponseCodeTran
 import com.consoleconnect.kraken.operator.core.enums.ExpectTypeEnum;
 import com.consoleconnect.kraken.operator.core.enums.MappingTypeEnum;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
+import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.gateway.CustomConfig;
 import com.consoleconnect.kraken.operator.gateway.dto.PathCheck;
@@ -306,5 +307,16 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
         () ->
             mappingMatrixCheckerActionRunner.validateContinuousDouble(
                 4.0, "x", List.of("1.0", "3.9"), MappingTypeEnum.CONTINUOUS_DOUBLE.getKind()));
+  }
+
+  @Test
+  void givenNotNumerical_whenValidatingConstantNumber_thenThrowsException() {
+    ComponentAPITargetFacets.Mapper mapper = new ComponentAPITargetFacets.Mapper();
+    mapper.setSourceType(MappingTypeEnum.CONSTANT_NUM.getKind());
+    Assertions.assertThrowsExactly(
+        KrakenException.class,
+        () ->
+            mappingMatrixCheckerActionRunner.validateConstantNumber(
+                "4", mapper, MappingTypeEnum.CONSTANT_NUM.getKind()));
   }
 }
