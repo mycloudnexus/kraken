@@ -89,7 +89,7 @@ public class ErrorResponse {
                 if (throwable == null) {
                   return ERROR_422_INVALID_FORMAT.getMsg();
                 }
-                return Optional.of(throwable.getCause())
+                return Optional.ofNullable(throwable.getCause())
                     .flatMap(cause -> Optional.ofNullable(cause.getMessage()))
                     .filter(isMissingProperty.or(isInvalidValue))
                     .orElseGet(ERROR_422_INVALID_FORMAT::getMsg);
