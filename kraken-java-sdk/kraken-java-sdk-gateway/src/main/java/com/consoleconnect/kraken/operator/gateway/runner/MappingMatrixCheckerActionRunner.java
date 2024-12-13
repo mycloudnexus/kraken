@@ -210,9 +210,6 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
       case EXPECTED_NOT_BLANK -> {
         return checkExpectNotBlank(pathCheck, value);
       }
-      default -> {
-        return false;
-      }
     }
     return false;
   }
