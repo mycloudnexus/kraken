@@ -10,8 +10,26 @@ import { cloneDeep, get, isEmpty, set } from "lodash";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import SwaggerInfo from "../NewAPIServer/components/SwaggerInfo";
-import { tranformSwaggerToArray } from "../NewAPIServer/components/UploadYaml";
 import styles from "./index.module.scss";
+
+const tranformSwaggerToArray = (data: any) => {
+  const paths = data.paths;
+  const pathsArray = [];
+
+  for (const path in paths) {
+    for (const method in paths[path]) {
+      const pathObject = {
+        key: `${path} ${method}`,
+        title: path,
+        description: method,
+        info: paths[path][method],
+      };
+      pathsArray.push(pathObject);
+    }
+  }
+
+  return pathsArray;
+};
 
 const APIServerEditSelection = () => {
   const { currentProduct } = useAppStore();
