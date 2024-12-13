@@ -154,13 +154,12 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
                   boolean check = check(documentContext, pathCheckEntry);
                   log.info("Evaluate {} : {}", pathCheckEntry.path(), check);
                   if (!check) {
+                    String pathName = extractCheckingPath(pathCheckEntry.path());
                     builder.append(
                         pathCheckEntry.errorMsg() != null
                             ? String.format(": %s", pathCheckEntry.errorMsg())
                             : String.format(
-                                "item:@{{%s}},expected:%s; ",
-                                extractCheckingPath(pathCheckEntry.path()),
-                                pathCheckEntry.value()));
+                                "item:@{{%s}},expected:%s; ", pathName, pathCheckEntry.value()));
                   }
                   return check;
                 });
@@ -171,6 +170,9 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
   }
 
   public boolean check(DocumentContext documentContext, PathCheck pathCheck) {
+    if (StringUtils.isBlank(pathCheck.path())) {
+      return false;
+    }
     Object realValue = readByPathCheckWithException(documentContext, pathCheck);
     if (realValue instanceof JSONArray array) {
       return array.stream().allMatch(value -> checkExpect(pathCheck, value));
