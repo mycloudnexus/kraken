@@ -16,9 +16,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.SneakyThrows;
+import org.apache.commons.lang3.tuple.Pair;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -195,46 +198,85 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
     MatcherAssert.assertThat(krakenException.getMessage(), Matchers.containsString(matchedMsg));
   }
 
+  public static List<Pair<PathCheck, Object>> buildIllegalPathCheckList() {
+    PathCheck pathCheck1 =
+        new PathCheck("expect1", "user", ExpectTypeEnum.EXPECTED_EXIST, "user", "error", null);
+    PathCheck pathCheck2 =
+        new PathCheck("expect2", "user", ExpectTypeEnum.EXPECTED_TRUE, "${param.id}", "error", 400);
+    PathCheck pathCheck3 =
+        new PathCheck("expect3", "user", ExpectTypeEnum.EXPECTED_STR, null, "error", 422);
+    PathCheck pathCheck4 =
+        new PathCheck("expect4", "user", ExpectTypeEnum.EXPECTED_INT, null, "error", 422);
+    PathCheck pathCheck5 =
+        new PathCheck("expect5", "user", ExpectTypeEnum.EXPECTED_NUMERIC, null, "error", 422);
+    PathCheck pathCheck6 =
+        new PathCheck("expect6", "user", ExpectTypeEnum.EXPECTED_NOT_BLANK, null, "error", 422);
+
+    Pair<PathCheck, Object> pair1 = Pair.of(pathCheck1, "user1");
+    Pair<PathCheck, Object> pair2 = Pair.of(pathCheck2, "user1");
+    Pair<PathCheck, Object> pair3A = Pair.of(pathCheck3, null);
+    Pair<PathCheck, Object> pair3B = Pair.of(pathCheck3, 123);
+    Pair<PathCheck, Object> pair4 = Pair.of(pathCheck4, "123");
+    Pair<PathCheck, Object> pair5 = Pair.of(pathCheck5, "123");
+    Pair<PathCheck, Object> pair6 = Pair.of(pathCheck6, "");
+
+    return List.of(pair1, pair2, pair3A, pair3B, pair4, pair5, pair6);
+  }
+
+  @ParameterizedTest
+  @MethodSource(value = "buildIllegalPathCheckList")
+  void givenCheckPath_whenCheckExpect_thenReturnException(Pair<PathCheck, Object> pair) {
+    Assertions.assertThrowsExactly(
+        KrakenException.class,
+        () -> mappingMatrixCheckerActionRunner.checkExpect(pair.getLeft(), pair.getRight()));
+  }
+
+  public static List<Pair<PathCheck, Object>> buildLegalPathCheckList() {
+    PathCheck pathCheck1 =
+        new PathCheck("EXPECTED", "user", ExpectTypeEnum.EXPECTED, "true", "", null);
+    PathCheck pathCheck2 =
+        new PathCheck("EXPECTED_EXIST", "user", ExpectTypeEnum.EXPECTED_EXIST, "true", "", null);
+    PathCheck pathCheck3 =
+        new PathCheck(
+            "EXPECTED_TRUE",
+            "$.body.submittedGeographicAddress.['country']",
+            ExpectTypeEnum.EXPECTED_TRUE,
+            "${param}",
+            "",
+            422);
+    PathCheck pathCheck4 =
+        new PathCheck("EXPECTED_STR", "", ExpectTypeEnum.EXPECTED_STR, "", "", 422);
+    PathCheck pathCheck5 =
+        new PathCheck("EXPECTED_INT", "", ExpectTypeEnum.EXPECTED_INT, "", "", 422);
+    PathCheck pathCheck6 =
+        new PathCheck("EXPECTED_NUMERIC", "", ExpectTypeEnum.EXPECTED_NUMERIC, "", "", 422);
+    PathCheck pathCheck7 =
+        new PathCheck("EXPECTED_NOT_BLANK", "", ExpectTypeEnum.EXPECTED_NOT_BLANK, "", "", 422);
+
+    Pair<PathCheck, Object> pair1 = Pair.of(pathCheck1, "true");
+    Pair<PathCheck, Object> pair2 = Pair.of(pathCheck2, null);
+    Pair<PathCheck, Object> pair3 = Pair.of(pathCheck3, "AU");
+    Pair<PathCheck, Object> pair4 = Pair.of(pathCheck4, "string here");
+    Pair<PathCheck, Object> pair5 = Pair.of(pathCheck5, 123);
+    Pair<PathCheck, Object> pair6 = Pair.of(pathCheck6, 123.4);
+    Pair<PathCheck, Object> pair7 = Pair.of(pathCheck7, "not blank");
+
+    return List.of(pair1, pair2, pair3, pair4, pair5, pair6, pair7);
+  }
+
+  @ParameterizedTest
+  @MethodSource(value = "buildLegalPathCheckList")
+  void givenCheckPath_whenCheckExpect_thenReturnTrue(Pair<PathCheck, Object> pair) {
+    Assertions.assertTrue(
+        mappingMatrixCheckerActionRunner.checkExpect(pair.getLeft(), pair.getRight()));
+  }
+
   @Test
   @Order(5)
-  void givenCheckPath_whenCheckExpect_thenReturnException() {
+  void givenCheckPath_whenCheckExpect_thenReturnFalse() {
     PathCheck pathCheck =
         new PathCheck("expect", "user", ExpectTypeEnum.EXPECTED, "user", "error", null);
     Assertions.assertFalse(mappingMatrixCheckerActionRunner.checkExpect(pathCheck, "user1"));
-    PathCheck pathCheck1 =
-        new PathCheck("expect1", "user", ExpectTypeEnum.EXPECTED_EXIST, "user", "error", null);
-    Assertions.assertThrowsExactly(
-        KrakenException.class,
-        () -> mappingMatrixCheckerActionRunner.checkExpect(pathCheck1, "user1"));
-    PathCheck pathCheck2 =
-        new PathCheck("expect2", "user", ExpectTypeEnum.EXPECTED_TRUE, "${param.id}", "error", 400);
-    Assertions.assertThrowsExactly(
-        KrakenException.class,
-        () -> mappingMatrixCheckerActionRunner.checkExpect(pathCheck2, "user1"));
-    PathCheck pathCheck3 =
-        new PathCheck("expect3", "user", ExpectTypeEnum.EXPECTED_STR, null, "error", 422);
-    Assertions.assertThrowsExactly(
-        KrakenException.class,
-        () -> mappingMatrixCheckerActionRunner.checkExpect(pathCheck3, null));
-    Assertions.assertThrowsExactly(
-        KrakenException.class, () -> mappingMatrixCheckerActionRunner.checkExpect(pathCheck3, 123));
-
-    PathCheck pathCheck4 =
-        new PathCheck("expect4", "user", ExpectTypeEnum.EXPECTED_INT, null, "error", 422);
-    Assertions.assertThrowsExactly(
-        KrakenException.class,
-        () -> mappingMatrixCheckerActionRunner.checkExpect(pathCheck4, "123"));
-
-    PathCheck pathCheck5 =
-        new PathCheck("expect5", "user", ExpectTypeEnum.EXPECTED_NUMERIC, null, "error", 422);
-    Assertions.assertThrowsExactly(
-        KrakenException.class,
-        () -> mappingMatrixCheckerActionRunner.checkExpect(pathCheck5, "123"));
-
-    PathCheck pathCheck6 =
-        new PathCheck("expect6", "user", ExpectTypeEnum.EXPECTED_NOT_BLANK, null, "error", 422);
-    Assertions.assertThrowsExactly(
-        KrakenException.class, () -> mappingMatrixCheckerActionRunner.checkExpect(pathCheck6, ""));
   }
 
   @Test

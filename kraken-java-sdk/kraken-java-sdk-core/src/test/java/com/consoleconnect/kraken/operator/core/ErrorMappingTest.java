@@ -39,7 +39,8 @@ class ErrorMappingTest {
   @MethodSource(value = "messageArray")
   void given422Exception_whenRouting_thenReturnOK(String message) {
     KrakenException exception =
-        new KrakenException(422, "422 UnProcessable Entity", new IllegalArgumentException(message));
+        new KrakenException(
+            422, "422 UnProcessable Entity," + message, new IllegalArgumentException(message));
     String result = ErrorResponse.ErrorMapping.process422(exception);
     Assertions.assertEquals(message, result);
   }
