@@ -1,7 +1,9 @@
 package com.consoleconnect.kraken.operator.core.exception;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -74,23 +76,24 @@ public class ErrorResponse {
     }
 
     public static String process422(Throwable throwable) {
-      if (StringUtils.isNotBlank(throwable.getMessage())
-          && throwable.getMessage().contains(ERROR_422_MISSING_PROPERTY.getMsg())) {
-        return ERROR_422_MISSING_PROPERTY.getMsg();
-      } else if (StringUtils.isNotBlank(throwable.getMessage())
-          && throwable.getMessage().contains(ERROR_422_INVALID_VALUE.getMsg())) {
-        return ERROR_422_INVALID_VALUE.getMsg();
-      } else if (null != throwable.getCause()
-          && StringUtils.isNotBlank(throwable.getCause().getMessage())
-          && throwable.getCause().getMessage().contains(ERROR_422_MISSING_PROPERTY.getMsg())) {
-        return ERROR_422_MISSING_PROPERTY.getMsg();
-      } else if (null != throwable.getCause()
-          && StringUtils.isNotBlank(throwable.getCause().getMessage())
-          && throwable.getCause().getMessage().contains(ERROR_422_INVALID_VALUE.getMsg())) {
-        return ERROR_422_INVALID_VALUE.getMsg();
-      } else {
-        return ERROR_422_INVALID_FORMAT.getMsg();
-      }
+      Predicate<String> isMissingProperty =
+          message -> message.contains(ERROR_422_MISSING_PROPERTY.getMsg());
+      Predicate<String> isInvalidValue =
+          message -> message.contains(ERROR_422_INVALID_VALUE.getMsg());
+
+      return Optional.ofNullable(throwable)
+          .flatMap(t -> Optional.ofNullable(t.getMessage()))
+          .filter(isMissingProperty.or(isInvalidValue))
+          .orElseGet(
+              () -> {
+                if (throwable == null) {
+                  return ERROR_422_INVALID_FORMAT.getMsg();
+                }
+                return Optional.of(throwable.getCause())
+                    .flatMap(cause -> Optional.ofNullable(cause.getMessage()))
+                    .filter(isMissingProperty.or(isInvalidValue))
+                    .orElseGet(ERROR_422_INVALID_FORMAT::getMsg);
+              });
     }
   }
 }
