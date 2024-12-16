@@ -2,16 +2,15 @@
 kind: kraken.product.mapping.matrix
 apiVersion: v1
 metadata:
-  key: mef.sonata.api.matrix.inventory.uni.list
+  key: mef.sonata.api.matrix.address.retrieve
   name: MEF Sonata API
   labels:
     mef-api-release: grace
-  version: 18
+  version: 10
 spec:
   matrix:
-    mef.sonata.api-target.inventory.uni.list:
-      - name: productOrderId
-        path: "$.query.productOrderId"
+    mef.sonata.api-target.address.retrieve:
+      - name: segment_exist
+        path: "$.segment"
         expectType: EXPECTED_EXIST
         value: true
-        code: 400

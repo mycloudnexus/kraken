@@ -3,18 +3,26 @@ package com.consoleconnect.kraken.operator.gateway.runner;
 import static com.consoleconnect.kraken.operator.gateway.runner.ResponseCodeTransform.TARGET_KEY_NOT_FOUND;
 
 import com.consoleconnect.kraken.operator.core.enums.ExpectTypeEnum;
+import com.consoleconnect.kraken.operator.core.enums.MappingTypeEnum;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
+import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
+import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
+import com.consoleconnect.kraken.operator.core.toolkit.YamlToolkit;
 import com.consoleconnect.kraken.operator.gateway.CustomConfig;
+import com.consoleconnect.kraken.operator.gateway.dto.PathCheck;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import lombok.SneakyThrows;
+import org.apache.commons.lang3.tuple.Pair;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -35,7 +43,7 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
             KrakenException.class, () -> mappingMatrixCheckerActionRunner.onCheck(inputs));
     MatcherAssert.assertThat(
         krakenException.getMessage(),
-        Matchers.containsString("api use case is not supported :not deployed"));
+        Matchers.containsString("api use case is not supported: not deployed"));
   }
 
   @Test
@@ -50,7 +58,7 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
     MatcherAssert.assertThat(
         krakenException.getMessage(),
         Matchers.containsString("""
-            api use case is not supported :not deployed"""));
+            api use case is not supported: not deployed"""));
   }
 
   @Test
@@ -191,24 +199,218 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
     MatcherAssert.assertThat(krakenException.getMessage(), Matchers.containsString(matchedMsg));
   }
 
+  public static List<Pair<PathCheck, Object>> buildIllegalPathCheckList() {
+    PathCheck pathCheck1 =
+        new PathCheck("expect1", "user", ExpectTypeEnum.EXPECTED_EXIST, "user", "error", null);
+    PathCheck pathCheck2 =
+        new PathCheck("expect2", "user", ExpectTypeEnum.EXPECTED_TRUE, "${param.id}", "error", 400);
+    PathCheck pathCheck3 =
+        new PathCheck("expect3", "user", ExpectTypeEnum.EXPECTED_STR, null, "error", 422);
+    PathCheck pathCheck4 =
+        new PathCheck("expect4", "user", ExpectTypeEnum.EXPECTED_INT, null, "error", 422);
+    PathCheck pathCheck5 =
+        new PathCheck("expect5", "user", ExpectTypeEnum.EXPECTED_NUMERIC, null, "error", 422);
+    PathCheck pathCheck6 =
+        new PathCheck("expect6", "user", ExpectTypeEnum.EXPECTED_NOT_BLANK, null, "error", 422);
+
+    Pair<PathCheck, Object> pair1 = Pair.of(pathCheck1, "user1");
+    Pair<PathCheck, Object> pair2 = Pair.of(pathCheck2, "user1");
+    Pair<PathCheck, Object> pair3A = Pair.of(pathCheck3, null);
+    Pair<PathCheck, Object> pair3B = Pair.of(pathCheck3, 123);
+    Pair<PathCheck, Object> pair4 = Pair.of(pathCheck4, "123");
+    Pair<PathCheck, Object> pair5 = Pair.of(pathCheck5, "123");
+    Pair<PathCheck, Object> pair6 = Pair.of(pathCheck6, "");
+
+    return List.of(pair1, pair2, pair3A, pair3B, pair4, pair5, pair6);
+  }
+
+  @ParameterizedTest
+  @MethodSource(value = "buildIllegalPathCheckList")
+  void givenCheckPath_whenCheckExpect_thenReturnException(Pair<PathCheck, Object> pair) {
+    Assertions.assertThrowsExactly(
+        KrakenException.class,
+        () -> mappingMatrixCheckerActionRunner.checkExpect(pair.getLeft(), pair.getRight()));
+  }
+
+  public static List<Pair<PathCheck, Object>> buildLegalPathCheckList() {
+    PathCheck pathCheck1 =
+        new PathCheck("EXPECTED", "user", ExpectTypeEnum.EXPECTED, "true", "", null);
+    PathCheck pathCheck2 =
+        new PathCheck("EXPECTED_EXIST", "user", ExpectTypeEnum.EXPECTED_EXIST, "true", "", null);
+    PathCheck pathCheck3 =
+        new PathCheck(
+            "EXPECTED_TRUE",
+            "$.body.submittedGeographicAddress.['country']",
+            ExpectTypeEnum.EXPECTED_TRUE,
+            "${param}",
+            "",
+            422);
+    PathCheck pathCheck4 =
+        new PathCheck("EXPECTED_STR", "", ExpectTypeEnum.EXPECTED_STR, "", "", 422);
+    PathCheck pathCheck5 =
+        new PathCheck("EXPECTED_INT", "", ExpectTypeEnum.EXPECTED_INT, "", "", 422);
+    PathCheck pathCheck6 =
+        new PathCheck("EXPECTED_NUMERIC", "", ExpectTypeEnum.EXPECTED_NUMERIC, "", "", 422);
+    PathCheck pathCheck7 =
+        new PathCheck("EXPECTED_NOT_BLANK", "", ExpectTypeEnum.EXPECTED_NOT_BLANK, "", "", 422);
+
+    Pair<PathCheck, Object> pair1 = Pair.of(pathCheck1, "true");
+    Pair<PathCheck, Object> pair2 = Pair.of(pathCheck2, null);
+    Pair<PathCheck, Object> pair3 = Pair.of(pathCheck3, "AU");
+    Pair<PathCheck, Object> pair4 = Pair.of(pathCheck4, "string here");
+    Pair<PathCheck, Object> pair5 = Pair.of(pathCheck5, 123);
+    Pair<PathCheck, Object> pair6 = Pair.of(pathCheck6, 123.4);
+    Pair<PathCheck, Object> pair7 = Pair.of(pathCheck7, "not blank");
+
+    return List.of(pair1, pair2, pair3, pair4, pair5, pair6, pair7);
+  }
+
+  @ParameterizedTest
+  @MethodSource(value = "buildLegalPathCheckList")
+  void givenCheckPath_whenCheckExpect_thenReturnTrue(Pair<PathCheck, Object> pair) {
+    Assertions.assertTrue(
+        mappingMatrixCheckerActionRunner.checkExpect(pair.getLeft(), pair.getRight()));
+  }
+
   @Test
   @Order(5)
-  void givenCheckPath_whenCheckExpect_thenReturnException() {
-    MappingMatrixCheckerActionRunner.PathCheck pathCheck =
-        new MappingMatrixCheckerActionRunner.PathCheck(
-            "expect", "user", ExpectTypeEnum.EXPECTED, "user", "error", null);
+  void givenCheckPath_whenCheckExpect_thenReturnFalse() {
+    PathCheck pathCheck =
+        new PathCheck("expect", "user", ExpectTypeEnum.EXPECTED, "user", "error", null);
     Assertions.assertFalse(mappingMatrixCheckerActionRunner.checkExpect(pathCheck, "user1"));
-    MappingMatrixCheckerActionRunner.PathCheck pathCheck1 =
-        new MappingMatrixCheckerActionRunner.PathCheck(
-            "expect", "user", ExpectTypeEnum.EXPECTED_EXIST, "user", "error", null);
+  }
+
+  @Test
+  void givenNonDiscreteString_whenValidating_thenThrowsException() {
     Assertions.assertThrowsExactly(
         KrakenException.class,
-        () -> mappingMatrixCheckerActionRunner.checkExpect(pathCheck1, "user1"));
-    MappingMatrixCheckerActionRunner.PathCheck pathCheck2 =
-        new MappingMatrixCheckerActionRunner.PathCheck(
-            "expect", "user", ExpectTypeEnum.EXPECTED_TRUE, "${param.id}", "error", 400);
+        () ->
+            mappingMatrixCheckerActionRunner.validateDiscreteString(
+                123, "x", MappingTypeEnum.DISCRETE_STR.getKind()));
+  }
+
+  @Test
+  void givenStringValueList_whenValueNotInDiscreteStr_thenThrowsException() {
     Assertions.assertThrowsExactly(
         KrakenException.class,
-        () -> mappingMatrixCheckerActionRunner.checkExpect(pathCheck2, "user1"));
+        () ->
+            mappingMatrixCheckerActionRunner.validateEnumOrDiscreteString(
+                "4", "x", List.of("1", "2", "3"), MappingTypeEnum.DISCRETE_STR.getKind()));
+  }
+
+  @Test
+  void givenNotInteger_whenValidatingDiscreteInt_thenThrowsException() {
+    Assertions.assertThrowsExactly(
+        KrakenException.class,
+        () ->
+            mappingMatrixCheckerActionRunner.validateDiscreteInteger(
+                "4", "x", List.of(), MappingTypeEnum.DISCRETE_INT.getKind()));
+  }
+
+  @Test
+  void givenIntegerNotIn_whenValidatingDiscreteInt_thenThrowsException() {
+    Assertions.assertThrowsExactly(
+        KrakenException.class,
+        () ->
+            mappingMatrixCheckerActionRunner.validateDiscreteInteger(
+                4, "x", List.of("1", "2", "3"), MappingTypeEnum.DISCRETE_INT.getKind()));
+  }
+
+  @Test
+  void givenNotInteger_whenValidatingContinuousInt_thenThrowsException() {
+    Assertions.assertThrowsExactly(
+        KrakenException.class,
+        () ->
+            mappingMatrixCheckerActionRunner.validateContinuousInteger(
+                "4", "x", List.of(), MappingTypeEnum.CONTINUOUS_INT.getKind()));
+  }
+
+  @Test
+  void givenIntegerNotIn_whenValidatingContinuousInt_thenThrowsException() {
+    Assertions.assertThrowsExactly(
+        KrakenException.class,
+        () ->
+            mappingMatrixCheckerActionRunner.validateContinuousInteger(
+                4, "x", List.of("1", "3"), MappingTypeEnum.CONTINUOUS_INT.getKind()));
+  }
+
+  @Test
+  void givenNotDouble_whenValidatingContinuousDouble_thenThrowsException() {
+    Assertions.assertThrowsExactly(
+        KrakenException.class,
+        () ->
+            mappingMatrixCheckerActionRunner.validateContinuousDouble(
+                "4", "x", List.of(), MappingTypeEnum.CONTINUOUS_DOUBLE.getKind()));
+  }
+
+  @Test
+  void givenDoubleNotIn_whenValidatingContinuousDouble_thenThrowsException() {
+    Assertions.assertThrowsExactly(
+        KrakenException.class,
+        () ->
+            mappingMatrixCheckerActionRunner.validateContinuousDouble(
+                4.0, "x", List.of("1.0", "3.9"), MappingTypeEnum.CONTINUOUS_DOUBLE.getKind()));
+  }
+
+  @Test
+  void givenNotNumerical_whenValidatingConstantNumber_thenThrowsException() {
+    ComponentAPITargetFacets.Mapper mapper = new ComponentAPITargetFacets.Mapper();
+    mapper.setSourceType(MappingTypeEnum.CONSTANT_NUM.getKind());
+    Assertions.assertThrowsExactly(
+        KrakenException.class,
+        () ->
+            mappingMatrixCheckerActionRunner.validateConstantNumber(
+                "4", mapper, MappingTypeEnum.CONSTANT_NUM.getKind()));
+  }
+
+  @SneakyThrows
+  @Test
+  void givenPathCheck_whenCheckMatrixConstraintsFailed_thenThrowsException() {
+    String targetKey = "mef.sonata.api-target.address.validate";
+    String filePath =
+        "deployment-config/components/mapping-matrix/mapping.matrix.address.validation.yaml";
+    Optional<UnifiedAsset> unifiedAsset =
+        YamlToolkit.parseYaml(readFileToString(filePath), UnifiedAsset.class);
+    UnifiedAsset targetAsset = unifiedAsset.get();
+    Map<String, List<PathCheck>> facets =
+        JsonToolkit.fromJson(
+            JsonToolkit.toJson(targetAsset.getFacets().get("matrix")),
+            new TypeReference<Map<String, List<PathCheck>>>() {});
+    String requestDataPath = "mockData/addressValidationRequest.json";
+    Map<String, Object> requestData =
+        JsonToolkit.fromJson(
+            readFileToString(requestDataPath), new TypeReference<Map<String, Object>>() {});
+    Map<String, Object> requestBody = new HashMap<>();
+    requestBody.put("body", requestData);
+    Assertions.assertThrowsExactly(
+        KrakenException.class,
+        () ->
+            mappingMatrixCheckerActionRunner.checkMatrixConstraints(
+                facets, targetKey, requestBody));
+  }
+
+  @SneakyThrows
+  @Test
+  void givenPathCheck_whenCheckMatrixConstraintsPassed_thenReturnOK() {
+    String targetKey = "mef.sonata.api-target.address.validate";
+    String filePath =
+        "deployment-config/components/mapping-matrix/mapping.matrix.address.validation.enable.yaml";
+    Optional<UnifiedAsset> unifiedAsset =
+        YamlToolkit.parseYaml(readFileToString(filePath), UnifiedAsset.class);
+    UnifiedAsset targetAsset = unifiedAsset.get();
+    Map<String, List<PathCheck>> facets =
+        JsonToolkit.fromJson(
+            JsonToolkit.toJson(targetAsset.getFacets().get("matrix")),
+            new TypeReference<Map<String, List<PathCheck>>>() {});
+    String requestDataPath = "mockData/addressValidationRequest.json";
+    Map<String, Object> requestData =
+        JsonToolkit.fromJson(
+            readFileToString(requestDataPath), new TypeReference<Map<String, Object>>() {});
+    Map<String, Object> requestBody = new HashMap<>();
+    requestBody.put("body", requestData);
+    Assertions.assertDoesNotThrow(
+        () ->
+            mappingMatrixCheckerActionRunner.checkMatrixConstraints(
+                facets, targetKey, requestBody));
   }
 }

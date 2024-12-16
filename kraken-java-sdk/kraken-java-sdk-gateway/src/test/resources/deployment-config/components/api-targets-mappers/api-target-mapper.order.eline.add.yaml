@@ -84,7 +84,7 @@ spec:
           - name: mapper.order.eline.add.bandwidth
             title: "Bandwidth of the ELINE"
             source: "@{{productOrderItem[0].product.productConfiguration.bandwidth}}"
-            sourceType: discreteVar
+            sourceType: discreteInt
             sourceValues:
               - 1000
               - 10000

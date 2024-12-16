@@ -25,6 +25,7 @@ spec:
             title: "quote item Term duration"
             source: "@{{quoteItem[0].requestedQuoteItemTerm.duration.amount}}"
             sourceLocation: BODY
+            sourceType: constantNumber
             target: ""
             targetLocation: BODY
             requiredMapping: true
@@ -63,6 +64,7 @@ spec:
             title: "quote item Term roll duration"
             source: "@{{quoteItem[0].requestedQuoteItemTerm.rollInterval.amount}}"
             sourceLocation: BODY
+            sourceType: constantNumber
             target: ""
             targetLocation: BODY
             requiredMapping: false
@@ -88,13 +90,22 @@ spec:
             title: "the id of the place where the products' quotation must be done"
             source: "@{{quoteItem[0].product.place[0].id}}"
             sourceLocation: BODY
+            sourceType: discreteStr
             target: ""
             targetLocation: BODY
             requiredMapping: true
+          - name: mapper.quote.uni.add.sync.place.keyName
+            source: "@{{quoteItem[0].product.place[0].keyName}}"
+            sourceLocation: BODY
+            sourceType: discreteStr
+            target: ""
+            targetLocation: BODY
+            requiredMapping: false
           - name: mapper.quote.uni.add.sync.productConfiguration.bandwidth
             title: "Bandwidth of the UNI"
             source: "@{{quoteItem[0].product.productConfiguration.bandwidth}}"
             sourceLocation: BODY
+            sourceType: constantNumber
             target: ""
             targetLocation: BODY
             requiredMapping: true
@@ -114,6 +125,7 @@ spec:
             title: "The id of the quoted product offering"
             source: "@{{quoteItem[0].product.productOffering.id}}"
             sourceLocation: BODY
+            sourceType: discreteStr
             target: ""
             targetLocation: BODY
             requiredMapping: false
