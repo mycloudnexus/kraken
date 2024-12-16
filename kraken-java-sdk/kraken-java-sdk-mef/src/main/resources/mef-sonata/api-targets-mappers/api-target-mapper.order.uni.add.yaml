@@ -101,7 +101,7 @@ spec:
             source: "@{{productOrderItem[0].product.productConfiguration.bandwidth}}"
             target: ""
             sourceLocation: BODY
-            sourceType: continuousInt
+            sourceType: discreteInt
             sourceValues:
               - 1000
               - 10000
