@@ -14,3 +14,4 @@ spec:
         path: "$.query.productOrderId"
         expectType: EXPECTED_EXIST
         value: true
+        code: 400

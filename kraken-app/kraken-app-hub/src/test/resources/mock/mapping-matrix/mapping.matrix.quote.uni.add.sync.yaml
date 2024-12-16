@@ -32,5 +32,6 @@ spec:
         value: INSTALL_LOCATION
       - name: quoteItem[0].product.place[0].@type
         path: "$.body.quoteItem[0].product.place[0].@type"
-        expectType: EXPECTED_EXIST
+        expectType: EXPECTED_STR
         value: true
+        code: 422

@@ -10,10 +10,6 @@ metadata:
 spec:
   matrix:
     mef.sonata.api-target.quote.eline.add.sync:
-      - name: product_type_eline
-        path: "$.body.quoteItem[*].product.productConfiguration.['@type']"
-        expectType: EXPECTED
-        value: ACCESS_E_LINE
       - name: action_add
         path: "$.body.quoteItem[*].['action']"
         expectType: EXPECTED
@@ -34,3 +30,25 @@ spec:
         path: "$.body.quoteItem[0].product.place[0].@type"
         expectType: EXPECTED
         value: GeographicAddressRef
+      - name: product_type_eline
+        path: "$.body.quoteItem[0].product.productConfiguration.['@type']"
+        expectType: EXPECTED
+        value: ACCESS_E_LINE
+      - name: relationship_type_0
+        path: "$.body.quoteItem[0].product.productRelationship[0].['relationshipType']"
+        expectType: EXPECTED
+        value: CONNECTS_TO_ENNI
+      - name: relationship_type_1
+        path: "$.body.quoteItem[0].product.productRelationship[1].['relationshipType']"
+        expectType: EXPECTED
+        value: CONNECTS_TO_UNI
+      - name: relationship_0_id
+        path: "$.body.quoteItem[0].product.productRelationship[0].['id']"
+        expectType: EXPECTED_STR
+        value: true
+        code: 422
+      - name: relationship_1_id
+        path: "$.body.quoteItem[0].product.productRelationship[1].['id']"
+        expectType: EXPECTED_STR
+        value: true
+        code: 422
