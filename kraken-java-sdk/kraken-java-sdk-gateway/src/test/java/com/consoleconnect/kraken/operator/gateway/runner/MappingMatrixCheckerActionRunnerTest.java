@@ -201,17 +201,20 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
 
   public static List<Pair<PathCheck, Object>> buildIllegalPathCheckList() {
     PathCheck pathCheck1 =
-        new PathCheck("expect1", "user", ExpectTypeEnum.EXPECTED_EXIST, "user", "error", null);
+        new PathCheck(
+            "expect1", "user", ExpectTypeEnum.EXPECTED_EXIST, "user", "error", null, null);
     PathCheck pathCheck2 =
-        new PathCheck("expect2", "user", ExpectTypeEnum.EXPECTED_TRUE, "${param.id}", "error", 400);
+        new PathCheck(
+            "expect2", "user", ExpectTypeEnum.EXPECTED_TRUE, "${param.id}", "error", 400, null);
     PathCheck pathCheck3 =
-        new PathCheck("expect3", "user", ExpectTypeEnum.EXPECTED_STR, null, "error", 422);
+        new PathCheck("expect3", "user", ExpectTypeEnum.EXPECTED_STR, null, "error", 422, null);
     PathCheck pathCheck4 =
-        new PathCheck("expect4", "user", ExpectTypeEnum.EXPECTED_INT, null, "error", 422);
+        new PathCheck("expect4", "user", ExpectTypeEnum.EXPECTED_INT, null, "error", 422, null);
     PathCheck pathCheck5 =
-        new PathCheck("expect5", "user", ExpectTypeEnum.EXPECTED_NUMERIC, null, "error", 422);
+        new PathCheck("expect5", "user", ExpectTypeEnum.EXPECTED_NUMERIC, null, "error", 422, null);
     PathCheck pathCheck6 =
-        new PathCheck("expect6", "user", ExpectTypeEnum.EXPECTED_NOT_BLANK, null, "error", 422);
+        new PathCheck(
+            "expect6", "user", ExpectTypeEnum.EXPECTED_NOT_BLANK, null, "error", 422, null);
 
     Pair<PathCheck, Object> pair1 = Pair.of(pathCheck1, "user1");
     Pair<PathCheck, Object> pair2 = Pair.of(pathCheck2, "user1");
@@ -234,9 +237,10 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
 
   public static List<Pair<PathCheck, Object>> buildLegalPathCheckList() {
     PathCheck pathCheck1 =
-        new PathCheck("EXPECTED", "user", ExpectTypeEnum.EXPECTED, "true", "", null);
+        new PathCheck("EXPECTED", "user", ExpectTypeEnum.EXPECTED, "true", "", null, null);
     PathCheck pathCheck2 =
-        new PathCheck("EXPECTED_EXIST", "user", ExpectTypeEnum.EXPECTED_EXIST, "true", "", null);
+        new PathCheck(
+            "EXPECTED_EXIST", "user", ExpectTypeEnum.EXPECTED_EXIST, "true", "", null, null);
     PathCheck pathCheck3 =
         new PathCheck(
             "EXPECTED_TRUE",
@@ -244,15 +248,17 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
             ExpectTypeEnum.EXPECTED_TRUE,
             "${param}",
             "",
-            422);
+            422,
+            null);
     PathCheck pathCheck4 =
-        new PathCheck("EXPECTED_STR", "", ExpectTypeEnum.EXPECTED_STR, "", "", 422);
+        new PathCheck("EXPECTED_STR", "", ExpectTypeEnum.EXPECTED_STR, "", "", 422, null);
     PathCheck pathCheck5 =
-        new PathCheck("EXPECTED_INT", "", ExpectTypeEnum.EXPECTED_INT, "", "", 422);
+        new PathCheck("EXPECTED_INT", "", ExpectTypeEnum.EXPECTED_INT, "", "", 422, null);
     PathCheck pathCheck6 =
-        new PathCheck("EXPECTED_NUMERIC", "", ExpectTypeEnum.EXPECTED_NUMERIC, "", "", 422);
+        new PathCheck("EXPECTED_NUMERIC", "", ExpectTypeEnum.EXPECTED_NUMERIC, "", "", 422, null);
     PathCheck pathCheck7 =
-        new PathCheck("EXPECTED_NOT_BLANK", "", ExpectTypeEnum.EXPECTED_NOT_BLANK, "", "", 422);
+        new PathCheck(
+            "EXPECTED_NOT_BLANK", "", ExpectTypeEnum.EXPECTED_NOT_BLANK, "", "", 422, null);
 
     Pair<PathCheck, Object> pair1 = Pair.of(pathCheck1, "true");
     Pair<PathCheck, Object> pair2 = Pair.of(pathCheck2, null);
@@ -276,7 +282,7 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
   @Order(5)
   void givenCheckPath_whenCheckExpect_thenReturnFalse() {
     PathCheck pathCheck =
-        new PathCheck("expect", "user", ExpectTypeEnum.EXPECTED, "user", "error", null);
+        new PathCheck("expect", "user", ExpectTypeEnum.EXPECTED, "user", "error", null, null);
     Assertions.assertFalse(mappingMatrixCheckerActionRunner.checkExpect(pathCheck, "user1"));
   }
 

@@ -8,4 +8,5 @@ public record PathCheck(
     ExpectTypeEnum expectType,
     String value,
     String errorMsg,
-    Integer code) {}
+    Integer code,
+    String expectedValueType) {}
