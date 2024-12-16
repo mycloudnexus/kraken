@@ -19,7 +19,7 @@ import {
   Tabs,
 } from "antd";
 import { ColumnsType } from "antd/es/table";
-import dayjs, { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 import { debounce, omit } from "lodash";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
