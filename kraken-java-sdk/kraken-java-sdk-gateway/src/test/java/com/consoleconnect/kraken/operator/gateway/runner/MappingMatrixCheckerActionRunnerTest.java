@@ -218,7 +218,23 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
 
     PathCheck pathCheck7 =
         new PathCheck(
-            "expect7", "user", ExpectTypeEnum.EXPECTED_TRUE, "${param.id}", "error", 400, "String");
+            "expect7",
+            "$.body.relatedContactInformation[*]",
+            ExpectTypeEnum.EXPECTED_TRUE,
+            "${param.emailAddress}",
+            "error",
+            400,
+            "String");
+
+    PathCheck pathCheck8 =
+        new PathCheck(
+            "expect7",
+            "$.body.relatedContactInformation[*]",
+            ExpectTypeEnum.EXPECTED_TRUE,
+            "${param.emailAddress}",
+            "error",
+            400,
+            "String");
 
     Pair<PathCheck, Object> pair1 = Pair.of(pathCheck1, "user1");
     Pair<PathCheck, Object> pair2 = Pair.of(pathCheck2, "user1");
@@ -227,9 +243,10 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
     Pair<PathCheck, Object> pair4 = Pair.of(pathCheck4, "123");
     Pair<PathCheck, Object> pair5 = Pair.of(pathCheck5, "123");
     Pair<PathCheck, Object> pair6 = Pair.of(pathCheck6, "");
-    Pair<PathCheck, Object> pair7 = Pair.of(pathCheck7, Map.of("id", 123));
+    Pair<PathCheck, Object> pair7 = Pair.of(pathCheck7, Map.of("emailAddress", 123));
+    Pair<PathCheck, Object> pair8 = Pair.of(pathCheck8, Map.of("emailAddress1", ""));
 
-    return List.of(pair1, pair2, pair3A, pair3B, pair4, pair5, pair6, pair7);
+    return List.of(pair1, pair2, pair3A, pair3B, pair4, pair5, pair6, pair7, pair8);
   }
 
   @ParameterizedTest
