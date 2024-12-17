@@ -19,6 +19,7 @@ public interface DataTypeChecker {
 
   String API_CASE_NOT_SUPPORTED = "api use case is not supported: %s";
   String EXPECT_INT_MSG = "invalidValue, can not process @{{%s}} = %s, %s found, %s expected";
+  String EXPECT_INF_MSG = "invalidFormat, can not process @{{%s}} = %s, %s found, %s expected";
   String PARAM_NOT_EXIST_MSG =
       "missingProperty, the parameter @{{%s}} does not exist in the request";
   String SHOULD_BE_MSG = "invalidValue, can not process @{{%s}} = %s, value should be %s";
@@ -154,9 +155,9 @@ public interface DataTypeChecker {
     if (MappingTypeEnum.DISCRETE_STR.getKind().equals(sourceType)) {
       Class<?> dataType = whichDataTypeClass(evaluateValue);
       if (!String.class.equals(dataType)) {
-        throw KrakenException.unProcessableEntityInvalidValue(
+        throw KrakenException.unProcessableEntityInvalidFormat(
             String.format(
-                EXPECT_INT_MSG,
+                EXPECT_INF_MSG,
                 paramName,
                 evaluateValue,
                 (dataType == null ? null : dataType.getSimpleName()),
@@ -184,7 +185,7 @@ public interface DataTypeChecker {
       throwException(
           pathCheck,
           String.format(
-              EXPECT_INT_MSG, checkingPath, variable, dataType, pathCheck.expectedValueType()));
+              EXPECT_INF_MSG, checkingPath, variable, dataType, pathCheck.expectedValueType()));
     }
     return true;
   }
