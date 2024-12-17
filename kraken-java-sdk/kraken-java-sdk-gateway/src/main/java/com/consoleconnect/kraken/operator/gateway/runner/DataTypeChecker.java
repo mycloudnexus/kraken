@@ -4,6 +4,7 @@ import com.consoleconnect.kraken.operator.core.enums.MappingTypeEnum;
 import com.consoleconnect.kraken.operator.core.exception.ErrorResponse;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
+import com.consoleconnect.kraken.operator.core.toolkit.ConstructExpressionUtil;
 import com.consoleconnect.kraken.operator.gateway.dto.PathCheck;
 import com.jayway.jsonpath.DocumentContext;
 import java.util.*;
@@ -29,6 +30,7 @@ public interface DataTypeChecker {
   String SHOULD_BE_INTERVAL =
       "invalidValue, can not process @{{%s}} = %s, value should be in closed interval[%s, %s]";
   String JSON_PATH_READ_ERR = "read json path error!";
+  String ARRAY_PARAM_PATTERN = "\\$\\{param\\.([^}]+)\\}";
 
   @Slf4j
   final class LogHolder {}
@@ -161,6 +163,30 @@ public interface DataTypeChecker {
                 "String"));
       }
     }
+  }
+
+  default String rewriteCheckingPath(PathCheck pathCheck) {
+    String checkingPath = extractCheckingPath(pathCheck.path());
+    if (checkingPath.contains("[*]")) {
+      List<String> params =
+          ConstructExpressionUtil.extractParam(pathCheck.value(), ARRAY_PARAM_PATTERN);
+      if (CollectionUtils.isNotEmpty(params)) {
+        checkingPath = checkingPath + "." + params.get(0);
+      }
+    }
+    return checkingPath;
+  }
+
+  default boolean checkExpectDataType(PathCheck pathCheck, Object variable) {
+    String dataType = whichDataType(variable);
+    if (Objects.isNull(variable) || !pathCheck.expectedValueType().equals(dataType)) {
+      String checkingPath = rewriteCheckingPath(pathCheck);
+      throwException(
+          pathCheck,
+          String.format(
+              EXPECT_INT_MSG, checkingPath, variable, dataType, pathCheck.expectedValueType()));
+    }
+    return true;
   }
 
   default void validateEnumOrDiscreteString(

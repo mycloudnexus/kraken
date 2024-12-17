@@ -106,7 +106,8 @@ spec:
             title: "Bandwidth of the Eline"
             source: "@{{quoteItem[0].product.productConfiguration.bandwidth}}"
             sourceLocation: BODY
-            sourceType: constantNumber
+            sourceType: discreteInt
+            sourceValues:
             target: ""
             targetLocation: BODY
             requiredMapping: true
