@@ -59,7 +59,11 @@ spec:
             title: "MEFEndOfTermAction"
             source: "@{{productOrderItem[0].requestedItemTerm.endOfTermAction}}"
             sourceLocation: BODY
-            sourceType: discreteStr
+            sourceType: enum
+            sourceValues:
+              - roll
+              - autoDisconnect
+              - autoRenew
             target: ""
             targetLocation: BODY
             requiredMapping: true
@@ -75,7 +79,16 @@ spec:
             title: " quote item Term roll unit"
             source: "@{{productOrderItem[0].requestedItemTerm.rollInterval.units}}"
             sourceLocation: BODY
-            sourceType: discreteStr
+            sourceType: enum
+            sourceValues:
+              - calendarYears
+              - calendarMonths
+              - calendarDays
+              - calendarHours
+              - calendarMinutes
+              - businessDays
+              - businessHours
+              - businessMinutes
             target: ""
             targetLocation: BODY
             requiredMapping: false
@@ -97,8 +110,6 @@ spec:
             sourceLocation: BODY
             sourceType: discreteInt
             sourceValues:
-              - 1000
-              - 10000
             target: ""
             targetLocation: BODY
             requiredMapping: true
@@ -121,6 +132,30 @@ spec:
           - name: mapper.order.eline.add.classOfService
             title: "The class of Service of the Eline"
             source: "@{{productOrderItem[0].product.productConfiguration.classOfService}}"
+            sourceLocation: BODY
+            sourceType: discreteStr
+            target: ""
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.order.eline.add.product.productConfiguration.buyerCompanyId
+            title: "The Id of buyer Company"
+            source: "@{{productOrderItem[0].product.productConfiguration.buyerCompanyId}}"
+            sourceLocation: BODY
+            sourceType: discreteStr
+            target: ""
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.order.eline.add.product.productConfiguration.destUNIMetroId
+            title: "The metro id of the destination UNI"
+            source: "@{{productOrderItem[0].product.productConfiguration.destUNIMetroId}}"
+            sourceLocation: BODY
+            sourceType: discreteStr
+            target: ""
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.order.eline.add.product.productConfiguration.type
+            title: "customized product type"
+            source: "@{{productOrderItem[0].product.productConfiguration.type}}"
             sourceLocation: BODY
             sourceType: discreteStr
             target: ""

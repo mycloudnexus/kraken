@@ -59,7 +59,11 @@ spec:
             title: "MEFEndOfTermAction"
             source: "@{{productOrderItem[0].requestedItemTerm.endOfTermAction}}"
             sourceLocation: BODY
-            sourceType: discreteStr
+            sourceType: enum
+            sourceValues:
+              - roll
+              - autoDisconnect
+              - autoRenew
             target: "roll"
             targetLocation: BODY
             requiredMapping: true
@@ -75,7 +79,16 @@ spec:
             title: " quote item Term roll unit"
             source: "@{{productOrderItem[0].requestedItemTerm.rollInterval.units}}"
             sourceLocation: BODY
-            sourceType: discreteStr
+            sourceType: enum
+            sourceValues:
+              - calendarYears
+              - calendarMonths
+              - calendarDays
+              - calendarHours
+              - calendarMinutes
+              - businessDays
+              - businessHours
+              - businessMinutes
             target: ""
             targetLocation: BODY
             requiredMapping: false
@@ -151,7 +164,7 @@ spec:
             targetLocation: BODY
             requiredMapping: true
           - name: mapper.order.eline.add.product.productConfiguration.type
-            title: "connection type"
+            title: "customized product type"
             source: "@{{productOrderItem[0].product.productConfiguration.type}}"
             sourceLocation: BODY
             sourceType: discreteStr
@@ -159,7 +172,7 @@ spec:
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.order.eline.add.product.productConfiguration.destUNIMetroId
-            title: "connection destUNIMetroId"
+            title: "The metro id of the destination UNI"
             source: "@{{productOrderItem[0].product.productConfiguration.destUNIMetroId}}"
             sourceLocation: BODY
             sourceType: discreteStr
@@ -167,7 +180,7 @@ spec:
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.order.eline.add.product.productConfiguration.buyerCompanyId
-            title: "connection buyerCompanyId"
+            title: "The Id of buyer Company"
             source: "@{{productOrderItem[0].product.productConfiguration.buyerCompanyId}}"
             sourceLocation: BODY
             sourceType: discreteStr

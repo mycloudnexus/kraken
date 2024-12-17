@@ -76,7 +76,16 @@ spec:
             title: " quote item Term roll unit"
             source: "@{{productOrderItem[0].requestedItemTerm.rollInterval.units}}"
             sourceLocation: BODY
-            sourceType: discreteStr
+            sourceType: enum
+            sourceValues:
+              - calendarYears
+              - calendarMonths
+              - calendarDays
+              - calendarHours
+              - calendarMinutes
+              - businessDays
+              - businessHours
+              - businessMinutes
             target: ""
             targetLocation: BODY
             requiredMapping: false
@@ -85,6 +94,15 @@ spec:
               the id of the place where the products' installation must be done.
             source: '@{{productOrderItem[0].product.place[0].id}}'
             description: ''
+            sourceLocation: BODY
+            sourceType: discreteStr
+            target: ''
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.order.uni.add.place.name
+            title: the keyName of the place where the products' installation must be done.
+            description: ''
+            source: '@{{productOrderItem[0].product.place[0].keyName}}'
             sourceLocation: BODY
             sourceType: discreteStr
             target: ''
@@ -107,8 +125,6 @@ spec:
             sourceLocation: BODY
             sourceType: discreteInt
             sourceValues:
-              - 1000
-              - 10000
             target: ""
             targetLocation: BODY
             requiredMapping: true
