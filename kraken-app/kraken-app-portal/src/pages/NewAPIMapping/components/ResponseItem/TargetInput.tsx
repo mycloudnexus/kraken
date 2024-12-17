@@ -49,6 +49,7 @@ export function TargetInput({
           className={clsx(styles.input, {
             [styles.activeInput]: isFocused,
             [styles.error]: errors?.responseIds?.has(item.id!) && !item.target,
+            [styles.disabled]: !item.customizedField,
           })}
           value={item.target}
           onClick={() => {

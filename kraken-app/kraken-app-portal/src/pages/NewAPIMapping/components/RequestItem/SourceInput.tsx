@@ -64,6 +64,7 @@ export function SourceInput({
             [styles.active]: isFocused,
             [styles.error]:
               errors?.requestIds?.has(item.id as any) && !item.source,
+            [styles.disabled]: !item.customizedField,
           })}
           value={item.source}
           style={{ flex: 1 }}
