@@ -1,0 +1,13 @@
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.1.6.5
+  name: V1.6.5
+  labels:
+    productSpec: grace
+    productVersion: V1.6.5
+    publishDate: 2024-12-18
+  description: |
+    Deleting the checking rule item of street name for the address validation in the rule matrix configuration.
+  version: 1
