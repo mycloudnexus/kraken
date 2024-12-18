@@ -29,11 +29,3 @@ spec:
         expectType: EXPECTED_TRUE
         value: "${param}"
         expectedValueType: String
-      - name: address_submittedGeographicAddress_streetName
-        path: "$.body.submittedGeographicAddress.['streetName']"
-        expectType: EXPECTED_TRUE
-        value: "${param}"
-        expectedValueType: String
-
-
-
