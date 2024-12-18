@@ -20,6 +20,7 @@ import com.consoleconnect.kraken.operator.sync.model.SyncProperty;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -100,6 +101,10 @@ public class PullDeploymentService extends KrakenServerConnector {
     dataIngestionJob.ingestData(event);
   }
 
+  @SchedulerLock(
+      name = "scheduledCheckLatestProductReleaseLock",
+      lockAtMostFor = "${app.cron-job.lock.at-most-for}",
+      lockAtLeastFor = "${app.cron-job.lock.at-least-for}")
   @Scheduled(cron = "${app.cron-job.pull-latest-release:-}")
   public void scheduledCheckLatestProductRelease() {
 

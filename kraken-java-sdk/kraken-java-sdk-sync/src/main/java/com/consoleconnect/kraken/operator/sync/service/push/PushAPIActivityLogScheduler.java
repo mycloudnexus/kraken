@@ -34,6 +34,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
@@ -71,6 +72,10 @@ public class PushAPIActivityLogScheduler extends KrakenServerConnector {
     this.apiActivityLogRepository = apiActivityLogRepository;
   }
 
+  @SchedulerLock(
+      name = "pushApiActivityLogToExternalSystemLock",
+      lockAtMostFor = "${app.cron-job.lock.at-most-for}",
+      lockAtLeastFor = "${app.cron-job.lock.at-least-for}")
   @Scheduled(cron = "${app.cron-job.push-log-external-system:-}")
   List<PushExternalSystemPayload> pushApiActivityLogToExternalSystem() {
     Optional<MgmtEventEntity> entity =

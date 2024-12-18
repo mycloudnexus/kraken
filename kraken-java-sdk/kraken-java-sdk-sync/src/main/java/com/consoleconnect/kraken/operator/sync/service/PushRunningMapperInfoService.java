@@ -15,6 +15,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,10 @@ public class PushRunningMapperInfoService extends KrakenServerConnector {
   }
 
   @Transactional
+  @SchedulerLock(
+      name = "pushRunningMapperInfoLock",
+      lockAtMostFor = "${app.cron-job.lock.at-most-for}",
+      lockAtLeastFor = "${app.cron-job.lock.at-least-for}")
   @Scheduled(cron = "${app.cron-job.push-running-mapper:-}")
   public void runIt() {
     ZonedDateTime now = ZonedDateTime.now();

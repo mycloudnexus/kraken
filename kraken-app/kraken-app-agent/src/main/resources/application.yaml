@@ -103,6 +103,9 @@ app:
     push-heartbeat: 0/20 * * * * *
     push-log: 0/20 * * * * *
     push-log-external-system: 0 0/1 * * * *
+    lock:
+      at-most-for: 2m
+      at-least-for: 10s
   accept-asset-kinds:
     - kraken.component.api
     - kraken.component.api-target

@@ -15,6 +15,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -50,6 +51,10 @@ public class PushMgmtEventService extends KrakenServerConnector {
     this.eventSinkService = eventSinkService;
   }
 
+  @SchedulerLock(
+      name = "pushMgmtEventLock",
+      lockAtMostFor = "${app.cron-job.lock.at-most-for}",
+      lockAtLeastFor = "${app.cron-job.lock.at-least-for}")
   @Scheduled(cron = "${app.cron-job.push-mgmt-event:-}")
   public void pushMgmtEvent() {
     List<MgmtEventEntity> mgmtEventEntities =

@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.ParameterizedTypeReference;
@@ -55,6 +56,10 @@ public class ApiServerSynchronizeService extends KrakenServerConnector {
     this.applicationContext = applicationContext;
   }
 
+  @SchedulerLock(
+      name = "synApiServerInfoLock",
+      lockAtMostFor = "${app.cron-job.lock.at-most-for}",
+      lockAtLeastFor = "${app.cron-job.lock.at-least-for}")
   @Scheduled(cron = "${app.cron-job.pull-api-server-info:-}")
   public void synApiServerInfo() {
     HttpResponse<List<SimpleApiServerDto>> res =
