@@ -1,6 +1,7 @@
 package com.consoleconnect.kraken.operator.controller.api.v2;
 
 import com.consoleconnect.kraken.operator.auth.security.UserContext;
+import com.consoleconnect.kraken.operator.controller.handler.ClientAPIAuditLogEventHandler;
 import com.consoleconnect.kraken.operator.controller.service.*;
 import com.consoleconnect.kraken.operator.core.client.ClientEvent;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
@@ -26,6 +27,8 @@ public class ClientPubSubController {
 
   private final ClientEventService clientEventService;
 
+  private final ClientAPIAuditLogEventHandler clientAPIAuditLogEventHandler;
+
   @Operation(summary = "receive a event from client")
   @PostMapping("/events")
   public Mono<HttpResponse<Void>> onEvent(
@@ -36,5 +39,12 @@ public class ClientPubSubController {
     return UserContext.getUserId()
         .publishOn(Schedulers.boundedElastic())
         .map(userId -> clientEventService.onEvent(envId, userId, event));
+  }
+
+  @Operation(summary = "receive a event from client")
+  @PostMapping("/test")
+  public Mono<HttpResponse<Void>> test() {
+    this.clientAPIAuditLogEventHandler.onEvent(1);
+    return null;
   }
 }

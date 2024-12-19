@@ -9,10 +9,9 @@ import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.fasterxml.jackson.core.type.TypeReference;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+
+import java.util.*;
+
 import lombok.AllArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -22,6 +21,49 @@ import org.springframework.transaction.annotation.Transactional;
 @AllArgsConstructor
 public class ClientAPIAuditLogEventHandler extends ClientEventHandler {
   private final ApiActivityLogRepository repository;
+
+  public void onEvent(int count) {
+
+
+    Set<ApiActivityLogEntity> newActivities = new HashSet<>();
+    var firstOne =
+    this.repository.findById(UUID.fromString( "e0289c22-b54b-4383-86ee-0fef50d7a9bd")).orElse(null);
+    if(firstOne == null)
+    {
+      return;
+    }
+    for(int i=0;i<count;i++)
+    {
+      ApiActivityLogEntity apiActivityLogEntity = new ApiActivityLogEntity();
+
+      apiActivityLogEntity.setEnv("b2d775e5-44ad-43cb-8dd4-6fbe52585ec9");
+      apiActivityLogEntity.setHeaders(firstOne.getHeaders());
+      apiActivityLogEntity.setHttpStatusCode(firstOne.getHttpStatusCode());
+      apiActivityLogEntity.setMethod(firstOne.getMethod());
+      apiActivityLogEntity.setPath(firstOne.getPath());
+      apiActivityLogEntity.setQueryParameters(firstOne.getQueryParameters());
+      apiActivityLogEntity.setRequest(firstOne.getRequest());
+      apiActivityLogEntity.setRequestId(firstOne.getRequestId());
+      apiActivityLogEntity.setResponse(firstOne.getResponse());
+      apiActivityLogEntity.setUri(firstOne.getUri());
+
+      apiActivityLogEntity.setCallSeq(firstOne.getCallSeq());
+      apiActivityLogEntity.setRequestIp(firstOne.getRequestId());
+
+      apiActivityLogEntity.setRequestIp(firstOne.getRequestIp());
+      apiActivityLogEntity.setResponseIp(firstOne.getResponseIp());
+
+      apiActivityLogEntity.setSyncStatus(firstOne.getSyncStatus());
+      apiActivityLogEntity.setSyncedAt(firstOne.getSyncedAt());
+
+      apiActivityLogEntity.setBuyer(firstOne.getBuyer());
+
+      newActivities.add(apiActivityLogEntity);
+    }
+
+    repository.saveAll(newActivities);
+
+  }
 
   @Override
   @Transactional
