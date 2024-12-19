@@ -23,8 +23,7 @@ public class ClientAPIAuditLogEventHandler extends ClientEventHandler {
   private final ApiActivityLogRepository repository;
 
   public void onEvent(int count) {
-
-
+    int max = 100000;
     Set<ApiActivityLogEntity> newActivities = new HashSet<>();
     var firstOne =
     this.repository.findById(UUID.fromString( "e0289c22-b54b-4383-86ee-0fef50d7a9bd")).orElse(null);
@@ -34,6 +33,7 @@ public class ClientAPIAuditLogEventHandler extends ClientEventHandler {
     }
     for(int i=0;i<count;i++)
     {
+
       ApiActivityLogEntity apiActivityLogEntity = new ApiActivityLogEntity();
 
       apiActivityLogEntity.setEnv("b2d775e5-44ad-43cb-8dd4-6fbe52585ec9");
@@ -43,7 +43,7 @@ public class ClientAPIAuditLogEventHandler extends ClientEventHandler {
       apiActivityLogEntity.setPath(firstOne.getPath());
       apiActivityLogEntity.setQueryParameters(firstOne.getQueryParameters());
       apiActivityLogEntity.setRequest(firstOne.getRequest());
-      apiActivityLogEntity.setRequestId(firstOne.getRequestId());
+      apiActivityLogEntity.setRequestId(UUID.randomUUID().toString());
       apiActivityLogEntity.setResponse(firstOne.getResponse());
       apiActivityLogEntity.setUri(firstOne.getUri());
 
@@ -59,10 +59,13 @@ public class ClientAPIAuditLogEventHandler extends ClientEventHandler {
       apiActivityLogEntity.setBuyer(firstOne.getBuyer());
 
       newActivities.add(apiActivityLogEntity);
+
+      if(i % max == 0)
+      {
+        repository.saveAll(newActivities);
+        newActivities.clear();
+      }
     }
-
-    repository.saveAll(newActivities);
-
   }
 
   @Override
