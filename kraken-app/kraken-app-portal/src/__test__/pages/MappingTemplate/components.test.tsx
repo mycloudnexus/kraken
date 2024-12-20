@@ -10,6 +10,7 @@ import { ListVersionSkeleton } from "@/pages/MappingTemplate/components/VersionS
 import * as productHooks from '@/hooks/product'
 import * as userHooks from '@/hooks/user/useUser'
 import { DeploymentStatus } from "@/pages/NewAPIMapping/components/Deployment/DeploymentStatus";
+import { VersionSelect } from "@/pages/MappingTemplate/components/VersionSelect";
 
 afterEach(() => {
   vi.clearAllMocks()
@@ -234,5 +235,15 @@ describe("components used in mapping template v2 pages", () => {
     const infoIcon = getByTestId('stageDeploymentInfo')
     fireEvent.mouseEnter(infoIcon)
     await waitFor(() => expect(getByRole('tooltip')).toHaveTextContent('Deploy success.By admin2024-10-03 10:33:32'))
+  })
+
+  it('should render loading version select component', () => {
+    const { container } = render(<VersionSelect isFetchingNextPage={true} hasNextPage={true} data={[]} setSelectedVersion={vi.fn()} selectedVersion={undefined} />)
+    expect(container).toBeInTheDocument()
+  })
+
+  it('should render version select component', () => {
+    const { container } = render(<VersionSelect isFetchingNextPage={false} hasNextPage={false} data={[]} setSelectedVersion={vi.fn()} selectedVersion={undefined} />)
+    expect(container).toBeInTheDocument()
   })
 });

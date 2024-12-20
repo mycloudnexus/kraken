@@ -86,10 +86,15 @@ spec:
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.inventory.eline.read.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.inventory.uni.read.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.address.validation.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.address.retrieve.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.uni.add.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.uni.delete.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.uni.read.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.uni.read.delete.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.eline.delete.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.eline.add.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.eline.read.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.eline.read.delete.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.quote.uni.add.sync.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.quote.uni.add.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.quote.eline.add.sync.yaml
@@ -98,7 +103,7 @@ spec:
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.inventory.eline.read.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.inventory.uni.list.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.inventory.eline.list.yaml
-    - classpath:/mef-sonata/template-upgrade/release.1.6.0.yaml
+    - classpath:/mef-sonata/template-upgrade/release.1.6.5.yaml
 
 
   templateUpgradePaths:
@@ -141,10 +146,15 @@ spec:
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.uni.read.sync.yaml
     - classpath:/mef-sonata/api-targets/api-target.quote.uni.read.sync.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.address.validation.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.address.retrieve.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.uni.add.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.uni.delete.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.uni.read.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.uni.read.delete.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.eline.delete.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.eline.add.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.eline.read.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.eline.read.delete.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.quote.uni.add.sync.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.quote.uni.add.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.quote.eline.add.sync.yaml

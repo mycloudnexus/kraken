@@ -20,7 +20,6 @@ import org.junit.jupiter.api.Test;
 
 @Slf4j
 class ResponseMappingTest extends AbstractIntegrationTest implements MappingTransformer {
-
   @SneakyThrows
   @Test
   void testResponseMapper() {

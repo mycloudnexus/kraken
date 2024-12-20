@@ -24,6 +24,7 @@ spec:
             description: ""
             source: "@{{submittedGeographicAddress.city}}"
             sourceLocation: BODY
+            sourceType: discreteStr
             requiredMapping: true
             target: ""
             targetLocation: ""
@@ -32,6 +33,7 @@ spec:
             description: ""
             source: "@{{submittedGeographicAddress.country}}"
             sourceLocation: BODY
+            sourceType: discreteStr
             requiredMapping: true
             target: ""
             targetLocation: ""
@@ -40,6 +42,7 @@ spec:
             description: ""
             source: "@{{submittedGeographicAddress.streetName}}"
             sourceLocation: BODY
+            sourceType: discreteStr
             requiredMapping: false
             target: ""
             targetLocation: ""

@@ -1,9 +1,11 @@
 package com.consoleconnect.kraken.operator.sync.service.push;
 
+import static com.consoleconnect.kraken.operator.core.client.ClientEventTypeEnum.CLIENT_PUSH_API_ACTIVITY_LOG;
 import static com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit.fromJson;
 import static com.consoleconnect.kraken.operator.core.toolkit.PagingHelper.toPageNoSubList;
 import static java.util.Collections.emptyList;
 
+import com.consoleconnect.kraken.operator.core.client.ClientEvent;
 import com.consoleconnect.kraken.operator.core.dto.ApiActivityLog;
 import com.consoleconnect.kraken.operator.core.dto.ComposedHttpRequest;
 import com.consoleconnect.kraken.operator.core.entity.AbstractHttpEntity;
@@ -16,6 +18,7 @@ import com.consoleconnect.kraken.operator.core.mapper.ApiActivityLogMapper;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
 import com.consoleconnect.kraken.operator.core.repo.MgmtEventRepository;
+import com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants;
 import com.consoleconnect.kraken.operator.sync.model.SyncProperty;
 import com.consoleconnect.kraken.operator.sync.service.KrakenServerConnector;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -36,12 +39,12 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpMethod;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.util.UriBuilder;
 
 @Service
 @Slf4j
@@ -111,7 +114,9 @@ public class PushAPIActivityLogScheduler extends KrakenServerConnector {
     while (true) {
       var pageable =
           PageRequest.of(
-              page, getAppProperty().getControlPlane().getPushActivityLogExternal().getBatchSize());
+              page,
+              getAppProperty().getControlPlane().getPushActivityLogExternal().getBatchSize(),
+              Sort.by(Sort.Direction.DESC, AssetsConstants.FIELD_CREATE_AT));
       var entities = getApiActivityLogRequestIds(logInfo, pageable);
       var composedLogs = getComposedHttpRequests(entities.get());
       if (composedLogs.isEmpty()) {
@@ -129,7 +134,9 @@ public class PushAPIActivityLogScheduler extends KrakenServerConnector {
                   entities.getNumber(),
                   entities.getSize(),
                   entities.getTotalElements()));
-      var res = sendLogsToExternalSystem(payload);
+      var res =
+          sendLogsToExternalSystem(
+              ClientEvent.of(CLIENT_ID, CLIENT_PUSH_API_ACTIVITY_LOG, payload));
       if (res.getCode() != 200) {
         throw new KrakenException(
             400, "Pushing logs to external system filed with status: " + res.getCode());
@@ -140,9 +147,12 @@ public class PushAPIActivityLogScheduler extends KrakenServerConnector {
     return sent;
   }
 
-  private HttpResponse<String> sendLogsToExternalSystem(PushExternalSystemPayload payload) {
-    return blockCurl(
-        HttpMethod.POST, UriBuilder::build, payload, new ParameterizedTypeReference<>() {});
+  private HttpResponse<String> sendLogsToExternalSystem(ClientEvent payload) {
+    return curl(
+        HttpMethod.POST,
+        getAppProperty().getMgmtPlane().getMgmtPushEventEndpoint(),
+        payload,
+        new ParameterizedTypeReference<>() {});
   }
 
   private List<ComposedHttpRequest> getComposedHttpRequests(Stream<ApiActivityLogEntity> logs) {

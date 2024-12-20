@@ -1,28 +1,57 @@
-import { fireEvent, getAllByTestId, render } from "@testing-library/react";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient } from "@/utils/helpers/reactQuery";
-import { BrowserRouter } from "react-router-dom";
+import { fireEvent, render, waitFor } from "@/__test__/utils";
 import NewAPIServer from "..";
 import SelectAPIServer from '../components/SelectAPIServer';
 import { isURL } from '@/utils/helpers/url';
 import { validateServerName, validateURL } from '@/utils/helpers/validators';
 import { Mock } from 'vitest';
+import UploadYaml from "../components/UploadYaml";
+import { Form, FormInstance } from "antd";
 
 vi.mock('@/utils/helpers/url', () => ({
   isURL: vi.fn(),
 }));
 
-test("test API new", () => {
-  const { container } = render(
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <NewAPIServer />
-      </BrowserRouter>
-    </QueryClientProvider>
+const createFormMock = () => {
+  const formInstance: FormInstance<any> = {} as any;
+  const FakeComponent = () => {
+    const [form] = Form.useForm();
+    Object.assign(formInstance, form);
+
+    formInstance.getFieldError = () => ['mock error']
+
+    return null;
+  };
+  render(<FakeComponent />);
+
+  return formInstance;
+};
+
+test("test API new", async () => {
+  const { container, getByText } = render(
+    <NewAPIServer />
   );
+
   expect(container).toBeInTheDocument();
+
+  expect(getByText('API spec')).toBeInTheDocument()
 });
 
+test('uploading openapi yaml file', async () => {
+  vi.spyOn(Form, 'useWatch').mockReturnValue({
+    file: new File(['(⌐□_□)'], 'chucknorris.png', { type: 'image/png' })
+  })
+
+  const { container, getByText, getByTestId } = render(<UploadYaml form={createFormMock()} />)
+  expect(container).toBeInTheDocument()
+
+  const btnUpload = getByTestId('btnUploadReplace')
+  fireEvent.click(btnUpload)
+
+  await waitFor(() => expect(getByText('Upload a new file will replace the existing one')).toBeInTheDocument())
+  fireEvent.click(getByText('Continue'))
+
+  fireEvent.click(getByTestId('btnViewFileContent'))
+})
 
 test("test SelectApiServer", async () => {
   vi.mock("@/hooks/product", async () => {
@@ -38,16 +67,12 @@ test("test SelectApiServer", async () => {
     };
   });
 
-  const { container } = render(
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <SelectAPIServer />
-      </BrowserRouter>
-    </QueryClientProvider>
+  const { container, getAllByTestId } = render(
+    <SelectAPIServer />
   );
   expect(container).toBeInTheDocument();
-  const input = getAllByTestId(container, "api-seller-name-input")[0];
-  const formContainer = getAllByTestId(container, "api-seller-name-container")[0];
+  const input = getAllByTestId("api-seller-name-input")[0];
+  const formContainer = getAllByTestId("api-seller-name-container")[0];
   fireEvent.change(input, { target: { value: "test" } });
   expect(formContainer).toBeInTheDocument();
 });
@@ -66,16 +91,12 @@ test("test SelectApiServer", async () => {
     };
   });
 
-  const { container } = render(
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <SelectAPIServer />
-      </BrowserRouter>
-    </QueryClientProvider>
+  const { container, getAllByTestId } = render(
+    <SelectAPIServer />
   );
   expect(container).toBeInTheDocument();
-  const input = getAllByTestId(container, "api-seller-name-input")[0];
-  const formContainer = getAllByTestId(container, "api-seller-name-container")[0];
+  const input = getAllByTestId("api-seller-name-input")[0];
+  const formContainer = getAllByTestId("api-seller-name-container")[0];
   fireEvent.change(input, { target: { value: "test" } });
   expect(formContainer).toBeInTheDocument();
 });
