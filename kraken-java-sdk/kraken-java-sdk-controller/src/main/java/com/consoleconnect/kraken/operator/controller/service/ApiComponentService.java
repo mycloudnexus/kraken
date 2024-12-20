@@ -470,4 +470,10 @@ public class ApiComponentService implements TargetMappingChecker, EndPointUsageC
         environmentService.search(productId, PageRequest.of(0, 10)).getData();
     return calculate(unifiedAssetDto, environments);
   }
+
+  public ComponentProductCategoryDTO listProductCategories(String productId) {
+    unifiedAssetService.findOne(productId);
+    ComponentProductCategoryDTO componentProductCategoryDTO = new ComponentProductCategoryDTO();
+    return componentProductCategoryDTO;
+  }
 }

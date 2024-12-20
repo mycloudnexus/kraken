@@ -3,7 +3,7 @@ package com.consoleconnect.kraken.operator.controller.api;
 import com.consoleconnect.kraken.operator.auth.security.UserContext;
 import com.consoleconnect.kraken.operator.controller.dto.CreateSellerContactRequest;
 import com.consoleconnect.kraken.operator.controller.service.SellerContactService;
-import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
+import com.consoleconnect.kraken.operator.core.event.IngestionDataResult;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,7 +27,7 @@ public class SellerContactController {
 
   @Operation(summary = "Create or Update a seller contact")
   @PostMapping()
-  public Mono<HttpResponse<UnifiedAssetDto>> create(
+  public Mono<HttpResponse<IngestionDataResult>> create(
       @PathVariable("productId") String productId,
       @PathVariable("componentId") String componentId,
       @RequestBody CreateSellerContactRequest request) {
