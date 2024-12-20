@@ -4,6 +4,7 @@ import com.consoleconnect.kraken.operator.core.client.ClientEvent;
 import com.consoleconnect.kraken.operator.core.client.ClientEventTypeEnum;
 import com.consoleconnect.kraken.operator.core.dto.ApiActivityLog;
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
+import com.consoleconnect.kraken.operator.core.entity.HttpRequestBodyEntity;
 import com.consoleconnect.kraken.operator.core.mapper.ApiActivityLogMapper;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
@@ -23,7 +24,7 @@ public class ClientAPIAuditLogEventHandler extends ClientEventHandler {
   private final ApiActivityLogRepository repository;
 
   public void onEvent(int count) {
-    int max = 100000;
+    int max = 1000;
     Set<ApiActivityLogEntity> newActivities = new HashSet<>();
     var firstOne =
     this.repository.findById(UUID.fromString( "e0289c22-b54b-4383-86ee-0fef50d7a9bd")).orElse(null);
@@ -31,7 +32,7 @@ public class ClientAPIAuditLogEventHandler extends ClientEventHandler {
     {
       return;
     }
-    for(int i=0;i<count;i++)
+    for(int i=1;i<=count;i++)
     {
 
       ApiActivityLogEntity apiActivityLogEntity = new ApiActivityLogEntity();
@@ -42,9 +43,9 @@ public class ClientAPIAuditLogEventHandler extends ClientEventHandler {
       apiActivityLogEntity.setMethod(firstOne.getMethod());
       apiActivityLogEntity.setPath(firstOne.getPath());
       apiActivityLogEntity.setQueryParameters(firstOne.getQueryParameters());
-      apiActivityLogEntity.setRequest(firstOne.getRequest());
+
       apiActivityLogEntity.setRequestId(UUID.randomUUID().toString());
-      apiActivityLogEntity.setResponse(firstOne.getResponse());
+
       apiActivityLogEntity.setUri(firstOne.getUri());
 
       apiActivityLogEntity.setCallSeq(firstOne.getCallSeq());
@@ -58,7 +59,15 @@ public class ClientAPIAuditLogEventHandler extends ClientEventHandler {
 
       apiActivityLogEntity.setBuyer(firstOne.getBuyer());
 
+
+      HttpRequestBodyEntity logEntity = new HttpRequestBodyEntity();
+      apiActivityLogEntity.setRequestBody(logEntity);
+      logEntity.setRequest(firstOne.getRequest());
+      logEntity.setResponse(firstOne.getResponse());
+
       newActivities.add(apiActivityLogEntity);
+
+
 
       if(i % max == 0)
       {

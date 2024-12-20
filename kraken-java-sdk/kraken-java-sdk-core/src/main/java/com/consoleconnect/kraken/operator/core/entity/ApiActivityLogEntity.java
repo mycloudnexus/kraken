@@ -41,4 +41,7 @@ public class ApiActivityLogEntity extends AbstractHttpEntity {
 
   @Column(name = "buyer", nullable = true, unique = false)
   private String buyer;
+
+  @OneToOne(mappedBy = "log")
+  private HttpRequestBodyEntity requestBody;
 }
