@@ -8,6 +8,11 @@
   display: flex;
   align-items: center;
 
+  &.disabled {
+    border-color: transparent !important;
+    pointer-events: none;
+  }
+
   &.focused {
     border-color: var(--primary);
 
@@ -20,7 +25,7 @@
     outline-color: var(--primary);
     outline-style: solid;
   }
-  
+
   .content {
     padding: 6px 7px;
     flex: 1;
@@ -35,6 +40,10 @@
 
     &:focus-visible {
       outline: none;
+    }
+
+    &.disabled {
+      pointer-events: none;
     }
   }
 }
