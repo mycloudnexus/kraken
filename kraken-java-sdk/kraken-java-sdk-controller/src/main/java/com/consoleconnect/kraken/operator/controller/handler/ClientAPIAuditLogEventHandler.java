@@ -11,9 +11,7 @@ import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
 import com.consoleconnect.kraken.operator.core.repo.HttpRequestBodyRepository;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.fasterxml.jackson.core.type.TypeReference;
-
 import java.util.*;
-
 import lombok.AllArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -30,13 +28,13 @@ public class ClientAPIAuditLogEventHandler extends ClientEventHandler {
     Set<ApiActivityLogEntity> newActivities = new HashSet<>();
     Set<HttpRequestBodyEntity> httpRequestBodyEntities = new HashSet<>();
     var firstOne =
-    this.repository.findById(UUID.fromString( "e0289c22-b54b-4383-86ee-0fef50d7a9bd")).orElse(null);
-    if(firstOne == null)
-    {
+        this.repository
+            .findById(UUID.fromString("e0289c22-b54b-4383-86ee-0fef50d7a9bd"))
+            .orElse(null);
+    if (firstOne == null) {
       return;
     }
-    for(int i=1;i<=count;i++)
-    {
+    for (int i = 1; i <= count; i++) {
 
       ApiActivityLogEntity apiActivityLogEntity = new ApiActivityLogEntity();
 
@@ -62,7 +60,6 @@ public class ClientAPIAuditLogEventHandler extends ClientEventHandler {
 
       apiActivityLogEntity.setBuyer(firstOne.getBuyer());
 
-
       HttpRequestBodyEntity logEntity = new HttpRequestBodyEntity();
       apiActivityLogEntity.setRequestBody(logEntity);
       httpRequestBodyEntities.add(logEntity);
@@ -71,10 +68,7 @@ public class ClientAPIAuditLogEventHandler extends ClientEventHandler {
 
       newActivities.add(apiActivityLogEntity);
 
-
-
-      if(i % max == 0)
-      {
+      if (i % max == 0) {
         httpRequestBodyRepository.saveAll(httpRequestBodyEntities);
         repository.saveAll(newActivities);
         newActivities.clear();

@@ -43,8 +43,7 @@ public class ClientPubSubController {
 
   @Operation(summary = "receive a event from client")
   @PostMapping("/test")
-  public Mono<HttpResponse<Void>> test(@RequestParam(value = "count", required = false)
-                                                 int   count) {
+  public Mono<HttpResponse<Void>> test(@RequestParam(value = "count", required = false) int count) {
     this.clientAPIAuditLogEventHandler.onEvent(count);
     return null;
   }
