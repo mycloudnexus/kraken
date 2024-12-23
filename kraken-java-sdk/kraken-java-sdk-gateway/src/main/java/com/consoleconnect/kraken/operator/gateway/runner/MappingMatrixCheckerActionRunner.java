@@ -192,13 +192,19 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
         return true;
       }
       case EXPECTED_TRUE -> {
+        Object obj = null;
         try {
-          SpELEngine.evaluateWithoutSuppressException(
-              pathCheck.value(), Map.of(PARAM_NAME, value), Object.class);
-          return true;
+          obj =
+              SpELEngine.evaluateWithoutSuppressException(
+                  pathCheck.value(), Map.of(PARAM_NAME, value), Object.class);
         } catch (Exception e) {
-          throwException(pathCheck, null);
+          String checkingPath = rewriteCheckingPath(pathCheck);
+          throwException(pathCheck, String.format(PARAM_NOT_EXIST_MSG, checkingPath));
         }
+        if (StringUtils.isNotBlank(pathCheck.expectedValueType())) {
+          return checkExpectDataType(pathCheck, obj);
+        }
+        return true;
       }
       case EXPECTED_STR -> {
         return checkExpectString(pathCheck, value);

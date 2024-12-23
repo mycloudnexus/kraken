@@ -150,15 +150,26 @@ const EnvironmentActivityLog = () => {
   const [modalActivityId, setModalActivityId] = useState<string | undefined>();
   const [modalOpen, setModalOpen] = useState(false);
   const isActivityLogActive = useMemo(() => mainTabKey === 'activityLog', [mainTabKey])
+  const [dates, setDates] = useState(undefined);
 
-  const handleHistoryActivityClick = useCallback((record: IActivityHistoryLog) => {
+  const handleHistoryActivityClick = (record: IActivityHistoryLog) => {
     setMainTabKey('activityLog');
     setQueryParams({
       ...queryParams,
       requestStartTime: dayjs(record.startTime).startOf("day").valueOf(),
       requestEndTime: dayjs(record.endTime).endOf("day").valueOf()
     });
-  }, [queryParams]);
+    handleDateChange([
+      dayjs(record.startTime).startOf("day"),
+      dayjs(record.endTime).endOf("day"),
+    ]);
+  };
+
+  const handleDateChange = (dates: any, _?: [string, string]) => {
+    setDates(dates);
+    form.setFieldsValue({ requestTime: dates });
+  }
+
 
   const columns: ColumnsType<IActivityLog> = [
     {
@@ -270,7 +281,11 @@ const EnvironmentActivityLog = () => {
             </Form.Item>
 
             <Form.Item label="Time range from" name="requestTime">
-              <RangePicker placeholder={["Select time", "Select time"]} />
+              <RangePicker
+                placeholder={["Select time", "Select time"]}
+                onChange={handleDateChange}
+                value={dates}
+              />
             </Form.Item>
 
             <Form.Item label="Method and path">
