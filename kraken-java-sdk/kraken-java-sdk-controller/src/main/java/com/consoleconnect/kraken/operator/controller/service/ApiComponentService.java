@@ -474,6 +474,13 @@ public class ApiComponentService implements TargetMappingChecker, EndPointUsageC
   public ComponentProductCategoryDTO listProductCategories(String productId) {
     unifiedAssetService.findOne(productId);
     ComponentProductCategoryDTO componentProductCategoryDTO = new ComponentProductCategoryDTO();
+    Map<String, String> keyIdMap =
+        unifiedAssetService.findByKind(AssetKindEnum.COMPONENT_API.getKind()).stream()
+            .map(UnifiedAssetDto::getMetadata)
+            .filter(item -> item.getKey().contains("quote") || item.getKey().contains("order"))
+            .collect(Collectors.toMap(Metadata::getKey, Metadata::getId));
+    componentProductCategoryDTO.setComponentKeys(keyIdMap);
+    componentProductCategoryDTO.setProductCategories(Arrays.asList(ProductCategoryEnum.values()));
     return componentProductCategoryDTO;
   }
 }

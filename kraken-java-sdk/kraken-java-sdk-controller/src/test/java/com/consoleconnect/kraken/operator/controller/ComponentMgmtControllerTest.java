@@ -101,7 +101,9 @@ public class ComponentMgmtControllerTest extends AbstractIntegrationTest
     endpoint.getMappers().getResponse().get(0).setTargetValues(new ArrayList<>());
     UnifiedAsset asset1 = new UnifiedAsset();
     asset1.setMetadata(asset.getMetadata());
-    asset1.setFacets(JsonToolkit.fromJson(JsonToolkit.toJson(facets), Map.class));
+    asset1.setFacets(
+        JsonToolkit.fromJson(
+            JsonToolkit.toJson(facets), new TypeReference<Map<String, Object>>() {}));
     assertUpdateErrorResult(asset1);
 
     ComponentAPITargetFacets facets2 =
@@ -110,7 +112,9 @@ public class ComponentMgmtControllerTest extends AbstractIntegrationTest
     endpoint2.getMappers().getRequest().get(0).setSource(null);
     UnifiedAsset asset2 = new UnifiedAsset();
     asset2.setMetadata(asset.getMetadata());
-    asset2.setFacets(JsonToolkit.fromJson(JsonToolkit.toJson(facets2), Map.class));
+    asset2.setFacets(
+        JsonToolkit.fromJson(
+            JsonToolkit.toJson(facets2), new TypeReference<Map<String, Object>>() {}));
     assertUpdateErrorResult(asset2);
   }
 
@@ -133,7 +137,6 @@ public class ComponentMgmtControllerTest extends AbstractIntegrationTest
         .consumeWith(
             response -> {
               String bodyStr = new String(Objects.requireNonNull(response.getResponseBody()));
-              log.info("update result {}", bodyStr);
               assertThat(bodyStr, Matchers.notNullValue());
             });
   }
@@ -371,5 +374,19 @@ public class ComponentMgmtControllerTest extends AbstractIntegrationTest
           new SyncMetadata("", "", DateTime.nowInUTCString(), UserContext.ANONYMOUS);
       unifiedAssetService.syncAsset(PRODUCT_ID, data, syncMetadata, true);
     }
+  }
+
+  @Test
+  @Order(11)
+  void givenProductId_whenQueryComponentProductCategories_thenReturnOK() {
+    String path = String.format("/products/%s/product-categories", PRODUCT_ID);
+    getTestClientHelper()
+        .getAndVerify(
+            (uriBuilder -> uriBuilder.path(path).build()),
+            bodyStr -> {
+              log.info(bodyStr);
+              assertThat(bodyStr, hasJsonPath("$.data.componentKeys", notNullValue()));
+              assertThat(bodyStr, hasJsonPath("$.data.productCategories", notNullValue()));
+            });
   }
 }

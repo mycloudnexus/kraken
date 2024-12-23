@@ -21,6 +21,8 @@ public class SellerContactService implements SellerContactChecker {
       String productId, String componentId, CreateSellerContactRequest request, String createdBy) {
     check(productId, componentId, request);
     UnifiedAssetDto unifiedAssetEntity = unifiedAssetService.findOne(componentId);
+    String key =
+        unifiedAssetEntity.getMetadata().getKey() + ".seller.contact" + System.currentTimeMillis();
 
     return null;
   }
