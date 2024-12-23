@@ -61,7 +61,9 @@ public interface DataTypeChecker {
 
   default boolean checkExpectString(PathCheck pathCheck, Object variable) {
     Class<?> dataType = whichDataTypeClass(variable);
-    if (Objects.isNull(variable) || !String.class.equals(dataType)) {
+    if (Objects.isNull(variable)
+        || !String.class.equals(dataType)
+        || StringUtils.isBlank((String) variable)) {
       throwException(
           pathCheck,
           String.format(
