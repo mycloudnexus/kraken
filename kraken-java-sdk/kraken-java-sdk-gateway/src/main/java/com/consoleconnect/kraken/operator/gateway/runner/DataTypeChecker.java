@@ -70,6 +70,15 @@ public interface DataTypeChecker {
               variable,
               (dataType == null ? null : dataType.getSimpleName()),
               "String"));
+    } else if (StringUtils.isBlank((String) variable)) {
+      throwException(
+          pathCheck,
+          String.format(
+              EXPECT_INT_MSG,
+              extractCheckingPath(pathCheck.path()),
+              variable,
+              "empty string",
+              "Non Empty String"));
     }
     return true;
   }
