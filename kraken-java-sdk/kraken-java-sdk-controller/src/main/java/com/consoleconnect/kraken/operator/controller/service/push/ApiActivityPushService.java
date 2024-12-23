@@ -1,8 +1,5 @@
 package com.consoleconnect.kraken.operator.controller.service.push;
 
-import static com.consoleconnect.kraken.operator.controller.service.statistics.ApiActivityStatisticsService.CALL_SEQ;
-import static com.consoleconnect.kraken.operator.controller.service.statistics.ApiActivityStatisticsService.CALL_SEQ_ZERO;
-import static com.consoleconnect.kraken.operator.controller.service.statistics.ApiActivityStatisticsService.ENV;
 import static com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit.fromJson;
 import static com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit.toJson;
 
@@ -12,13 +9,11 @@ import com.consoleconnect.kraken.operator.controller.dto.push.PushApiActivityLog
 import com.consoleconnect.kraken.operator.controller.dto.push.PushApiActivityLogHistory;
 import com.consoleconnect.kraken.operator.controller.model.Environment;
 import com.consoleconnect.kraken.operator.controller.service.EnvironmentService;
-import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
 import com.consoleconnect.kraken.operator.core.entity.MgmtEventEntity;
 import com.consoleconnect.kraken.operator.core.enums.EventStatusType;
 import com.consoleconnect.kraken.operator.core.enums.MgmtEventType;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
-import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
 import com.consoleconnect.kraken.operator.core.repo.MgmtEventRepository;
 import com.consoleconnect.kraken.operator.core.request.PushLogSearchRequest;
 import com.consoleconnect.kraken.operator.core.toolkit.Paging;
@@ -45,13 +40,10 @@ public class ApiActivityPushService {
       "Push api activity logs is disabled.";
   public static final String THE_SAME_PARAMETERS_ALREADY_EXISTS_ERROR =
       "Push event with the same parameters already exists with status 'ack' or 'in_progress'.";
-  public static final String NO_API_ACTIVITIES_FOUND =
-      "No API activities found for the provided request parameters. Please verify your input and try again.";
 
   private final MgmtEventRepository mgmtEventRepository;
   private final EnvironmentService environmentService;
   private final AppProperty appProperty;
-  private final ApiActivityLogRepository apiActivityLogRepository;
 
   public ApiRequestActivityPushResult createPushApiActivityLogInfo(
       CreatePushApiActivityRequest request, String userId) {
@@ -68,27 +60,6 @@ public class ApiActivityPushService {
   private void validateRequest(CreatePushApiActivityRequest searchRequest) {
     validateIfFeatureIsEnabled();
     validatePushEventWithTheSameParameters(searchRequest);
-    validateIfTimeRangeContainsAtLeastOneApiActivityLog(searchRequest);
-  }
-
-  private void validateIfTimeRangeContainsAtLeastOneApiActivityLog(
-      CreatePushApiActivityRequest searchRequest) {
-    Specification<ApiActivityLogEntity> spec =
-        (root, query, criteriaBuilder) -> {
-          var predicateList = new ArrayList<Predicate>();
-          predicateList.add(criteriaBuilder.equal(root.get(ENV), searchRequest.getEnvId()));
-          predicateList.add(criteriaBuilder.equal(root.get(CALL_SEQ), CALL_SEQ_ZERO));
-          predicateList.add(
-              criteriaBuilder.greaterThanOrEqualTo(
-                  root.get(CREATED_AT), searchRequest.getStartTime()));
-          predicateList.add(
-              criteriaBuilder.lessThanOrEqualTo(root.get(CREATED_AT), searchRequest.getEndTime()));
-          return query.where(predicateList.toArray(new Predicate[0])).getRestriction();
-        };
-    long count = apiActivityLogRepository.count(spec);
-    if (count < 1) {
-      throw new KrakenException(400, NO_API_ACTIVITIES_FOUND);
-    }
   }
 
   private void validateIfFeatureIsEnabled() {
