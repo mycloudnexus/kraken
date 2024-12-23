@@ -39,7 +39,7 @@ public class SellerContactController {
         .map(HttpResponse::ok);
   }
 
-  @Operation(summary = "Delete a seller contact by id")
+  @Operation(summary = "Delete a seller contact by key")
   @DeleteMapping("/{id}")
   public Mono<HttpResponse<Boolean>> delete(
       @PathVariable("productId") String productId,
@@ -47,7 +47,7 @@ public class SellerContactController {
       @PathVariable("id") String id) {
     return UserContext.getUserId()
         .publishOn(Schedulers.boundedElastic())
-        .map(userId -> sellerContactService.deleteSellerContact(componentId, id, userId))
+        .map(userId -> sellerContactService.deleteSellerContact(productId, componentId, id, userId))
         .map(HttpResponse::ok);
   }
 }

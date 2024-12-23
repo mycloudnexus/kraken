@@ -2,6 +2,7 @@ package com.consoleconnect.kraken.operator.core.enums;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.Getter;
 
 @Getter
@@ -12,13 +13,22 @@ public enum ProductCategoryEnum {
   ProductCategoryEnum(String kind, String name) {
     this.kind = kind;
     this.name = name;
-    Holder.categoryMap.put(kind, name);
+    Holder.categoryMap.put(kind, this);
   }
 
   private final String kind;
   private final String name;
 
-  public static class Holder {
-    static Map<String, String> categoryMap = new HashMap<>();
+  private static class Holder {
+    private static final Map<String, ProductCategoryEnum> categoryMap = new HashMap<>();
+  }
+
+  public static ProductCategoryEnum kindOf(String kind) {
+    return Holder.categoryMap.getOrDefault(kind, null);
+  }
+
+  public static Map<String, String> all() {
+    return Holder.categoryMap.entrySet().stream()
+        .collect(Collectors.toMap(Map.Entry::getKey, v -> v.getValue().getName()));
   }
 }

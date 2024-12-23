@@ -385,7 +385,7 @@ public class ComponentMgmtControllerTest extends AbstractIntegrationTest
             (uriBuilder -> uriBuilder.path(path).build()),
             bodyStr -> {
               log.info(bodyStr);
-              assertThat(bodyStr, hasJsonPath("$.data.componentKeys", notNullValue()));
+              assertThat(bodyStr, hasJsonPath("$.data.componentProducts", notNullValue()));
               assertThat(bodyStr, hasJsonPath("$.data.productCategories", notNullValue()));
             });
   }

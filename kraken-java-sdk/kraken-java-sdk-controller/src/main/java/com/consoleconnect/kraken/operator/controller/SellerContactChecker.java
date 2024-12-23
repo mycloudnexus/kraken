@@ -1,21 +1,45 @@
 package com.consoleconnect.kraken.operator.controller;
 
 import com.consoleconnect.kraken.operator.controller.dto.CreateSellerContactRequest;
+import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
 import com.consoleconnect.kraken.operator.core.enums.ProductCategoryEnum;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
+import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Stream;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 public interface SellerContactChecker {
 
-  default void check(String productId, String componentId, CreateSellerContactRequest request) {
-    if (StringUtils.isBlank(productId) || StringUtils.isBlank(componentId)) {
-      throw KrakenException.badRequest("productId and componentId are mandatory");
+  String COMPONENT_KEY = "componentKey";
+
+  UnifiedAssetRepository getUnifiedAssetRepository();
+
+  default void checkProductAndComponent(String productId, String componentId) {
+    if (StringUtils.isBlank(productId)) {
+      throw KrakenException.badRequest("The productId is mandatory");
+    }
+    if (StringUtils.isBlank(componentId)) {
+      throw KrakenException.badRequest("The componentId is mandatory");
+    }
+  }
+
+  default void checkSellerContacts(
+      String productId, String componentId, CreateSellerContactRequest request) {
+    checkProductAndComponent(productId, componentId);
+    if (StringUtils.isBlank(request.getContactName())) {
+      throw KrakenException.badRequest("The contactName is mandatory");
+    }
+    if (StringUtils.isBlank(request.getContactEmail())) {
+      throw KrakenException.badRequest("The contactEmail is mandatory");
+    }
+    if (StringUtils.isBlank(request.getContactPhone())) {
+      throw KrakenException.badRequest("The contactPhone is mandatory");
     }
     if (CollectionUtils.isEmpty(request.getProductTypes())) {
-      throw KrakenException.badRequest("productTypes are mandatory");
+      throw KrakenException.badRequest("The productTypes are mandatory");
     }
     request
         .getProductTypes()
@@ -31,5 +55,13 @@ public interface SellerContactChecker {
                         + "]");
               }
             });
+  }
+
+  default void checkExisted(List<String> keyList) {
+    List<UnifiedAssetEntity> existed = getUnifiedAssetRepository().findAllByKeyIn(keyList);
+    if (CollectionUtils.isNotEmpty(existed)) {
+      throw KrakenException.badRequest(
+          "The seller contact with same componentKey and productTypes has existed.");
+    }
   }
 }

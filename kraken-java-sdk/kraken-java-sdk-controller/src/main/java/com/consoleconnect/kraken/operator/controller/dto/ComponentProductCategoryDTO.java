@@ -1,12 +1,22 @@
 package com.consoleconnect.kraken.operator.controller.dto;
 
-import com.consoleconnect.kraken.operator.core.enums.ProductCategoryEnum;
 import java.util.List;
-import java.util.Map;
 import lombok.Data;
 
 @Data
 public class ComponentProductCategoryDTO {
-  private Map<String, String> componentKeys;
-  private List<ProductCategoryEnum> productCategories;
+  private List<ComponentProductMetadata> componentProducts;
+  private List<ProductCategoryMetaData> productCategories;
+
+  @Data
+  public static class ComponentProductMetadata {
+    private String key;
+    private String id;
+  }
+
+  @Data
+  public static class ProductCategoryMetaData {
+    private String kind;
+    private String name;
+  }
 }

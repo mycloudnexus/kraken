@@ -474,13 +474,31 @@ public class ApiComponentService implements TargetMappingChecker, EndPointUsageC
   public ComponentProductCategoryDTO listProductCategories(String productId) {
     unifiedAssetService.findOne(productId);
     ComponentProductCategoryDTO componentProductCategoryDTO = new ComponentProductCategoryDTO();
-    Map<String, String> keyIdMap =
+    List<ComponentProductCategoryDTO.ComponentProductMetadata> metadataList =
         unifiedAssetService.findByKind(AssetKindEnum.COMPONENT_API.getKind()).stream()
             .map(UnifiedAssetDto::getMetadata)
             .filter(item -> item.getKey().contains("quote") || item.getKey().contains("order"))
-            .collect(Collectors.toMap(Metadata::getKey, Metadata::getId));
-    componentProductCategoryDTO.setComponentKeys(keyIdMap);
-    componentProductCategoryDTO.setProductCategories(Arrays.asList(ProductCategoryEnum.values()));
+            .map(
+                item -> {
+                  ComponentProductCategoryDTO.ComponentProductMetadata metadata =
+                      new ComponentProductCategoryDTO.ComponentProductMetadata();
+                  metadata.setKey(item.getKey());
+                  metadata.setId(item.getId());
+                  return metadata;
+                })
+            .toList();
+    componentProductCategoryDTO.setComponentProducts(metadataList);
+    componentProductCategoryDTO.setProductCategories(
+        Arrays.stream(ProductCategoryEnum.values())
+            .map(
+                item -> {
+                  ComponentProductCategoryDTO.ProductCategoryMetaData metadata =
+                      new ComponentProductCategoryDTO.ProductCategoryMetaData();
+                  metadata.setKind(item.getKind());
+                  metadata.setName(item.getName());
+                  return metadata;
+                })
+            .toList());
     return componentProductCategoryDTO;
   }
 }
