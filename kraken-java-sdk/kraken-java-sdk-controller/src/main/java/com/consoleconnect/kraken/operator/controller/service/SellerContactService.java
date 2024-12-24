@@ -94,12 +94,15 @@ public class SellerContactService implements SellerContactChecker {
 
   public Boolean deleteSellerContact(
       String productId, String componentId, String id, String deletedBy) {
-    checkProductAndComponent(productId, componentId);
     UnifiedAssetDto sellerContactAssetDto = unifiedAssetService.findOne(id);
     if (Objects.nonNull(sellerContactAssetDto)) {
       unifiedAssetService.deleteOne(sellerContactAssetDto.getMetadata().getKey());
       log.info(
-          "Seller contact asset:{} is deleted by:{}, componentId:{}", id, deletedBy, componentId);
+          "Seller contact asset:{} is deleted by:{}, componentId:{}, productId:{}",
+          id,
+          deletedBy,
+          componentId,
+          productId);
     }
     return true;
   }

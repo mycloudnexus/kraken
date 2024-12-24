@@ -72,9 +72,7 @@ public class AuditCollectorV2Controller {
       @RequestParam(value = "updatedAt", required = false) ZonedDateTime lastUpdateTime,
       @RequestParam(value = "env", required = false) String env,
       @Autowired(required = false) JwtAuthenticationToken authenticationToken) {
-
     String envId = apiTokenService.findEnvId(authenticationToken, env);
-
     if (AssetKindEnum.COMPONENT_API_SERVER.getKind().equals(kind)) {
       List<APIServerEnvDTO> apiServerEnvs = environment2APIServerCache.getAPIServerEnvs(envId);
       return HttpResponse.ok(apiServerEnvs);
@@ -95,6 +93,9 @@ public class AuditCollectorV2Controller {
           "syncServerAsset end to query buyers, result:{}",
           Objects.nonNull(pages) ? JsonToolkit.toJson(pages.getData()) : "");
       return HttpResponse.ok(Objects.nonNull(pages) ? pages.getData() : List.of());
+    } else if (AssetKindEnum.COMPONENT_SELLER_CONTACT.getKind().equals(kind)) {
+
+      return null;
     } else {
       return HttpResponse.of(
           HttpStatus.NOT_IMPLEMENTED.value(),

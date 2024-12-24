@@ -17,18 +17,8 @@ public interface SellerContactChecker {
 
   UnifiedAssetRepository getUnifiedAssetRepository();
 
-  default void checkProductAndComponent(String productId, String componentId) {
-    if (StringUtils.isBlank(productId)) {
-      throw KrakenException.badRequest("The productId is mandatory");
-    }
-    if (StringUtils.isBlank(componentId)) {
-      throw KrakenException.badRequest("The componentId is mandatory");
-    }
-  }
-
   default void checkSellerContacts(
       String productId, String componentId, CreateSellerContactRequest request) {
-    checkProductAndComponent(productId, componentId);
     if (StringUtils.isBlank(request.getContactName())) {
       throw KrakenException.badRequest("The contactName is mandatory");
     }
