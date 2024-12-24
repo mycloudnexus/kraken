@@ -25,6 +25,7 @@ spec:
             title: "quote item Term duration"
             source: "@{{quoteItem[0].requestedQuoteItemTerm.duration.amount}}"
             sourceLocation: BODY
+            sourceType: constantNumber
             target: ""
             targetLocation: BODY
             requiredMapping: true
@@ -63,6 +64,7 @@ spec:
             title: "quote item Term roll duration"
             source: "@{{quoteItem[0].requestedQuoteItemTerm.rollInterval.amount}}"
             sourceLocation: BODY
+            sourceType: constantNumber
             target: ""
             targetLocation: BODY
             requiredMapping: false
@@ -88,6 +90,7 @@ spec:
             title: "The id of the place where source location of the quoted product"
             source: "@{{quoteItem[0].product.place[0].id}}"
             sourceLocation: BODY
+            sourceType: discreteStr
             target: ""
             targetLocation: BODY
             requiredMapping: true
@@ -95,6 +98,7 @@ spec:
             title: "The id of the place where destination location of the quoted product"
             source: "@{{quoteItem[0].product.place[1].id}}"
             sourceLocation: BODY
+            sourceType: discreteStr
             target: ""
             targetLocation: BODY
             requiredMapping: true
@@ -102,6 +106,8 @@ spec:
             title: "Bandwidth of the Eline"
             source: "@{{quoteItem[0].product.productConfiguration.bandwidth}}"
             sourceLocation: BODY
+            sourceType: discreteInt
+            sourceValues:
             target: ""
             targetLocation: BODY
             requiredMapping: true
@@ -121,6 +127,7 @@ spec:
             title: "The class of Service of the Eline"
             source: "@{{quoteItem[0].product.productConfiguration.classOfService}}"
             sourceLocation: BODY
+            sourceType: discreteStr
             target: ""
             targetLocation: BODY
             requiredMapping: false
@@ -128,6 +135,7 @@ spec:
             title: "The payment type of the Eline"
             source: "@{{quoteItem[0].product.productConfiguration.paymentType}}"
             sourceLocation: BODY
+            sourceType: discreteStr
             target: ""
             targetLocation: BODY
             requiredMapping: false
@@ -135,6 +143,7 @@ spec:
             title: "The id of the quoted product offering"
             source: "@{{quoteItem[0].product.productOffering.id}}"
             sourceLocation: BODY
+            sourceType: discreteStr
             target: ""
             targetLocation: BODY
             requiredMapping: false

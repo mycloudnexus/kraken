@@ -1,4 +1,3 @@
-import DetailIcon from "@/assets/icon/detail.svg";
 import EmptyIcon from "@/assets/icon/empty.svg";
 import {
   PRODUCT_CACHE_KEYS,
@@ -14,7 +13,6 @@ import { IPagination } from "@/utils/types/common.type";
 import { IEnv } from "@/utils/types/env.type";
 import { IDeploymentHistory } from "@/utils/types/product.type";
 import {
-  Button,
   Flex,
   Result,
   Switch,
@@ -30,13 +28,14 @@ import { ContentTime } from "./ContentTime";
 import { DeploymentBtn } from "./DeployBtn";
 import styles from "./index.module.scss";
 import { ApiCard } from "@/components/ApiMapping";
+import { InfoCircleOutlined } from "@ant-design/icons";
 
 const DeployHistory = ({
   scrollHeight,
   selectedEnv,
   targetMapperKey,
 }: {
-  scrollHeight?: number;
+  scrollHeight: number;
   selectedEnv?: IEnv;
   targetMapperKey?: string;
 }) => {
@@ -148,7 +147,10 @@ const DeployHistory = ({
     if (isStage)
       columns.push(
         {
-          title: "Verified for Production",
+          title: <>
+            Verified for Production{' '}
+            <Tooltip title="Toggle this button means you have verified this deployment version in stage environment"><InfoCircleOutlined /></Tooltip>
+          </>,
           dataIndex: "verifiedStatus",
           width: 160,
           render: (verifiedStatus: boolean, record: IDeploymentHistory) =>
@@ -181,16 +183,11 @@ const DeployHistory = ({
       width: 120,
       fixed: "right",
       render: (record: IDeploymentHistory) => (
-        <Flex gap={12} align="center">
-          <Tooltip title="Check details and difference">
-            <Button type="text" className={styles.defaultBtn}>
-              <DetailIcon />
-            </Button>
-          </Tooltip>
+        <>
           {record.envName !== "production" && (
             <DeploymentBtn record={record} env={envItems} />
           )}
-        </Flex>
+        </>
       ),
     });
 
@@ -223,14 +220,10 @@ const DeployHistory = ({
     });
   }, []);
 
-  const scroll = scrollHeight
-    ? { y: scrollHeight - 215, x: 800 }
-    : { y: 400, x: 800 };
-
   return (
     <div className={styles.root} id="deploy-history">
       <Table
-        scroll={scroll}
+        scroll={{ y: scrollHeight - 144, x: 800 }}
         loading={isLoading || isFetching || isLoadingVerify}
         locale={{
           emptyText: (

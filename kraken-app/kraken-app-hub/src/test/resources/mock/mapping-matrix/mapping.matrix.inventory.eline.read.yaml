@@ -14,7 +14,9 @@ spec:
         path: "$.query.productType"
         expectType: EXPECTED_EXIST
         value: true
+        code: 400
       - name: query_buyerId
         path: "$.query.buyerId"
         expectType: EXPECTED_EXIST
         value: true
+        code: 400

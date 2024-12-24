@@ -41,7 +41,7 @@ const MostPopularEndpoints = ({ props }: Props) => {
       title: "#",
       dataIndex: "index",
       key: "index",
-      render: (_, __, index) => <Text.LightSmall>{index + 1}</Text.LightSmall>,
+      render: (_, __, index) => <Text.LightSmall data-testid="ordinal">{index + 1}</Text.LightSmall>,
       width: "5%",
     },
     {
@@ -80,6 +80,7 @@ const MostPopularEndpoints = ({ props }: Props) => {
       align: "right",
       render: (usage: number) => (
         <Text.LightSmall
+          data-testid="usage"
           color="#2962FF"
           style={{
             border: "1px solid #2962FF",
@@ -106,7 +107,7 @@ const MostPopularEndpoints = ({ props }: Props) => {
         align="center"
       >
         <Spin spinning={isLoading || isRefetching}>
-          {!mostPopularEndpointsData
+          {!mostPopularEndpointsData?.length
             ? <NoData description='As endpoints are accessed, the most popular ones will be displayed here.' /> :
             <Table
               className={styles.table}

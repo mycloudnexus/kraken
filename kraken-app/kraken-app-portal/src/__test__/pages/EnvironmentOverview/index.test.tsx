@@ -1,5 +1,6 @@
 import EnvironmentOverview from "@/pages/EnvironmentOverview";
 import * as productHooks from "@/hooks/product";
+import * as sizeHooks from '@/hooks/useContainerHeight'
 import { fireEvent, render, waitFor } from "@/__test__/utils";
 
 const ResizeObserverMock = vi.fn(() => ({
@@ -62,6 +63,8 @@ describe(" Environment Overview component list", () => {
   });
 
   it("running components list", async () => {
+    vi.spyOn(sizeHooks, 'useContainerHeight').mockReturnValue([1000])
+
     const { getByText, getAllByRole } = render(
       <EnvironmentOverview />
     );

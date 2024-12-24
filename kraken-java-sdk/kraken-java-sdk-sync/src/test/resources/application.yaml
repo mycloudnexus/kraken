@@ -89,3 +89,7 @@ app:
     - kraken.component.api-target
   task:
     enabled: false
+  cron-job:
+    lock:
+      at-most-for: 0s
+      at-least-for: 0s
