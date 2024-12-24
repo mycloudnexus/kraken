@@ -44,6 +44,7 @@ const UserModal = ({ open, onClose }: Props) => {
     <Drawer
       width="40vw"
       open={open}
+      maskClosable
       onClose={onClose}
       title={
         <Flex justify="space-between" align="center">

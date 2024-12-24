@@ -14,7 +14,7 @@ const NoData = ({ icon: Icon = SearchIcon, title = "No data", description = "Whe
     >
       <Col>
         <Icon />
-        <Title level={3} style={{ color: '#595959' }}>
+        <Title style={{ color: '#595959', fontWeight: 400, fontSize: 14 }}>
           {title}
         </Title>
         <Text type="secondary">{description}</Text>

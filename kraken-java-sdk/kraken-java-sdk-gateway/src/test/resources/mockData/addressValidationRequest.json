@@ -2,6 +2,7 @@
   "provideAlternative": true,
   "submittedGeographicAddress": {
     "@type": "FieldedAddress",
+    "country": "AU",
     "city": "Cracow",
     "streetName": "Wasilewskiego",
     "streetNr": "20",

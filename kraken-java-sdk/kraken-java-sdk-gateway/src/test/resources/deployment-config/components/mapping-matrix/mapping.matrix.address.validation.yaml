@@ -21,6 +21,22 @@ spec:
         path: "$.body.submittedGeographicAddress.['@type']"
         expectType: EXPECTED
         value: FieldedAddress
+        code: 422
+      - name: address_submittedGeographicAddress_country
+        path: "$.body.submittedGeographicAddress.['country']"
+        expectType: EXPECTED_TRUE
+        value: "${param}"
+        code: 422
+      - name: address_submittedGeographicAddress_city
+        path: "$.body.submittedGeographicAddress.['city']"
+        expectType: EXPECTED_TRUE
+        value: "${param}"
+        code: 422
+      - name: address_submittedGeographicAddress_streetName
+        path: "$.body.submittedGeographicAddress.['streetName']"
+        expectType: EXPECTED_TRUE
+        value: "${param}"
+        code: 422
 
 
 

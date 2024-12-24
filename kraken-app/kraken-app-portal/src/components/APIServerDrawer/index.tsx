@@ -81,7 +81,9 @@ const APIServerDrawer = ({ item, isOpen, onClose }: Props) => {
       zIndex={1100}
       width={"80vw"}
       closable={false}
+      maskClosable
       open={isOpen}
+      onClose={onClose}
       title={
         <Flex justify="space-between">
           <Text.NormalLarge>Check details</Text.NormalLarge>

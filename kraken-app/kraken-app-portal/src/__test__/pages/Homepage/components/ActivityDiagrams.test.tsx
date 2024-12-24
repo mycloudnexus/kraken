@@ -3,6 +3,10 @@ import { fireEvent } from "@testing-library/react";
 import * as homepageHooks from '@/hooks/homepage'
 import { render } from "@/__test__/utils";
 
+beforeEach(() => {
+  vi.clearAllMocks()
+})
+
 test("ActivityDiagrams test with data", () => {
   const envs = {
     data: [
@@ -49,15 +53,44 @@ test("ActivityDiagrams test with data", () => {
     isRefetching: false
   } as any);
 
-  const { container, getByTestId } = render(
+  const popularEndpoints = [
+    {
+      "method": "GET",
+      "endpoint": "/mefApi/sonata/quoteManagement/v8/quote/43d1e7e9-a11b-4843-a6da-39086ec5ceb2",
+      "usage": 11,
+      "popularity": 33.33
+    }
+  ]
+  vi.spyOn(homepageHooks, 'useGetMostPopularEndpoints').mockReturnValue({
+    data: {
+      endpointUsages: popularEndpoints
+    },
+    refetch: () => popularEndpoints,
+    isLoading: false,
+    isFetching: false,
+    isFetched: true
+  } as any)
+
+  const { container, getByTestId, getByText, getAllByTestId } = render(
     <ActivityDiagrams envs={envs.data} />
   );
   expect(container).toBeInTheDocument();
   const recentButton = getByTestId('recent-90-days');
   fireEvent.click(recentButton);
+
+  // most popular endpoints
+  expect(getByText('Endpoint name')).toBeInTheDocument()
+  expect(getByText('Popularity')).toBeInTheDocument()
+  expect(getByText('Usage')).toBeInTheDocument()
+  expect(getByText('Most popular endpoints')).toBeInTheDocument()
+
+  expect(getAllByTestId('method')[0]).toHaveTextContent('GET')
+  expect(getAllByTestId('apiPath')[0]).toHaveTextContent('v8/quote/43d1e7e9-a11b-4843-a6da-39086ec5ceb2')
+  expect(getAllByTestId('usage')[0]).toHaveTextContent('11')
+
 });
 
-test("ActivityDiagrams test with no data", () => {
+test("ActivityDiagrams test with no data", async () => {
   const envs = {
     data: [
       {
@@ -81,23 +114,27 @@ test("ActivityDiagrams test with no data", () => {
   vi.spyOn(homepageHooks, "useGetActivityRequests").mockReturnValue({
     data: {},
     isLoading: false,
+    isFetcing: false,
     refetch: vi.fn(),
     isRefetching: false
   } as any);
 
-  const { container } = render(
+  vi.spyOn(homepageHooks, 'useGetMostPopularEndpoints').mockReturnValue({
+    data: {
+      endpointUsages: []
+    },
+    refetch: () => [],
+    isLoading: false,
+    isFetching: false,
+    isFetched: true
+  } as any)
+
+  const { container, getByText } = render(
     <ActivityDiagrams envs={envs.data} />
   );
   expect(container).toBeInTheDocument();
-});
 
-test("ActivityDiagrams test with no data", () => {
-  const envs = {
-    data: [],
-  };
-
-  const { container } = render(
-    <ActivityDiagrams envs={envs.data} />
-  );
-  expect(container).toBeInTheDocument();
+  expect(getByText('When requests are made, request status data will be displayed here.')).toBeInTheDocument()
+  expect(getByText('As endpoints are accessed, the most popular ones will be displayed here.')).toBeInTheDocument()
+  expect(getByText('When errors occur, they will be displayed here.')).toBeInTheDocument()
 });

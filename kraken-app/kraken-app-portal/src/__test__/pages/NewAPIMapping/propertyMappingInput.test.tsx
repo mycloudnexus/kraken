@@ -1,3 +1,4 @@
+import { AutoGrowingInput } from "@/components/form";
 import { SourceInput as RequestSourceInput } from "@/pages/NewAPIMapping/components/RequestItem/SourceInput";
 import { TargetInput as RequestTargetInput } from "@/pages/NewAPIMapping/components/RequestItem/TargetInput";
 import { SourceInput as ResponseSourceInput } from "@/pages/NewAPIMapping/components/ResponseItem/SourceInput";
@@ -194,3 +195,27 @@ describe("NewAPIMapping > response mapping", () => {
     expect(response.setActiveSonataResponse).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('auto growing height input component tests', () => {
+  it('should render with initial value', () => {
+    const handleChange = vi.fn()
+    const { getByRole } = render(<AutoGrowingInput value="hello world" onChange={handleChange} />)
+    
+    const textbox = getByRole('textbox')
+    expect(textbox).toHaveTextContent("hello world")
+
+    fireEvent.focus(textbox)
+    fireEvent.blur(textbox)
+    expect(handleChange).toHaveBeenCalledTimes(1)
+  })
+
+  it('should not change value once disabled', () => {
+    const handleChange = vi.fn()
+    const { getByRole } = render(<AutoGrowingInput disabled onChange={handleChange} />)
+
+    const textbox = getByRole('textbox')
+    fireEvent.keyDown(textbox, { key: 'A' })
+    fireEvent.blur(textbox)
+    expect(handleChange).toHaveBeenCalledTimes(0)
+  })
+})

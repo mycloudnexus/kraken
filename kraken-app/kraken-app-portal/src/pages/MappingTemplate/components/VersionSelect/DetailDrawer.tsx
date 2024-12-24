@@ -20,6 +20,7 @@ export function DetailDrawer({ deploymentId, ...props }: Readonly<DrawerProps & 
       {...props}
       title="View details"
       width={760}
+      maskClosable
       className={styles.detailDrawer}
     >
       <Alert
@@ -39,6 +40,8 @@ export function DetailDrawer({ deploymentId, ...props }: Readonly<DrawerProps & 
       <Table<IDeploymentHistory>
         loading={isLoading}
         rowKey={record => record.mapperKey}
+        tableLayout="fixed"
+        scroll={{ x: 500 }}
         columns={[
           {
             title: "Mapping use case",
@@ -54,7 +57,7 @@ export function DetailDrawer({ deploymentId, ...props }: Readonly<DrawerProps & 
           },
           {
             title: "Upgrade status",
-            width: 180,
+            width: 140,
             dataIndex: "status",
             render: (status: string) => <DeploymentStatus status={status} />,
           },

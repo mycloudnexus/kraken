@@ -106,7 +106,11 @@ spec:
           env:
             input: ${path}
             pattern: /mefApi/sonata/geographicAddressManagement/v7/geographicAddress/(?<segment>.*)
-
+        - id: mapping_matrix_check_retrieve_address
+          actionType: buildin@mapping-matrix-checker
+          env:
+            mappingMatrixKey: mef.sonata.api.matrix.address.retrieve
+            targetKey: mef.sonata.api-target.address.retrieve
         - id: load-downstream-api-config
           actionType: buildin@load-target-api-config
           env:
@@ -133,6 +137,9 @@ spec:
 links:
   - targetAssetKey: mef.sonata.api-target.address.retrieve
     relationship: implementation.target
+    group: mef.sonata.api-target.address.retrieve
+  - targetAssetKey: mef.sonata.api.matrix.address.retrieve
+    relationship: implementation.matrix
     group: mef.sonata.api-target.address.retrieve
   - targetAssetKey: mef.sonata.api-target.address.validate
     relationship: implementation.target

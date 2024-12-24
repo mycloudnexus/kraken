@@ -80,7 +80,7 @@ const ErrorBrakedownDiagram = ({ props }: Props) => {
   return (
     <Flex vertical className={styles.contentBox}>
       <Flex style={{ paddingBottom: "12px" }}>
-        <Text.LightMedium>Error brakedown</Text.LightMedium>
+        <Text.LightMedium>Error breakdown</Text.LightMedium>
       </Flex>
       <Spin spinning={isLoading || isRefetching}>
         {!errorData.length

@@ -45,8 +45,8 @@ const MappingDetailsList = ({
       // Auto select the corresponding api
       const initialMapItem = targetMapperKey
         ? (apis.find(
-            (mapping) => mapping.targetMapperKey === targetMapperKey
-          ) ?? apis[0])
+          (mapping) => mapping.targetMapperKey === targetMapperKey
+        ) ?? apis[0])
         : apis[0];
 
       setSelectedKey(initialMapItem.path);

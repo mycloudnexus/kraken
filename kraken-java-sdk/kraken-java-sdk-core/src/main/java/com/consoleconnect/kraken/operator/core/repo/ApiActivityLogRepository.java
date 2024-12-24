@@ -44,4 +44,6 @@ public interface ApiActivityLogRepository
       @Param("callSeq") String callSeq,
       @Param("buyer") String buyer,
       @Param("limit") int limit);
+
+  List<ApiActivityLogEntity> findAllByRequestIdIn(List<String> requestIds);
 }

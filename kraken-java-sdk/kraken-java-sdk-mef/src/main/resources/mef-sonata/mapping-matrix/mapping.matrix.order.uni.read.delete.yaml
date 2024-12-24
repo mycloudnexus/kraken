@@ -1,0 +1,16 @@
+---
+kind: kraken.product.mapping.matrix
+apiVersion: v1
+metadata:
+  key: mef.sonata.api.matrix.order.uni.read.delete
+  name: MEF Sonata API
+  labels:
+    mef-api-release: grace
+  version: 1
+spec:
+  matrix:
+    mef.sonata.api-target.order.uni.read.delete:
+      - name: segment_exist
+        path: "$.segment"
+        expectType: EXPECTED_EXIST
+        value: true

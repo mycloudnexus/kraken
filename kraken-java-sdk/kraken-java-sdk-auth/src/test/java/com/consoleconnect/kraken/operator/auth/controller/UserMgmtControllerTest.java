@@ -22,6 +22,7 @@ import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.*;
 import java.util.function.Consumer;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.SpyBean;
@@ -31,6 +32,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+@Slf4j
 @ActiveProfiles("test-login-enabled")
 @MockIntegrationTest
 @ContextConfiguration(classes = {TestApplication.class})
@@ -428,6 +430,25 @@ class UserMgmtControllerTest extends AbstractIntegrationTest {
           assertThat(bodyStr, hasJsonPath("$.data.data", notNullValue()));
           assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(greaterThanOrEqualTo(1))));
           assertThat(bodyStr, hasJsonPath("$.data.data[0].email", equalTo("abc@test.com")));
+        });
+
+    // search by role and state
+    testClientHelper.requestAndVerify(
+        HttpMethod.GET,
+        (uriBuilder ->
+            uriBuilder
+                .path("/users")
+                .queryParam("role", "USER")
+                .queryParam("state", "ENABLED")
+                .build()),
+        headers,
+        null,
+        HttpStatus.OK.value(),
+        bodyStr -> {
+          log.info("bodyStr:{}", bodyStr);
+          Assertions.assertNotNull(bodyStr);
+          assertThat(bodyStr, hasJsonPath("$.data.data", notNullValue()));
+          assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(greaterThanOrEqualTo(3))));
         });
   }
 

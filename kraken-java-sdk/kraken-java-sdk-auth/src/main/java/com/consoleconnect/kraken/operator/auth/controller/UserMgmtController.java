@@ -39,10 +39,16 @@ public class UserMgmtController {
       @RequestParam(value = "size", required = false, defaultValue = PagingHelper.DEFAULT_SIZE_STR)
           int size,
       @RequestParam(value = "filterInternalUser", required = false, defaultValue = "false")
-          Boolean filterInternalUser) {
+          Boolean filterInternalUser,
+      @RequestParam(value = "state", required = false) String state,
+      @RequestParam(value = "role", required = false) String role) {
     return HttpResponse.ok(
         userService.search(
-            q, UnifiedAssetService.getSearchPageRequest(page, size), filterInternalUser));
+            q,
+            UnifiedAssetService.getSearchPageRequest(page, size),
+            filterInternalUser,
+            state,
+            role));
   }
 
   @Operation(summary = "add a new user")

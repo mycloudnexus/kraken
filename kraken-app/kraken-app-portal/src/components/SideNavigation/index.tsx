@@ -198,21 +198,19 @@ const SideNavigation = ({ info }: Readonly<{ info?: ISystemInfo }>) => {
           className={classNames(styles.siderBottomVersion, collapsed && styles.collapsed)}
           gap={4}
         >
-          {info?.productionAppVersion && (
-            <div className={classNames(styles.appVersion, collapsed && styles.collapsed)}>
-              <Typography.Text data-testid="productionAppVersion" ellipsis style={{ color: 'var(--text-secondary)' }}>
-                {info.productionAppVersion}
-              </Typography.Text>
-              <Tooltip title={<KrakenVersion info={info} />}>
-                <ExclamationCircleOutlined data-testid="appVersionsIndicator" style={{ color: 'var(--text-secondary)' }} />
-              </Tooltip>
-              {!collapsed && (<Divider type="vertical" style={{ margin: '0 6px' }} />)}
-            </div>
-          )}
-            {!collapsed ? (
-              <span className={styles.productionBy}>A product by <ETIcon /></span>
-            ) : <ETIcon />}
-            
+          <div className={classNames(styles.appVersion, collapsed && styles.collapsed)}>
+            <Typography.Text data-testid="productionAppVersion" ellipsis style={{ color: 'var(--text-secondary)' }}>
+              {info?.productionAppVersion}
+            </Typography.Text>
+            <Tooltip title={<KrakenVersion info={info as any} />}>
+              <ExclamationCircleOutlined data-testid="appVersionsIndicator" style={{ color: 'var(--text-secondary)' }} />
+            </Tooltip>
+            {!collapsed && (<Divider type="vertical" style={{ margin: '0 6px' }} />)}
+          </div>
+
+          {!collapsed ? (
+            <span className={styles.productionBy}>A product by <ETIcon /></span>
+          ) : <ETIcon />}
         </Flex>
 
         <Flex

@@ -62,6 +62,7 @@ const ActivityDetailModal = ({
       title="View Details"
       onClose={handleOk}
       open={open}
+      maskClosable
       width={"80%"}
       footer={
         <div style={{ textAlign: "right" }}>

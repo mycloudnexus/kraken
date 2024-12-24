@@ -15,6 +15,7 @@ import com.consoleconnect.kraken.operator.sync.model.SyncProperty;
 import java.time.ZonedDateTime;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,10 @@ public class PushLogService extends KrakenServerConnector {
     this.apiActivityLogRepository = apiActivityLogRepository;
   }
 
+  @SchedulerLock(
+      name = "pushLogLock",
+      lockAtMostFor = "${app.cron-job.lock.at-most-for}",
+      lockAtLeastFor = "${app.cron-job.lock.at-least-for}")
   @Scheduled(cron = "${app.cron-job.push-log:-}")
   public void runIt() {
     ZonedDateTime createdAt =

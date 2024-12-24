@@ -15,7 +15,7 @@ import {
   Select,
 } from "antd";
 import dayjs from "dayjs";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ApiActivityDiagram from "./ApiActivityDiagram";
 import ErrorBrakedownDiagram from "./ErrorDiagram";
 import MostPopularEndpoints from "./MostPopularEndpoints";
@@ -82,6 +82,16 @@ const ActivityDiagrams = ({ envs }: Props) => {
     });
   };
 
+  useEffect(() => {
+    // default filter values to first option each select box
+    if (!form.getFieldValue('envId')) {
+      form.setFieldValue('envId', envOptions[0]?.value)
+    }
+    if (!form.getFieldValue('buyer')) {
+      form.setFieldValue('buyer', 'ALL_BUYERS')
+    }
+  }, [])
+
   return (
     <Flex vertical className={styles.wrapper} justify="center">
       <Form
@@ -97,26 +107,25 @@ const ActivityDiagrams = ({ envs }: Props) => {
           justify="space-between"
         >
           <Flex gap={12} align="center">
-            <Text.BoldMedium>Activity diagrams</Text.BoldMedium>
+            <Text.NormalLarge>API activity dashboard</Text.NormalLarge>
             <Form.Item name="envId">
               <Select
+                className={styles.customSelectBox}
                 value={form.getFieldValue("envId")}
                 options={envOptions}
                 popupMatchSelectWidth={false}
                 size="middle"
                 variant="borderless"
-                placeholder="Stage"
               />
             </Form.Item>
             <Form.Item name="buyer">
               <Select
-                options={[{ value: undefined, label: "All buyers" }]}
-                placeholder="All buyers"
+                className={styles.customSelectBox}
+                options={[{ value: 'ALL_BUYERS', label: "All buyers" }]}
                 popupMatchSelectWidth={false}
                 size="middle"
                 style={{ minWidth: 100 }}
                 variant="borderless"
-                allowClear
               />
             </Form.Item>
           </Flex>

@@ -93,6 +93,9 @@ app:
     url: http://localhost:8001
     token: Bearer ${KRAKEN_MGMT_API_ACCESS_TOKEN:FAKE_TOKEN}
   cron-job:
+    lock:
+      at-most-for: 2m
+      at-least-for: 10s
   accept-asset-kinds:
     - kraken.component.api
     - kraken.component.api-target

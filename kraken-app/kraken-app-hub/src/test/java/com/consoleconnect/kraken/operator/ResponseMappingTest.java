@@ -11,8 +11,7 @@ import com.consoleconnect.kraken.operator.gateway.runner.MappingTransformer;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.io.IOException;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -21,7 +20,6 @@ import org.junit.jupiter.api.Test;
 
 @Slf4j
 class ResponseMappingTest extends AbstractIntegrationTest implements MappingTransformer {
-
   @SneakyThrows
   @Test
   void testResponseMapper() {

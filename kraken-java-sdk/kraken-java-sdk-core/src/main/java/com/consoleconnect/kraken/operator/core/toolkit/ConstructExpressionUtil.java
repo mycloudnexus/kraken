@@ -18,6 +18,9 @@ public class ConstructExpressionUtil {
   }
 
   public static List<String> extractParam(String param, String patternStr) {
+    if (StringUtils.isBlank(param)) {
+      return List.of();
+    }
     List<String> contents = new ArrayList<>();
     Pattern pattern = Pattern.compile(patternStr);
     Matcher matcher = pattern.matcher(param);
@@ -59,6 +62,10 @@ public class ConstructExpressionUtil {
 
   public static String constructBody(String source) {
     return source.replace("@{{", "${body.").replace("}}", "}");
+  }
+
+  public static String constructJsonPathBody(String source) {
+    return source.replace("@{{", "$.body.").replace("}}", "");
   }
 
   public static String constructQuery(String source) {

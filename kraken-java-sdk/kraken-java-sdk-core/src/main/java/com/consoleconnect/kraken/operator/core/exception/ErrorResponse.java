@@ -1,9 +1,12 @@
 package com.consoleconnect.kraken.operator.core.exception;
 
+import java.util.Map;
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 
 @Setter
 @Getter
@@ -14,6 +17,7 @@ public class ErrorResponse {
   private String reason;
   private String message;
   private String referenceError;
+  private String propertyPath;
 
   @Getter
   public enum ErrorMapping {
@@ -46,24 +50,46 @@ public class ErrorResponse {
       this.msg = msg;
     }
 
-    public static String defaultMsg(int code, String detailMessage) {
-      if (ERROR_400_INVALID_BODY.getCode() == code) {
-        if (null != detailMessage
-            && detailMessage.contains("mapping")
-            && detailMessage.contains("incomplete")) {
-          return ERROR_400_IN_COMPLETED_MAPPING.getMsg();
-        }
-        return ERROR_400_INVALID_BODY.getMsg();
-      } else if (ERROR_404_NOT_FOUND.getCode() == code) {
-        return ERROR_404_NOT_FOUND.getMsg();
-      } else if (ERROR_401_INVALID_CREDENTIALS.getCode() == code) {
-        return ERROR_401_INVALID_CREDENTIALS.getMsg();
-      } else if (ERROR_403_ACCESS_DENIED.getCode() == code) {
-        return ERROR_403_ACCESS_DENIED.getMsg();
-      } else if (ERROR_422_INVALID_FORMAT.getCode() == code) {
-        return ERROR_422_INVALID_FORMAT.getMsg();
+    private static final Map<Integer, Function<Throwable, String>> errorMap =
+        Map.of(
+            ERROR_400_INVALID_BODY.getCode(),
+                throwable -> {
+                  if (StringUtils.isNotBlank(throwable.getMessage())
+                      && throwable.getMessage().contains("mapping")
+                      && throwable.getMessage().contains("incomplete")) {
+                    return ERROR_400_IN_COMPLETED_MAPPING.getMsg();
+                  }
+                  return ERROR_400_INVALID_BODY.getMsg();
+                },
+            ERROR_404_NOT_FOUND.getCode(), throwable -> ERROR_404_NOT_FOUND.getMsg(),
+            ERROR_401_INVALID_CREDENTIALS.getCode(),
+                throwable -> ERROR_401_INVALID_CREDENTIALS.getMsg(),
+            ERROR_403_ACCESS_DENIED.getCode(), throwable -> ERROR_403_ACCESS_DENIED.getMsg(),
+            ERROR_422_INVALID_FORMAT.getCode(), ErrorMapping::process422);
+
+    public static String defaultMsg(int code, Throwable throwable) {
+      return errorMap
+          .getOrDefault(code, item -> ERROR_500_INTERNAL_ERROR.getMsg())
+          .apply(throwable);
+    }
+
+    public static String process422(Throwable throwable) {
+      if (StringUtils.isNotBlank(throwable.getMessage())
+          && throwable.getMessage().contains(ERROR_422_MISSING_PROPERTY.getMsg())) {
+        return ERROR_422_MISSING_PROPERTY.getMsg();
+      } else if (StringUtils.isNotBlank(throwable.getMessage())
+          && throwable.getMessage().contains(ERROR_422_INVALID_VALUE.getMsg())) {
+        return ERROR_422_INVALID_VALUE.getMsg();
+      } else if (null != throwable.getCause()
+          && StringUtils.isNotBlank(throwable.getCause().getMessage())
+          && throwable.getCause().getMessage().contains(ERROR_422_MISSING_PROPERTY.getMsg())) {
+        return ERROR_422_MISSING_PROPERTY.getMsg();
+      } else if (null != throwable.getCause()
+          && StringUtils.isNotBlank(throwable.getCause().getMessage())
+          && throwable.getCause().getMessage().contains(ERROR_422_INVALID_VALUE.getMsg())) {
+        return ERROR_422_INVALID_VALUE.getMsg();
       } else {
-        return ERROR_500_INTERNAL_ERROR.getMsg();
+        return ERROR_422_INVALID_FORMAT.getMsg();
       }
     }
   }

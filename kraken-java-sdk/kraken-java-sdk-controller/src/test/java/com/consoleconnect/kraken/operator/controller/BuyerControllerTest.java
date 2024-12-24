@@ -12,6 +12,7 @@ import com.consoleconnect.kraken.operator.controller.service.EnvironmentService;
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
+import com.consoleconnect.kraken.operator.core.enums.AssetStatusEnum;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants;
 import com.consoleconnect.kraken.operator.core.toolkit.LabelConstants;
@@ -74,12 +75,36 @@ class BuyerControllerTest extends AbstractIntegrationTest implements EnvCreator,
   void givenBuyer_whenSearch_thenOK() {
     webTestClient.requestAndVerify(
         HttpMethod.GET,
-        uriBuilder -> uriBuilder.path(BUYER_BASE_URL).build(),
+        uriBuilder ->
+            uriBuilder
+                .path(BUYER_BASE_URL)
+                .queryParam("status", AssetStatusEnum.ACTIVATED.getKind())
+                .queryParam("buyerId", "testing-company")
+                .build(),
         HttpStatus.OK.value(),
         null,
         bodyStr -> {
           assertThat(bodyStr, Matchers.notNullValue());
           assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(1)));
+        });
+  }
+
+  @Test
+  @Order(3)
+  void givenBuyer_whenSearchInactive_thenReturnEmptyData() {
+    webTestClient.requestAndVerify(
+        HttpMethod.GET,
+        uriBuilder ->
+            uriBuilder
+                .path(BUYER_BASE_URL)
+                .queryParam("status", AssetStatusEnum.DEACTIVATED.getKind())
+                .build(),
+        HttpStatus.OK.value(),
+        null,
+        bodyStr -> {
+          log.info(bodyStr);
+          assertThat(bodyStr, Matchers.notNullValue());
+          assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(0)));
         });
   }
 

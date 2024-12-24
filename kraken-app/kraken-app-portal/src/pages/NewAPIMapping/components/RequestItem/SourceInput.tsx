@@ -1,13 +1,14 @@
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { EnumRightType } from "@/utils/types/common.type";
 import { IRequestMapping } from "@/utils/types/component.type";
-import { Flex, Tooltip } from "antd";
+import { Flex } from "antd";
 import clsx from "clsx";
 import { isEqual, cloneDeep, set } from "lodash";
 import { useMemo } from "react";
 import { LocationSelector } from "../LocationSelector";
 import styles from "./index.module.scss";
 import { AutoGrowingInput } from "@/components/form";
+import { Text } from "@/components/Text";
 
 export function SourceInput({
   item,
@@ -54,7 +55,12 @@ export function SourceInput({
         />
       ) : <div className={styles.bloater}></div>}
 
-      <Tooltip title={item.source}>
+      {!item.customizedField && (
+        <Text.LightMedium ellipsis
+          className={styles.requestMappingItemWrapper}
+          style={{ padding: 7 }}>{item.source}</Text.LightMedium>
+      )}
+      {item.customizedField && (
         <AutoGrowingInput
           data-testid="sourceInput"
           variant="filled"
@@ -64,6 +70,7 @@ export function SourceInput({
             [styles.active]: isFocused,
             [styles.error]:
               errors?.requestIds?.has(item.id as any) && !item.source,
+            [styles.disabled]: !item.customizedField,
           })}
           value={item.source}
           style={{ flex: 1 }}
@@ -86,7 +93,7 @@ export function SourceInput({
             }
           }}
         />
-      </Tooltip>
+      )}
     </Flex>
   );
 }

@@ -49,6 +49,7 @@ const SpecDrawer = ({ content, isOpen, onClose }: Props) => {
       className={styles.drawer}
       width="90vw"
       open={isOpen}
+      maskClosable
       onClose={onClose}
       footer={
         <Flex justify="flex-end">

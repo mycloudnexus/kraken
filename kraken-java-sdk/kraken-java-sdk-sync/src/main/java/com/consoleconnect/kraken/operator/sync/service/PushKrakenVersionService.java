@@ -6,6 +6,7 @@ import com.consoleconnect.kraken.operator.core.enums.MgmtEventType;
 import com.consoleconnect.kraken.operator.core.repo.MgmtEventRepository;
 import com.consoleconnect.kraken.operator.core.repo.SystemInfoRepository;
 import lombok.RequiredArgsConstructor;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -20,6 +21,10 @@ public class PushKrakenVersionService {
   private final MgmtEventRepository eventRepository;
   private final MgmtEventRepository mgmtEventRepository;
 
+  @SchedulerLock(
+      name = "pushKrakenVersionLock",
+      lockAtMostFor = "${app.cron-job.lock.at-most-for}",
+      lockAtLeastFor = "${app.cron-job.lock.at-least-for}")
   @Scheduled(cron = "${app.cron-job.sync-system-info-from-control-plane:-}")
   public void runIt() {
     // produce sync kraken info event

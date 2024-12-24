@@ -1,0 +1,116 @@
+{
+  "note": [],
+  "relatedContactInformation": [
+    {
+      "number": "111 222 333",
+      "emailAddress": "productOrderContact@mef.com",
+      "role": "productOrderContact",
+      "postalAddress": null,
+      "organization": "MEF",
+      "name": "Joe Order",
+      "numberExtension": null
+    }
+  ],
+  "externalId": "AEL[9301] General On-net Order ",
+  "projectId": "MEF OIT",
+  "productOrderItem": [
+    {
+      "relatedBuyerPON": null,
+      "note": [],
+      "product": {
+        "productOffering": {
+          "href": null,
+          "id": "UNI"
+        },
+        "productConfiguration": {
+          "@type": "UNI",
+          "bandwidth": 10001,
+          "bandwidthUnit": "MBPS",
+          "name" : "test-qc01",
+          "paymentType" : "invoice"
+        },
+        "productRelationship": [],
+        "id": null,
+        "href": null,
+        "place": [
+          {
+            "role": "INSTALL_LOCATION",
+            "href": null,
+            "id": "6356792a4806220015488631",
+            "keyName":"qe-dcf-1",
+            "@type": "GeographicAddressRef",
+            "@schemaLocation": null
+          }
+        ]
+      },
+      "relatedContactInformation": [
+        {
+          "number": "+12-345-678-90",
+          "emailAddress": "Buyer.ProductOrderItemContact@mef.com",
+          "role": "buyerProductOrderItemContact",
+          "postalAddress": null,
+          "organization": null,
+          "name": "Buyer Product Order Item Contact",
+          "numberExtension": null
+        },
+        {
+          "number": "+12-345-678-90",
+          "emailAddress": "Buyer.ImplementationContact@mef.com",
+          "role": "buyerImplementationContact",
+          "postalAddress": null,
+          "organization": null,
+          "name": "Buyer Implementation Contact",
+          "numberExtension": null
+        },
+        {
+          "number": "+12-345-678-90",
+          "emailAddress": "Buyer.TechnicalContact@mef.com",
+          "role": "buyerTechnicalContact",
+          "postalAddress": null,
+          "organization": null,
+          "name": "Buyer Technical Contact ",
+          "numberExtension": null
+        },
+        {
+          "number": "+12-345-678-90",
+          "emailAddress": "Buyer.ItemServiceSiteContact@mef.com",
+          "role": "orderItemServiceSiteContact",
+          "postalAddress": null,
+          "organization": null,
+          "name": "Buyer Technical Contact ",
+          "numberExtension": null
+        }
+      ],
+      "requestedItemTerm": {
+        "name": "UNI Item Term",
+        "duration": {
+          "amount": 1,
+          "units": "calendarMonths"
+        },
+        "endOfTermAction": "roll",
+        "rollInterval": {
+          "amount": 1,
+          "units": "calendarMonths"
+        }
+      },
+      "billingAccount": {
+        "id": "001"
+      },
+      "productOrderItemRelationship": [],
+      "tspRestorationPriority": null,
+      "productOfferingQualificationItem": {
+        "productOfferingQualificationId": "",
+        "alternateProductProposalId": null,
+        "productOfferingQualificationHref": null,
+        "id": "UNI"
+      },
+      "coordinatedAction": [],
+      "action": "add",
+      "quoteItem": {"quoteHref":null,"id":"UNI","quoteId":"479645d9-1792-4916-9576-3400abd1b361"},
+      "endCustomerName": null,
+      "expediteIndicator": false,
+      "id": "UNI",
+      "requestedCompletionDate": "2121-11-30T23:00:00Z"
+    }
+  ]
+}

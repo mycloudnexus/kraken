@@ -22,7 +22,7 @@ describe("Deployment > Deployment history tests", () => {
       })
     );
 
-    const { getByText } = render(<DeployHistory />);
+    const { getByText } = render(<DeployHistory scrollHeight={1000} />);
 
     // Table headings assertions
     expect(getByText("Version")).toBeInTheDocument();
@@ -75,7 +75,7 @@ describe("Deployment > Deployment history tests", () => {
       isFetched: true,
     } as any)
 
-    const { getByText } = render(<DeployHistory selectedEnv={{ id: 'abc', name: 'stage' } as any} />)
+    const { getByText } = render(<DeployHistory scrollHeight={1000} selectedEnv={{ id: 'abc', name: 'stage' } as any} />)
     expect(getByText('API mapping')).toBeInTheDocument()
   })
 });

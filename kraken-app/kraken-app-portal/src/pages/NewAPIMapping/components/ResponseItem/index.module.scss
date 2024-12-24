@@ -34,11 +34,11 @@
     text-overflow: ellipsis;
   }
 
-  &:disabled {
+  &.disabled {
     color: #000 !important;
     background: #f0f2f5 !important;
     border: none !important;
-    cursor: default;
+    cursor: not-allowed;
   }
 
   &.error {

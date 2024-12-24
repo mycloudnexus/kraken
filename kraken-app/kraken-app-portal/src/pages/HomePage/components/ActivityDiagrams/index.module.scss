@@ -38,3 +38,11 @@
     }
   }
 }
+
+.customSelectBox {
+  :global {
+    .ant-select-arrow {
+      color: var(--text);
+    }
+  }
+}

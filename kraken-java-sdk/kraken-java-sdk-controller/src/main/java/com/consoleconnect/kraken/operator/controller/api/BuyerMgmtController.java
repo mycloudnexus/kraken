@@ -79,7 +79,7 @@ public class BuyerMgmtController {
             envId,
             buyerId,
             status,
-            null,
+            orderBy,
             PageRequest.of(page, size, direction, FIELD_CREATE_AT_ORIGINAL)));
   }
 

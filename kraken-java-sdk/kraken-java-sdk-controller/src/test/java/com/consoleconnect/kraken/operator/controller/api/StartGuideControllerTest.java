@@ -50,7 +50,7 @@ class StartGuideControllerTest extends AbstractIntegrationTest {
             new SellerApiServerRegistrationInfoDto(true),
             new ApiMappingInfoDto(true),
             new DeploymentInfoDto(true, true, false));
-    when(service.getStartGuideInfo(productId, kind)).thenReturn(guideInfoDto);
+    when(service.getStartGuideInfo(productId)).thenReturn(guideInfoDto);
     // when
     var path = StartGuideController.URL + "/" + productId;
     testClientHelper.getAndVerify(

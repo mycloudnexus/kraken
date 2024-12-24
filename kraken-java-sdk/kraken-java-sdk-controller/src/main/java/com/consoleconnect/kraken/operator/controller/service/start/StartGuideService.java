@@ -1,5 +1,6 @@
 package com.consoleconnect.kraken.operator.controller.service.start;
 
+import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.COMPONENT_API_TARGET_SPEC;
 import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.PRODUCT_BUYER;
 import static com.consoleconnect.kraken.operator.core.enums.MappingStatusEnum.COMPLETE;
 import static com.consoleconnect.kraken.operator.core.service.UnifiedAssetService.getSearchPageRequest;
@@ -28,7 +29,6 @@ public class StartGuideService {
 
   public static final int DEFAULT_NUMBER_OF_COMPLETED_MAPPINGS = 2;
   public static final String PRODUCT_ID_CAN_NOT_BE_EMPTY_ERROR = "Product id can not be empty.";
-  public static final String KIND_CAN_NOT_BE_EMPTY_ERROR = "Kind can not be empty.";
 
   private final ApiComponentService apiComponentService;
   private final UnifiedAssetRepository unifiedAssetRepository;
@@ -36,9 +36,9 @@ public class StartGuideService {
   private final EnvironmentService environmentService;
   private final ProductDeploymentService productDeploymentService;
 
-  public StartGuideInfoDto getStartGuideInfo(String productId, String kind) {
-    validateParams(productId, kind);
-    var atLeastOneSellerApiRegistered = atLeastOneSellerApiRegistered(productId, kind);
+  public StartGuideInfoDto getStartGuideInfo(String productId) {
+    validateParams(productId);
+    var atLeastOneSellerApiRegistered = atLeastOneSellerApiRegistered(productId);
     var atLeastOneMappingCompleted = atLeastOneMappingCompleted();
     var atLestOnBuyerRegistered = atLestOnBuyerRegistered(productId);
     var atLeastOneApiDeployedOnStage = atLeastOneApiDeployedToEvn(productId, EnvNameEnum.STAGE);
@@ -54,18 +54,16 @@ public class StartGuideService {
             atLeastOneApiDeployedOnProduction));
   }
 
-  private void validateParams(String productId, String kind) {
+  private void validateParams(String productId) {
     if (StringUtils.isBlank(productId)) {
       throw new KrakenException(400, PRODUCT_ID_CAN_NOT_BE_EMPTY_ERROR);
     }
-    if (StringUtils.isBlank(kind)) {
-      throw new KrakenException(400, KIND_CAN_NOT_BE_EMPTY_ERROR);
-    }
   }
 
-  private boolean atLeastOneSellerApiRegistered(String productId, String kind) {
+  private boolean atLeastOneSellerApiRegistered(String productId) {
     var parentId = unifiedAssetService.findOne(productId).getId();
-    return unifiedAssetRepository.existsByParentIdAndKind(parentId, kind);
+    return unifiedAssetRepository.existsByParentIdAndKind(
+        parentId, COMPONENT_API_TARGET_SPEC.getKind());
   }
 
   private boolean atLeastOneMappingCompleted() {

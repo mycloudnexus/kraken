@@ -7,17 +7,34 @@ import { IUser } from "@/utils/types/user.type";
 import { Button, Flex, Input, Switch, Table, notification } from "antd";
 import dayjs from "dayjs";
 import { debounce, get } from "lodash";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useBoolean } from "usehooks-ts";
 import ResetPwd from "./components/ResetPwd";
 import UserModal from "./components/UserModal";
 import UserRoleEdit from "./components/UserRoleEdit";
 import styles from "./index.module.scss";
+import { ColumnsType } from "antd/es/table";
+
+function parseFiltersObj(filters: Record<string, Array<any>>): Record<string, any> {
+  if (!filters) return {}
+
+  return Object.entries(filters).reduce((acc: Record<string, any>, [key, value]) => {
+    acc[key] = value ? value[0] : undefined
+    return acc
+  }, {})
+}
 
 const UserManagement = () => {
   const { currentUser } = useUser();
   const { userParams, setUserParams, resetParams } = useUserStore();
-  const { data: dataUser, isLoading: loadingUser } = useGetUserList(userParams);
+
+  const [filters, setFilters] = useState<{ role?: Array<string>; state?: Array<string> }>({})
+
+  const { data: dataUser, isLoading: loadingUser } = useGetUserList({
+    ...userParams,
+    ...parseFiltersObj(filters)
+  });
+
   const { value: isOpen, setTrue: open, setFalse: close } = useBoolean(false);
   const { mutateAsync: runEnable, isPending: pendingEnable } = useEnableUser();
   const { mutateAsync: runDisable, isPending: pendingDisable } =
@@ -45,7 +62,7 @@ const UserManagement = () => {
       });
     }
   };
-  const columns: any = useMemo(
+  const columns: ColumnsType<IUser> = useMemo(
     () => [
       {
         title: "User name",
@@ -57,6 +74,7 @@ const UserManagement = () => {
       },
       {
         title: "User role",
+        key: 'role',
         dataIndex: "role",
         width: 205,
         filters: [
@@ -73,12 +91,10 @@ const UserManagement = () => {
           <UserRoleEdit user={record} isAdmin={isAdmin} />
         ),
         filterMultiple: false,
-        onFilter: () => {
-          return true;
-        },
       },
       {
         title: "Enable State",
+        key: 'state',
         dataIndex: "state",
         width: 205,
         filters: [
@@ -101,9 +117,6 @@ const UserManagement = () => {
             style={!isAdmin ? { opacity: 0.4 } : {}}
           />
         ),
-        onFilter: () => {
-          return true;
-        },
       },
       {
         title: "Created at",
@@ -166,6 +179,10 @@ const UserManagement = () => {
             onChange: (page, pageSize) => {
               setUserParams({ page: page - 1, size: pageSize });
             },
+          }}
+          onChange={(_, filters) => {
+            setFilters(filters)
+            setUserParams({ page: 0 })
           }}
           scroll={{
             // y: get(size, "height", 0) - 164,

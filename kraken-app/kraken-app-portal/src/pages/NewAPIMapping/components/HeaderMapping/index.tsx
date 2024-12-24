@@ -49,7 +49,7 @@ const SellerAPI = ({ disabled, isFocus, handleClick }: Props) => {
             }}
           />
         ) : (
-          <RightOutlined style={{ color: "rgba(0, 0, 0, 0.45)" }} />
+          <RightOutlined style={{ color: "rgba(0, 0, 0, 0.45)", marginLeft: 'auto' }} />
         )}
       </>
     );
@@ -175,7 +175,6 @@ const HeaderMapping = ({
         </div>
         <Flex
           align="center"
-          justify="space-between"
           gap={8} style={{ width: "100%" }}
           className={clsx(styles.sellerAPIBasicInfoWrapper, {
             [styles.highlight]:

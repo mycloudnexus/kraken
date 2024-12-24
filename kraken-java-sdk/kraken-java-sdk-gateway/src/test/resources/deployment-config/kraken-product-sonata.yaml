@@ -15,7 +15,7 @@ spec:
     - classpath:deployment-config/components/apis/mef.sonata.api.address.yaml
     - classpath:deployment-config/components/apis/mef.sonata.api.quote.yaml
     - classpath:deployment-config/components/api-targets/mef.sonata.api-target.address.validate.yaml
-    - classpath:deployment-config/components/api-targets/mef.sonata.api-target.order.unit.add.yaml
+    - classpath:deployment-config/components/api-targets/mef.sonata.api-target.order.uni.add.yaml
     - classpath:deployment-config/components/api-targets/api-target.address.validate.yaml
     - classpath:deployment-config/components/api-targets/api-target-mapper.address.validate.yaml
     - classpath:deployment-config/components/api-targets/api-target.order.eline.add.yaml
@@ -26,6 +26,7 @@ spec:
     - classpath:deployment-config/components/api-targets/api-target.order.notification.state.change.yaml
     - classpath:deployment-config/components/api-targets-mappers/api-target-mapper.hub.add.yaml
     - classpath:deployment-config/components/api-targets-mappers/api-target-mapper.quote.uni.add.yaml
+    - classpath:deployment-config/components/api-targets-mappers/api-target-mapper.order.uni.add.yaml
     - classpath:deployment-config/components/api-targets-mappers/api-target-mapper.order.eline.add.yaml
     - classpath:deployment-config/components/api-targets-mappers/api-target-mapper.order.notification.state.change.yaml
     - classpath:deployment-config/components/mapping-matrix/mapping.matrix.order.yaml

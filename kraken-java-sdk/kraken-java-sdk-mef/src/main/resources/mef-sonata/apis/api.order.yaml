@@ -65,10 +65,10 @@ spec:
                 } else {
                   errorArr = ['api use case is not supported :'];
                   if (!typeArr.includes(type)){
-                    errorArr.push(`expect productOrderItem.product.productConfiguration.@type in [ ${typeArr} ], but ${type}.`);
+                    errorArr.push(`expect @{{productOrderItem.product.productConfiguration.@type}} in [ ${typeArr} ], but ${type}.`);
                   }
                   if (!actionArr.includes(action)) {
-                    errorArr.push(`expect productOrderItem.action in [ ${actionArr} ], but ${action}`)
+                    errorArr.push(`expect @{{productOrderItem.action}} in [ ${actionArr} ], but ${action}`)
                   }
                   errorMsg = errorArr.join(' ');
                   targetAPIConfigKey = 'targetKey:notFound';
@@ -176,24 +176,35 @@ spec:
                 console.log("input: " + jsonStr);
                 let input = JSON.parse(jsonStr);
                 let targetAPIConfigKey = '';
+                let matrixConfigKey = '';
                 if (input.bizType == 'UNI' && input.bizAction == 'add') {
                   targetAPIConfigKey = 'mef.sonata.api-target.order.uni.read';
+                  matrixConfigKey = 'mef.sonata.api.matrix.order.uni.read';
                 } else if(input.bizType == 'ACCESS_E_LINE' && input.bizAction == 'add') {
                   targetAPIConfigKey = 'mef.sonata.api-target.order.eline.read';
+                  matrixConfigKey = 'mef.sonata.api.matrix.order.eline.read';
                 } else if (input.bizType == 'UNI' && input.bizAction == 'delete') {
                   targetAPIConfigKey = 'mef.sonata.api-target.order.uni.read.delete';
+                  matrixConfigKey = 'mef.sonata.api.matrix.order.uni.read.delete';
                 } else if(input.bizType == 'ACCESS_E_LINE' && input.bizAction == 'delete') {
                   targetAPIConfigKey = 'mef.sonata.api-target.order.eline.read.delete';
+                  matrixConfigKey = 'mef.sonata.api.matrix.order.eline.read.delete';
                 } else {
                   targetAPIConfigKey = 'targetKey:notFound';
                 }
                 let ret = {
                   orderType: input.bizType,
-                  targetAPIConfigKey: targetAPIConfigKey
+                  targetAPIConfigKey: targetAPIConfigKey,
+                  matrixConfigKey: matrixConfigKey
                 };
                 return JSON.stringify(ret);
               }
           outputKey: order
+        - id: mapping_matrix_check_read_order
+          actionType: buildin@mapping-matrix-checker
+          env:
+            mappingMatrixKey: ${order.matrixConfigKey}
+            targetKey: ${order.targetAPIConfigKey}
         - id: load-downstream-api-config
           actionType: buildin@load-target-api-config
           env:
@@ -339,3 +350,16 @@ links:
   - targetAssetKey: mef.sonata.api.matrix.order.eline.delete
     relationship: implementation.matrix
     group: mef.sonata.api-target.order.eline.delete
+
+  - targetAssetKey: mef.sonata.api.matrix.order.uni.read
+    relationship: implementation.matrix
+    group: mef.sonata.api-target.order.uni.read
+  - targetAssetKey: mef.sonata.api.matrix.order.uni.read.delete
+    relationship: implementation.matrix
+    group: mef.sonata.api-target.order.uni.read.delete
+  - targetAssetKey: mef.sonata.api.matrix.order.eline.read
+    relationship: implementation.matrix
+    group: mef.sonata.api-target.order.eline.read
+  - targetAssetKey: mef.sonata.api.matrix.order.eline.read.delete
+    relationship: implementation.matrix
+    group: mef.sonata.api-target.order.eline.read.delete

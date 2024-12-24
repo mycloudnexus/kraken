@@ -4,32 +4,24 @@ import { useGetRunningAPIList } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
 import { IEnv, IRunningMapping } from "@/utils/types/env.type";
 import { Flex, Table, Tag, Typography } from "antd";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { ColumnsType } from "antd/es/table";
 import { toDateTime } from "@/libs/dayjs";
 import styles from './index.module.scss'
 
 type Props = {
-  scrollHeight?: number;
+  scrollHeight: number;
   env?: IEnv;
-};
-
-
-const defaultPage = {
-  size: 20,
-  page: 0,
 };
 
 type GroupedMapping = IRunningMapping & { mappingCount: number }
 
 const RunningAPIMapping = ({ scrollHeight, env }: Props) => {
   const { currentProduct } = useAppStore();
-  const [pageInfo] = useState(defaultPage);
   const { data, isLoading } = useGetRunningAPIList(currentProduct, {
     envId: env?.id,
     orderBy: "createdAt",
     direction: "DESC",
-    ...pageInfo,
   });
 
   const mappings = useMemo(() => {
@@ -97,20 +89,16 @@ const RunningAPIMapping = ({ scrollHeight, env }: Props) => {
     },
   ];
 
-  const scroll = scrollHeight
-    ? { y: scrollHeight - 144, x: 800 }
-    : { x: 800, y: 400 } as any;
-
   return (
     <Table
-      scroll={scroll}
+      scroll={{ y: scrollHeight, x: 800 }}
       columns={columns}
       loading={isLoading}
       dataSource={mappings}
       tableLayout="fixed"
-      pagination={false}
       rowClassName={styles.mappingRow}
       rowKey={(item) => JSON.stringify(item)}
+      pagination={false}
     />
   );
 };
