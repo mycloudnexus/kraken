@@ -7,5 +7,5 @@ import java.util.List;
 public interface ClientSyncHandler {
   AssetKindEnum getKind();
 
-  void handleLatest(List<UnifiedAssetDto> latestAssets);
+  void handleAssets(List<UnifiedAssetDto> assets);
 }

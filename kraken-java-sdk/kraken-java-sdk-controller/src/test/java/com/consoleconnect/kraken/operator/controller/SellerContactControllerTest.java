@@ -78,6 +78,7 @@ class SellerContactControllerTest extends AbstractIntegrationTest {
   @Order(2)
   void givenLegalSellerContacts_whenCreating_thenReturnOK(String componentId) {
     CreateSellerContactRequest request = createSellerContact();
+    String key = componentId + "." + ACCESS_ELINE.getKind() + "." + INTERNET_ACCESS.getKind();
     String path =
         String.format("/products/%s/components/%s/seller-contacts", PRODUCT_ID, componentId);
     getTestClientHelper()
@@ -88,6 +89,7 @@ class SellerContactControllerTest extends AbstractIntegrationTest {
               log.info(bodyStr);
               assertThat(bodyStr, hasJsonPath("$.code", is(200)));
               assertThat(bodyStr, hasJsonPath("$.data.data.key", notNullValue()));
+              assertThat(bodyStr, hasJsonPath("$.data.data.key", is(key)));
               assertThat(bodyStr, hasJsonPath("$.data.data.labels.componentKey", notNullValue()));
             });
   }

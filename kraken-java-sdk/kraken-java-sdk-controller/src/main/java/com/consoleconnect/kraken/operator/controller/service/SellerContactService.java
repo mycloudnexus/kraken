@@ -1,6 +1,6 @@
 package com.consoleconnect.kraken.operator.controller.service;
 
-import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.COMPONENT_API_TARGET_SPEC;
+import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.COMPONENT_SELLER_CONTACT;
 import static com.consoleconnect.kraken.operator.core.toolkit.Constants.DOT;
 
 import com.consoleconnect.kraken.operator.controller.SellerContactChecker;
@@ -68,7 +68,7 @@ public class SellerContactService implements SellerContactChecker {
   private UnifiedAsset createSellerContact(
       CreateSellerContactRequest request, String key, UnifiedAssetDto componentAssetEntity) {
     UnifiedAsset unifiedAsset =
-        UnifiedAsset.of(COMPONENT_API_TARGET_SPEC.getKind(), key, SELLER_CONTACT_PREFIX);
+        UnifiedAsset.of(COMPONENT_SELLER_CONTACT.getKind(), key, SELLER_CONTACT_PREFIX);
     unifiedAsset.getMetadata().setDescription(SELLER_CONTACT_DESC);
     unifiedAsset.getMetadata().setStatus(AssetStatusEnum.ACTIVATED.getKind());
     unifiedAsset

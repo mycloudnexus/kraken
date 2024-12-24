@@ -1,10 +1,11 @@
 package com.consoleconnect.kraken.operator.core.enums;
 
-import lombok.AllArgsConstructor;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor
 public enum AssetKindEnum {
   WORKSPACE("kraken.workspace"),
   PRODUCT("kraken.product"),
@@ -31,5 +32,18 @@ public enum AssetKindEnum {
   PRODUCT_APP_KRAKEN("kraken.product.app.kraken"),
   PRODUCT_COMPATIBILITY("kraken.product.compatibility");
 
+  AssetKindEnum(String kind) {
+    this.kind = kind;
+    AssetKindEnum.Holder.holderMap.put(kind, this);
+  }
+
   private final String kind;
+
+  private static class Holder {
+    private static final Map<String, AssetKindEnum> holderMap = new HashMap<>();
+  }
+
+  public static AssetKindEnum kindOf(String kind) {
+    return Objects.isNull(kind) ? null : Holder.holderMap.getOrDefault(kind, null);
+  }
 }

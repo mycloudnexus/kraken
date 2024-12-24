@@ -7,6 +7,7 @@ import com.consoleconnect.kraken.operator.controller.service.*;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
+import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.core.toolkit.Paging;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class AuditCollectorV2Controller {
 
+  private final UnifiedAssetService unifiedAssetService;
   private final APITokenService apiTokenService;
   private final BuyerService buyerService;
   private final ProductDeploymentService productDeploymentService;
@@ -94,8 +96,9 @@ public class AuditCollectorV2Controller {
           Objects.nonNull(pages) ? JsonToolkit.toJson(pages.getData()) : "");
       return HttpResponse.ok(Objects.nonNull(pages) ? pages.getData() : List.of());
     } else if (AssetKindEnum.COMPONENT_SELLER_CONTACT.getKind().equals(kind)) {
-
-      return null;
+      List<UnifiedAssetDto> assetDtoList =
+          unifiedAssetService.findByKind(AssetKindEnum.COMPONENT_SELLER_CONTACT.getKind());
+      return HttpResponse.ok(assetDtoList);
     } else {
       return HttpResponse.of(
           HttpStatus.NOT_IMPLEMENTED.value(),
