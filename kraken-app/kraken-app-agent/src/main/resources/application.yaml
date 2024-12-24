@@ -39,7 +39,7 @@ spring:
       connection-timeout: 60000
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     show-sql: false
     database: POSTGRESQL
     properties:
@@ -89,6 +89,8 @@ logging:
 app:
   delete-log-conf:
     log-kind: control-plane
+    control-plane:
+      month: 1
   tenant:
     workspacePath:
   controlPlane:

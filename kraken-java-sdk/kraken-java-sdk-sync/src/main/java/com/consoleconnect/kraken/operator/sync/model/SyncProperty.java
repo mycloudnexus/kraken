@@ -15,8 +15,14 @@ public class SyncProperty {
 
   @Data
   public static class DeleteLogConf {
-    private boolean turnSwitch;
+
     private LogKindEnum logKind;
+    private DeleteDataPlaneConf controlPlane;
+  }
+
+  @Data
+  public static class DeleteDataPlaneConf {
+    private int month;
   }
 
   @Data
