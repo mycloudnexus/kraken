@@ -12,7 +12,7 @@ import org.hibernate.annotations.Type;
 @Table(
     name = "kraken_api_log_body_activity",
     indexes = {@Index(name = "kraken_api_log_activity_idx_createAt", columnList = "created_at")})
-public class ApiLogBodyEntity extends AbstractEntity {
+public class ApiActivityLogBodyEntity extends AbstractEntity {
 
   @OneToOne
   @JoinColumn(name = "api_log_id")

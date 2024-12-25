@@ -44,5 +44,5 @@ public class ApiActivityLogEntity extends AbstractHttpEntity {
 
   @OneToOne
   @JoinColumn(name = "api_log_body_id")
-  private ApiLogBodyEntity apiLogBodyEntity;
+  private ApiActivityLogBodyEntity apiLogBodyEntity;
 }
