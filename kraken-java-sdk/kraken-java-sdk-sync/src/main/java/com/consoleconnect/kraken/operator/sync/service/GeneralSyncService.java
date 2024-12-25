@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -46,6 +47,10 @@ public class GeneralSyncService extends KrakenServerConnector {
     this.clientSyncHandlers = clientSyncHandlers;
   }
 
+  @SchedulerLock(
+      name = "syncServerAssetsLock",
+      lockAtMostFor = "${app.cron-job.lock.at-most-for}",
+      lockAtLeastFor = "${app.cron-job.lock.at-least-for}")
   @Scheduled(cron = "${app.cron-job.pull-server-assets:-}")
   public void syncServerAssets() {
     clientSyncHandlers.forEach(
