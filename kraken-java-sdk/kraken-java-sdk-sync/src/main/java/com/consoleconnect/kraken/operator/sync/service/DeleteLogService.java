@@ -7,6 +7,7 @@ import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
 import com.consoleconnect.kraken.operator.sync.model.SyncProperty;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -32,14 +33,10 @@ public class DeleteLogService {
 
   @Scheduled(cron = "${app.cron-job.delete-api-activity-log:-}")
   public void runIt() {
-
-    if (LogKindEnum.CONTROL_PLANE == this.deleteLogConf.getLogKind()) {
-
-      this.deleteApiLogAtDataPlane();
-    }
+    this.deleteApiLogAtDataPlane(this.deleteLogConf.getLogKind());
   }
 
-  private void deleteApiLogAtDataPlane() {
+  public void deleteApiLogAtDataPlane(LogKindEnum logKind) {
     ZonedDateTime toDelete =
         ZonedDateTime.now()
             .truncatedTo(ChronoUnit.DAYS)
@@ -50,16 +47,31 @@ public class DeleteLogService {
         DELETE_API_ACTIVITY_LOG,
         this.deleteLogConf.getLogKind().name(),
         toDelete);
-    do {
-      var list = this.apiActivityLogRepository.deleteExpiredLog(toDelete, PageRequest.of(0, 20));
+
+    if (logKind != LogKindEnum.DATA_PLANE && logKind != LogKindEnum.CONTROL_PLANE) {
+      log.info("{}, {}, skip", DELETE_API_ACTIVITY_LOG, this.deleteLogConf.getLogKind().name());
+      return;
+    }
+
+    for (int page = 0; ; page++) {
+      var list = this.apiActivityLogRepository.deleteExpiredLog(toDelete, PageRequest.of(page, 20));
       if (list.isEmpty()) {
         break;
       }
-      this.apiActivityLogRepository.deleteAll(list);
-      this.apiActivityLogBodyRepository.deleteAll(
-          list.stream().map(ApiActivityLogEntity::getApiLogBodyEntity).toList());
+      var bodySet =
+          list.stream()
+              .map(ApiActivityLogEntity::getApiLogBodyEntity)
+              .filter(Objects::nonNull)
+              .toList();
+      if (logKind == LogKindEnum.DATA_PLANE) {
+        this.apiActivityLogRepository.deleteAll(list);
+      } else {
 
-    } while (true);
+        list.forEach(x -> x.setApiLogBodyEntity(null));
+        this.apiActivityLogRepository.saveAll(list);
+      }
+      this.apiActivityLogBodyRepository.deleteAll(bodySet);
+    }
 
     log.info("{}, {}, end", DELETE_API_ACTIVITY_LOG, this.deleteLogConf.getLogKind().name());
   }

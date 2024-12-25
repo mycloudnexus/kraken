@@ -4,6 +4,7 @@ import static org.mockito.Mockito.*;
 
 import com.consoleconnect.kraken.operator.core.client.ClientEvent;
 import com.consoleconnect.kraken.operator.core.client.ClientEventTypeEnum;
+import com.consoleconnect.kraken.operator.core.enums.LogKindEnum;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogBodyRepository;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
 import com.consoleconnect.kraken.operator.core.service.ApiActivityLogService;
@@ -64,7 +65,7 @@ class DeleteApiActivityLogServiceTest extends AbstractIntegrationTest {
   }
 
   @Test
-  void saveApiActivityLog() {
+  void deleteApiActivityLogInDataPlane() {
 
     var envId = UUID.randomUUID();
     var now = ZonedDateTime.parse(NOW_WITH_TIMEZONE);
@@ -73,9 +74,25 @@ class DeleteApiActivityLogServiceTest extends AbstractIntegrationTest {
     Assertions.assertEquals(result.size(), 1);
 
     // when run it again
-    deleteLogService.runIt();
+    deleteLogService.deleteApiLogAtDataPlane(LogKindEnum.DATA_PLANE);
 
     Assertions.assertEquals(this.apiActivityLogRepository.findAll().size(), 0);
+    Assertions.assertEquals(this.apiActivityLogBodyRepository.findAll().size(), 0);
+  }
+
+  @Test
+  void deleteApiActivityLogInControlPlane() {
+
+    var envId = UUID.randomUUID();
+    var now = ZonedDateTime.parse(NOW_WITH_TIMEZONE);
+    addApiLogActivity(envId.toString());
+    var result = this.apiActivityLogRepository.findAll();
+    Assertions.assertEquals(result.size(), 1);
+
+    // when run it again
+    deleteLogService.deleteApiLogAtDataPlane(LogKindEnum.CONTROL_PLANE);
+
+    Assertions.assertEquals(this.apiActivityLogRepository.findAll().size(), 1);
     Assertions.assertEquals(this.apiActivityLogBodyRepository.findAll().size(), 0);
   }
 }
