@@ -11,6 +11,7 @@ import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogBodyEntity;
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
 import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
 import com.consoleconnect.kraken.operator.core.enums.LogKindEnum;
+import com.consoleconnect.kraken.operator.core.enums.SyncStatusEnum;
 import com.consoleconnect.kraken.operator.core.mapper.ApiActivityLogMapper;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
@@ -177,6 +178,15 @@ public class ApiActivityLogService {
     apiActivityLogBodyRepository.saveAll(newLogActivities);
     repository.saveAll(newActivities);
     return HttpResponse.ok(null);
+  }
+
+  public void setSynced(List<ApiActivityLogEntity> logEntities, ZonedDateTime now) {
+    logEntities.forEach(
+        logEntity -> {
+          logEntity.setSyncStatus(SyncStatusEnum.SYNCED);
+          logEntity.setSyncedAt(now);
+        });
+    repository.saveAll(logEntities);
   }
 
   private void addEq(
