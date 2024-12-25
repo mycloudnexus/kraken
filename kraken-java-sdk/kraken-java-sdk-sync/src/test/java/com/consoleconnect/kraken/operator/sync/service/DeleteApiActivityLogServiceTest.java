@@ -13,10 +13,7 @@ import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import java.time.ZonedDateTime;
 import java.util.UUID;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.ContextConfiguration;
@@ -30,6 +27,12 @@ class DeleteApiActivityLogServiceTest extends AbstractIntegrationTest {
   @SpyBean private ApiActivityLogService apiActivityLogService;
   @SpyBean private ApiActivityLogBodyRepository apiActivityLogBodyRepository;
   public static final String NOW_WITH_TIMEZONE = "2023-10-24T05:00:00+02:00";
+
+  @BeforeEach
+  void init() {
+    this.apiActivityLogRepository.deleteAll();
+    this.apiActivityLogBodyRepository.deleteAll();
+  }
 
   private static ClientEvent createEvent() {
     var clientEvent = new ClientEvent();
