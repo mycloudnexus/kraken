@@ -1,7 +1,6 @@
 package com.consoleconnect.kraken.operator.controller.service;
 
 import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.COMPONENT_API_TARGET_SPEC;
-import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.COMPONENT_SELLER_CONTACT;
 
 import com.consoleconnect.kraken.operator.controller.dto.*;
 import com.consoleconnect.kraken.operator.controller.dto.APIServerEnvDTO;
@@ -46,7 +45,7 @@ public class ComponentAPIServerService extends AssetStatusManager {
                 + ".api-server."
                 + System.currentTimeMillis();
     UnifiedAsset tagAsset =
-        UnifiedAsset.of(COMPONENT_SELLER_CONTACT.getKind(), key, request.getName());
+        UnifiedAsset.of(COMPONENT_API_TARGET_SPEC.getKind(), key, request.getName());
     tagAsset.getMetadata().setDescription(request.getDescription());
     tagAsset.getMetadata().setStatus(AssetStatusEnum.ACTIVATED.getKind());
     Map<String, Object> facets = new HashMap<>();
