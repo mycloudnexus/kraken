@@ -11,10 +11,18 @@ public class ComponentAPITargetFacets {
   private List<Object> inputs;
   private Trigger trigger;
   private List<Endpoint> endpoints;
+  private Workflow workflow;
 
   @Data
   public static class Server {
     private String uri;
+  }
+
+  @Data
+  public static class Workflow {
+    private boolean enabled;
+    private boolean synchronous;
+    private boolean workflowId;
   }
 
   @Data

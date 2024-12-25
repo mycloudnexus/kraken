@@ -22,7 +22,8 @@ public class WorkflowConfig {
     return new OrkesMetadataClient(getApiClient(appProperty));
   }
 
-  private ApiClient getApiClient(AppProperty appProperty) {
+  @Bean
+  public ApiClient getApiClient(AppProperty appProperty) {
     return new ApiClient(appProperty.getWorkflow().getBaseUrl());
   }
 }

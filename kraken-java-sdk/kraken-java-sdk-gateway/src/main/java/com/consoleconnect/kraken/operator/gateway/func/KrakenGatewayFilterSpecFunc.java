@@ -11,6 +11,8 @@ import com.consoleconnect.kraken.operator.gateway.repo.HttpRequestRepository;
 import com.consoleconnect.kraken.operator.gateway.runner.*;
 import com.consoleconnect.kraken.operator.gateway.service.FilterHeaderService;
 import com.consoleconnect.kraken.operator.gateway.template.JavaScriptEngine;
+import io.orkes.conductor.client.http.OrkesMetadataClient;
+import io.orkes.conductor.client.http.OrkesWorkflowClient;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
@@ -33,6 +35,8 @@ public class KrakenGatewayFilterSpecFunc implements Function<GatewayFilterSpec, 
   private final HttpRequestRepository httpRequestRepository;
   private final AppProperty appProperty;
   private final FilterHeaderService filterHeaderService;
+  private final OrkesWorkflowClient workflowClient;
+  private final OrkesMetadataClient metaDataClient;
 
   @Override
   public UriSpec apply(GatewayFilterSpec gatewayFilterSpec) {
@@ -95,6 +99,15 @@ public class KrakenGatewayFilterSpecFunc implements Function<GatewayFilterSpec, 
         case REWRITE_PATH -> gatewayFilterSpec.filter(
             new ActionGatewayFilterFactory(actionRunners).apply(action),
             RouteToRequestUrlFilter.ROUTE_TO_URL_FILTER_ORDER + 1);
+        case WORKFLOW -> {
+          WorkflowActionFilterFactory.Config config = new WorkflowActionFilterFactory.Config();
+          config.setAction(action);
+          config.setWorkflowClient(workflowClient);
+          config.setMetadataClient(metaDataClient);
+          config.setBaseUri(mapping.getUri());
+          config.setAppProperty(appProperty);
+          gatewayFilterSpec.filter(new WorkflowActionFilterFactory().apply(config));
+        }
         default -> gatewayFilterSpec.filter(
             new ActionGatewayFilterFactory(actionRunners).apply(action), action.getOrder());
       }
