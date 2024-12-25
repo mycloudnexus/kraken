@@ -10,7 +10,6 @@ import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogBodyEntity;
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
 import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
-import com.consoleconnect.kraken.operator.core.mapper.ApiActivityLogBodyMapper;
 import com.consoleconnect.kraken.operator.core.mapper.ApiActivityLogMapper;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
@@ -129,15 +128,14 @@ public class ApiActivityLogService {
           repository.findByRequestIdAndCallSeq(dto.getRequestId(), dto.getCallSeq());
       if (db.isEmpty()) {
         ApiActivityLogEntity entity = ApiActivityLogMapper.INSTANCE.map(dto);
-        entity.setRequest(null);
-        entity.setResponse(null);
+
         entity.setEnv(envId);
         entity.setCreatedBy(userId);
         newActivities.add(entity);
 
-        ApiActivityLogBodyEntity apiLogBodyEntity = ApiActivityLogBodyMapper.INSTANCE.map(dto);
-        entity.setApiLogBodyEntity(apiLogBodyEntity);
-        newLogActivities.add(apiLogBodyEntity);
+        if (entity.getApiLogBodyEntity() != null) {
+          newLogActivities.add(entity.getApiLogBodyEntity());
+        }
       }
     }
     apiActivityLogBodyRepository.saveAll(newLogActivities);

@@ -11,7 +11,9 @@ import org.hibernate.annotations.Type;
 @Setter
 @Table(
     name = "kraken_api_log_body_activity",
-    indexes = {@Index(name = "kraken_api_log_activity_idx_createAt", columnList = "created_at")})
+    indexes = {
+      @Index(name = "kraken_api_log_body_activity_idx_createAt", columnList = "created_at")
+    })
 public class ApiActivityLogBodyEntity extends AbstractEntity {
 
   @OneToOne
