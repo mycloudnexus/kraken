@@ -15,7 +15,7 @@ public class DeleteLogService {
 
   private final SyncProperty.DeleteLogConf deleteLogConf;
   private final ApiActivityLogRepository apiActivityLogRepository;
-  private final String DELETE_API_ACTIVITY_LOG = "DELETE_API_ACTIVITY_LOG";
+  private static final String DELETE_API_ACTIVITY_LOG = "DELETE_API_ACTIVITY_LOG";
 
   public DeleteLogService(
       SyncProperty syncProperty, ApiActivityLogRepository apiActivityLogRepository) {
