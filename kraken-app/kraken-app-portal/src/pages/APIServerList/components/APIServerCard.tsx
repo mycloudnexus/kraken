@@ -4,6 +4,7 @@ import SpecDrawer from "@/components/SpecDrawer";
 import { SecondaryText, Text } from "@/components/Text";
 import { useDeleteApiServer } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
+import { decodeFileContent } from "@/utils/helpers/base64";
 import { IComponent } from "@/utils/types/component.type";
 import { PaperClipOutlined } from "@ant-design/icons";
 import {
@@ -17,7 +18,6 @@ import {
   Typography,
   notification,
 } from "antd";
-import { decode } from "js-base64";
 import jsYaml from "js-yaml";
 import { get } from "lodash";
 import { useMemo, useState } from "react";
@@ -64,7 +64,7 @@ const APIServerCard = ({ item, refetchList }: Props) => {
       if (!content) {
         return "";
       }
-      const swaggerData = jsYaml.load(decode(content));
+      const swaggerData = jsYaml.load(decodeFileContent(content));
       return get(swaggerData, "info.title");
     } catch (error) {
       notification.error({ message: "Can not load yaml" });
