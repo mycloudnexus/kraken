@@ -10,11 +10,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
-import org.springframework.transaction.annotation.Transactional;
 
 public interface ApiActivityLogRepository
     extends PagingAndSortingRepository<ApiActivityLogEntity, UUID>,
@@ -49,10 +47,6 @@ public interface ApiActivityLogRepository
 
   List<ApiActivityLogEntity> findAllByRequestIdIn(List<String> requestIds);
 
-  @Modifying
-  @Transactional
-  @Query(
-      nativeQuery = true,
-      value = "delete from kraken_api_log_activity where created_at <  :expiredDateTime")
-  void deleteExpiredLog(ZonedDateTime expiredDateTime);
+  @Query(value = "SELECT e FROM #{#entityName} e where e.createdAt < :expiredDateTime")
+  Page<ApiActivityLogEntity> deleteExpiredLog(ZonedDateTime expiredDateTime, Pageable pageable);
 }

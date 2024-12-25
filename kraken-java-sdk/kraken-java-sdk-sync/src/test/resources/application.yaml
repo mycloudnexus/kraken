@@ -85,7 +85,7 @@ app:
   delete-log-conf:
     log-kind: control-plane
     control-plane:
-      month: 1
+      month: -1
   controlPlane:
     url: http://localhost:4567
     token: 123456

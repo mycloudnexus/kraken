@@ -4,6 +4,7 @@ import static org.mockito.Mockito.*;
 
 import com.consoleconnect.kraken.operator.core.client.ClientEvent;
 import com.consoleconnect.kraken.operator.core.client.ClientEventTypeEnum;
+import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogBodyRepository;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
 import com.consoleconnect.kraken.operator.core.service.ApiActivityLogService;
 import com.consoleconnect.kraken.operator.sync.CustomConfig;
@@ -26,6 +27,7 @@ class DeleteApiActivityLogServiceTest extends AbstractIntegrationTest {
   @Autowired ApiActivityLogRepository apiActivityLogRepository;
   @SpyBean private DeleteLogService deleteLogService;
   @SpyBean private ApiActivityLogService apiActivityLogService;
+  @SpyBean private ApiActivityLogBodyRepository apiActivityLogBodyRepository;
   public static final String NOW_WITH_TIMEZONE = "2023-10-24T05:00:00+02:00";
 
   private static ClientEvent createEvent() {
@@ -73,7 +75,7 @@ class DeleteApiActivityLogServiceTest extends AbstractIntegrationTest {
     // when run it again
     deleteLogService.runIt();
 
-    result = this.apiActivityLogRepository.findAll();
-    Assertions.assertEquals(result.size(), 0);
+    Assertions.assertEquals(this.apiActivityLogRepository.findAll().size(), 0);
+    Assertions.assertEquals(this.apiActivityLogBodyRepository.findAll().size(), 0);
   }
 }
