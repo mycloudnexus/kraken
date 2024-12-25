@@ -19,6 +19,14 @@ public interface ApiActivityLogRepository
         JpaRepository<ApiActivityLogEntity, UUID>,
         JpaSpecificationExecutor<ApiActivityLogEntity> {
 
+  //  ApiActivityLogEntity save(ApiActivityLogEntity entity);
+  //
+  //  List<ApiActivityLogEntity> saveAll(Iterable<ApiActivityLogEntity> entities);
+  //
+  //  ApiActivityLogEntity delete(ApiActivityLogEntity entity);
+  //
+  //  List<ApiActivityLogEntity> deleteAll(Iterable<ApiActivityLogEntity> entities);
+
   Optional<ApiActivityLogEntity> findByRequestIdAndCallSeq(String requestId, int seq);
 
   List<ApiActivityLogEntity> findAllByRequestId(String requestId);
