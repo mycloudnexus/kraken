@@ -3,19 +3,26 @@ package com.consoleconnect.kraken.operator.core.service;
 import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.PRODUCT_BUYER;
 import static com.consoleconnect.kraken.operator.core.toolkit.LabelConstants.LABEL_BUYER_ID;
 
+import com.consoleconnect.kraken.operator.core.client.ClientEvent;
 import com.consoleconnect.kraken.operator.core.dto.ApiActivityLog;
 import com.consoleconnect.kraken.operator.core.dto.ComposedHttpRequest;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
+import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogBodyEntity;
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
 import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
+import com.consoleconnect.kraken.operator.core.mapper.ApiActivityLogBodyMapper;
 import com.consoleconnect.kraken.operator.core.mapper.ApiActivityLogMapper;
+import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.BuyerOnboardFacets;
+import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogBodyRepository;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
 import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
 import com.consoleconnect.kraken.operator.core.request.LogSearchRequest;
+import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.core.toolkit.Paging;
 import com.consoleconnect.kraken.operator.core.toolkit.PagingHelper;
+import com.fasterxml.jackson.core.type.TypeReference;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
@@ -39,6 +46,7 @@ public class ApiActivityLogService {
   public static final String CREATED_AT = "createdAt";
   private final ApiActivityLogRepository repository;
   private final UnifiedAssetRepository unifiedAssetRepository;
+  private final ApiActivityLogBodyRepository apiActivityLogBodyRepository;
 
   @Transactional(readOnly = true)
   public Paging<ApiActivityLog> search(LogSearchRequest logSearchRequest, Pageable pageable) {
@@ -101,6 +109,40 @@ public class ApiActivityLogService {
             Collectors.toMap(
                 entity -> entity.getLabels().get(LABEL_BUYER_ID),
                 entity -> UnifiedAssetService.toAsset(entity, true)));
+  }
+
+  @Transactional
+  public HttpResponse<Void> onEvent(String envId, String userId, ClientEvent event) {
+    if (event.getEventPayload() == null) {
+      return HttpResponse.ok(null);
+    }
+    List<ApiActivityLog> requestList =
+        JsonToolkit.fromJson(event.getEventPayload(), new TypeReference<>() {});
+
+    if (CollectionUtils.isEmpty(requestList)) {
+      return HttpResponse.ok(null);
+    }
+    Set<ApiActivityLogEntity> newActivities = new HashSet<>();
+    Set<ApiActivityLogBodyEntity> newLogActivities = new HashSet<>();
+    for (ApiActivityLog dto : requestList) {
+      Optional<ApiActivityLogEntity> db =
+          repository.findByRequestIdAndCallSeq(dto.getRequestId(), dto.getCallSeq());
+      if (db.isEmpty()) {
+        ApiActivityLogEntity entity = ApiActivityLogMapper.INSTANCE.map(dto);
+        entity.setRequest(null);
+        entity.setResponse(null);
+        entity.setEnv(envId);
+        entity.setCreatedBy(userId);
+        newActivities.add(entity);
+
+        ApiActivityLogBodyEntity apiLogBodyEntity = ApiActivityLogBodyMapper.INSTANCE.map(dto);
+        entity.setApiLogBodyEntity(apiLogBodyEntity);
+        newLogActivities.add(apiLogBodyEntity);
+      }
+    }
+    apiActivityLogBodyRepository.saveAll(newLogActivities);
+    repository.saveAll(newActivities);
+    return HttpResponse.ok(null);
   }
 
   private void addEq(
