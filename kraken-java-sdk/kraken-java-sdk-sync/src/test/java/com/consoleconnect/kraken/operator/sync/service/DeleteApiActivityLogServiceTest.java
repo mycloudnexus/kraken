@@ -70,14 +70,15 @@ class DeleteApiActivityLogServiceTest extends AbstractIntegrationTest {
     var envId = UUID.randomUUID();
     var now = ZonedDateTime.parse(NOW_WITH_TIMEZONE);
     addApiLogActivity(envId.toString());
-    var result = this.apiActivityLogRepository.findAll();
-    Assertions.assertEquals(result.size(), 1);
+
+    Assertions.assertEquals(1, this.apiActivityLogRepository.findAll().size());
+    Assertions.assertEquals(1, this.apiActivityLogBodyRepository.findAll().size());
 
     // when run it again
     deleteLogService.deleteApiLogAtDataPlane(LogKindEnum.DATA_PLANE);
 
-    Assertions.assertEquals(this.apiActivityLogRepository.findAll().size(), 0);
-    Assertions.assertEquals(this.apiActivityLogBodyRepository.findAll().size(), 0);
+    Assertions.assertEquals(0, this.apiActivityLogRepository.findAll().size());
+    Assertions.assertEquals(0, this.apiActivityLogBodyRepository.findAll().size());
   }
 
   @Test
@@ -87,12 +88,13 @@ class DeleteApiActivityLogServiceTest extends AbstractIntegrationTest {
     var now = ZonedDateTime.parse(NOW_WITH_TIMEZONE);
     addApiLogActivity(envId.toString());
     var result = this.apiActivityLogRepository.findAll();
-    Assertions.assertEquals(result.size(), 1);
+    Assertions.assertEquals(1, this.apiActivityLogRepository.findAll().size());
+    Assertions.assertEquals(1, this.apiActivityLogBodyRepository.findAll().size());
 
     // when run it again
     deleteLogService.deleteApiLogAtDataPlane(LogKindEnum.CONTROL_PLANE);
 
-    Assertions.assertEquals(this.apiActivityLogRepository.findAll().size(), 1);
-    Assertions.assertEquals(this.apiActivityLogBodyRepository.findAll().size(), 0);
+    Assertions.assertEquals(1, this.apiActivityLogRepository.findAll().size());
+    Assertions.assertEquals(0, this.apiActivityLogBodyRepository.findAll().size());
   }
 }
