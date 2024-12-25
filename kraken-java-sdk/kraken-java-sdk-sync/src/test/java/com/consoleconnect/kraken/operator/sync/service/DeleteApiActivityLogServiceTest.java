@@ -78,7 +78,7 @@ class DeleteApiActivityLogServiceTest extends AbstractIntegrationTest {
     Assertions.assertEquals(1, this.apiActivityLogBodyRepository.findAll().size());
 
     // when run it again
-    deleteLogService.deleteApiLogAtDataPlane(LogKindEnum.DATA_PLANE);
+    apiActivityLogService.deleteApiLogAtDataPlane(LogKindEnum.DATA_PLANE, ZonedDateTime.now());
 
     Assertions.assertEquals(0, this.apiActivityLogRepository.findAll().size());
     Assertions.assertEquals(0, this.apiActivityLogBodyRepository.findAll().size());
@@ -95,7 +95,7 @@ class DeleteApiActivityLogServiceTest extends AbstractIntegrationTest {
     Assertions.assertEquals(1, this.apiActivityLogBodyRepository.findAll().size());
 
     // when run it again
-    deleteLogService.deleteApiLogAtDataPlane(LogKindEnum.CONTROL_PLANE);
+    apiActivityLogService.deleteApiLogAtDataPlane(LogKindEnum.CONTROL_PLANE, ZonedDateTime.now());
 
     Assertions.assertEquals(1, this.apiActivityLogRepository.findAll().size());
     Assertions.assertEquals(0, this.apiActivityLogBodyRepository.findAll().size());

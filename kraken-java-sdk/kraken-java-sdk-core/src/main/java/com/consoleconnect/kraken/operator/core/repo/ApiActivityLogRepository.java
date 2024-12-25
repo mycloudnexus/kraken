@@ -21,7 +21,7 @@ public interface ApiActivityLogRepository
 
   //  ApiActivityLogEntity save(ApiActivityLogEntity entity);
   //
-  //  List<ApiActivityLogEntity> saveAll(Iterable<ApiActivityLogEntity> entities);
+  // List<ApiActivityLogEntity> saveAll(Iterable<ApiActivityLogEntity> entities);
   //
   //  ApiActivityLogEntity delete(ApiActivityLogEntity entity);
   //

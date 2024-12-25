@@ -10,6 +10,7 @@ import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogBodyEntity;
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
 import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
+import com.consoleconnect.kraken.operator.core.enums.LogKindEnum;
 import com.consoleconnect.kraken.operator.core.mapper.ApiActivityLogMapper;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
@@ -25,6 +26,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
@@ -46,6 +48,8 @@ public class ApiActivityLogService {
   private final ApiActivityLogRepository repository;
   private final UnifiedAssetRepository unifiedAssetRepository;
   private final ApiActivityLogBodyRepository apiActivityLogBodyRepository;
+
+  private static final String DELETE_API_ACTIVITY_LOG = "DELETE_API_ACTIVITY_LOG";
 
   @Transactional(readOnly = true)
   public Paging<ApiActivityLog> search(LogSearchRequest logSearchRequest, Pageable pageable) {
@@ -108,6 +112,38 @@ public class ApiActivityLogService {
             Collectors.toMap(
                 entity -> entity.getLabels().get(LABEL_BUYER_ID),
                 entity -> UnifiedAssetService.toAsset(entity, true)));
+  }
+
+  public void deleteApiLogAtDataPlane(LogKindEnum logKind, ZonedDateTime toDelete) {
+
+    log.info("{}, {}, {}, start", DELETE_API_ACTIVITY_LOG, logKind.name(), toDelete);
+
+    if (logKind != LogKindEnum.DATA_PLANE && logKind != LogKindEnum.CONTROL_PLANE) {
+      log.info("{}, {}, skip", DELETE_API_ACTIVITY_LOG, logKind.name());
+      return;
+    }
+
+    for (int page = 0; ; page++) {
+      var list = this.repository.deleteExpiredLog(toDelete, PageRequest.of(page, 20));
+      if (list.isEmpty()) {
+        break;
+      }
+      var bodySet =
+          list.stream()
+              .map(ApiActivityLogEntity::getApiLogBodyEntity)
+              .filter(Objects::nonNull)
+              .toList();
+      if (logKind == LogKindEnum.DATA_PLANE) {
+        this.repository.deleteAll(list);
+      } else {
+
+        list.forEach(x -> x.setApiLogBodyEntity(null));
+        this.repository.saveAll(list);
+      }
+      this.apiActivityLogBodyRepository.deleteAll(bodySet);
+    }
+
+    log.info("{}, {}, end", DELETE_API_ACTIVITY_LOG, logKind.name());
   }
 
   @Transactional
