@@ -39,8 +39,8 @@ public class ClientAPIAuditLogEventHandler extends ClientEventHandler {
     for (ApiActivityLog dto : requestList) {
       Optional<ApiActivityLogEntity> db =
           repository.findByRequestIdAndCallSeq(dto.getRequestId(), dto.getCallSeq());
-      ApiActivityLogEntity entity = ApiActivityLogMapper.INSTANCE.map(dto);
       if (db.isEmpty()) {
+        ApiActivityLogEntity entity = ApiActivityLogMapper.INSTANCE.map(dto);
         entity.setEnv(envId);
         entity.setCreatedBy(userId);
         newActivities.add(entity);
