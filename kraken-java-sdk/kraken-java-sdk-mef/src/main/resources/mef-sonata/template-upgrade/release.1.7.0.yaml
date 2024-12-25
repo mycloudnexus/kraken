@@ -17,6 +17,5 @@ metadata:
       - New mapping template upgrade feature
 Fixed some issues:
       - Fixed spring Framework Path Traversal vulnerability
-      - Fixed page jump error after logout
       - Fixed some UI display issues
   version: 1

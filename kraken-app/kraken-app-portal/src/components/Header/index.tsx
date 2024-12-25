@@ -28,8 +28,8 @@ const Header = ({ info }: Readonly<{ info?: ISystemInfo }>) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    navigate("/login");
     localStorage.clear();
+    navigate("/login");
   };
 
   const dropdownRender = () => {
