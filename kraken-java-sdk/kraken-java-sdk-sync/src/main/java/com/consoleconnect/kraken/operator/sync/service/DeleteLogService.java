@@ -15,6 +15,7 @@ public class DeleteLogService {
 
   private final SyncProperty.DeleteLogConf deleteLogConf;
   private final ApiActivityLogRepository apiActivityLogRepository;
+  private final String DELETE_API_ACTIVITY_LOG = "DELETE_API_ACTIVITY_LOG";
 
   public DeleteLogService(
       SyncProperty syncProperty, ApiActivityLogRepository apiActivityLogRepository) {
@@ -26,15 +27,22 @@ public class DeleteLogService {
   public void scanEvent() {
     if (LogKindEnum.CONTROL_PLANE == this.deleteLogConf.getLogKind()) {
 
-      log.info("xxxxxxxxxxxxxxxxxxx, {}", this.deleteLogConf.getLogKind().name());
-      ZonedDateTime toDelete =
-          ZonedDateTime.now()
-              .truncatedTo(ChronoUnit.DAYS)
-              .minusMonths(this.deleteLogConf.getControlPlane().getMonth());
-
-      log.info("xxxxxxxxxxxxxxxxxx, {}", toDelete);
-      this.apiActivityLogRepository.deleteExpiredLog(toDelete);
-      log.info("xxxxxxxxxxxxxxxxxxxx, end");
+      this.deleteApiLogAtDataPlane();
     }
+  }
+
+  private void deleteApiLogAtDataPlane() {
+    ZonedDateTime toDelete =
+        ZonedDateTime.now()
+            .truncatedTo(ChronoUnit.DAYS)
+            .minusMonths(this.deleteLogConf.getControlPlane().getMonth());
+
+    log.info(
+        "{}, {}, {}, start",
+        DELETE_API_ACTIVITY_LOG,
+        this.deleteLogConf.getLogKind().name(),
+        toDelete);
+    this.apiActivityLogRepository.deleteExpiredLog(toDelete);
+    log.info("{}, {}, end", DELETE_API_ACTIVITY_LOG, this.deleteLogConf.getLogKind().name());
   }
 }
