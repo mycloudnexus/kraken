@@ -24,7 +24,10 @@ public class DeleteLogService {
   }
 
   @Scheduled(cron = "${app.cron-job.delete-api-activity-log:-}")
-  public void scanEvent() {
+  public void runIt() {
+
+    int abc = 1;
+
     if (LogKindEnum.CONTROL_PLANE == this.deleteLogConf.getLogKind()) {
 
       this.deleteApiLogAtDataPlane();

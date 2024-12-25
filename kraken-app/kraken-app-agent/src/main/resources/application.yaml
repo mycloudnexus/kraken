@@ -87,10 +87,6 @@ logging:
     com.consoleconnect.kraken: DEBUG
 #    reactor.netty: DEBUG
 app:
-  delete-log-conf:
-    log-kind: control-plane
-    control-plane:
-      month: 1
   tenant:
     workspacePath:
   controlPlane:
