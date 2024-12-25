@@ -14,7 +14,6 @@ import com.consoleconnect.kraken.operator.core.toolkit.Paging;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 
 public interface APIServerCreator {
@@ -22,9 +21,6 @@ public interface APIServerCreator {
   String PRODUCT_BASE_PATH = "/v2/products";
   String PRODUCT_ID = "product.mef.sonata.api";
   String COMPONENT_ID = "mef.sonata.api.order";
-
-  @Slf4j
-  final class LogHolder {}
 
   WebTestClientHelper getTestClientHelper();
 
@@ -58,7 +54,6 @@ public interface APIServerCreator {
             JsonToolkit.toJson(request),
             bodyStr -> {
               assertThat(bodyStr, hasJsonPath("$.data", notNullValue()));
-              LogHolder.log.info(bodyStr);
             });
   }
 
