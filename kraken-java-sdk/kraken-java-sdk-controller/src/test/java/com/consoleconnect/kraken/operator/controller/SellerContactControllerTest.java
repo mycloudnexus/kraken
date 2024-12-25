@@ -8,6 +8,7 @@ import static org.hamcrest.Matchers.*;
 
 import com.consoleconnect.kraken.operator.config.TestApplication;
 import com.consoleconnect.kraken.operator.controller.dto.CreateSellerContactRequest;
+import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
@@ -20,6 +21,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -94,10 +96,42 @@ class SellerContactControllerTest extends AbstractIntegrationTest {
             });
   }
 
+  @Test
+  @Order(3)
+  void givenAssetKind_whenSearchSellerContacts_thenReturnOK() {
+    String path = String.format("/products/%s/components", PRODUCT_ID);
+    getTestClientHelper()
+        .getAndVerify(
+            (uriBuilder ->
+                uriBuilder
+                    .path(path)
+                    .queryParam("kind", AssetKindEnum.COMPONENT_SELLER_CONTACT.getKind())
+                    .build()),
+            bodyStr -> {
+              log.info(bodyStr);
+              assertThat(bodyStr, hasJsonPath("$.code", is(200)));
+            });
+  }
+
+  @ParameterizedTest
+  @MethodSource(value = "buildComponentIds")
+  @Order(4)
+  void givenKeyOfSellerContact_whenFindOne_thenReturnOK(String componentId) {
+    String key = componentId + "." + ACCESS_ELINE.getKind() + "." + INTERNET_ACCESS.getKind();
+    String path = String.format("/products/%s/components/%s", PRODUCT_ID, key);
+    getTestClientHelper()
+        .getAndVerify(
+            (uriBuilder -> uriBuilder.path(path).build()),
+            bodyStr -> {
+              log.info(bodyStr);
+              assertThat(bodyStr, hasJsonPath("$.code", is(200)));
+            });
+  }
+
   @SneakyThrows
   @ParameterizedTest
   @MethodSource(value = "buildComponentIds")
-  @Order(3)
+  @Order(5)
   void givenDuplicateSellerContacts_whenCreating_thenReturn400(String componentId) {
     CreateSellerContactRequest request = createSellerContact();
     String path =
@@ -116,7 +150,7 @@ class SellerContactControllerTest extends AbstractIntegrationTest {
   @SneakyThrows
   @ParameterizedTest
   @MethodSource(value = "buildComponentIds")
-  @Order(4)
+  @Order(6)
   void givenAnExistedSellerContact_whenDeleting_thenReturnOK(String componentId) {
     String id = componentId + "." + ACCESS_ELINE.getKind() + "." + INTERNET_ACCESS.getKind();
     String path =

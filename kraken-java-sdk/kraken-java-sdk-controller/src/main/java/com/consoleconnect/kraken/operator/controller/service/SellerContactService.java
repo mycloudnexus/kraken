@@ -61,8 +61,7 @@ public class SellerContactService implements SellerContactChecker {
 
     UnifiedAsset sellerAsset = createSellerContact(request, key, componentAssetDto);
     SyncMetadata syncMetadata = new SyncMetadata("", "", DateTime.nowInUTCString(), createdBy);
-    return unifiedAssetService.syncAsset(
-        componentAssetDto.getMetadata().getKey(), sellerAsset, syncMetadata, true);
+    return unifiedAssetService.syncAsset(productId, sellerAsset, syncMetadata, true);
   }
 
   private UnifiedAsset createSellerContact(

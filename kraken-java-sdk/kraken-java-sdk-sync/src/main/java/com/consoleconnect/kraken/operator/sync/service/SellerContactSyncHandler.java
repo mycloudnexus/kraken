@@ -36,7 +36,6 @@ public class SellerContactSyncHandler implements ClientSyncHandler {
     assets.forEach(
         assetDto -> {
           IngestDataEvent event = new IngestDataEvent();
-          event.setParentId(assetDto.getParentId());
           event.setAsset(assetDto);
           event.setFullPath(
               ResourceLoaderTypeEnum.generatePath(

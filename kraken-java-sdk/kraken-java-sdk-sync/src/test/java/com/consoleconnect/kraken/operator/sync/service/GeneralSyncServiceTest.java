@@ -100,7 +100,7 @@ public class GeneralSyncServiceTest extends AbstractIntegrationTest {
   @SneakyThrows
   private MockResponse mockerSellerContact() {
     MockResponse mockResponse = new MockResponse();
-    String mockData = readFileToString("data/buyer-01.json");
+    String mockData = readFileToString("data/seller-contact-01.json");
     UnifiedAssetDto mockAsset = JsonToolkit.fromJson(mockData, new TypeReference<>() {});
     mockResponse.setBody(JsonToolkit.toJson(HttpResponse.ok(Collections.singletonList(mockAsset))));
     mockResponse.addHeader("Content-Type", "application/json");
