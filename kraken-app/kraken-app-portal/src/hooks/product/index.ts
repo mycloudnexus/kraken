@@ -363,10 +363,13 @@ export const useEditComponentV2 = () => {
     mutationKey: [PRODUCT_CACHE_KEYS.edit_component_detail],
     mutationFn: ({ productId, componentId, data }: any) =>
         editComponentDetail(productId, componentId, data),
-    onSuccess:(data, variables, context) =>
+    onSuccess:(data:any,variables:any) => {
+      if (data?.code == 200) {
         queryClient.invalidateQueries({
-          queryKey: [PRODUCT_CACHE_KEYS.get_component_detail,variables?.productId,variables?.componentId],
-        }),
+          queryKey: [PRODUCT_CACHE_KEYS.get_component_detail, variables?.productId, variables?.componentId],
+        })
+      }
+    },
   });
 };
 export const useGetProductDeployments = (
