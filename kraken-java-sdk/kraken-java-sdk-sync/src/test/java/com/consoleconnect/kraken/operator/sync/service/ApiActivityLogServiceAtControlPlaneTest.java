@@ -37,6 +37,18 @@ class ApiActivityLogServiceAtControlPlaneTest extends AbstractIntegrationTest {
   public static final String NOW_WITH_TIMEZONE = "2023-10-24T05:00:00+02:00";
   public static final String REQUEST_ID = "requestId";
 
+  @BeforeEach
+  void clearDb() {
+    var list = this.apiActivityLogRepository.findAll();
+    list.forEach(
+        x -> {
+          x.setApiLogBodyEntity(null);
+        });
+    this.apiActivityLogRepository.saveAll(list);
+    this.apiActivityLogBodyRepository.deleteAll();
+    this.apiActivityLogRepository.deleteAll();
+  }
+
   @NoArgsConstructor
   @Getter
   @Setter
@@ -81,8 +93,8 @@ class ApiActivityLogServiceAtControlPlaneTest extends AbstractIntegrationTest {
   public static final String EXISTED_REQUEST_ID = "requestId_existed";
 
   @Test
-  @Order(1)
   void insertLogWithoutSubTable() {
+
     ApiActivityLogEntity entity = new ApiActivityLogEntity();
     entity.setRequestId(EXISTED_REQUEST_ID);
     entity.setCallSeq(0);
@@ -110,9 +122,8 @@ class ApiActivityLogServiceAtControlPlaneTest extends AbstractIntegrationTest {
   }
 
   @Test
-  @Order(2)
   void receiveClientApiActivityLog() {
-
+    this.insertLogWithoutSubTable();
     var envId = UUID.randomUUID();
     var now = ZonedDateTime.parse(NOW_WITH_TIMEZONE);
     addApiLogActivity(envId.toString());
@@ -161,8 +172,8 @@ class ApiActivityLogServiceAtControlPlaneTest extends AbstractIntegrationTest {
   }
 
   @Test
-  @Order(3)
   void migrateExistedData() {
+    this.receiveClientApiActivityLog();
     this.apiActivityLogService.migrateApiLog(LogKindEnum.CONTROL_PLANE);
     var apiLog = this.apiActivityLogRepository.findAll();
     var apiLogBody = this.apiActivityLogBodyRepository.findAll();
@@ -178,8 +189,8 @@ class ApiActivityLogServiceAtControlPlaneTest extends AbstractIntegrationTest {
   }
 
   @Test
-  @Order(4)
   void achieveApiActivityLog() {
+    this.migrateExistedData();
     ZonedDateTime toAchieve = ZonedDateTime.now().plusYears(100);
     apiActivityLogService.achieveApiActivityLog(LogKindEnum.CONTROL_PLANE, toAchieve);
 
