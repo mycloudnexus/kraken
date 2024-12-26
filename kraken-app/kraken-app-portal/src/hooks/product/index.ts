@@ -358,7 +358,17 @@ export const useEditComponent = () => {
       editComponentDetail(productId, componentId, data),
   });
 };
-
+export const useEditComponentV2 = () => {
+  return useMutation<any, Error>({
+    mutationKey: [PRODUCT_CACHE_KEYS.edit_component_detail],
+    mutationFn: ({ productId, componentId, data }: any) =>
+        editComponentDetail(productId, componentId, data),
+    onSuccess:(data, variables, context) =>
+        queryClient.invalidateQueries({
+          queryKey: [PRODUCT_CACHE_KEYS.get_component_detail,variables?.productId,variables?.componentId],
+        }),
+  });
+};
 export const useGetProductDeployments = (
   productId: string,
   params: unknown
