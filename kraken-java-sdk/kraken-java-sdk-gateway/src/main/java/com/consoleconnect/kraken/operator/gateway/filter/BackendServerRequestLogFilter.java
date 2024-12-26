@@ -8,6 +8,7 @@ import static org.springframework.core.io.buffer.DataBufferUtils.join;
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
+import com.consoleconnect.kraken.operator.core.service.ApiActivityLogService;
 import com.consoleconnect.kraken.operator.gateway.service.FilterHeaderService;
 import java.nio.charset.Charset;
 import java.util.UUID;
@@ -26,11 +27,13 @@ import reactor.core.publisher.Mono;
 @Component
 @Slf4j
 public class BackendServerRequestLogFilter extends AbstractGlobalFilter {
+
   public BackendServerRequestLogFilter(
       AppProperty appProperty,
       ApiActivityLogRepository apiActivityLogRepository,
-      FilterHeaderService filterHeaderService) {
-    super(appProperty, apiActivityLogRepository, filterHeaderService);
+      FilterHeaderService filterHeaderService,
+      ApiActivityLogService apiActivityLogService) {
+    super(appProperty, apiActivityLogRepository, filterHeaderService, apiActivityLogService);
   }
 
   @Override
@@ -65,7 +68,7 @@ public class BackendServerRequestLogFilter extends AbstractGlobalFilter {
         }
       }
 
-      apiActivityLogRepository.save(entity);
+      this.apiActivityLogService.save(entity);
       log.info("createdEntity:{}", entity.getId());
       exchange
           .getAttributes()
@@ -92,7 +95,7 @@ public class BackendServerRequestLogFilter extends AbstractGlobalFilter {
       if (route != null) {
         entity.setUri(route.getUri().getHost());
       }
-      apiActivityLogRepository.save(entity);
+      this.apiActivityLogService.save(entity);
       log.info("updateEntity:{}", entity.getId());
       exchange
           .getAttributes()
