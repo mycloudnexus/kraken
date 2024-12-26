@@ -148,7 +148,7 @@ public class ApiActivityLogService {
   }
 
   @Transactional
-  public HttpResponse<Void> onEvent(String envId, String userId, ClientEvent event) {
+  public HttpResponse<Void> receiveClientLog(String envId, String userId, ClientEvent event) {
     if (event.getEventPayload() == null) {
       return HttpResponse.ok(null);
     }
@@ -165,7 +165,6 @@ public class ApiActivityLogService {
           repository.findByRequestIdAndCallSeq(dto.getRequestId(), dto.getCallSeq());
       if (db.isEmpty()) {
         ApiActivityLogEntity entity = ApiActivityLogMapper.INSTANCE.map(dto);
-
         entity.setEnv(envId);
         entity.setCreatedBy(userId);
         newActivities.add(entity);
@@ -180,12 +179,21 @@ public class ApiActivityLogService {
     return HttpResponse.ok(null);
   }
 
+  public ApiActivityLogEntity save(ApiActivityLogEntity apiActivityLogEntity) {
+    if (apiActivityLogEntity.getApiLogBodyEntity() != null) {
+      this.apiActivityLogBodyRepository.save(apiActivityLogEntity.getApiLogBodyEntity());
+    }
+    return this.repository.save(apiActivityLogEntity);
+  }
+
   public void setSynced(List<ApiActivityLogEntity> logEntities, ZonedDateTime now) {
     logEntities.forEach(
         logEntity -> {
           logEntity.setSyncStatus(SyncStatusEnum.SYNCED);
           logEntity.setSyncedAt(now);
         });
+    apiActivityLogBodyRepository.saveAll(
+        logEntities.stream().map(ApiActivityLogEntity::getApiLogBodyEntity).toList());
     repository.saveAll(logEntities);
   }
 

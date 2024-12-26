@@ -1,7 +1,5 @@
 package com.consoleconnect.kraken.operator.sync.service;
 
-import static org.mockito.Mockito.*;
-
 import com.consoleconnect.kraken.operator.core.client.ClientEvent;
 import com.consoleconnect.kraken.operator.core.client.ClientEventTypeEnum;
 import com.consoleconnect.kraken.operator.core.enums.LogKindEnum;
@@ -64,7 +62,7 @@ class DeleteApiActivityLogServiceTest extends AbstractIntegrationTest {
 
   private void addApiLogActivity(String envId) {
 
-    apiActivityLogService.onEvent(envId, UUID.randomUUID().toString(), createEvent());
+    apiActivityLogService.receiveClientLog(envId, UUID.randomUUID().toString(), createEvent());
   }
 
   @Test

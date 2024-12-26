@@ -17,7 +17,7 @@ public class ClientAPIAuditLogEventHandler extends ClientEventHandler {
   @Override
   @Transactional
   public HttpResponse<Void> onEvent(String envId, String userId, ClientEvent event) {
-    return this.apiActivityLogService.onEvent(envId, userId, event);
+    return this.apiActivityLogService.receiveClientLog(envId, userId, event);
   }
 
   @Override
