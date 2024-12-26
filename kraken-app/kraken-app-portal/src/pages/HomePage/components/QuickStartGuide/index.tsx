@@ -70,7 +70,7 @@ const QuickStartGuide = () => {
       <div className={styles.stepContainer}>
         <div className={styles.diagram} />
       </div>
-      <h3>Quick start guide</h3>
+      <Text.NormalLarge style={{ margin: '16px 0 12px 0' }}>Quick start guide</Text.NormalLarge>
       <Flex className={styles.guideContainer}>
         <Spin spinning={isLoading}>
           <Row gutter={[24, 24]}>

@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.consoleconnect.kraken</groupId>
         <artifactId>kraken-java-sdk</artifactId>
-        <version>1.0.0</version>
+        <version>1.1.0-snapshot.0</version>
     </parent>
     <artifactId>kraken-java-sdk-test</artifactId>
     <name>kraken-java-sdk-test</name>
@@ -124,12 +124,12 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
-            <version>6.1.13</version>
+            <version>6.1.14</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webflux</artifactId>
-            <version>6.1.13</version>
+            <version>6.1.14</version>
         </dependency>
     </dependencies>
 </project>

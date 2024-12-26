@@ -28,6 +28,7 @@ const AuditLogDetailsModal = ({ open, onClose, item }: Props) => {
     <Drawer
       className={styles.modal}
       open={open}
+      maskClosable
       onClose={onClose}
       footer={false}
       width="40vw"

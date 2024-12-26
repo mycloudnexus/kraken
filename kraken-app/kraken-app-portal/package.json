@@ -1,7 +1,7 @@
 {
   "name": "kraken-app-portal",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.1.0-snapshot.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -32,7 +32,7 @@
     "js-base64": "^3.7.7",
     "js-yaml": "^4.1.0",
     "lodash": "^4.17.21",
-    "nanoid": "^5.0.7",
+    "nanoid": "^5.0.9",
     "path": "^0.12.7",
     "qs": "^6.12.1",
     "react": "^18.2.0",

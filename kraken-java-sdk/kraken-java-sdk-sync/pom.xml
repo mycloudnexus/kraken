@@ -5,23 +5,33 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>kraken-java-sdk-sync</artifactId>
     <name>kraken-java-sdk-sync</name>
-    <version>1.0.0</version>
+    <version>1.1.0-snapshot.0</version>
     <packaging>jar</packaging>
     <parent>
         <groupId>com.consoleconnect.kraken</groupId>
         <artifactId>kraken-java-sdk</artifactId>
-        <version>1.0.0</version>
+        <version>1.1.0-snapshot.0</version>
     </parent>
     <dependencies>
         <dependency>
+            <groupId>net.javacrumbs.shedlock</groupId>
+            <artifactId>shedlock-spring</artifactId>
+            <version>6.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>net.javacrumbs.shedlock</groupId>
+            <artifactId>shedlock-provider-jdbc-template</artifactId>
+            <version>6.0.2</version>
+        </dependency>
+        <dependency>
             <groupId>com.consoleconnect.kraken</groupId>
             <artifactId>kraken-java-sdk-data</artifactId>
-            <version>1.0.0</version>
+            <version>1.1.0-snapshot.0</version>
         </dependency>
         <dependency>
             <groupId>com.consoleconnect.kraken</groupId>
             <artifactId>kraken-java-sdk-test</artifactId>
-            <version>1.0.0</version>
+            <version>1.1.0-snapshot.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>

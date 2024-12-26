@@ -1,0 +1,21 @@
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.1.7.0
+  name: V1.7.0
+  labels:
+    productSpec: grace
+    productVersion: V1.7.0
+    publishDate: 2024-12-24
+  description: |
+    New features:
+      - Support multi-agent instance deployment
+      - Data type validation for Order and Quote Creating
+      - Mapping page loading behavior enhancement
+      - Filter user by role and enabled state
+      - New mapping template upgrade feature
+    Fixed issues:
+      - Fixed spring Framework Path Traversal vulnerability
+      - Fixed some UI display issues
+  version: 1

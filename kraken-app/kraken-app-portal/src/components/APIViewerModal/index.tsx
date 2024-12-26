@@ -17,6 +17,7 @@ const APIViewerModal = ({ selectedAPI, content, isOpen, onClose }: Props) => {
     <Drawer
       className={styles.modal}
       open={isOpen}
+      maskClosable
       title={
         <Flex justifyContent="space-between">
           <Text.BoldLarge>API details</Text.BoldLarge>
@@ -28,6 +29,7 @@ const APIViewerModal = ({ selectedAPI, content, isOpen, onClose }: Props) => {
         </Flex>
       }
       closable={false}
+      onClose={onClose}
       width="70vw"
       footer={
         <Flex justifyContent="flex-end">

@@ -4,15 +4,14 @@ import { PageLayout } from "@/components/Layout";
 import {
   useCreateNewComponent,
   useDeleteApiServer,
-  useEditComponent,
+  useEditComponentV2,
   useGetComponentDetailV2,
   useGetProductEnvs,
 } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
 import { COMPONENT_KIND_API_TARGET_SPEC } from "@/utils/constants/product";
 import { transformApiData } from "@/utils/helpers/swagger";
-import { Flex, Form, Spin, notification } from "antd";
-import { decode } from "js-base64";
+import { Form, Spin, notification } from "antd";
 import jsYaml from "js-yaml";
 import { get, isEmpty, set } from "lodash";
 import { useEffect, useState } from "react";
@@ -22,6 +21,8 @@ import BtnStep from "./components/BtnStep";
 import SelectAPIServer from "./components/SelectAPIServer";
 import UploadYaml from "./components/UploadYaml";
 import styles from "./index.module.scss";
+import renderRequiredMark from '@/components/RequiredFormMark';
+import { decodeFileContent } from "@/utils/helpers/base64";
 
 const NewAPIServer = () => {
   const { componentId } = useParams();
@@ -41,7 +42,7 @@ const NewAPIServer = () => {
   const { mutateAsync: runCreate, isPending: loadingCreate } =
     useCreateNewComponent();
   const navigate = useNavigate();
-  const { mutateAsync: runUpdate, isPending } = useEditComponent();
+  const { mutateAsync: runUpdate, isPending } = useEditComponentV2();
 
   const handleSave = async () => {
     try {
@@ -64,7 +65,7 @@ const NewAPIServer = () => {
         "data:application/octet-stream;base64",
         "data:application/x-yaml;base64"
       );
-      const yamlContent = jsYaml.load(decode(newSwaggerData));
+      const yamlContent = jsYaml.load(decodeFileContent(newSwaggerData));
       const result = transformApiData(get(yamlContent, "paths", {}));
 
       const data = {
@@ -130,7 +131,7 @@ const NewAPIServer = () => {
       let swaggerData;
       let fileDecode = "";
       if (base64data) {
-        fileDecode = decode(get(componentDetail, "facets.baseSpec.content"));
+        fileDecode = decodeFileContent(get(componentDetail, "facets.baseSpec.content"));
         swaggerData = jsYaml.load(fileDecode);
       }
       const environments = get(componentDetail, "facets.environments");
@@ -180,18 +181,7 @@ const NewAPIServer = () => {
           className={styles.container}
           form={form}
           onFinish={onFinish}
-          requiredMark={(label, { required }) =>
-            required ? (
-              <Flex align="center" gap={4}>
-                {label}{" "}
-                <span className="required-label" style={{ color: "#FF4D4F" }}>
-                  *
-                </span>
-              </Flex>
-            ) : (
-              <span>{label}</span>
-            )
-          }
+          requiredMark={renderRequiredMark}
         >
           <main id="12" className={styles.paper} style={{ flex: 1 }}>
             <div id="12" style={{ maxWidth: "60%", minWidth: 600 }}>
