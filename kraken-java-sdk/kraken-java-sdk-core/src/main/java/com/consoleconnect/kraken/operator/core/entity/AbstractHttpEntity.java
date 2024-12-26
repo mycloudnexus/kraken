@@ -48,4 +48,12 @@ public class AbstractHttpEntity extends AbstractEntity {
   @Column(name = "response", nullable = true, unique = false, columnDefinition = "jsonb")
   @Type(JsonType.class)
   private Object response;
+
+  public void setLogRequest(Object request) {
+    this.request = request;
+  }
+
+  public void setLogResponse(Object response) {
+    this.response = response;
+  }
 }

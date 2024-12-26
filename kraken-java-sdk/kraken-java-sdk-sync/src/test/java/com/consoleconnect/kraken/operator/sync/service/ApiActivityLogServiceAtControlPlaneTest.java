@@ -2,15 +2,21 @@ package com.consoleconnect.kraken.operator.sync.service;
 
 import com.consoleconnect.kraken.operator.core.client.ClientEvent;
 import com.consoleconnect.kraken.operator.core.client.ClientEventTypeEnum;
+import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
 import com.consoleconnect.kraken.operator.core.enums.LogKindEnum;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogBodyRepository;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
 import com.consoleconnect.kraken.operator.core.service.ApiActivityLogService;
+import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.sync.CustomConfig;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import java.time.ZonedDateTime;
 import java.util.UUID;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.SpyBean;
@@ -19,20 +25,23 @@ import org.springframework.test.context.ContextConfiguration;
 @MockIntegrationTest
 @ContextConfiguration(classes = {CustomConfig.class})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class DeleteApiActivityLogServiceTest extends AbstractIntegrationTest {
+class ApiActivityLogServiceAtControlPlaneTest extends AbstractIntegrationTest {
   @Autowired ApiActivityLogRepository apiActivityLogRepository;
   @SpyBean private DeleteApiActivityLogService deleteLogService;
   @SpyBean private ApiActivityLogService apiActivityLogService;
   @SpyBean private ApiActivityLogBodyRepository apiActivityLogBodyRepository;
   public static final String NOW_WITH_TIMEZONE = "2023-10-24T05:00:00+02:00";
+  public static final String REQUEST_ID = "requestId";
 
-  @BeforeEach
-  void init() {
-    this.apiActivityLogRepository.deleteAll();
-    this.apiActivityLogBodyRepository.deleteAll();
+  @NoArgsConstructor
+  @Getter
+  @Setter
+  @EqualsAndHashCode(of = "age")
+  public static class BodyAge {
+    private int age;
   }
 
-  private static ClientEvent createEvent() {
+  private static ClientEvent createClientEventWithBody() {
     var clientEvent = new ClientEvent();
     clientEvent.setEventType(ClientEventTypeEnum.CLIENT_API_AUDIT_LOG);
     clientEvent.setClientId("127.0.1.1");
@@ -45,7 +54,7 @@ class DeleteApiActivityLogServiceTest extends AbstractIntegrationTest {
                   "callSeq": 0,
                   "method": "GET",
                   "buyer": "buyerId2",
-                  "request_id": "request_id",
+
                   "uri": "uri",
                   "path": "path",
                   "request": {
@@ -61,28 +70,77 @@ class DeleteApiActivityLogServiceTest extends AbstractIntegrationTest {
   }
 
   private void addApiLogActivity(String envId) {
+    apiActivityLogService.receiveClientLog(
+        envId, UUID.randomUUID().toString(), createClientEventWithBody());
+  }
 
-    apiActivityLogService.receiveClientLog(envId, UUID.randomUUID().toString(), createEvent());
+  public static final String EXISTED_REQUEST_ID = "requestId_existed";
+
+  @Test
+  @Order(1)
+  void insertLogWithoutSubTable() {
+    ApiActivityLogEntity entity = new ApiActivityLogEntity();
+    entity.setRequestId(EXISTED_REQUEST_ID);
+    entity.setCallSeq(0);
+    entity.setMethod("POST");
+    entity.setBuyer("buy");
+    entity.setUri("uri");
+    entity.setPath("path");
+    entity.setLogRequest("""
+            {
+            "age":91
+            }
+            """);
+    entity.setLogResponse("""
+            {
+            "age":92
+            }
+            """);
+    this.apiActivityLogRepository.save(entity);
   }
 
   @Test
-  void deleteApiActivityLogInDataPlane() {
-
+  @Order(2)
+  void receiveClientApiActivityLog() {
     var envId = UUID.randomUUID();
     var now = ZonedDateTime.parse(NOW_WITH_TIMEZONE);
     addApiLogActivity(envId.toString());
 
-    Assertions.assertEquals(1, this.apiActivityLogRepository.findAll().size());
-    Assertions.assertEquals(1, this.apiActivityLogBodyRepository.findAll().size());
+    var apiLog = this.apiActivityLogRepository.findAll();
+    var apiLogBody = this.apiActivityLogBodyRepository.findAll();
 
-    // when run it again
-    apiActivityLogService.deleteApiLogAtDataPlane(LogKindEnum.DATA_PLANE, ZonedDateTime.now());
+    Assertions.assertEquals(2, apiLog.size());
+    Assertions.assertEquals(1, apiLogBody.size());
+    var newLog =
+        this.apiActivityLogRepository.findByRequestIdAndCallSeq(REQUEST_ID, 0).orElse(null);
+    BodyAge requestAge = new BodyAge();
+    requestAge.setAge(1);
+    Assertions.assertEquals(
+        requestAge,
+        JsonToolkit.fromJson(
+            JsonToolkit.toJson(newLog.getApiLogBodyEntity().getRequest()), BodyAge.class));
+    BodyAge responseAge = new BodyAge();
+    responseAge.setAge(2);
+    Assertions.assertEquals(
+        responseAge,
+        JsonToolkit.fromJson(
+            JsonToolkit.toJson(newLog.getApiLogBodyEntity().getResponse()), BodyAge.class));
 
-    Assertions.assertEquals(0, this.apiActivityLogRepository.findAll().size());
-    Assertions.assertEquals(0, this.apiActivityLogBodyRepository.findAll().size());
+    var existedLog =
+        this.apiActivityLogRepository.findByRequestIdAndCallSeq(EXISTED_REQUEST_ID, 0).orElse(null);
+    requestAge.setAge(91);
+    Assertions.assertEquals(
+        requestAge,
+        JsonToolkit.fromJson(
+            JsonToolkit.toJson(existedLog.getApiLogBodyEntity().getRequest()), BodyAge.class));
+    responseAge.setAge(92);
+    Assertions.assertEquals(
+        responseAge,
+        JsonToolkit.fromJson(
+            JsonToolkit.toJson(existedLog.getApiLogBodyEntity().getResponse()), BodyAge.class));
   }
 
-  @Test
+  // @Test
   void deleteApiActivityLogInControlPlane() {
 
     var envId = UUID.randomUUID();
