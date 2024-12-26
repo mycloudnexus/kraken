@@ -168,7 +168,9 @@ public class ApiActivityLogService {
         entity.setEnv(envId);
         entity.setCreatedBy(userId);
         newActivities.add(entity);
-        newLogActivities.add(entity.getApiLogBodyEntity());
+        if (entity.getApiLogBodyEntity() != null) {
+          newLogActivities.add(entity.getApiLogBodyEntity());
+        }
       }
     }
     apiActivityLogBodyRepository.saveAll(newLogActivities);
