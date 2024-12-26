@@ -39,6 +39,9 @@ public class ApiActivityLogEntity extends AbstractHttpEntity {
   @Column(name = "sync_status", nullable = true, unique = false)
   private SyncStatusEnum syncStatus;
 
+  @Column(name = "migrate_status")
+  private boolean migrateStatus;
+
   @Column(name = "buyer", nullable = true, unique = false)
   private String buyer;
 
@@ -49,6 +52,8 @@ public class ApiActivityLogEntity extends AbstractHttpEntity {
   public ApiActivityLogBodyEntity getApiLogBodyEntity() {
     if (this.apiLogBodyEntity == null) {
       this.apiLogBodyEntity = new ApiActivityLogBodyEntity();
+      this.apiLogBodyEntity.setRequest(this.getRequest());
+      this.apiLogBodyEntity.setResponse(this.getResponse());
     }
     return this.apiLogBodyEntity;
   }

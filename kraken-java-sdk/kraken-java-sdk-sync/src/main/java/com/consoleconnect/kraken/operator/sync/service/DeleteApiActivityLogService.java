@@ -10,12 +10,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class DeleteLogService {
+public class DeleteApiActivityLogService {
 
   private final SyncProperty.DeleteLogConf deleteLogConf;
   private ApiActivityLogService apiActivityLogService;
 
-  public DeleteLogService(SyncProperty syncProperty) {
+  public DeleteApiActivityLogService(SyncProperty syncProperty) {
     this.deleteLogConf = syncProperty.getDeleteLogConf();
   }
 

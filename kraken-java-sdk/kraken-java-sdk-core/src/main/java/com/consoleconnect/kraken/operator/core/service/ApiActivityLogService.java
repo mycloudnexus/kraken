@@ -125,7 +125,7 @@ public class ApiActivityLogService {
     }
 
     for (int page = 0; ; page++) {
-      var list = this.repository.deleteExpiredLog(toDelete, PageRequest.of(page, 20));
+      var list = this.repository.listExpiredApiLog(toDelete, PageRequest.of(page, 20));
       if (list.isEmpty()) {
         break;
       }
@@ -142,6 +142,31 @@ public class ApiActivityLogService {
         this.repository.saveAll(list);
       }
       this.apiActivityLogBodyRepository.deleteAll(bodySet);
+    }
+
+    log.info("{}, {}, end", DELETE_API_ACTIVITY_LOG, logKind.name());
+  }
+
+  public void migrateApiLog(LogKindEnum logKind) {
+
+    if (logKind != LogKindEnum.CONTROL_PLANE) {
+      log.info("{}, {}, skip", DELETE_API_ACTIVITY_LOG, logKind.name());
+      return;
+    }
+
+    for (int page = 0; ; page++) {
+      var list = this.repository.findAllByMigrateStatus(PageRequest.of(page, 20)).stream().toList();
+      if (list.isEmpty()) {
+        break;
+      }
+      var bodySet =
+          list.stream()
+              .map(ApiActivityLogEntity::getApiLogBodyEntity)
+              .filter(Objects::nonNull)
+              .toList();
+
+      this.apiActivityLogBodyRepository.saveAll(bodySet);
+      this.repository.saveAll(list);
     }
 
     log.info("{}, {}, end", DELETE_API_ACTIVITY_LOG, logKind.name());

@@ -25,6 +25,9 @@ public interface ApiActivityLogRepository
 
   Page<ApiActivityLogEntity> findAll(Pageable pageable);
 
+  @Query(value = "SELECT e FROM #{#entityName} e where e.migrateStatus is null ")
+  Page<ApiActivityLogEntity> findAllByMigrateStatus(Pageable pageable);
+
   Page<ApiActivityLogEntity> findAllBySyncStatusAndCreatedAtBefore(
       SyncStatusEnum syncStatus, ZonedDateTime createdAt, Pageable pageable);
 
@@ -48,5 +51,5 @@ public interface ApiActivityLogRepository
   List<ApiActivityLogEntity> findAllByRequestIdIn(List<String> requestIds);
 
   @Query(value = "SELECT e FROM #{#entityName} e where e.createdAt < :expiredDateTime")
-  Page<ApiActivityLogEntity> deleteExpiredLog(ZonedDateTime expiredDateTime, Pageable pageable);
+  Page<ApiActivityLogEntity> listExpiredApiLog(ZonedDateTime expiredDateTime, Pageable pageable);
 }
