@@ -3,6 +3,7 @@ package com.consoleconnect.kraken.operator.sync.service;
 import com.consoleconnect.kraken.operator.core.client.ClientEvent;
 import com.consoleconnect.kraken.operator.core.client.ClientEventTypeEnum;
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
+import com.consoleconnect.kraken.operator.core.enums.LifeStatusEnum;
 import com.consoleconnect.kraken.operator.core.enums.LogKindEnum;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogBodyRepository;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
@@ -17,11 +18,14 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ContextConfiguration;
 
+@Slf4j
 @MockIntegrationTest
 @ContextConfiguration(classes = {CustomConfig.class})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -86,31 +90,47 @@ class ApiActivityLogServiceAtControlPlaneTest extends AbstractIntegrationTest {
     entity.setBuyer("buy");
     entity.setUri("uri");
     entity.setPath("path");
-    entity.setLogRequest("""
+    entity.setRawRequest("""
             {
             "age":91
             }
             """);
-    entity.setLogResponse("""
+    entity.setRawResponse("""
             {
             "age":92
             }
             """);
     this.apiActivityLogRepository.save(entity);
+
+    var toMigrate =
+        this.apiActivityLogRepository
+            .findAllByMigrateStatus(PageRequest.of(0, Integer.MAX_VALUE))
+            .getContent();
+    Assertions.assertEquals(1, toMigrate.size());
   }
 
   @Test
   @Order(2)
   void receiveClientApiActivityLog() {
+
     var envId = UUID.randomUUID();
     var now = ZonedDateTime.parse(NOW_WITH_TIMEZONE);
     addApiLogActivity(envId.toString());
 
     var apiLog = this.apiActivityLogRepository.findAll();
     var apiLogBody = this.apiActivityLogBodyRepository.findAll();
+    var toMigrate =
+        this.apiActivityLogRepository
+            .findAllByMigrateStatus(PageRequest.of(0, Integer.MAX_VALUE))
+            .getContent();
+    Assertions.assertEquals(1, toMigrate.size());
 
     Assertions.assertEquals(2, apiLog.size());
     Assertions.assertEquals(1, apiLogBody.size());
+    assertRequestAndResponse();
+  }
+
+  private void assertRequestAndResponse() {
     var newLog =
         this.apiActivityLogRepository.findByRequestIdAndCallSeq(REQUEST_ID, 0).orElse(null);
     BodyAge requestAge = new BodyAge();
@@ -140,20 +160,44 @@ class ApiActivityLogServiceAtControlPlaneTest extends AbstractIntegrationTest {
             JsonToolkit.toJson(existedLog.getApiLogBodyEntity().getResponse()), BodyAge.class));
   }
 
-  // @Test
-  void deleteApiActivityLogInControlPlane() {
+  @Test
+  @Order(3)
+  void migrateExistedData() {
+    this.apiActivityLogService.migrateApiLog(LogKindEnum.CONTROL_PLANE);
+    var apiLog = this.apiActivityLogRepository.findAll();
+    var apiLogBody = this.apiActivityLogBodyRepository.findAll();
+    var toMigrate =
+        this.apiActivityLogRepository
+            .findAllByMigrateStatus(PageRequest.of(0, Integer.MAX_VALUE))
+            .getContent();
+    Assertions.assertEquals(2, apiLog.size());
+    Assertions.assertEquals(2, apiLogBody.size());
 
-    var envId = UUID.randomUUID();
-    var now = ZonedDateTime.parse(NOW_WITH_TIMEZONE);
-    addApiLogActivity(envId.toString());
-    var result = this.apiActivityLogRepository.findAll();
-    Assertions.assertEquals(1, this.apiActivityLogRepository.findAll().size());
-    Assertions.assertEquals(1, this.apiActivityLogBodyRepository.findAll().size());
+    Assertions.assertEquals(0, toMigrate.size());
+    assertRequestAndResponse();
+  }
 
-    // when run it again
-    apiActivityLogService.deleteApiLogAtDataPlane(LogKindEnum.CONTROL_PLANE, ZonedDateTime.now());
+  @Test
+  @Order(4)
+  void achieveApiActivityLog() {
+    ZonedDateTime toAchieve = ZonedDateTime.now().plusYears(100);
+    apiActivityLogService.achieveApiActivityLog(LogKindEnum.CONTROL_PLANE, toAchieve);
 
-    Assertions.assertEquals(1, this.apiActivityLogRepository.findAll().size());
+    Assertions.assertEquals(
+        0,
+        this.apiActivityLogRepository
+            .listExpiredApiLog(toAchieve, LifeStatusEnum.LIVE, PageRequest.of(0, Integer.MAX_VALUE))
+            .getContent()
+            .size());
+
+    var list = this.apiActivityLogRepository.findAll();
+    list.forEach(
+        x -> {
+          Assertions.assertNull(x.getRawResponse());
+          Assertions.assertNull(x.getRawRequest());
+        });
+
+    Assertions.assertEquals(2, list.size());
     Assertions.assertEquals(0, this.apiActivityLogBodyRepository.findAll().size());
   }
 }

@@ -25,6 +25,6 @@ public class DeleteApiActivityLogService {
         ZonedDateTime.now()
             .truncatedTo(ChronoUnit.DAYS)
             .minusMonths(this.deleteLogConf.getControlPlane().getMonth());
-    this.apiActivityLogService.deleteApiLogAtDataPlane(this.deleteLogConf.getLogKind(), toDelete);
+    this.apiActivityLogService.achieveApiActivityLog(this.deleteLogConf.getLogKind(), toDelete);
   }
 }

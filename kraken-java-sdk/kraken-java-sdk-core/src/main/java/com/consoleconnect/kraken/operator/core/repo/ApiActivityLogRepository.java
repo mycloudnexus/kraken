@@ -1,6 +1,7 @@
 package com.consoleconnect.kraken.operator.core.repo;
 
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
+import com.consoleconnect.kraken.operator.core.enums.LifeStatusEnum;
 import com.consoleconnect.kraken.operator.core.enums.SyncStatusEnum;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -25,7 +26,7 @@ public interface ApiActivityLogRepository
 
   Page<ApiActivityLogEntity> findAll(Pageable pageable);
 
-  @Query(value = "SELECT e FROM #{#entityName} e where e.migrateStatus is null ")
+  @Query(value = "SELECT e FROM #{#entityName} e where e.lifeStatus is null ")
   Page<ApiActivityLogEntity> findAllByMigrateStatus(Pageable pageable);
 
   Page<ApiActivityLogEntity> findAllBySyncStatusAndCreatedAtBefore(
@@ -50,6 +51,9 @@ public interface ApiActivityLogRepository
 
   List<ApiActivityLogEntity> findAllByRequestIdIn(List<String> requestIds);
 
-  @Query(value = "SELECT e FROM #{#entityName} e where e.createdAt < :expiredDateTime")
-  Page<ApiActivityLogEntity> listExpiredApiLog(ZonedDateTime expiredDateTime, Pageable pageable);
+  @Query(
+      value =
+          "SELECT e FROM #{#entityName} e where e.createdAt < :expiredDateTime and e.lifeStatus = :lifeStatus")
+  Page<ApiActivityLogEntity> listExpiredApiLog(
+      ZonedDateTime expiredDateTime, LifeStatusEnum lifeStatus, Pageable pageable);
 }

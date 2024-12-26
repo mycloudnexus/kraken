@@ -49,11 +49,19 @@ public class AbstractHttpEntity extends AbstractEntity {
   @Type(JsonType.class)
   private Object response;
 
-  public void setLogRequest(Object request) {
+  public Object getRawRequest() {
+    return this.request;
+  }
+
+  public Object getRawResponse() {
+    return this.response;
+  }
+
+  public void setRawRequest(Object request) {
     this.request = request;
   }
 
-  public void setLogResponse(Object response) {
+  public void setRawResponse(Object response) {
     this.response = response;
   }
 }

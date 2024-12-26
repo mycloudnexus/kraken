@@ -10,6 +10,7 @@ import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogBodyEntity;
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
 import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
+import com.consoleconnect.kraken.operator.core.enums.LifeStatusEnum;
 import com.consoleconnect.kraken.operator.core.enums.LogKindEnum;
 import com.consoleconnect.kraken.operator.core.enums.SyncStatusEnum;
 import com.consoleconnect.kraken.operator.core.mapper.ApiActivityLogMapper;
@@ -115,7 +116,7 @@ public class ApiActivityLogService {
                 entity -> UnifiedAssetService.toAsset(entity, true)));
   }
 
-  public void deleteApiLogAtDataPlane(LogKindEnum logKind, ZonedDateTime toDelete) {
+  public void achieveApiActivityLog(LogKindEnum logKind, ZonedDateTime toDelete) {
 
     log.info("{}, {}, {}, start", DELETE_API_ACTIVITY_LOG, logKind.name(), toDelete);
 
@@ -125,7 +126,9 @@ public class ApiActivityLogService {
     }
 
     for (int page = 0; ; page++) {
-      var list = this.repository.listExpiredApiLog(toDelete, PageRequest.of(page, 20));
+      var list =
+          this.repository.listExpiredApiLog(
+              toDelete, LifeStatusEnum.LIVE, PageRequest.of(page, 20));
       if (list.isEmpty()) {
         break;
       }
@@ -137,8 +140,14 @@ public class ApiActivityLogService {
       if (logKind == LogKindEnum.DATA_PLANE) {
         this.repository.deleteAll(list);
       } else {
+        list.forEach(
+            x -> {
+              x.setRawRequest(null);
+              x.setRawResponse(null);
+              x.setApiLogBodyEntity(null);
+              x.setLifeStatus(LifeStatusEnum.ACHIEVED);
+            });
 
-        list.forEach(x -> x.setApiLogBodyEntity(null));
         this.repository.saveAll(list);
       }
       this.apiActivityLogBodyRepository.deleteAll(bodySet);
@@ -164,6 +173,7 @@ public class ApiActivityLogService {
               .map(ApiActivityLogEntity::getApiLogBodyEntity)
               .filter(Objects::nonNull)
               .toList();
+      list.forEach(x -> x.setLifeStatus(LifeStatusEnum.LIVE));
 
       this.apiActivityLogBodyRepository.saveAll(bodySet);
       this.repository.saveAll(list);
@@ -192,6 +202,7 @@ public class ApiActivityLogService {
         ApiActivityLogEntity entity = ApiActivityLogMapper.INSTANCE.map(dto);
         entity.setEnv(envId);
         entity.setCreatedBy(userId);
+        entity.setLifeStatus(LifeStatusEnum.LIVE);
         newActivities.add(entity);
         if (entity.getApiLogBodyEntity() != null) {
           newLogActivities.add(entity.getApiLogBodyEntity());

@@ -1,5 +1,6 @@
 package com.consoleconnect.kraken.operator.core.entity;
 
+import com.consoleconnect.kraken.operator.core.enums.LifeStatusEnum;
 import com.consoleconnect.kraken.operator.core.enums.SyncStatusEnum;
 import jakarta.persistence.*;
 import java.time.ZonedDateTime;
@@ -39,8 +40,8 @@ public class ApiActivityLogEntity extends AbstractHttpEntity {
   @Column(name = "sync_status", nullable = true, unique = false)
   private SyncStatusEnum syncStatus;
 
-  @Column(name = "migrate_status")
-  private boolean migrateStatus;
+  @Column(name = "life_status")
+  private LifeStatusEnum lifeStatus;
 
   @Column(name = "buyer", nullable = true, unique = false)
   private String buyer;
