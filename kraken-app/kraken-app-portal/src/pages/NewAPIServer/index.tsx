@@ -4,7 +4,7 @@ import { PageLayout } from "@/components/Layout";
 import {
   useCreateNewComponent,
   useDeleteApiServer,
-  useEditComponent,
+  useEditComponentV2,
   useGetComponentDetailV2,
   useGetProductEnvs,
 } from "@/hooks/product";
@@ -42,7 +42,7 @@ const NewAPIServer = () => {
   const { mutateAsync: runCreate, isPending: loadingCreate } =
     useCreateNewComponent();
   const navigate = useNavigate();
-  const { mutateAsync: runUpdate, isPending } = useEditComponent();
+  const { mutateAsync: runUpdate, isPending } = useEditComponentV2();
 
   const handleSave = async () => {
     try {
