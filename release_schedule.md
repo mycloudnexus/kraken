@@ -8,7 +8,7 @@ A new major version’s first snapshot version will start right after the previo
 
 | Version          | Release Content       | Target Release Date  | Actual Release Date |
 | -----------------|:---------------------| --------------------:|--------------------:|
-| 2.0.0-snapshot.0 | - sonata property type validation<br>- allow user to set value limits for sonata property(BE only)  |      Dec-23-2024     |                     |
+| 2.0.0-snapshot.0 | - sonata property type validation<br>- allow user to set value limits for sonata property(BE only)  |      Dec-23-2024     |         Dec-26-2024            |
 | 2.0.0-snapshot.1 | - seller contact info set up in control plane(BE only)<br>- auto delete api activity logs out of retention period |      Dec-30-2024     |                     |
 | 2.0.0-snapshot.2 | - to be added               |      Jan-06-2024     |                     |
 | 2.0.0-snapshot.3 | - to be added               |      Jan-13-2024     |                     |
