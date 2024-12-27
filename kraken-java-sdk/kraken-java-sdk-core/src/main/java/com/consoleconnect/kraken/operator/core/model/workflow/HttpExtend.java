@@ -60,10 +60,6 @@ public class HttpExtend extends Task<HttpExtend> {
     return this;
   }
 
-  public Input getHttpRequest() {
-    return httpRequest;
-  }
-
   @Override
   protected void updateWorkflowTask(WorkflowTask workflowTask) {
     workflowTask.getInputParameters().put(INPUT_PARAM, httpRequest);

@@ -112,12 +112,18 @@ public class WorkflowTemplateTransformer {
   private SimpleTask constructSimpleTask(String taskName) {
     return task2InputParamMap.entrySet().stream()
         .filter(v -> Objects.equals(taskName, v.getKey()))
-        .map(entry -> buildSimpleTask(entry.getKey(), entry.getKey(), entry.getValue()))
+        .map(entry -> buildSimpleTask(entry.getKey(), getUniqueTaskRef(entry), entry.getValue()))
         .findAny()
         .orElseThrow(
             () ->
                 KrakenException.internalError(
                     String.format("can not found build-in task: %s", taskName)));
+  }
+
+  private static String getUniqueTaskRef(Map.Entry<String, Map<String, String>> entry) {
+    return entry.getKey()
+        + com.consoleconnect.kraken.operator.core.toolkit.StringUtils.shortenUUID(
+            UUID.randomUUID().toString());
   }
 
   private SimpleTask buildSimpleTask(String taskName, String taskRef, Map<String, String> input) {
@@ -139,7 +145,7 @@ public class WorkflowTemplateTransformer {
             .method(HttpExtend.Input.HttpMethod.getIgnoreCase(endpoint.getMethod()));
     http.headers(SUB_REQUEST_HEADER);
     TaskDef def = new TaskDef(http.getName());
-    if ("GET".equalsIgnoreCase(endpoint.getMethod())) {
+    if (!"GET".equalsIgnoreCase(endpoint.getMethod())) {
       http.body(String.format(SUB_REQUEST_BODY, httpTask.getTaskName()));
       def.setRetryCount(0);
     } else {
