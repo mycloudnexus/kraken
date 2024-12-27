@@ -218,6 +218,7 @@ spec:
         - id: rewrite-path
           actionType: buildin@rewrite-path
           env:
+            workflowEnabled: ${targetApiConfig.workflow.enabled}
             path: ${targetApiConfig.endpoints[0].path}
             method: ${targetApiConfig.endpoints[0].method}
           with:

@@ -87,6 +87,8 @@ logging:
     com.consoleconnect.core.beehive: DEBUG
     org.springframework.security: DEBUG
 app:
+  workflow:
+    base-url: http://base-url.com
   tenant:
     tenantId: ef90f7e7-dc7d-4538-aa5b-a4a7d8432da2
     mode: SINGLE
