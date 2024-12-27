@@ -4,6 +4,7 @@ import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import io.orkes.conductor.client.ApiClient;
 import io.orkes.conductor.client.http.OrkesMetadataClient;
 import io.orkes.conductor.client.http.OrkesWorkflowClient;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,6 +25,7 @@ public class WorkflowConfig {
 
   @Bean
   public ApiClient getApiClient(AppProperty appProperty) {
-    return new ApiClient(appProperty.getWorkflow().getBaseUrl());
+    String baseUrl = appProperty.getWorkflow().getBaseUrl();
+    return new ApiClient(StringUtils.isBlank(baseUrl) ? "http://base-url.com" : baseUrl);
   }
 }
