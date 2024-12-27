@@ -29,8 +29,11 @@ public interface ApiActivityLogRepository
   @Query(value = "SELECT e FROM #{#entityName} e where e.lifeStatus is null ")
   Page<ApiActivityLogEntity> findAllByMigrateStatus(Pageable pageable);
 
-  Page<ApiActivityLogEntity> findAllBySyncStatusAndCreatedAtBefore(
-      SyncStatusEnum syncStatus, ZonedDateTime createdAt, Pageable pageable);
+  Page<ApiActivityLogEntity> findAllBySyncStatusAndLifeStatusAndCreatedAtBefore(
+      SyncStatusEnum syncStatus,
+      LifeStatusEnum lifeStatus,
+      ZonedDateTime createdAt,
+      Pageable pageable);
 
   @Query(
       "SELECT e.path, e.method , COUNT(e) FROM #{#entityName} e "

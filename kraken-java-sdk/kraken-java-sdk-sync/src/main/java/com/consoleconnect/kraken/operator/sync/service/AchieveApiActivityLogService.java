@@ -7,6 +7,7 @@ import com.consoleconnect.kraken.operator.core.service.ApiActivityLogService;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.sync.model.SyncProperty;
 import lombok.extern.slf4j.Slf4j;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -15,13 +16,19 @@ import org.springframework.stereotype.Service;
 public class AchieveApiActivityLogService {
 
   private final AppConfig.AchieveApiActivityLogConf deleteLogConf;
-  private ApiActivityLogService apiActivityLogService;
+  private final ApiActivityLogService apiActivityLogService;
 
-  public AchieveApiActivityLogService(SyncProperty syncProperty) {
+  public AchieveApiActivityLogService(
+      SyncProperty syncProperty, ApiActivityLogService apiActivityLogService) {
     this.deleteLogConf = syncProperty.getAchieveLogConf();
+    this.apiActivityLogService = apiActivityLogService;
     log.info("{}, {}", ACHIEVE_LOG_CONFIG, JsonToolkit.toJson(this.deleteLogConf));
   }
 
+  @SchedulerLock(
+      name = "achieveLogLock",
+      lockAtMostFor = "${app.cron-job.lock.at-most-for}",
+      lockAtLeastFor = "${app.cron-job.lock.at-least-for}")
   @Scheduled(cron = "${app.cron-job.achieve-api-activity-log:-}")
   public void runIt() {
     log.info("{}, {}, run it", ACHIEVE_LOG_CONFIG, JsonToolkit.toJson(this.deleteLogConf));

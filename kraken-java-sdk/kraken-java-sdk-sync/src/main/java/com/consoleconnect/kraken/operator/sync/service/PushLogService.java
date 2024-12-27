@@ -5,6 +5,7 @@ import static com.consoleconnect.kraken.operator.core.service.ApiActivityLogServ
 import com.consoleconnect.kraken.operator.core.client.ClientEvent;
 import com.consoleconnect.kraken.operator.core.client.ClientEventTypeEnum;
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
+import com.consoleconnect.kraken.operator.core.enums.LifeStatusEnum;
 import com.consoleconnect.kraken.operator.core.enums.SyncStatusEnum;
 import com.consoleconnect.kraken.operator.core.mapper.ApiActivityLogMapper;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
@@ -49,8 +50,9 @@ public class PushLogService extends KrakenServerConnector {
         ZonedDateTime.now().minusSeconds(getAppProperty().getSynDelaySeconds());
     List<ApiActivityLogEntity> logEntities =
         apiActivityLogRepository
-            .findAllBySyncStatusAndCreatedAtBefore(
+            .findAllBySyncStatusAndLifeStatusAndCreatedAtBefore(
                 SyncStatusEnum.UNDEFINED,
+                LifeStatusEnum.LIVE,
                 createdAt,
                 UnifiedAssetService.getSearchPageRequest(0, 50, Sort.Direction.ASC, CREATED_AT))
             .getContent();

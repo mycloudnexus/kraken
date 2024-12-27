@@ -40,6 +40,7 @@ public class ApiActivityLogEntity extends AbstractHttpEntity {
   @Column(name = "sync_status", nullable = true, unique = false)
   private SyncStatusEnum syncStatus;
 
+  @Enumerated(EnumType.STRING)
   @Column(name = "life_status")
   private LifeStatusEnum lifeStatus;
 
