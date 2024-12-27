@@ -1,7 +1,6 @@
 import { get } from "lodash";
 import { useEffect, useMemo, useState } from "react";
 import swaggerClient from "swagger-client";
-import { decode } from "js-base64";
 import jsYaml from "js-yaml";
 import { Text } from "../Text";
 import RequestBody from "@/pages/NewAPIServer/components/RequestBody";
@@ -11,6 +10,7 @@ import { Col, Row, Table, notification } from "antd";
 import Flex from "../Flex";
 import RequestMethod from "../Method";
 import TrimmedPath from "../TrimmedPath";
+import { decodeFileContent } from "@/utils/helpers/base64";
 
 type Props = {
   selectedAPI?: string;
@@ -25,7 +25,7 @@ const APIViewerContent = ({ selectedAPI, content }: Props) => {
     try {
       if (selectedAPI && content) {
         const selectedArray = selectedAPI.split(" ");
-        const yamlContent = jsYaml.load(decode(content));
+        const yamlContent = jsYaml.load(decodeFileContent(content));
         const result = await swaggerClient.resolve({ spec: yamlContent });
         const data = get(result, "spec");
         setSchemas(get(data, "components.schemas"));

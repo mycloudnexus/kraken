@@ -3,12 +3,12 @@ import { Text } from "../Text";
 import { CloseOutlined } from "@ant-design/icons";
 import styles from "./index.module.scss";
 import jsYaml from "js-yaml";
-import { decode } from "js-base64";
 import { useEffect, useState } from "react";
 import { get, isEmpty } from "lodash";
 import APIViewerContent from "../APIViewerContent";
 import TableAPIList from "./TableAPIList";
 import { transformApiData } from "@/utils/helpers/swagger";
+import { decodeFileContent } from "@/utils/helpers/base64";
 
 type Props = {
   content: string;
@@ -29,7 +29,7 @@ const SpecDrawer = ({ content, isOpen, onClose }: Props) => {
   const loadContent = () => {
     try {
       if (content) {
-        const yamlContent = jsYaml.load(decode(content));
+        const yamlContent = jsYaml.load(decodeFileContent(content));
         const result = transformApiData(get(yamlContent, "paths", {}));
         setTitle(get(yamlContent, "info.title", ""));
         setTableData(result);
