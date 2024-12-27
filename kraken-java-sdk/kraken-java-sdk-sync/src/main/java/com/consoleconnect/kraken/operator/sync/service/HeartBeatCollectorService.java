@@ -12,6 +12,7 @@ import com.consoleconnect.kraken.operator.core.repo.MgmtEventRepository;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import java.time.ZonedDateTime;
 import lombok.extern.slf4j.Slf4j;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -31,6 +32,10 @@ public class HeartBeatCollectorService {
     this.environmentClientRepository = environmentClientRepository;
   }
 
+  @SchedulerLock(
+      name = "heartBeatCollectorLock",
+      lockAtMostFor = "${app.cron-job.lock.at-most-for}",
+      lockAtLeastFor = "${app.cron-job.lock.at-least-for}")
   @Scheduled(cron = "${app.cron-job.push-heartbeat-collector:-}")
   public void runIt() {
     ZonedDateTime now = ZonedDateTime.now();

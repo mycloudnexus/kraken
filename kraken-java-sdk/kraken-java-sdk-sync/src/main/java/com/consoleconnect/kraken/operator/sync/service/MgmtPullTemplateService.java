@@ -23,6 +23,7 @@ import com.consoleconnect.kraken.operator.sync.model.SyncProperty;
 import java.time.ZonedDateTime;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -55,6 +56,10 @@ public class MgmtPullTemplateService extends KrakenServerConnector {
     this.eventSinkService = eventSinkService;
   }
 
+  @SchedulerLock(
+      name = "pullMappingTemplateDetailsLock",
+      lockAtMostFor = "${app.cron-job.lock.at-most-for}",
+      lockAtLeastFor = "${app.cron-job.lock.at-least-for}")
   @Scheduled(cron = "${app.cron-job.download-mapping-template-content-from-mgmt:-}")
   public void pullMappingTemplateDetails() {
     Paging<UnifiedAssetDto> assetDtoPaging =
@@ -128,6 +133,10 @@ public class MgmtPullTemplateService extends KrakenServerConnector {
     installMappingTemplateViaMgmt(id);
   }
 
+  @SchedulerLock(
+      name = "queryLatestProductReleaseLock",
+      lockAtMostFor = "${app.cron-job.lock.at-most-for}",
+      lockAtLeastFor = "${app.cron-job.lock.at-least-for}")
   @Scheduled(cron = "${app.cron-job.pull-latest-release-from-mgmt:-}")
   public void queryLatestProductRelease() {
     Paging<UnifiedAssetDto> assetDtoPaging =
