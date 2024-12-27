@@ -197,7 +197,7 @@ class ApiActivityLogServiceAtControlPlaneTest extends AbstractIntegrationTest {
     AppConfig.AchieveApiActivityLogConf achieveApiActivityLogConf =
         new AppConfig.AchieveApiActivityLogConf();
     achieveApiActivityLogConf.setAchieveScope(AchieveScopeEnum.DETAIL);
-    achieveApiActivityLogConf.setMonth(1);
+    achieveApiActivityLogConf.setMonth(-1);
     achieveApiActivityLogConf.setProtocol("GET");
     achieveApiActivityLogConf.setLogKind(LogKindEnum.CONTROL_PLANE);
     apiActivityLogService.achieveApiActivityLog(achieveApiActivityLogConf);
@@ -213,14 +213,21 @@ class ApiActivityLogServiceAtControlPlaneTest extends AbstractIntegrationTest {
             .getContent()
             .size());
 
-    var list = this.apiActivityLogRepository.findAll();
+    var list =
+        this.apiActivityLogRepository
+            .listExpiredApiLog(
+                achieveApiActivityLogConf.toAchieve(),
+                LifeStatusEnum.ACHIEVED,
+                achieveApiActivityLogConf.getProtocol(),
+                PageRequest.of(0, 20))
+            .getContent();
+    Assertions.assertEquals(1, list.size());
     list.forEach(
         x -> {
           Assertions.assertNull(x.getRawResponse());
           Assertions.assertNull(x.getRawRequest());
         });
 
-    Assertions.assertEquals(2, list.size());
-    Assertions.assertEquals(0, this.apiActivityLogBodyRepository.findAll().size());
+    Assertions.assertEquals(1, this.apiActivityLogBodyRepository.findAll().size());
   }
 }
