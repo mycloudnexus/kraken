@@ -22,6 +22,8 @@ public class AppConfig {
   @Data
   public static class AchieveApiActivityLogConf {
 
+    public static final String ACHIEVE_LOG_CONFIG = "ACHIEVE_LOG_CONFIG";
+
     private LogKindEnum logKind;
 
     private int month;

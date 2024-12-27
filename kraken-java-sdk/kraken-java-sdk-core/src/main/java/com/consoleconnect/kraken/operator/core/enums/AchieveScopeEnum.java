@@ -6,8 +6,8 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum AchieveScopeEnum {
-  BASIC("BASIC"),
-  DETAIL("DETAIL");
+  BASIC("basic"),
+  DETAIL("detail");
 
   private final String scope;
 }

@@ -146,7 +146,11 @@ class ApiActivityLogServiceAtDataPlaneTest extends AbstractIntegrationTest {
   @Test
   void migrateExistedData() {
     this.insertLogWithoutSubTable();
-    this.apiActivityLogService.migrateApiLog(LogKindEnum.DATA_PLANE);
+    AppConfig.AchieveApiActivityLogConf achieveApiActivityLogConf =
+        new AppConfig.AchieveApiActivityLogConf();
+    achieveApiActivityLogConf.setLogKind(LogKindEnum.DATA_PLANE);
+
+    this.apiActivityLogService.migrateApiLog(achieveApiActivityLogConf);
     var apiLog = this.apiActivityLogRepository.findAll();
     var apiLogBody = this.apiActivityLogBodyRepository.findAll();
     var toMigrate =

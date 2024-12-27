@@ -119,6 +119,9 @@ public class ApiActivityLogService {
   }
 
   public void achieveApiActivityLog(AppConfig.AchieveApiActivityLogConf activityLogConf) {
+    if (activityLogConf == null) {
+      return;
+    }
     var logKind = activityLogConf.getLogKind();
 
     if (logKind != LogKindEnum.DATA_PLANE && logKind != LogKindEnum.CONTROL_PLANE) {
@@ -161,8 +164,11 @@ public class ApiActivityLogService {
     log.info("{}, {}, end", DELETE_API_ACTIVITY_LOG, logKind.name());
   }
 
-  public void migrateApiLog(LogKindEnum logKind) {
-
+  public void migrateApiLog(AppConfig.AchieveApiActivityLogConf activityLogConf) {
+    var logKind = activityLogConf.getLogKind();
+    if (activityLogConf == null) {
+      return;
+    }
     for (int page = 0; ; page++) {
       var list = this.repository.findAllByMigrateStatus(PageRequest.of(page, 20)).stream().toList();
       if (list.isEmpty()) {

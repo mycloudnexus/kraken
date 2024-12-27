@@ -87,6 +87,11 @@ logging:
     com.consoleconnect.kraken: DEBUG
 #    reactor.netty: DEBUG
 app:
+  achieve-log-conf:
+    log-kind: data-plane
+    month: 1
+    protocol: GET
+    achieveScope: basic
   tenant:
     workspacePath:
   controlPlane:

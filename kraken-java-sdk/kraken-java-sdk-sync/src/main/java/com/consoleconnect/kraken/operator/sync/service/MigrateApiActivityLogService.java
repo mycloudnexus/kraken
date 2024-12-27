@@ -15,12 +15,12 @@ public class MigrateApiActivityLogService {
   private ApiActivityLogService apiActivityLogService;
 
   public MigrateApiActivityLogService(SyncProperty syncProperty) {
-    this.deleteLogConf = syncProperty.getDeleteLogConf();
+    this.deleteLogConf = syncProperty.getAchieveLogConf();
   }
 
   @Scheduled(cron = "${app.cron-job.migrate-api-activity-log:-}")
   public void runIt() {
 
-    this.apiActivityLogService.migrateApiLog(this.deleteLogConf.getLogKind());
+    this.apiActivityLogService.migrateApiLog(this.deleteLogConf);
   }
 }
