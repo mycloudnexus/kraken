@@ -8,9 +8,9 @@ import { PaperClipOutlined } from "@ant-design/icons";
 import TitleIcon from "@/assets/title-icon.svg";
 import RequestMethod from "../Method";
 import jsYaml from "js-yaml";
-import { decode } from "js-base64";
 import { useNavigate } from "react-router-dom";
 import { useAppStore } from "@/stores/app.store";
+import { decodeFileContent } from "@/utils/helpers/base64";
 
 type Props = {
   detail: any;
@@ -25,7 +25,7 @@ const APIViewer = ({ detail }: Props) => {
       if (!get(detail, "facets.baseSpec.content")) {
         return "";
       }
-      const fileData = decode(get(detail, "facets.baseSpec.content"));
+      const fileData = decodeFileContent(get(detail, "facets.baseSpec.content"));
       const swaggerData = jsYaml.load(fileData);
       return get(swaggerData, "info.title");
     } catch (error) {
