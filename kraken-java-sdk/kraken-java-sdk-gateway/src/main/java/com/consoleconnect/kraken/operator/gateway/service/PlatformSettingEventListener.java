@@ -3,6 +3,7 @@ package com.consoleconnect.kraken.operator.gateway.service;
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
 import com.consoleconnect.kraken.operator.core.event.PlatformSettingCompletedEvent;
 import com.consoleconnect.kraken.operator.core.ingestion.DataIngestionJob;
+import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentTransformerFacets;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
@@ -31,6 +32,7 @@ public class PlatformSettingEventListener {
   private final DataIngestionJob dataIngestionJob;
   private final ApiClient apiClient;
   private final WorkflowTaskConfig workflowTaskConfig;
+  private final AppProperty appProperty;
 
   @EventListener(PlatformSettingCompletedEvent.class)
   public void handlePlatformSettingCompletedEvent(PlatformSettingCompletedEvent event) {
@@ -67,12 +69,15 @@ public class PlatformSettingEventListener {
 
   @EventListener(classes = PlatformSettingCompletedEvent.class)
   public void initWorkerTask() {
-    log.info("init worker task");
-    OrkesClients oc = new OrkesClients(apiClient);
-    AnnotatedWorkerExecutor annotatedWorkerExecutor =
-        new AnnotatedWorkerExecutor(oc.getTaskClient(), 10);
-    annotatedWorkerExecutor.addBean(workflowTaskConfig);
-    annotatedWorkerExecutor.initWorkers("com.consoleconnect.kraken.operator.core.service.workflow");
+    if (appProperty.getWorkflow() != null && appProperty.getWorkflow().isEnabled()) {
+      log.info("init worker task");
+      OrkesClients oc = new OrkesClients(apiClient);
+      AnnotatedWorkerExecutor annotatedWorkerExecutor =
+          new AnnotatedWorkerExecutor(oc.getTaskClient(), 10);
+      annotatedWorkerExecutor.addBean(workflowTaskConfig);
+      annotatedWorkerExecutor.initWorkers(
+          "com.consoleconnect.kraken.operator.core.service.workflow");
+    }
   }
 
   @EventListener(classes = ApplicationReadyEvent.class)

@@ -37,5 +37,6 @@ public class AppProperty {
     private String baseUrl = "http://base-url.com";
     private String key;
     private String secret;
+    private boolean enabled = false;
   }
 }
