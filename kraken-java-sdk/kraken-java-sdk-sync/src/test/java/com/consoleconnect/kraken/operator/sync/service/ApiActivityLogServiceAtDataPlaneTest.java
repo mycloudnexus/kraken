@@ -154,9 +154,9 @@ class ApiActivityLogServiceAtDataPlaneTest extends AbstractIntegrationTest {
             .findAllByMigrateStatus(PageRequest.of(0, Integer.MAX_VALUE))
             .getContent();
     Assertions.assertEquals(1, apiLog.size());
-    Assertions.assertEquals(0, apiLogBody.size());
+    Assertions.assertEquals(1, apiLogBody.size());
 
-    Assertions.assertEquals(1, toMigrate.size());
+    Assertions.assertEquals(0, toMigrate.size());
     assertRequestAndResponse();
   }
 
@@ -168,8 +168,7 @@ class ApiActivityLogServiceAtDataPlaneTest extends AbstractIntegrationTest {
     AppConfig.AchieveApiActivityLogConf achieveApiActivityLogConf =
         new AppConfig.AchieveApiActivityLogConf();
     achieveApiActivityLogConf.setAchieveScope(AchieveScopeEnum.BASIC);
-    achieveApiActivityLogConf.setMonth(1);
-    achieveApiActivityLogConf.setProtocol("GET");
+    achieveApiActivityLogConf.setMonth(-1);
     achieveApiActivityLogConf.setLogKind(LogKindEnum.DATA_PLANE);
     apiActivityLogService.achieveApiActivityLog(achieveApiActivityLogConf);
 
@@ -191,7 +190,7 @@ class ApiActivityLogServiceAtDataPlaneTest extends AbstractIntegrationTest {
           Assertions.assertNotNull(x.getRawRequest());
         });
 
-    Assertions.assertEquals(1, list.size());
+    Assertions.assertEquals(0, list.size());
     Assertions.assertEquals(0, this.apiActivityLogBodyRepository.findAll().size());
   }
 }
