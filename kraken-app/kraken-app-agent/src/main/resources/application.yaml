@@ -108,7 +108,8 @@ app:
     push-heartbeat: 0/20 * * * * *
     push-log: 0/20 * * * * *
     push-log-external-system: 0 0/1 * * * *
-    delete-api-activity-log: 0 0/1 * * * *
+    achieve-api-activity-log: 0 0/1 * * * *
+    migrate-api-activity-log: 0 0/1 * * * *
     lock:
       at-most-for: 2m
       at-least-for: 10s

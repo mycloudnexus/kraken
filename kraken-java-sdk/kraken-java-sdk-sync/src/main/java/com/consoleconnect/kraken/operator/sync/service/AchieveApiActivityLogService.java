@@ -12,19 +12,19 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class DeleteApiActivityLogService {
+public class AchieveApiActivityLogService {
 
   private final AppConfig.AchieveApiActivityLogConf deleteLogConf;
   private ApiActivityLogService apiActivityLogService;
 
-  public DeleteApiActivityLogService(SyncProperty syncProperty) {
+  public AchieveApiActivityLogService(SyncProperty syncProperty) {
     this.deleteLogConf = syncProperty.getAchieveLogConf();
     log.info("{}, {}", ACHIEVE_LOG_CONFIG, JsonToolkit.toJson(this.deleteLogConf));
   }
 
-  @Scheduled(cron = "${app.cron-job.delete-api-activity-log:-}")
+  @Scheduled(cron = "${app.cron-job.achieve-api-activity-log:-}")
   public void runIt() {
-
+    log.info("{}, {}, run it", ACHIEVE_LOG_CONFIG, JsonToolkit.toJson(this.deleteLogConf));
     this.apiActivityLogService.achieveApiActivityLog(this.deleteLogConf);
   }
 }

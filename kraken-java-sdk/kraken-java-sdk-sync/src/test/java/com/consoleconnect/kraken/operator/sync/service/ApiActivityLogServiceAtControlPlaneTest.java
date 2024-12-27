@@ -33,7 +33,7 @@ import org.springframework.test.context.ContextConfiguration;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class ApiActivityLogServiceAtControlPlaneTest extends AbstractIntegrationTest {
   @Autowired ApiActivityLogRepository apiActivityLogRepository;
-  @SpyBean private DeleteApiActivityLogService deleteLogService;
+  @SpyBean private AchieveApiActivityLogService deleteLogService;
   @SpyBean private ApiActivityLogService apiActivityLogService;
   @SpyBean private ApiActivityLogBodyRepository apiActivityLogBodyRepository;
   public static final String NOW_WITH_TIMEZONE = "2023-10-24T05:00:00+02:00";
