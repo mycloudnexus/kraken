@@ -1,6 +1,11 @@
 package com.consoleconnect.kraken.operator.core.config;
 
+import com.consoleconnect.kraken.operator.core.enums.AchieveScopeEnum;
+import com.consoleconnect.kraken.operator.core.enums.LogKindEnum;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,5 +17,19 @@ public class AppConfig {
   @ConfigurationProperties(prefix = "app")
   public AppProperty appProperty() {
     return new AppProperty();
+  }
+
+  @Data
+  public static class AchieveApiActivityLogConf {
+
+    private LogKindEnum logKind;
+
+    private int month;
+    private String protocol;
+    private AchieveScopeEnum achieveScope;
+
+    public ZonedDateTime toAchieve() {
+      return ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS).minusMonths(this.month);
+    }
   }
 }

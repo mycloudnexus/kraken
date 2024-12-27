@@ -50,6 +50,14 @@ public class ApiActivityLogEntity extends AbstractHttpEntity {
   @JoinColumn(name = "api_log_body_id")
   private ApiActivityLogBodyEntity apiLogBodyEntity;
 
+  public ApiActivityLogBodyEntity getRawApiLogBodyEntity() {
+    return this.apiLogBodyEntity;
+  }
+
+  public void setRawApiLogBodyEntity(ApiActivityLogBodyEntity bodyEntity) {
+    this.apiLogBodyEntity = null;
+  }
+
   public ApiActivityLogBodyEntity getApiLogBodyEntity() {
     if (this.apiLogBodyEntity == null) {
       this.apiLogBodyEntity = new ApiActivityLogBodyEntity();

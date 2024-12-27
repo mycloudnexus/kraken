@@ -53,7 +53,8 @@ public interface ApiActivityLogRepository
 
   @Query(
       value =
-          "SELECT e FROM #{#entityName} e where e.createdAt < :expiredDateTime and e.lifeStatus = :lifeStatus")
+          "SELECT e FROM #{#entityName} e where e.createdAt < :expiredDateTime and e.lifeStatus = :lifeStatus"
+              + " and (:method is null or e.method = :method)")
   Page<ApiActivityLogEntity> listExpiredApiLog(
-      ZonedDateTime expiredDateTime, LifeStatusEnum lifeStatus, Pageable pageable);
+      ZonedDateTime expiredDateTime, LifeStatusEnum lifeStatus, String method, Pageable pageable);
 }

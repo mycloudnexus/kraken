@@ -1,5 +1,6 @@
 package com.consoleconnect.kraken.operator.sync.service;
 
+import com.consoleconnect.kraken.operator.core.config.AppConfig;
 import com.consoleconnect.kraken.operator.core.service.ApiActivityLogService;
 import com.consoleconnect.kraken.operator.sync.model.SyncProperty;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class MigrateApiActivityLogService {
 
-  private final SyncProperty.DeleteLogConf deleteLogConf;
+  private final AppConfig.AchieveApiActivityLogConf deleteLogConf;
   private ApiActivityLogService apiActivityLogService;
 
   public MigrateApiActivityLogService(SyncProperty syncProperty) {

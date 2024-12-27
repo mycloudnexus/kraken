@@ -1,29 +1,18 @@
 package com.consoleconnect.kraken.operator.sync.model;
 
-import com.consoleconnect.kraken.operator.core.enums.LogKindEnum;
+import com.consoleconnect.kraken.operator.core.config.AppConfig;
 import java.util.List;
 import lombok.Data;
 
 @Data
 public class SyncProperty {
   private ControlPlane controlPlane = new ControlPlane();
-  private DeleteLogConf deleteLogConf = new DeleteLogConf();
+  private AppConfig.AchieveApiActivityLogConf deleteLogConf =
+      new AppConfig.AchieveApiActivityLogConf();
   private MgmtPlane mgmtPlane = new MgmtPlane();
   private List<String> acceptAssetKinds = List.of();
   private boolean assetConfigOverwriteFlag = false;
   private long synDelaySeconds = 60;
-
-  @Data
-  public static class DeleteLogConf {
-
-    private LogKindEnum logKind;
-    private DeleteDataPlaneConf controlPlane;
-  }
-
-  @Data
-  public static class DeleteDataPlaneConf {
-    private int month;
-  }
 
   @Data
   public static class ControlPlane {

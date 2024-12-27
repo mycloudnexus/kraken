@@ -2,7 +2,9 @@ package com.consoleconnect.kraken.operator.sync.service;
 
 import com.consoleconnect.kraken.operator.core.client.ClientEvent;
 import com.consoleconnect.kraken.operator.core.client.ClientEventTypeEnum;
+import com.consoleconnect.kraken.operator.core.config.AppConfig;
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
+import com.consoleconnect.kraken.operator.core.enums.AchieveScopeEnum;
 import com.consoleconnect.kraken.operator.core.enums.LifeStatusEnum;
 import com.consoleconnect.kraken.operator.core.enums.LogKindEnum;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogBodyRepository;
@@ -162,12 +164,23 @@ class ApiActivityLogServiceAtDataPlaneTest extends AbstractIntegrationTest {
   void achieveApiActivityLog() {
     this.migrateExistedData();
     ZonedDateTime toAchieve = ZonedDateTime.now().plusYears(100);
-    apiActivityLogService.achieveApiActivityLog(LogKindEnum.DATA_PLANE, toAchieve);
+
+    AppConfig.AchieveApiActivityLogConf achieveApiActivityLogConf =
+        new AppConfig.AchieveApiActivityLogConf();
+    achieveApiActivityLogConf.setAchieveScope(AchieveScopeEnum.BASIC);
+    achieveApiActivityLogConf.setMonth(1);
+    achieveApiActivityLogConf.setProtocol("GET");
+    achieveApiActivityLogConf.setLogKind(LogKindEnum.DATA_PLANE);
+    apiActivityLogService.achieveApiActivityLog(achieveApiActivityLogConf);
 
     Assertions.assertEquals(
         0,
         this.apiActivityLogRepository
-            .listExpiredApiLog(toAchieve, LifeStatusEnum.LIVE, PageRequest.of(0, Integer.MAX_VALUE))
+            .listExpiredApiLog(
+                toAchieve,
+                LifeStatusEnum.LIVE,
+                achieveApiActivityLogConf.getProtocol(),
+                PageRequest.of(0, Integer.MAX_VALUE))
             .getContent()
             .size());
 

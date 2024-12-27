@@ -4,12 +4,14 @@ import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.PRODUC
 import static com.consoleconnect.kraken.operator.core.toolkit.LabelConstants.LABEL_BUYER_ID;
 
 import com.consoleconnect.kraken.operator.core.client.ClientEvent;
+import com.consoleconnect.kraken.operator.core.config.AppConfig;
 import com.consoleconnect.kraken.operator.core.dto.ApiActivityLog;
 import com.consoleconnect.kraken.operator.core.dto.ComposedHttpRequest;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogBodyEntity;
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
 import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
+import com.consoleconnect.kraken.operator.core.enums.AchieveScopeEnum;
 import com.consoleconnect.kraken.operator.core.enums.LifeStatusEnum;
 import com.consoleconnect.kraken.operator.core.enums.LogKindEnum;
 import com.consoleconnect.kraken.operator.core.enums.SyncStatusEnum;
@@ -116,9 +118,10 @@ public class ApiActivityLogService {
                 entity -> UnifiedAssetService.toAsset(entity, true)));
   }
 
-  public void achieveApiActivityLog(LogKindEnum logKind, ZonedDateTime toDelete) {
-
-    log.info("{}, {}, {}, start", DELETE_API_ACTIVITY_LOG, logKind.name(), toDelete);
+  public void achieveApiActivityLog(AppConfig.AchieveApiActivityLogConf activityLogConf) {
+    var logKind = activityLogConf.getLogKind();
+    log.info(
+        "{}, {}, {}, start", DELETE_API_ACTIVITY_LOG, logKind.name(), activityLogConf.toAchieve());
 
     if (logKind != LogKindEnum.DATA_PLANE && logKind != LogKindEnum.CONTROL_PLANE) {
       log.info("{}, {}, skip", DELETE_API_ACTIVITY_LOG, logKind.name());
@@ -128,29 +131,33 @@ public class ApiActivityLogService {
     for (int page = 0; ; page++) {
       var list =
           this.repository.listExpiredApiLog(
-              toDelete, LifeStatusEnum.LIVE, PageRequest.of(page, 20));
+              activityLogConf.toAchieve(),
+              LifeStatusEnum.LIVE,
+              activityLogConf.getProtocol(),
+              PageRequest.of(page, 20));
       if (list.isEmpty()) {
         break;
       }
       var bodySet =
           list.stream()
-              .map(ApiActivityLogEntity::getApiLogBodyEntity)
+              .map(ApiActivityLogEntity::getRawApiLogBodyEntity)
               .filter(Objects::nonNull)
               .toList();
-      if (logKind == LogKindEnum.DATA_PLANE) {
-        this.repository.deleteAll(list);
-      } else {
-        list.forEach(
-            x -> {
-              x.setRawRequest(null);
-              x.setRawResponse(null);
-              x.setApiLogBodyEntity(null);
-              x.setLifeStatus(LifeStatusEnum.ACHIEVED);
-            });
 
-        this.repository.saveAll(list);
-      }
+      list.forEach(
+          x -> {
+            x.setRawRequest(null);
+            x.setRawResponse(null);
+            x.setRawApiLogBodyEntity(null);
+            x.setLifeStatus(LifeStatusEnum.ACHIEVED);
+          });
+
+      this.repository.saveAll(list);
+
       this.apiActivityLogBodyRepository.deleteAll(bodySet);
+      if (activityLogConf.getAchieveScope() == AchieveScopeEnum.BASIC) {
+        this.repository.deleteAll(list);
+      }
     }
 
     log.info("{}, {}, end", DELETE_API_ACTIVITY_LOG, logKind.name());
