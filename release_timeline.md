@@ -22,4 +22,4 @@
 | Version          | Release Content       | Target Release Date  | Actual Release Date |
 | -----------------|:---------------------| --------------------:|--------------------:|
 | 1.0.0 | [1.0.0 release note](https://github.com/mycloudnexus/kraken/releases/tag/v1.0.0)  |    Nov-21-2024       |           Nov-25-2024          |
-| 1.1.0 | - seller contact info set up in control plane(BE only)<br>- auto delete api activity logs out of retention period  |      Dec-27-2024     |                     |
+| 1.1.0 | (https://github.com/mycloudnexus/kraken/releases/tag/v1.1.0)  |      Dec-27-2024     |       Dec-30-2024              |
