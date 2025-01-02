@@ -21,24 +21,43 @@ public class EndpointAuditService implements UUIDWrapper {
   }
 
   public Paging<Object> search(
-      EndpointAudit query, ZonedDateTime startTime, ZonedDateTime endTime, int page, int size) {
-    Page<Object> data =
-        endpointAuditRepository.search(
-            query, startTime, endTime, PagingHelper.toPageable(page, size));
+      EndpointAudit query,
+      ZonedDateTime startTime,
+      ZonedDateTime endTime,
+      int page,
+      int size,
+      boolean liteSearch) {
+    Page<Object> data;
+    if (liteSearch) {
+      data =
+          endpointAuditRepository.searchLite(
+              query, startTime, endTime, PagingHelper.toPageable(page, size));
+    } else {
+      data =
+          endpointAuditRepository.search(
+              query, startTime, endTime, PagingHelper.toPageable(page, size));
+    }
     return PagingHelper.toPaging(data, x -> x);
   }
 
-  public Paging<Object> searchByResourceId(String resourceId, int page, int size) {
+  public Paging<Object> searchByResourceId(
+      String resourceId, int page, int size, boolean liteSearch) {
     EndpointAudit query = new EndpointAudit();
     query.setResourceId(resourceId);
-    Page<Object> data =
-        endpointAuditRepository.search(query, null, null, PagingHelper.toPageable(page, size));
+    Page<Object> data;
+    if (liteSearch) {
+      data =
+          endpointAuditRepository.searchLite(
+              query, null, null, PagingHelper.toPageable(page, size));
+    } else {
+      data = endpointAuditRepository.search(query, null, null, PagingHelper.toPageable(page, size));
+    }
     return PagingHelper.toPaging(data, x -> x);
   }
 
   public Optional<EndpointAuditEntity> findOne(String id) {
     return getUUID(id)
-            .map(endpointAuditRepository::findById)
-            .orElseThrow(() -> KrakenException.notFound("Asset not found,key=" + id));
+        .map(endpointAuditRepository::findById)
+        .orElseThrow(() -> KrakenException.notFound("Asset not found,key=" + id));
   }
 }
