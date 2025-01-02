@@ -55,7 +55,7 @@ spec:
                   } else {
                     targetAPIConfigKey = 'mef.sonata.api-target.quote.uni.add';
                     matrixConfigKey = 'mef.sonata.api.matrix.quote.uni.add';
-                    errorArr = ['api use case is not supported : disabled : instantSyncQuote==false'];
+                    errorArr = ['api use case is not supported : disabled : @{{instantSyncQuote}}==false'];
                   }
                 } else if(typeVal == 'ACCESS_E_LINE') {
                   if(input.instantSyncQuote === true) {
@@ -64,15 +64,15 @@ spec:
                   } else {
                     targetAPIConfigKey = 'mef.sonata.api-target.quote.eline.add';
                     matrixConfigKey = 'mef.sonata.api.matrix.quote.eline.add';
-                    errorArr = ['api use case is not supported : disabled : instantSyncQuote==false'];
+                    errorArr = ['api use case is not supported : disabled : @{{instantSyncQuote}}==false'];
                   }
                 } else {
                   errorArr = ['api use case is not supported :'];
                   if (!typeArr.includes(typeVal)){
-                    errorArr.push(`expect quoteItem[0].product.productConfiguration.@type in [ ${typeArr} ], but ${typeVal}.`);
+                    errorArr.push(`expect @{{quoteItem[0].product.productConfiguration.@type}} in [ ${typeArr} ], but ${typeVal}.`);
                   }
                   if (!syncQuote) {
-                    errorArr.push('disabled : instantSyncQuote==false');
+                    errorArr.push('disabled : @{{instantSyncQuote}}==false');
                   }
                   targetAPIConfigKey = 'targetKey:notFound';
                 }
@@ -195,7 +195,7 @@ spec:
                     forwardDownstream = false;
                   } else {
                     targetAPIConfigKey = 'mef.sonata.api-target.quote.uni.read';
-                    errorArr = ['api use case is not supported : disabled : instantSyncQuote==false'];
+                    errorArr = ['api use case is not supported : disabled : @{{instantSyncQuote}}==false'];
                   }
                 } else if(input.bizType == 'ACCESS_E_LINE') {
                   if(syncQuote === true) {
@@ -203,16 +203,16 @@ spec:
                     forwardDownstream = false;
                   } else {
                     targetAPIConfigKey = 'mef.sonata.api-target.quote.eline.read';
-                    errorArr = ['api use case is not supported : disabled : instantSyncQuote==false'];
+                    errorArr = ['api use case is not supported : disabled : @{{instantSyncQuote}}==false'];
                   }
                 } else {
                   targetAPIConfigKey = 'targetKey:notFound';
                   errorArr = ['api use case is not supported :'];
                   if (!typeArr.includes(typeVal)){
-                    errorArr.push(`expect quoteItem[0].product.productConfiguration.@type in [ ${typeArr} ], but ${typeVal}.`);
+                    errorArr.push(`expect @{{quoteItem[0].product.productConfiguration.@type}} in [ ${typeArr} ], but ${typeVal}`);
                   }
                   if (!syncQuote) {
-                    errorArr.push('disabled : instantSyncQuote==false');
+                    errorArr.push('disabled : @{{instantSyncQuote}}==false');
                   }
                 }
                 errorMsg = errorArr.join(' ');

@@ -78,7 +78,7 @@ export const VersionSelect = ({
 }: Readonly<{
   data: IReleaseHistory[];
   selectedVersion: string | null | undefined;
-  setSelectedVersion: (templateUpgradeId: string) => void;
+  setSelectedVersion: (templateUpgradeId: string | null) => void;
   // Inifinite scroll
   loading?: boolean;
   isFetchingNextPage?: boolean;
@@ -91,38 +91,30 @@ export const VersionSelect = ({
 
   const fetchNext = debounce(() => onFetchNext?.(), 100);
 
-  useEffect(() => {
-    if (!listRef.current) return;
+  const handleScroll = () => {
+    const {
+      scrollTop = 0,
+      scrollHeight = 0,
+      clientHeight = 0,
+    } = listRef.current ?? {};
 
-    const handleScroll = () => {
-      const {
-        scrollTop = 0,
-        scrollHeight = 0,
-        clientHeight = 0,
-      } = listRef.current ?? {};
-
-      if (
-        scrollTop + clientHeight >= scrollHeight &&
-        hasNextPage &&
-        !isFetchingNextPage
-      ) {
-        fetchNext();
-      }
-    };
-
-    listRef.current.addEventListener("scroll", handleScroll);
-
-    return () => {
-      listRef.current?.removeEventListener("scroll", handleScroll);
-    };
-  }, [listRef.current, filterBy]);
+    if (
+      scrollTop + clientHeight >= scrollHeight &&
+      hasNextPage &&
+      !isFetchingNextPage
+    ) {
+      fetchNext();
+    }
+  };
 
   const listRelease =
     filterBy === "All" ? data : data.filter((item) => item.status === filterBy);
 
   useEffect(() => {
-    setSelectedVersion(listRelease[0]?.templateUpgradeId ?? null)
-  }, [filterBy])
+    if (!selectedVersion) {
+      setSelectedVersion(listRelease[0]?.templateUpgradeId ?? null)
+    }
+  }, [selectedVersion, listRelease, filterBy])
 
   return (
     <div className={styles.root}>
@@ -134,7 +126,10 @@ export const VersionSelect = ({
         <Dropdown
           menu={{
             items: statusItems,
-            onClick: (info) => setFilterBy(info.key),
+            onClick: (info) => {
+              setFilterBy(info.key)
+              setSelectedVersion(null)
+            },
           }}
         >
           <span className={styles.releaseFilter}>
@@ -152,10 +147,10 @@ export const VersionSelect = ({
         </Dropdown>
       </Flex>
 
-      <Flex vertical className={styles.versionList} ref={listRef}>
+      <Flex vertical className={styles.versionList} ref={listRef} onScroll={handleScroll}>
         {loading && <ListVersionSkeleton />}
 
-        {!listRelease.length && (
+        {!listRelease.length && !loading && (
           <Empty
             className={styles.emptyRelease}
             description={<SecondaryText.LightNormal>No matched release</SecondaryText.LightNormal>} />
@@ -171,13 +166,13 @@ export const VersionSelect = ({
             className={clsx([
               styles.item,
               !isEmpty(selectedVersion) &&
-                d.templateUpgradeId === selectedVersion &&
-                styles.selected,
+              d.templateUpgradeId === selectedVersion &&
+              styles.selected,
             ])}
             onClick={() => setSelectedVersion(d.templateUpgradeId)}
           >
             <Flex align="center" gap={7}>
-              <Text.LightMedium data-testid="releaseVersion">
+              <Text.LightMedium data-testid="releaseVersion" className={styles.releaseVersion}>
                 {d.productVersion}
               </Text.LightMedium>
               <SecondaryText.LightSmall data-testid="productSpec" className={styles.productSpec}>

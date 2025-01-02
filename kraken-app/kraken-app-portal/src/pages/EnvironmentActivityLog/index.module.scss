@@ -24,6 +24,7 @@
   }
 }
 
+
 .table {
   max-width: 100%;
 
@@ -100,6 +101,12 @@
   padding: 16px 20px;
   display: flex;
   flex-direction: column;
+
+  :global {
+    .ant-tabs-nav-operations {
+      display: none !important;
+    }
+  }
 }
 
 .inputPath {

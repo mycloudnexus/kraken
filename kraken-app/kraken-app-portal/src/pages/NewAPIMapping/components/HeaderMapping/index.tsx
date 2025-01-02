@@ -15,6 +15,7 @@ import clsx from "clsx";
 import { get, isEmpty } from "lodash";
 import { useBoolean } from "usehooks-ts";
 import styles from "./index.module.scss";
+import TrimmedPath from "@/components/TrimmedPath";
 
 type Props = {
   disabled: boolean;
@@ -34,10 +35,8 @@ const SellerAPI = ({ disabled, isFocus, handleClick }: Props) => {
     return (
       <>
         <LogMethodTag method={sellerApi.method} />
-        <Typography.Text style={{ flex: 1 }} ellipsis={{ tooltip: true }}>
-          {sellerApi.url}
-        </Typography.Text>
-        {isFocus && (
+        <TrimmedPath path={sellerApi.url} />
+        {isFocus ? (
           <CloseCircleFilled
             style={{
               color: "#00000040",
@@ -49,6 +48,8 @@ const SellerAPI = ({ disabled, isFocus, handleClick }: Props) => {
               handleClick();
             }}
           />
+        ) : (
+          <RightOutlined style={{ color: "rgba(0, 0, 0, 0.45)", marginLeft: 'auto' }} />
         )}
       </>
     );
@@ -66,17 +67,21 @@ const HeaderMapping = ({
   disabled?: boolean;
   mappers: any;
 }) => {
-  const { query, sellerApi, rightSide, setRightSide } = useNewApiMappingStore();
-  const { activeTab } = useMappingUiStore();
-  const queryData = JSON.parse(query ?? "{}");
-  const { value: isFocus, setTrue, setFalse } = useBoolean(false);
   const {
+    query,
+    sellerApi,
+    rightSide,
+    setRightSide,
     setRequestMapping,
     setResponseMapping,
     setSellerApi,
     setServerKey,
     setListMappingStateResponse,
   } = useNewApiMappingStore();
+  const { activeTab } = useMappingUiStore();
+  const queryData = JSON.parse(query ?? "{}");
+  const { value: isFocus, setTrue, setFalse } = useBoolean(false);
+
   const resetMappingFnc = () => {
     setRequestMapping(
       mappers.request
@@ -132,9 +137,10 @@ const HeaderMapping = ({
             padding: 10,
           }}
         >
-          <Text.NormalLarge lineHeight="24px">Sonata API</Text.NormalLarge>
+          <Text.NormalLarge lineHeight="24px" data-testid="sonataApi">Sonata API</Text.NormalLarge>
         </Flex>
         <Text.NormalLarge
+          data-testid="sellerApi"
           style={{
             boxSizing: "border-box",
             flex: "0 0 calc(50% - 30px)",
@@ -162,19 +168,14 @@ const HeaderMapping = ({
           className={styles.sonataAPIBasicInfoWrapper}
         >
           <LogMethodTag method={queryData?.method} />
-          <Typography.Text
-            style={{ flex: 1, color: "#595959" }}
-            ellipsis={{ tooltip: true }}
-          >
-            {queryData?.path}
-          </Typography.Text>
+          <TrimmedPath path={queryData?.path} />
         </Flex>
         <div className={styles.mappingIcon}>
           {activeTab === "request" ? <MappingIcon /> : <MappingReverseIcon />}
         </div>
         <Flex
           align="center"
-          justify="space-between"
+          gap={8} style={{ width: "100%" }}
           className={clsx(styles.sellerAPIBasicInfoWrapper, {
             [styles.highlight]:
               rightSide === EnumRightType.SelectSellerAPI && !disabled,
@@ -192,14 +193,11 @@ const HeaderMapping = ({
             setFalse();
           }}
         >
-          <Flex align="center" gap={8} style={{ width: "100%" }}>
-            <SellerAPI
-              isFocus={isFocus}
-              disabled={disabled}
-              handleClick={handleClick}
-            />
-          </Flex>
-          <RightOutlined style={{ color: "rgba(0, 0, 0, 0.45)" }} />
+          <SellerAPI
+            isFocus={isFocus}
+            disabled={disabled}
+            handleClick={handleClick}
+          />
         </Flex>
       </Flex>
     </>
