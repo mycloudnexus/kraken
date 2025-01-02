@@ -16,7 +16,8 @@ There are 3 key properties that contribute to effective GitHub issue management 
 
 * **Projects:** indicates if the issue has been scheduled into a sprint or iteration.
 
-* **Milestone:** Specifies the target release version for the issue (e.g., "2.0.0-snaphot.2", "1.0.0").
+* **Milestone:** Specifies the target release version for the issue (e.g., "2.0.0-snaphot.2", "1.0.0") and it also indicates which branch it is going to be fixed.
+    * If a issue fixed in release/1.0 branch first with 1.1.0 as milestone, then later we must clone it into another new issue with a milestone from main branch.
 
 **2. Workflow**
 
