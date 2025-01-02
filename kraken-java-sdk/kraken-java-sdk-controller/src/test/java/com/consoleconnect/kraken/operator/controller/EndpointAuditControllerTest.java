@@ -112,20 +112,17 @@ class EndpointAuditControllerTest extends AbstractIntegrationTest {
   @Test
   void givenLiteSearch_whenListAuditLog_thenSuccess() {
     testClientHelper.getAndVerify(
-            uriBuilder -> uriBuilder.path("/audit/logs")
-                    .queryParam("liteSearch", true)
-                    .build(),
-            bodyStr -> {
-              log.info(bodyStr);
-              assertThat(bodyStr, Matchers.notNullValue());
-            });
+        uriBuilder -> uriBuilder.path("/audit/logs").queryParam("liteSearch", true).build(),
+        bodyStr -> {
+          log.info(bodyStr);
+          assertThat(bodyStr, Matchers.notNullValue());
+        });
     String detail = String.format("/audit/logs/%s", audit_uuid);
     testClientHelper.getAndVerify(
-            uriBuilder -> uriBuilder.path(detail).build(),
-            bodyStr -> {
-              log.info(bodyStr);
-              assertThat(bodyStr, Matchers.notNullValue());
-            });
+        uriBuilder -> uriBuilder.path(detail).build(),
+        bodyStr -> {
+          log.info(bodyStr);
+          assertThat(bodyStr, Matchers.notNullValue());
+        });
   }
-
 }
