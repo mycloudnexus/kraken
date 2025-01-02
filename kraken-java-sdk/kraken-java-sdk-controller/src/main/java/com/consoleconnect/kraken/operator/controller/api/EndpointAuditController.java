@@ -25,7 +25,7 @@ public class EndpointAuditController {
 
   @Operation(summary = "Search audit logs")
   @GetMapping()
-  public HttpResponse<Paging<Object>> search(
+  public HttpResponse<Paging<EndpointAuditEntity>> search(
       @RequestParam(value = "resource", required = false) String resource,
       @RequestParam(value = "resourceId", required = false) String resourceId,
       @RequestParam(value = "action", required = false) String action,
@@ -57,7 +57,7 @@ public class EndpointAuditController {
 
   @Operation(summary = "Search a resource's audit logs")
   @GetMapping("/resources/{resourceId}")
-  public HttpResponse<Paging<Object>> searchByResourceId(
+  public HttpResponse<Paging<EndpointAuditEntity>> searchByResourceId(
       @PathVariable String resourceId,
       @RequestParam(value = "liteSearch", required = false, defaultValue = "false")
           boolean liteSearch,

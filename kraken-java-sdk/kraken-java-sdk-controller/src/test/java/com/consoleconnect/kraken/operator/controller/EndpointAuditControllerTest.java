@@ -1,6 +1,9 @@
 package com.consoleconnect.kraken.operator.controller;
 
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasNoJsonPath;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.notNullValue;
 
 import com.consoleconnect.kraken.operator.config.TestApplication;
 import com.consoleconnect.kraken.operator.controller.audit.AuditLogFilter;
@@ -116,6 +119,9 @@ class EndpointAuditControllerTest extends AbstractIntegrationTest {
         bodyStr -> {
           log.info(bodyStr);
           assertThat(bodyStr, Matchers.notNullValue());
+          assertThat(bodyStr, hasJsonPath("$.data", notNullValue()));
+          assertThat(bodyStr, hasNoJsonPath("$.data.data[0].request"));
+          assertThat(bodyStr, hasNoJsonPath("$.data.data[0].response"));
         });
     String detail = String.format("/audit/logs/%s", audit_uuid);
     testClientHelper.getAndVerify(
@@ -123,6 +129,8 @@ class EndpointAuditControllerTest extends AbstractIntegrationTest {
         bodyStr -> {
           log.info(bodyStr);
           assertThat(bodyStr, Matchers.notNullValue());
+          assertThat(bodyStr, hasJsonPath("$.data.request", notNullValue()));
+          assertThat(bodyStr, hasJsonPath("$.data.response", notNullValue()));
         });
   }
 }

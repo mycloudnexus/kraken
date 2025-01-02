@@ -26,24 +26,7 @@ public interface EndpointAuditRepository
           + " and ( cast(:startTime as date) is null or e.createdAt >= :startTime )"
           + " and ( cast(:endTime as date) is null or e.createdAt <= :endTime )")
   @Transactional(readOnly = true)
-  Page<Object> search(
-      @Param("query") EndpointAudit query,
-      @Param("startTime") ZonedDateTime startTime,
-      @Param("endTime") ZonedDateTime endTime,
-      Pageable pageable);
-
-  @Query(
-      "select e.userId, e.email, e.name, e.path, e.method, e.action, "
-          + " e.resource, e.resourceId, e.statusCode, e.createdBy, e.createdAt, e.updatedBy, e.updatedAt "
-          + " from #{#entityName} e "
-          + " where ( :#{#query.getUserId()}  is null or e.userId = :#{#query.getUserId()} ) "
-          + " and ( :#{#query.getResource()}  is null or e.resource = :#{#query.getResource()} ) "
-          + " and ( :#{#query.getResourceId()}  is null or e.resourceId = :#{#query.getResourceId()} ) "
-          + " and ( :#{#query.getAction()}  is null or e.action = :#{#query.getAction()} ) "
-          + " and ( cast(:startTime as date) is null or e.createdAt >= :startTime )"
-          + " and ( cast(:endTime as date) is null or e.createdAt <= :endTime )")
-  @Transactional(readOnly = true)
-  Page<Object> searchLite(
+  Page<EndpointAuditEntity> search(
       @Param("query") EndpointAudit query,
       @Param("startTime") ZonedDateTime startTime,
       @Param("endTime") ZonedDateTime endTime,

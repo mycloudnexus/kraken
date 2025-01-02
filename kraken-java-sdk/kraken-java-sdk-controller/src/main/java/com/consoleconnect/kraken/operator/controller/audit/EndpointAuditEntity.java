@@ -6,9 +6,7 @@ import jakarta.persistence.*;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.Type;
 
 @Entity
@@ -18,6 +16,8 @@ import org.hibernate.annotations.Type;
 @Table(
     name = "kraken_audit_endpoint",
     indexes = {@Index(columnList = "resource_id, user_id", unique = false)})
+@NoArgsConstructor
+@AllArgsConstructor
 public class EndpointAuditEntity extends AbstractEntity {
 
   @Column(name = "user_id", nullable = true)

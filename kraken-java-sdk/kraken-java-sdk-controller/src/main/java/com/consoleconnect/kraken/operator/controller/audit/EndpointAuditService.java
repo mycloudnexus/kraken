@@ -20,39 +20,52 @@ public class EndpointAuditService implements UUIDWrapper {
     this.endpointAuditRepository = endpointAuditRepository;
   }
 
-  public Paging<Object> search(
+  public Paging<EndpointAuditEntity> search(
       EndpointAudit query,
       ZonedDateTime startTime,
       ZonedDateTime endTime,
       int page,
       int size,
       boolean liteSearch) {
-    Page<Object> data;
-    if (liteSearch) {
-      data =
-          endpointAuditRepository.searchLite(
-              query, startTime, endTime, PagingHelper.toPageable(page, size));
-    } else {
-      data =
-          endpointAuditRepository.search(
-              query, startTime, endTime, PagingHelper.toPageable(page, size));
+
+    Page<EndpointAuditEntity> data =
+        endpointAuditRepository.search(
+            query, startTime, endTime, PagingHelper.toPageable(page, size));
+    if (!liteSearch) {
+      return PagingHelper.toPaging(data, x -> x);
     }
-    return PagingHelper.toPaging(data, x -> x);
+    return PagingHelper.toPaging(
+        data.stream()
+            .map(
+                x -> {
+                  x.setRequest(null);
+                  x.setResponse(null);
+                  return x;
+                })
+            .toList(),
+        x -> x);
   }
 
-  public Paging<Object> searchByResourceId(
+  public Paging<EndpointAuditEntity> searchByResourceId(
       String resourceId, int page, int size, boolean liteSearch) {
     EndpointAudit query = new EndpointAudit();
     query.setResourceId(resourceId);
-    Page<Object> data;
-    if (liteSearch) {
-      data =
-          endpointAuditRepository.searchLite(
-              query, null, null, PagingHelper.toPageable(page, size));
-    } else {
-      data = endpointAuditRepository.search(query, null, null, PagingHelper.toPageable(page, size));
+
+    Page<EndpointAuditEntity> data =
+        endpointAuditRepository.search(query, null, null, PagingHelper.toPageable(page, size));
+    if (!liteSearch) {
+      return PagingHelper.toPaging(data, x -> x);
     }
-    return PagingHelper.toPaging(data, x -> x);
+    return PagingHelper.toPaging(
+        data.stream()
+            .map(
+                x -> {
+                  x.setRequest(null);
+                  x.setResponse(null);
+                  return x;
+                })
+            .toList(),
+        x -> x);
   }
 
   public Optional<EndpointAuditEntity> findOne(String id) {
