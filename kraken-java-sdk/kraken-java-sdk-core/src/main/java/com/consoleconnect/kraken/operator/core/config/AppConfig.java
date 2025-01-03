@@ -46,11 +46,7 @@ public class AppConfig {
         return false;
       }
 
-      if (logKind != LogKindEnum.DATA_PLANE && logKind != LogKindEnum.CONTROL_PLANE) {
-
-        return false;
-      }
-      return true;
+      return logKind != LogKindEnum.DATA_PLANE && logKind != LogKindEnum.CONTROL_PLANE;
     }
   }
 }

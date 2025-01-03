@@ -234,7 +234,7 @@ class ApiActivityLogServiceAtControlPlaneTest extends AbstractIntegrationTest {
   }
 
   @Test
-  void abc() {
+  void moreCodeCover() {
 
     this.apiActivityLogService.achieveApiActivityLog(null);
     AppConfig.AchieveApiActivityLogConf achieveApiActivityLogConf =
