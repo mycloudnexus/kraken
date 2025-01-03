@@ -39,7 +39,7 @@ spring:
       connection-timeout: 60000
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     show-sql: false
     database: POSTGRESQL
     properties:
@@ -87,11 +87,6 @@ logging:
     com.consoleconnect.kraken: DEBUG
 #    reactor.netty: DEBUG
 app:
-  achieve-log-conf:
-    log-kind: data-plane
-    month: 1
-    protocol: GET
-    achieveScope: basic
   tenant:
     workspacePath:
   controlPlane:
@@ -106,10 +101,8 @@ app:
     pull-latest-release: 0 0/1 * * * *
     pull-reset-event: 0 0/1 * * * *
     push-heartbeat: 0/20 * * * * *
-    push-log: 0/1 * * * * *
+    push-log: 0/20 * * * * *
     push-log-external-system: 0 0/1 * * * *
-    achieve-api-activity-log: 0 0/1 * * * *
-    migrate-api-activity-log: 0 0/1 * * * *
     lock:
       at-most-for: 2m
       at-least-for: 10s
