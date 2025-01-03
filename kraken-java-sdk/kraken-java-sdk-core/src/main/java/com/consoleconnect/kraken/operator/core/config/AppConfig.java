@@ -3,6 +3,7 @@ package com.consoleconnect.kraken.operator.core.config;
 import com.consoleconnect.kraken.operator.core.enums.AchieveScopeEnum;
 import com.consoleconnect.kraken.operator.core.enums.LogKindEnum;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
+import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import lombok.Data;
@@ -37,6 +38,7 @@ public class AppConfig {
     }
 
     public static boolean needAchieveMigrate(AchieveApiActivityLogConf conf) {
+      log.info("{},{}", ACHIEVE_LOG_CONFIG, JsonToolkit.toJson(conf));
       if (conf == null) {
         return false;
       }

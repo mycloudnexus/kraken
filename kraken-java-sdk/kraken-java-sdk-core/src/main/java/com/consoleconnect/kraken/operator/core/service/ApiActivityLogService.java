@@ -1,5 +1,6 @@
 package com.consoleconnect.kraken.operator.core.service;
 
+import static com.consoleconnect.kraken.operator.core.config.AppConfig.AchieveApiActivityLogConf.ACHIEVE_LOG_CONFIG;
 import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.PRODUCT_BUYER;
 import static com.consoleconnect.kraken.operator.core.toolkit.LabelConstants.LABEL_BUYER_ID;
 
@@ -51,8 +52,6 @@ public class ApiActivityLogService {
   private final ApiActivityLogRepository repository;
   private final UnifiedAssetRepository unifiedAssetRepository;
   private final ApiActivityLogBodyRepository apiActivityLogBodyRepository;
-
-  private static final String DELETE_API_ACTIVITY_LOG = "DELETE_API_ACTIVITY_LOG";
 
   @Transactional(readOnly = true)
   public Paging<ApiActivityLog> search(LogSearchRequest logSearchRequest, Pageable pageable) {
@@ -156,7 +155,7 @@ public class ApiActivityLogService {
       }
     }
 
-    log.info("{}, {}, end", DELETE_API_ACTIVITY_LOG, logKind.name());
+    log.info("{}, {}, end", ACHIEVE_LOG_CONFIG, logKind.name());
   }
 
   public void migrateApiLog(AppConfig.AchieveApiActivityLogConf activityLogConf) {
@@ -182,7 +181,7 @@ public class ApiActivityLogService {
       this.repository.saveAll(list);
     }
 
-    log.info("{}, {}, end", DELETE_API_ACTIVITY_LOG, logKind.name());
+    log.info("{}, {}, end", ACHIEVE_LOG_CONFIG, logKind.name());
   }
 
   @Transactional
