@@ -15,7 +15,9 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
 public interface TargetMappingChecker {
-  Set<String> keywords = Set.of("quote", "read", "sync");
+  String QUOTE_KEY = "quote";
+  String ORDER_KEY = "order";
+  Set<String> keywords = Set.of(QUOTE_KEY, "read", "sync");
 
   @Slf4j
   final class LogHolder {}

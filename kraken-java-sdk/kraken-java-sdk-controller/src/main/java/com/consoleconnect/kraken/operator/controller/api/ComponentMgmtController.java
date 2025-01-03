@@ -141,4 +141,11 @@ public class ComponentMgmtController {
       @PathVariable String productId, @PathVariable String componentId) {
     return HttpResponse.ok(apiComponentService.queryEndPointUsageDetail(productId, componentId));
   }
+
+  @Operation(summary = "list all supported components and product categories")
+  @GetMapping("/product-categories")
+  public HttpResponse<ComponentProductCategoryDTO> listProductCategories(
+      @PathVariable String productId) {
+    return HttpResponse.ok(apiComponentService.listProductCategories(productId));
+  }
 }
