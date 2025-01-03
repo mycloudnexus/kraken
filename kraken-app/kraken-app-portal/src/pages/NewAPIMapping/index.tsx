@@ -34,7 +34,6 @@ import {
 } from "lodash";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { useSessionStorage } from "usehooks-ts";
 import { Deployment } from "./components/Deployment";
 import DeploymentInfo from "./components/DeploymentInfo";
 import HeaderMapping from "./components/HeaderMapping";
@@ -44,7 +43,6 @@ import ResponseMapping, { IMapping } from "./components/ResponseMapping";
 import { RightSide } from "./components/RightSide";
 import useGetApiSpec from "./components/useGetApiSpec";
 import useGetDefaultSellerApi from "./components/useGetDefaultSellerApi";
-// import { validateMappers } from "./helper";
 import styles from "./index.module.scss";
 import DeployHistory from "./components/DeployHistory";
 
@@ -52,8 +50,6 @@ enum EMainTab {
   mapping = "mapping",
   deploy = "deploy",
 }
-
-const collapsedStyle = { maxWidth: `calc(100vw - 462px)` };
 
 const NewAPIMapping = ({
   refetch,
@@ -63,7 +59,6 @@ const NewAPIMapping = ({
   isRequiredMapping: boolean;
 }) => {
   const pathQuery = usePathQuery();
-  const [collapsed] = useSessionStorage("collapsed", false);
   const { currentProduct } = useAppStore();
   const { activeTab, setActiveTab } = useMappingUiStore();
   const {
@@ -299,20 +294,6 @@ const NewAPIMapping = ({
 
   const handleSave = async (callback?: () => void) => {
     try {
-      // @TODO: temporarily remove for demo
-      // Validate properties name and location
-      // const { requestIds, responseIds, errorMessage } = validateMappers({
-      //   request: requestMapping,
-      //   response: responseMapping,
-      // });
-      // setErrors({ requestIds, responseIds });
-
-      // if (errorMessage) {
-      //   notification.error({ message: errorMessage });
-
-      //   return;
-      // }
-
       const newDataResponse = transformListMappingItem(
         listMappingStateResponse,
         "response"
@@ -434,7 +415,7 @@ const NewAPIMapping = ({
   const upgradingVersion = pathQuery.get("version");
 
   return (
-    <Flex className={styles.container}>
+    <main className={styles.container}>
       {/* User guide */}
       <StepBar
         type={EStep.MAPPING}
@@ -525,7 +506,6 @@ const NewAPIMapping = ({
                       Save
                     </Button>
                   </Tooltip>
-                  <Button type="default">Compare</Button>
                 </>
               )}
               <DeployStage
@@ -539,7 +519,6 @@ const NewAPIMapping = ({
         <div
           ref={ref}
           className={styles.newContent}
-          style={collapsed ? collapsedStyle : {}}
         >
           {upgradingVersion && (
             <Alert
@@ -560,7 +539,6 @@ const NewAPIMapping = ({
             <Flex
               gap={12}
               className={styles.mainWrapper}
-              style={collapsed ? collapsedStyle : {}}
             >
               <div className={styles.center}>
                 {!isRequiredMapping && (
@@ -610,7 +588,7 @@ const NewAPIMapping = ({
           )}
         </div>
       </Flex>
-    </Flex>
+    </main>
   );
 };
 

@@ -23,7 +23,6 @@
 }
 
 .sellerPropItemWrapper {
-  background: #f2f3f5;
   cursor: pointer;
 
   input {
@@ -46,11 +45,11 @@
   text-overflow: ellipsis;
   cursor: pointer;
 
-  &:disabled {
+  &.disabled {
     color: var(--black) !important;
     background: var(--lightgray) !important;
     border: none !important;
-    cursor: default;
+    cursor: not-allowed;
   }
 
   &.error {

@@ -8,7 +8,12 @@ public class KrakenException extends RuntimeException {
   private static final String NOT_FOUND_MSG = "404 Not Found";
   private static final String NOT_FOUND_DESC =
       "The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.";
-  private static final String UNPROCESSABLE_ENTITY_MSG = "422 UnProcessable Entity";
+  private static final String UNPROCESSABLE_ENTITY_MISSING_PROPERTY =
+      "422 UnProcessable Entity, missingProperty";
+  private static final String UNPROCESSABLE_ENTITY_INVALID_VALUE =
+      "422 UnProcessable Entity, invalidValue";
+  private static final String UNPROCESSABLE_ENTITY_INVALID_FORMAT =
+      "422 UnProcessable Entity, invalidFormat";
 
   private final int code;
 
@@ -47,9 +52,19 @@ public class KrakenException extends RuntimeException {
     return new KrakenException(404, NOT_FOUND_MSG, new IllegalArgumentException(NOT_FOUND_DESC));
   }
 
-  public static KrakenException unProcessableEntity(String message) {
+  public static KrakenException unProcessableEntityInvalidFormat(String message) {
     return new KrakenException(
-        422, UNPROCESSABLE_ENTITY_MSG, new IllegalArgumentException(message));
+        422, UNPROCESSABLE_ENTITY_INVALID_FORMAT, new IllegalArgumentException(message));
+  }
+
+  public static KrakenException unProcessableEntityInvalidValue(String message) {
+    return new KrakenException(
+        422, UNPROCESSABLE_ENTITY_INVALID_VALUE, new IllegalArgumentException(message));
+  }
+
+  public static KrakenException unProcessableEntityMissingProperty(String message) {
+    return new KrakenException(
+        422, UNPROCESSABLE_ENTITY_MISSING_PROPERTY, new IllegalArgumentException(message));
   }
 
   public static KrakenException unauthorized(String message) {

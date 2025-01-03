@@ -1,6 +1,5 @@
 import AuthLayout from "@/components/Layout/AuthLayout";
 import BasicLayout from "@/components/Layout/BasicLayout";
-import APIServerEditSelection from "@/pages/APIServerEditSelection";
 import APIServerList from "@/pages/APIServerList";
 import AuditLog from "@/pages/AuditLog";
 import Buyer from "@/pages/Buyer";
@@ -55,10 +54,6 @@ const router = createBrowserRouter([
                 path: "edit/:componentId",
                 children: [
                   { path: "", element: <NewAPIServer /> },
-                  {
-                    path: "api",
-                    element: <APIServerEditSelection />,
-                  },
                 ],
               },
             ],

@@ -21,6 +21,7 @@ spec:
           - name: mapper.quote.uni.add.sync.duration.amount
             source: "@{{quoteItem[*].requestedQuoteItemTerm.duration.amount}}"
             sourceLocation: BODY
+            sourceType: constantNumber
             target: "1"
             targetLocation: BODY
             requiredMapping: true
@@ -59,6 +60,7 @@ spec:
           - name: mapper.quote.uni.add.sync.rollInterval.amount
             source: "@{{quoteItem[*].requestedQuoteItemTerm.rollInterval.amount}}"
             sourceLocation: BODY
+            sourceType: constantNumber
             target: "1"
             targetLocation: BODY
             requiredMapping: false
@@ -83,13 +85,25 @@ spec:
           - name: mapper.quote.uni.add.sync.place.id
             source: "@{{quoteItem[*].product.place[0].id}}"
             sourceLocation: BODY
+            sourceType: discreteStr
             target: "@{{ports[*].dcf}}"
             targetLocation: BODY
             requiredMapping: true
             mappingType: array
+          - name: mapper.quote.uni.add.sync.place.keyName
+            source: "@{{quoteItem[*].product.place[0].keyName}}"
+            sourceLocation: BODY
+            sourceType: discreteStr
+            target: ""
+            targetLocation: BODY
+            requiredMapping: false
           - name: mapper.quote.uni.add.sync.productConfiguration.bandwidth
             source: "@{{quoteItem[*].product.productConfiguration.bandwidth}}"
             sourceLocation: BODY
+            sourceType: discreteInt
+            sourceValues:
+              - 1000
+              - 10000
             target: "@{{ports[*].speed}}"
             targetLocation: BODY
             requiredMapping: true
@@ -109,6 +123,7 @@ spec:
           - name: mapper.quote.uni.add.sync.productOffering.id
             source: "@{{quoteItem[*].product.productOffering.id}}"
             sourceLocation: BODY
+            sourceType: discreteStr
             target: "UNI"
             targetLocation: BODY
             requiredMapping: false

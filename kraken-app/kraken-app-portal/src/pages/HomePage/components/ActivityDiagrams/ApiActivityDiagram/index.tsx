@@ -39,10 +39,10 @@ const ApiActivityDiagram = ({ props }: Props) => {
 
   const activityData = useMemo(
     () => (data?.requestStatistics || []).map(entry => ({
-        ...entry,
-        error: entry.error || 0,
-        success: entry.success || 0,
-      })),
+      ...entry,
+      error: entry.error || 0,
+      success: entry.success || 0,
+    })),
     [isLoading, data]
   );
 
@@ -52,8 +52,8 @@ const ApiActivityDiagram = ({ props }: Props) => {
         <Text.LightMedium>Requests</Text.LightMedium>
       </Flex>
       <Spin spinning={isLoading || isRefetching}>
-        {!isLoading && !activityData
-          ? <NoData icon={EmptyBin} />
+        {!isLoading && !activityData.length
+          ? <NoData icon={EmptyBin} title="No requests received" description="When requests are made, request status data will be displayed here." />
           : <ResponsiveContainer width="100%" height="100%">
             <LineChart width={500} height={300} data={activityData}>
               <XAxis

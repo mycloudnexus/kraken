@@ -39,7 +39,7 @@ class ComponentControllerTest extends AbstractIntegrationTest {
     testClientHelper.getAndVerify(
         (uriBuilder -> uriBuilder.path(path).build()),
         bodyStr -> {
-          assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(3)));
+          assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(4)));
         });
   }
 

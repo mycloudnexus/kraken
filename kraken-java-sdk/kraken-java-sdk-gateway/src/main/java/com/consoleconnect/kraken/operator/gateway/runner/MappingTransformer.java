@@ -1,5 +1,6 @@
 package com.consoleconnect.kraken.operator.gateway.runner;
 
+import static com.consoleconnect.kraken.operator.core.toolkit.Constants.DOT;
 import static com.consoleconnect.kraken.operator.core.toolkit.ConstructExpressionUtil.*;
 
 import com.consoleconnect.kraken.operator.core.dto.StateValueMappingDto;
@@ -25,7 +26,6 @@ public interface MappingTransformer {
   String ARRAY_FIRST_REGEX = "\\[0\\]";
   String TARGET_VALUE_MAPPER_KEY = "targetValueMapping";
   String JSON_PATH_EXPRESSION_PREFIX = "$.";
-  String DOT = ".";
   String ENUM_KIND = "enum";
   String LENGTH_FUNC = "length()";
   String LEFT_SQUARE_BRACKET = "[";
