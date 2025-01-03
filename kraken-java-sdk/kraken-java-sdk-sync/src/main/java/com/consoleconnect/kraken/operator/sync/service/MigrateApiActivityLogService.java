@@ -37,7 +37,7 @@ public class MigrateApiActivityLogService {
 
   public void migrateApiLog(AppConfig.AchieveApiActivityLogConf activityLogConf) {
 
-    var logKind = activityLogConf.getLogKind();
+    log.info("{}, start", ACHIEVE_LOG_CONFIG);
 
     for (int page = 0; page < 100; page++) {
       if (this.apiActivityLogService.migrateOnePage(activityLogConf)) {
@@ -45,6 +45,6 @@ public class MigrateApiActivityLogService {
       }
     }
 
-    log.info("{}, {}, end", ACHIEVE_LOG_CONFIG, logKind.name());
+    log.info("{}, end", ACHIEVE_LOG_CONFIG);
   }
 }
