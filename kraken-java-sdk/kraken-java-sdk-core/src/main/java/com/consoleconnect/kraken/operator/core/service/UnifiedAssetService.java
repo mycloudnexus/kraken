@@ -37,7 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class UnifiedAssetService {
+public class UnifiedAssetService implements UUIDWrapper {
 
   private static final String DEFAULT_ORDER_SEQ = "1000";
   private static final String MAPPER_REQUEST = "request";
@@ -118,14 +118,6 @@ public class UnifiedAssetService {
             .sorted(Comparator.comparing(t -> orderBy.getOrDefault(t.getKey(), DEFAULT_ORDER_SEQ)))
             .toList();
     return new PageImpl<>(sorted, PageRequest.of(data.getNumber(), data.getSize()), sorted.size());
-  }
-
-  private Optional<UUID> getUUID(String id) {
-    try {
-      return Optional.of(UUID.fromString(id));
-    } catch (Exception e) {
-      return Optional.empty();
-    }
   }
 
   @Transactional(readOnly = true)
