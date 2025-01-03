@@ -40,7 +40,7 @@ public class MigrateApiActivityLogService {
     var logKind = activityLogConf.getLogKind();
 
     for (int page = 0; page < 100; page++) {
-      if (this.apiActivityLogService.migrateOnePage()) {
+      if (this.apiActivityLogService.migrateOnePage(activityLogConf)) {
         break;
       }
     }
