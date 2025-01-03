@@ -5,10 +5,12 @@ import static com.consoleconnect.kraken.operator.core.service.ApiActivityLogServ
 import com.consoleconnect.kraken.operator.core.client.ClientEvent;
 import com.consoleconnect.kraken.operator.core.client.ClientEventTypeEnum;
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
+import com.consoleconnect.kraken.operator.core.enums.LifeStatusEnum;
 import com.consoleconnect.kraken.operator.core.enums.SyncStatusEnum;
 import com.consoleconnect.kraken.operator.core.mapper.ApiActivityLogMapper;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
+import com.consoleconnect.kraken.operator.core.service.ApiActivityLogService;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.DateTime;
 import com.consoleconnect.kraken.operator.sync.model.SyncProperty;
@@ -26,13 +28,16 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class PushLogService extends KrakenServerConnector {
 
   private final ApiActivityLogRepository apiActivityLogRepository;
+  private final ApiActivityLogService apiActivityLogService;
 
   public PushLogService(
       SyncProperty appProperty,
       WebClient webClient,
-      ApiActivityLogRepository apiActivityLogRepository) {
+      ApiActivityLogRepository apiActivityLogRepository,
+      ApiActivityLogService apiActivityLogService) {
     super(appProperty, webClient);
     this.apiActivityLogRepository = apiActivityLogRepository;
+    this.apiActivityLogService = apiActivityLogService;
   }
 
   @SchedulerLock(
@@ -45,8 +50,9 @@ public class PushLogService extends KrakenServerConnector {
         ZonedDateTime.now().minusSeconds(getAppProperty().getSynDelaySeconds());
     List<ApiActivityLogEntity> logEntities =
         apiActivityLogRepository
-            .findAllBySyncStatusAndCreatedAtBefore(
+            .findAllBySyncStatusAndLifeStatusAndCreatedAtBefore(
                 SyncStatusEnum.UNDEFINED,
+                LifeStatusEnum.LIVE,
                 createdAt,
                 UnifiedAssetService.getSearchPageRequest(0, 50, Sort.Direction.ASC, CREATED_AT))
             .getContent();
@@ -67,12 +73,7 @@ public class PushLogService extends KrakenServerConnector {
     HttpResponse<Void> res = pushEvent(event);
     if (res.getCode() == 200) {
       ZonedDateTime now = DateTime.nowInUTC();
-      logEntities.forEach(
-          logEntity -> {
-            logEntity.setSyncStatus(SyncStatusEnum.SYNCED);
-            logEntity.setSyncedAt(now);
-          });
-      apiActivityLogRepository.saveAll(logEntities);
+      this.apiActivityLogService.setSynced(logEntities, now);
     }
   }
 }

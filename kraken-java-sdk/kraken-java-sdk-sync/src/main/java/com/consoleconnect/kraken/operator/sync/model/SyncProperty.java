@@ -1,11 +1,14 @@
 package com.consoleconnect.kraken.operator.sync.model;
 
+import com.consoleconnect.kraken.operator.core.config.AppConfig;
 import java.util.List;
 import lombok.Data;
 
 @Data
 public class SyncProperty {
   private ControlPlane controlPlane = new ControlPlane();
+  private AppConfig.AchieveApiActivityLogConf achieveLogConf =
+      new AppConfig.AchieveApiActivityLogConf();
   private MgmtPlane mgmtPlane = new MgmtPlane();
   private List<String> acceptAssetKinds = List.of();
   private boolean assetConfigOverwriteFlag = false;

@@ -3,6 +3,7 @@ package com.consoleconnect.kraken.operator.gateway.service;
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
 import com.consoleconnect.kraken.operator.core.exception.KrakenExceptionHandler;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
+import com.consoleconnect.kraken.operator.core.service.ApiActivityLogService;
 import com.consoleconnect.kraken.operator.gateway.filter.KrakenFilterConstants;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.web.server.ServerWebExchange;
 public class ExceptionLogService implements InitializingBean {
   private final KrakenExceptionHandler krakenExceptionHandler;
   private final ApiActivityLogRepository apiActivityLogRepository;
+  private final ApiActivityLogService apiActivityLogService;
 
   @Override
   public void afterPropertiesSet() throws Exception {
@@ -50,6 +52,6 @@ public class ExceptionLogService implements InitializingBean {
   private void updateEntity(int code, Object errorMap, ApiActivityLogEntity entity) {
     entity.setResponse(errorMap);
     entity.setHttpStatusCode(code);
-    apiActivityLogRepository.save(entity);
+    apiActivityLogService.save(entity);
   }
 }

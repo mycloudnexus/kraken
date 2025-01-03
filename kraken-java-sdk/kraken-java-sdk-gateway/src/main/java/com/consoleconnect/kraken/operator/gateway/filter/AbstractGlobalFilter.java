@@ -4,6 +4,7 @@ import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
 import com.consoleconnect.kraken.operator.core.enums.SyncStatusEnum;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
+import com.consoleconnect.kraken.operator.core.service.ApiActivityLogService;
 import com.consoleconnect.kraken.operator.gateway.service.FilterHeaderService;
 import java.util.Optional;
 import java.util.UUID;
@@ -22,6 +23,7 @@ public abstract class AbstractGlobalFilter implements GlobalFilter, Ordered {
   protected final AppProperty appProperty;
   protected final ApiActivityLogRepository apiActivityLogRepository;
   protected final FilterHeaderService filterHeaderService;
+  protected final ApiActivityLogService apiActivityLogService;
 
   public ApiActivityLogEntity generateHttpRequestEntity(ServerWebExchange exchange) {
     String seq =
