@@ -6,6 +6,7 @@ import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.G
 import static org.springframework.core.io.buffer.DataBufferUtils.join;
 
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
+import com.consoleconnect.kraken.operator.core.enums.LifeStatusEnum;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
 import com.consoleconnect.kraken.operator.core.service.ApiActivityLogService;
@@ -57,6 +58,7 @@ public class BackendServerRequestLogFilter extends AbstractGlobalFilter {
       entity.setHeaders(
           filterHeaderService.filterHeaders(exchange.getRequest().getHeaders().toSingleValueMap()));
       entity.setRequestIp(GATEWAY_SERVICE);
+      entity.setLifeStatus(LifeStatusEnum.LIVE);
       entity.setResponseIp(exchange.getRequest().getRemoteAddress().getHostName());
       Route route = exchange.getRequiredAttribute(GATEWAY_ROUTE_ATTR);
       Object url = exchange.getAttributes().get(X_KRAKEN_URL);

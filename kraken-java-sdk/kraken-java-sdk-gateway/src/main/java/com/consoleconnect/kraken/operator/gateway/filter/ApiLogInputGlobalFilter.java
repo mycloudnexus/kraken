@@ -6,6 +6,7 @@ import static org.springframework.core.io.buffer.DataBufferUtils.join;
 import com.consoleconnect.kraken.operator.auth.jwt.JwtDecoderToolkit;
 import com.consoleconnect.kraken.operator.auth.model.AuthDataProperty;
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
+import com.consoleconnect.kraken.operator.core.enums.LifeStatusEnum;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
 import com.consoleconnect.kraken.operator.core.service.ApiActivityLogService;
@@ -66,6 +67,7 @@ public class ApiLogInputGlobalFilter extends AbstractGlobalFilter {
       entity.setQueryParameters(exchange.getRequest().getQueryParams().toSingleValueMap());
       entity.setRequestIp(IpUtils.getIP(exchange.getRequest()));
       entity.setResponseIp(GATEWAY_SERVICE);
+      entity.setLifeStatus(LifeStatusEnum.LIVE);
       entity.setBuyer(readBuyer(headers));
       this.apiActivityLogService.save(entity);
       log.info("createdEntity:{}", entity.getId());
