@@ -1,7 +1,7 @@
 package com.consoleconnect.kraken.operator.core.config;
 
 import com.consoleconnect.kraken.operator.core.enums.AchieveScopeEnum;
-import com.consoleconnect.kraken.operator.core.enums.LogKindEnum;
+import com.consoleconnect.kraken.operator.core.enums.PlaneTypeEnum;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import java.time.ZonedDateTime;
@@ -27,7 +27,7 @@ public class AppConfig {
 
     public static final String ACHIEVE_LOG_CONFIG = "ACHIEVE_LOG_CONFIG";
 
-    private LogKindEnum logKind;
+    private PlaneTypeEnum logKind;
 
     private int month;
     private String protocol;
@@ -48,7 +48,7 @@ public class AppConfig {
         return false;
       }
 
-      return logKind == LogKindEnum.DATA_PLANE || logKind == LogKindEnum.CONTROL_PLANE;
+      return logKind == PlaneTypeEnum.DATA_PLANE || logKind == PlaneTypeEnum.CONTROL_PLANE;
     }
   }
 }
