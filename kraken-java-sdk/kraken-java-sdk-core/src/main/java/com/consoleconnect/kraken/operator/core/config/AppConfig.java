@@ -30,7 +30,8 @@ public class AppConfig {
     private PlaneTypeEnum logKind;
 
     private int month;
-    private String protocol;
+
+    private String protocol; // for example: GET、POST、PATCH、DELETE
     private AchieveScopeEnum achieveScope;
 
     public ZonedDateTime toAchieve() {
