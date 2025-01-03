@@ -30,15 +30,19 @@ public class ConstructExpressionUtil {
     return contents;
   }
 
-  public static String convertToJsonPointer(String path) {
+  public static String convertPathToJsonPointer(String path) {
+    return convertPathToJsonPointer(path, "[0]");
+  }
+
+  public static String convertPathToJsonPointer(String path, String arrayReplacement) {
     List<String> params = extractMapperParam(path);
     String param = params.get(0);
     if (StringUtils.isNotBlank(param) && param.startsWith(ARRAY_ROOT_PREFIX)) {
-      param = param.substring(ARRAY_ROOT_PREFIX.length(), param.length());
+      param = param.substring(ARRAY_ROOT_PREFIX.length());
     }
     return "/"
         + param
-            .replaceAll("\\[(\\*)\\]", "[0]")
+            .replaceAll("\\[(\\*)\\]", arrayReplacement)
             .replaceAll("(?)\\[", "\\/")
             .replaceAll("(?)\\].", "\\/")
             .replaceAll("(\\.)", "\\/");
@@ -62,6 +66,21 @@ public class ConstructExpressionUtil {
 
   public static String constructBody(String source) {
     return source.replace("@{{", "${body.").replace("}}", "}");
+  }
+
+  public static String constructBodyOfArray(String source, int indexOfArray) {
+    return constructBodyOfArray(source, indexOfArray, "${body.");
+  }
+
+  public static String constructBodyOfArray(String source, int indexOfArray, String arrayPrefix) {
+    return source
+        .replace("@{{", arrayPrefix)
+        .replace("}}", "}")
+        .replace("[*]", "[" + indexOfArray + "]");
+  }
+
+  public static String constructJsonPath(String prefix, String source) {
+    return source.replace("@{{", prefix).replace("}}", "");
   }
 
   public static String constructJsonPathBody(String source) {

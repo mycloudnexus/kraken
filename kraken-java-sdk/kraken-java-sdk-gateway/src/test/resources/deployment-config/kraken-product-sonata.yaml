@@ -23,9 +23,11 @@ spec:
     - classpath:deployment-config/components/api-targets/api-target.order.eline.read.yaml
     - classpath:deployment-config/components/api-targets/api-target.hub.add.yaml
     - classpath:deployment-config/components/api-targets/api-target.quote.uni.add.yaml
+    - classpath:deployment-config/components/api-targets/api-target.quote.uni.add.sync.yaml
     - classpath:deployment-config/components/api-targets/api-target.order.notification.state.change.yaml
     - classpath:deployment-config/components/api-targets-mappers/api-target-mapper.hub.add.yaml
     - classpath:deployment-config/components/api-targets-mappers/api-target-mapper.quote.uni.add.yaml
+    - classpath:deployment-config/components/api-targets-mappers/api-target-mapper.quote.uni.add.sync.yaml
     - classpath:deployment-config/components/api-targets-mappers/api-target-mapper.order.uni.add.yaml
     - classpath:deployment-config/components/api-targets-mappers/api-target-mapper.order.eline.add.yaml
     - classpath:deployment-config/components/api-targets-mappers/api-target-mapper.order.notification.state.change.yaml

@@ -78,7 +78,8 @@ public class LoadTargetAPIConfigActionRunner extends AbstractActionRunner {
     }
 
     StateValueMappingDto stateValueMappingDto = new StateValueMappingDto();
-    renderRequestService.parseRequest(facets, stateValueMappingDto);
+    renderRequestService.handlePath(facets);
+    renderRequestService.handleBody(facets, stateValueMappingDto, inputs);
 
     if (render != null && render) {
       facets
@@ -92,8 +93,9 @@ public class LoadTargetAPIConfigActionRunner extends AbstractActionRunner {
                   endpoint.setRequestBody(renderedRequest);
                 }
                 if (Objects.nonNull(endpoint.getResponseBody())) {
-                  String transformedResp = transform(endpoint, stateValueMappingDto);
+                  String transformedResp = transform(endpoint, stateValueMappingDto, inputs);
                   endpoint.setResponseBody(SpELEngine.evaluate(transformedResp, inputs));
+                  log.info("After rendering, the response body is:{}", endpoint.getResponseBody());
                 }
                 if (Objects.nonNull(endpoint.getPath())) {
                   String evaluate =

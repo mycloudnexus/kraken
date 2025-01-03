@@ -238,6 +238,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
         log.info("Skipped mapper due to blank target, source:{}", mapper.getSource());
         continue;
       }
+      String source = replaceStar(mapper.getSource());
       if (MappingTypeEnum.ENUM.getKind().equals(mapper.getSourceType())
           || MappingTypeEnum.DISCRETE_STR.getKind().equals(mapper.getSourceType())
           || MappingTypeEnum.DISCRETE_INT.getKind().equals(mapper.getSourceType())
