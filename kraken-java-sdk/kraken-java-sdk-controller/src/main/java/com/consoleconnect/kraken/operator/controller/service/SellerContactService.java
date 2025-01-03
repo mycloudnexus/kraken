@@ -42,19 +42,18 @@ public class SellerContactService implements SellerContactChecker {
     UnifiedAssetDto componentAssetDto = unifiedAssetService.findOne(componentId);
     List<String> productTypes = request.getProductCategories();
     Collections.sort(productTypes);
-    String key = componentAssetDto.getMetadata().getKey() + DOT + String.join(DOT, productTypes);
+    String key = generateKey(componentAssetDto.getMetadata().getKey(), productTypes);
 
     List<String> keyList = new ArrayList<>();
     keyList.add(key);
     if (request.getProductCategories().size() == 1) {
-      keyList.add(
-          componentAssetDto.getMetadata().getKey()
-              + DOT
-              + String.join(
-                  DOT,
-                  Arrays.stream(ProductCategoryEnum.values())
-                      .map(ProductCategoryEnum::getKind)
-                      .toList()));
+      String fullKey =
+          generateKey(
+              componentAssetDto.getMetadata().getKey(),
+              Arrays.stream(ProductCategoryEnum.values())
+                  .map(ProductCategoryEnum::getKind)
+                  .toList());
+      keyList.add(fullKey);
     }
 
     checkExisted(keyList);
@@ -62,6 +61,10 @@ public class SellerContactService implements SellerContactChecker {
     UnifiedAsset sellerAsset = createSellerContact(request, key, componentAssetDto);
     SyncMetadata syncMetadata = new SyncMetadata("", "", DateTime.nowInUTCString(), createdBy);
     return unifiedAssetService.syncAsset(productId, sellerAsset, syncMetadata, true);
+  }
+
+  private String generateKey(String componentKey, List<String> productCategories) {
+    return componentKey + DOT + String.join(DOT, productCategories);
   }
 
   private UnifiedAsset createSellerContact(
@@ -74,8 +77,8 @@ public class SellerContactService implements SellerContactChecker {
         .getMetadata()
         .getLabels()
         .put(COMPONENT_KEY, componentAssetEntity.getMetadata().getKey());
-    request
-        .getProductCategories()
+    request.getProductCategories().stream()
+        .filter(Objects::nonNull)
         .forEach(
             item -> unifiedAsset.getMetadata().getLabels().put(item, String.valueOf(Boolean.TRUE)));
 
