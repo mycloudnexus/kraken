@@ -100,5 +100,6 @@ public class ComponentAPITargetFacets {
     private String addressType;
     private String quoteLevel;
     private Boolean syncMode;
+    private List<String> sellerContactKeys;
   }
 }

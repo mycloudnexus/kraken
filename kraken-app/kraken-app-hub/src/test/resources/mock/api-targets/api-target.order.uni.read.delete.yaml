@@ -16,6 +16,9 @@ spec:
     method: get
     productType: uni
     actionType: delete
+    sellerContactKeys:
+      - mef.sonata.api.order.access.eline
+      - mef.sonata.api.order.access.eline.internet.access
   endpoints:
     - id: retrieve connection detail by id of uni delete order
       path: ""

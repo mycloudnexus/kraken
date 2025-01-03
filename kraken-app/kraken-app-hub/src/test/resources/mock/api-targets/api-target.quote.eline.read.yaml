@@ -15,6 +15,9 @@ spec:
     path: /mefApi/sonata/quoteManagement/v8/quote/{id}
     method: get
     productType: access_e_line
+    sellerContactKeys:
+      - mef.sonata.api.quote.access.eline
+      - mef.sonata.api.quote.access.eline.internet.access
   endpoints:
     - id: retrieve quote for connection
       path: ""

@@ -15,6 +15,9 @@ spec:
     method: post
     productType: uni
     actionType: delete
+    sellerContactKeys:
+      - mef.sonata.api.order.access.eline
+      - mef.sonata.api.order.access.eline.internet.access
   endpoints:
     - id: delete port
       path: ""
