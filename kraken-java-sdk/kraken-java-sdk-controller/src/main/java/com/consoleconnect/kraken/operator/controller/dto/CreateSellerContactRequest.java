@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 public class CreateSellerContactRequest {
-  private List<String> productTypes;
+  private List<String> productCategories;
   private String contactName;
   private String contactEmail;
   private String contactPhone;

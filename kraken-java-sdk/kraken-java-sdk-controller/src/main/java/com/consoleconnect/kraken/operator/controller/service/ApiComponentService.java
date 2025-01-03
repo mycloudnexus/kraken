@@ -477,7 +477,7 @@ public class ApiComponentService implements TargetMappingChecker, EndPointUsageC
     List<ComponentProductCategoryDTO.ComponentProductMetadata> metadataList =
         unifiedAssetService.findByKind(AssetKindEnum.COMPONENT_API.getKind()).stream()
             .map(UnifiedAssetDto::getMetadata)
-            .filter(item -> item.getKey().contains("quote") || item.getKey().contains("order"))
+            .filter(item -> item.getKey().contains(QUOTE_KEY) || item.getKey().contains(ORDER_KEY))
             .map(
                 item -> {
                   ComponentProductCategoryDTO.ComponentProductMetadata metadata =

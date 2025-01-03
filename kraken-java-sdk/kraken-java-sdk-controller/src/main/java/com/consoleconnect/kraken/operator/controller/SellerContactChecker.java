@@ -28,11 +28,11 @@ public interface SellerContactChecker {
     if (StringUtils.isBlank(request.getContactPhone())) {
       throw KrakenException.badRequest("The contactPhone is mandatory");
     }
-    if (CollectionUtils.isEmpty(request.getProductTypes())) {
+    if (CollectionUtils.isEmpty(request.getProductCategories())) {
       throw KrakenException.badRequest("The productTypes are mandatory");
     }
     request
-        .getProductTypes()
+        .getProductCategories()
         .forEach(
             item -> {
               if (Arrays.stream(ProductCategoryEnum.values())

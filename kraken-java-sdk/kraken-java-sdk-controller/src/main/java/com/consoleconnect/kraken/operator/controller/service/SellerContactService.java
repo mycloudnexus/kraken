@@ -40,13 +40,13 @@ public class SellerContactService implements SellerContactChecker {
     checkSellerContacts(productId, componentId, request);
 
     UnifiedAssetDto componentAssetDto = unifiedAssetService.findOne(componentId);
-    List<String> productTypes = request.getProductTypes();
+    List<String> productTypes = request.getProductCategories();
     Collections.sort(productTypes);
     String key = componentAssetDto.getMetadata().getKey() + DOT + String.join(DOT, productTypes);
 
     List<String> keyList = new ArrayList<>();
     keyList.add(key);
-    if (request.getProductTypes().size() == 1) {
+    if (request.getProductCategories().size() == 1) {
       keyList.add(
           componentAssetDto.getMetadata().getKey()
               + DOT
@@ -75,7 +75,7 @@ public class SellerContactService implements SellerContactChecker {
         .getLabels()
         .put(COMPONENT_KEY, componentAssetEntity.getMetadata().getKey());
     request
-        .getProductTypes()
+        .getProductCategories()
         .forEach(
             item -> unifiedAsset.getMetadata().getLabels().put(item, String.valueOf(Boolean.TRUE)));
 

@@ -55,7 +55,7 @@ class SellerContactControllerTest extends AbstractIntegrationTest {
   void givenIllegalRequest_whenCreating_thenThrowsException(SellerContactCreateReq req) {
     CreateSellerContactRequest request = new CreateSellerContactRequest();
     if (req.getRequest() != null) {
-      request.setProductTypes(req.getRequest().getProductTypes());
+      request.setProductCategories(req.getRequest().getProductCategories());
       request.setContactName(req.getRequest().getContactName());
       request.setContactEmail(req.getRequest().getContactEmail());
       request.setContactPhone(req.getRequest().getContactPhone());
@@ -209,7 +209,7 @@ class SellerContactControllerTest extends AbstractIntegrationTest {
     SellerContactCreateReq req5 = new SellerContactCreateReq();
     req5.setProductId(PRODUCT_ID);
     req5.setComponentId(COMPONENT_KEY_OF_ORDER);
-    request5.setProductTypes(List.of());
+    request5.setProductCategories(List.of());
     req5.setRequest(request5);
     list.add(req5);
 
@@ -218,7 +218,7 @@ class SellerContactControllerTest extends AbstractIntegrationTest {
     SellerContactCreateReq req6 = new SellerContactCreateReq();
     req6.setProductId(PRODUCT_ID);
     req6.setComponentId(COMPONENT_KEY_OF_ORDER);
-    request6.setProductTypes(List.of("access.eline-11111", "internet.access"));
+    request6.setProductCategories(List.of("access.eline-11111", "internet.access"));
     req6.setRequest(request6);
     list.add(req6);
 
