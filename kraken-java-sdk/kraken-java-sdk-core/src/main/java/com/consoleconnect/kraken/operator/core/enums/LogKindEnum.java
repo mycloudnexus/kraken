@@ -7,7 +7,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum LogKindEnum {
   DATA_PLANE("data-plane"),
-  CONTROL_PLANE("control-plane");
+  CONTROL_PLANE("control-plane"),
+  MANAGE_PLANE("manage-plane");
 
   private final String kind;
 }

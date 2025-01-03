@@ -232,4 +232,19 @@ class ApiActivityLogServiceAtControlPlaneTest extends AbstractIntegrationTest {
 
     Assertions.assertEquals(1, this.apiActivityLogBodyRepository.findAll().size());
   }
+
+  @Test
+  void abc() {
+
+    this.apiActivityLogService.achieveApiActivityLog(null);
+    AppConfig.AchieveApiActivityLogConf achieveApiActivityLogConf =
+        new AppConfig.AchieveApiActivityLogConf();
+    achieveApiActivityLogConf.setLogKind(LogKindEnum.MANAGE_PLANE);
+    this.apiActivityLogService.achieveApiActivityLog(achieveApiActivityLogConf);
+
+    this.apiActivityLogService.migrateApiLog(null);
+    this.apiActivityLogService.migrateApiLog(achieveApiActivityLogConf);
+
+    Assertions.assertNotNull(achieveApiActivityLogConf);
+  }
 }

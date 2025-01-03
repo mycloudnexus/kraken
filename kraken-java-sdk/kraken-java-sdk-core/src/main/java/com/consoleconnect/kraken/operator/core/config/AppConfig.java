@@ -6,10 +6,12 @@ import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+@Slf4j
 @Configuration
 public class AppConfig {
 
@@ -32,6 +34,23 @@ public class AppConfig {
 
     public ZonedDateTime toAchieve() {
       return ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS).minusMonths(this.month);
+    }
+
+    public static boolean needAchieveMigrate(AchieveApiActivityLogConf conf) {
+      if (conf == null) {
+        return false;
+      }
+
+      var logKind = conf.getLogKind();
+      if (logKind == null) {
+        return false;
+      }
+
+      if (logKind != LogKindEnum.DATA_PLANE && logKind != LogKindEnum.CONTROL_PLANE) {
+
+        return false;
+      }
+      return true;
     }
   }
 }

@@ -13,7 +13,6 @@ import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
 import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
 import com.consoleconnect.kraken.operator.core.enums.AchieveScopeEnum;
 import com.consoleconnect.kraken.operator.core.enums.LifeStatusEnum;
-import com.consoleconnect.kraken.operator.core.enums.LogKindEnum;
 import com.consoleconnect.kraken.operator.core.enums.SyncStatusEnum;
 import com.consoleconnect.kraken.operator.core.mapper.ApiActivityLogMapper;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
@@ -119,15 +118,11 @@ public class ApiActivityLogService {
   }
 
   public void achieveApiActivityLog(AppConfig.AchieveApiActivityLogConf activityLogConf) {
-    if (activityLogConf == null) {
+    if (!AppConfig.AchieveApiActivityLogConf.needAchieveMigrate(activityLogConf)) {
       return;
     }
-    var logKind = activityLogConf.getLogKind();
 
-    if (logKind != LogKindEnum.DATA_PLANE && logKind != LogKindEnum.CONTROL_PLANE) {
-      log.info("{}, {}, skip", DELETE_API_ACTIVITY_LOG, logKind.name());
-      return;
-    }
+    var logKind = activityLogConf.getLogKind();
 
     for (int page = 0; ; page++) {
       var list =
@@ -165,9 +160,10 @@ public class ApiActivityLogService {
   }
 
   public void migrateApiLog(AppConfig.AchieveApiActivityLogConf activityLogConf) {
-    if (activityLogConf == null) {
+    if (!AppConfig.AchieveApiActivityLogConf.needAchieveMigrate(activityLogConf)) {
       return;
     }
+
     var logKind = activityLogConf.getLogKind();
 
     for (int page = 0; ; page++) {
