@@ -1,5 +1,6 @@
-package com.consoleconnect.kraken.operator.sync.service;
+package com.consoleconnect.kraken.operator.core.service;
 
+import com.consoleconnect.kraken.operator.core.CustomConfig;
 import com.consoleconnect.kraken.operator.core.client.ClientEvent;
 import com.consoleconnect.kraken.operator.core.client.ClientEventTypeEnum;
 import com.consoleconnect.kraken.operator.core.config.AppConfig;
@@ -9,9 +10,7 @@ import com.consoleconnect.kraken.operator.core.enums.LifeStatusEnum;
 import com.consoleconnect.kraken.operator.core.enums.LogKindEnum;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogBodyRepository;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
-import com.consoleconnect.kraken.operator.core.service.ApiActivityLogService;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
-import com.consoleconnect.kraken.operator.sync.CustomConfig;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import java.time.ZonedDateTime;
@@ -33,7 +32,7 @@ import org.springframework.test.context.ContextConfiguration;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class ApiActivityLogServiceAtControlPlaneTest extends AbstractIntegrationTest {
   @Autowired ApiActivityLogRepository apiActivityLogRepository;
-  @SpyBean private AchieveApiActivityLogService deleteLogService;
+
   @SpyBean private ApiActivityLogService apiActivityLogService;
   @SpyBean private ApiActivityLogBodyRepository apiActivityLogBodyRepository;
   public static final String NOW_WITH_TIMEZONE = "2023-10-24T05:00:00+02:00";
