@@ -470,4 +470,35 @@ public class ApiComponentService implements TargetMappingChecker, EndPointUsageC
         environmentService.search(productId, PageRequest.of(0, 10)).getData();
     return calculate(unifiedAssetDto, environments);
   }
+
+  public ComponentProductCategoryDTO listProductCategories(String productId) {
+    unifiedAssetService.findOne(productId);
+    ComponentProductCategoryDTO componentProductCategoryDTO = new ComponentProductCategoryDTO();
+    List<ComponentProductCategoryDTO.ComponentProductMetadata> metadataList =
+        unifiedAssetService.findByKind(AssetKindEnum.COMPONENT_API.getKind()).stream()
+            .map(UnifiedAssetDto::getMetadata)
+            .filter(item -> item.getKey().contains(QUOTE_KEY) || item.getKey().contains(ORDER_KEY))
+            .map(
+                item -> {
+                  ComponentProductCategoryDTO.ComponentProductMetadata metadata =
+                      new ComponentProductCategoryDTO.ComponentProductMetadata();
+                  metadata.setKey(item.getKey());
+                  metadata.setId(item.getId());
+                  return metadata;
+                })
+            .toList();
+    componentProductCategoryDTO.setComponentProducts(metadataList);
+    componentProductCategoryDTO.setProductCategories(
+        Arrays.stream(ProductCategoryEnum.values())
+            .map(
+                item -> {
+                  ComponentProductCategoryDTO.ProductCategoryMetaData metadata =
+                      new ComponentProductCategoryDTO.ProductCategoryMetaData();
+                  metadata.setKind(item.getKind());
+                  metadata.setName(item.getName());
+                  return metadata;
+                })
+            .toList());
+    return componentProductCategoryDTO;
+  }
 }

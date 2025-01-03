@@ -10,6 +10,7 @@ spec:
     - classpath:deployment-config/api-target-spec/api-spec.order.yaml
     - classpath:deployment-config/apis/api.address.yaml
     - classpath:deployment-config/apis/api.order.yaml
+    - classpath:deployment-config/apis/api.quote.yaml
     - classpath:deployment-config/apis/mock-api-response.yaml
     - classpath:deployment-config/api-targets/api-target.address.validate.yaml
     - classpath:deployment-config/api-targets/api-target.address.retrieve.yaml
