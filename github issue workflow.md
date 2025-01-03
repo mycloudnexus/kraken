@@ -30,13 +30,19 @@ There are 3 key properties that contribute to effective GitHub issue management 
     * Product Owner (PO) reviews the issue.
     * PO verifies and corrects the **Category** label, **Project**, and **Milestone** as needed.
     * PO adds the **Release Branch Candidate** label if applicable.
+    * PO assigns the issue to a developer
 
 * **Development:**
-    * Developer is assigned to the issue.
+    * Developer moves the issue to In Progress once he/she starts to work on it.
     * Developer creates a Pull Request (PR) and links the issue to the PR.
+    * Developer move the issue the In Review once the PR is ready for review.
+    * Github project Workflow(if works) will move the issue to Merged once the PR is merged, if not, developer has to Move the status by themselves.
+    * Developer(BE) updates API detail in the issues for later FE integration.
 
 * **QA:**
-    * QA tests the changes in the PR.
-    * QA adds comments to the issue.
-    * QA moves the issue to a "Ready for Release" status by using project status upon successful testing.
+    * QA creates a docker image with github Actions if there are some issues in the merged queue and deploy it into testing env.
+    * QA moves those merged issues to "Ready for Testing" once the deployment is done.
+    * QA tests the changes in testing env.
+    * QA adds comments to the issue with test result.
+    * QA moves the issue to a "Ready for Release" status by using project status upon successful testing. If failed, moves it back to "In progress".
 
