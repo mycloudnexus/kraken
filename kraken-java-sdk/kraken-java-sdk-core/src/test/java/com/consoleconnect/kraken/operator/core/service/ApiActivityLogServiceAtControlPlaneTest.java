@@ -91,6 +91,30 @@ class ApiActivityLogServiceAtControlPlaneTest extends AbstractIntegrationTest {
         envId, UUID.randomUUID().toString(), createClientEventWithBody());
   }
 
+  @Test
+  void recordBodyByFilter() {
+    ApiActivityLogEntity apiActivityLogEntity = new ApiActivityLogEntity();
+    apiActivityLogEntity.setRequestId(EXISTED_REQUEST_ID);
+    apiActivityLogEntity.setCallSeq(0);
+    apiActivityLogEntity.setMethod("POST");
+    apiActivityLogEntity.setBuyer("buy");
+    apiActivityLogEntity.setUri("uri");
+    apiActivityLogEntity.setPath("path");
+    this.apiActivityLogService.save(apiActivityLogEntity);
+
+    var entity = this.apiActivityLogRepository.findById(apiActivityLogEntity.getId()).orElse(null);
+    Assertions.assertNotNull(entity.getApiLogBodyEntity());
+    entity.setRequest("{}");
+    entity.setResponse("{}");
+    this.apiActivityLogService.save(entity);
+
+    var entityWithBody =
+        this.apiActivityLogRepository.findById(apiActivityLogEntity.getId()).orElse(null);
+
+    Assertions.assertEquals("{}", entity.getApiLogBodyEntity().getRequest());
+    Assertions.assertEquals("{}", entity.getApiLogBodyEntity().getRequest());
+  }
+
   public static final String EXISTED_REQUEST_ID = "requestId_existed";
 
   @Test
