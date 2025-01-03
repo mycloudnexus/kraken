@@ -9,7 +9,7 @@ The Doc is describing the branching and versioning strategy of Kraken.
 
 *   **snapshot Versions:** On `main`, versions follow the pattern `x.0.0-snapshot.n`. Examples: `2.0.0-snapshot.0`, `2.0.0-snapshot.1`.
 *   **Release Candidate (RC) Versions:** On the **`release/x.0`** branch, RC versions are tagged: `x.0.0-rc.n` (e.g., `1.0.0-rc.0`, `1.0.0-rc.1`, `2.0.0-rc.0`).
-*   **Release Versions:** On the `release/x.0` branch, the final release version is tagged: `x.0.0` (e.g., `1.0.0`, `2.0.0`).
+*   **Major Release Versions:** On the `release/x.0` branch, the final release version is tagged: `x.0.0` (e.g., `1.0.0`, `2.0.0`).
 *   **Minor Release Versions:** On the `release/x.0` branch, after the `x.0.0` release, subsequent bug fixes, minor features and improvements result in minor version increments: `x.y.0` (e.g., `1.1.0`, `1.2.0`, `2.1.0`).
 
 **Workflow:**
