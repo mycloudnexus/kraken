@@ -7,7 +7,6 @@ import com.consoleconnect.kraken.operator.core.config.AppConfig;
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
 import com.consoleconnect.kraken.operator.core.enums.AchieveScopeEnum;
 import com.consoleconnect.kraken.operator.core.enums.LifeStatusEnum;
-import com.consoleconnect.kraken.operator.core.enums.PlaneTypeEnum;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogBodyRepository;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
@@ -201,7 +200,7 @@ class ApiActivityLogServiceAtControlPlaneTest extends AbstractIntegrationTest {
     this.receiveClientApiActivityLog();
     AppConfig.AchieveApiActivityLogConf achieveApiActivityLogConf =
         new AppConfig.AchieveApiActivityLogConf();
-    achieveApiActivityLogConf.setLogKind(PlaneTypeEnum.CONTROL_PLANE);
+
     this.apiActivityLogService.migrateOnePage(achieveApiActivityLogConf);
     var apiLog = this.apiActivityLogRepository.findAll();
     var apiLogBody = this.apiActivityLogBodyRepository.findAll();
@@ -225,7 +224,7 @@ class ApiActivityLogServiceAtControlPlaneTest extends AbstractIntegrationTest {
     achieveApiActivityLogConf.setAchieveScope(AchieveScopeEnum.DETAIL);
     achieveApiActivityLogConf.setMonth(-1);
     achieveApiActivityLogConf.setProtocol("GET");
-    achieveApiActivityLogConf.setLogKind(PlaneTypeEnum.CONTROL_PLANE);
+
     apiActivityLogService.achieveOnePage(achieveApiActivityLogConf);
 
     Assertions.assertEquals(
@@ -263,7 +262,7 @@ class ApiActivityLogServiceAtControlPlaneTest extends AbstractIntegrationTest {
     this.apiActivityLogService.achieveOnePage(null);
     AppConfig.AchieveApiActivityLogConf achieveApiActivityLogConf =
         new AppConfig.AchieveApiActivityLogConf();
-    achieveApiActivityLogConf.setLogKind(PlaneTypeEnum.MGMT_PLANE);
+
     this.apiActivityLogService.achieveOnePage(achieveApiActivityLogConf);
 
     this.apiActivityLogService.migrateOnePage(null);

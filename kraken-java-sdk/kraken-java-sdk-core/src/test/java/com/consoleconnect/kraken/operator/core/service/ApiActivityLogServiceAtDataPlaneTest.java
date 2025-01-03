@@ -7,7 +7,6 @@ import com.consoleconnect.kraken.operator.core.config.AppConfig;
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
 import com.consoleconnect.kraken.operator.core.enums.AchieveScopeEnum;
 import com.consoleconnect.kraken.operator.core.enums.LifeStatusEnum;
-import com.consoleconnect.kraken.operator.core.enums.PlaneTypeEnum;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogBodyRepository;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
@@ -147,7 +146,6 @@ class ApiActivityLogServiceAtDataPlaneTest extends AbstractIntegrationTest {
     this.insertLogWithoutSubTable();
     AppConfig.AchieveApiActivityLogConf achieveApiActivityLogConf =
         new AppConfig.AchieveApiActivityLogConf();
-    achieveApiActivityLogConf.setLogKind(PlaneTypeEnum.DATA_PLANE);
 
     this.apiActivityLogService.migrateOnePage(achieveApiActivityLogConf);
     var apiLog = this.apiActivityLogRepository.findAll();
@@ -172,7 +170,7 @@ class ApiActivityLogServiceAtDataPlaneTest extends AbstractIntegrationTest {
         new AppConfig.AchieveApiActivityLogConf();
     achieveApiActivityLogConf.setAchieveScope(AchieveScopeEnum.BASIC);
     achieveApiActivityLogConf.setMonth(-1);
-    achieveApiActivityLogConf.setLogKind(PlaneTypeEnum.DATA_PLANE);
+
     apiActivityLogService.achieveOnePage(achieveApiActivityLogConf);
 
     Assertions.assertEquals(

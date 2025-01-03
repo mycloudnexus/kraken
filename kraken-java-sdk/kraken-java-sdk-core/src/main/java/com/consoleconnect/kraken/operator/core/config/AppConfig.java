@@ -1,7 +1,6 @@
 package com.consoleconnect.kraken.operator.core.config;
 
 import com.consoleconnect.kraken.operator.core.enums.AchieveScopeEnum;
-import com.consoleconnect.kraken.operator.core.enums.PlaneTypeEnum;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import java.time.ZonedDateTime;
@@ -27,8 +26,6 @@ public class AppConfig {
 
     public static final String ACHIEVE_LOG_CONFIG = "ACHIEVE_LOG_CONFIG";
 
-    private PlaneTypeEnum logKind;
-
     private int month;
 
     private String protocol; // for example: GET、POST、PATCH、DELETE
@@ -40,16 +37,7 @@ public class AppConfig {
 
     public static boolean needAchieveMigrate(AchieveApiActivityLogConf conf) {
       log.info("{},{}", ACHIEVE_LOG_CONFIG, JsonToolkit.toJson(conf));
-      if (conf == null) {
-        return false;
-      }
-
-      var logKind = conf.getLogKind();
-      if (logKind == null) {
-        return false;
-      }
-
-      return logKind == PlaneTypeEnum.DATA_PLANE || logKind == PlaneTypeEnum.CONTROL_PLANE;
+      return conf != null;
     }
   }
 }
