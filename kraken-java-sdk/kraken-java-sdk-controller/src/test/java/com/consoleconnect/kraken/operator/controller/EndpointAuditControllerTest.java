@@ -29,6 +29,7 @@ class EndpointAuditControllerTest extends AbstractIntegrationTest {
   private final WebTestClientHelper testClientHelper;
   @Autowired EndpointAuditRepository endpointAuditRepository;
   private static final UUID audit_uuid = UUID.randomUUID();
+  private static final UUID resource_uuid = UUID.randomUUID();
 
   @Autowired
   EndpointAuditControllerTest(WebTestClient webTestClient) {
@@ -47,7 +48,7 @@ class EndpointAuditControllerTest extends AbstractIntegrationTest {
     entity.setPathVariables(pathVariables);
     entity.setRemoteAddress("127.0.0.1");
     entity.setResource("target api server");
-    entity.setResourceId(UUID.randomUUID().toString());
+    entity.setResourceId(resource_uuid.toString());
     Map<String, String> request = new HashMap<>();
     request.put("description", "test request");
     entity.setRequest(request);
@@ -116,6 +117,30 @@ class EndpointAuditControllerTest extends AbstractIntegrationTest {
   void givenLiteSearch_whenListAuditLog_thenSuccess() {
     testClientHelper.getAndVerify(
         uriBuilder -> uriBuilder.path("/audit/logs").queryParam("liteSearch", true).build(),
+        bodyStr -> {
+          log.info(bodyStr);
+          assertThat(bodyStr, Matchers.notNullValue());
+          assertThat(bodyStr, hasJsonPath("$.data", notNullValue()));
+          assertThat(bodyStr, hasNoJsonPath("$.data.data[0].request"));
+          assertThat(bodyStr, hasNoJsonPath("$.data.data[0].response"));
+        });
+    String detail = String.format("/audit/logs/%s", audit_uuid);
+    testClientHelper.getAndVerify(
+        uriBuilder -> uriBuilder.path(detail).build(),
+        bodyStr -> {
+          log.info(bodyStr);
+          assertThat(bodyStr, Matchers.notNullValue());
+          assertThat(bodyStr, hasJsonPath("$.data.request", notNullValue()));
+          assertThat(bodyStr, hasJsonPath("$.data.response", notNullValue()));
+        });
+  }
+
+  @Order(4)
+  @Test
+  void givenLiteSearch_whenSearchByResourceId_thenSuccess() {
+    String path = String.format("/audit/logs/resources/%s", resource_uuid);
+    testClientHelper.getAndVerify(
+        uriBuilder -> uriBuilder.path(path).queryParam("liteSearch", true).build(),
         bodyStr -> {
           log.info(bodyStr);
           assertThat(bodyStr, Matchers.notNullValue());

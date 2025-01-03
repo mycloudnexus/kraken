@@ -27,45 +27,35 @@ public class EndpointAuditService implements UUIDWrapper {
       int page,
       int size,
       boolean liteSearch) {
-
-    Page<EndpointAuditEntity> data =
-        endpointAuditRepository.search(
-            query, startTime, endTime, PagingHelper.toPageable(page, size));
-    if (!liteSearch) {
-      return PagingHelper.toPaging(data, x -> x);
-    }
-    return PagingHelper.toPaging(
-        data.stream()
-            .map(
-                x -> {
-                  x.setRequest(null);
-                  x.setResponse(null);
-                  return x;
-                })
-            .toList(),
-        x -> x);
+    return searchInternal(query, startTime, endTime, page, size, liteSearch);
   }
 
   public Paging<EndpointAuditEntity> searchByResourceId(
       String resourceId, int page, int size, boolean liteSearch) {
     EndpointAudit query = new EndpointAudit();
     query.setResourceId(resourceId);
+    return searchInternal(query, null, null, page, size, liteSearch);
+  }
 
+  private Paging<EndpointAuditEntity> searchInternal(
+      EndpointAudit query,
+      ZonedDateTime startTime,
+      ZonedDateTime endTime,
+      int page,
+      int size,
+      boolean liteSearch) {
     Page<EndpointAuditEntity> data =
-        endpointAuditRepository.search(query, null, null, PagingHelper.toPageable(page, size));
-    if (!liteSearch) {
-      return PagingHelper.toPaging(data, x -> x);
-    }
-    return PagingHelper.toPaging(
-        data.stream()
-            .map(
-                x -> {
-                  x.setRequest(null);
-                  x.setResponse(null);
-                  return x;
-                })
-            .toList(),
-        x -> x);
+        endpointAuditRepository.search(
+            query, startTime, endTime, PagingHelper.toPageable(page, size));
+    return liteSearch
+        ? PagingHelper.toPaging(data.stream().map(this::removeDetails).toList(), x -> x)
+        : PagingHelper.toPaging(data, x -> x);
+  }
+
+  private EndpointAuditEntity removeDetails(EndpointAuditEntity entity) {
+    entity.setRequest(null);
+    entity.setResponse(null);
+    return entity;
   }
 
   public Optional<EndpointAuditEntity> findOne(String id) {
