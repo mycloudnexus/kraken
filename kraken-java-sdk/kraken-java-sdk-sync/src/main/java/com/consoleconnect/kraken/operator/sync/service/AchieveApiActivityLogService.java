@@ -32,6 +32,19 @@ public class AchieveApiActivityLogService {
   @Scheduled(cron = "${app.cron-job.achieve-api-activity-log:-}")
   public void runIt() {
     log.info("{}, {}, run it", ACHIEVE_LOG_CONFIG, JsonToolkit.toJson(this.deleteLogConf));
-    this.apiActivityLogService.achieveApiActivityLog(this.deleteLogConf);
+    this.achieveApiActivityLog(this.deleteLogConf);
+  }
+
+  public void achieveApiActivityLog(AppConfig.AchieveApiActivityLogConf activityLogConf) {
+
+    var logKind = activityLogConf.getLogKind();
+
+    for (int page = 0; page < 100; page++) {
+      if (this.apiActivityLogService.achieveOnePage(activityLogConf)) {
+        break;
+      }
+    }
+
+    log.info("{}, {}, end", ACHIEVE_LOG_CONFIG, logKind.name());
   }
 }

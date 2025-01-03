@@ -149,7 +149,7 @@ class ApiActivityLogServiceAtDataPlaneTest extends AbstractIntegrationTest {
         new AppConfig.AchieveApiActivityLogConf();
     achieveApiActivityLogConf.setLogKind(PlaneTypeEnum.DATA_PLANE);
 
-    this.apiActivityLogService.migrateApiLog(achieveApiActivityLogConf);
+    this.apiActivityLogService.migrateOnePage(achieveApiActivityLogConf);
     var apiLog = this.apiActivityLogRepository.findAll();
     var apiLogBody = this.apiActivityLogBodyRepository.findAll();
     var toMigrate =
@@ -173,7 +173,7 @@ class ApiActivityLogServiceAtDataPlaneTest extends AbstractIntegrationTest {
     achieveApiActivityLogConf.setAchieveScope(AchieveScopeEnum.BASIC);
     achieveApiActivityLogConf.setMonth(-1);
     achieveApiActivityLogConf.setLogKind(PlaneTypeEnum.DATA_PLANE);
-    apiActivityLogService.achieveApiActivityLog(achieveApiActivityLogConf);
+    apiActivityLogService.achieveOnePage(achieveApiActivityLogConf);
 
     Assertions.assertEquals(
         0,

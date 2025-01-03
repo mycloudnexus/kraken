@@ -1,6 +1,5 @@
 package com.consoleconnect.kraken.operator.core.service;
 
-import static com.consoleconnect.kraken.operator.core.config.AppConfig.AchieveApiActivityLogConf.ACHIEVE_LOG_CONFIG;
 import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.PRODUCT_BUYER;
 import static com.consoleconnect.kraken.operator.core.toolkit.LabelConstants.LABEL_BUYER_ID;
 
@@ -116,72 +115,62 @@ public class ApiActivityLogService {
                 entity -> UnifiedAssetService.toAsset(entity, true)));
   }
 
-  public void achieveApiActivityLog(AppConfig.AchieveApiActivityLogConf activityLogConf) {
+  @Transactional(rollbackFor = Exception.class)
+  public boolean achieveOnePage(AppConfig.AchieveApiActivityLogConf activityLogConf) {
     if (!AppConfig.AchieveApiActivityLogConf.needAchieveMigrate(activityLogConf)) {
-      return;
+      return true;
     }
-
-    var logKind = activityLogConf.getLogKind();
-
-    for (int page = 0; ; page++) {
-      var list =
-          this.repository.listExpiredApiLog(
-              activityLogConf.toAchieve(),
-              LifeStatusEnum.LIVE,
-              activityLogConf.getProtocol(),
-              PageRequest.of(page, 20));
-      if (list.isEmpty()) {
-        break;
-      }
-      var bodySet =
-          list.stream()
-              .map(ApiActivityLogEntity::getRawApiLogBodyEntity)
-              .filter(Objects::nonNull)
-              .toList();
-
-      list.forEach(
-          x -> {
-            x.setRawRequest(null);
-            x.setRawResponse(null);
-            x.setRawApiLogBodyEntity(null);
-            x.setLifeStatus(LifeStatusEnum.ACHIEVED);
-          });
-
-      this.repository.saveAll(list);
-
-      this.apiActivityLogBodyRepository.deleteAll(bodySet);
-      if (activityLogConf.getAchieveScope() == AchieveScopeEnum.BASIC) {
-        this.repository.deleteAll(list);
-      }
+    var list =
+        this.repository.listExpiredApiLog(
+            activityLogConf.toAchieve(),
+            LifeStatusEnum.LIVE,
+            activityLogConf.getProtocol(),
+            PageRequest.of(0, 20));
+    if (list.isEmpty()) {
+      return true;
     }
+    var bodySet =
+        list.stream()
+            .map(ApiActivityLogEntity::getRawApiLogBodyEntity)
+            .filter(Objects::nonNull)
+            .toList();
 
-    log.info("{}, {}, end", ACHIEVE_LOG_CONFIG, logKind.name());
+    list.forEach(
+        x -> {
+          x.setRawRequest(null);
+          x.setRawResponse(null);
+          x.setRawApiLogBodyEntity(null);
+          x.setLifeStatus(LifeStatusEnum.ACHIEVED);
+        });
+
+    this.repository.saveAll(list);
+
+    this.apiActivityLogBodyRepository.deleteAll(bodySet);
+    if (activityLogConf.getAchieveScope() == AchieveScopeEnum.BASIC) {
+      this.repository.deleteAll(list);
+    }
+    return false;
   }
 
-  public void migrateApiLog(AppConfig.AchieveApiActivityLogConf activityLogConf) {
+  @Transactional(rollbackFor = Exception.class)
+  public boolean migrateOnePage(AppConfig.AchieveApiActivityLogConf activityLogConf) {
     if (!AppConfig.AchieveApiActivityLogConf.needAchieveMigrate(activityLogConf)) {
-      return;
+      return true;
     }
-
-    var logKind = activityLogConf.getLogKind();
-
-    for (int page = 0; ; page++) {
-      var list = this.repository.findAllByMigrateStatus(PageRequest.of(page, 20)).stream().toList();
-      if (list.isEmpty()) {
-        break;
-      }
-      var bodySet =
-          list.stream()
-              .map(ApiActivityLogEntity::getApiLogBodyEntity)
-              .filter(Objects::nonNull)
-              .toList();
-      list.forEach(x -> x.setLifeStatus(LifeStatusEnum.LIVE));
-
-      this.apiActivityLogBodyRepository.saveAll(bodySet);
-      this.repository.saveAll(list);
+    var list = this.repository.findAllByMigrateStatus(PageRequest.of(0, 20)).stream().toList();
+    if (list.isEmpty()) {
+      return true;
     }
+    var bodySet =
+        list.stream()
+            .map(ApiActivityLogEntity::getApiLogBodyEntity)
+            .filter(Objects::nonNull)
+            .toList();
+    list.forEach(x -> x.setLifeStatus(LifeStatusEnum.LIVE));
 
-    log.info("{}, {}, end", ACHIEVE_LOG_CONFIG, logKind.name());
+    this.apiActivityLogBodyRepository.saveAll(bodySet);
+    this.repository.saveAll(list);
+    return false;
   }
 
   @Transactional
@@ -216,6 +205,7 @@ public class ApiActivityLogService {
     return HttpResponse.ok(null);
   }
 
+  @Transactional(rollbackFor = Exception.class)
   public ApiActivityLogEntity save(ApiActivityLogEntity apiActivityLogEntity) {
     if (apiActivityLogEntity.getApiLogBodyEntity() != null) {
       this.apiActivityLogBodyRepository.save(apiActivityLogEntity.getApiLogBodyEntity());

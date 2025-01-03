@@ -32,6 +32,19 @@ public class MigrateApiActivityLogService {
   @Scheduled(cron = "${app.cron-job.migrate-api-activity-log:-}")
   public void runIt() {
     log.info("{}, {}, run it", ACHIEVE_LOG_CONFIG, JsonToolkit.toJson(this.deleteLogConf));
-    this.apiActivityLogService.migrateApiLog(this.deleteLogConf);
+    this.migrateApiLog(this.deleteLogConf);
+  }
+
+  public void migrateApiLog(AppConfig.AchieveApiActivityLogConf activityLogConf) {
+
+    var logKind = activityLogConf.getLogKind();
+
+    for (int page = 0; page < 100; page++) {
+      if (this.apiActivityLogService.migrateOnePage()) {
+        break;
+      }
+    }
+
+    log.info("{}, {}, end", ACHIEVE_LOG_CONFIG, logKind.name());
   }
 }

@@ -202,7 +202,7 @@ class ApiActivityLogServiceAtControlPlaneTest extends AbstractIntegrationTest {
     AppConfig.AchieveApiActivityLogConf achieveApiActivityLogConf =
         new AppConfig.AchieveApiActivityLogConf();
     achieveApiActivityLogConf.setLogKind(PlaneTypeEnum.CONTROL_PLANE);
-    this.apiActivityLogService.migrateApiLog(achieveApiActivityLogConf);
+    this.apiActivityLogService.migrateOnePage(achieveApiActivityLogConf);
     var apiLog = this.apiActivityLogRepository.findAll();
     var apiLogBody = this.apiActivityLogBodyRepository.findAll();
     var toMigrate =
@@ -226,7 +226,7 @@ class ApiActivityLogServiceAtControlPlaneTest extends AbstractIntegrationTest {
     achieveApiActivityLogConf.setMonth(-1);
     achieveApiActivityLogConf.setProtocol("GET");
     achieveApiActivityLogConf.setLogKind(PlaneTypeEnum.CONTROL_PLANE);
-    apiActivityLogService.achieveApiActivityLog(achieveApiActivityLogConf);
+    apiActivityLogService.achieveOnePage(achieveApiActivityLogConf);
 
     Assertions.assertEquals(
         0,
@@ -260,14 +260,14 @@ class ApiActivityLogServiceAtControlPlaneTest extends AbstractIntegrationTest {
   @Test
   void moreCodeCover() {
 
-    this.apiActivityLogService.achieveApiActivityLog(null);
+    this.apiActivityLogService.achieveOnePage(null);
     AppConfig.AchieveApiActivityLogConf achieveApiActivityLogConf =
         new AppConfig.AchieveApiActivityLogConf();
     achieveApiActivityLogConf.setLogKind(PlaneTypeEnum.MGMT_PLANE);
-    this.apiActivityLogService.achieveApiActivityLog(achieveApiActivityLogConf);
+    this.apiActivityLogService.achieveOnePage(achieveApiActivityLogConf);
 
-    this.apiActivityLogService.migrateApiLog(null);
-    this.apiActivityLogService.migrateApiLog(achieveApiActivityLogConf);
+    this.apiActivityLogService.migrateOnePage(null);
+    this.apiActivityLogService.migrateOnePage(achieveApiActivityLogConf);
 
     Assertions.assertNotNull(achieveApiActivityLogConf);
   }
