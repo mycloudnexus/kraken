@@ -165,10 +165,11 @@ public class ApiActivityLogService {
   }
 
   public void migrateApiLog(AppConfig.AchieveApiActivityLogConf activityLogConf) {
-    var logKind = activityLogConf.getLogKind();
     if (activityLogConf == null) {
       return;
     }
+    var logKind = activityLogConf.getLogKind();
+
     for (int page = 0; ; page++) {
       var list = this.repository.findAllByMigrateStatus(PageRequest.of(page, 20)).stream().toList();
       if (list.isEmpty()) {
