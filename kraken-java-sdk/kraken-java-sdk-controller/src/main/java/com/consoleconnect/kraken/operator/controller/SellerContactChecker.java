@@ -29,7 +29,7 @@ public interface SellerContactChecker {
       throw KrakenException.badRequest("The contactPhone is mandatory");
     }
     if (CollectionUtils.isEmpty(request.getProductCategories())) {
-      throw KrakenException.badRequest("The productTypes are mandatory");
+      throw KrakenException.badRequest("The productCategories are mandatory");
     }
     request
         .getProductCategories()
@@ -38,7 +38,7 @@ public interface SellerContactChecker {
               if (Arrays.stream(ProductCategoryEnum.values())
                   .noneMatch(category -> category.getKind().equals(item))) {
                 throw KrakenException.badRequest(
-                    "productTypes should be in: ["
+                    "productCategories should be in: ["
                         + Stream.of(ProductCategoryEnum.values())
                             .map(ProductCategoryEnum::getKind)
                             .toList()
