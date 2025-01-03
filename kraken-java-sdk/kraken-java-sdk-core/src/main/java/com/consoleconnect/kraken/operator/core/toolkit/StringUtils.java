@@ -42,4 +42,9 @@ public class StringUtils {
     }
     return raw.trim().substring(0, upperLength).replace(ESCAPED_DOUBLE_QUOTE, EMPTY);
   }
+
+  public static String shortenUUID(String uuidString) {
+    // fetch the first 8 characters of the UUID, which is enough to uniquely identify it
+    return uuidString.substring(0, 8);
+  }
 }

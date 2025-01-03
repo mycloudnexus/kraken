@@ -1,0 +1,52 @@
+---
+kind: kraken.component.api-workflow
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-workflow.order.eline.delete
+  name: Geographic Address Management
+  version: 1
+spec:
+  validationStage:
+    - taskName: status_checking_task
+      taskType: http
+      endpoint:
+          path: "/api/v2/company/consolecore-poping-company/connections/{id}"
+          method: GET
+          serverKey: ''
+          mappers:
+            request:
+              - source: ''
+                sourceLocation: BODY
+                target: ''
+                targetLocation: ''
+      conditionCheck:
+        caseExpression: "${status_checking_task.output.response.body.state}==DELETED"
+        buildInTask: reject_order_task
+  preparationStage:
+    - taskName: disable_order_task
+      taskType: http
+      endpoint:
+          path: "/api/company/consolecore-poping-company/connections/{id}/disable"
+          method: PUT
+          serverKey: ''
+          mappers:
+            request:
+              - source: ''
+                sourceLocation: BODY
+                target: ''
+                targetLocation: ''
+  executionStage:
+    - taskName: delete_order_task
+      taskType: http
+      endpoint:
+          path: "/api/v2/company/consolecore-poping-company/connections/{id}"
+          method: ''
+          serverKey: ''
+          mappers:
+            request:
+              - source: ''
+                sourceLocation: BODY
+                target: ''
+                targetLocation: ''
+      notificationUrl: http://slack.notice/api
+

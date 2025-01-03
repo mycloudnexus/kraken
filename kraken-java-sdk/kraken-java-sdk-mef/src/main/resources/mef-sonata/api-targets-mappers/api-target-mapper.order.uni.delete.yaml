@@ -12,6 +12,9 @@ spec:
     method: post
     productType: uni
     actionType: delete
+  workflow:
+    enabled: true
+    workflowSchema:
   endpoints:
     - id: delete port
       path: ""

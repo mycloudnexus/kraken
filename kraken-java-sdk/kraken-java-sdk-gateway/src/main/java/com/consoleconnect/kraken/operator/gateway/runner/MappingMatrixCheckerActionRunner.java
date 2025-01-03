@@ -232,6 +232,9 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
             .get(0)
             .getMappers();
     List<ComponentAPITargetFacets.Mapper> request = mappers.getRequest();
+    if (CollectionUtils.isEmpty(request)) {
+      return;
+    }
     DocumentContext documentContext = JsonPath.parse(inputs);
     for (ComponentAPITargetFacets.Mapper mapper : request) {
       if (StringUtils.isBlank(mapper.getTarget())) {

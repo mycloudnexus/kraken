@@ -20,6 +20,7 @@ public class AppProperty {
   private Map<String, String> apiOrderBy = new HashMap<>();
   private Map<String, String> apiTargetMapperOrderBy = new HashMap<>();
   private Features features;
+  private WorkflowConfig workflow = new WorkflowConfig();
 
   @Data
   public static class Features {
@@ -29,5 +30,13 @@ public class AppProperty {
   @Data
   public static class PushActivityLogExternal {
     private boolean enabled;
+  }
+
+  @Data
+  public static class WorkflowConfig {
+    private String baseUrl = "http://base-url.com";
+    private String key;
+    private String secret;
+    private boolean enabled = false;
   }
 }
