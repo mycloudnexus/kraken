@@ -7,7 +7,6 @@ import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Stream;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -38,11 +37,7 @@ public interface SellerContactChecker {
               if (Arrays.stream(ProductCategoryEnum.values())
                   .noneMatch(category -> category.getKind().equals(item))) {
                 throw KrakenException.badRequest(
-                    "productCategories should be in: ["
-                        + Stream.of(ProductCategoryEnum.values())
-                            .map(ProductCategoryEnum::getKind)
-                            .toList()
-                        + "]");
+                    "productCategories should be in:['access.eline', 'internet.access']");
               }
             });
   }
