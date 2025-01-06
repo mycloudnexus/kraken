@@ -220,6 +220,9 @@ public class ApiActivityLogService {
           logEntity.setSyncedAt(now);
         });
 
+    this.apiActivityLogBodyRepository.saveAll(
+        logEntities.stream().map(ApiActivityLogEntity::getApiLogBodyEntity).toList());
+
     repository.saveAll(logEntities);
   }
 
