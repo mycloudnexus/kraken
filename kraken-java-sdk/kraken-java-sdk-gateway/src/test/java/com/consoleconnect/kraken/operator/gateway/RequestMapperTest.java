@@ -83,7 +83,7 @@ class RequestMapperTest implements MappingTransformer {
     ComponentAPITargetFacets facets =
         UnifiedAsset.getFacets(unifiedAsset.get(), ComponentAPITargetFacets.class);
     StateValueMappingDto stateValueMappingDto = new StateValueMappingDto();
-    renderRequestService.parseRequest(facets, stateValueMappingDto);
+    renderRequestService.parseRequest(facets.getEndpoints(), stateValueMappingDto);
     return facets;
   }
 

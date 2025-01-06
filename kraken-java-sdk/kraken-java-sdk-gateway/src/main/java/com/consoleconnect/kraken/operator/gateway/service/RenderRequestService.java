@@ -26,8 +26,7 @@ public class RenderRequestService implements MappingTransformer {
     this.unifiedAssetService = unifiedAssetService;
   }
 
-  public void handlePath(ComponentAPITargetFacets facets) {
-    List<ComponentAPITargetFacets.Endpoint> endpoints = facets.getEndpoints();
+  public void handlePath(List<ComponentAPITargetFacets.Endpoint> endpoints) {
     ComponentAPITargetFacets.Mappers mappers = endpoints.get(0).getMappers();
     String path = endpoints.get(0).getPath();
     if (mappers != null && mappers.getRequest() != null) {
@@ -86,16 +85,17 @@ public class RenderRequestService implements MappingTransformer {
   }
 
   public void parseRequest(
-      ComponentAPITargetFacets facets, StateValueMappingDto stateValueMappingDto) {
-    handlePath(facets);
-    handleBody(facets, stateValueMappingDto);
+      List<ComponentAPITargetFacets.Endpoint> endpoints,
+      StateValueMappingDto stateValueMappingDto) {
+    handlePath(endpoints);
+    handleBody(endpoints, stateValueMappingDto);
   }
 
   private void handleBody(
-      ComponentAPITargetFacets facets, StateValueMappingDto stateValueMappingDto) {
-    String requestBody = facets.getEndpoints().get(0).getRequestBody();
-    List<ComponentAPITargetFacets.Mapper> request =
-        facets.getEndpoints().get(0).getMappers().getRequest();
+      List<ComponentAPITargetFacets.Endpoint> endpoints,
+      StateValueMappingDto stateValueMappingDto) {
+    String requestBody = endpoints.get(0).getRequestBody();
+    List<ComponentAPITargetFacets.Mapper> request = endpoints.get(0).getMappers().getRequest();
     if (StringUtils.isBlank(requestBody) || CollectionUtils.isEmpty(request)) {
       return;
     }
@@ -132,7 +132,7 @@ public class RenderRequestService implements MappingTransformer {
             mapper.getTarget());
       }
     }
-    facets.getEndpoints().get(0).setRequestBody(requestBody);
+    endpoints.get(0).setRequestBody(requestBody);
     log.info("handleBody rendered request body:{}", requestBody);
   }
 

@@ -22,7 +22,8 @@ public class ComponentAPITargetFacets {
   public static class Workflow {
     private boolean enabled;
     private boolean synchronous;
-    private boolean workflowId;
+    private String id;
+    private String key;
   }
 
   @Data

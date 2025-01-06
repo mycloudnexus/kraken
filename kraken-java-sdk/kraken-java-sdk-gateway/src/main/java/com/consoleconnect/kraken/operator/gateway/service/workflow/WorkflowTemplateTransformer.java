@@ -14,17 +14,21 @@ import com.consoleconnect.kraken.operator.core.model.workflow.HttpTask;
 import com.netflix.conductor.common.metadata.tasks.TaskDef;
 import com.netflix.conductor.common.metadata.workflow.WorkflowDef;
 import com.netflix.conductor.common.metadata.workflow.WorkflowTask;
+import com.netflix.conductor.common.run.Workflow;
 import com.netflix.conductor.sdk.workflow.def.tasks.SimpleTask;
 import com.netflix.conductor.sdk.workflow.def.tasks.Switch;
 import com.netflix.conductor.sdk.workflow.def.tasks.Task;
+import com.netflix.conductor.sdk.workflow.def.tasks.Terminate;
 import java.util.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 public class WorkflowTemplateTransformer {
-  private static final String SUB_REQUEST_BODY = "${workflow.input.%s.requestBody}";
-  private static final String SUB_REQUEST_HEADER = "${workflow.input.%s.requestHeader}";
+  private static final String SUB_REQUEST_BODY = "${workflow.input.payload.%s.body}";
+  private static final String SUB_REQUEST_URL = "${workflow.input.payload.%s.url}";
+  private static final String SUB_REQUEST_HEADER = "${workflow.input.headers}";
+  private static final String TERMINATE_TASK = "TERMINATE_TASK_";
   private static final String HTTP_STATUS_SWITCH_CASE_EXPRESSION =
       "${%s.output.response.statusCode}";
 
@@ -35,7 +39,8 @@ public class WorkflowTemplateTransformer {
   public WorkflowDef transfer(UnifiedAsset asset) {
     ComponentWorkflowFacets facets = UnifiedAsset.getFacets(asset, ComponentWorkflowFacets.class);
     WorkflowDef workflowDef = new WorkflowDef();
-    workflowDef.setName(asset.getMetadata().getKey());
+    workflowDef.setName(facets.getMetaData().getWorkflowName());
+    workflowDef.setOwnerEmail("example@email.com");
     List<WorkflowTask> taskList = new ArrayList<>();
     workflowDef.setTasks(taskList);
     buildWorkflowByStage(facets.getValidationStage(), workflowDef, VALIDATION_STAGE);
@@ -84,7 +89,8 @@ public class WorkflowTemplateTransformer {
     branches.put("201", List.of(constructSimpleTask(EMPTY_TASK_VALUE)));
     switchTask.decisionCases(branches);
     switchTask.defaultCase(
-        constructSimpleTask(stage == EXECUTION_STAGE ? NOTIFY_TASK_VALUE : FAIL_ORDER_TASK_VALUE));
+        constructSimpleTask(stage == EXECUTION_STAGE ? NOTIFY_TASK_VALUE : FAIL_ORDER_TASK_VALUE),
+        new Terminate(getUniqueTaskRef(TERMINATE_TASK), Workflow.WorkflowStatus.COMPLETED, null));
     return switchTask.getWorkflowDefTasks();
   }
 
@@ -103,7 +109,12 @@ public class WorkflowTemplateTransformer {
     Switch switchTask =
         new Switch(String.format(SWITCH_CUSTOMIZED_CHECK_PREFIX, taskName), expression);
     Map<String, List<Task<?>>> branches = new HashMap<>();
-    branches.put(caseValue, List.of(constructSimpleTask(buildInTaskName)));
+    branches.put(
+        caseValue,
+        List.of(
+            constructSimpleTask(buildInTaskName),
+            new Terminate(
+                getUniqueTaskRef(TERMINATE_TASK), Workflow.WorkflowStatus.COMPLETED, null)));
     switchTask.decisionCases(branches);
     switchTask.setOptional(true);
     return switchTask.getWorkflowDefTasks();
@@ -112,7 +123,9 @@ public class WorkflowTemplateTransformer {
   private SimpleTask constructSimpleTask(String taskName) {
     return task2InputParamMap.entrySet().stream()
         .filter(v -> Objects.equals(taskName, v.getKey()))
-        .map(entry -> buildSimpleTask(entry.getKey(), getUniqueTaskRef(entry), entry.getValue()))
+        .map(
+            entry ->
+                buildSimpleTask(entry.getKey(), getUniqueTaskRef(entry.getKey()), entry.getValue()))
         .findAny()
         .orElseThrow(
             () ->
@@ -120,8 +133,8 @@ public class WorkflowTemplateTransformer {
                     String.format("can not found build-in task: %s", taskName)));
   }
 
-  private static String getUniqueTaskRef(Map.Entry<String, Map<String, String>> entry) {
-    return entry.getKey()
+  private static String getUniqueTaskRef(String key) {
+    return key
         + com.consoleconnect.kraken.operator.core.toolkit.StringUtils.shortenUUID(
             UUID.randomUUID().toString());
   }
@@ -141,9 +154,10 @@ public class WorkflowTemplateTransformer {
     ComponentAPITargetFacets.Endpoint endpoint = httpTask.getEndpoint();
     HttpExtend http =
         new HttpExtend(httpTask.getTaskName())
-            .url(endpoint.getUrl())
+            .url(String.format(SUB_REQUEST_URL, httpTask.getTaskName()))
             .method(HttpExtend.Input.HttpMethod.getIgnoreCase(endpoint.getMethod()));
     http.headers(SUB_REQUEST_HEADER);
+    http.setOptional(true);
     TaskDef def = new TaskDef(http.getName());
     if (!"GET".equalsIgnoreCase(endpoint.getMethod())) {
       http.body(String.format(SUB_REQUEST_BODY, httpTask.getTaskName()));

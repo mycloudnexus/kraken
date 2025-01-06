@@ -1,5 +1,6 @@
 package com.consoleconnect.kraken.operator.gateway.func;
 
+import static com.consoleconnect.kraken.operator.core.enums.ActionTypeEnum.REWRITE_PATH;
 import static org.springframework.cloud.gateway.support.RouteMetadataUtils.CONNECT_TIMEOUT_ATTR;
 import static org.springframework.cloud.gateway.support.RouteMetadataUtils.RESPONSE_TIMEOUT_ATTR;
 
@@ -99,6 +100,15 @@ public class KrakenGatewayFilterSpecFunc implements Function<GatewayFilterSpec, 
         case REWRITE_PATH -> gatewayFilterSpec.filter(
             new ActionGatewayFilterFactory(actionRunners).apply(action),
             RouteToRequestUrlFilter.ROUTE_TO_URL_FILTER_ORDER + 1);
+        case WORKFLOW -> {
+          WorkflowActionFilterFactory.Config config = new WorkflowActionFilterFactory.Config();
+          config.setAction(action);
+          config.setWorkflowClient(workflowClient);
+          config.setMetadataClient(metaDataClient);
+          config.setBaseUri(mapping.getUri());
+          config.setAppProperty(appProperty);
+          gatewayFilterSpec.filter(new WorkflowActionFilterFactory().apply(config));
+        }
         default -> gatewayFilterSpec.filter(
             new ActionGatewayFilterFactory(actionRunners).apply(action), action.getOrder());
       }

@@ -37,6 +37,8 @@ public class AppProperty {
     private String baseUrl = "http://base-url.com";
     private String key;
     private String secret;
+    private Integer pollTimes = 30;
+    private Long pollInterval = 2000l;
     private boolean enabled = false;
   }
 }

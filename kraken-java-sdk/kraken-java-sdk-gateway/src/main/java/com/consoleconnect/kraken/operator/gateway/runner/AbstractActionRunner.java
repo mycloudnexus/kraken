@@ -74,10 +74,9 @@ public abstract class AbstractActionRunner implements ResponseCodeTransform, Map
 
     Map<String, String> query = exchange.getRequest().getQueryParams().toSingleValueMap();
     context.put("query", query);
-
+    context.put("mefRequestBody", context.get("body"));
     context.put("path", exchange.getRequest().getPath().toString());
     context.put("method", exchange.getRequest().getMethod().name());
-
     exchange
         .getAttributes()
         .forEach(

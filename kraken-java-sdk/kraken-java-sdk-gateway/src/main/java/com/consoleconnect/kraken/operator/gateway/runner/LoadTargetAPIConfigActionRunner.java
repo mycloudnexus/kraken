@@ -1,6 +1,7 @@
 package com.consoleconnect.kraken.operator.gateway.runner;
 
 import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.COMPONENT_API_SERVER;
+import static com.consoleconnect.kraken.operator.gateway.filter.KrakenFilterConstants.X_KRAKEN_WORKFLOW_CONFIG;
 
 import com.consoleconnect.kraken.operator.core.dto.SimpleApiServerDto;
 import com.consoleconnect.kraken.operator.core.dto.StateValueMappingDto;
@@ -11,6 +12,8 @@ import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPIFacets;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
+import com.consoleconnect.kraken.operator.core.model.facet.ComponentWorkflowFacets;
+import com.consoleconnect.kraken.operator.core.model.workflow.HttpTask;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.gateway.filter.KrakenFilterConstants;
@@ -23,7 +26,6 @@ import java.util.*;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ServerWebExchange;
 
@@ -67,47 +69,73 @@ public class LoadTargetAPIConfigActionRunner extends AbstractActionRunner {
     // merge mapper and base template file
     mergeMappers(asset, facets);
 
-    String serverKey = facets.getEndpoints().get(0).getServerKey();
-    if (StringUtils.isNotBlank(facets.getEndpoints().get(0).getUrl())) {
-      outputs.put(
-          "url", SpELEngine.evaluate(facets.getEndpoints().get(0).getUrl(), inputs, String.class));
-    } else {
-      // serverKey
-      String serverUrl = getServerUrl(serverKey);
-      outputs.put("url", serverUrl);
-    }
+    //    String serverKey = facets.getEndpoints().get(0).getServerKey();
+    //    if (StringUtils.isNotBlank(facets.getEndpoints().get(0).getUrl())) {
+    //      outputs.put(
+    //          "url", SpELEngine.evaluate(facets.getEndpoints().get(0).getUrl(), inputs,
+    // String.class));
+    //    } else {
+    //      // serverKey
+    //      String serverUrl = getServerUrl(serverKey);
+    //      outputs.put("url", serverUrl);
+    //    }
+    outputs.put("url", "https://79822d20-557f-4620-b5c3-b83d8457d8e0.mock.pstmn.io");
 
     StateValueMappingDto stateValueMappingDto = new StateValueMappingDto();
-    renderRequestService.parseRequest(facets, stateValueMappingDto);
-
-    if (render != null && render) {
-      facets
-          .getEndpoints()
-          .forEach(
-              endpoint -> {
-                if (Objects.nonNull(endpoint.getRequestBody())) {
-                  String replaced = replaceStar(endpoint.getRequestBody());
-                  String renderedRequest =
-                      renderStatus(stateValueMappingDto, SpELEngine.evaluate(replaced, inputs));
-                  endpoint.setRequestBody(renderedRequest);
-                }
-                if (Objects.nonNull(endpoint.getResponseBody())) {
-                  String transformedResp = transform(endpoint, stateValueMappingDto);
-                  endpoint.setResponseBody(SpELEngine.evaluate(transformedResp, inputs));
-                }
-                if (Objects.nonNull(endpoint.getPath())) {
-                  String evaluate =
-                      SpELEngine.evaluate(replaceStar(endpoint.getPath()), inputs, String.class);
-                  endpoint.setPath(encodeUrlParam(evaluate));
-                }
-              });
+    if (facets.getWorkflow() != null && facets.getWorkflow().isEnabled()) {
+      UnifiedAssetDto workflowAsset = unifiedAssetService.findOne(facets.getWorkflow().getKey());
+      ComponentWorkflowFacets workflowFacts =
+          UnifiedAsset.getFacets(workflowAsset, ComponentWorkflowFacets.class);
+      renderTaskList(workflowFacts.getValidationStage(), inputs, stateValueMappingDto, render);
+      renderTaskList(workflowFacts.getPreparationStage(), inputs, stateValueMappingDto, render);
+      renderTaskList(workflowFacts.getExecutionStage(), inputs, stateValueMappingDto, render);
+      outputs.put(X_KRAKEN_WORKFLOW_CONFIG, JsonToolkit.toJson(workflowFacts));
+    } else {
+      renderEndPoint(inputs, facets.getEndpoints(), stateValueMappingDto, render);
     }
+    outputs.put(action.getOutputKey(), JsonToolkit.toJson(facets));
     outputs.put(
         KrakenFilterConstants.X_KRAKEN_TARGET_VALUE_MAPPER,
         JsonToolkit.toJson(stateValueMappingDto));
 
-    outputs.put(action.getOutputKey(), JsonToolkit.toJson(facets));
     return Optional.empty();
+  }
+
+  private void renderTaskList(
+      List<HttpTask> workflowFacts,
+      Map<String, Object> inputs,
+      StateValueMappingDto stateValueMappingDto,
+      Boolean render) {
+    workflowFacts.forEach(
+        task -> renderEndPoint(inputs, List.of(task.getEndpoint()), stateValueMappingDto, render));
+  }
+
+  private void renderEndPoint(
+      Map<String, Object> inputs,
+      List<ComponentAPITargetFacets.Endpoint> endpoints,
+      StateValueMappingDto stateValueMappingDto,
+      Boolean render) {
+    renderRequestService.parseRequest(endpoints, stateValueMappingDto);
+    if (render != null && render) {
+      endpoints.forEach(
+          endpoint -> {
+            if (Objects.nonNull(endpoint.getRequestBody())) {
+              String replaced = replaceStar(endpoint.getRequestBody());
+              String renderedRequest =
+                  renderStatus(stateValueMappingDto, SpELEngine.evaluate(replaced, inputs));
+              endpoint.setRequestBody(renderedRequest);
+            }
+            if (Objects.nonNull(endpoint.getResponseBody())) {
+              String transformedResp = transform(endpoint, stateValueMappingDto);
+              endpoint.setResponseBody(SpELEngine.evaluate(transformedResp, inputs));
+            }
+            if (Objects.nonNull(endpoint.getPath())) {
+              String evaluate =
+                  SpELEngine.evaluate(replaceStar(endpoint.getPath()), inputs, String.class);
+              endpoint.setPath(encodeUrlParam(evaluate));
+            }
+          });
+    }
   }
 
   public static String encodeUrlParam(String path) {
@@ -141,6 +169,7 @@ public class LoadTargetAPIConfigActionRunner extends AbstractActionRunner {
     }
     ComponentAPITargetFacets mapperFacets =
         UnifiedAsset.getFacets(mapper, ComponentAPITargetFacets.class);
+    facets.setWorkflow(mapperFacets.getWorkflow());
     mergeMapper(facets, mapperFacets.getEndpoints().get(0));
   }
 
