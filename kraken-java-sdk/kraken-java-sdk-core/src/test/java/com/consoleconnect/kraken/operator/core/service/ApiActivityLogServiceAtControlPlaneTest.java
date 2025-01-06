@@ -276,7 +276,7 @@ class ApiActivityLogServiceAtControlPlaneTest extends AbstractIntegrationTest {
   void setSynced() {
     ApiActivityLogEntity entity = new ApiActivityLogEntity();
     entity.setRequestId(EXISTED_REQUEST_ID);
-    entity.setCallSeq(0);
+    entity.setCallSeq(10);
     entity.setMethod("POST");
     entity.setBuyer("buy");
     entity.setUri("uri");
