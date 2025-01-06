@@ -82,6 +82,11 @@ logging:
   level:
     com.consoleconnect.kraken.operator: INFO
 app:
+  achieve-log-conf:
+    month: 1
+    protocol: GET
+    achieveScope: basic
+    page: 100
   controlPlane:
     url: http://localhost:4567
     token: 123456
