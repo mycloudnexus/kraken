@@ -22,6 +22,7 @@ import lombok.Setter;
           name = "kraken_api_log_activity_uni_idx",
           columnNames = {"request_id", "call_seq"})
     })
+@SuppressWarnings("javaarchitecture:S7027")
 public class ApiActivityLogEntity extends AbstractHttpEntity {
 
   @Column(name = "request_ip", nullable = true, unique = false)
@@ -56,7 +57,7 @@ public class ApiActivityLogEntity extends AbstractHttpEntity {
   }
 
   public void setRawApiLogBodyEntity(ApiActivityLogBodyEntity bodyEntity) {
-    this.apiLogBodyEntity = null;
+    this.apiLogBodyEntity = bodyEntity;
   }
 
   public ApiActivityLogBodyEntity getApiLogBodyEntity() {

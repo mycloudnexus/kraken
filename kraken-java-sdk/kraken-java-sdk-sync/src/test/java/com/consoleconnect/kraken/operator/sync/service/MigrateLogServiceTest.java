@@ -1,7 +1,5 @@
 package com.consoleconnect.kraken.operator.sync.service;
 
-import static org.mockito.Mockito.*;
-
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
 import com.consoleconnect.kraken.operator.sync.CustomConfig;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;

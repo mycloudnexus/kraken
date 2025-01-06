@@ -13,7 +13,6 @@ import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import java.time.ZonedDateTime;
-import java.util.UUID;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -83,11 +82,6 @@ class ApiActivityLogServiceAtDataPlaneTest extends AbstractIntegrationTest {
               ]
             """);
     return clientEvent;
-  }
-
-  private void addApiLogActivity(String envId) {
-    apiActivityLogService.receiveClientLog(
-        envId, UUID.randomUUID().toString(), createClientEventWithBody());
   }
 
   public static final String EXISTED_REQUEST_ID = "requestId_existed";

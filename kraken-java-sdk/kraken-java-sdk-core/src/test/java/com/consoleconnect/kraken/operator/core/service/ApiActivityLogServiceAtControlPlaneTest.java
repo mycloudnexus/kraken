@@ -108,9 +108,6 @@ class ApiActivityLogServiceAtControlPlaneTest extends AbstractIntegrationTest {
     entity.setResponse("{}");
     this.apiActivityLogService.save(entity);
 
-    var entityWithBody =
-        this.apiActivityLogRepository.findById(apiActivityLogEntity.getId()).orElse(null);
-
     Assertions.assertEquals("{}", entity.getApiLogBodyEntity().getRequest());
     Assertions.assertEquals("{}", entity.getApiLogBodyEntity().getRequest());
   }
