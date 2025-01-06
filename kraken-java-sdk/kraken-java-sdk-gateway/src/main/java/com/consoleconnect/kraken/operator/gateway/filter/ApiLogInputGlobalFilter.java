@@ -6,8 +6,10 @@ import static org.springframework.core.io.buffer.DataBufferUtils.join;
 import com.consoleconnect.kraken.operator.auth.jwt.JwtDecoderToolkit;
 import com.consoleconnect.kraken.operator.auth.model.AuthDataProperty;
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
+import com.consoleconnect.kraken.operator.core.enums.LifeStatusEnum;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
+import com.consoleconnect.kraken.operator.core.service.ApiActivityLogService;
 import com.consoleconnect.kraken.operator.core.toolkit.IpUtils;
 import com.consoleconnect.kraken.operator.gateway.service.FilterHeaderService;
 import java.nio.charset.Charset;
@@ -33,8 +35,9 @@ public class ApiLogInputGlobalFilter extends AbstractGlobalFilter {
       AppProperty appProperty,
       AuthDataProperty.ResourceServer resourceServer,
       ApiActivityLogRepository apiActivityLogRepository,
-      FilterHeaderService filterHeaderService) {
-    super(appProperty, apiActivityLogRepository, filterHeaderService);
+      FilterHeaderService filterHeaderService,
+      ApiActivityLogService apiActivityLogService) {
+    super(appProperty, apiActivityLogRepository, filterHeaderService, apiActivityLogService);
     this.resourceServer = resourceServer;
   }
 
@@ -64,8 +67,9 @@ public class ApiLogInputGlobalFilter extends AbstractGlobalFilter {
       entity.setQueryParameters(exchange.getRequest().getQueryParams().toSingleValueMap());
       entity.setRequestIp(IpUtils.getIP(exchange.getRequest()));
       entity.setResponseIp(GATEWAY_SERVICE);
+      entity.setLifeStatus(LifeStatusEnum.LIVE);
       entity.setBuyer(readBuyer(headers));
-      apiActivityLogRepository.save(entity);
+      this.apiActivityLogService.save(entity);
       log.info("createdEntity:{}", entity.getId());
       exchange
           .getAttributes()
@@ -94,7 +98,7 @@ public class ApiLogInputGlobalFilter extends AbstractGlobalFilter {
           entity.setRequest(requestPayload);
         }
       }
-      apiActivityLogRepository.save(entity);
+      this.apiActivityLogService.save(entity);
       log.info("updateEntity:{}", entity.getId());
     } catch (Exception e) {
       log.error(" tracing original request,error ", e);

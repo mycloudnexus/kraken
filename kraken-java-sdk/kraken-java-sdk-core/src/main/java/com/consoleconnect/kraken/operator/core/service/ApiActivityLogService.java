@@ -3,22 +3,33 @@ package com.consoleconnect.kraken.operator.core.service;
 import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.PRODUCT_BUYER;
 import static com.consoleconnect.kraken.operator.core.toolkit.LabelConstants.LABEL_BUYER_ID;
 
+import com.consoleconnect.kraken.operator.core.client.ClientEvent;
+import com.consoleconnect.kraken.operator.core.config.AppConfig;
 import com.consoleconnect.kraken.operator.core.dto.ApiActivityLog;
 import com.consoleconnect.kraken.operator.core.dto.ComposedHttpRequest;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
+import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogBodyEntity;
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
 import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
+import com.consoleconnect.kraken.operator.core.enums.AchieveScopeEnum;
+import com.consoleconnect.kraken.operator.core.enums.LifeStatusEnum;
+import com.consoleconnect.kraken.operator.core.enums.SyncStatusEnum;
 import com.consoleconnect.kraken.operator.core.mapper.ApiActivityLogMapper;
+import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.BuyerOnboardFacets;
+import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogBodyRepository;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
 import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
 import com.consoleconnect.kraken.operator.core.request.LogSearchRequest;
+import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.core.toolkit.Paging;
 import com.consoleconnect.kraken.operator.core.toolkit.PagingHelper;
+import com.fasterxml.jackson.core.type.TypeReference;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
@@ -39,6 +50,7 @@ public class ApiActivityLogService {
   public static final String CREATED_AT = "createdAt";
   private final ApiActivityLogRepository repository;
   private final UnifiedAssetRepository unifiedAssetRepository;
+  private final ApiActivityLogBodyRepository apiActivityLogBodyRepository;
 
   @Transactional(readOnly = true)
   public Paging<ApiActivityLog> search(LogSearchRequest logSearchRequest, Pageable pageable) {
@@ -101,6 +113,117 @@ public class ApiActivityLogService {
             Collectors.toMap(
                 entity -> entity.getLabels().get(LABEL_BUYER_ID),
                 entity -> UnifiedAssetService.toAsset(entity, true)));
+  }
+
+  @Transactional(rollbackFor = Exception.class)
+  public boolean achieveOnePage(AppConfig.AchieveApiActivityLogConf activityLogConf) {
+    if (!AppConfig.AchieveApiActivityLogConf.needAchieveMigrate(activityLogConf)) {
+      return true;
+    }
+    var list =
+        this.repository.listExpiredApiLog(
+            activityLogConf.toAchieve(),
+            LifeStatusEnum.LIVE,
+            activityLogConf.getProtocol(),
+            PageRequest.of(0, 20));
+    if (list.isEmpty()) {
+      return true;
+    }
+    var bodySet =
+        list.stream()
+            .map(ApiActivityLogEntity::getRawApiLogBodyEntity)
+            .filter(Objects::nonNull)
+            .toList();
+
+    list.forEach(
+        x -> {
+          x.setRawRequest(null);
+          x.setRawResponse(null);
+          x.setRawApiLogBodyEntity(null);
+          x.setLifeStatus(LifeStatusEnum.ACHIEVED);
+        });
+
+    this.repository.saveAll(list);
+
+    this.apiActivityLogBodyRepository.deleteAll(bodySet);
+    if (activityLogConf.getAchieveScope() == AchieveScopeEnum.BASIC) {
+      this.repository.deleteAll(list);
+    }
+    return false;
+  }
+
+  @Transactional(rollbackFor = Exception.class)
+  public boolean migrateOnePage(AppConfig.AchieveApiActivityLogConf activityLogConf) {
+    if (!AppConfig.AchieveApiActivityLogConf.needAchieveMigrate(activityLogConf)) {
+      return true;
+    }
+    var list = this.repository.findAllByMigrateStatus(PageRequest.of(0, 20)).stream().toList();
+    if (list.isEmpty()) {
+      return true;
+    }
+    var bodySet =
+        list.stream()
+            .map(ApiActivityLogEntity::getApiLogBodyEntity)
+            .filter(Objects::nonNull)
+            .toList();
+    list.forEach(x -> x.setLifeStatus(LifeStatusEnum.LIVE));
+
+    this.apiActivityLogBodyRepository.saveAll(bodySet);
+    this.repository.saveAll(list);
+    return false;
+  }
+
+  @Transactional
+  public HttpResponse<Void> receiveClientLog(String envId, String userId, ClientEvent event) {
+    if (event.getEventPayload() == null) {
+      return HttpResponse.ok(null);
+    }
+    List<ApiActivityLog> requestList =
+        JsonToolkit.fromJson(event.getEventPayload(), new TypeReference<>() {});
+
+    if (CollectionUtils.isEmpty(requestList)) {
+      return HttpResponse.ok(null);
+    }
+    Set<ApiActivityLogEntity> newActivities = new HashSet<>();
+    Set<ApiActivityLogBodyEntity> newLogActivities = new HashSet<>();
+    for (ApiActivityLog dto : requestList) {
+      Optional<ApiActivityLogEntity> db =
+          repository.findByRequestIdAndCallSeq(dto.getRequestId(), dto.getCallSeq());
+      if (db.isEmpty()) {
+        ApiActivityLogEntity entity = ApiActivityLogMapper.INSTANCE.map(dto);
+        entity.setEnv(envId);
+        entity.setCreatedBy(userId);
+        entity.setLifeStatus(LifeStatusEnum.LIVE);
+        newActivities.add(entity);
+        if (entity.getApiLogBodyEntity() != null) {
+          newLogActivities.add(entity.getApiLogBodyEntity());
+        }
+      }
+    }
+    apiActivityLogBodyRepository.saveAll(newLogActivities);
+    repository.saveAll(newActivities);
+    return HttpResponse.ok(null);
+  }
+
+  @Transactional(rollbackFor = Exception.class)
+  public ApiActivityLogEntity save(ApiActivityLogEntity apiActivityLogEntity) {
+    if (apiActivityLogEntity.getApiLogBodyEntity() != null) {
+      this.apiActivityLogBodyRepository.save(apiActivityLogEntity.getApiLogBodyEntity());
+    }
+    return this.repository.save(apiActivityLogEntity);
+  }
+
+  public void setSynced(List<ApiActivityLogEntity> logEntities, ZonedDateTime now) {
+    logEntities.forEach(
+        logEntity -> {
+          logEntity.setSyncStatus(SyncStatusEnum.SYNCED);
+          logEntity.setSyncedAt(now);
+        });
+
+    this.apiActivityLogBodyRepository.saveAll(
+        logEntities.stream().map(ApiActivityLogEntity::getApiLogBodyEntity).toList());
+
+    repository.saveAll(logEntities);
   }
 
   private void addEq(

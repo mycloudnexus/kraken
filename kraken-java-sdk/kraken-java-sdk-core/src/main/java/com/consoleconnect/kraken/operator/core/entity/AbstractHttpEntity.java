@@ -43,9 +43,9 @@ public class AbstractHttpEntity extends AbstractEntity {
 
   @Column(name = "request", nullable = true, unique = false, columnDefinition = "jsonb")
   @Type(JsonType.class)
-  private Object request;
+  protected Object request;
 
   @Column(name = "response", nullable = true, unique = false, columnDefinition = "jsonb")
   @Type(JsonType.class)
-  private Object response;
+  protected Object response;
 }
