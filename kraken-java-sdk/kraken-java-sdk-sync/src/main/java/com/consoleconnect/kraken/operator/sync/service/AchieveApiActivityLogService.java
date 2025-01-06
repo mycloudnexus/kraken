@@ -38,7 +38,7 @@ public class AchieveApiActivityLogService {
   public void achieveApiActivityLog(AppConfig.AchieveApiActivityLogConf activityLogConf) {
 
     log.info("{}, start", ACHIEVE_LOG_CONFIG);
-    for (int page = 0; page < 100; page++) {
+    for (int page = 0; page < activityLogConf.getPage(); page++) {
       if (this.apiActivityLogService.achieveOnePage(activityLogConf)) {
         break;
       }

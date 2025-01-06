@@ -30,6 +30,7 @@ public class AppConfig {
 
     private String protocol; // for example: GET、POST、PATCH、DELETE
     private AchieveScopeEnum achieveScope;
+    private int page;
 
     public ZonedDateTime toAchieve() {
       return ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS).minusMonths(this.month);
