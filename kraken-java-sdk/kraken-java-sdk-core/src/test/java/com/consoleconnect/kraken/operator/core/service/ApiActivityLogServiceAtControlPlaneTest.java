@@ -147,7 +147,7 @@ class ApiActivityLogServiceAtControlPlaneTest extends AbstractIntegrationTest {
   void receiveClientApiActivityLog() {
     this.insertLogWithoutSubTable();
     var envId = UUID.randomUUID();
-    var now = ZonedDateTime.parse(NOW_WITH_TIMEZONE);
+
     addApiLogActivity(envId.toString());
 
     var apiLog = this.apiActivityLogRepository.findAll();

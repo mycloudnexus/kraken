@@ -1,8 +1,6 @@
 package com.consoleconnect.kraken.operator.core.service;
 
 import com.consoleconnect.kraken.operator.core.CustomConfig;
-import com.consoleconnect.kraken.operator.core.client.ClientEvent;
-import com.consoleconnect.kraken.operator.core.client.ClientEventTypeEnum;
 import com.consoleconnect.kraken.operator.core.config.AppConfig;
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
 import com.consoleconnect.kraken.operator.core.enums.AchieveScopeEnum;
@@ -54,34 +52,6 @@ class ApiActivityLogServiceAtDataPlaneTest extends AbstractIntegrationTest {
   @EqualsAndHashCode(of = "age")
   public static class BodyAge {
     private int age;
-  }
-
-  private static ClientEvent createClientEventWithBody() {
-    var clientEvent = new ClientEvent();
-    clientEvent.setEventType(ClientEventTypeEnum.CLIENT_API_AUDIT_LOG);
-    clientEvent.setClientId("127.0.1.1");
-
-    clientEvent.setEventPayload(
-        """
-            [
-                {
-                  "requestId": "requestId",
-                  "callSeq": 0,
-                  "method": "GET",
-                  "buyer": "buyerId2",
-
-                  "uri": "uri",
-                  "path": "path",
-                  "request": {
-                    "age": 1
-                  },
-                  "response": {
-                    "age": 2
-                  }
-                }
-              ]
-            """);
-    return clientEvent;
   }
 
   public static final String EXISTED_REQUEST_ID = "requestId_existed";
