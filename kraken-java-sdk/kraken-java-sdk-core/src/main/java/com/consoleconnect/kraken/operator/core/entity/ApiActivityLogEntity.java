@@ -80,4 +80,20 @@ public class ApiActivityLogEntity extends AbstractHttpEntity {
     var bodyEntity = this.getApiLogBodyEntity();
     bodyEntity.setResponse(response);
   }
+
+  public Object getRawRequest() {
+    return this.request;
+  }
+
+  public Object getRawResponse() {
+    return this.response;
+  }
+
+  public void setRawRequest(Object request) {
+    this.request = request;
+  }
+
+  public void setRawResponse(Object response) {
+    this.response = response;
+  }
 }
