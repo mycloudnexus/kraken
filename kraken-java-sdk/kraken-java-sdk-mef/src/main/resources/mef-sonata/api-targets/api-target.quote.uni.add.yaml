@@ -16,6 +16,8 @@ spec:
     method: post
     productType: uni
     actionType: add
+    sellerContactKeys:
+      - mef.sonata.api.quote.access.eline
   endpoints:
     - id: create quote for port
       path: ""

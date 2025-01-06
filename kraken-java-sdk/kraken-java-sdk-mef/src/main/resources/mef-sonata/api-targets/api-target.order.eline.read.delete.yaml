@@ -16,6 +16,8 @@ spec:
     method: get
     productType: access_e_line
     actionType: delete
+    sellerContactKeys:
+      - mef.sonata.api.order.access.eline
   endpoints:
     - id: retrieve connection detail by id of eline delete order
       path: ""

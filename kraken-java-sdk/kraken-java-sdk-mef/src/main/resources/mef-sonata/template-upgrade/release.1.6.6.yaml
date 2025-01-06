@@ -1,0 +1,13 @@
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.1.6.6
+  name: V1.6.6
+  labels:
+    productSpec: grace
+    productVersion: V1.6.6
+    publishDate: 2025-01-06
+  description: |
+    Adding support of configuration for seller contacts from control plane
+  version: 1
