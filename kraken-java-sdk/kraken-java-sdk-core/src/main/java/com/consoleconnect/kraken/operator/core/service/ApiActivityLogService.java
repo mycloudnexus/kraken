@@ -219,8 +219,7 @@ public class ApiActivityLogService {
           logEntity.setSyncStatus(SyncStatusEnum.SYNCED);
           logEntity.setSyncedAt(now);
         });
-    apiActivityLogBodyRepository.saveAll(
-        logEntities.stream().map(ApiActivityLogEntity::getApiLogBodyEntity).toList());
+
     repository.saveAll(logEntities);
   }
 

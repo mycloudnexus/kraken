@@ -13,6 +13,7 @@ import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.UUID;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -269,5 +270,19 @@ class ApiActivityLogServiceAtControlPlaneTest extends AbstractIntegrationTest {
     this.apiActivityLogService.migrateOnePage(achieveApiActivityLogConf);
 
     Assertions.assertNotNull(achieveApiActivityLogConf);
+  }
+
+  @Test
+  void setSynced() {
+    ApiActivityLogEntity entity = new ApiActivityLogEntity();
+    entity.setRequestId(EXISTED_REQUEST_ID);
+    entity.setCallSeq(0);
+    entity.setMethod("POST");
+    entity.setBuyer("buy");
+    entity.setUri("uri");
+    entity.setPath("path");
+    this.apiActivityLogService.setSynced(List.of(entity), ZonedDateTime.now());
+
+    Assertions.assertEquals(1, this.apiActivityLogRepository.findAll().size());
   }
 }
