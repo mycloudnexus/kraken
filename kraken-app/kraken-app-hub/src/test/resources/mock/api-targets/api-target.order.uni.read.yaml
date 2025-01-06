@@ -17,7 +17,6 @@ spec:
     productType: uni
     sellerContactKeys:
       - mef.sonata.api.order.access.eline
-      - mef.sonata.api.order.access.eline.internet.access
   endpoints:
     - id: retrieve connection detail by id
       path: ""

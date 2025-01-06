@@ -2,11 +2,13 @@ package com.consoleconnect.kraken.operator.controller.api;
 
 import com.consoleconnect.kraken.operator.auth.security.UserContext;
 import com.consoleconnect.kraken.operator.controller.dto.CreateSellerContactRequest;
+import com.consoleconnect.kraken.operator.controller.dto.UpdateSellerContactRequest;
 import com.consoleconnect.kraken.operator.controller.service.SellerContactService;
 import com.consoleconnect.kraken.operator.core.event.IngestionDataResult;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -25,9 +27,9 @@ public class SellerContactController {
 
   private final SellerContactService sellerContactService;
 
-  @Operation(summary = "Create or Update a seller contact")
+  @Operation(summary = "Create a seller contact")
   @PostMapping()
-  public Mono<HttpResponse<IngestionDataResult>> create(
+  public Mono<HttpResponse<List<IngestionDataResult>>> create(
       @PathVariable("productId") String productId,
       @PathVariable("componentId") String componentId,
       @RequestBody CreateSellerContactRequest request) {
@@ -39,15 +41,15 @@ public class SellerContactController {
         .map(HttpResponse::ok);
   }
 
-  @Operation(summary = "Delete a seller contact by key")
-  @DeleteMapping("/{id}")
-  public Mono<HttpResponse<Boolean>> delete(
+  @Operation(summary = "Update a seller contact by key or id")
+  @PatchMapping()
+  public Mono<HttpResponse<IngestionDataResult>> updateOne(
       @PathVariable("productId") String productId,
       @PathVariable("componentId") String componentId,
-      @PathVariable("id") String id) {
+      @RequestBody UpdateSellerContactRequest request) {
     return UserContext.getUserId()
         .publishOn(Schedulers.boundedElastic())
-        .map(userId -> sellerContactService.deleteSellerContact(productId, componentId, id, userId))
+        .map(userId -> sellerContactService.updateOne(productId, componentId, request, userId))
         .map(HttpResponse::ok);
   }
 }

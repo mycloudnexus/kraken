@@ -17,7 +17,6 @@ spec:
     productType: uni
     sellerContactKeys:
       - mef.sonata.api.quote.access.eline
-      - mef.sonata.api.quote.access.eline.internet.access
   endpoints:
     - id: retrieve quote for port
       url: ${env.target.url}

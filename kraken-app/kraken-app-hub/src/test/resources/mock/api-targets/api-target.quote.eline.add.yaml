@@ -17,7 +17,6 @@ spec:
     actionType: add
     sellerContactKeys:
       - mef.sonata.api.quote.access.eline
-      - mef.sonata.api.quote.access.eline.internet.access
   endpoints:
     - id: create quote for connection
       path:

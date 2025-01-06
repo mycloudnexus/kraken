@@ -18,7 +18,6 @@ spec:
     actionType: add
     sellerContactKeys:
       - mef.sonata.api.order.access.eline
-      - mef.sonata.api.order.access.eline.internet.access
   endpoints:
     - id: create connection order
       path: ""
