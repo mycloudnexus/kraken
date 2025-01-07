@@ -15,7 +15,7 @@ spec:
     actionType: delete
   workflow:
     enabled: true
-    synchronous: false
+    synchronous: true
     key: mef.sonata.api-workflow.order.eline.delete
   endpoints:
     - id: delete connection by id

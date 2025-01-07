@@ -26,6 +26,7 @@ import java.util.*;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ServerWebExchange;
 
@@ -69,17 +70,15 @@ public class LoadTargetAPIConfigActionRunner extends AbstractActionRunner {
     // merge mapper and base template file
     mergeMappers(asset, facets);
 
-    //    String serverKey = facets.getEndpoints().get(0).getServerKey();
-    //    if (StringUtils.isNotBlank(facets.getEndpoints().get(0).getUrl())) {
-    //      outputs.put(
-    //          "url", SpELEngine.evaluate(facets.getEndpoints().get(0).getUrl(), inputs,
-    // String.class));
-    //    } else {
-    //      // serverKey
-    //      String serverUrl = getServerUrl(serverKey);
-    //      outputs.put("url", serverUrl);
-    //    }
-    outputs.put("url", "https://79822d20-557f-4620-b5c3-b83d8457d8e0.mock.pstmn.io");
+    String serverKey = facets.getEndpoints().get(0).getServerKey();
+    if (StringUtils.isNotBlank(facets.getEndpoints().get(0).getUrl())) {
+      outputs.put(
+          "url", SpELEngine.evaluate(facets.getEndpoints().get(0).getUrl(), inputs, String.class));
+    } else {
+      // serverKey
+      String serverUrl = getServerUrl(serverKey);
+      outputs.put("url", serverUrl);
+    }
 
     StateValueMappingDto stateValueMappingDto = new StateValueMappingDto();
     if (facets.getWorkflow() != null && facets.getWorkflow().isEnabled()) {

@@ -14,11 +14,13 @@ import com.consoleconnect.kraken.operator.gateway.repo.HttpRequestRepository;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import com.netflix.conductor.common.metadata.workflow.WorkflowDef;
+import com.netflix.conductor.common.run.Workflow;
 import io.orkes.conductor.client.http.OrkesMetadataClient;
 import io.orkes.conductor.client.http.OrkesWorkflowClient;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import lombok.SneakyThrows;
@@ -235,8 +237,13 @@ class GatewayTest extends AbstractIntegrationTest {
     WorkflowDef def = new WorkflowDef();
     def.setVersion(1);
     String id = "worklflow_id";
+    Workflow workflow = new Workflow();
+    workflow.setOutput(Collections.emptyMap());
+    workflow.setStatus(Workflow.WorkflowStatus.COMPLETED);
     Mockito.doReturn(def).when(metaDataClient).getWorkflowDef(anyString(), isNull());
     Mockito.doReturn(id).when(workflowClient).startWorkflow(any());
+    Mockito.doReturn(workflow).when(workflowClient).getWorkflow(anyString(), anyBoolean());
+
     webTestClient
         .mutate()
         .responseTimeout(Duration.ofSeconds(600))
