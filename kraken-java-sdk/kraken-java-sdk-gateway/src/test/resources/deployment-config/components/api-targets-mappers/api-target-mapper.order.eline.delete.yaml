@@ -1,0 +1,85 @@
+
+---
+kind: kraken.component.api-target-mapper
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target-mapper.order.eline.delete
+  name:  Mapper Of Deleting Order Connection
+  description: This operation deletes a ProductOrder entity
+  version: 3
+spec:
+  trigger:
+    path: /mefApi/sonata/productOrderingManagement/v10/productOrder
+    method: post
+    productType: access_e_line
+    actionType: delete
+  workflow:
+    enabled: true
+    synchronous: false
+    key: mef.sonata.api-workflow.order.eline.delete
+  endpoints:
+    - id: delete connection by id
+      path: ""
+      method: ""
+      serverKey: ""
+      mappers:
+        request:
+          - name: mapper.order.eline.delete.buyerId
+            title: "The unique identifier of the organization that is acting as the a Buyer."
+            description: ""
+            source: "@{{buyerId}}"
+            sourceLocation: "QUERY"
+            target: ""
+            targetLocation: ""
+            targetArr:
+              - taskName: status_check_task
+                target: "@{{companyName}}"
+                targetLocation: "PATH"
+            requiredMapping: false
+          - name: mapper.order.eline.delete.productId
+            title: "The unique identifier of an in-service Product that is the ordering subject"
+            description: ""
+            source: "@{{productOrderItem[*].product.id}}"
+            sourceLocation: "BODY"
+            target: ""
+            targetLocation: ""
+            requiredMapping: true
+          - name: mapper.order.uni.delete.productOffering.id
+            title: " id of a Product Offering"
+            description: ""
+            source: "@{{productOrderItem[0].product.productOffering.id}}"
+            sourceLocation: "BODY"
+            target: ""
+            targetLocation: ""
+            requiredMapping: true
+        response:
+          - name: mapper.order.eline.delete.state
+            title: "Order State"
+            description: ""
+            target: "@{{state}}"
+            targetType: enum
+            targetLocation: BODY
+            requiredMapping: true
+            targetValues:
+              - acknowledged
+              - assessingCancellation
+              - held.assessingCharge
+              - pending.assessingModification
+              - cancelled
+              - pendingCancellation
+              - completed
+              - failed
+              - inProgress
+              - partial
+              - rejected
+            valueMapping: {}
+            source: ""
+            sourceLocation: ""
+          - name: mapper.order.eline.delete.orderId
+            title: order Id from seller
+            source: ""
+            target: '@{{orderId}}'
+            description: ""
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: true

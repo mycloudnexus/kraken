@@ -8,6 +8,8 @@ spec:
   componentPaths:
     - classpath:deployment-config/components/apis/mock-api-response.yaml
     - classpath:deployment-config/components/apis/mef.sonata.api.order.yaml
+    - classpath:deployment-config/components/apis/api.order.yaml
+    - classpath:deployment-config/components/api-workflow/api-workflow.order.eline.delete.yaml
     - classpath:deployment-config/components/transformers/echo.yaml
     - classpath:deployment-config/components/transformers/request_echo.yaml
     - classpath:deployment-config/components/transformers/response_echo.yaml
@@ -21,6 +23,7 @@ spec:
     - classpath:deployment-config/components/api-targets/api-target.order.eline.add.yaml
     - classpath:deployment-config/components/api-targets/api-target.order.eline.read.yaml
     - classpath:deployment-config/components/api-targets/api-target.order.eline.read.yaml
+    - classpath:deployment-config/components/api-targets/api-target.order.eline.delete.yaml
     - classpath:deployment-config/components/api-targets/api-target.hub.add.yaml
     - classpath:deployment-config/components/api-targets/api-target.quote.uni.add.yaml
     - classpath:deployment-config/components/api-targets/api-target.order.notification.state.change.yaml
@@ -28,10 +31,12 @@ spec:
     - classpath:deployment-config/components/api-targets-mappers/api-target-mapper.quote.uni.add.yaml
     - classpath:deployment-config/components/api-targets-mappers/api-target-mapper.order.uni.add.yaml
     - classpath:deployment-config/components/api-targets-mappers/api-target-mapper.order.eline.add.yaml
+    - classpath:deployment-config/components/api-targets-mappers/api-target-mapper.order.eline.delete.yaml
     - classpath:deployment-config/components/api-targets-mappers/api-target-mapper.order.notification.state.change.yaml
     - classpath:deployment-config/components/mapping-matrix/mapping.matrix.order.yaml
     - classpath:deployment-config/components/mapping-matrix/mapping.matrix.address.validation.yaml
     - classpath:deployment-config/components/mapping-matrix/mapping.matrix.address.validation.enable.yaml
     - classpath:deployment-config/components/mapping-matrix/mapping.matrix.quote.uni.add.yaml
+    - classpath:deployment-config/components/mapping-matrix/mapping.matrix.order.eline.delete.yaml
 
 
