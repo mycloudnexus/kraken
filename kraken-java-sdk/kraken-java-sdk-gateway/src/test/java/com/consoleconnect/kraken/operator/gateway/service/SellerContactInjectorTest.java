@@ -1,6 +1,8 @@
 package com.consoleconnect.kraken.operator.gateway.service;
 
 import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.COMPONENT_SELLER_CONTACT;
+import static com.consoleconnect.kraken.operator.core.toolkit.Constants.ORDER_KEY_WORD;
+import static com.consoleconnect.kraken.operator.core.toolkit.Constants.QUOTE_KEY_WORD;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -23,6 +25,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -101,16 +104,28 @@ class SellerContactInjectorTest extends AbstractIntegrationTest implements Selle
     unifiedAsset.getMetadata().getLabels().put("componentKey", componentKey);
     unifiedAsset.getMetadata().getLabels().put(productCategory, String.valueOf(Boolean.TRUE));
 
-    SellerContactFacets facets = new SellerContactFacets();
-    SellerContactFacets.SellerInfo sellerInfo = new SellerContactFacets.SellerInfo();
-    sellerInfo.setContactName("test-new-seller-contact");
-    sellerInfo.setContactPhone("789");
-    sellerInfo.setContactEmail("test-new-seller-contact@gmail.com");
-    facets.setSellerInfo(sellerInfo);
+    SellerContactFacets facets = getSellerContactFacets(componentKey);
     unifiedAsset.setFacets(
         JsonToolkit.fromJson(
             JsonToolkit.toJson(facets), new TypeReference<Map<String, Object>>() {}));
     return unifiedAsset;
+  }
+
+  private static @NotNull SellerContactFacets getSellerContactFacets(String componentKey) {
+    SellerContactFacets facets = new SellerContactFacets();
+    SellerContactFacets.SellerInfo sellerInfo = new SellerContactFacets.SellerInfo();
+    sellerInfo.setContactName("test-new-seller-contact");
+    sellerInfo.setContactPhone("789");
+    if (componentKey.contains(ORDER_KEY_WORD)) {
+      sellerInfo.setRole("sellerContact");
+    } else if (componentKey.contains(QUOTE_KEY_WORD)) {
+      sellerInfo.setRole("sellerContactInformation");
+    } else {
+      sellerInfo.setRole("");
+    }
+    sellerInfo.setContactEmail("test-new-seller-contact@gmail.com");
+    facets.setSellerInfo(sellerInfo);
+    return facets;
   }
 
   public Map<String, Object> buildInputs() {
