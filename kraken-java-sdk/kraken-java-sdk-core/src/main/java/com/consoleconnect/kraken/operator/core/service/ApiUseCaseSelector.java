@@ -53,16 +53,16 @@ public interface ApiUseCaseSelector {
               ApiUseCaseDto apiUseCaseDto = new ApiUseCaseDto();
               tuple2s.forEach(
                   tuple2 -> {
-                    if (tuple2.value().equalsIgnoreCase(IMPLEMENTATION_TARGET_MAPPER.getKind())) {
+                    if (IMPLEMENTATION_TARGET_MAPPER.getKind().equalsIgnoreCase(tuple2.value())) {
                       apiUseCaseDto.setMapperKey(tuple2.field());
                     }
-                    if (tuple2.value().equalsIgnoreCase(IMPLEMENTATION_MAPPING_MATRIX.getKind())) {
+                    if (IMPLEMENTATION_MAPPING_MATRIX.getKind().equalsIgnoreCase(tuple2.value())) {
                       apiUseCaseDto.setMappingMatrixKey(tuple2.field());
                     }
-                    if (tuple2.value().equalsIgnoreCase(IMPLEMENTATION_WORKFLOW.getKind())) {
+                    if (IMPLEMENTATION_WORKFLOW.getKind().equalsIgnoreCase(tuple2.value())) {
                       apiUseCaseDto.setComponentApiKey(tuple2.field());
                     }
-                    if (tuple2.value().equalsIgnoreCase(IMPLEMENTATION_TARGET.getKind())) {
+                    if (IMPLEMENTATION_TARGET.getKind().equalsIgnoreCase(tuple2.value())) {
                       apiUseCaseDto.setTargetKey(tuple2.field());
                     }
                   });

@@ -1,7 +1,7 @@
 package com.consoleconnect.kraken.operator.controller.service;
 
 import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.COMPONENT_SELLER_CONTACT;
-import static com.consoleconnect.kraken.operator.core.toolkit.Constants.DOT;
+import static com.consoleconnect.kraken.operator.core.toolkit.Constants.*;
 
 import com.consoleconnect.kraken.operator.controller.dto.CreateSellerContactRequest;
 import com.consoleconnect.kraken.operator.controller.dto.UpdateSellerContactRequest;
@@ -23,6 +23,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,8 @@ public class SellerContactService {
   private static final String SELLER_CONTACT_PREFIX = "mef.sonata.seller.contact";
   private static final String SELLER_CONTACT_DESC = "seller contact information";
   private static final String COMPONENT_KEY = "componentKey";
+  private static final String QUOTE_ROLE = "sellerContactInformation";
+  private static final String ORDER_ROLE = "sellerContact";
   private final UnifiedAssetService unifiedAssetService;
   @Getter private final UnifiedAssetRepository unifiedAssetRepository;
 
@@ -70,11 +73,22 @@ public class SellerContactService {
         .toList();
   }
 
+  private String whichRole(UnifiedAssetDto componentAssetDto) {
+    String key = componentAssetDto.getMetadata().getKey();
+    if ( key.contains(QUOTE_KEY_WORD)) {
+      return QUOTE_ROLE;
+    } else if (key.contains(ORDER_KEY_WORD)) {
+      return ORDER_ROLE;
+    } else {
+      return "";
+    }
+  }
+
   private UnifiedAsset createSellerContact(
       CreateSellerContactRequest request,
       String sellerContactKey,
       String productCategory,
-      UnifiedAssetDto componentAssetEntity) {
+      UnifiedAssetDto componentAssetDto) {
     UnifiedAsset unifiedAsset =
         UnifiedAsset.of(
             COMPONENT_SELLER_CONTACT.getKind(), sellerContactKey, SELLER_CONTACT_PREFIX);
@@ -83,11 +97,12 @@ public class SellerContactService {
     unifiedAsset
         .getMetadata()
         .getLabels()
-        .put(COMPONENT_KEY, componentAssetEntity.getMetadata().getKey());
+        .put(COMPONENT_KEY, componentAssetDto.getMetadata().getKey());
     unifiedAsset.getMetadata().getLabels().put(productCategory, String.valueOf(Boolean.TRUE));
 
     SellerContactFacets facets = new SellerContactFacets();
     SellerContactFacets.SellerInfo sellerInfo = new SellerContactFacets.SellerInfo();
+    sellerInfo.setRole(whichRole(componentAssetDto));
     sellerInfo.setContactName(request.getContactName());
     sellerInfo.setContactPhone(request.getContactPhone());
     sellerInfo.setContactEmail(request.getContactEmail());

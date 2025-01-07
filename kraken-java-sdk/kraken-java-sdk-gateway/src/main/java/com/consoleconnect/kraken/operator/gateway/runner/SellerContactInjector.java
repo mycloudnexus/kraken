@@ -13,6 +13,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.*;
 import org.apache.commons.collections4.CollectionUtils;
 
+import static com.consoleconnect.kraken.operator.core.toolkit.Constants.ENV;
+
 public interface SellerContactInjector extends ApiUseCaseSelector {
 
   UnifiedAssetService getUnifiedAssetService();
@@ -41,7 +43,7 @@ public interface SellerContactInjector extends ApiUseCaseSelector {
     // Read configuration from application.yaml
     Map<String, Object> envMap =
         JsonToolkit.fromJson(
-            JsonToolkit.toJson(inputs.get("env")), new TypeReference<Map<String, Object>>() {});
+            JsonToolkit.toJson(inputs.get(ENV)), new TypeReference<Map<String, Object>>() {});
     Map<String, Object> sellerMap =
         JsonToolkit.fromJson(
             JsonToolkit.toJson(envMap.get("seller")), new TypeReference<Map<String, Object>>() {});
@@ -49,8 +51,9 @@ public interface SellerContactInjector extends ApiUseCaseSelector {
     sellerMap.put("name", sellerInfo.getContactName());
     sellerMap.put("number", sellerInfo.getContactPhone());
     sellerMap.put("emailAddress", sellerInfo.getContactEmail());
+    sellerMap.put("role", sellerInfo.getRole());
     envMap.put("seller", sellerMap);
-    inputs.put("env", envMap);
+    inputs.put(ENV, envMap);
   }
 
   default String generateSellerContactKey(String componentKey, String productCategoryKind) {
