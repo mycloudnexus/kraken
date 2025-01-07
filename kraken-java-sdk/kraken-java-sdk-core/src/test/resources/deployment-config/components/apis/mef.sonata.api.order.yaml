@@ -9,6 +9,8 @@ metadata:
     order-api-version: v10
   version: 6
 spec:
+  apiSpec:
+    key: mef.sonata.api-spec.order
   supportedProductTypesAndActions:
     - path: /mefApi/sonata/productOrderingManagement/v10/productOrder
       method: post
