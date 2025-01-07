@@ -16,6 +16,7 @@ import java.util.*;
 import org.apache.commons.collections4.CollectionUtils;
 
 public interface SellerContactInjector extends ApiUseCaseSelector {
+  String SELLER_KEY_WORD = "seller";
 
   UnifiedAssetService getUnifiedAssetService();
 
@@ -46,13 +47,14 @@ public interface SellerContactInjector extends ApiUseCaseSelector {
             JsonToolkit.toJson(inputs.get(ENV)), new TypeReference<Map<String, Object>>() {});
     Map<String, Object> sellerMap =
         JsonToolkit.fromJson(
-            JsonToolkit.toJson(envMap.get("seller")), new TypeReference<Map<String, Object>>() {});
+            JsonToolkit.toJson(envMap.get(SELLER_KEY_WORD)),
+            new TypeReference<Map<String, Object>>() {});
     // Overwrite the configurations of application.yaml with data from the database.
     sellerMap.put("name", sellerInfo.getContactName());
     sellerMap.put("number", sellerInfo.getContactPhone());
     sellerMap.put("emailAddress", sellerInfo.getContactEmail());
     sellerMap.put("role", sellerInfo.getRole());
-    envMap.put("seller", sellerMap);
+    envMap.put(SELLER_KEY_WORD, sellerMap);
     inputs.put(ENV, envMap);
   }
 
