@@ -125,6 +125,7 @@ class SellerContactControllerTest extends AbstractIntegrationTest {
     request.setNumber("456");
     request.setEmailAddress("update-test@gmail.com");
     request.setKey(key);
+    log.info(JsonToolkit.toJson(request));
     getTestClientHelper()
         .requestAndVerify(
             HttpMethod.PATCH,
