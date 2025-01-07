@@ -13,10 +13,10 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component("spelFunc")
 public class SpelFunc {
-  private final HttpRequestRepository repository;
+  private final HttpRequestRepository httpRequestRepository;
 
-  public SpelFunc(HttpRequestRepository repository) {
-    this.repository = repository;
+  public SpelFunc(HttpRequestRepository httpRequestRepository) {
+    this.httpRequestRepository = httpRequestRepository;
   }
 
   public static List<Object> appendSellerInformation(
@@ -32,7 +32,7 @@ public class SpelFunc {
   }
 
   public String renderId(String sellerOrderId) {
-    List<HttpRequestEntity> entities = repository.findByExternalId(sellerOrderId);
+    List<HttpRequestEntity> entities = httpRequestRepository.findByExternalId(sellerOrderId);
     if (CollectionUtils.isEmpty(entities)) {
       throw KrakenException.notFound("not found externalId in Kraken");
     }
