@@ -7,7 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum LifeStatusEnum {
   LIVE("LIVE"),
-  ACHIEVED("ACHIEVED");
+  ARCHIVED("ARCHIVED");
 
   private final String status;
 }
