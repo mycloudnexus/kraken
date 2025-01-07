@@ -169,6 +169,7 @@ spec:
     - classpath:/mef-sonata/apis/api.order.yaml
     - classpath:/mef-sonata/apis/api.product.offering.yaml
     - classpath:/mef-sonata/apis/api.quote.yaml
+    - classpath:/mef-sonata/api-workflow/api-workflow.order.eline.delete.yaml
   sampleMapperDataPaths:
     - classpath:/mef-sonata/api-targets-mappers-sample-data/api-target-mapper.order.uni.add.yaml
   sampleConfigPaths:

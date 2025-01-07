@@ -111,6 +111,13 @@ spec:
             render: true
           outputKey: targetApiConfig
 
+        - id: workflow
+          actionType: buildin@workflow
+          env:
+            enabled: ${targetApiConfig.workflow.enabled}
+            synchronous: ${targetApiConfig.workflow.synchronous}
+          outputKey: finalResp
+
         - id: rewrite-path
           actionType: buildin@rewrite-path
           env:
