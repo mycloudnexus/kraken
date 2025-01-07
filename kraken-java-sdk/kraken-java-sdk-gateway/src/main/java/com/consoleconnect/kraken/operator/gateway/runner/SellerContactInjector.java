@@ -1,5 +1,7 @@
 package com.consoleconnect.kraken.operator.gateway.runner;
 
+import static com.consoleconnect.kraken.operator.core.toolkit.Constants.ENV;
+
 import com.consoleconnect.kraken.operator.core.dto.ApiUseCaseDto;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.enums.ProductCategoryEnum;
@@ -12,8 +14,6 @@ import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.*;
 import org.apache.commons.collections4.CollectionUtils;
-
-import static com.consoleconnect.kraken.operator.core.toolkit.Constants.ENV;
 
 public interface SellerContactInjector extends ApiUseCaseSelector {
 

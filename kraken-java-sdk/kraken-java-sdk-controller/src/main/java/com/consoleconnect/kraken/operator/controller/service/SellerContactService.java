@@ -23,7 +23,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -75,7 +74,7 @@ public class SellerContactService {
 
   private String whichRole(UnifiedAssetDto componentAssetDto) {
     String key = componentAssetDto.getMetadata().getKey();
-    if ( key.contains(QUOTE_KEY_WORD)) {
+    if (key.contains(QUOTE_KEY_WORD)) {
       return QUOTE_ROLE;
     } else if (key.contains(ORDER_KEY_WORD)) {
       return ORDER_ROLE;
