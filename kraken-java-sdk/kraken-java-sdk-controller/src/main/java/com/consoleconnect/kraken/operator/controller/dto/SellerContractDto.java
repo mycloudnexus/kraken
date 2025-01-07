@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class SellerContractDto {
-  protected String contactName;
-  protected String contactEmail;
-  protected String contactPhone;
+  protected String name;
+  protected String emailAddress;
+  protected String number;
 }

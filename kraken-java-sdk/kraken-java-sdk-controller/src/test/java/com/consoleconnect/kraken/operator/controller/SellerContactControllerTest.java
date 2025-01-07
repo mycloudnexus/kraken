@@ -121,9 +121,9 @@ class SellerContactControllerTest extends AbstractIntegrationTest {
         String.format(
             "/products/%s/components/%s/seller-contacts/%s", PRODUCT_ID, componentId, key);
     UpdateSellerContactRequest request = new UpdateSellerContactRequest();
-    request.setContactName("update-test");
-    request.setContactPhone("456");
-    request.setContactEmail("update-test@gmail.com");
+    request.setName("update-test");
+    request.setNumber("456");
+    request.setEmailAddress("update-test@gmail.com");
     request.setKey(key);
     getTestClientHelper()
         .requestAndVerify(

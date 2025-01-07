@@ -102,9 +102,9 @@ public class SellerContactService {
     SellerContactFacets facets = new SellerContactFacets();
     SellerContactFacets.SellerInfo sellerInfo = new SellerContactFacets.SellerInfo();
     sellerInfo.setRole(whichRole(componentAssetDto));
-    sellerInfo.setName(request.getContactName());
-    sellerInfo.setNumber(request.getContactPhone());
-    sellerInfo.setEmailAddress(request.getContactEmail());
+    sellerInfo.setName(request.getName());
+    sellerInfo.setNumber(request.getNumber());
+    sellerInfo.setEmailAddress(request.getEmailAddress());
     facets.setSellerInfo(sellerInfo);
     unifiedAsset.setFacets(
         JsonToolkit.fromJson(
@@ -126,9 +126,9 @@ public class SellerContactService {
         (null == facets.getSellerInfo()
             ? new SellerContactFacets.SellerInfo()
             : facets.getSellerInfo());
-    sellerInfo.setName(request.getContactName());
-    sellerInfo.setNumber(request.getContactPhone());
-    sellerInfo.setEmailAddress(request.getContactEmail());
+    sellerInfo.setName(request.getName());
+    sellerInfo.setNumber(request.getNumber());
+    sellerInfo.setEmailAddress(request.getEmailAddress());
     facets.setSellerInfo(sellerInfo);
     unifiedAsset.setFacets(
         JsonToolkit.fromJson(
