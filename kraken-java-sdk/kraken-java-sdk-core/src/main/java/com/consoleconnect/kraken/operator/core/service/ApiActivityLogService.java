@@ -140,7 +140,7 @@ public class ApiActivityLogService {
           x.setRawRequest(null);
           x.setRawResponse(null);
           x.setRawApiLogBodyEntity(null);
-          x.setLifeStatus(LifeStatusEnum.ACHIEVED);
+          x.setLifeStatus(LifeStatusEnum.ARCHIVED);
         });
 
     this.repository.saveAll(list);
