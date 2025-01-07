@@ -240,7 +240,7 @@ class ApiActivityLogServiceAtControlPlaneTest extends AbstractIntegrationTest {
         this.apiActivityLogRepository
             .listExpiredApiLog(
                 achieveApiActivityLogConf.toAchieve(),
-                LifeStatusEnum.ACHIEVED,
+                LifeStatusEnum.ARCHIVED,
                 achieveApiActivityLogConf.getProtocol(),
                 PageRequest.of(0, 20))
             .getContent();
