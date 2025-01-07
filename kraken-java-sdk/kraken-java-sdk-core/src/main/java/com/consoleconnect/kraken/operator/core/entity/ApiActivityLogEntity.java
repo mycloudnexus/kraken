@@ -1,5 +1,6 @@
 package com.consoleconnect.kraken.operator.core.entity;
 
+import com.consoleconnect.kraken.operator.core.enums.LifeStatusEnum;
 import com.consoleconnect.kraken.operator.core.enums.SyncStatusEnum;
 import jakarta.persistence.*;
 import java.time.ZonedDateTime;
@@ -21,6 +22,7 @@ import lombok.Setter;
           name = "kraken_api_log_activity_uni_idx",
           columnNames = {"request_id", "call_seq"})
     })
+@SuppressWarnings("javaarchitecture:S7027")
 public class ApiActivityLogEntity extends AbstractHttpEntity {
 
   @Column(name = "request_ip", nullable = true, unique = false)
@@ -39,6 +41,59 @@ public class ApiActivityLogEntity extends AbstractHttpEntity {
   @Column(name = "sync_status", nullable = true, unique = false)
   private SyncStatusEnum syncStatus;
 
+  @Enumerated(EnumType.STRING)
+  @Column(name = "life_status")
+  private LifeStatusEnum lifeStatus;
+
   @Column(name = "buyer", nullable = true, unique = false)
   private String buyer;
+
+  @OneToOne
+  @JoinColumn(name = "api_log_body_id")
+  private ApiActivityLogBodyEntity apiLogBodyEntity;
+
+  public ApiActivityLogBodyEntity getRawApiLogBodyEntity() {
+    return this.apiLogBodyEntity;
+  }
+
+  public void setRawApiLogBodyEntity(ApiActivityLogBodyEntity bodyEntity) {
+    this.apiLogBodyEntity = bodyEntity;
+  }
+
+  public ApiActivityLogBodyEntity getApiLogBodyEntity() {
+    if (this.apiLogBodyEntity == null) {
+      this.apiLogBodyEntity = new ApiActivityLogBodyEntity();
+      this.apiLogBodyEntity.setRequest(this.getRequest());
+      this.apiLogBodyEntity.setResponse(this.getResponse());
+    }
+    return this.apiLogBodyEntity;
+  }
+
+  @Override
+  public void setRequest(Object request) {
+    var bodyEntity = this.getApiLogBodyEntity();
+    bodyEntity.setRequest(request);
+  }
+
+  @Override
+  public void setResponse(Object response) {
+    var bodyEntity = this.getApiLogBodyEntity();
+    bodyEntity.setResponse(response);
+  }
+
+  public Object getRawRequest() {
+    return this.request;
+  }
+
+  public Object getRawResponse() {
+    return this.response;
+  }
+
+  public void setRawRequest(Object request) {
+    this.request = request;
+  }
+
+  public void setRawResponse(Object response) {
+    this.response = response;
+  }
 }

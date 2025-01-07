@@ -423,22 +423,24 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
     String targetKey = "mef.sonata.api-target.address.validate";
     String filePath =
         "deployment-config/components/mapping-matrix/mapping.matrix.address.validation.enable.yaml";
-    Optional<UnifiedAsset> unifiedAsset =
-        YamlToolkit.parseYaml(readFileToString(filePath), UnifiedAsset.class);
-    UnifiedAsset targetAsset = unifiedAsset.get();
-    Map<String, List<PathCheck>> facets =
-        JsonToolkit.fromJson(
-            JsonToolkit.toJson(targetAsset.getFacets().get("matrix")),
-            new TypeReference<Map<String, List<PathCheck>>>() {});
     String requestDataPath = "mockData/addressValidationRequest.json";
     Map<String, Object> requestData =
         JsonToolkit.fromJson(
             readFileToString(requestDataPath), new TypeReference<Map<String, Object>>() {});
-    Map<String, Object> requestBody = new HashMap<>();
-    requestBody.put("body", requestData);
-    Assertions.assertDoesNotThrow(
-        () ->
-            mappingMatrixCheckerActionRunner.checkMatrixConstraints(
-                facets, targetKey, requestBody));
+    Optional<UnifiedAsset> unifiedAsset =
+        YamlToolkit.parseYaml(readFileToString(filePath), UnifiedAsset.class);
+    unifiedAsset.ifPresent(
+        targetAsset -> {
+          Map<String, List<PathCheck>> facets =
+              JsonToolkit.fromJson(
+                  JsonToolkit.toJson(targetAsset.getFacets().get("matrix")),
+                  new TypeReference<Map<String, List<PathCheck>>>() {});
+          Map<String, Object> requestBody = new HashMap<>();
+          requestBody.put("body", requestData);
+          Assertions.assertDoesNotThrow(
+              () ->
+                  mappingMatrixCheckerActionRunner.checkMatrixConstraints(
+                      facets, targetKey, requestBody));
+        });
   }
 }

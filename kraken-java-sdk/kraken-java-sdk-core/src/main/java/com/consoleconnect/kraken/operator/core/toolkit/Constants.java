@@ -6,6 +6,7 @@ public class Constants {
 
   public static final String IP_LOCAL_HOSTNAME = "localhost";
   public static final String COMMA = ",";
+  public static final String DOT = ".";
   public static final String MAPPER_SIGN = "-mapper";
   public static final String INIT_VERSION = "1.0";
   public static final String ENV = "env";
