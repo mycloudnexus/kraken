@@ -105,6 +105,7 @@ spec:
             title: "Bandwidth of the UNI"
             source: "@{{quoteItem[0].product.productConfiguration.bandwidth}}"
             sourceLocation: BODY
+            allowValueLimit: true
             sourceType: discreteInt
             sourceValues:
             target: ""
