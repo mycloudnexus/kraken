@@ -8,9 +8,9 @@ public class SellerContactFacets {
 
   @Data
   public static class SellerInfo {
-    private String contactName;
-    private String contactEmail;
-    private String contactPhone;
+    private String name;
+    private String emailAddress;
+    private String number;
     private String role;
   }
 }

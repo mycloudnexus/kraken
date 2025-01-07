@@ -42,14 +42,15 @@ public class SellerContactController {
   }
 
   @Operation(summary = "Update a seller contact by key or id")
-  @PatchMapping()
+  @PatchMapping("/{id}")
   public Mono<HttpResponse<IngestionDataResult>> updateOne(
       @PathVariable("productId") String productId,
       @PathVariable("componentId") String componentId,
+      @PathVariable("id") String id,
       @RequestBody UpdateSellerContactRequest request) {
     return UserContext.getUserId()
         .publishOn(Schedulers.boundedElastic())
-        .map(userId -> sellerContactService.updateOne(productId, componentId, request, userId))
+        .map(userId -> sellerContactService.updateOne(productId, componentId, id, request, userId))
         .map(HttpResponse::ok);
   }
 }

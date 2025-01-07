@@ -102,9 +102,9 @@ public class SellerContactService {
     SellerContactFacets facets = new SellerContactFacets();
     SellerContactFacets.SellerInfo sellerInfo = new SellerContactFacets.SellerInfo();
     sellerInfo.setRole(whichRole(componentAssetDto));
-    sellerInfo.setContactName(request.getContactName());
-    sellerInfo.setContactPhone(request.getContactPhone());
-    sellerInfo.setContactEmail(request.getContactEmail());
+    sellerInfo.setName(request.getContactName());
+    sellerInfo.setNumber(request.getContactPhone());
+    sellerInfo.setEmailAddress(request.getContactEmail());
     facets.setSellerInfo(sellerInfo);
     unifiedAsset.setFacets(
         JsonToolkit.fromJson(
@@ -113,8 +113,12 @@ public class SellerContactService {
   }
 
   public IngestionDataResult updateOne(
-      String productId, String componentId, UpdateSellerContactRequest request, String updatedBy) {
-    UnifiedAssetDto unifiedAsset = unifiedAssetService.findOne(request.getKey());
+      String productId,
+      String componentId,
+      String id,
+      UpdateSellerContactRequest request,
+      String updatedBy) {
+    UnifiedAssetDto unifiedAsset = unifiedAssetService.findOne(id);
 
     SellerContactFacets facets =
         UnifiedAsset.getFacets(unifiedAsset, new TypeReference<SellerContactFacets>() {});
@@ -122,9 +126,9 @@ public class SellerContactService {
         (null == facets.getSellerInfo()
             ? new SellerContactFacets.SellerInfo()
             : facets.getSellerInfo());
-    sellerInfo.setContactName(request.getContactName());
-    sellerInfo.setContactPhone(request.getContactPhone());
-    sellerInfo.setContactEmail(request.getContactEmail());
+    sellerInfo.setName(request.getContactName());
+    sellerInfo.setNumber(request.getContactPhone());
+    sellerInfo.setEmailAddress(request.getContactEmail());
     facets.setSellerInfo(sellerInfo);
     unifiedAsset.setFacets(
         JsonToolkit.fromJson(
@@ -136,7 +140,7 @@ public class SellerContactService {
       throw new KrakenException(syncResult.getCode(), syncResult.getMessage());
     }
     log.info(
-        "Seller contact asset:{} is updated by:{}, componentId:{}, productId:{}",
+        "Seller contact asset:{} has been updated by:{}, componentId:{}, productId:{}",
         request,
         updatedBy,
         componentId,

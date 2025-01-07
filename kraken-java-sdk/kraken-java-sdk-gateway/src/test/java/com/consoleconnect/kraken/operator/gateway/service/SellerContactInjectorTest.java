@@ -114,8 +114,8 @@ class SellerContactInjectorTest extends AbstractIntegrationTest implements Selle
   private static @NotNull SellerContactFacets getSellerContactFacets(String componentKey) {
     SellerContactFacets facets = new SellerContactFacets();
     SellerContactFacets.SellerInfo sellerInfo = new SellerContactFacets.SellerInfo();
-    sellerInfo.setContactName("test-new-seller-contact");
-    sellerInfo.setContactPhone("789");
+    sellerInfo.setName("test-new-seller-contact");
+    sellerInfo.setNumber("789");
     if (componentKey.contains(ORDER_KEY_WORD)) {
       sellerInfo.setRole("sellerContact");
     } else if (componentKey.contains(QUOTE_KEY_WORD)) {
@@ -123,7 +123,7 @@ class SellerContactInjectorTest extends AbstractIntegrationTest implements Selle
     } else {
       sellerInfo.setRole("");
     }
-    sellerInfo.setContactEmail("test-new-seller-contact@gmail.com");
+    sellerInfo.setEmailAddress("test-new-seller-contact@gmail.com");
     facets.setSellerInfo(sellerInfo);
     return facets;
   }

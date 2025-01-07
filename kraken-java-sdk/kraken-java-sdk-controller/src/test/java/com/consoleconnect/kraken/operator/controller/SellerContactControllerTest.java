@@ -118,7 +118,8 @@ class SellerContactControllerTest extends AbstractIntegrationTest {
     String productCategory = pair.getRight();
     String key = componentId + "." + productCategory;
     String path =
-        String.format("/products/%s/components/%s/seller-contacts", PRODUCT_ID, componentId);
+        String.format(
+            "/products/%s/components/%s/seller-contacts/%s", PRODUCT_ID, componentId, key);
     UpdateSellerContactRequest request = new UpdateSellerContactRequest();
     request.setContactName("update-test");
     request.setContactPhone("456");
