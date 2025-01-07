@@ -1,0 +1,80 @@
+package com.consoleconnect.kraken.operator.core.service;
+
+import static com.consoleconnect.kraken.operator.core.enums.AssetLinkKindEnum.*;
+import static com.consoleconnect.kraken.operator.core.enums.AssetLinkKindEnum.IMPLEMENTATION_TARGET;
+
+import com.consoleconnect.kraken.operator.core.dto.ApiUseCaseDto;
+import com.consoleconnect.kraken.operator.core.dto.Tuple2;
+import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
+import com.consoleconnect.kraken.operator.core.model.AssetLink;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import org.apache.commons.collections4.CollectionUtils;
+
+public interface ComponentIterator {
+
+  UnifiedAssetService getUnifiedAssetService();
+
+  default Map<String, List<Tuple2>> findApiUseCase() {
+    // groupKey,<componentKey,assetLinkKind>
+    Map<String, List<Tuple2>> result = new HashMap<>();
+    getUnifiedAssetService().findByKind(AssetKindEnum.COMPONENT_API.getKind()).stream()
+        .filter(component -> CollectionUtils.isNotEmpty(component.getLinks()))
+        .forEach(
+            component -> {
+              Map<String, List<Tuple2>> groupMap =
+                  component.getLinks().stream()
+                      .filter(assetLink -> assetLink.getGroup() != null)
+                      .collect(
+                          Collectors.groupingBy(
+                              AssetLink::getGroup,
+                              Collectors.mapping(
+                                  t -> Tuple2.of(t.getTargetAssetKey(), t.getRelationship()),
+                                  Collectors.toList())));
+              groupMap.forEach(
+                  (key, members) -> {
+                    members.add(
+                        Tuple2.of(
+                            component.getMetadata().getKey(), IMPLEMENTATION_WORKFLOW.getKind()));
+                    result.put(key, members);
+                  });
+            });
+    return result;
+  }
+
+  default Optional<ApiUseCaseDto> findRelatedApiUse(
+      String key, Map<String, List<Tuple2>> apiUseCaseMap) {
+    return apiUseCaseMap.entrySet().stream()
+        .map(
+            entry -> {
+              ApiUseCaseDto apiUseCaseDto = new ApiUseCaseDto();
+              entry
+                  .getValue()
+                  .forEach(
+                      tuple2 -> {
+                        if (tuple2
+                            .value()
+                            .equalsIgnoreCase(IMPLEMENTATION_TARGET_MAPPER.getKind())) {
+                          apiUseCaseDto.setMapperKey(tuple2.field());
+                        }
+                        if (tuple2
+                            .value()
+                            .equalsIgnoreCase(IMPLEMENTATION_MAPPING_MATRIX.getKind())) {
+                          apiUseCaseDto.setMappingMatrixKey(tuple2.field());
+                        }
+                        if (tuple2.value().equalsIgnoreCase(IMPLEMENTATION_WORKFLOW.getKind())) {
+                          apiUseCaseDto.setComponentApiKey(tuple2.field());
+                        }
+                        if (tuple2.value().equalsIgnoreCase(IMPLEMENTATION_TARGET.getKind())) {
+                          apiUseCaseDto.setTargetKey(tuple2.field());
+                        }
+                      });
+              return apiUseCaseDto;
+            })
+        .filter(t -> t.membersExcludeApiKey().contains(key))
+        .findFirst();
+  }
+}

@@ -81,7 +81,7 @@ public class LoadTargetAPIConfigActionRunner extends AbstractActionRunner
     StateValueMappingDto stateValueMappingDto = new StateValueMappingDto();
     renderRequestService.parseRequest(facets, stateValueMappingDto);
     // replace env.seller if the seller contact key exists
-    inject(inputs, facets.getTrigger());
+    inject(inputs, asset.getMetadata().getKey());
     if (render != null && render) {
       facets
           .getEndpoints()

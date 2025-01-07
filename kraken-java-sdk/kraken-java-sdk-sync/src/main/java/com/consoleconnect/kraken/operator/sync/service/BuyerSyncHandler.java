@@ -1,6 +1,5 @@
 package com.consoleconnect.kraken.operator.sync.service;
 
-import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.PRODUCT;
 import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.PRODUCT_BUYER;
 
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
@@ -18,6 +17,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -29,10 +29,10 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class BuyerSyncHandler implements ClientSyncHandler {
+public class BuyerSyncHandler implements ClientSyncHandler, ParentIdSelector {
 
   private final SyncProperty syncProperty;
-  private final UnifiedAssetRepository unifiedAssetRepository;
+  @Getter private final UnifiedAssetRepository unifiedAssetRepository;
   private final DataIngestionJob dataIngestionJob;
 
   @Override
@@ -90,15 +90,6 @@ public class BuyerSyncHandler implements ClientSyncHandler {
     return existedData.getContent().isEmpty()
         ? Optional.empty()
         : Optional.of(existedData.getContent().get(0));
-  }
-
-  private String parentIdFromProduct() {
-    Page<UnifiedAssetEntity> assetEntities =
-        unifiedAssetRepository.search(
-            null, PRODUCT.getKind(), null, UnifiedAssetService.getSearchPageRequest(0, 1));
-    return assetEntities.getContent().isEmpty()
-        ? null
-        : assetEntities.getContent().get(0).getParentId();
   }
 
   private void processBuyerUpdate(UnifiedAssetDto dto, String parentId) {

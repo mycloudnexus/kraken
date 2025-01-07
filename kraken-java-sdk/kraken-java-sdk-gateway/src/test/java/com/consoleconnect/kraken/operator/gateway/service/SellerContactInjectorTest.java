@@ -3,6 +3,7 @@ package com.consoleconnect.kraken.operator.gateway.service;
 import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.COMPONENT_SELLER_CONTACT;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 
 import com.consoleconnect.kraken.operator.core.enums.AssetStatusEnum;
@@ -10,7 +11,6 @@ import com.consoleconnect.kraken.operator.core.enums.ProductCategoryEnum;
 import com.consoleconnect.kraken.operator.core.event.IngestionDataResult;
 import com.consoleconnect.kraken.operator.core.model.SyncMetadata;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
-import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
 import com.consoleconnect.kraken.operator.core.model.facet.SellerContactFacets;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.DateTime;
@@ -20,15 +20,10 @@ import com.consoleconnect.kraken.operator.gateway.runner.SellerContactInjector;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import com.fasterxml.jackson.core.type.TypeReference;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -46,28 +41,23 @@ class SellerContactInjectorTest extends AbstractIntegrationTest implements Selle
 
   @Test
   @Order(1)
-  void givenEmptySellerContactKey_whenInjection_thenReturnOK() {
+  void givenNotExistedTargetKey_whenInjection_thenReturnDirectly() {
     Map<String, Object> inputs = buildInputs();
-    ComponentAPITargetFacets.Trigger trigger = new ComponentAPITargetFacets.Trigger();
-    inject(inputs, trigger);
+    inject(inputs, "mef.sonata.api-target.order.eline.add1");
     String bodyStr = JsonToolkit.toJson(inputs);
     log.info(bodyStr);
     assertThat(bodyStr, hasJsonPath("$.env.seller", notNullValue()));
-    assertThat(bodyStr, hasJsonPath("$.env.seller.name", notNullValue()));
     assertThat(bodyStr, hasJsonPath("$.env.seller.number", notNullValue()));
     assertThat(bodyStr, hasJsonPath("$.env.seller.role", notNullValue()));
     assertThat(bodyStr, hasJsonPath("$.env.seller.emailAddress", notNullValue()));
+    assertThat(bodyStr, hasJsonPath("$.env.seller.name", equalTo("kraken")));
   }
 
   @Test
   @Order(2)
   void givenNotExistSellerContactKey_whenInjection_thenReturnOK() {
     Map<String, Object> inputs = buildInputs();
-    ComponentAPITargetFacets.Trigger trigger = new ComponentAPITargetFacets.Trigger();
-    List<String> sellerContactKeys = new ArrayList<>();
-    sellerContactKeys.add("mef.sonata.api.order.access.eline.1");
-    trigger.setSellerContactKeys(sellerContactKeys);
-    inject(inputs, trigger);
+    inject(inputs, "mef.sonata.api-target.order.eline.add");
     String bodyStr = JsonToolkit.toJson(inputs);
     log.info(bodyStr);
     assertThat(bodyStr, hasJsonPath("$.env.seller", notNullValue()));
@@ -89,20 +79,17 @@ class SellerContactInjectorTest extends AbstractIntegrationTest implements Selle
     SyncMetadata syncMetadata = new SyncMetadata("", "", DateTime.nowInUTCString(), "test-user");
     IngestionDataResult ingestionDataResult =
         unifiedAssetService.syncAsset(productId, sellerContactAsset, syncMetadata, true);
-
+    Assertions.assertNotNull(ingestionDataResult);
     Map<String, Object> inputs = buildInputs();
-    ComponentAPITargetFacets.Trigger trigger = new ComponentAPITargetFacets.Trigger();
-    List<String> sellerContactKeys = new ArrayList<>();
-    sellerContactKeys.add(sellerContactKey);
-    trigger.setSellerContactKeys(sellerContactKeys);
-    inject(inputs, trigger);
+
+    inject(inputs, "mef.sonata.api-target.order.eline.add");
     String bodyStr = JsonToolkit.toJson(inputs);
     log.info(bodyStr);
     assertThat(bodyStr, hasJsonPath("$.env.seller", notNullValue()));
-    assertThat(bodyStr, hasJsonPath("$.env.seller.name", notNullValue()));
     assertThat(bodyStr, hasJsonPath("$.env.seller.number", notNullValue()));
     assertThat(bodyStr, hasJsonPath("$.env.seller.role", notNullValue()));
     assertThat(bodyStr, hasJsonPath("$.env.seller.emailAddress", notNullValue()));
+    assertThat(bodyStr, hasJsonPath("$.env.seller.name", equalTo("test-new-seller-contact")));
   }
 
   private UnifiedAsset createSellerContact(

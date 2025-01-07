@@ -15,8 +15,6 @@ spec:
     path: /mefApi/sonata/productOrderingManagement/v10/productOrder/{id}
     method: get
     productType: access_e_line
-    sellerContactKeys:
-      - mef.sonata.api.order.access.eline
   endpoints:
     - id: retrieve connection detail by id
       path: ""

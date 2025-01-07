@@ -15,8 +15,6 @@ spec:
     path: /mefApi/sonata/quoteManagement/v8/quote/{id}
     method: get
     productType: uni
-    sellerContactKeys:
-      - mef.sonata.api.quote.access.eline
   endpoints:
     - id: retrieve quote for port
       path: ""
