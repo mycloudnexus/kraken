@@ -14,7 +14,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
 
-public interface ComponentIterator {
+public interface ApiUseCaseSelector {
 
   UnifiedAssetService getUnifiedAssetService();
 

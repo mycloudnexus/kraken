@@ -5,7 +5,7 @@ import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.enums.ProductCategoryEnum;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.SellerContactFacets;
-import com.consoleconnect.kraken.operator.core.service.ComponentIterator;
+import com.consoleconnect.kraken.operator.core.service.ApiUseCaseSelector;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.Constants;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
@@ -13,7 +13,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.*;
 import org.apache.commons.collections4.CollectionUtils;
 
-public interface SellerContactInjector extends ComponentIterator {
+public interface SellerContactInjector extends ApiUseCaseSelector {
 
   UnifiedAssetService getUnifiedAssetService();
 

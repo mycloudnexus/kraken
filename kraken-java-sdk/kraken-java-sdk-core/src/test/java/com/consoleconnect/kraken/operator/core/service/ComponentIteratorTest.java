@@ -17,7 +17,7 @@ import org.springframework.test.context.ContextConfiguration;
 @MockIntegrationTest
 @ContextConfiguration(classes = CustomConfig.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class ComponentIteratorTest extends AbstractIntegrationTest implements ComponentIterator {
+class ComponentIteratorTest extends AbstractIntegrationTest implements ApiUseCaseSelector {
 
   @Autowired UnifiedAssetService unifiedAssetService;
 

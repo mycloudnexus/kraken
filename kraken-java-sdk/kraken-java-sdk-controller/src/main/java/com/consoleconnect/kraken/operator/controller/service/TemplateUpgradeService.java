@@ -28,7 +28,7 @@ import com.consoleconnect.kraken.operator.core.model.*;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
 import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
 import com.consoleconnect.kraken.operator.core.service.CompatibilityCheckService;
-import com.consoleconnect.kraken.operator.core.service.ComponentIterator;
+import com.consoleconnect.kraken.operator.core.service.ApiUseCaseSelector;
 import com.consoleconnect.kraken.operator.core.service.EventSinkService;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.*;
@@ -56,7 +56,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @AllArgsConstructor
 @Slf4j
-public class TemplateUpgradeService implements ComponentIterator {
+public class TemplateUpgradeService implements ApiUseCaseSelector {
   @Getter private final UnifiedAssetService unifiedAssetService;
   private final EnvironmentService environmentService;
   private final ProductDeploymentService productDeploymentService;

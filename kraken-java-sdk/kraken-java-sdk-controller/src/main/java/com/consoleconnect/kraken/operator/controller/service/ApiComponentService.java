@@ -22,7 +22,7 @@ import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFac
 import com.consoleconnect.kraken.operator.core.repo.AssetFacetRepository;
 import com.consoleconnect.kraken.operator.core.repo.EnvironmentClientRepository;
 import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
-import com.consoleconnect.kraken.operator.core.service.ComponentIterator;
+import com.consoleconnect.kraken.operator.core.service.ApiUseCaseSelector;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.*;
 import java.util.*;
@@ -46,7 +46,7 @@ import org.springframework.transaction.annotation.Transactional;
 @AllArgsConstructor
 @Service
 public class ApiComponentService
-    implements TargetMappingChecker, EndPointUsageCalculator, ComponentIterator {
+    implements TargetMappingChecker, EndPointUsageCalculator, ApiUseCaseSelector {
   private static final Logger log = LoggerFactory.getLogger(ApiComponentService.class);
   public static final KrakenException ASSET_NOT_FOUND = KrakenException.notFound("asset not found");
   @Getter private final UnifiedAssetService unifiedAssetService;
