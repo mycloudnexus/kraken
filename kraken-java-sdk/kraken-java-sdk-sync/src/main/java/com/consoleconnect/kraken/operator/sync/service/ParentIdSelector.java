@@ -17,6 +17,6 @@ public interface ParentIdSelector {
             .search(null, PRODUCT.getKind(), null, UnifiedAssetService.getSearchPageRequest(0, 1));
     return assetEntities.getContent().isEmpty()
         ? null
-        : assetEntities.getContent().get(0).getParentId();
+        : assetEntities.getContent().get(0).getKey();
   }
 }
