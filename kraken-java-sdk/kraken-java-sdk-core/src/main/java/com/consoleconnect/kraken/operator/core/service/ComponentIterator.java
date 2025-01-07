@@ -47,31 +47,25 @@ public interface ComponentIterator {
 
   default Optional<ApiUseCaseDto> findRelatedApiUse(
       String key, Map<String, List<Tuple2>> apiUseCaseMap) {
-    return apiUseCaseMap.entrySet().stream()
+    return apiUseCaseMap.values().stream()
         .map(
-            entry -> {
+            tuple2s -> {
               ApiUseCaseDto apiUseCaseDto = new ApiUseCaseDto();
-              entry
-                  .getValue()
-                  .forEach(
-                      tuple2 -> {
-                        if (tuple2
-                            .value()
-                            .equalsIgnoreCase(IMPLEMENTATION_TARGET_MAPPER.getKind())) {
-                          apiUseCaseDto.setMapperKey(tuple2.field());
-                        }
-                        if (tuple2
-                            .value()
-                            .equalsIgnoreCase(IMPLEMENTATION_MAPPING_MATRIX.getKind())) {
-                          apiUseCaseDto.setMappingMatrixKey(tuple2.field());
-                        }
-                        if (tuple2.value().equalsIgnoreCase(IMPLEMENTATION_WORKFLOW.getKind())) {
-                          apiUseCaseDto.setComponentApiKey(tuple2.field());
-                        }
-                        if (tuple2.value().equalsIgnoreCase(IMPLEMENTATION_TARGET.getKind())) {
-                          apiUseCaseDto.setTargetKey(tuple2.field());
-                        }
-                      });
+              tuple2s.forEach(
+                  tuple2 -> {
+                    if (tuple2.value().equalsIgnoreCase(IMPLEMENTATION_TARGET_MAPPER.getKind())) {
+                      apiUseCaseDto.setMapperKey(tuple2.field());
+                    }
+                    if (tuple2.value().equalsIgnoreCase(IMPLEMENTATION_MAPPING_MATRIX.getKind())) {
+                      apiUseCaseDto.setMappingMatrixKey(tuple2.field());
+                    }
+                    if (tuple2.value().equalsIgnoreCase(IMPLEMENTATION_WORKFLOW.getKind())) {
+                      apiUseCaseDto.setComponentApiKey(tuple2.field());
+                    }
+                    if (tuple2.value().equalsIgnoreCase(IMPLEMENTATION_TARGET.getKind())) {
+                      apiUseCaseDto.setTargetKey(tuple2.field());
+                    }
+                  });
               return apiUseCaseDto;
             })
         .filter(t -> t.membersExcludeApiKey().contains(key))

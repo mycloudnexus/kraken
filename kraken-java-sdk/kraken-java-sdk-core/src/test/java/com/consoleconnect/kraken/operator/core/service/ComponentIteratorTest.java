@@ -48,15 +48,18 @@ class ComponentIteratorTest extends AbstractIntegrationTest implements Component
   void givenTargetKey_whenFindRelatedApiUse_thenReturnOK() {
     Map<String, List<Tuple2>> map = findApiUseCase();
     Assertions.assertNotNull(map);
-    Optional<ApiUseCaseDto> result = findRelatedApiUse("mef.sonata.api-target.order.eline.add", map);
+    Optional<ApiUseCaseDto> result =
+        findRelatedApiUse("mef.sonata.api-target.order.eline.add", map);
     Assertions.assertTrue(result.isPresent());
     ApiUseCaseDto apiUseCaseDto = result.get();
     Assertions.assertNotNull(apiUseCaseDto);
     log.info(JsonToolkit.toJson(apiUseCaseDto));
     Assertions.assertEquals("mef.sonata.api.order", apiUseCaseDto.getComponentApiKey());
-    Assertions.assertEquals("mef.sonata.api-target-mapper.order.eline.add", apiUseCaseDto.getMapperKey());
+    Assertions.assertEquals(
+        "mef.sonata.api-target-mapper.order.eline.add", apiUseCaseDto.getMapperKey());
     Assertions.assertEquals("mef.sonata.api-target.order.eline.add", apiUseCaseDto.getTargetKey());
-    Assertions.assertEquals("mef.sonata.api.matrix.order.eline.add", apiUseCaseDto.getMappingMatrixKey());
+    Assertions.assertEquals(
+        "mef.sonata.api.matrix.order.eline.add", apiUseCaseDto.getMappingMatrixKey());
   }
 
   public static Set<String> targetKeys() {
