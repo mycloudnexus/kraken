@@ -26,5 +26,9 @@
             <groupId>com.consoleconnect.kraken</groupId>
             <artifactId>kraken-java-sdk-sync</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.consoleconnect.kraken</groupId>
+            <artifactId>kraken-java-sdk-gateway</artifactId>
+        </dependency>
     </dependencies>
 </project>

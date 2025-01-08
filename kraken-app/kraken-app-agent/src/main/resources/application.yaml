@@ -95,6 +95,9 @@ app:
     push-activity-log-external:
       enabled: false
       batch-size: ${EXTERNAL_SYSTEM_PUSH_LOG_BATCH_SIZE:200}
+  workflow:
+    baseUrl: https://external-kraken-conductor.dev.consolecore.io/api
+    enabled: true
   cron-job:
     pull-api-server-info: 0/20 * * * * *
     pull-server-assets: 0 0/1 * * * *
@@ -110,6 +113,7 @@ app:
     - kraken.component.api
     - kraken.component.api-target
     - kraken.component.api-target-mapper
+    - kraken.component.api-workflow
     - kraken.component.api-server
   unified-asset:
     endpoints:

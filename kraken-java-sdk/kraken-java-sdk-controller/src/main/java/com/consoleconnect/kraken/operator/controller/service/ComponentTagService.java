@@ -8,7 +8,6 @@ import com.consoleconnect.kraken.operator.controller.dto.*;
 import com.consoleconnect.kraken.operator.controller.model.ComponentTag;
 import com.consoleconnect.kraken.operator.controller.model.ComponentTagFacet;
 import com.consoleconnect.kraken.operator.controller.model.DeploymentFacet;
-import com.consoleconnect.kraken.operator.controller.tools.AssetKeyHelper;
 import com.consoleconnect.kraken.operator.controller.tools.VersionHelper;
 import com.consoleconnect.kraken.operator.core.dto.AssetLinkDto;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
@@ -107,19 +106,10 @@ public class ComponentTagService implements TargetMappingChecker, LatestDeployme
         componentAsset.getMetadata().getKey(), tagAsset, syncMetadata, true);
   }
 
-  private static final String KIND_WORKFLOW = "api-workflow";
-
   public IngestionDataResult createMappingTag(
       String componentId, String mapperKey, String createdBy) {
     UnifiedAssetEntity mapperEntity =
         unifiedAssetRepository.findOneByKey(mapperKey).orElseThrow(() -> ASSET_NOT_FOUND);
-    String parentKey =
-        unifiedAssetRepository
-            .findById(UUID.fromString(mapperEntity.getParentId()))
-            .map(UnifiedAssetEntity::getKey)
-            .orElseThrow(() -> ASSET_NOT_FOUND);
-    String workflowKey = AssetKeyHelper.toKindKey(mapperKey, parentKey, KIND_WORKFLOW);
-    Optional<UnifiedAssetEntity> workflowEntity = unifiedAssetRepository.findOneByKey(workflowKey);
     String newVersion = newVersion(mapperEntity);
     // upgrade version for mapper
     mapperEntity.getLabels().put(LABEL_VERSION_NAME, newVersion);
