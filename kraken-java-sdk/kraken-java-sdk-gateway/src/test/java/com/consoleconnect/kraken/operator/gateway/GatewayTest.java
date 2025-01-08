@@ -238,7 +238,7 @@ class GatewayTest extends AbstractIntegrationTest {
   void givenOrderPayload_whenDeleteOrder_thenSuccess() {
     WorkflowDef def = new WorkflowDef();
     def.setVersion(1);
-    String id = "worklflow_id";
+    String id = "workflow_id";
     Workflow workflow = new Workflow();
     workflow.setWorkflowDefinition(def);
     WorkflowResponse workflowResponse = new WorkflowResponse();
@@ -262,9 +262,6 @@ class GatewayTest extends AbstractIntegrationTest {
                 uriBuilder
                     .path("/mefApi/sonata/productOrderingManagement/v10/productOrder")
                     .queryParam("buyerId", "cc-company")
-                    .queryParam("page", 0)
-                    .queryParam("pageSize", 24)
-                    .queryParam("criteria", "%7B%7D")
                     .build())
         .bodyValue(
             JsonToolkit.fromJson(
