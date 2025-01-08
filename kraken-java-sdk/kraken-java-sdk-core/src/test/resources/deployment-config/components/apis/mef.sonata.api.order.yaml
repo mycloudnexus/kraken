@@ -7,16 +7,32 @@ metadata:
   labels:
     mef-api-release: grace
     order-api-version: v10
+  version: 6
 spec:
   apiSpec:
     key: mef.sonata.api-spec.order
+  supportedProductTypesAndActions:
+    - path: /mefApi/sonata/productOrderingManagement/v10/productOrder
+      method: post
+      actionTypes:
+        - add
+        - delete
+      productTypes:
+        - UNI
+        - ACCESS_E_LINE
+    - path: /mefApi/sonata/productOrderingManagement/v10/productOrder/{id}
+      method: get
+      actionTypes:
+        - add
+        - delete
+      productTypes:
+        - UNI
+        - ACCESS_E_LINE
   mappings:
     - uri: ${env.target.url}
       trigger:
         path: /mefApi/sonata/productOrderingManagement/v10/productOrder
         method: post
-        queryParams:
-          - buyerId
       metadata:
         cacheRequestBody: true
       actions:
@@ -30,24 +46,50 @@ spec:
                 console.log("input: " + jsonStr);
                 let input = JSON.parse(jsonStr);
                 let targetAPIConfigKey = '';
-                if(input.productOrderItem['product']['productConfiguration']['@type'] == 'UNI' && input.productOrderItem['action'] == 'add') {
+                let matrixConfigKey = '';
+                let errorMsg = '';
+                let type = input.productOrderItem['product']['productConfiguration']['@type'];
+                let action = input.productOrderItem['action'];
+                let typeArr = ['UNI', 'ACCESS_E_LINE'];
+                let actionArr = ['add', 'delete'];
+                if(type == 'UNI' && action == 'add') {
                   targetAPIConfigKey = 'mef.sonata.api-target.order.uni.add';
-                } else if(input.productOrderItem['product']['productConfiguration']['@type'] == 'ACCESS_E_LINE' && input.productOrderItem['action'] == 'add') {
+                  matrixConfigKey = 'mef.sonata.api.matrix.order.uni.add'
+                } else if(type == 'ACCESS_E_LINE' && action == 'add') {
                   targetAPIConfigKey = 'mef.sonata.api-target.order.eline.add';
-                } else if(input.productOrderItem['product']['productConfiguration']['@type'] == 'UNI' && input.productOrderItem['action'] == 'delete') {
+                  matrixConfigKey = 'mef.sonata.api.matrix.order.eline.add'
+                } else if(type == 'UNI' && action == 'delete') {
                   targetAPIConfigKey = 'mef.sonata.api-target.order.uni.delete';
-                } else if(input.productOrderItem['product']['productConfiguration']['@type'] == 'ACCESS_E_LINE' && input.productOrderItem['action'] == 'delete') {
+                  matrixConfigKey = 'mef.sonata.api.matrix.order.uni.delete'
+                } else if(type == 'ACCESS_E_LINE' && action == 'delete') {
                   targetAPIConfigKey = 'mef.sonata.api-target.order.eline.delete';
+                  matrixConfigKey = 'mef.sonata.api.matrix.order.eline.delete'
+                } else {
+                  errorArr = ['api use case is not supported :'];
+                  if (!typeArr.includes(type)){
+                    errorArr.push(`expect @{{productOrderItem.product.productConfiguration.@type}} in [ ${typeArr} ], but ${type}.`);
+                  }
+                  if (!actionArr.includes(action)) {
+                    errorArr.push(`expect @{{productOrderItem.action}} in [ ${actionArr} ], but ${action}`)
+                  }
+                  errorMsg = errorArr.join(' ');
+                  targetAPIConfigKey = 'targetKey:notFound';
                 }
                 let ret = {
                   orderType: input.productOrderItem['product']['productConfiguration']['@type'],
                   orderAction: input.productOrderItem['action'],
-                  targetAPIConfigKey: targetAPIConfigKey
+                  targetAPIConfigKey: targetAPIConfigKey,
+                  matrixConfigKey: matrixConfigKey,
+                  errorMsg: errorMsg
                 };
                 return JSON.stringify(ret);
               }
           outputKey: order
-
+        - id: mapping_matrix_check_order
+          actionType: buildin@mapping-matrix-checker
+          env:
+            mappingMatrixKey: ${order.matrixConfigKey}
+            targetKey: ${order.targetAPIConfigKey}
         - id: persist_http_request
           actionType: buildin@db
           env:
@@ -76,7 +118,6 @@ spec:
           env:
             path: ${targetApiConfig.endpoints[0].path}
             method: ${targetApiConfig.endpoints[0].method}
-
         - id: modify-request-body
           actionType: buildin@modify-request-body
           env:
@@ -86,11 +127,14 @@ spec:
           actionType: buildin@modify-response-body
           with:
             engine: spel
+            successStatus: 201
           env:
             code: ${targetApiConfig.endpoints[0].responseBody}
             inputs: ${targetApiConfig.inputs}
+          postResultRender: true
 
-        - actionType: buildin@db
+        - id: persist_http_response
+          actionType: buildin@db
           with:
             action: update
             properties:
@@ -117,6 +161,8 @@ spec:
           actionType: buildin@db
           env:
             id: ${segment}
+            blankIdErrMsg: "order id cannot be blank"
+            notExistedErrMsg: "order id does not exist"
           with:
             action: read
           preRequest: true
@@ -125,25 +171,42 @@ spec:
           actionType: engine@javascript
           env:
             bizType: ${entity.bizType}
+            bizAction: ${entity.renderedResponse.productOrderItem[0]['action']}
           with:
             code: |
               (jsonStr) => {
                 console.log("input: " + jsonStr);
                 let input = JSON.parse(jsonStr);
                 let targetAPIConfigKey = '';
-                if(input.bizType == 'UNI') {
+                let matrixConfigKey = '';
+                if (input.bizType == 'UNI' && input.bizAction == 'add') {
                   targetAPIConfigKey = 'mef.sonata.api-target.order.uni.read';
-                } else if(input.bizType == 'ACCESS_E_LINE') {
+                  matrixConfigKey = 'mef.sonata.api.matrix.order.uni.read';
+                } else if(input.bizType == 'ACCESS_E_LINE' && input.bizAction == 'add') {
                   targetAPIConfigKey = 'mef.sonata.api-target.order.eline.read';
+                  matrixConfigKey = 'mef.sonata.api.matrix.order.eline.read';
+                } else if (input.bizType == 'UNI' && input.bizAction == 'delete') {
+                  targetAPIConfigKey = 'mef.sonata.api-target.order.uni.read.delete';
+                  matrixConfigKey = 'mef.sonata.api.matrix.order.uni.read.delete';
+                } else if(input.bizType == 'ACCESS_E_LINE' && input.bizAction == 'delete') {
+                  targetAPIConfigKey = 'mef.sonata.api-target.order.eline.read.delete';
+                  matrixConfigKey = 'mef.sonata.api.matrix.order.eline.read.delete';
+                } else {
+                  targetAPIConfigKey = 'targetKey:notFound';
                 }
                 let ret = {
                   orderType: input.bizType,
-                  targetAPIConfigKey: targetAPIConfigKey
+                  targetAPIConfigKey: targetAPIConfigKey,
+                  matrixConfigKey: matrixConfigKey
                 };
                 return JSON.stringify(ret);
               }
           outputKey: order
-
+        - id: mapping_matrix_check_read_order
+          actionType: buildin@mapping-matrix-checker
+          env:
+            mappingMatrixKey: ${order.matrixConfigKey}
+            targetKey: ${order.targetAPIConfigKey}
         - id: load-downstream-api-config
           actionType: buildin@load-target-api-config
           env:
@@ -169,7 +232,135 @@ spec:
           env:
             code: ${targetApiConfig.endpoints[0].responseBody}
             inputs: ${targetApiConfig.inputs}
-  apiTargetMapping:
-    keys:
-      - api.target.order.add.eLine
-  ##
+          postResultRender: true
+
+    - trigger:
+        path: /mefApi/sonata/productOrderingManagement/v10/hub
+        method: post
+      metadata:
+        cacheRequestBody: true
+      actions:
+
+        - id: calculate_event_types_via_javascript
+          actionType: engine@javascript
+          env:
+            query: ${body.query}
+          with:
+            code: |
+              (jsonStr) => {
+                console.log("input: " + jsonStr);
+                let input = JSON.parse(jsonStr);
+                let query = input.query;
+                let arr = query.split("=");
+                let eventArr = arr[1].split(",");
+                let ret = {
+                  "eventTypes": eventArr,
+                  "targetAPIConfigKey": "mef.sonata.api-target.hub.add"
+                };
+                return JSON.stringify(ret);
+              }
+          outputKey: event
+        - id: register-order-event
+          actionType: buildin@register-event
+          env:
+            eventTypes: ${event.eventTypes}
+          with:
+            action: register
+
+        - id: load-downstream-api-config
+          actionType: buildin@load-target-api-config
+          env:
+            configKey: ${event.targetAPIConfigKey}
+            mefRequestBody: ${body}
+            entity: ${entity}
+          with:
+            render: true
+          outputKey: targetApiConfig
+        - id: mock-response
+          actionType: buildin@mock-response
+          with:
+            forwardDownstream: false
+
+        - id: modify-response-body
+          actionType: buildin@modify-response-body
+          with:
+            engine: spel
+          env:
+            code: ${targetApiConfig.endpoints[0].responseBody}
+            inputs: ${targetApiConfig.inputs}
+
+links:
+  - targetAssetKey: mef.sonata.api-target.order.eline.add
+    relationship: implementation.target
+    group: mef.sonata.api-target.order.eline.add
+  - targetAssetKey: mef.sonata.api-target.order.eline.delete
+    relationship: implementation.target
+    group: mef.sonata.api-target.order.eline.delete
+  - targetAssetKey: mef.sonata.api-target.order.eline.read
+    relationship: implementation.target
+    group: mef.sonata.api-target.order.eline.read
+  - targetAssetKey: mef.sonata.api-target.order.eline.read.delete
+    relationship: implementation.target
+    group: mef.sonata.api-target.order.eline.read.delete
+  - targetAssetKey: mef.sonata.api-target.order.uni.delete
+    relationship: implementation.target
+    group: mef.sonata.api-target.order.uni.delete
+  - targetAssetKey: mef.sonata.api-target.order.uni.read
+    relationship: implementation.target
+    group: mef.sonata.api-target.order.uni.read
+  - targetAssetKey: mef.sonata.api-target.order.uni.read.delete
+    relationship: implementation.target
+    group: mef.sonata.api-target.order.uni.read.delete
+  - targetAssetKey: mef.sonata.api-target.order.uni.add
+    relationship: implementation.target
+    group: mef.sonata.api-target.order.uni.add
+  - targetAssetKey: mef.sonata.api-spec.order
+    relationship: implementation.standard.api-spec
+  - targetAssetKey: mef.sonata.api-target-mapper.order.uni.add
+    relationship: implementation.target-mapper
+    group: mef.sonata.api-target.order.uni.add
+  - targetAssetKey: mef.sonata.api.matrix.order.uni.add
+    relationship: implementation.matrix
+    group: mef.sonata.api-target.order.uni.add
+  - targetAssetKey: mef.sonata.api-target-mapper.order.eline.add
+    relationship: implementation.target-mapper
+    group: mef.sonata.api-target.order.eline.add
+  - targetAssetKey: mef.sonata.api.matrix.order.eline.add
+    relationship: implementation.matrix
+    group: mef.sonata.api-target.order.eline.add
+  - targetAssetKey: mef.sonata.api-target-mapper.order.uni.read
+    relationship: implementation.target-mapper
+    group: mef.sonata.api-target.order.uni.read
+  - targetAssetKey: mef.sonata.api-target-mapper.order.uni.read.delete
+    relationship: implementation.target-mapper
+    group: mef.sonata.api-target.order.uni.read.delete
+  - targetAssetKey: mef.sonata.api-target-mapper.order.eline.read
+    relationship: implementation.target-mapper
+    group: mef.sonata.api-target.order.eline.read
+  - targetAssetKey: mef.sonata.api-target-mapper.order.eline.read.delete
+    relationship: implementation.target-mapper
+    group: mef.sonata.api-target.order.eline.read.delete
+  - targetAssetKey: mef.sonata.api-target-mapper.order.uni.delete
+    relationship: implementation.target-mapper
+    group: mef.sonata.api-target.order.uni.delete
+  - targetAssetKey: mef.sonata.api.matrix.order.uni.delete
+    relationship: implementation.matrix
+    group: mef.sonata.api-target.order.uni.delete
+  - targetAssetKey: mef.sonata.api-target-mapper.order.eline.delete
+    relationship: implementation.target-mapper
+    group: mef.sonata.api-target.order.eline.delete
+  - targetAssetKey: mef.sonata.api.matrix.order.eline.delete
+    relationship: implementation.matrix
+    group: mef.sonata.api-target.order.eline.delete
+  - targetAssetKey: mef.sonata.api.matrix.order.uni.read
+    relationship: implementation.matrix
+    group: mef.sonata.api-target.order.uni.read
+  - targetAssetKey: mef.sonata.api.matrix.order.uni.read.delete
+    relationship: implementation.matrix
+    group: mef.sonata.api-target.order.uni.read.delete
+  - targetAssetKey: mef.sonata.api.matrix.order.eline.read
+    relationship: implementation.matrix
+    group: mef.sonata.api-target.order.eline.read
+  - targetAssetKey: mef.sonata.api.matrix.order.eline.read.delete
+    relationship: implementation.matrix
+    group: mef.sonata.api-target.order.eline.read.delete

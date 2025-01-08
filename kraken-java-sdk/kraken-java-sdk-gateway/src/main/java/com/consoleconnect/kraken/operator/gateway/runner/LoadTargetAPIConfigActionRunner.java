@@ -32,7 +32,8 @@ import org.springframework.web.server.ServerWebExchange;
 
 @Service
 @Slf4j
-public class LoadTargetAPIConfigActionRunner extends AbstractActionRunner {
+public class LoadTargetAPIConfigActionRunner extends AbstractActionRunner
+    implements SellerContactInjector {
 
   public static final String INPUT_CONFIG_KEY = "configKey";
   public static final String INPUT_RENDER = "render";
@@ -115,6 +116,8 @@ public class LoadTargetAPIConfigActionRunner extends AbstractActionRunner {
       StateValueMappingDto stateValueMappingDto,
       Boolean render) {
     renderRequestService.parseRequest(endpoints, stateValueMappingDto);
+    // replace env.seller if the seller contact key exists
+    inject(inputs, asset.getMetadata().getKey());
     if (render != null && render) {
       endpoints.forEach(
           endpoint -> {
