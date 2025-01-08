@@ -45,10 +45,7 @@ public interface SellerContactInjector extends ApiUseCaseSelector {
     Map<String, Object> envMap =
         JsonToolkit.fromJson(
             JsonToolkit.toJson(inputs.get(ENV)), new TypeReference<Map<String, Object>>() {});
-    SellerContactFacets.SellerInfo currentSeller =
-        JsonToolkit.fromJson(
-            JsonToolkit.toJson(envMap.get(SELLER_KEY_WORD)),
-            new TypeReference<SellerContactFacets.SellerInfo>() {});
+    SellerContactFacets.SellerInfo currentSeller = new SellerContactFacets.SellerInfo();
     // Overwrite the configurations of application.yaml with data from the database.
     currentSeller.setName(sellerInfo.getName());
     currentSeller.setNumber(sellerInfo.getNumber());
