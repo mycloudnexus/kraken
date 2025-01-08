@@ -82,6 +82,8 @@ public class LoadTargetAPIConfigActionRunner extends AbstractActionRunner
     }
 
     StateValueMappingDto stateValueMappingDto = new StateValueMappingDto();
+    // replace env.seller if the seller contact key exists
+    inject(inputs, asset.getMetadata().getKey());
     if (facets.getWorkflow() != null && facets.getWorkflow().isEnabled()) {
       UnifiedAssetDto workflowAsset = unifiedAssetService.findOne(facets.getWorkflow().getKey());
       ComponentWorkflowFacets workflowFacts =
@@ -116,8 +118,6 @@ public class LoadTargetAPIConfigActionRunner extends AbstractActionRunner
       StateValueMappingDto stateValueMappingDto,
       Boolean render) {
     renderRequestService.parseRequest(endpoints, stateValueMappingDto);
-    // replace env.seller if the seller contact key exists
-    inject(inputs, asset.getMetadata().getKey());
     if (render != null && render) {
       endpoints.forEach(
           endpoint -> {
