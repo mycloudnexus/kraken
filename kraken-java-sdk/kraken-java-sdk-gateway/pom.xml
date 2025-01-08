@@ -34,6 +34,12 @@
             <version>4.1.4</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.consoleconnect.kraken</groupId>
+            <artifactId>kraken-java-sdk-workflow</artifactId>
+            <version>2.0.0-snapshot.1</version>
+        </dependency>
+
         <!-- SpEL -->
         <dependency>
             <groupId>org.springframework.integration</groupId>

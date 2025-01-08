@@ -1,4 +1,6 @@
-package com.consoleconnect.kraken.operator.gateway.service.workflow;
+package com.consoleconnect.kraken.operator.gateway.service;
+
+import static com.consoleconnect.kraken.operator.core.toolkit.Constants.*;
 
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
@@ -6,11 +8,7 @@ import com.consoleconnect.kraken.operator.gateway.entity.HttpRequestEntity;
 import com.consoleconnect.kraken.operator.gateway.repo.HttpRequestRepository;
 import com.netflix.conductor.sdk.workflow.task.InputParam;
 import com.netflix.conductor.sdk.workflow.task.WorkerTask;
-import jakarta.annotation.PostConstruct;
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 import java.util.*;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -23,14 +21,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @AllArgsConstructor
 @Getter
 public class WorkflowTaskConfig {
-  public static final String FAIL_ORDER_TASK_VALUE = "fail_order_task";
-  public static final String REJECT_ORDER_TASK_VALUE = "reject_order_task";
-  public static final String EMPTY_TASK_VALUE = "empty_task";
-  public static final String PROCESS_ORDER_TASK_VALUE = "process_order_task";
-  public static final String NOTIFY_TASK_VALUE = "notify_task";
-  private static final String WORKFLOW_PARAM_PREFIX = "${workflow.input.%s}";
   private final HttpRequestRepository repository;
-  protected static final Map<String, Map<String, String>> task2InputParamMap = new HashMap<>();
 
   @WorkerTask(NOTIFY_TASK_VALUE)
   public void notify(
@@ -84,22 +75,5 @@ public class WorkflowTaskConfig {
           entity.setRenderedResponse(map);
           repository.save(entity);
         });
-  }
-
-  @PostConstruct
-  public void init() {
-    Class<?> clazz = this.getClass();
-    for (Method method : clazz.getMethods()) {
-      WorkerTask annotation = method.getAnnotation(WorkerTask.class);
-      if (annotation == null) {
-        continue;
-      }
-      Map<String, String> paramMap =
-          Arrays.stream(method.getParameters())
-              .collect(
-                  Collectors.toMap(
-                      Parameter::getName, v -> String.format(WORKFLOW_PARAM_PREFIX, v.getName())));
-      task2InputParamMap.put(annotation.value(), paramMap);
-    }
   }
 }

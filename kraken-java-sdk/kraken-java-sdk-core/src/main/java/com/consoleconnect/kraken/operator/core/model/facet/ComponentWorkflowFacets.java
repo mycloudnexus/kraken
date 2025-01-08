@@ -1,6 +1,6 @@
 package com.consoleconnect.kraken.operator.core.model.facet;
 
-import com.consoleconnect.kraken.operator.core.model.workflow.HttpTask;
+import com.consoleconnect.kraken.operator.core.model.HttpTask;
 import java.util.List;
 import lombok.Data;
 import lombok.Getter;

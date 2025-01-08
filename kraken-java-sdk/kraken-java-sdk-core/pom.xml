@@ -130,20 +130,6 @@
             <artifactId>mapstruct</artifactId>
             <version>1.5.5.Final</version>
         </dependency>
-        <!-- workflow -->
-        <dependency>
-            <groupId>io.orkes.conductor</groupId>
-            <artifactId>orkes-conductor-client</artifactId>
-            <version>2.1.6</version>
-        </dependency>
-
-
-        <!-- workflow dependency -->
-        <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-            <version>2.1</version>
-        </dependency>
 
         <!-- dev -->
         <dependency>
@@ -170,12 +156,6 @@
             <groupId>com.consoleconnect.kraken</groupId>
             <artifactId>kraken-java-sdk-test</artifactId>
             <version>2.0.0-snapshot.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>okhttp</artifactId>
-            <version>3.7.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

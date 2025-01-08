@@ -1,4 +1,4 @@
-package com.consoleconnect.kraken.operator.core.model.workflow;
+package com.consoleconnect.kraken.operator.core.model;
 
 import lombok.Getter;
 import lombok.Setter;

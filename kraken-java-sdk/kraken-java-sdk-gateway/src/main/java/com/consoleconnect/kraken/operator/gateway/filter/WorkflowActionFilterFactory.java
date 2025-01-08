@@ -2,9 +2,9 @@ package com.consoleconnect.kraken.operator.gateway.filter;
 
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
+import com.consoleconnect.kraken.operator.core.model.HttpTask;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPIFacets;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentWorkflowFacets;
-import com.consoleconnect.kraken.operator.core.model.workflow.HttpTask;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.gateway.model.WorkflowPayload;
 import com.consoleconnect.kraken.operator.gateway.model.WorkflowResponse;

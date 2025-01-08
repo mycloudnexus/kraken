@@ -1,4 +1,4 @@
-package com.consoleconnect.kraken.operator.core.model.workflow;
+package com.consoleconnect.kraken.operator.workflow.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.conductor.common.metadata.tasks.TaskType;
@@ -8,14 +8,12 @@ import com.netflix.conductor.sdk.workflow.utils.ObjectMapperProvider;
 import java.util.Arrays;
 import lombok.Getter;
 import lombok.Setter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 @Getter
 @Setter
+@Slf4j
 public class HttpExtend extends Task<HttpExtend> {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(HttpExtend.class);
 
   private static final String INPUT_PARAM = "http_request";
 
@@ -30,7 +28,7 @@ public class HttpExtend extends Task<HttpExtend> {
     super.input(INPUT_PARAM, httpRequest);
   }
 
-  public HttpExtend input(HttpExtend.Input httpRequest) {
+  public HttpExtend input(Input httpRequest) {
     this.httpRequest = httpRequest;
     return this;
   }
@@ -40,7 +38,7 @@ public class HttpExtend extends Task<HttpExtend> {
     return this;
   }
 
-  public HttpExtend method(HttpExtend.Input.HttpMethod method) {
+  public HttpExtend method(Input.HttpMethod method) {
     this.httpRequest.setMethod(method);
     return this;
   }
