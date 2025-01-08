@@ -411,13 +411,7 @@ public class ApiComponentService implements TargetMappingChecker, EndPointUsageC
                               Collectors.mapping(
                                   t -> Tuple2.of(t.getTargetAssetKey(), t.getRelationship()),
                                   Collectors.toList())));
-              groupMap.forEach(
-                  (key, members) -> {
-                    members.add(
-                        Tuple2.of(
-                            component.getMetadata().getKey(), IMPLEMENTATION_WORKFLOW.getKind()));
-                    result.put(key, members);
-                  });
+              result.putAll(groupMap);
             });
     return result;
   }
@@ -437,13 +431,13 @@ public class ApiComponentService implements TargetMappingChecker, EndPointUsageC
                             .equalsIgnoreCase(IMPLEMENTATION_TARGET_MAPPER.getKind())) {
                           apiUseCaseDto.setMapperKey(tuple2.field());
                         }
+                        if (tuple2.value().equalsIgnoreCase(IMPLEMENTATION_WORKFLOW.getKind())) {
+                          apiUseCaseDto.setWorkflowKey(tuple2.field());
+                        }
                         if (tuple2
                             .value()
                             .equalsIgnoreCase(IMPLEMENTATION_MAPPING_MATRIX.getKind())) {
                           apiUseCaseDto.setMappingMatrixKey(tuple2.field());
-                        }
-                        if (tuple2.value().equalsIgnoreCase(IMPLEMENTATION_WORKFLOW.getKind())) {
-                          apiUseCaseDto.setComponentApiKey(tuple2.field());
                         }
                         if (tuple2.value().equalsIgnoreCase(IMPLEMENTATION_TARGET.getKind())) {
                           apiUseCaseDto.setTargetKey(tuple2.field());
