@@ -65,10 +65,10 @@ spec:
                 } else {
                   errorArr = ['api use case is not supported :'];
                   if (!typeArr.includes(type)){
-                    errorArr.push(`expect @{{productOrderItem.product.productConfiguration.@type}} in [ ${typeArr} ], but ${type}.`);
+                    errorArr.push(`expect productOrderItem.product.productConfiguration.@type in [ ${typeArr} ], but ${type}.`);
                   }
                   if (!actionArr.includes(action)) {
-                    errorArr.push(`expect @{{productOrderItem.action}} in [ ${actionArr} ], but ${action}`)
+                    errorArr.push(`expect productOrderItem.action in [ ${actionArr} ], but ${action}`)
                   }
                   errorMsg = errorArr.join(' ');
                   targetAPIConfigKey = 'targetKey:notFound';
@@ -111,11 +111,22 @@ spec:
             render: true
           outputKey: targetApiConfig
 
+        - id: workflow
+          actionType: buildin@workflow
+          env:
+            enabled: ${targetApiConfig.workflow.enabled}
+            synchronous: ${targetApiConfig.workflow.synchronous}
+          outputKey: finalResp
+
         - id: rewrite-path
           actionType: buildin@rewrite-path
           env:
+            workflowEnabled: ${targetApiConfig.workflow.enabled}
             path: ${targetApiConfig.endpoints[0].path}
             method: ${targetApiConfig.endpoints[0].method}
+          with:
+            method: get
+
         - id: modify-request-body
           actionType: buildin@modify-request-body
           env:
@@ -274,10 +285,6 @@ spec:
           with:
             render: true
           outputKey: targetApiConfig
-        - id: mock-response
-          actionType: buildin@mock-response
-          with:
-            forwardDownstream: false
 
         - id: modify-response-body
           actionType: buildin@modify-response-body
@@ -350,6 +357,7 @@ links:
   - targetAssetKey: mef.sonata.api.matrix.order.eline.delete
     relationship: implementation.matrix
     group: mef.sonata.api-target.order.eline.delete
+
   - targetAssetKey: mef.sonata.api.matrix.order.uni.read
     relationship: implementation.matrix
     group: mef.sonata.api-target.order.uni.read

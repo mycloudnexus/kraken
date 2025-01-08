@@ -8,7 +8,6 @@ spec:
   componentPaths:
     - classpath:deployment-config/components/apis/mock-api-response.yaml
     - classpath:deployment-config/components/apis/mef.sonata.api.order.yaml
-    - classpath:deployment-config/components/apis/api.order.yaml
     - classpath:deployment-config/components/api-workflow/api-workflow.order.eline.delete.yaml
     - classpath:deployment-config/components/transformers/echo.yaml
     - classpath:deployment-config/components/transformers/request_echo.yaml
