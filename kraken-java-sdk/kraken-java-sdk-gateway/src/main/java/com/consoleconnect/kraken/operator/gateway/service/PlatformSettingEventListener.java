@@ -74,8 +74,7 @@ public class PlatformSettingEventListener {
       AnnotatedWorkerExecutor annotatedWorkerExecutor =
           new AnnotatedWorkerExecutor(oc.getTaskClient(), 10);
       annotatedWorkerExecutor.addBean(workflowTaskConfig);
-      annotatedWorkerExecutor.initWorkers(
-          "com.consoleconnect.kraken.operator.gateway.service.workflow");
+      annotatedWorkerExecutor.initWorkers("com.consoleconnect.kraken.operator.gateway.service");
     }
   }
 

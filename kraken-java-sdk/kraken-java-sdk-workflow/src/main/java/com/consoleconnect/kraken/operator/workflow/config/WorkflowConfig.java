@@ -28,7 +28,7 @@ import org.springframework.context.annotation.Configuration;
 public class WorkflowConfig {
 
   private final ApplicationContext context;
-  private static final String BUILD_IN_WORKER_TASK_CONTAINER = "workflowTaskConfig";
+  public static final String BUILD_IN_WORKER_TASK_CONTAINER = "workflowTaskConfig";
 
   @Bean
   public OrkesWorkflowClient getWorkflowClient(AppProperty appProperty) {
