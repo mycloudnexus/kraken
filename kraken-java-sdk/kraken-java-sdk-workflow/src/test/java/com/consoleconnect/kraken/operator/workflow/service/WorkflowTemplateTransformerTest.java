@@ -1,7 +1,5 @@
 package com.consoleconnect.kraken.operator.workflow.service;
 
-import static com.consoleconnect.kraken.operator.workflow.config.WorkflowConfig.BUILD_IN_WORKER_TASK_CONTAINER;
-
 import com.consoleconnect.kraken.CustomConfig;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
@@ -18,7 +16,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 
 @MockIntegrationTest
@@ -29,9 +26,6 @@ class WorkflowTemplateTransformerTest extends AbstractIntegrationTest {
   @Autowired WorkflowConfig.BuildInTask buildInTask;
   @Autowired WorkflowTemplateTransformer transformer;
   @Autowired WorkflowConfig workflowConfig;
-
-  @MockBean(name = BUILD_IN_WORKER_TASK_CONTAINER)
-  Object workerTask;
 
   @BeforeEach
   void init() {
