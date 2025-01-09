@@ -34,6 +34,7 @@ public interface ApiUseCaseSelector {
                               Collectors.mapping(
                                   t -> Tuple2.of(t.getTargetAssetKey(), t.getRelationship()),
                                   Collectors.toList())));
+              groupMap.forEach((key, members) -> result.put(key, members));
             });
     return result;
   }
