@@ -1,7 +1,5 @@
 package com.consoleconnect.kraken.operator.transform;
 
-import static com.consoleconnect.kraken.operator.core.enums.AssetLinkKindEnum.*;
-
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
 import com.consoleconnect.kraken.operator.core.enums.DeployStatusEnum;
 import com.consoleconnect.kraken.operator.core.event.IngestionDataResult;
@@ -11,7 +9,7 @@ import com.consoleconnect.kraken.operator.core.ingestion.DataIngestionJob;
 import com.consoleconnect.kraken.operator.core.model.*;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.DateTime;
-import com.consoleconnect.kraken.operator.gateway.service.workflow.WorkflowTemplateTransformer;
+import com.consoleconnect.kraken.operator.workflow.service.WorkflowTemplateTransformer;
 import com.netflix.conductor.common.metadata.workflow.WorkflowDef;
 import io.orkes.conductor.client.http.OrkesMetadataClient;
 import lombok.extern.slf4j.Slf4j;
@@ -28,14 +26,18 @@ public class WorkflowEventListener extends AbstractAssetEventListener {
 
   private final UnifiedAssetService unifiedAssetService;
 
+  private final WorkflowTemplateTransformer workflowTemplateTransformer;
+
   public WorkflowEventListener(
       final ApplicationEventPublisher eventPublisher,
       final AppProperty appProperty,
       final OrkesMetadataClient metadataClient,
-      final UnifiedAssetService unifiedAssetService) {
+      final UnifiedAssetService unifiedAssetService,
+      final WorkflowTemplateTransformer workflowTemplateTransformer) {
     super(eventPublisher, appProperty);
     this.metadataClient = metadataClient;
     this.unifiedAssetService = unifiedAssetService;
+    this.workflowTemplateTransformer = workflowTemplateTransformer;
   }
 
   public AssetKindEnum getKind() {
@@ -46,8 +48,7 @@ public class WorkflowEventListener extends AbstractAssetEventListener {
   public void onPostPersist(
       String productId, FileDescriptor fileDescriptor, UnifiedAsset asset, DataIngestionJob job) {
     log.info("Transforming workflow");
-    WorkflowTemplateTransformer transformer = new WorkflowTemplateTransformer();
-    WorkflowDef workflowDef = transformer.transfer(asset);
+    WorkflowDef workflowDef = workflowTemplateTransformer.transfer(asset);
     try {
       int version = computeNewVersion(asset, workflowDef.getName());
       workflowDef.setVersion(version);

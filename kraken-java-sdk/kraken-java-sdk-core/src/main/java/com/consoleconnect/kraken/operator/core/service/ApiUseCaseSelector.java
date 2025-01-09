@@ -34,13 +34,6 @@ public interface ApiUseCaseSelector {
                               Collectors.mapping(
                                   t -> Tuple2.of(t.getTargetAssetKey(), t.getRelationship()),
                                   Collectors.toList())));
-              groupMap.forEach(
-                  (key, members) -> {
-                    members.add(
-                        Tuple2.of(
-                            component.getMetadata().getKey(), IMPLEMENTATION_WORKFLOW.getKind()));
-                    result.put(key, members);
-                  });
             });
     return result;
   }
@@ -59,8 +52,8 @@ public interface ApiUseCaseSelector {
                     if (IMPLEMENTATION_MAPPING_MATRIX.getKind().equalsIgnoreCase(tuple2.value())) {
                       apiUseCaseDto.setMappingMatrixKey(tuple2.field());
                     }
-                    if (IMPLEMENTATION_WORKFLOW.getKind().equalsIgnoreCase(tuple2.value())) {
-                      apiUseCaseDto.setComponentApiKey(tuple2.field());
+                    if (tuple2.value().equalsIgnoreCase(IMPLEMENTATION_WORKFLOW.getKind())) {
+                      apiUseCaseDto.setWorkflowKey(tuple2.field());
                     }
                     if (IMPLEMENTATION_TARGET.getKind().equalsIgnoreCase(tuple2.value())) {
                       apiUseCaseDto.setTargetKey(tuple2.field());
