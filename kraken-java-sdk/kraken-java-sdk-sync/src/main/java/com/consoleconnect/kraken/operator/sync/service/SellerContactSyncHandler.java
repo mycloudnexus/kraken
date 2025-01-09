@@ -9,6 +9,7 @@ import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.sync.model.SyncProperty;
 import java.util.List;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,10 +17,10 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class SellerContactSyncHandler implements ClientSyncHandler {
+public class SellerContactSyncHandler implements ClientSyncHandler, ParentIdSelector {
 
   private final SyncProperty syncProperty;
-  private final UnifiedAssetRepository unifiedAssetRepository;
+  @Getter private final UnifiedAssetRepository unifiedAssetRepository;
   private final DataIngestionJob dataIngestionJob;
 
   @Override
@@ -36,6 +37,7 @@ public class SellerContactSyncHandler implements ClientSyncHandler {
     assets.forEach(
         assetDto -> {
           IngestDataEvent event = new IngestDataEvent();
+          event.setParentId(parentIdFromProduct());
           event.setAsset(assetDto);
           event.setFullPath(
               ResourceLoaderTypeEnum.generatePath(

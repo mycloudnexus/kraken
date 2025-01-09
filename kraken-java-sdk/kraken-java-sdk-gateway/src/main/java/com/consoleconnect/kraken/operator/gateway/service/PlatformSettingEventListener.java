@@ -7,7 +7,6 @@ import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentTransformerFacets;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
-import com.consoleconnect.kraken.operator.gateway.service.workflow.WorkflowTaskConfig;
 import com.consoleconnect.kraken.operator.gateway.template.JavaScriptEngine;
 import com.netflix.conductor.sdk.workflow.executor.task.AnnotatedWorkerExecutor;
 import io.orkes.conductor.client.ApiClient;
@@ -75,8 +74,7 @@ public class PlatformSettingEventListener {
       AnnotatedWorkerExecutor annotatedWorkerExecutor =
           new AnnotatedWorkerExecutor(oc.getTaskClient(), 10);
       annotatedWorkerExecutor.addBean(workflowTaskConfig);
-      annotatedWorkerExecutor.initWorkers(
-          "com.consoleconnect.kraken.operator.gateway.service.workflow");
+      annotatedWorkerExecutor.initWorkers("com.consoleconnect.kraken.operator.gateway.service");
     }
   }
 

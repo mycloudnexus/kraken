@@ -1,8 +1,9 @@
-package com.consoleconnect.kraken.operator.core.model.workflow;
+package com.consoleconnect.kraken.operator.workflow.model;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.consoleconnect.kraken.operator.core.enums.TaskEnum;
+import com.consoleconnect.kraken.operator.core.model.HttpTask;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
 import com.netflix.conductor.common.metadata.workflow.WorkflowTask;
 import java.util.HashMap;

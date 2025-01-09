@@ -1,16 +1,17 @@
-package com.consoleconnect.kraken.operator.gateway.service.workflow;
+package com.consoleconnect.kraken.operator.workflow.service;
 
 import static com.consoleconnect.kraken.operator.core.enums.WorkflowStageEnum.*;
-import static com.consoleconnect.kraken.operator.gateway.service.workflow.WorkflowTaskConfig.*;
+import static com.consoleconnect.kraken.operator.core.toolkit.Constants.*;
 
 import com.consoleconnect.kraken.operator.core.enums.TaskEnum;
 import com.consoleconnect.kraken.operator.core.enums.WorkflowStageEnum;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
+import com.consoleconnect.kraken.operator.core.model.HttpTask;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentWorkflowFacets;
-import com.consoleconnect.kraken.operator.core.model.workflow.HttpExtend;
-import com.consoleconnect.kraken.operator.core.model.workflow.HttpTask;
+import com.consoleconnect.kraken.operator.workflow.config.WorkflowConfig;
+import com.consoleconnect.kraken.operator.workflow.model.HttpExtend;
 import com.netflix.conductor.common.metadata.tasks.TaskDef;
 import com.netflix.conductor.common.metadata.workflow.WorkflowDef;
 import com.netflix.conductor.common.metadata.workflow.WorkflowTask;
@@ -23,8 +24,11 @@ import java.util.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.stereotype.Component;
 
+@Component
 public class WorkflowTemplateTransformer {
+  private final WorkflowConfig.BuildInTask buildInTask;
   private static final String SUB_REQUEST_BODY = "${workflow.input.payload.%s.body}";
   private static final String SUB_REQUEST_URL = "${workflow.input.payload.%s.url}";
   private static final String SUB_REQUEST_HEADER = "${workflow.input.headers}";
@@ -35,6 +39,10 @@ public class WorkflowTemplateTransformer {
   private static final int RETRY_COUNT = 3;
   private static final String SWITCH_HTTP_CHECK_NAME_PREFIX = "switch_http_check_%s";
   private static final String SWITCH_CUSTOMIZED_CHECK_PREFIX = "switch_%s";
+
+  public WorkflowTemplateTransformer(WorkflowConfig.BuildInTask buildInTask) {
+    this.buildInTask = buildInTask;
+  }
 
   public WorkflowDef transfer(UnifiedAsset asset) {
     ComponentWorkflowFacets facets = UnifiedAsset.getFacets(asset, ComponentWorkflowFacets.class);
@@ -121,7 +129,7 @@ public class WorkflowTemplateTransformer {
   }
 
   private SimpleTask constructSimpleTask(String taskName) {
-    return task2InputParamMap.entrySet().stream()
+    return buildInTask.getParams().entrySet().stream()
         .filter(v -> Objects.equals(taskName, v.getKey()))
         .map(
             entry ->

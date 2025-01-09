@@ -2,11 +2,10 @@ package com.consoleconnect.kraken.operator.controller.dto;
 
 import java.util.List;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class CreateSellerContactRequest {
+public class CreateSellerContactRequest extends SellerContractDto {
   private List<String> productCategories;
-  private String contactName;
-  private String contactEmail;
-  private String contactPhone;
 }

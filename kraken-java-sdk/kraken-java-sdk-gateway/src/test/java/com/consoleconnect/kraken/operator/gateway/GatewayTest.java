@@ -10,16 +10,20 @@ import static org.mockito.ArgumentMatchers.*;
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
+import com.consoleconnect.kraken.operator.gateway.model.WorkflowResponse;
 import com.consoleconnect.kraken.operator.gateway.repo.HttpRequestRepository;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import com.netflix.conductor.common.metadata.workflow.WorkflowDef;
+import com.netflix.conductor.common.run.Workflow;
 import io.orkes.conductor.client.http.OrkesMetadataClient;
 import io.orkes.conductor.client.http.OrkesWorkflowClient;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import lombok.SneakyThrows;
 import org.apache.commons.collections4.CollectionUtils;
@@ -234,9 +238,20 @@ class GatewayTest extends AbstractIntegrationTest {
   void givenOrderPayload_whenDeleteOrder_thenSuccess() {
     WorkflowDef def = new WorkflowDef();
     def.setVersion(1);
-    String id = "worklflow_id";
+    String id = "workflow_id";
+    Workflow workflow = new Workflow();
+    workflow.setWorkflowDefinition(def);
+    WorkflowResponse workflowResponse = new WorkflowResponse();
+    WorkflowResponse.ItemResponse itemResponse = new WorkflowResponse.ItemResponse();
+    itemResponse.setId(id);
+    itemResponse.setResponse(new HashMap<>());
+    workflowResponse.setResult(Map.of(id, itemResponse));
+    workflow.setOutput(JsonToolkit.fromJson(JsonToolkit.toJson(workflowResponse), Map.class));
+    workflow.setStatus(Workflow.WorkflowStatus.COMPLETED);
     Mockito.doReturn(def).when(metaDataClient).getWorkflowDef(anyString(), isNull());
     Mockito.doReturn(id).when(workflowClient).startWorkflow(any());
+    Mockito.doReturn(workflow).when(workflowClient).getWorkflow(anyString(), anyBoolean());
+
     webTestClient
         .mutate()
         .responseTimeout(Duration.ofSeconds(600))
@@ -247,9 +262,6 @@ class GatewayTest extends AbstractIntegrationTest {
                 uriBuilder
                     .path("/mefApi/sonata/productOrderingManagement/v10/productOrder")
                     .queryParam("buyerId", "cc-company")
-                    .queryParam("page", 0)
-                    .queryParam("pageSize", 24)
-                    .queryParam("criteria", "%7B%7D")
                     .build())
         .bodyValue(
             JsonToolkit.fromJson(

@@ -2,9 +2,9 @@ package com.consoleconnect.kraken.operator.gateway.filter;
 
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
+import com.consoleconnect.kraken.operator.core.model.HttpTask;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPIFacets;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentWorkflowFacets;
-import com.consoleconnect.kraken.operator.core.model.workflow.HttpTask;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.gateway.model.WorkflowPayload;
 import com.consoleconnect.kraken.operator.gateway.model.WorkflowResponse;
@@ -118,7 +118,7 @@ public class WorkflowActionFilterFactory
             JsonToolkit.toJson(inputs.get(VAR_WORKFLOW_CONFIG)), ComponentWorkflowFacets.class);
     WorkflowPayload payload = new WorkflowPayload();
     payload.setId((String) inputs.get(VAR_ENTITY_ID));
-    //    payload.setHeaders(exchange.getRequest().getHeaders().toSingleValueMap());
+    payload.setHeaders(exchange.getRequest().getHeaders().toSingleValueMap());
     payload.setHeaders(new HashMap<>());
     workflowFacets.getValidationStage().stream()
         .forEach(task -> constructHttpPayload(task, payload, inputs));
@@ -128,7 +128,7 @@ public class WorkflowActionFilterFactory
         .forEach(task -> constructHttpPayload(task, payload, inputs));
 
     StartWorkflowRequest request = new StartWorkflowRequest();
-    Map map = JsonToolkit.fromJson(payload, Map.class);
+    Map<String, Object> map = JsonToolkit.fromJson(payload, Map.class);
     request.setInput(map);
     request.setName(workflowFacets.getMetaData().getWorkflowName());
     request.setVersion(getLatestVersion(config.getMetadataClient(), request.getName()));

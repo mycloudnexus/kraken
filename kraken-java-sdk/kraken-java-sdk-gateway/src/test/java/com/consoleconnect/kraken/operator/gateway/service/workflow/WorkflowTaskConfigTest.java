@@ -7,6 +7,7 @@ import static org.mockito.Mockito.*;
 import com.consoleconnect.kraken.operator.gateway.CustomConfig;
 import com.consoleconnect.kraken.operator.gateway.entity.HttpRequestEntity;
 import com.consoleconnect.kraken.operator.gateway.repo.HttpRequestRepository;
+import com.consoleconnect.kraken.operator.gateway.service.WorkflowTaskConfig;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import java.util.*;

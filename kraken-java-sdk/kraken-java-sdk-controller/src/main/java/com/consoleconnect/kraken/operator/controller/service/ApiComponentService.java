@@ -1,6 +1,5 @@
 package com.consoleconnect.kraken.operator.controller.service;
 
-import static com.consoleconnect.kraken.operator.core.enums.AssetLinkKindEnum.*;
 import static com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants.*;
 import static com.consoleconnect.kraken.operator.core.toolkit.LabelConstants.*;
 
@@ -11,6 +10,7 @@ import com.consoleconnect.kraken.operator.controller.model.ComponentTagFacet;
 import com.consoleconnect.kraken.operator.controller.model.DeploymentFacet;
 import com.consoleconnect.kraken.operator.controller.model.Environment;
 import com.consoleconnect.kraken.operator.controller.tools.VersionHelper;
+import com.consoleconnect.kraken.operator.core.dto.ApiUseCaseDto;
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.entity.*;
@@ -22,6 +22,7 @@ import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFac
 import com.consoleconnect.kraken.operator.core.repo.AssetFacetRepository;
 import com.consoleconnect.kraken.operator.core.repo.EnvironmentClientRepository;
 import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
+import com.consoleconnect.kraken.operator.core.service.ApiUseCaseSelector;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.*;
 import java.util.*;
@@ -44,7 +45,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 @AllArgsConstructor
 @Service
-public class ApiComponentService implements TargetMappingChecker, EndPointUsageCalculator {
+public class ApiComponentService
+    implements TargetMappingChecker, EndPointUsageCalculator, ApiUseCaseSelector {
   private static final Logger log = LoggerFactory.getLogger(ApiComponentService.class);
   public static final KrakenException ASSET_NOT_FOUND = KrakenException.notFound("asset not found");
   @Getter private final UnifiedAssetService unifiedAssetService;
@@ -393,60 +395,6 @@ public class ApiComponentService implements TargetMappingChecker, EndPointUsageC
     detail.setUpdatedAt(mapperAsset.getUpdatedAt());
     detail.setUpdatedBy(mapperAsset.getUpdatedBy());
     return detail;
-  }
-
-  public Map<String, List<Tuple2>> findApiUseCase() {
-    // groupKey,<componentKey,assetLinkKind>
-    Map<String, List<Tuple2>> result = new HashMap<>();
-    unifiedAssetService.findByKind(AssetKindEnum.COMPONENT_API.getKind()).stream()
-        .filter(component -> CollectionUtils.isNotEmpty(component.getLinks()))
-        .forEach(
-            component -> {
-              Map<String, List<Tuple2>> groupMap =
-                  component.getLinks().stream()
-                      .filter(assetLink -> assetLink.getGroup() != null)
-                      .collect(
-                          Collectors.groupingBy(
-                              AssetLink::getGroup,
-                              Collectors.mapping(
-                                  t -> Tuple2.of(t.getTargetAssetKey(), t.getRelationship()),
-                                  Collectors.toList())));
-              result.putAll(groupMap);
-            });
-    return result;
-  }
-
-  public Optional<ApiUseCaseDto> findRelatedApiUse(
-      String key, Map<String, List<Tuple2>> apiUseCaseMap) {
-    return apiUseCaseMap.entrySet().stream()
-        .map(
-            entry -> {
-              ApiUseCaseDto apiUseCaseDto = new ApiUseCaseDto();
-              entry
-                  .getValue()
-                  .forEach(
-                      tuple2 -> {
-                        if (tuple2
-                            .value()
-                            .equalsIgnoreCase(IMPLEMENTATION_TARGET_MAPPER.getKind())) {
-                          apiUseCaseDto.setMapperKey(tuple2.field());
-                        }
-                        if (tuple2.value().equalsIgnoreCase(IMPLEMENTATION_WORKFLOW.getKind())) {
-                          apiUseCaseDto.setWorkflowKey(tuple2.field());
-                        }
-                        if (tuple2
-                            .value()
-                            .equalsIgnoreCase(IMPLEMENTATION_MAPPING_MATRIX.getKind())) {
-                          apiUseCaseDto.setMappingMatrixKey(tuple2.field());
-                        }
-                        if (tuple2.value().equalsIgnoreCase(IMPLEMENTATION_TARGET.getKind())) {
-                          apiUseCaseDto.setTargetKey(tuple2.field());
-                        }
-                      });
-              return apiUseCaseDto;
-            })
-        .filter(t -> t.membersExcludeApiKey().contains(key))
-        .findFirst();
   }
 
   public Optional<ApiUseCaseDto> findRelatedApiUse(String key) {

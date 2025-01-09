@@ -19,6 +19,7 @@ spec:
   endpoints:
     - id: delete connection by id
       path: ""
+      url: "mock-url"
       method: ""
       responseBody: |
         {

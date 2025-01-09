@@ -3,7 +3,7 @@
     "access.eline",
     "internet.access"
   ],
-  "contactName": "test-contact-name",
-  "contactEmail": "test-contact@gmail.com",
-  "contactPhone": "1234567"
+  "name": "test-contact-name",
+  "emailAddress": "test-contact@gmail.com",
+  "number": "1234567"
 }

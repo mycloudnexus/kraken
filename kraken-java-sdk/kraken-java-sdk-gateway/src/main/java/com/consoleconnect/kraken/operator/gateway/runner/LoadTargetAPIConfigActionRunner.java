@@ -9,11 +9,11 @@ import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.enums.ActionTypeEnum;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
+import com.consoleconnect.kraken.operator.core.model.HttpTask;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPIFacets;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentWorkflowFacets;
-import com.consoleconnect.kraken.operator.core.model.workflow.HttpTask;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.gateway.filter.KrakenFilterConstants;
@@ -26,12 +26,14 @@ import java.util.*;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ServerWebExchange;
 
 @Service
 @Slf4j
-public class LoadTargetAPIConfigActionRunner extends AbstractActionRunner {
+public class LoadTargetAPIConfigActionRunner extends AbstractActionRunner
+    implements SellerContactInjector {
 
   public static final String INPUT_CONFIG_KEY = "configKey";
   public static final String INPUT_RENDER = "render";
@@ -69,19 +71,19 @@ public class LoadTargetAPIConfigActionRunner extends AbstractActionRunner {
     // merge mapper and base template file
     mergeMappers(asset, facets);
 
-    //    String serverKey = facets.getEndpoints().get(0).getServerKey();
-    //    if (StringUtils.isNotBlank(facets.getEndpoints().get(0).getUrl())) {
-    //      outputs.put(
-    //          "url", SpELEngine.evaluate(facets.getEndpoints().get(0).getUrl(), inputs,
-    // String.class));
-    //    } else {
-    //      // serverKey
-    //      String serverUrl = getServerUrl(serverKey);
-    //      outputs.put("url", serverUrl);
-    //    }
-    outputs.put("url", "https://79822d20-557f-4620-b5c3-b83d8457d8e0.mock.pstmn.io");
+    String serverKey = facets.getEndpoints().get(0).getServerKey();
+    if (StringUtils.isNotBlank(facets.getEndpoints().get(0).getUrl())) {
+      outputs.put(
+          "url", SpELEngine.evaluate(facets.getEndpoints().get(0).getUrl(), inputs, String.class));
+    } else {
+      // serverKey
+      String serverUrl = getServerUrl(serverKey);
+      outputs.put("url", serverUrl);
+    }
 
     StateValueMappingDto stateValueMappingDto = new StateValueMappingDto();
+    // replace env.seller if the seller contact key exists
+    inject(inputs, asset.getMetadata().getKey());
     if (facets.getWorkflow() != null && facets.getWorkflow().isEnabled()) {
       UnifiedAssetDto workflowAsset = unifiedAssetService.findOne(facets.getWorkflow().getKey());
       ComponentWorkflowFacets workflowFacts =

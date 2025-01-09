@@ -1,4 +1,4 @@
-package com.consoleconnect.kraken.operator.core.model.workflow;
+package com.consoleconnect.kraken.operator.core.model;
 
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
 import lombok.Data;
