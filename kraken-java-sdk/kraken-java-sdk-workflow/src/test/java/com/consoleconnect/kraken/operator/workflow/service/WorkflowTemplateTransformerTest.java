@@ -8,12 +8,10 @@ import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import com.consoleconnect.kraken.operator.workflow.config.WorkflowConfig;
 import com.netflix.conductor.common.metadata.workflow.WorkflowDef;
-import java.util.Collections;
 import java.util.Optional;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -26,15 +24,6 @@ class WorkflowTemplateTransformerTest extends AbstractIntegrationTest {
   @Autowired WorkflowConfig.BuildInTask buildInTask;
   @Autowired WorkflowTemplateTransformer transformer;
   @Autowired WorkflowConfig workflowConfig;
-
-  @BeforeEach
-  void init() {
-    this.buildInTask.getParams().put("empty_task", Collections.emptyMap());
-    this.buildInTask.getParams().put("fail_order_task", Collections.emptyMap());
-    this.buildInTask.getParams().put("reject_order_task", Collections.emptyMap());
-    this.buildInTask.getParams().put("process_order_task", Collections.emptyMap());
-    this.buildInTask.getParams().put("notify_task", Collections.emptyMap());
-  }
 
   @Test
   @SneakyThrows

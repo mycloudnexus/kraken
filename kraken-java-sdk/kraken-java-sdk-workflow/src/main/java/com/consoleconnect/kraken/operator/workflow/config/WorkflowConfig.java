@@ -3,6 +3,7 @@ package com.consoleconnect.kraken.operator.workflow.config;
 import static com.consoleconnect.kraken.operator.core.toolkit.Constants.WORKFLOW_PARAM_PREFIX;
 
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
+import com.consoleconnect.kraken.operator.workflow.service.WorkflowTaskRegister;
 import com.netflix.conductor.sdk.workflow.task.WorkerTask;
 import io.orkes.conductor.client.ApiClient;
 import io.orkes.conductor.client.http.OrkesMetadataClient;
@@ -17,7 +18,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -26,10 +26,6 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 @AllArgsConstructor
 public class WorkflowConfig {
-
-  private final ApplicationContext context;
-  public static final String BUILD_IN_WORKER_TASK_CONTAINER = "workflowTaskConfig";
-
   @Bean
   public OrkesWorkflowClient getWorkflowClient(AppProperty appProperty) {
     return new OrkesWorkflowClient(getApiClient(appProperty));
@@ -53,12 +49,8 @@ public class WorkflowConfig {
   @Bean
   public BuildInTask getBuildinTask() {
     BuildInTask buildInTask = new BuildInTask();
-    if (!context.containsBean(BUILD_IN_WORKER_TASK_CONTAINER)) {
-      return buildInTask;
-    }
-    Class<?> clazz = context.getBean(BUILD_IN_WORKER_TASK_CONTAINER).getClass();
     Map<String, Map<String, String>> task2InputParamMap = new HashMap<>();
-    for (Method method : clazz.getMethods()) {
+    for (Method method : WorkflowTaskRegister.class.getMethods()) {
       WorkerTask annotation = method.getAnnotation(WorkerTask.class);
       if (annotation == null) {
         continue;
