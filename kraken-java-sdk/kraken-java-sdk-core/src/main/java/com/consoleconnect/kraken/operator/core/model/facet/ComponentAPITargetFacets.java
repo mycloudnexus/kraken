@@ -52,6 +52,7 @@ public class ComponentAPITargetFacets {
     private String targetLocation;
     private Boolean requiredMapping = Boolean.TRUE;
     private Boolean replaceStar = Boolean.TRUE;
+    private Boolean allowValueLimit = Boolean.FALSE;
     private String defaultValue;
     private List<String> targetValues;
     private Map<String, String> valueMapping;

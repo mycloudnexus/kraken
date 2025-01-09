@@ -1,4 +1,4 @@
-package com.consoleconnect.kraken.operator.controller.dto;
+package com.consoleconnect.kraken.operator.core.dto;
 
 import java.util.List;
 import java.util.Objects;

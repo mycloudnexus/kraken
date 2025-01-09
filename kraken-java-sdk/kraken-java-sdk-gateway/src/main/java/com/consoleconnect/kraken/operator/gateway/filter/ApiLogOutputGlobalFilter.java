@@ -7,6 +7,7 @@ import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
 import com.consoleconnect.kraken.operator.core.enums.SyncStatusEnum;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
+import com.consoleconnect.kraken.operator.core.service.ApiActivityLogService;
 import com.consoleconnect.kraken.operator.gateway.service.FilterHeaderService;
 import java.util.Objects;
 import java.util.Optional;
@@ -28,8 +29,9 @@ public class ApiLogOutputGlobalFilter extends AbstractGlobalFilter {
   public ApiLogOutputGlobalFilter(
       AppProperty appProperty,
       ApiActivityLogRepository apiActivityLogRepository,
-      FilterHeaderService filterHeaderService) {
-    super(appProperty, apiActivityLogRepository, filterHeaderService);
+      FilterHeaderService filterHeaderService,
+      ApiActivityLogService apiActivityLogService) {
+    super(appProperty, apiActivityLogRepository, filterHeaderService, apiActivityLogService);
   }
 
   @Override
@@ -61,7 +63,7 @@ public class ApiLogOutputGlobalFilter extends AbstractGlobalFilter {
                         apiActivityLogEntity.setHttpStatusCode(
                             Objects.requireNonNull(exchange.getResponse().getStatusCode()).value());
                         apiActivityLogEntity.setSyncStatus(SyncStatusEnum.UNDEFINED);
-                        apiActivityLogRepository.save(apiActivityLogEntity);
+                        apiActivityLogService.save(apiActivityLogEntity);
                         return this.getDelegate().writeWith(Mono.just(db));
                       } catch (Exception e) {
                         log.error("tracing final response error", e);

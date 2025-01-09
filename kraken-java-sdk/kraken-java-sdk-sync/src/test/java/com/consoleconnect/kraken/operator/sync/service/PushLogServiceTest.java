@@ -3,6 +3,7 @@ package com.consoleconnect.kraken.operator.sync.service;
 import static org.mockito.Mockito.*;
 
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
+import com.consoleconnect.kraken.operator.core.enums.LifeStatusEnum;
 import com.consoleconnect.kraken.operator.core.enums.SyncStatusEnum;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
@@ -38,6 +39,7 @@ class PushLogServiceTest extends AbstractIntegrationTest {
     // given
     ApiActivityLogEntity apiActivityLogEntity = new ApiActivityLogEntity();
     apiActivityLogEntity.setSyncStatus(SyncStatusEnum.UNDEFINED);
+    apiActivityLogEntity.setLifeStatus(LifeStatusEnum.LIVE);
     apiActivityLogEntity.setRequestId(UUID.randomUUID().toString());
     apiActivityLogEntity.setMethod("GET");
     apiActivityLogEntity.setPath("/api/v1/test");
