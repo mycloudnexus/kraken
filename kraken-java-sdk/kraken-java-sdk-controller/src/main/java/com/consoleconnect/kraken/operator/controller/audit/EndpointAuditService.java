@@ -60,7 +60,8 @@ public class EndpointAuditService implements UUIDWrapper {
 
   public EndpointAuditEntity findOne(String id) {
     return getUUID(id)
-           .map(endpointAuditRepository::findById).flatMap(x -> x)
+        .map(endpointAuditRepository::findById)
+        .flatMap(x -> x)
         .orElseThrow(() -> KrakenException.notFound("Asset not found,key=" + id));
   }
 }
