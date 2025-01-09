@@ -8,6 +8,7 @@ import com.consoleconnect.kraken.operator.core.model.facet.ComponentTransformerF
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.gateway.template.JavaScriptEngine;
+import com.consoleconnect.kraken.operator.workflow.service.WorkflowTaskRegister;
 import com.netflix.conductor.sdk.workflow.executor.task.AnnotatedWorkerExecutor;
 import io.orkes.conductor.client.ApiClient;
 import io.orkes.conductor.client.OrkesClients;
@@ -30,7 +31,7 @@ public class PlatformSettingEventListener {
   private final UnifiedAssetService unifiedAssetService;
   private final DataIngestionJob dataIngestionJob;
   private final ApiClient apiClient;
-  private final WorkflowTaskConfig workflowTaskConfig;
+  private final WorkflowTaskRegister workflowTaskConfig;
   private final AppProperty appProperty;
 
   @EventListener(PlatformSettingCompletedEvent.class)
@@ -74,7 +75,7 @@ public class PlatformSettingEventListener {
       AnnotatedWorkerExecutor annotatedWorkerExecutor =
           new AnnotatedWorkerExecutor(oc.getTaskClient(), 10);
       annotatedWorkerExecutor.addBean(workflowTaskConfig);
-      annotatedWorkerExecutor.initWorkers("com.consoleconnect.kraken.operator.gateway.service");
+      annotatedWorkerExecutor.initWorkers("com.consoleconnect.kraken.operator.workflow.service");
     }
   }
 

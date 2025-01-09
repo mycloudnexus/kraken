@@ -6,6 +6,7 @@ import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.gateway.entity.HttpRequestEntity;
 import com.consoleconnect.kraken.operator.gateway.repo.HttpRequestRepository;
+import com.consoleconnect.kraken.operator.workflow.service.WorkflowTaskRegister;
 import com.netflix.conductor.sdk.workflow.task.InputParam;
 import com.netflix.conductor.sdk.workflow.task.WorkerTask;
 import java.util.*;
@@ -20,7 +21,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Component
 @AllArgsConstructor
 @Getter
-public class WorkflowTaskConfig {
+public class WorkflowTaskConfig implements WorkflowTaskRegister {
   private final HttpRequestRepository repository;
 
   @WorkerTask(NOTIFY_TASK_VALUE)
