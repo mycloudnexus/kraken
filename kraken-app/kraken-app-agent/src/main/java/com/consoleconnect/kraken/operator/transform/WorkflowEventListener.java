@@ -22,6 +22,8 @@ public class WorkflowEventListener extends AbstractAssetEventListener {
 
   public static final String KEY_WORKFLOW_DEF = "workflowDef";
 
+  public static final String LABEL_WORKFLOW_DEF_VERSION = "workflow-def-version";
+
   private final OrkesMetadataClient metadataClient;
 
   private final UnifiedAssetService unifiedAssetService;
@@ -73,6 +75,7 @@ public class WorkflowEventListener extends AbstractAssetEventListener {
     SyncMetadata syncMetadata = new SyncMetadata("", "", DateTime.nowInUTCString());
     deployment.getMetadata().setStatus(DeployStatusEnum.SUCCESS.name());
     deployment.getMetadata().setVersion(version);
+    deployment.getMetadata().getLabels().put(LABEL_WORKFLOW_DEF_VERSION, "" + version);
 
     IngestionDataResult result =
         unifiedAssetService.syncAsset(
