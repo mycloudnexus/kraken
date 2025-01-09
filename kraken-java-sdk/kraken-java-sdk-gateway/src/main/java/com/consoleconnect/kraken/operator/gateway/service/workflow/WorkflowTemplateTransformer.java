@@ -40,7 +40,6 @@ public class WorkflowTemplateTransformer {
     ComponentWorkflowFacets facets = UnifiedAsset.getFacets(asset, ComponentWorkflowFacets.class);
     WorkflowDef workflowDef = new WorkflowDef();
     workflowDef.setName(facets.getMetaData().getWorkflowName());
-    workflowDef.setVersion(asset.getMetadata().getVersion());
     workflowDef.setOwnerEmail("example@email.com");
     List<WorkflowTask> taskList = new ArrayList<>();
     workflowDef.setTasks(taskList);
