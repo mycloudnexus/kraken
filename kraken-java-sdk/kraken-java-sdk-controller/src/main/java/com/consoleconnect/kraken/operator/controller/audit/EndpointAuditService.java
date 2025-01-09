@@ -62,6 +62,6 @@ public class EndpointAuditService implements UUIDWrapper {
     return getUUID(id)
         .map(endpointAuditRepository::findById)
         .flatMap(x -> x)
-        .orElseThrow(() -> KrakenException.notFound("Asset not found,key=" + id));
+        .orElseThrow(() -> KrakenException.notFound("Audit log not found,key=" + id));
   }
 }
