@@ -128,7 +128,7 @@ export const getAPIServers = (
   return request(
     `/v2${PRODUCT}/${productId}/components/${productId}/api-servers`,
     {
-      params: { ...params, facetIncluded: true },
+      params: { ...params, facetIncluded: false },
     }
   );
 };
@@ -371,10 +371,7 @@ export const regenerateBuyerAccessToken = (productId: string, id: string) => {
   });
 };
 
-export const getValidateServerName = (
-  productId: string,
-  name: string
-) => {
+export const getValidateServerName = (productId: string, name: string) => {
   return request(
     `/v2${PRODUCT}/${productId}/components/${productId}/api-servers/${name}`,
     {
