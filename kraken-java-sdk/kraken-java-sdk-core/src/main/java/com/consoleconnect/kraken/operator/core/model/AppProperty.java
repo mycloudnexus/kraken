@@ -40,5 +40,12 @@ public class AppProperty {
     private Integer pollTimes = 30;
     private Long pollInterval = 2000l;
     private boolean enabled = false;
+
+    private WorkflowDeploymentConfig deployment;
+  }
+
+  @Data
+  public static class WorkflowDeploymentConfig {
+    private boolean enabled = false;
   }
 }

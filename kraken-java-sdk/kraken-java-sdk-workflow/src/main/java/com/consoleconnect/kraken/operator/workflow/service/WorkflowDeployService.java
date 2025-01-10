@@ -8,13 +8,19 @@ import com.consoleconnect.kraken.operator.core.model.SyncMetadata;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.DateTime;
+import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
+import com.consoleconnect.kraken.operator.workflow.model.WorkflowDeploymentFacets;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.netflix.conductor.common.metadata.workflow.WorkflowDef;
 import io.orkes.conductor.client.http.OrkesMetadataClient;
+import java.util.Map;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
+@AllArgsConstructor
 public class WorkflowDeployService {
 
   public static final String KEY_WORKFLOW_DEF = "workflowDef";
@@ -27,23 +33,14 @@ public class WorkflowDeployService {
 
   private final WorkflowTemplateTransformer workflowTemplateTransformer;
 
-  public WorkflowDeployService(
-      final OrkesMetadataClient metadataClient,
-      final UnifiedAssetService unifiedAssetService,
-      final WorkflowTemplateTransformer workflowTemplateTransformer) {
-    this.metadataClient = metadataClient;
-    this.unifiedAssetService = unifiedAssetService;
-    this.workflowTemplateTransformer = workflowTemplateTransformer;
-  }
-
   public AssetKindEnum getKind() {
     return AssetKindEnum.COMPONENT_API_WORK_FLOW;
   }
 
   public void deployWorkflow(UnifiedAsset asset) {
     log.info("Transforming workflow");
-    WorkflowDef workflowDef = workflowTemplateTransformer.transfer(asset);
     try {
+      WorkflowDef workflowDef = workflowTemplateTransformer.transfer(asset);
       int version = computeNewVersion(asset, workflowDef.getName());
       workflowDef.setVersion(version);
       log.info("Deploying workflow to conductor, {} v{}", workflowDef.getName(), version);
@@ -69,6 +66,15 @@ public class WorkflowDeployService {
     deployment.getMetadata().setStatus(DeployStatusEnum.SUCCESS.name());
     deployment.getMetadata().setVersion(version);
     deployment.getMetadata().getLabels().put(LABEL_WORKFLOW_DEF_VERSION, "" + version);
+    WorkflowDeploymentFacets workflowDeploymentFacets =
+        WorkflowDeploymentFacets.builder()
+            .assetVersion(workflow.getMetadata().getVersion())
+            .targetVersion(version)
+            .build();
+    Map<String, Object> facets =
+        JsonToolkit.fromJson(
+            JsonToolkit.toJson(workflowDeploymentFacets), new TypeReference<>() {});
+    deployment.setFacets(facets);
 
     IngestionDataResult result =
         unifiedAssetService.syncAsset(

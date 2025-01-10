@@ -7,11 +7,16 @@ import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.core.model.FileDescriptor;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
+@ConditionalOnProperty(
+    value = "app.workflow.deployment.enabled",
+    havingValue = "true",
+    matchIfMissing = false)
 public class WorkflowEventListener extends AbstractAssetEventListener {
 
   private final WorkflowDeployService workflowDeployService;

@@ -90,6 +90,8 @@ app:
   workflow:
     enabled: false
     base-url: http://base-url.com
+    deployment:
+      enabled: true
   tenant:
     tenantId: ef90f7e7-dc7d-4538-aa5b-a4a7d8432da2
     mode: SINGLE
