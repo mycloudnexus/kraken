@@ -1,7 +1,6 @@
 package com.consoleconnect.kraken.operator.core.service;
 
 import static com.consoleconnect.kraken.operator.core.enums.AssetLinkKindEnum.*;
-import static com.consoleconnect.kraken.operator.core.enums.AssetLinkKindEnum.IMPLEMENTATION_TARGET;
 
 import com.consoleconnect.kraken.operator.core.dto.ApiUseCaseDto;
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
@@ -11,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -34,7 +34,12 @@ public interface ApiUseCaseSelector {
                               Collectors.mapping(
                                   t -> Tuple2.of(t.getTargetAssetKey(), t.getRelationship()),
                                   Collectors.toList())));
-              groupMap.forEach((key, members) -> result.put(key, members));
+              groupMap.forEach(
+                  (key, members) -> {
+                    members.add(
+                        Tuple2.of(component.getMetadata().getKey(), COMPONENT_API.getKind()));
+                    result.put(key, members);
+                  });
             });
     return result;
   }
@@ -42,27 +47,51 @@ public interface ApiUseCaseSelector {
   default Optional<ApiUseCaseDto> findRelatedApiUse(
       String key, Map<String, List<Tuple2>> apiUseCaseMap) {
     return apiUseCaseMap.values().stream()
-        .map(
-            tuple2s -> {
-              ApiUseCaseDto apiUseCaseDto = new ApiUseCaseDto();
-              tuple2s.forEach(
-                  tuple2 -> {
-                    if (IMPLEMENTATION_TARGET_MAPPER.getKind().equalsIgnoreCase(tuple2.value())) {
-                      apiUseCaseDto.setMapperKey(tuple2.field());
-                    }
-                    if (IMPLEMENTATION_MAPPING_MATRIX.getKind().equalsIgnoreCase(tuple2.value())) {
-                      apiUseCaseDto.setMappingMatrixKey(tuple2.field());
-                    }
-                    if (tuple2.value().equalsIgnoreCase(IMPLEMENTATION_WORKFLOW.getKind())) {
-                      apiUseCaseDto.setWorkflowKey(tuple2.field());
-                    }
-                    if (IMPLEMENTATION_TARGET.getKind().equalsIgnoreCase(tuple2.value())) {
-                      apiUseCaseDto.setTargetKey(tuple2.field());
-                    }
-                  });
-              return apiUseCaseDto;
-            })
+        .map(this::createReferences)
         .filter(t -> t.membersExcludeApiKey().contains(key))
         .findFirst();
   }
+
+  private ApiUseCaseDto createReferences(List<Tuple2> tuple2s) {
+    final ApiUseCaseDto apiUseCaseDto = new ApiUseCaseDto();
+    tuple2s.stream()
+        .forEach(
+            link -> {
+              if (referenceHandlers.containsKey(link.value())) {
+                referenceHandlers.get(link.value()).accept(link.field(), apiUseCaseDto);
+              }
+            });
+    return apiUseCaseDto;
+  }
+
+  private static void handleComponent(String key, ApiUseCaseDto apiUseCaseDto) {
+    apiUseCaseDto.setComponentApiKey(key);
+  }
+
+  private static void handleTargetMapper(String key, ApiUseCaseDto apiUseCaseDto) {
+    apiUseCaseDto.setMapperKey(key);
+  }
+
+  private static void handleWorkflow(String key, ApiUseCaseDto apiUseCaseDto) {
+    apiUseCaseDto.setWorkflowKey(key);
+  }
+
+  private static void handleMappingMatrix(String key, ApiUseCaseDto apiUseCaseDto) {
+    apiUseCaseDto.setMappingMatrixKey(key);
+  }
+
+  private static void handleApiTarget(String key, ApiUseCaseDto apiUseCaseDto) {
+    apiUseCaseDto.setTargetKey(key);
+  }
+
+  static final Map<String, BiConsumer<String, ApiUseCaseDto>> referenceHandlers =
+      new HashMap<>() {
+        {
+          put(COMPONENT_API.getKind(), ApiUseCaseSelector::handleComponent);
+          put(IMPLEMENTATION_TARGET_MAPPER.getKind(), ApiUseCaseSelector::handleTargetMapper);
+          put(IMPLEMENTATION_WORKFLOW.getKind(), ApiUseCaseSelector::handleWorkflow);
+          put(IMPLEMENTATION_MAPPING_MATRIX.getKind(), ApiUseCaseSelector::handleMappingMatrix);
+          put(IMPLEMENTATION_TARGET.getKind(), ApiUseCaseSelector::handleApiTarget);
+        }
+      };
 }

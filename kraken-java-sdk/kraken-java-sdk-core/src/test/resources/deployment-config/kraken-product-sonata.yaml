@@ -15,7 +15,9 @@ spec:
     - classpath:deployment-config/components/transformers/request_echo.yaml
     - classpath:deployment-config/components/transformers/response_echo.yaml
     - classpath:deployment-config/components/api-targets/mef.sonata.api.order.eline.add.yaml
+    - classpath:deployment-config/components/api-targets/mef.sonata.api.order.eline.delete.yaml
     - classpath:deployment-config/components/api-targets/test.add.component.yaml
     - classpath:deployment-config/components/api-targets-mappers/api-target-mapper.order.eline.add.yaml
+    - classpath:deployment-config/components/api-workflow/api-target-mapper.order.eline.delete.yaml
     - classpath:deployment-config/components/api-targets-mappers/api-target-mapper.quote.uni.add.yaml
     - classpath:deployment-config/components/template-upgrade/release.1.4.7.yaml

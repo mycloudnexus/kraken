@@ -336,6 +336,9 @@ links:
   - targetAssetKey: mef.sonata.api-target-mapper.order.eline.delete
     relationship: implementation.target-mapper
     group: mef.sonata.api-target.order.eline.delete
+  - targetAssetKey: mef.sonata.api-workflow.order.eline.delete
+    relationship: implementation.workflow
+    group: mef.sonata.api-target.order.eline.delete
   - targetAssetKey: mef.sonata.api.matrix.order.eline.delete
     relationship: implementation.matrix
     group: mef.sonata.api-target.order.eline.delete
