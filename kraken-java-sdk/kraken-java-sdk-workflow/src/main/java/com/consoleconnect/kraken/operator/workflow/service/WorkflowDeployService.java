@@ -1,24 +1,21 @@
-package com.consoleconnect.kraken.operator.transform;
+package com.consoleconnect.kraken.operator.workflow.service;
 
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
 import com.consoleconnect.kraken.operator.core.enums.DeployStatusEnum;
 import com.consoleconnect.kraken.operator.core.event.IngestionDataResult;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
-import com.consoleconnect.kraken.operator.core.ingestion.AbstractAssetEventListener;
-import com.consoleconnect.kraken.operator.core.ingestion.DataIngestionJob;
-import com.consoleconnect.kraken.operator.core.model.*;
+import com.consoleconnect.kraken.operator.core.model.SyncMetadata;
+import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.DateTime;
-import com.consoleconnect.kraken.operator.workflow.service.WorkflowTemplateTransformer;
 import com.netflix.conductor.common.metadata.workflow.WorkflowDef;
 import io.orkes.conductor.client.http.OrkesMetadataClient;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-public class WorkflowEventListener extends AbstractAssetEventListener {
+public class WorkflowDeployService {
 
   public static final String KEY_WORKFLOW_DEF = "workflowDef";
 
@@ -30,13 +27,10 @@ public class WorkflowEventListener extends AbstractAssetEventListener {
 
   private final WorkflowTemplateTransformer workflowTemplateTransformer;
 
-  public WorkflowEventListener(
-      final ApplicationEventPublisher eventPublisher,
-      final AppProperty appProperty,
+  public WorkflowDeployService(
       final OrkesMetadataClient metadataClient,
       final UnifiedAssetService unifiedAssetService,
       final WorkflowTemplateTransformer workflowTemplateTransformer) {
-    super(eventPublisher, appProperty);
     this.metadataClient = metadataClient;
     this.unifiedAssetService = unifiedAssetService;
     this.workflowTemplateTransformer = workflowTemplateTransformer;
@@ -46,9 +40,7 @@ public class WorkflowEventListener extends AbstractAssetEventListener {
     return AssetKindEnum.COMPONENT_API_WORK_FLOW;
   }
 
-  @Override
-  public void onPostPersist(
-      String productId, FileDescriptor fileDescriptor, UnifiedAsset asset, DataIngestionJob job) {
+  public void deployWorkflow(UnifiedAsset asset) {
     log.info("Transforming workflow");
     WorkflowDef workflowDef = workflowTemplateTransformer.transfer(asset);
     try {
@@ -59,6 +51,7 @@ public class WorkflowEventListener extends AbstractAssetEventListener {
       createWorkflowDeployment(asset, workflowDef);
     } catch (Exception e) {
       log.error("Failed to register workflow", e);
+      throw KrakenException.internalError("Failed to deploy conductor");
     }
     log.info("Deploying workflow completed");
   }
