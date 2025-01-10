@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.*;
 import com.consoleconnect.kraken.operator.auth.security.UserContext;
 import com.consoleconnect.kraken.operator.config.TestApplication;
 import com.consoleconnect.kraken.operator.controller.dto.ComponentExpandDTO;
+import com.consoleconnect.kraken.operator.controller.dto.SaveWorkflowTemplateRequest;
 import com.consoleconnect.kraken.operator.controller.model.Environment;
 import com.consoleconnect.kraken.operator.controller.service.EnvironmentService;
 import com.consoleconnect.kraken.operator.core.client.ClientEvent;
@@ -55,6 +56,8 @@ public class ComponentMgmtControllerTest extends AbstractIntegrationTest
   public static final String LIST_VERSIONS_URL = "products/mef.sonata/component-versions";
   public static final String UPDATE_COMPONENT =
       "/products/kraken.component.api-target-mapper/components/{id}/targetMapper";
+  public static final String UPDATE_WORKFLOW =
+      "/products/kraken.component.api-target-mapper/components/{id}/workflow";
   public static final String LIST_API_USE_CASES =
       "/products/kraken.component.api-target-mapper/api-use-cases";
   @Autowired UnifiedAssetService unifiedAssetService;
@@ -81,6 +84,37 @@ public class ComponentMgmtControllerTest extends AbstractIntegrationTest
                     .path(UPDATE_COMPONENT)
                     .build("mef.sonata.api-target-mapper.order.eline.add"))
         .bodyValue(asset)
+        .exchange()
+        .expectBody()
+        .consumeWith(
+            response -> {
+              String bodyStr = new String(Objects.requireNonNull(response.getResponseBody()));
+              log.info("update result {}", bodyStr);
+              assertThat(bodyStr, Matchers.notNullValue());
+            });
+  }
+
+  @Order(10)
+  @Test
+  void givenWorkflowRequest_whenUpdateWorkflowTemplate_thenSuccess() {
+    UnifiedAssetDto asset =
+        unifiedAssetService.findOne("mef.sonata.api-target-mapper.order.eline.delete");
+    UnifiedAssetDto workflow =
+        unifiedAssetService.findOne("mef.sonata.api-workflow.order.eline.delete");
+    SaveWorkflowTemplateRequest request = new SaveWorkflowTemplateRequest();
+    request.setMappingTemplate(asset);
+    request.setWorkflowTemplate(workflow);
+    webTestClient
+        .mutate()
+        .responseTimeout(Duration.ofSeconds(600))
+        .build()
+        .patch()
+        .uri(
+            uriBuilder ->
+                uriBuilder
+                    .path(UPDATE_WORKFLOW)
+                    .build("mef.sonata.api-target-mapper.order.eline.delete"))
+        .bodyValue(request)
         .exchange()
         .expectBody()
         .consumeWith(

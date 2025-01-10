@@ -8,4 +8,5 @@ import lombok.Setter;
 public class AbstractTask {
   private String taskName;
   private String taskType;
+  private String description;
 }

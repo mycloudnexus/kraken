@@ -1,0 +1,223 @@
+---
+kind: kraken.component.api-workflow
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-workflow.order.uni.add
+  name: Order Management
+  version: 1
+spec:
+  metaData:
+    workflowName: "order.uni.add"
+    externalId: ""
+  validationStage:
+    - taskName: validation_task
+      description: ""
+      taskType: http
+      endpoint:
+        path: ""
+        method: ""
+        serverKey: ''
+        mappers:
+          request:
+      conditionCheck:
+        caseExpression: ""
+        buildInTask: reject_order_task
+  preparationStage:
+    - taskName: preparation_task
+      description: ""
+      taskType: http
+      endpoint:
+        path: "/v2/data-center-facility/{id}"
+        method: "GET"
+        serverKey: ''
+        mappers:
+          request:
+            - source: "@{{productOrderItem[0].product.place[0].id}}"
+            - sourceLocation: "BODY"
+            - target: "@{{id}}"
+            - targetLocation: "PATH"
+  executionStage:
+    - taskName: create_order_task
+      description: ""
+      taskType: http
+      endpoint:
+        path: "/api/company/{companyName}/ports/order"
+        method: 'PUT'
+        serverKey: ''
+        mappers:
+          request:
+            - name: mapper.order.uni.add.buyerId
+              title: >-
+                The unique identifier of the organization that is acting as the a
+                Buyer.
+              source: '@{{buyerId}}'
+              target: '@{{companyName}}'
+              description: ''
+              replaceStar: true
+              sourceLocation: QUERY
+              targetLocation: PATH
+              allowValueLimit: false
+              customizedField: false
+              requiredMapping: false
+            - name: mapper.order.uni.add.duration
+              title: order item Term duration
+              source: '@{{productOrderItem[0].requestedItemTerm.duration.amount}}'
+              target: '1'
+              sourceType: constantNumber
+              replaceStar: true
+              sourceLocation: BODY
+              targetLocation: CONSTANT
+              allowValueLimit: false
+              customizedField: false
+              requiredMapping: true
+            - name: mapper.order.uni.add.duration.units
+              title: order item Term unit
+              source: '@{{productOrderItem[0].requestedItemTerm.duration.units}}'
+              target: '@{{durationUnit}}'
+              sourceType: enum
+              replaceStar: true
+              sourceValues:
+                - calendarYears
+                - calendarMonths
+                - calendarDays
+                - calendarHours
+                - calendarMinutes
+                - businessDays
+                - businessHours
+                - businessMinutes
+              valueMapping:
+                calendarYears: 'y'
+                calendarMonths: m
+              sourceLocation: BODY
+              targetLocation: BODY
+              allowValueLimit: false
+              customizedField: false
+              requiredMapping: true
+            - name: mapper.order.eline.add.endOfTermAction
+              title: MEFEndOfTermAction
+              source: '@{{productOrderItem[0].requestedItemTerm.endOfTermAction}}'
+              target: roll
+              sourceType: discreteStr
+              replaceStar: true
+              sourceLocation: BODY
+              targetLocation: CONSTANT
+              allowValueLimit: false
+              customizedField: false
+              requiredMapping: true
+            - name: mapper.order.eline.add.rollInterval.amount
+              title: ' quote item Term roll duration'
+              source: '@{{productOrderItem[0].requestedItemTerm.rollInterval.amount}}'
+              target: '1'
+              sourceType: constantNumber
+              replaceStar: true
+              sourceLocation: BODY
+              targetLocation: CONSTANT
+              allowValueLimit: false
+              customizedField: false
+              requiredMapping: false
+            - name: mapper.order.eline.add.rollInterval.units
+              title: ' quote item Term roll unit'
+              source: '@{{productOrderItem[0].requestedItemTerm.rollInterval.units}}'
+              target: calendarMonths
+              sourceType: enum
+              replaceStar: true
+              sourceValues:
+                - calendarYears
+                - calendarMonths
+                - calendarDays
+                - calendarHours
+                - calendarMinutes
+                - businessDays
+                - businessHours
+                - businessMinutes
+              sourceLocation: BODY
+              targetLocation: CONSTANT
+              allowValueLimit: false
+              customizedField: false
+              requiredMapping: false
+            - name: mapper.order.uni.add.place.id
+              title: the id of the place where the products' installation must be done.
+              source: '@{{preparation_task.output.response.body.keyname}}'
+              target: '@{{dataCenterFacilityId}}'
+              sourceType: discreteStr
+              description: ''
+              replaceStar: true
+              sourceLocation: BODY
+              targetLocation: BODY
+              allowValueLimit: false
+              customizedField: false
+              requiredMapping: false
+            - name: mapper.order.uni.add.place.name
+              title: >-
+                the keyName of the place where the products' installation must be
+                done.
+              source: '@{{productOrderItem[0].product.place[0].keyName}}'
+              target: '@{{dataCenterFacility}}'
+              sourceType: discreteStr
+              description: ''
+              replaceStar: true
+              sourceLocation: BODY
+              targetLocation: BODY
+              allowValueLimit: false
+              customizedField: false
+              requiredMapping: false
+            - name: mapper.order.uni.add.bandwidthUnit
+              title: The unit of bandwidth
+              source: >-
+                @{{productOrderItem[0].product.productConfiguration.bandwidthUnit}}
+              target: MBPS
+              sourceType: enum
+              replaceStar: true
+              sourceValues:
+                - MBPS
+                - GBPS
+              sourceLocation: BODY
+              targetLocation: CONSTANT
+              allowValueLimit: false
+              customizedField: false
+              requiredMapping: true
+            - name: mapper.order.uni.add.bandwidth
+              title: Bandwidth of the UNI
+              source: '@{{productOrderItem[0].product.productConfiguration.bandwidth}}'
+              target: '@{{speed}}'
+              sourceType: discreteInt
+              replaceStar: true
+              sourceLocation: BODY
+              targetLocation: BODY
+              allowValueLimit: true
+              customizedField: false
+              requiredMapping: true
+            - name: mapper.order.uni.add.name
+              title: The name of the UNI
+              source: '@{{productOrderItem[0].product.productConfiguration.name}}'
+              target: '@{{portName}}'
+              sourceType: discreteStr
+              replaceStar: true
+              sourceLocation: BODY
+              targetLocation: BODY
+              allowValueLimit: false
+              customizedField: false
+              requiredMapping: false
+            - name: mapper.order.uni.add.paymentType
+              title: The payment type of the UNI
+              source: '@{{productOrderItem[0].product.productConfiguration.paymentType}}'
+              target: '@{{paymentType}}'
+              sourceType: discreteStr
+              replaceStar: true
+              sourceLocation: BODY
+              targetLocation: BODY
+              allowValueLimit: false
+              customizedField: false
+              requiredMapping: false
+            - name: mapper.order.uni.add.productOffering.id
+              title: id of a Product Offering
+              source: '@{{productOrderItem[0].product.productOffering.id}}'
+              target: UNI
+              replaceStar: true
+              sourceLocation: BODY
+              targetLocation: CONSTANT
+              allowValueLimit: false
+              customizedField: false
+              requiredMapping: true
+      notificationUrl:
+

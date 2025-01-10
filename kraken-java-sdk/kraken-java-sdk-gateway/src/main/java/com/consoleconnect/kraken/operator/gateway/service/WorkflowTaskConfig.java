@@ -6,6 +6,7 @@ import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.gateway.entity.HttpRequestEntity;
 import com.consoleconnect.kraken.operator.gateway.repo.HttpRequestRepository;
+import com.consoleconnect.kraken.operator.gateway.template.SpELEngine;
 import com.consoleconnect.kraken.operator.workflow.service.WorkflowTaskRegister;
 import com.netflix.conductor.sdk.workflow.task.InputParam;
 import com.netflix.conductor.sdk.workflow.task.WorkerTask;
@@ -13,6 +14,7 @@ import java.util.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -48,6 +50,15 @@ public class WorkflowTaskConfig implements WorkflowTaskRegister {
   public void failOrder(@InputParam("id") String id) {
     log.info("Set order to failed: {}", id);
     setOrderState(id, "failed");
+  }
+
+  @WorkerTask(EVALUATE_PAYLOAD)
+  public Map<String, Object> evaluateTask(
+      @InputParam("value") Map<String, Object> value, @InputParam("expression") Object expression) {
+    String evaluate = SpELEngine.evaluate(expression, value);
+    return StringUtils.isBlank(evaluate)
+        ? Collections.emptyMap()
+        : JsonToolkit.fromJson(evaluate, Map.class);
   }
 
   @WorkerTask(EMPTY_TASK_VALUE)

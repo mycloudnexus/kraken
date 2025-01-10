@@ -10,16 +10,16 @@ import com.consoleconnect.kraken.operator.core.model.HttpTask;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentWorkflowFacets;
+import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.workflow.config.WorkflowConfig;
+import com.consoleconnect.kraken.operator.workflow.model.EvaluateObject;
 import com.consoleconnect.kraken.operator.workflow.model.HttpExtend;
+import com.google.common.collect.Streams;
 import com.netflix.conductor.common.metadata.tasks.TaskDef;
 import com.netflix.conductor.common.metadata.workflow.WorkflowDef;
 import com.netflix.conductor.common.metadata.workflow.WorkflowTask;
 import com.netflix.conductor.common.run.Workflow;
-import com.netflix.conductor.sdk.workflow.def.tasks.SimpleTask;
-import com.netflix.conductor.sdk.workflow.def.tasks.Switch;
-import com.netflix.conductor.sdk.workflow.def.tasks.Task;
-import com.netflix.conductor.sdk.workflow.def.tasks.Terminate;
+import com.netflix.conductor.sdk.workflow.def.tasks.*;
 import java.util.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -33,6 +33,7 @@ public class WorkflowTemplateTransformer {
   private static final String SUB_REQUEST_URL = "${workflow.input.payload.%s.url}";
   private static final String SUB_REQUEST_HEADER = "${workflow.input.headers}";
   private static final String TERMINATE_TASK = "TERMINATE_TASK_";
+  private static final String EVALUATE_RESULT = "${evaluate_payload_task_%s.output}";
   private static final String HTTP_STATUS_SWITCH_CASE_EXPRESSION =
       "${%s.output.response.statusCode}";
 
@@ -51,19 +52,35 @@ public class WorkflowTemplateTransformer {
     workflowDef.setOwnerEmail("example@email.com");
     List<WorkflowTask> taskList = new ArrayList<>();
     workflowDef.setTasks(taskList);
-    buildWorkflowByStage(facets.getValidationStage(), workflowDef, VALIDATION_STAGE);
-    buildWorkflowByStage(facets.getPreparationStage(), workflowDef, PREPARATION_STAGE);
-    buildWorkflowByStage(facets.getExecutionStage(), workflowDef, EXECUTION_STAGE);
+    List<HttpTask> httpTasks =
+        Streams.concat(
+                facets.getExecutionStage().stream(),
+                facets.getValidationStage().stream(),
+                facets.getPreparationStage().stream())
+            .toList();
+    buildWorkflowByStage(facets.getValidationStage(), workflowDef, VALIDATION_STAGE, httpTasks);
+    buildWorkflowByStage(facets.getPreparationStage(), workflowDef, PREPARATION_STAGE, httpTasks);
+    buildWorkflowByStage(facets.getExecutionStage(), workflowDef, EXECUTION_STAGE, httpTasks);
     return workflowDef;
   }
 
   private void buildWorkflowByStage(
-      List<HttpTask> customizedTasks, WorkflowDef workflowDef, WorkflowStageEnum stage) {
+      List<HttpTask> customizedTasks,
+      WorkflowDef workflowDef,
+      WorkflowStageEnum stage,
+      List<HttpTask> httpTasks) {
     List<WorkflowTask> tasks = workflowDef.getTasks();
     if (CollectionUtils.isNotEmpty(customizedTasks)) {
       customizedTasks.stream()
           .forEachOrdered(
               task -> {
+                if (StringUtils.isBlank(task.getEndpoint().getPath())) {
+                  return;
+                }
+                // add evaluate sample task
+                tasks.addAll(
+                    constructSimpleTask(EVALUATE_PAYLOAD, task.getTaskName(), httpTasks)
+                        .getWorkflowDefTasks());
                 // add http task
                 tasks.addAll(constructHttpTask(task).getRight());
                 // add check http status task for each http task
@@ -82,7 +99,7 @@ public class WorkflowTemplateTransformer {
     if (stage == PREPARATION_STAGE) {
       workflowDef
           .getTasks()
-          .addAll(constructSimpleTask(PROCESS_ORDER_TASK_VALUE).getWorkflowDefTasks());
+          .addAll(constructSimpleTask(PROCESS_ORDER_TASK_VALUE, null, null).getWorkflowDefTasks());
     }
   }
 
@@ -93,11 +110,12 @@ public class WorkflowTemplateTransformer {
             String.format(SWITCH_HTTP_CHECK_NAME_PREFIX, taskName),
             String.format(HTTP_STATUS_SWITCH_CASE_EXPRESSION, taskName));
     Map<String, List<Task<?>>> branches = new HashMap<>();
-    branches.put("200", List.of(constructSimpleTask(EMPTY_TASK_VALUE)));
-    branches.put("201", List.of(constructSimpleTask(EMPTY_TASK_VALUE)));
+    branches.put("200", List.of(constructSimpleTask(EMPTY_TASK_VALUE, null, null)));
+    branches.put("201", List.of(constructSimpleTask(EMPTY_TASK_VALUE, null, null)));
     switchTask.decisionCases(branches);
     switchTask.defaultCase(
-        constructSimpleTask(stage == EXECUTION_STAGE ? NOTIFY_TASK_VALUE : FAIL_ORDER_TASK_VALUE),
+        constructSimpleTask(
+            stage == EXECUTION_STAGE ? NOTIFY_TASK_VALUE : FAIL_ORDER_TASK_VALUE, null, null),
         new Terminate(getUniqueTaskRef(TERMINATE_TASK), Workflow.WorkflowStatus.COMPLETED, null));
     return switchTask.getWorkflowDefTasks();
   }
@@ -120,7 +138,7 @@ public class WorkflowTemplateTransformer {
     branches.put(
         caseValue,
         List.of(
-            constructSimpleTask(buildInTaskName),
+            constructSimpleTask(buildInTaskName, null, null),
             new Terminate(
                 getUniqueTaskRef(TERMINATE_TASK), Workflow.WorkflowStatus.COMPLETED, null)));
     switchTask.decisionCases(branches);
@@ -128,12 +146,14 @@ public class WorkflowTemplateTransformer {
     return switchTask.getWorkflowDefTasks();
   }
 
-  private SimpleTask constructSimpleTask(String taskName) {
+  private SimpleTask constructSimpleTask(String taskName, String httpTask, List<HttpTask> tasks) {
+    String taskRef =
+        Objects.equals(taskName, EVALUATE_PAYLOAD)
+            ? String.format("%s_%s", EVALUATE_PAYLOAD, httpTask)
+            : getUniqueTaskRef(taskName);
     return buildInTask.getParams().entrySet().stream()
         .filter(v -> Objects.equals(taskName, v.getKey()))
-        .map(
-            entry ->
-                buildSimpleTask(entry.getKey(), getUniqueTaskRef(entry.getKey()), entry.getValue()))
+        .map(entry -> buildSimpleTask(entry.getKey(), taskRef, httpTask, entry.getValue(), tasks))
         .findAny()
         .orElseThrow(
             () ->
@@ -147,9 +167,31 @@ public class WorkflowTemplateTransformer {
             UUID.randomUUID().toString());
   }
 
-  private SimpleTask buildSimpleTask(String taskName, String taskRef, Map<String, String> input) {
+  private SimpleTask buildSimpleTask(
+      String taskName,
+      String taskRef,
+      String httpTask,
+      Map<String, String> input,
+      List<HttpTask> tasks) {
     SimpleTask simpleTask = new SimpleTask(taskName, taskRef);
-    simpleTask.getInput().putAll(input);
+    if (EVALUATE_PAYLOAD.equals(taskName)) {
+      Map<String, Map<String, String>> value = new HashMap<>();
+      tasks.stream()
+          .filter(task -> StringUtils.isNotBlank(task.getEndpoint().getPath()))
+          .forEach(
+              task ->
+                  value.put(
+                      task.getTaskName(),
+                      Map.of("output", String.format("${%s.output}", task.getTaskName()))));
+      EvaluateObject evaluateObject = new EvaluateObject();
+      evaluateObject.setExpression(String.format(SUB_REQUEST_BODY, httpTask));
+      evaluateObject.setValue(value);
+      simpleTask
+          .getInput()
+          .putAll(JsonToolkit.fromJson(JsonToolkit.toJson(evaluateObject), Map.class));
+    } else {
+      simpleTask.getInput().putAll(input);
+    }
     simpleTask.setOptional(true);
     return simpleTask;
   }
@@ -168,7 +210,7 @@ public class WorkflowTemplateTransformer {
     http.setOptional(true);
     TaskDef def = new TaskDef(http.getName());
     if (!"GET".equalsIgnoreCase(endpoint.getMethod())) {
-      http.body(String.format(SUB_REQUEST_BODY, httpTask.getTaskName()));
+      http.body(String.format(EVALUATE_RESULT, httpTask.getTaskName()));
       def.setRetryCount(0);
     } else {
       // add retry for get request
