@@ -72,6 +72,6 @@ public class EndpointAuditController {
   @Operation(summary = "Retrieve a audit log by id")
   @GetMapping("/{id}")
   public HttpResponse<EndpointAuditEntity> findOne(@PathVariable("id") String id) {
-    return HttpResponse.ok(this.endpointAuditService.findOne(id).orElse(null));
+    return HttpResponse.ok(this.endpointAuditService.findOne(id));
   }
 }

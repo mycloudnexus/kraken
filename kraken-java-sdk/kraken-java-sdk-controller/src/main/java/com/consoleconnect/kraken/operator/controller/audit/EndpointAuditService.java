@@ -5,7 +5,6 @@ import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.service.UUIDWrapper;
 import com.consoleconnect.kraken.operator.core.toolkit.*;
 import java.time.ZonedDateTime;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -48,7 +47,8 @@ public class EndpointAuditService implements UUIDWrapper {
         endpointAuditRepository.search(
             query, startTime, endTime, PagingHelper.toPageable(page, size));
     return liteSearch
-        ? PagingHelper.toPaging(data.stream().map(this::removeDetails).toList(), x -> x)
+        ? PagingHelper.toPage(
+            data.stream().map(this::removeDetails).toList(), page, size, data.getTotalElements())
         : PagingHelper.toPaging(data, x -> x);
   }
 
@@ -58,9 +58,10 @@ public class EndpointAuditService implements UUIDWrapper {
     return entity;
   }
 
-  public Optional<EndpointAuditEntity> findOne(String id) {
+  public EndpointAuditEntity findOne(String id) {
     return getUUID(id)
         .map(endpointAuditRepository::findById)
-        .orElseThrow(() -> KrakenException.notFound("Asset not found,key=" + id));
+        .flatMap(x -> x)
+        .orElseThrow(() -> KrakenException.notFound("Audit log not found,key=" + id));
   }
 }
