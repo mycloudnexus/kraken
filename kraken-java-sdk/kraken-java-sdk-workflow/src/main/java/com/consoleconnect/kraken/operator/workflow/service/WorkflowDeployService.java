@@ -23,8 +23,6 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class WorkflowDeployService {
 
-  public static final String KEY_WORKFLOW_DEF = "workflowDef";
-
   public static final String LABEL_WORKFLOW_DEF_VERSION = "workflow-def-version";
 
   private final OrkesMetadataClient metadataClient;
