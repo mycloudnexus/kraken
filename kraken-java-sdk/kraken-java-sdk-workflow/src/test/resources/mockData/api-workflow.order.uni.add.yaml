@@ -33,17 +33,17 @@ spec:
         mappers:
           request:
             - source: "@{{productOrderItem[0].product.place[0].id}}"
-            - sourceLocation: "BODY"
-            - target: "@{{id}}"
-            - targetLocation: "PATH"
+              sourceLocation: "BODY"
+              target: "@{{id}}"
+              targetLocation: "PATH"
   executionStage:
     - taskName: create_order_task
-      description: ""
+      description: "create uni order task"
       taskType: http
       endpoint:
         path: "/api/company/{companyName}/ports/order"
-        method: 'PUT'
-        serverKey: ''
+        method: "PUT"
+        serverKey: ""
         mappers:
           request:
             - name: mapper.order.uni.add.buyerId
@@ -59,17 +59,6 @@ spec:
               allowValueLimit: false
               customizedField: false
               requiredMapping: false
-            - name: mapper.order.uni.add.duration
-              title: order item Term duration
-              source: '@{{productOrderItem[0].requestedItemTerm.duration.amount}}'
-              target: '1'
-              sourceType: constantNumber
-              replaceStar: true
-              sourceLocation: BODY
-              targetLocation: CONSTANT
-              allowValueLimit: false
-              customizedField: false
-              requiredMapping: true
             - name: mapper.order.uni.add.duration.units
               title: order item Term unit
               source: '@{{productOrderItem[0].requestedItemTerm.duration.units}}'
@@ -93,65 +82,9 @@ spec:
               allowValueLimit: false
               customizedField: false
               requiredMapping: true
-            - name: mapper.order.eline.add.endOfTermAction
-              title: MEFEndOfTermAction
-              source: '@{{productOrderItem[0].requestedItemTerm.endOfTermAction}}'
-              target: roll
-              sourceType: discreteStr
-              replaceStar: true
-              sourceLocation: BODY
-              targetLocation: CONSTANT
-              allowValueLimit: false
-              customizedField: false
-              requiredMapping: true
-            - name: mapper.order.eline.add.rollInterval.amount
-              title: ' quote item Term roll duration'
-              source: '@{{productOrderItem[0].requestedItemTerm.rollInterval.amount}}'
-              target: '1'
-              sourceType: constantNumber
-              replaceStar: true
-              sourceLocation: BODY
-              targetLocation: CONSTANT
-              allowValueLimit: false
-              customizedField: false
-              requiredMapping: false
-            - name: mapper.order.eline.add.rollInterval.units
-              title: ' quote item Term roll unit'
-              source: '@{{productOrderItem[0].requestedItemTerm.rollInterval.units}}'
-              target: calendarMonths
-              sourceType: enum
-              replaceStar: true
-              sourceValues:
-                - calendarYears
-                - calendarMonths
-                - calendarDays
-                - calendarHours
-                - calendarMinutes
-                - businessDays
-                - businessHours
-                - businessMinutes
-              sourceLocation: BODY
-              targetLocation: CONSTANT
-              allowValueLimit: false
-              customizedField: false
-              requiredMapping: false
             - name: mapper.order.uni.add.place.id
               title: the id of the place where the products' installation must be done.
-              source: '@{{preparation_task.output.response.body.keyname}}'
-              target: '@{{dataCenterFacilityId}}'
-              sourceType: discreteStr
-              description: ''
-              replaceStar: true
-              sourceLocation: BODY
-              targetLocation: BODY
-              allowValueLimit: false
-              customizedField: false
-              requiredMapping: false
-            - name: mapper.order.uni.add.place.name
-              title: >-
-                the keyName of the place where the products' installation must be
-                done.
-              source: '@{{productOrderItem[0].product.place[0].keyName}}'
+              source: '@{{workflow.preparation_task.name}}'
               target: '@{{dataCenterFacility}}'
               sourceType: discreteStr
               description: ''
@@ -161,21 +94,6 @@ spec:
               allowValueLimit: false
               customizedField: false
               requiredMapping: false
-            - name: mapper.order.uni.add.bandwidthUnit
-              title: The unit of bandwidth
-              source: >-
-                @{{productOrderItem[0].product.productConfiguration.bandwidthUnit}}
-              target: MBPS
-              sourceType: enum
-              replaceStar: true
-              sourceValues:
-                - MBPS
-                - GBPS
-              sourceLocation: BODY
-              targetLocation: CONSTANT
-              allowValueLimit: false
-              customizedField: false
-              requiredMapping: true
             - name: mapper.order.uni.add.bandwidth
               title: Bandwidth of the UNI
               source: '@{{productOrderItem[0].product.productConfiguration.bandwidth}}'
@@ -209,15 +127,5 @@ spec:
               allowValueLimit: false
               customizedField: false
               requiredMapping: false
-            - name: mapper.order.uni.add.productOffering.id
-              title: id of a Product Offering
-              source: '@{{productOrderItem[0].product.productOffering.id}}'
-              target: UNI
-              replaceStar: true
-              sourceLocation: BODY
-              targetLocation: CONSTANT
-              allowValueLimit: false
-              customizedField: false
-              requiredMapping: true
       notificationUrl:
 
