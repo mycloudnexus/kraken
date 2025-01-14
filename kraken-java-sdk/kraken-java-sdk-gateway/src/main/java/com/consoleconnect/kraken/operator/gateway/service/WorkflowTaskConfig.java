@@ -3,6 +3,9 @@ package com.consoleconnect.kraken.operator.gateway.service;
 import static com.consoleconnect.kraken.operator.core.toolkit.Constants.*;
 
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
+import com.consoleconnect.kraken.operator.core.model.ApiActivityRequestLog;
+import com.consoleconnect.kraken.operator.core.model.ApiActivityResponseLog;
+import com.consoleconnect.kraken.operator.core.service.BackendApiActivityLogService;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.gateway.entity.HttpRequestEntity;
 import com.consoleconnect.kraken.operator.gateway.repo.HttpRequestRepository;
@@ -25,6 +28,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Getter
 public class WorkflowTaskConfig implements WorkflowTaskRegister {
   private final HttpRequestRepository repository;
+
+  private final BackendApiActivityLogService backendApiActivityLogService;
 
   @WorkerTask(NOTIFY_TASK)
   public void notify(
@@ -64,17 +69,21 @@ public class WorkflowTaskConfig implements WorkflowTaskRegister {
   @WorkerTask(LOG_REQUEST_PAYLOAD_TASK)
   public void logRequestPayload(
       @InputParam("payload") Object payload, @InputParam("requestId") String requestId) {
-    // log request
     log.info(
         "request payload: requestId= {},  payload= {}", requestId, JsonToolkit.toJson(payload));
+    ApiActivityRequestLog requestLog =
+        ApiActivityRequestLog.builder().requestId(requestId).request(payload).build();
+    backendApiActivityLogService.logApiActivityRequest(requestLog);
   }
 
   @WorkerTask(LOG_RESPONSE_PAYLOAD_TASK)
   public void logResponsePayload(
       @InputParam("payload") Object payload, @InputParam("requestId") String requestId) {
-    // log response
-    log.info(
-        "response payload: requestId= {},  payload= {}", requestId, JsonToolkit.toJson(payload));
+    final String response = JsonToolkit.toJson(payload);
+    log.info("response payload: requestId= {},  payload= {}", requestId, response);
+    ApiActivityResponseLog responseLog =
+        ApiActivityResponseLog.builder().requestId(requestId).response(response).build();
+    backendApiActivityLogService.logApiActivityResponse(responseLog);
   }
 
   @WorkerTask(EMPTY_TASK)
