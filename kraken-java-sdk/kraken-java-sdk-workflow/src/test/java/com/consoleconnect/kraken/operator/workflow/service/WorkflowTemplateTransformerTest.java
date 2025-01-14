@@ -8,6 +8,7 @@ import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import com.consoleconnect.kraken.operator.workflow.config.WorkflowConfig;
 import com.netflix.conductor.common.metadata.workflow.WorkflowDef;
+import java.io.IOException;
 import java.util.Optional;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +29,12 @@ class WorkflowTemplateTransformerTest extends AbstractIntegrationTest {
   @Test
   @SneakyThrows
   void givenComponentWorkflowFacets_whenTransform_thenSuccess() {
-    String s = readFileToString("/mockData/api-workflow.order.uni.add.yaml");
+    verifyWorkflow("/mockData/api-workflow.order.uni.add.yaml");
+    verifyWorkflow("/mockData/api-workflow.order.eline.delete.yaml");
+  }
+
+  private void verifyWorkflow(String workflow) throws IOException {
+    String s = readFileToString(workflow);
     Optional<UnifiedAsset> unifiedAsset = YamlToolkit.parseYaml(s, UnifiedAsset.class);
     WorkflowDef transfer = transformer.transfer(unifiedAsset.get());
     log.info("transfer result: {}", JsonToolkit.toJson(transfer));
