@@ -2,6 +2,8 @@ package com.consoleconnect.kraken.operator.workflow.service;
 
 import static com.consoleconnect.kraken.operator.core.toolkit.Constants.*;
 
+import com.consoleconnect.kraken.operator.workflow.model.LogTaskRequest;
+import com.netflix.conductor.sdk.workflow.task.InputParam;
 import com.netflix.conductor.sdk.workflow.task.WorkerTask;
 import java.util.Map;
 
@@ -25,9 +27,9 @@ public interface WorkflowTaskRegister {
   @WorkerTask(EVALUATE_PAYLOAD_TASK)
   Map<String, Object> evaluateTask(Map<String, Object> value, Object expression);
 
-  @WorkerTask(LOG_REQUEST_PAYLOAD_TASK)
-  void logRequestPayload(Object payload, String requestId);
+  @WorkerTask(LOG_PAYLOAD_TASK)
+  void logRequestPayload(LogTaskRequest payload);
 
-  @WorkerTask(LOG_RESPONSE_PAYLOAD_TASK)
-  void logResponsePayload(Object payload, String requestId);
+  @WorkerTask(PERSIST_RESPONSE_TASK)
+  void persistResponse(@InputParam("id") String id, @InputParam("payload") Object payload);
 }

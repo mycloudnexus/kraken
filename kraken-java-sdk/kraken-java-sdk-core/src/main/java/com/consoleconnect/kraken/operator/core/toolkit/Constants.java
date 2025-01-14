@@ -17,9 +17,9 @@ public class Constants {
   public static final String EVALUATE_PAYLOAD_TASK = "evaluate_payload_task";
   public static final String REJECT_ORDER_TASK = "reject_order_task";
   public static final String EMPTY_TASK = "empty_task";
-  public static final String LOG_REQUEST_PAYLOAD_TASK = "log_request_task";
-  public static final String LOG_RESPONSE_PAYLOAD_TASK = "log_response_task";
+  public static final String LOG_PAYLOAD_TASK = "log_payload_task";
   public static final String PROCESS_ORDER_TASK = "process_order_task";
+  public static final String PERSIST_RESPONSE_TASK = "persist_response_task";
   public static final String NOTIFY_TASK = "notify_task";
   public static final String WORKFLOW_PARAM_PREFIX = "${workflow.input.%s}";
 

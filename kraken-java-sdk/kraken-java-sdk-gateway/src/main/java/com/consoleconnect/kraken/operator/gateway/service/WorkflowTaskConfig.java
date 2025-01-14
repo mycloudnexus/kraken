@@ -7,6 +7,7 @@ import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.gateway.entity.HttpRequestEntity;
 import com.consoleconnect.kraken.operator.gateway.repo.HttpRequestRepository;
 import com.consoleconnect.kraken.operator.gateway.template.SpELEngine;
+import com.consoleconnect.kraken.operator.workflow.model.LogTaskRequest;
 import com.consoleconnect.kraken.operator.workflow.service.WorkflowTaskRegister;
 import com.netflix.conductor.sdk.workflow.task.InputParam;
 import com.netflix.conductor.sdk.workflow.task.WorkerTask;
@@ -61,20 +62,9 @@ public class WorkflowTaskConfig implements WorkflowTaskRegister {
         : JsonToolkit.fromJson(evaluate, Map.class);
   }
 
-  @WorkerTask(LOG_REQUEST_PAYLOAD_TASK)
-  public void logRequestPayload(
-      @InputParam("payload") Object payload, @InputParam("requestId") String requestId) {
-    // log request
-    log.info(
-        "request payload: requestId= {},  payload= {}", requestId, JsonToolkit.toJson(payload));
-  }
-
-  @WorkerTask(LOG_RESPONSE_PAYLOAD_TASK)
-  public void logResponsePayload(
-      @InputParam("payload") Object payload, @InputParam("requestId") String requestId) {
-    // log response
-    log.info(
-        "response payload: requestId= {},  payload= {}", requestId, JsonToolkit.toJson(payload));
+  @WorkerTask(LOG_PAYLOAD_TASK)
+  public void logRequestPayload(@InputParam("payload") LogTaskRequest payload) {
+    log.info("log payload: {}", JsonToolkit.toJson(payload));
   }
 
   @WorkerTask(EMPTY_TASK)
@@ -92,6 +82,20 @@ public class WorkflowTaskConfig implements WorkflowTaskRegister {
   public void processOrder(@InputParam("id") String id) {
     log.info("Set order to inProgress: {}", id);
     setOrderState(id, "inProgress");
+  }
+
+  @WorkerTask(PERSIST_RESPONSE_TASK)
+  public void persistResponse(@InputParam("id") String id, @InputParam("payload") Object payload) {
+    log.info("persist response: {}", id);
+    if (StringUtils.isNotBlank(id)) {
+      repository
+          .findById(UUID.fromString(id))
+          .ifPresent(
+              httpRequestEntity -> {
+                httpRequestEntity.setResponse(payload);
+                repository.save(httpRequestEntity);
+              });
+    }
   }
 
   private void setOrderState(String id, String state) {
