@@ -245,7 +245,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
                   || MappingTypeEnum.CONTINUOUS_DOUBLE.getKind().equals(mapper.getSourceType())
                   || MappingTypeEnum.CONTINUOUS_INT.getKind().equals(mapper.getSourceType()))) {
         checkEnumValue(documentContext, mapper);
-      } else if (mapper.getTarget() != null && !mapper.getTarget().contains("@{{")) {
+      } else if (isConstantType(mapper.getTarget())) {
         checkConstantValue(documentContext, mapper, inputs);
       } else {
         checkMappingValue(documentContext, mapper, inputs);
