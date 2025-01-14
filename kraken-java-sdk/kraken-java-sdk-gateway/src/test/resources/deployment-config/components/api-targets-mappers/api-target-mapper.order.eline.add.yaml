@@ -85,6 +85,7 @@ spec:
             title: "Bandwidth of the ELINE"
             source: "@{{productOrderItem[0].product.productConfiguration.bandwidth}}"
             sourceType: integer
+            allowValueLimit: true
             discrete: true
             sourceValues:
               - 1000

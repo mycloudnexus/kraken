@@ -388,6 +388,7 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
   void givenNotNumerical_whenValidatingConstantNumber_thenThrowsException() {
     ComponentAPITargetFacets.Mapper mapper = new ComponentAPITargetFacets.Mapper();
     mapper.setSourceType(MappingTypeEnum.DISCRETE_INT.getKind());
+    mapper.setTarget("1");
     Assertions.assertThrowsExactly(
         KrakenException.class,
         () ->
