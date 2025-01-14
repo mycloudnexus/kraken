@@ -14,6 +14,7 @@ import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.workflow.config.WorkflowConfig;
 import com.consoleconnect.kraken.operator.workflow.model.EvaluateObject;
 import com.consoleconnect.kraken.operator.workflow.model.HttpExtend;
+import com.consoleconnect.kraken.operator.workflow.model.LogTaskRequest;
 import com.google.common.collect.Streams;
 import com.netflix.conductor.common.metadata.tasks.TaskDef;
 import com.netflix.conductor.common.metadata.workflow.WorkflowDef;
@@ -34,6 +35,8 @@ public class WorkflowTemplateTransformer {
   private static final String SUB_REQUEST_HEADER = "${workflow.input.headers}";
   private static final String TERMINATE_TASK = "TERMINATE_TASK_";
   private static final String EVALUATE_RESULT = "${evaluate_payload_task_%s.output}";
+  private static final String SUB_TASK_OUTPUT = "${%s.output}";
+  private static final String SUB_TASK_INPUT = "${%s.input}";
   private static final String SUB_HTTP_TASK_RESPONSE = "${%s.output.response.body}";
   private static final String HTTP_STATUS_SWITCH_CASE_EXPRESSION =
       "${%s.output.response.statusCode}";
@@ -55,9 +58,9 @@ public class WorkflowTemplateTransformer {
     workflowDef.setTasks(taskList);
     List<HttpTask> httpTasks =
         Streams.concat(
-                facets.getExecutionStage().stream(),
                 facets.getValidationStage().stream(),
-                facets.getPreparationStage().stream())
+                facets.getPreparationStage().stream(),
+                facets.getExecutionStage().stream())
             .toList();
     buildWorkflowByStage(facets.getValidationStage(), workflowDef, VALIDATION_STAGE, httpTasks);
     buildWorkflowByStage(facets.getPreparationStage(), workflowDef, PREPARATION_STAGE, httpTasks);
@@ -82,15 +85,11 @@ public class WorkflowTemplateTransformer {
                 tasks.addAll(
                     constructSimpleTask(EVALUATE_PAYLOAD_TASK, task.getTaskName(), httpTasks)
                         .getWorkflowDefTasks());
-                // add log request task
-                tasks.addAll(
-                    constructSimpleTask(LOG_REQUEST_PAYLOAD_TASK, task.getTaskName(), httpTasks)
-                        .getWorkflowDefTasks());
                 // add http task
                 tasks.addAll(constructHttpTask(task).getRight());
-                // add log response task
+                // add log task
                 tasks.addAll(
-                    constructSimpleTask(LOG_RESPONSE_PAYLOAD_TASK, task.getTaskName(), httpTasks)
+                    constructSimpleTask(LOG_PAYLOAD_TASK, task.getTaskName(), httpTasks)
                         .getWorkflowDefTasks());
                 // add check http status task for each http task
                 tasks.addAll(constructHttpCheckSwitchTask(task.getTaskName(), stage));
@@ -101,14 +100,22 @@ public class WorkflowTemplateTransformer {
                 }
               });
     }
-    buildAfterEachStageTask(workflowDef, stage);
+    buildAfterEachStageTask(workflowDef, stage, httpTasks.get(httpTasks.size() - 1));
   }
 
-  private void buildAfterEachStageTask(WorkflowDef workflowDef, WorkflowStageEnum stage) {
+  private void buildAfterEachStageTask(
+      WorkflowDef workflowDef, WorkflowStageEnum stage, HttpTask httpTask) {
     if (stage == PREPARATION_STAGE) {
       workflowDef
           .getTasks()
           .addAll(constructSimpleTask(PROCESS_ORDER_TASK, null, null).getWorkflowDefTasks());
+    }
+    if (stage == EXECUTION_STAGE) {
+      workflowDef
+          .getTasks()
+          .addAll(
+              constructSimpleTask(PERSIST_RESPONSE_TASK, httpTask.getTaskName(), null)
+                  .getWorkflowDefTasks());
     }
   }
 
@@ -190,7 +197,7 @@ public class WorkflowTemplateTransformer {
                 task ->
                     value.put(
                         task.getTaskName(),
-                        Map.of("output", String.format("${%s.output}", task.getTaskName()))));
+                        Map.of("output", String.format(SUB_TASK_OUTPUT, task.getTaskName()))));
         EvaluateObject evaluateObject = new EvaluateObject();
         evaluateObject.setExpression(String.format(SUB_REQUEST_BODY, httpTask));
         evaluateObject.setValue(value);
@@ -198,11 +205,15 @@ public class WorkflowTemplateTransformer {
             .getInput()
             .putAll(JsonToolkit.fromJson(JsonToolkit.toJson(evaluateObject), Map.class));
       }
-      case LOG_REQUEST_PAYLOAD_TASK -> {
+      case LOG_PAYLOAD_TASK -> {
         simpleTask.getInput().putAll(input);
-        simpleTask.getInput().putAll(Map.of("payload", String.format(EVALUATE_RESULT, httpTask)));
+        LogTaskRequest request = new LogTaskRequest();
+        request.setRequestPayload(String.format(SUB_TASK_INPUT, httpTask));
+        request.setResponsePayload(String.format(SUB_TASK_OUTPUT, httpTask));
+        request.setRequestId(String.format(WORKFLOW_PARAM_PREFIX, "requestId"));
+        simpleTask.getInput().putAll(Map.of("payload", request));
       }
-      case LOG_RESPONSE_PAYLOAD_TASK -> {
+      case PERSIST_RESPONSE_TASK -> {
         simpleTask.getInput().putAll(input);
         simpleTask
             .getInput()

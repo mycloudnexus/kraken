@@ -3,6 +3,7 @@ package com.consoleconnect.kraken.operator.workflow.service;
 import static com.consoleconnect.kraken.operator.core.toolkit.Constants.*;
 
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
+import com.consoleconnect.kraken.operator.workflow.model.LogTaskRequest;
 import com.netflix.conductor.sdk.workflow.task.InputParam;
 import com.netflix.conductor.sdk.workflow.task.WorkerTask;
 import lombok.AllArgsConstructor;
@@ -42,20 +43,9 @@ public class WorkflowTaskConfig {
     log.info("Set order to inProgress: {}", id);
   }
 
-  @WorkerTask(LOG_REQUEST_PAYLOAD_TASK)
-  public void logRequestPayload(
-      @InputParam("payload") Object payload, @InputParam("requestId") String requestId) {
-    // log request
-    log.info(
-        "request payload: requestId= {},  payload= {}", requestId, JsonToolkit.toJson(payload));
-  }
-
-  @WorkerTask(LOG_RESPONSE_PAYLOAD_TASK)
-  public void logResponsePayload(
-      @InputParam("payload") Object payload, @InputParam("requestId") String requestId) {
-    // log response
-    log.info(
-        "response payload: requestId= {},  payload= {}", requestId, JsonToolkit.toJson(payload));
+  @WorkerTask(LOG_PAYLOAD_TASK)
+  public void logRequestPayload(@InputParam("payload") LogTaskRequest payload) {
+    log.info("log payload: {}", JsonToolkit.toJson(payload));
   }
 
   private void setOrderState(String id, String state) {

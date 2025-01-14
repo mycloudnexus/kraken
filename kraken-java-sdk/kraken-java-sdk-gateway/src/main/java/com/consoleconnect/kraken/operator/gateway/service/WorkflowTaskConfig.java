@@ -3,13 +3,11 @@ package com.consoleconnect.kraken.operator.gateway.service;
 import static com.consoleconnect.kraken.operator.core.toolkit.Constants.*;
 
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
-import com.consoleconnect.kraken.operator.core.model.ApiActivityRequestLog;
-import com.consoleconnect.kraken.operator.core.model.ApiActivityResponseLog;
-import com.consoleconnect.kraken.operator.core.service.BackendApiActivityLogService;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.gateway.entity.HttpRequestEntity;
 import com.consoleconnect.kraken.operator.gateway.repo.HttpRequestRepository;
 import com.consoleconnect.kraken.operator.gateway.template.SpELEngine;
+import com.consoleconnect.kraken.operator.workflow.model.LogTaskRequest;
 import com.consoleconnect.kraken.operator.workflow.service.WorkflowTaskRegister;
 import com.netflix.conductor.sdk.workflow.task.InputParam;
 import com.netflix.conductor.sdk.workflow.task.WorkerTask;
@@ -28,8 +26,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Getter
 public class WorkflowTaskConfig implements WorkflowTaskRegister {
   private final HttpRequestRepository repository;
-
-  private final BackendApiActivityLogService backendApiActivityLogService;
 
   @WorkerTask(NOTIFY_TASK)
   public void notify(
@@ -66,24 +62,9 @@ public class WorkflowTaskConfig implements WorkflowTaskRegister {
         : JsonToolkit.fromJson(evaluate, Map.class);
   }
 
-  @WorkerTask(LOG_REQUEST_PAYLOAD_TASK)
-  public void logRequestPayload(
-      @InputParam("payload") Object payload, @InputParam("requestId") String requestId) {
-    log.info(
-        "request payload: requestId= {},  payload= {}", requestId, JsonToolkit.toJson(payload));
-    ApiActivityRequestLog requestLog =
-        ApiActivityRequestLog.builder().requestId(requestId).request(payload).build();
-    backendApiActivityLogService.logApiActivityRequest(requestLog);
-  }
-
-  @WorkerTask(LOG_RESPONSE_PAYLOAD_TASK)
-  public void logResponsePayload(
-      @InputParam("payload") Object payload, @InputParam("requestId") String requestId) {
-    final String response = JsonToolkit.toJson(payload);
-    log.info("response payload: requestId= {},  payload= {}", requestId, response);
-    ApiActivityResponseLog responseLog =
-        ApiActivityResponseLog.builder().requestId(requestId).response(response).build();
-    backendApiActivityLogService.logApiActivityResponse(responseLog);
+  @WorkerTask(LOG_PAYLOAD_TASK)
+  public void logRequestPayload(@InputParam("payload") LogTaskRequest payload) {
+    log.info("log payload: {}", JsonToolkit.toJson(payload));
   }
 
   @WorkerTask(EMPTY_TASK)
@@ -101,6 +82,20 @@ public class WorkflowTaskConfig implements WorkflowTaskRegister {
   public void processOrder(@InputParam("id") String id) {
     log.info("Set order to inProgress: {}", id);
     setOrderState(id, "inProgress");
+  }
+
+  @WorkerTask(PERSIST_RESPONSE_TASK)
+  public void persistResponse(@InputParam("id") String id, @InputParam("payload") Object payload) {
+    log.info("persist response: {}", id);
+    if (StringUtils.isNotBlank(id)) {
+      repository
+          .findById(UUID.fromString(id))
+          .ifPresent(
+              httpRequestEntity -> {
+                httpRequestEntity.setResponse(payload);
+                repository.save(httpRequestEntity);
+              });
+    }
   }
 
   private void setOrderState(String id, String state) {
