@@ -46,13 +46,14 @@ public class ComponentAPITargetFacets {
     private String source;
     private String sourceType;
     private String sourceLocation;
+    private Boolean allowValueLimit = Boolean.FALSE;
+    private Boolean discrete;
     private List<String> sourceValues;
     private String target;
     private String targetType;
     private String targetLocation;
     private Boolean requiredMapping = Boolean.TRUE;
     private Boolean replaceStar = Boolean.TRUE;
-    private Boolean allowValueLimit = Boolean.FALSE;
     private String defaultValue;
     private List<String> targetValues;
     private Map<String, String> valueMapping;

@@ -332,7 +332,7 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
         KrakenException.class,
         () ->
             mappingMatrixCheckerActionRunner.validateDiscreteInteger(
-                "4", "x", List.of(), MappingTypeEnum.DISCRETE_INT.getKind()));
+                "4", "x", List.of(), MappingTypeEnum.DISCRETE_INT.getKind(), true));
   }
 
   @Test
@@ -341,7 +341,7 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
         KrakenException.class,
         () ->
             mappingMatrixCheckerActionRunner.validateDiscreteInteger(
-                4, "x", List.of("1", "2", "3"), MappingTypeEnum.DISCRETE_INT.getKind()));
+                4, "x", List.of("1", "2", "3"), MappingTypeEnum.DISCRETE_INT.getKind(), true));
   }
 
   @Test
@@ -350,7 +350,7 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
         KrakenException.class,
         () ->
             mappingMatrixCheckerActionRunner.validateContinuousInteger(
-                "4", "x", List.of(), MappingTypeEnum.CONTINUOUS_INT.getKind()));
+                "4", "x", List.of(), MappingTypeEnum.CONTINUOUS_INT.getKind(), false));
   }
 
   @Test
@@ -359,7 +359,7 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
         KrakenException.class,
         () ->
             mappingMatrixCheckerActionRunner.validateContinuousInteger(
-                4, "x", List.of("1", "3"), MappingTypeEnum.CONTINUOUS_INT.getKind()));
+                4, "x", List.of("1", "3"), MappingTypeEnum.CONTINUOUS_INT.getKind(), false));
   }
 
   @Test
@@ -368,7 +368,7 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
         KrakenException.class,
         () ->
             mappingMatrixCheckerActionRunner.validateContinuousDouble(
-                "4", "x", List.of(), MappingTypeEnum.CONTINUOUS_DOUBLE.getKind()));
+                "4", "x", List.of(), MappingTypeEnum.CONTINUOUS_DOUBLE.getKind(), false));
   }
 
   @Test
@@ -377,7 +377,7 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
         KrakenException.class,
         () ->
             mappingMatrixCheckerActionRunner.validateContinuousDouble(
-                4.0, "x", List.of("1.0", "3.9"), MappingTypeEnum.CONTINUOUS_DOUBLE.getKind()));
+                4.0, "x", List.of("1.0", "3.9"), MappingTypeEnum.CONTINUOUS_DOUBLE.getKind(), false));
   }
 
   @Test

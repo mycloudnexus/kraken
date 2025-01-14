@@ -221,8 +221,8 @@ public interface DataTypeChecker {
   }
 
   default void validateDiscreteInteger(
-      Object evaluateValue, String paramName, List<String> valueList, String sourceType) {
-    if (MappingTypeEnum.DISCRETE_INT.getKind().equals(sourceType)) {
+      Object evaluateValue, String paramName, List<String> valueList, String sourceType, Boolean discrete) {
+    if (MappingTypeEnum.DISCRETE_INT.getKind().equals(sourceType) && MappingTypeEnum.DISCRETE_INT.getDiscrete().equals(discrete)) {
       if (Objects.isNull(evaluateValue) || isNotInteger(evaluateValue)) {
         throw KrakenException.unProcessableEntityInvalidValue(
             String.format(
@@ -240,8 +240,9 @@ public interface DataTypeChecker {
   }
 
   default void validateContinuousInteger(
-      Object evaluateValue, String paramName, List<String> valueList, String sourceType) {
-    if (MappingTypeEnum.CONTINUOUS_INT.getKind().equals(sourceType)) {
+      Object evaluateValue, String paramName, List<String> valueList, String sourceType, Boolean discrete) {
+    if (MappingTypeEnum.CONTINUOUS_INT.getKind().equals(sourceType)
+        && MappingTypeEnum.CONTINUOUS_INT.getDiscrete().equals(discrete)) {
       if (Objects.isNull(evaluateValue) || isNotInteger(evaluateValue)) {
         throw KrakenException.unProcessableEntityInvalidValue(
             String.format(
@@ -252,8 +253,9 @@ public interface DataTypeChecker {
   }
 
   default void validateContinuousDouble(
-      Object evaluateValue, String paramName, List<String> valueList, String sourceType) {
-    if (MappingTypeEnum.CONTINUOUS_DOUBLE.getKind().equals(sourceType)) {
+      Object evaluateValue, String paramName, List<String> valueList, String sourceType, Boolean discrete) {
+    if (MappingTypeEnum.CONTINUOUS_DOUBLE.getKind().equals(sourceType)
+        && MappingTypeEnum.CONTINUOUS_DOUBLE.getDiscrete().equals(discrete)) {
       if (Objects.isNull(evaluateValue) || isNotDouble(evaluateValue)) {
         throw KrakenException.unProcessableEntityInvalidValue(
             String.format(
