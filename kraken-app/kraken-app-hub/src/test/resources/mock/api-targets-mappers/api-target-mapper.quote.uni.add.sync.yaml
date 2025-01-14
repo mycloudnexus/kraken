@@ -21,8 +21,8 @@ spec:
           - name: mapper.quote.uni.add.sync.duration.amount
             source: "@{{quoteItem[0].requestedQuoteItemTerm.duration.amount}}"
             sourceLocation: BODY
-            sourceType: number
-            discrete:
+            sourceType: integer
+            discrete: true
             target: "1"
             targetLocation: BODY
             requiredMapping: true
@@ -58,7 +58,7 @@ spec:
           - name: mapper.quote.uni.add.sync.rollInterval.amount
             source: "@{{quoteItem[0].requestedQuoteItemTerm.rollInterval.amount}}"
             sourceLocation: BODY
-            sourceType: number
+            sourceType: integer
             target: "1"
             targetLocation: BODY
             requiredMapping: false

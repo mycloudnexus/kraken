@@ -4,6 +4,7 @@ import com.consoleconnect.kraken.operator.core.enums.MappingTypeEnum;
 import com.consoleconnect.kraken.operator.core.exception.ErrorResponse;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
+import com.consoleconnect.kraken.operator.core.toolkit.Constants;
 import com.consoleconnect.kraken.operator.core.toolkit.ConstructExpressionUtil;
 import com.consoleconnect.kraken.operator.gateway.dto.PathCheck;
 import com.jayway.jsonpath.DocumentContext;
@@ -153,7 +154,15 @@ public interface DataTypeChecker {
       String target, Object evaluateValue, String paramName, String sourceType) {
     if (isConstantType(target)) {
       validateDiscreteString(evaluateValue, paramName, sourceType);
-      if (!target.equals(evaluateValue)) {
+      Object targetObj = null;
+      if (Constants.INT_VAL.equals(sourceType)) {
+        targetObj = Integer.valueOf(target);
+      } else if (Constants.DOUBLE_VAL.equals(sourceType)) {
+        targetObj = Double.valueOf(target);
+      } else {
+        targetObj = target;
+      }
+      if (!targetObj.equals(evaluateValue)) {
         throw KrakenException.unProcessableEntityInvalidValue(
             String.format(SHOULD_BE_MSG, paramName, evaluateValue, target));
       }
@@ -295,7 +304,7 @@ public interface DataTypeChecker {
 
   default void validateConstantNumber(
       Object evaluateValue, ComponentAPITargetFacets.Mapper mapper, String paramName) {
-    if (MappingTypeEnum.CONSTANT_NUM.getKind().equals(mapper.getSourceType())) {
+    if (MappingTypeEnum.DISCRETE_INT.getKind().equals(mapper.getSourceType()) && NumberUtils.isCreatable(mapper.getTarget())) {
       Class<?> dataType = whichDataTypeClass(evaluateValue);
       if (Objects.isNull(evaluateValue) || isNotNumeric(evaluateValue)) {
         throw KrakenException.unProcessableEntityInvalidValue(

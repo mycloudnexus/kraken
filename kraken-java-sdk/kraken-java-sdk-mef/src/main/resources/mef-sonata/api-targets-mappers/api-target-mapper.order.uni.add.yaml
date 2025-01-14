@@ -34,7 +34,7 @@ spec:
             title: "order item Term duration"
             source: "@{{productOrderItem[0].requestedItemTerm.duration.amount}}"
             sourceLocation: BODY
-            sourceType: number
+            sourceType: integer
             target: ""
             targetLocation: ""
             requiredMapping: true
@@ -69,7 +69,7 @@ spec:
             title: " quote item Term roll duration"
             source: "@{{productOrderItem[0].requestedItemTerm.rollInterval.amount}}"
             sourceLocation: BODY
-            sourceType: number
+            sourceType: integer
             target: ""
             targetLocation: BODY
             requiredMapping: false

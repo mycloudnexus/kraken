@@ -240,7 +240,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
       }
       if (MappingTypeEnum.ENUM.getKind().equals(mapper.getSourceType())
           || MappingTypeEnum.DISCRETE_STR.getKind().equals(mapper.getSourceType())
-          || Objects.nonNull(mapper.getDiscrete())
+          || Boolean.TRUE.equals(mapper.getAllowValueLimit())
               && (MappingTypeEnum.DISCRETE_INT.getKind().equals(mapper.getSourceType())
                   || MappingTypeEnum.CONTINUOUS_DOUBLE.getKind().equals(mapper.getSourceType())
                   || MappingTypeEnum.CONTINUOUS_INT.getKind().equals(mapper.getSourceType()))) {
