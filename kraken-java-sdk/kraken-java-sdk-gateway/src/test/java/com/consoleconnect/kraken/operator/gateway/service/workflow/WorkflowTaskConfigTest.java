@@ -10,6 +10,7 @@ import com.consoleconnect.kraken.operator.gateway.repo.HttpRequestRepository;
 import com.consoleconnect.kraken.operator.gateway.service.WorkflowTaskConfig;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
+import com.consoleconnect.kraken.operator.workflow.model.LogTaskRequest;
 import java.util.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,11 +36,11 @@ class WorkflowTaskConfigTest extends AbstractIntegrationTest {
     HttpRequestEntity entity = new HttpRequestEntity();
     entity.setRenderedResponse(Map.of("state", "active"));
     doReturn(Optional.of(entity)).when(httpRequestRepository).findById(any());
-    Map<String, Object> entityMap = Map.of("entity", entity);
     doReturn(entity).when(httpRequestRepository).save(any());
-    assertDoesNotThrow(() -> workflowTaskConfig.evaluateTask(entityMap, "${id}"));
-    assertDoesNotThrow(() -> workflowTaskConfig.logRequestPayload(entityMap, id));
-    assertDoesNotThrow(() -> workflowTaskConfig.logResponsePayload(entityMap, id));
+    assertDoesNotThrow(
+        () -> workflowTaskConfig.evaluateTask(Map.of("entity", entity), "${entity}"));
+    assertDoesNotThrow(() -> workflowTaskConfig.logRequestPayload(new LogTaskRequest()));
+    assertDoesNotThrow(() -> workflowTaskConfig.persistResponse(id, entity));
     assertDoesNotThrow(() -> workflowTaskConfig.failOrder(id));
     assertDoesNotThrow(() -> workflowTaskConfig.rejectOrder(id));
   }
