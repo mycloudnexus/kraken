@@ -162,7 +162,7 @@ public interface DataTypeChecker {
       } else {
         targetObj = target;
       }
-      if (!targetObj.equals(evaluateValue)) {
+      if (Objects.isNull(targetObj) || !targetObj.equals(evaluateValue)) {
         throw KrakenException.unProcessableEntityInvalidValue(
             String.format(SHOULD_BE_MSG, paramName, evaluateValue, target));
       }
