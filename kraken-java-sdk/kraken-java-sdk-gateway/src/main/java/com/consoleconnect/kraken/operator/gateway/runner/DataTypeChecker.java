@@ -304,7 +304,8 @@ public interface DataTypeChecker {
 
   default void validateConstantNumber(
       Object evaluateValue, ComponentAPITargetFacets.Mapper mapper, String paramName) {
-    if (MappingTypeEnum.DISCRETE_INT.getKind().equals(mapper.getSourceType()) && NumberUtils.isCreatable(mapper.getTarget())) {
+    if (MappingTypeEnum.DISCRETE_INT.getKind().equals(mapper.getSourceType())
+        && NumberUtils.isCreatable(mapper.getTarget())) {
       Class<?> dataType = whichDataTypeClass(evaluateValue);
       if (Objects.isNull(evaluateValue) || isNotNumeric(evaluateValue)) {
         throw KrakenException.unProcessableEntityInvalidValue(
