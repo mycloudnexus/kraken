@@ -38,6 +38,7 @@ public class WorkflowActionFilterFactory
   public static final String VAR_WORKFLOW_ENABLED = "enabled";
   public static final String VAR_WORKFLOW_CONFIG = "workflow-config";
   public static final String VAR_ENTITY_ID = "entity-id";
+  public static final String VAR_REQUEST_ID = "request-id";
   public static final String VAR_BASE_URL = "url";
 
   public WorkflowActionFilterFactory() {
@@ -118,6 +119,7 @@ public class WorkflowActionFilterFactory
             JsonToolkit.toJson(inputs.get(VAR_WORKFLOW_CONFIG)), ComponentWorkflowFacets.class);
     WorkflowPayload payload = new WorkflowPayload();
     payload.setId((String) inputs.get(VAR_ENTITY_ID));
+    payload.setRequestId((String) inputs.get(VAR_REQUEST_ID));
     payload.setHeaders(exchange.getRequest().getHeaders().toSingleValueMap());
     payload.setHeaders(new HashMap<>());
     workflowFacets.getValidationStage().stream()

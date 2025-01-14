@@ -34,6 +34,7 @@ public class WorkflowTemplateTransformer {
   private static final String SUB_REQUEST_HEADER = "${workflow.input.headers}";
   private static final String TERMINATE_TASK = "TERMINATE_TASK_";
   private static final String EVALUATE_RESULT = "${evaluate_payload_task_%s.output}";
+  private static final String SUB_HTTP_TASK_RESPONSE = "${%s.output.response.body}";
   private static final String HTTP_STATUS_SWITCH_CASE_EXPRESSION =
       "${%s.output.response.statusCode}";
 
@@ -79,10 +80,18 @@ public class WorkflowTemplateTransformer {
                 }
                 // add evaluate sample task
                 tasks.addAll(
-                    constructSimpleTask(EVALUATE_PAYLOAD, task.getTaskName(), httpTasks)
+                    constructSimpleTask(EVALUATE_PAYLOAD_TASK, task.getTaskName(), httpTasks)
+                        .getWorkflowDefTasks());
+                // add log request task
+                tasks.addAll(
+                    constructSimpleTask(LOG_REQUEST_PAYLOAD_TASK, task.getTaskName(), httpTasks)
                         .getWorkflowDefTasks());
                 // add http task
                 tasks.addAll(constructHttpTask(task).getRight());
+                // add log response task
+                tasks.addAll(
+                    constructSimpleTask(LOG_RESPONSE_PAYLOAD_TASK, task.getTaskName(), httpTasks)
+                        .getWorkflowDefTasks());
                 // add check http status task for each http task
                 tasks.addAll(constructHttpCheckSwitchTask(task.getTaskName(), stage));
                 if (task.getConditionCheck() != null
@@ -99,7 +108,7 @@ public class WorkflowTemplateTransformer {
     if (stage == PREPARATION_STAGE) {
       workflowDef
           .getTasks()
-          .addAll(constructSimpleTask(PROCESS_ORDER_TASK_VALUE, null, null).getWorkflowDefTasks());
+          .addAll(constructSimpleTask(PROCESS_ORDER_TASK, null, null).getWorkflowDefTasks());
     }
   }
 
@@ -110,12 +119,10 @@ public class WorkflowTemplateTransformer {
             String.format(SWITCH_HTTP_CHECK_NAME_PREFIX, taskName),
             String.format(HTTP_STATUS_SWITCH_CASE_EXPRESSION, taskName));
     Map<String, List<Task<?>>> branches = new HashMap<>();
-    branches.put("200", List.of(constructSimpleTask(EMPTY_TASK_VALUE, null, null)));
-    branches.put("201", List.of(constructSimpleTask(EMPTY_TASK_VALUE, null, null)));
+    branches.put("200", List.of(constructSimpleTask(EMPTY_TASK, null, null)));
     switchTask.decisionCases(branches);
     switchTask.defaultCase(
-        constructSimpleTask(
-            stage == EXECUTION_STAGE ? NOTIFY_TASK_VALUE : FAIL_ORDER_TASK_VALUE, null, null),
+        constructSimpleTask(stage == EXECUTION_STAGE ? NOTIFY_TASK : FAIL_ORDER_TASK, null, null),
         new Terminate(getUniqueTaskRef(TERMINATE_TASK), Workflow.WorkflowStatus.COMPLETED, null));
     return switchTask.getWorkflowDefTasks();
   }
@@ -148,8 +155,8 @@ public class WorkflowTemplateTransformer {
 
   private SimpleTask constructSimpleTask(String taskName, String httpTask, List<HttpTask> tasks) {
     String taskRef =
-        Objects.equals(taskName, EVALUATE_PAYLOAD)
-            ? String.format("%s_%s", EVALUATE_PAYLOAD, httpTask)
+        Objects.equals(taskName, EVALUATE_PAYLOAD_TASK)
+            ? String.format("%s_%s", EVALUATE_PAYLOAD_TASK, httpTask)
             : getUniqueTaskRef(taskName);
     return buildInTask.getParams().entrySet().stream()
         .filter(v -> Objects.equals(taskName, v.getKey()))
@@ -174,23 +181,34 @@ public class WorkflowTemplateTransformer {
       Map<String, String> input,
       List<HttpTask> tasks) {
     SimpleTask simpleTask = new SimpleTask(taskName, taskRef);
-    if (EVALUATE_PAYLOAD.equals(taskName)) {
-      Map<String, Map<String, String>> value = new HashMap<>();
-      tasks.stream()
-          .filter(task -> StringUtils.isNotBlank(task.getEndpoint().getPath()))
-          .forEach(
-              task ->
-                  value.put(
-                      task.getTaskName(),
-                      Map.of("output", String.format("${%s.output}", task.getTaskName()))));
-      EvaluateObject evaluateObject = new EvaluateObject();
-      evaluateObject.setExpression(String.format(SUB_REQUEST_BODY, httpTask));
-      evaluateObject.setValue(value);
-      simpleTask
-          .getInput()
-          .putAll(JsonToolkit.fromJson(JsonToolkit.toJson(evaluateObject), Map.class));
-    } else {
-      simpleTask.getInput().putAll(input);
+    switch (taskName) {
+      case EVALUATE_PAYLOAD_TASK -> {
+        Map<String, Map<String, String>> value = new HashMap<>();
+        tasks.stream()
+            .filter(task -> StringUtils.isNotBlank(task.getEndpoint().getPath()))
+            .forEach(
+                task ->
+                    value.put(
+                        task.getTaskName(),
+                        Map.of("output", String.format("${%s.output}", task.getTaskName()))));
+        EvaluateObject evaluateObject = new EvaluateObject();
+        evaluateObject.setExpression(String.format(SUB_REQUEST_BODY, httpTask));
+        evaluateObject.setValue(value);
+        simpleTask
+            .getInput()
+            .putAll(JsonToolkit.fromJson(JsonToolkit.toJson(evaluateObject), Map.class));
+      }
+      case LOG_REQUEST_PAYLOAD_TASK -> {
+        simpleTask.getInput().putAll(input);
+        simpleTask.getInput().putAll(Map.of("payload", String.format(EVALUATE_RESULT, httpTask)));
+      }
+      case LOG_RESPONSE_PAYLOAD_TASK -> {
+        simpleTask.getInput().putAll(input);
+        simpleTask
+            .getInput()
+            .putAll(Map.of("payload", String.format(SUB_HTTP_TASK_RESPONSE, httpTask)));
+      }
+      default -> simpleTask.getInput().putAll(input);
     }
     simpleTask.setOptional(true);
     return simpleTask;

@@ -9,6 +9,7 @@ public class WorkflowPayload {
   private Map<String, HttpPayload> payload = new HashMap<>();
   private Object headers;
   private String id;
+  private String requestId;
 
   @Data
   public static class HttpPayload {
