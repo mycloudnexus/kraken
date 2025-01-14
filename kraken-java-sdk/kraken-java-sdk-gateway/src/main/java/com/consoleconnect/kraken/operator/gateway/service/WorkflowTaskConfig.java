@@ -26,7 +26,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class WorkflowTaskConfig implements WorkflowTaskRegister {
   private final HttpRequestRepository repository;
 
-  @WorkerTask(NOTIFY_TASK_VALUE)
+  @WorkerTask(NOTIFY_TASK)
   public void notify(
       @InputParam("id") String id, @InputParam("notificationUrl") String notificationUrl) {
     log.info("Failed to delete order: {}", id);
@@ -46,13 +46,13 @@ public class WorkflowTaskConfig implements WorkflowTaskRegister {
         .block();
   }
 
-  @WorkerTask(FAIL_ORDER_TASK_VALUE)
+  @WorkerTask(FAIL_ORDER_TASK)
   public void failOrder(@InputParam("id") String id) {
     log.info("Set order to failed: {}", id);
     setOrderState(id, "failed");
   }
 
-  @WorkerTask(EVALUATE_PAYLOAD)
+  @WorkerTask(EVALUATE_PAYLOAD_TASK)
   public Map<String, Object> evaluateTask(
       @InputParam("value") Map<String, Object> value, @InputParam("expression") Object expression) {
     String evaluate = SpELEngine.evaluate(expression, value);
@@ -61,18 +61,34 @@ public class WorkflowTaskConfig implements WorkflowTaskRegister {
         : JsonToolkit.fromJson(evaluate, Map.class);
   }
 
-  @WorkerTask(EMPTY_TASK_VALUE)
+  @WorkerTask(LOG_REQUEST_PAYLOAD_TASK)
+  public void logRequestPayload(
+      @InputParam("payload") Object payload, @InputParam("requestId") String requestId) {
+    // log request
+    log.info(
+        "request payload: requestId= {},  payload= {}", requestId, JsonToolkit.toJson(payload));
+  }
+
+  @WorkerTask(LOG_RESPONSE_PAYLOAD_TASK)
+  public void logResponsePayload(
+      @InputParam("payload") Object payload, @InputParam("requestId") String requestId) {
+    // log response
+    log.info(
+        "response payload: requestId= {},  payload= {}", requestId, JsonToolkit.toJson(payload));
+  }
+
+  @WorkerTask(EMPTY_TASK)
   public void doNothing() {
     log.info("empty task");
   }
 
-  @WorkerTask(REJECT_ORDER_TASK_VALUE)
+  @WorkerTask(REJECT_ORDER_TASK)
   public void rejectOrder(@InputParam("id") String id) {
     log.info("Set order to rejected: {}", id);
     setOrderState(id, "rejected");
   }
 
-  @WorkerTask(PROCESS_ORDER_TASK_VALUE)
+  @WorkerTask(PROCESS_ORDER_TASK)
   public void processOrder(@InputParam("id") String id) {
     log.info("Set order to inProgress: {}", id);
     setOrderState(id, "inProgress");

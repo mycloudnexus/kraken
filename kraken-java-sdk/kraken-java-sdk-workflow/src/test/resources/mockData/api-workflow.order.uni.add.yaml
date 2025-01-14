@@ -24,7 +24,7 @@ spec:
         buildInTask: reject_order_task
   preparationStage:
     - taskName: preparation_task
-      description: ""
+      description: "get datacenter facility name by datacenter id"
       taskType: http
       endpoint:
         path: "/v2/data-center-facility/{id}"
@@ -127,5 +127,5 @@ spec:
               allowValueLimit: false
               customizedField: false
               requiredMapping: false
-      notificationUrl:
+      notificationUrl: https://hooks.slack.com/services/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
 
