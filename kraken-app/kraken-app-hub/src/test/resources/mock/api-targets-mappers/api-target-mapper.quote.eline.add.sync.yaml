@@ -81,7 +81,6 @@ spec:
             source: "@{{quoteItem[0].product.place[0].id}}"
             sourceLocation: BODY
             sourceType: string
-            discrete: true
             target: "@{{connections[*].srcDcf}}"
             targetLocation: BODY
             requiredMapping: true
@@ -89,7 +88,6 @@ spec:
             source: "@{{quoteItem[0].product.place[1].id}}"
             sourceLocation: BODY
             sourceType: string
-            discrete: true
             target: "@{{connections[*].destDcf}}"
             targetLocation: BODY
             requiredMapping: true
@@ -120,7 +118,6 @@ spec:
             source: "@{{quoteItem[0].product.productConfiguration.classOfService}}"
             sourceLocation: BODY
             sourceType: string
-            discrete: true
             target: "@{{connections[*].classOfService}}"
             targetLocation: BODY
             requiredMapping: false
@@ -128,7 +125,6 @@ spec:
             source: "@{{quoteItem[0].product.productConfiguration.paymentType}}"
             sourceLocation: BODY
             sourceType: string
-            discrete: true
             target: "@{{connections[*].paymentMethod}}"
             targetLocation: BODY
             requiredMapping: false
@@ -136,7 +132,6 @@ spec:
             source: "@{{quoteItem[0].product.productOffering.id}}"
             sourceLocation: BODY
             sourceType: string
-            discrete: true
             target: "ACCESS_E_LINE"
             targetLocation: BODY
             requiredMapping: false

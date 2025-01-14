@@ -22,7 +22,6 @@ spec:
             source: "@{{quoteItem[0].requestedQuoteItemTerm.duration.amount}}"
             sourceLocation: BODY
             sourceType: integer
-            discrete: true
             target: "1"
             targetLocation: BODY
             requiredMapping: true
@@ -82,7 +81,6 @@ spec:
             source: "@{{quoteItem[0].product.place[0].id}}"
             sourceLocation: BODY
             sourceType: string
-            discrete: true
             target: "@{{ports[*].dcf}}"
             targetLocation: BODY
             requiredMapping: true
@@ -90,7 +88,6 @@ spec:
             source: "@{{quoteItem[0].product.place[0].keyName}}"
             sourceLocation: BODY
             sourceType: string
-            discrete: true
             target: ""
             targetLocation: BODY
             requiredMapping: false
@@ -121,7 +118,6 @@ spec:
             source: "@{{quoteItem[0].product.productOffering.id}}"
             sourceLocation: BODY
             sourceType: string
-            discrete: true
             target: "UNI"
             targetLocation: BODY
             requiredMapping: false

@@ -110,7 +110,6 @@ spec:
             sourceLocation: BODY
             allowValueLimit: true
             sourceType: integer
-            discrete: true
             sourceValues:
             target: ""
             targetLocation: BODY
@@ -120,7 +119,6 @@ spec:
             source: "@{{productOrderItem[0].product.productConfiguration.name}}"
             sourceLocation: BODY
             sourceType: string
-            discrete: true
             target: ""
             targetLocation: BODY
             requiredMapping: false
@@ -128,7 +126,6 @@ spec:
             title: "The payment type of the ELINE"
             source: "@{{productOrderItem[0].product.productConfiguration.paymentType}}"
             sourceType: string
-            discrete: true
             sourceLocation: BODY
             target: ""
             targetLocation: BODY
@@ -138,7 +135,6 @@ spec:
             source: "@{{productOrderItem[0].product.productConfiguration.classOfService}}"
             sourceLocation: BODY
             sourceType: string
-            discrete: true
             target: ""
             targetLocation: BODY
             requiredMapping: false
@@ -147,7 +143,6 @@ spec:
             source: "@{{productOrderItem[0].product.productConfiguration.buyerCompanyId}}"
             sourceLocation: BODY
             sourceType: string
-            discrete: true
             target: ""
             targetLocation: BODY
             requiredMapping: false
@@ -156,7 +151,6 @@ spec:
             source: "@{{productOrderItem[0].product.productConfiguration.destUNIMetroId}}"
             sourceLocation: BODY
             sourceType: string
-            discrete: true
             target: ""
             targetLocation: BODY
             requiredMapping: false
@@ -165,7 +159,6 @@ spec:
             source: "@{{productOrderItem[0].product.productConfiguration.type}}"
             sourceLocation: BODY
             sourceType: string
-            discrete: true
             target: ""
             targetLocation: BODY
             requiredMapping: false
@@ -174,7 +167,6 @@ spec:
             source: "@{{productOrderItem[0].product.productRelationship[0].id}}"
             sourceLocation: BODY
             sourceType: string
-            discrete: true
             target: ""
             targetLocation: BODY
             requiredMapping: true
@@ -183,7 +175,6 @@ spec:
             source: "@{{productOrderItem[0].product.productRelationship[1].id}}"
             sourceLocation: BODY
             sourceType: string
-            discrete: true
             target: ""
             targetLocation: BODY
             requiredMapping: true
@@ -192,7 +183,6 @@ spec:
             source: "@{{productOrderItem[0].product.productOffering.id}}"
             sourceLocation: BODY
             sourceType: string
-            discrete: true
             target: ""
             targetLocation: BODY
             requiredMapping: true

@@ -33,7 +33,6 @@ spec:
             source: "@{{productOrderItem[*].product.id}}"
             sourceLocation: "BODY"
             sourceType: string
-            discrete: true
             target: ""
             targetLocation: ""
             requiredMapping: true
@@ -43,7 +42,6 @@ spec:
             source: "@{{productOrderItem[0].product.productOffering.id}}"
             sourceLocation: "BODY"
             sourceType: string
-            discrete: true
             target: ""
             targetLocation: ""
             requiredMapping: true

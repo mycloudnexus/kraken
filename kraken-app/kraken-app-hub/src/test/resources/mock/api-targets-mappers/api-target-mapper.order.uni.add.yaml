@@ -59,7 +59,6 @@ spec:
             source: "@{{productOrderItem[0].requestedItemTerm.endOfTermAction}}"
             sourceLocation: BODY
             sourceType: string
-            discrete: true
             target: "roll"
             targetLocation: BODY
             requiredMapping: true
@@ -76,7 +75,6 @@ spec:
             source: "@{{productOrderItem[0].requestedItemTerm.rollInterval.units}}"
             sourceLocation: BODY
             sourceType: string
-            discrete: true
             target: "calendarMonths"
             targetLocation: BODY
             requiredMapping: false
@@ -87,7 +85,6 @@ spec:
             source: '@{{productOrderItem[0].product.place[0].id}}'
             sourceLocation: BODY
             sourceType: string
-            discrete: true
             target: '@{{dataCenterFacilityId}}'
             targetLocation: BODY
             requiredMapping: false
@@ -97,7 +94,6 @@ spec:
             source: '@{{productOrderItem[0].product.place[0].keyName}}'
             sourceLocation: BODY
             sourceType: string
-            discrete: true
             target: '@{{dataCenterFacility}}'
             targetLocation: BODY
             requiredMapping: false
@@ -130,7 +126,6 @@ spec:
             source: "@{{productOrderItem[0].product.productConfiguration.name}}"
             sourceLocation: BODY
             sourceType: string
-            discrete: true
             target: "@{{portName}}"
             targetLocation: BODY
             requiredMapping: false
@@ -139,7 +134,6 @@ spec:
             source: "@{{productOrderItem[0].product.productConfiguration.paymentType}}"
             sourceLocation: BODY
             sourceType: string
-            discrete: true
             target: "@{{paymentType}}"
             targetLocation: BODY
             requiredMapping: false

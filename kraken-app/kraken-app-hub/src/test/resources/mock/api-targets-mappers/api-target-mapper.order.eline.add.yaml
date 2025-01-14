@@ -122,7 +122,6 @@ spec:
             source: "@{{productOrderItem[0].product.productConfiguration.name}}"
             sourceLocation: BODY
             sourceType: string
-            discrete: true
             target: "@{{name}}"
             targetLocation: BODY
             requiredMapping: false
@@ -131,7 +130,6 @@ spec:
             source: "@{{productOrderItem[0].product.productConfiguration.paymentType}}"
             sourceLocation: BODY
             sourceType: string
-            discrete: true
             target: "@{{paymentType}}"
             targetLocation: BODY
             requiredMapping: false
@@ -140,7 +138,6 @@ spec:
             source: "@{{productOrderItem[0].product.productConfiguration.classOfService}}"
             sourceLocation: BODY
             sourceType: string
-            discrete: true
             target: "@{{classOfService}}"
             targetLocation: BODY
             requiredMapping: false
@@ -149,7 +146,6 @@ spec:
             source: "@{{productOrderItem[0].product.productRelationship[0].id}}"
             sourceLocation: BODY
             sourceType: string
-            discrete: true
             target: "@{{portId}}"
             targetLocation: BODY
             requiredMapping: true
@@ -158,7 +154,6 @@ spec:
             source: "@{{productOrderItem[0].product.productRelationship[1].id}}"
             sourceLocation: BODY
             sourceType: string
-            discrete: true
             target: "@{{destPortId}}"
             targetLocation: BODY
             requiredMapping: true
@@ -167,7 +162,6 @@ spec:
             source: "@{{productOrderItem[0].product.productOffering.id}}"
             sourceLocation: BODY
             sourceType: string
-            discrete: true
             target: "ACCESS_E_LINE"
             targetLocation: BODY
             requiredMapping: true
@@ -176,7 +170,6 @@ spec:
             source: "@{{productOrderItem[0].product.productConfiguration.type}}"
             sourceLocation: BODY
             sourceType: string
-            discrete: true
             target: "@{{type}}"
             targetLocation: BODY
             requiredMapping: false
@@ -185,7 +178,6 @@ spec:
             source: "@{{productOrderItem[0].product.productConfiguration.destUNIMetroId}}"
             sourceLocation: BODY
             sourceType: string
-            discrete: true
             target: "@{{destMetroId}}"
             targetLocation: BODY
             requiredMapping: false
@@ -194,7 +186,6 @@ spec:
             source: "@{{productOrderItem[0].product.productConfiguration.buyerCompanyId}}"
             sourceLocation: BODY
             sourceType: string
-            discrete: true
             target: "@{{destCompany}}"
             targetLocation: BODY
             requiredMapping: false

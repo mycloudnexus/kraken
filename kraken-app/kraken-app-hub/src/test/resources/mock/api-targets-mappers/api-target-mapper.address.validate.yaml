@@ -28,7 +28,6 @@ spec:
             source: "@{{submittedGeographicAddress.city}}"
             sourceLocation: BODY
             sourceType: string
-            discrete: true
             requiredMapping: true
             target: "filter={\"where\":{\"company.addresses.country\":\"@{{submittedGeographicAddress.country}}\",\"company.addresses.city\":\"@{{submittedGeographicAddress.city}}\"},\"skip\":0,\"limit\":10}"
             targetLocation: HYBRID
@@ -38,7 +37,6 @@ spec:
             source: "@{{submittedGeographicAddress.country}}"
             sourceLocation: BODY
             sourceType: string
-            discrete: true
             requiredMapping: true
             target: "filter={\"where\":{\"company.addresses.country\":\"@{{submittedGeographicAddress.country}}\",\"company.addresses.city\":\"@{{submittedGeographicAddress.city}}\"},\"skip\":0,\"limit\":10}"
             targetLocation: HYBRID
@@ -48,7 +46,6 @@ spec:
             source: "@{{submittedGeographicAddress.streetName}}"
             sourceLocation: BODY
             sourceType: string
-            discrete: true
             requiredMapping: false
             target: ""
             targetLocation: ""

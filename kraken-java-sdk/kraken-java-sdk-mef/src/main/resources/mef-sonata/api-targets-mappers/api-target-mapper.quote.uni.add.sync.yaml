@@ -91,7 +91,6 @@ spec:
             source: "@{{quoteItem[0].product.place[0].id}}"
             sourceLocation: BODY
             sourceType: string
-            discrete: true
             target: ""
             targetLocation: BODY
             requiredMapping: true
@@ -99,7 +98,6 @@ spec:
             source: "@{{quoteItem[0].product.place[0].keyName}}"
             sourceLocation: BODY
             sourceType: string
-            discrete: true
             target: ""
             targetLocation: BODY
             requiredMapping: false
@@ -109,7 +107,6 @@ spec:
             sourceLocation: BODY
             allowValueLimit: true
             sourceType: integer
-            discrete: true
             sourceValues:
             target: ""
             targetLocation: BODY
@@ -131,7 +128,6 @@ spec:
             source: "@{{quoteItem[0].product.productOffering.id}}"
             sourceLocation: BODY
             sourceType: string
-            discrete: true
             target: ""
             targetLocation: BODY
             requiredMapping: false
