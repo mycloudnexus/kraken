@@ -96,7 +96,7 @@ public class RenderRequestService implements MappingTransformer {
       StateValueMappingDto stateValueMappingDto) {
     String requestBody = endpoints.get(0).getRequestBody();
     List<ComponentAPITargetFacets.Mapper> request = endpoints.get(0).getMappers().getRequest();
-    if (StringUtils.isBlank(requestBody) || CollectionUtils.isEmpty(request)) {
+    if (CollectionUtils.isEmpty(request)) {
       return;
     }
     for (ComponentAPITargetFacets.Mapper mapper : request) {

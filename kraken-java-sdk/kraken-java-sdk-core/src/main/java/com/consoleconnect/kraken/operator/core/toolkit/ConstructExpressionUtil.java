@@ -61,6 +61,14 @@ public class ConstructExpressionUtil {
   }
 
   public static String constructBody(String source) {
+    // handle workflow output expression
+    if (source.startsWith("@{{workflow.")) {
+      List<String> params = extractMapperParam(source);
+      String[] split = params.get(0).split("\\.");
+      return String.format(
+          "${%s.output.response.body.%s}",
+          split[1], params.get(0).substring(split[0].length() + split[1].length() + 2));
+    }
     return source.replace("@{{", "${body.").replace("}}", "}");
   }
 

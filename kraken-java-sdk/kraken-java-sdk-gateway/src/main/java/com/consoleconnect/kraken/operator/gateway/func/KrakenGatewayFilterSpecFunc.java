@@ -107,7 +107,9 @@ public class KrakenGatewayFilterSpecFunc implements Function<GatewayFilterSpec, 
           config.setMetadataClient(metaDataClient);
           config.setBaseUri(mapping.getUri());
           config.setAppProperty(appProperty);
-          gatewayFilterSpec.filter(new WorkflowActionFilterFactory().apply(config));
+          gatewayFilterSpec.filter(
+              new WorkflowActionFilterFactory().apply(config),
+              RouteToRequestUrlFilter.ROUTE_TO_URL_FILTER_ORDER + 1);
         }
         default -> gatewayFilterSpec.filter(
             new ActionGatewayFilterFactory(actionRunners).apply(action), action.getOrder());

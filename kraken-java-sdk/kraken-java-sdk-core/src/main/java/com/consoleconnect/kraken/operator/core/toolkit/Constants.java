@@ -14,6 +14,7 @@ public class Constants {
   public static final String ORDER_KEY_WORD = "order";
 
   public static final String FAIL_ORDER_TASK_VALUE = "fail_order_task";
+  public static final String EVALUATE_PAYLOAD = "evaluate_payload_task";
   public static final String REJECT_ORDER_TASK_VALUE = "reject_order_task";
   public static final String EMPTY_TASK_VALUE = "empty_task";
   public static final String PROCESS_ORDER_TASK_VALUE = "process_order_task";

@@ -28,7 +28,7 @@ class WorkflowTemplateTransformerTest extends AbstractIntegrationTest {
   @Test
   @SneakyThrows
   void givenComponentWorkflowFacets_whenTransform_thenSuccess() {
-    String s = readFileToString("/mockData/api-workflow.order.eline.delete.yaml");
+    String s = readFileToString("/mockData/api-workflow.order.uni.add.yaml");
     Optional<UnifiedAsset> unifiedAsset = YamlToolkit.parseYaml(s, UnifiedAsset.class);
     WorkflowDef transfer = transformer.transfer(unifiedAsset.get());
     log.info("transfer result: {}", JsonToolkit.toJson(transfer));

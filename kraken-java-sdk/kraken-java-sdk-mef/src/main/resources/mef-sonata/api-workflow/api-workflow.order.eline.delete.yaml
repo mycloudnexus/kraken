@@ -10,7 +10,8 @@ spec:
     workflowName: "order.eline.delete"
     externalId: ""
   validationStage:
-    - taskName: status_checking_task
+    - taskName: validation_task
+      description: ""
       taskType: http
       endpoint:
           path: ""
@@ -22,16 +23,18 @@ spec:
         caseExpression: ""
         buildInTask: reject_order_task
   preparationStage:
-    - taskName: disable_order_task
+    - taskName: preparation_task
+      description: ""
       taskType: http
       endpoint:
           path: ""
-          method: PUT
+          method: ""
           serverKey: ''
           mappers:
             request:
   executionStage:
-    - taskName: delete_order_task
+    - taskName: create_order_task
+      description: ""
       taskType: http
       endpoint:
           path: ""
