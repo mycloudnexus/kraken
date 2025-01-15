@@ -73,10 +73,18 @@ public class WorkflowTaskConfig implements WorkflowTaskRegister {
     log.info("log payload: {}", JsonToolkit.toJson(payload));
 
     ApiActivityRequestLog activityRequestLog = ApiActivityLogHelper.extractRequestLog(payload);
+    if (activityRequestLog == null) {
+      log.error("Invalid activity log, empty request");
+      return;
+    }
     ApiActivityLogEntity entity =
         backendApiActivityLogService.logApiActivityRequest(activityRequestLog);
 
     ApiActivityResponseLog activityResponseLog = ApiActivityLogHelper.extractResponseLog(payload);
+    if (activityResponseLog == null) {
+      log.error("Invalid activity log, empty response");
+      return;
+    }
     activityResponseLog.setApiActivityLog(entity);
     backendApiActivityLogService.logApiActivityResponse(activityResponseLog);
   }

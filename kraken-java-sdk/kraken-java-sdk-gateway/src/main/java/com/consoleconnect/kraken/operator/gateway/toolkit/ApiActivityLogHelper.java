@@ -27,6 +27,9 @@ public class ApiActivityLogHelper {
   private static final String INPUT_PARAM_STATUS_CODE = "statusCode";
 
   public static ApiActivityRequestLog extractRequestLog(LogTaskRequest payload) {
+    if (payload.getRequestPayload() == null) {
+      return null;
+    }
     Map<String, Object> map =
         JsonToolkit.fromJson(
             (String) payload.getRequestPayload(), new TypeReference<Map<String, Object>>() {});
@@ -45,6 +48,9 @@ public class ApiActivityLogHelper {
   }
 
   public static ApiActivityResponseLog extractResponseLog(LogTaskRequest payload) {
+    if (payload.getResponsePayload() == null) {
+      return null;
+    }
     Map<String, Object> map =
         JsonToolkit.fromJson(
             (String) payload.getResponsePayload(), new TypeReference<Map<String, Object>>() {});
