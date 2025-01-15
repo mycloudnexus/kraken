@@ -4,10 +4,11 @@ import static com.consoleconnect.kraken.operator.core.toolkit.DataBufferUtil.con
 import static org.springframework.core.io.buffer.DataBufferUtils.join;
 
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
-import com.consoleconnect.kraken.operator.core.enums.SyncStatusEnum;
+import com.consoleconnect.kraken.operator.core.model.ApiActivityResponseLog;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
 import com.consoleconnect.kraken.operator.core.service.ApiActivityLogService;
+import com.consoleconnect.kraken.operator.gateway.service.BackendApiActivityLogService;
 import com.consoleconnect.kraken.operator.gateway.service.FilterHeaderService;
 import java.util.Objects;
 import java.util.Optional;
@@ -25,12 +26,16 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class BackendServerResponseLogFilter extends AbstractGlobalFilter {
 
+  private final BackendApiActivityLogService backendApiActivityLogService;
+
   public BackendServerResponseLogFilter(
       AppProperty appProperty,
       ApiActivityLogRepository apiActivityLogRepository,
       FilterHeaderService filterHeaderService,
-      ApiActivityLogService apiActivityLogService) {
+      ApiActivityLogService apiActivityLogService,
+      BackendApiActivityLogService backendApiActivityLogService) {
     super(appProperty, apiActivityLogRepository, filterHeaderService, apiActivityLogService);
+    this.backendApiActivityLogService = backendApiActivityLogService;
   }
 
   @Override
@@ -52,16 +57,22 @@ public class BackendServerResponseLogFilter extends AbstractGlobalFilter {
                           return this.getDelegate().writeWith(Mono.just(db));
                         }
                         ApiActivityLogEntity updatedEntity = updatedEntityOptional.get();
-                        String response = convert2String(db, exchange);
-                        log.info(" the backend response is {}", response);
-                        if (StringUtils.isNoneBlank(response)) {
-                          updatedEntity.setResponse(response);
+                        String response = null;
+                        String responseStr = convert2String(db, exchange);
+                        log.info(" the backend response is {}", responseStr);
+                        if (StringUtils.isNoneBlank(responseStr)) {
+                          response = responseStr;
                         }
-                        updatedEntity.setHttpStatusCode(
-                            Objects.requireNonNull(exchange.getResponse().getStatusCode()).value());
-                        updatedEntity.setResponseIp(updatedEntity.getUri());
-                        updatedEntity.setSyncStatus(SyncStatusEnum.UNDEFINED);
-                        apiActivityLogService.save(updatedEntity);
+                        Integer statusCode =
+                            Objects.requireNonNull(exchange.getResponse().getStatusCode()).value();
+                        ApiActivityResponseLog responseLog =
+                            ApiActivityResponseLog.builder()
+                                .apiActivityLog(updatedEntity)
+                                .responseIp(updatedEntity.getUri())
+                                .response(response)
+                                .httpStatusCode(statusCode)
+                                .build();
+                        backendApiActivityLogService.logApiActivityResponse(responseLog);
                         return this.getDelegate().writeWith(Mono.just(db));
                       } catch (Exception e) {
                         log.error("tracing backed response error", e);

@@ -9,11 +9,10 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class ApiActivityRequestLog {
-  private String env;
-
-  private String responseIp;
 
   private String requestId;
+
+  private Integer callSeq;
 
   private String uri;
 
@@ -21,13 +20,15 @@ public class ApiActivityRequestLog {
 
   private String method;
 
-  private Integer httpStatusCode;
-
   private Map<String, String> queryParameters;
 
   private Map<String, String> headers;
 
-  protected Object request;
+  private String requestIp;
 
-  protected Object response;
+  private String responseIp;
+
+  private String activityRequestLogId;
+
+  private Object request;
 }

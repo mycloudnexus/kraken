@@ -213,6 +213,10 @@ public class ApiActivityLogService {
     return this.repository.save(apiActivityLogEntity);
   }
 
+  public Optional<ApiActivityLogEntity> findById(UUID id) {
+    return repository.findById(id);
+  }
+
   public Optional<ApiActivityLogEntity> findLatestSeq(String requestId) {
     return repository.findLatestSeq(requestId);
   }

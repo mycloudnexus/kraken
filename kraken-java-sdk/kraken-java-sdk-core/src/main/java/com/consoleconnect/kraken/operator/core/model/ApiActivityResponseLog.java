@@ -1,6 +1,6 @@
 package com.consoleconnect.kraken.operator.core.model;
 
-import java.util.Map;
+import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
 import lombok.*;
 
 @Getter
@@ -9,23 +9,12 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class ApiActivityResponseLog {
-  private String env;
 
-  private String requestId;
-
-  private int callSeq;
-
-  private String uri;
-
-  private String path;
-
-  private String method;
+  private ApiActivityLogEntity apiActivityLog;
 
   private Integer httpStatusCode;
 
-  private Map<String, String> queryParameters;
+  private String responseIp;
 
-  private Map<String, String> headers;
-
-  protected String response;
+  protected Object response;
 }
