@@ -108,7 +108,6 @@ spec:
             sourceLocation: BODY
             allowValueLimit: true
             sourceType: integer
-            discrete:
             sourceValues:
             target: ""
             targetLocation: BODY

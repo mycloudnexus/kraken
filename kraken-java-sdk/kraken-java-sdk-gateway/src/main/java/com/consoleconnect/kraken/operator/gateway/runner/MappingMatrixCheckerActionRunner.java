@@ -240,10 +240,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
       }
       if (MappingTypeEnum.ENUM.getKind().equals(mapper.getSourceType())
           || MappingTypeEnum.DISCRETE_STR.getKind().equals(mapper.getSourceType())
-          || Boolean.TRUE.equals(mapper.getAllowValueLimit())
-              && (MappingTypeEnum.DISCRETE_INT.getKind().equals(mapper.getSourceType())
-                  || MappingTypeEnum.CONTINUOUS_DOUBLE.getKind().equals(mapper.getSourceType())
-                  || MappingTypeEnum.CONTINUOUS_INT.getKind().equals(mapper.getSourceType()))) {
+          || isNumberKind(mapper.getAllowValueLimit(), mapper.getSourceType())) {
         checkEnumValue(documentContext, mapper);
       } else if (isConstantType(mapper.getTarget())) {
         checkConstantValue(documentContext, mapper, inputs);
@@ -308,11 +305,8 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     // Discrete integer checking
     validateDiscreteInteger(evaluateValue, paramName, valueList, sourceType, discrete);
 
-    // Continuous integer variables checking
-    validateContinuousInteger(evaluateValue, paramName, valueList, sourceType, discrete);
-
-    // Continuous double variables checking
-    validateContinuousDouble(evaluateValue, paramName, valueList, sourceType, discrete);
+    // Continuous number variables checking, include integer and double
+    validateContinuousNumber(evaluateValue, paramName, valueList, sourceType, discrete);
   }
 
   private void checkMappingValue(

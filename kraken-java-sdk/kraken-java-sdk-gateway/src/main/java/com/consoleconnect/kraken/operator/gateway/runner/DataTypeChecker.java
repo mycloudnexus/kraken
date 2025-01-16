@@ -146,6 +146,13 @@ public interface DataTypeChecker {
         : String.valueOf(realValue));
   }
 
+  default boolean isNumberKind(Boolean allowValueLimit, String sourceType) {
+    return Boolean.TRUE.equals(allowValueLimit)
+            && (MappingTypeEnum.DISCRETE_INT.getKind().equals(sourceType)
+            || MappingTypeEnum.CONTINUOUS_DOUBLE.getKind().equals(sourceType)
+            || MappingTypeEnum.CONTINUOUS_INT.getKind().equals(sourceType));
+  }
+
   default boolean isConstantType(String target) {
     return StringUtils.isNotBlank(target) && !target.contains("@{{");
   }
@@ -154,7 +161,17 @@ public interface DataTypeChecker {
       String target, Object evaluateValue, String paramName, String sourceType) {
     if (isConstantType(target)) {
       validateDiscreteString(evaluateValue, paramName, sourceType);
-      Object targetObj = null;
+      Object targetObj = convertBySourceType(target, sourceType);
+      if (Objects.isNull(targetObj) || !targetObj.equals(evaluateValue)) {
+        throw KrakenException.unProcessableEntityInvalidValue(
+            String.format(SHOULD_BE_MSG, paramName, evaluateValue, target));
+      }
+    }
+  }
+
+  default Object convertBySourceType(String target, String sourceType) {
+    Object targetObj = null;
+    try {
       if (Constants.INT_VAL.equals(sourceType)) {
         targetObj = Integer.valueOf(target);
       } else if (Constants.DOUBLE_VAL.equals(sourceType)) {
@@ -162,11 +179,10 @@ public interface DataTypeChecker {
       } else {
         targetObj = target;
       }
-      if (Objects.isNull(targetObj) || !targetObj.equals(evaluateValue)) {
-        throw KrakenException.unProcessableEntityInvalidValue(
-            String.format(SHOULD_BE_MSG, paramName, evaluateValue, target));
-      }
+    } catch (Exception e) {
+      LogHolder.log.error("Failed to convert by sourceType", e);
     }
+    return targetObj;
   }
 
   default void validateDiscreteString(Object evaluateValue, String paramName, String sourceType) {
@@ -253,38 +269,29 @@ public interface DataTypeChecker {
     }
   }
 
-  default void validateContinuousInteger(
-      Object evaluateValue,
-      String paramName,
-      List<String> valueList,
-      String sourceType,
-      Boolean discrete) {
+  default void validateContinuousNumber(Object evaluateValue,
+                                        String paramName,
+                                        List<String> valueList,
+                                        String sourceType,
+                                        Boolean discrete) {
     if (MappingTypeEnum.CONTINUOUS_INT.getKind().equals(sourceType)
-        && MappingTypeEnum.CONTINUOUS_INT.getDiscrete().equals(discrete)) {
+            && MappingTypeEnum.CONTINUOUS_INT.getDiscrete().equals(discrete)) {
       if (Objects.isNull(evaluateValue) || isNotInteger(evaluateValue)) {
         throw KrakenException.unProcessableEntityInvalidValue(
-            String.format(
-                EXPECT_INT_MSG, paramName, evaluateValue, whichDataType(evaluateValue), "Integer"));
+                String.format(
+                        EXPECT_INT_MSG, paramName, evaluateValue, whichDataType(evaluateValue), "Integer"));
       }
       validateContinuousDouble(evaluateValue, paramName, valueList);
-    }
-  }
-
-  default void validateContinuousDouble(
-      Object evaluateValue,
-      String paramName,
-      List<String> valueList,
-      String sourceType,
-      Boolean discrete) {
-    if (MappingTypeEnum.CONTINUOUS_DOUBLE.getKind().equals(sourceType)
-        && MappingTypeEnum.CONTINUOUS_DOUBLE.getDiscrete().equals(discrete)) {
+    } else if (MappingTypeEnum.CONTINUOUS_DOUBLE.getKind().equals(sourceType)
+            && MappingTypeEnum.CONTINUOUS_DOUBLE.getDiscrete().equals(discrete)) {
       if (Objects.isNull(evaluateValue) || isNotDouble(evaluateValue)) {
         throw KrakenException.unProcessableEntityInvalidValue(
-            String.format(
-                EXPECT_INT_MSG, paramName, evaluateValue, whichDataType(evaluateValue), "Double"));
+                String.format(
+                        EXPECT_INT_MSG, paramName, evaluateValue, whichDataType(evaluateValue), "Double"));
       }
       validateContinuousDouble(evaluateValue, paramName, valueList);
     }
+
   }
 
   default void validateContinuousDouble(
