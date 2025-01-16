@@ -210,6 +210,9 @@ public class ApiActivityLogService {
     if (apiActivityLogEntity.getApiLogBodyEntity() != null) {
       this.apiActivityLogBodyRepository.save(apiActivityLogEntity.getApiLogBodyEntity());
     }
+    if (apiActivityLogEntity.getTriggeredAt() == null) {
+      apiActivityLogEntity.setTriggeredAt(ZonedDateTime.now());
+    }
     return this.repository.save(apiActivityLogEntity);
   }
 

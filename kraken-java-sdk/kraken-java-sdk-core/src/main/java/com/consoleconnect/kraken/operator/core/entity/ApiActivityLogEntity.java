@@ -37,6 +37,9 @@ public class ApiActivityLogEntity extends AbstractHttpEntity {
   @Column(name = "synced_at", nullable = true, unique = false)
   private ZonedDateTime syncedAt;
 
+  @Column(name = "triggered_at", nullable = true, unique = false)
+  private ZonedDateTime triggeredAt;
+
   @Enumerated(EnumType.STRING)
   @Column(name = "sync_status", nullable = true, unique = false)
   private SyncStatusEnum syncStatus;
