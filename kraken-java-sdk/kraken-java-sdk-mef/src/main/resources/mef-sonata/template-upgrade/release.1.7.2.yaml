@@ -9,5 +9,6 @@ metadata:
     productVersion: V1.7.2
     publishDate: 2025-01-14
   description: |
-    Split source property type and value range type in mapping template
+    Split source property type and value range type in mapping template.
+    Removed the associatedGeographicAddress in templates of the address retrieve.
   version: 1
