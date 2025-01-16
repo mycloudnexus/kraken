@@ -148,7 +148,7 @@ public interface DataTypeChecker {
 
   default boolean isNumberKind(Boolean allowValueLimit, String sourceType) {
     return Boolean.TRUE.equals(allowValueLimit)
-            && (MappingTypeEnum.DISCRETE_INT.getKind().equals(sourceType)
+        && (MappingTypeEnum.DISCRETE_INT.getKind().equals(sourceType)
             || MappingTypeEnum.CONTINUOUS_DOUBLE.getKind().equals(sourceType)
             || MappingTypeEnum.CONTINUOUS_INT.getKind().equals(sourceType));
   }
@@ -269,29 +269,29 @@ public interface DataTypeChecker {
     }
   }
 
-  default void validateContinuousNumber(Object evaluateValue,
-                                        String paramName,
-                                        List<String> valueList,
-                                        String sourceType,
-                                        Boolean discrete) {
+  default void validateContinuousNumber(
+      Object evaluateValue,
+      String paramName,
+      List<String> valueList,
+      String sourceType,
+      Boolean discrete) {
     if (MappingTypeEnum.CONTINUOUS_INT.getKind().equals(sourceType)
-            && MappingTypeEnum.CONTINUOUS_INT.getDiscrete().equals(discrete)) {
+        && MappingTypeEnum.CONTINUOUS_INT.getDiscrete().equals(discrete)) {
       if (Objects.isNull(evaluateValue) || isNotInteger(evaluateValue)) {
         throw KrakenException.unProcessableEntityInvalidValue(
-                String.format(
-                        EXPECT_INT_MSG, paramName, evaluateValue, whichDataType(evaluateValue), "Integer"));
+            String.format(
+                EXPECT_INT_MSG, paramName, evaluateValue, whichDataType(evaluateValue), "Integer"));
       }
       validateContinuousDouble(evaluateValue, paramName, valueList);
     } else if (MappingTypeEnum.CONTINUOUS_DOUBLE.getKind().equals(sourceType)
-            && MappingTypeEnum.CONTINUOUS_DOUBLE.getDiscrete().equals(discrete)) {
+        && MappingTypeEnum.CONTINUOUS_DOUBLE.getDiscrete().equals(discrete)) {
       if (Objects.isNull(evaluateValue) || isNotDouble(evaluateValue)) {
         throw KrakenException.unProcessableEntityInvalidValue(
-                String.format(
-                        EXPECT_INT_MSG, paramName, evaluateValue, whichDataType(evaluateValue), "Double"));
+            String.format(
+                EXPECT_INT_MSG, paramName, evaluateValue, whichDataType(evaluateValue), "Double"));
       }
       validateContinuousDouble(evaluateValue, paramName, valueList);
     }
-
   }
 
   default void validateContinuousDouble(
