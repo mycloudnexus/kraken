@@ -109,6 +109,17 @@ public interface DataTypeChecker {
     return realValue;
   }
 
+  default PathCheck rewritePath(PathCheck pathCheck, int index) {
+    return new PathCheck(
+        pathCheck.name(),
+        pathCheck.path().replace("[*]", "[" + index + "]"),
+        pathCheck.expectType(),
+        pathCheck.value(),
+        pathCheck.errorMsg(),
+        pathCheck.code(),
+        pathCheck.expectedValueType());
+  }
+
   default void throwException(Integer code, String errorMsg, String defaultMsg) {
     String msg = errorMsg == null ? defaultMsg : errorMsg;
     if (code != null && code != HttpStatus.UNPROCESSABLE_ENTITY.value()) {

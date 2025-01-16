@@ -406,6 +406,22 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
   }
 
   @Test
+  void givenIndex_whenRewritePath_thenReturnOK() {
+    PathCheck pathCheck =
+        new PathCheck(
+            "EXPECTED_STR",
+            "$.body.quoteItem[0].product.place[*].@type",
+            ExpectTypeEnum.EXPECTED_STR,
+            "",
+            "",
+            422,
+            null);
+    PathCheck updatedPathCheck = mappingMatrixCheckerActionRunner.rewritePath(pathCheck, 0);
+    String expected = "$.body.quoteItem[0].product.place[0].@type";
+    Assertions.assertEquals(expected, updatedPathCheck.path());
+  }
+
+  @Test
   void givenNotNumerical_whenValidatingConstantNumber_thenThrowsException() {
     ComponentAPITargetFacets.Mapper mapper = new ComponentAPITargetFacets.Mapper();
     mapper.setSourceType(MappingTypeEnum.DISCRETE_INT.getKind());

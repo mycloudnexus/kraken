@@ -26,10 +26,11 @@ spec:
         path: "$.body.quoteItem[0].product.place[0].role"
         expectType: EXPECTED
         value: INSTALL_LOCATION
-      - name: quoteItem[0].product.place[0].@type
-        path: "$.body.quoteItem[0].product.place[0].@type"
-        expectType: EXPECTED
-        value: GeographicAddressRef
+      - name: quoteItem[0].product.place[*].@type
+        path: "$.body.quoteItem[0].product.place[*].@type"
+        expectType: EXPECTED_STR
+        value: true
+        code: 422
       - name: product_type_eline
         path: "$.body.quoteItem[*].product.productConfiguration.['@type']"
         expectType: EXPECTED
