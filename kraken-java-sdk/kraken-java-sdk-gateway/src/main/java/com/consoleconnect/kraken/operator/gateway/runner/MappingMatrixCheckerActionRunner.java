@@ -360,6 +360,6 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
 
   public Object readByPathCheckWithException(DocumentContext documentContext, PathCheck pathCheck) {
     return readByPathWithException(
-        documentContext, pathCheck.path(), pathCheck.code(), pathCheck.errorMsg());
+        documentContext, pathCheck.path(), pathCheck.code() == null ? 400 : pathCheck.code(), pathCheck.errorMsg());
   }
 }

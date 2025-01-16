@@ -23,6 +23,7 @@ public interface DataTypeChecker {
   String EXPECT_INF_MSG = "invalidFormat, can not process @{{%s}} = %s, %s found, %s expected";
   String PARAM_NOT_EXIST_MSG =
       "missingProperty, the parameter @{{%s}} does not exist in the request";
+  String MISSING_PROPERTY_MSG = "missingProperty, the parameter %s does not exist in the request";
   String SHOULD_BE_MSG = "invalidValue, can not process @{{%s}} = %s, value should be %s";
   String SHOULD_BE_IN_MSG = "invalidValue, can not process @{{%s}} = %s, value should be in %s";
   String SHOULD_NOT_BE_BLANK =
@@ -103,8 +104,12 @@ public interface DataTypeChecker {
       realValue = documentContext.read(checkPath);
     } catch (Exception e) {
       printJsonPathReadError();
+      String defaultMsg = PARAM_NOT_EXIST_MSG;
+      if (Integer.valueOf(HttpStatus.BAD_REQUEST.value()).equals(code)) {
+        defaultMsg = MISSING_PROPERTY_MSG;
+      }
       throwException(
-          code, errorMsg, String.format(PARAM_NOT_EXIST_MSG, extractCheckingPath(checkPath)));
+          code, errorMsg, String.format(defaultMsg, extractCheckingPath(checkPath)));
     }
     return realValue;
   }
