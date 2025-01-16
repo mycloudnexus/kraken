@@ -10,5 +10,5 @@ metadata:
     publishDate: 2025-01-14
   description: |
     Split source property type and value range type in mapping template.
-    Removed the associatedGeographicAddress int templates of the address retrieve.
+    Removed the associatedGeographicAddress in templates of the address retrieve.
   version: 1
