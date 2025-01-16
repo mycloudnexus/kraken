@@ -38,7 +38,7 @@ public class WorkflowActionFilterFactory
   public static final String VAR_WORKFLOW_ENABLED = "enabled";
   public static final String VAR_WORKFLOW_CONFIG = "workflow-config";
   public static final String VAR_ENTITY_ID = "entity-id";
-  public static final String VAR_REQUEST_ID = "request-id";
+  public static final String VAR_REQUEST_ID = "log-request-id";
   public static final String VAR_BASE_URL = "url";
 
   public WorkflowActionFilterFactory() {
