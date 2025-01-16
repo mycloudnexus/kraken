@@ -31,7 +31,7 @@ spec:
             description: ""
             source: "@{{productOrderItem[*].product.id}}"
             sourceLocation: "BODY"
-            sourceType: discreteStr
+            sourceType: string
             target: "@{{portId}}"
             targetLocation: PATH
             requiredMapping: false
@@ -40,7 +40,7 @@ spec:
             description: ""
             source: "@{{productOrderItem[0].product.productOffering.id}}"
             sourceLocation: "BODY"
-            sourceType: discreteStr
+            sourceType: string
             target: "UNI"
             targetLocation: ""
             requiredMapping: true

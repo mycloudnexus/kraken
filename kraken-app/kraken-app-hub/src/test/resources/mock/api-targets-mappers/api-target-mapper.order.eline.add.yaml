@@ -33,7 +33,7 @@ spec:
             title: "order item Term duration"
             source: "@{{productOrderItem[0].requestedItemTerm.duration.amount}}"
             sourceLocation: BODY
-            sourceType: constantNumber
+            sourceType: integer
             target: "@{{duration}}"
             targetLocation: BODY
             requiredMapping: true
@@ -71,7 +71,7 @@ spec:
             title: " quote item Term roll duration"
             source: "@{{productOrderItem[0].requestedItemTerm.rollInterval.amount}}"
             sourceLocation: BODY
-            sourceType: constantNumber
+            sourceType: integer
             target: ""
             targetLocation: BODY
             requiredMapping: false
@@ -109,7 +109,8 @@ spec:
             source: "@{{productOrderItem[0].product.productConfiguration.bandwidth}}"
             sourceLocation: BODY
             allowValueLimit: true
-            sourceType: discreteInt
+            sourceType: integer
+            discrete: true
             sourceValues:
               - 1000
               - 10000
@@ -120,7 +121,7 @@ spec:
             title: "The name of the ELINE"
             source: "@{{productOrderItem[0].product.productConfiguration.name}}"
             sourceLocation: BODY
-            sourceType: discreteStr
+            sourceType: string
             target: "@{{name}}"
             targetLocation: BODY
             requiredMapping: false
@@ -128,7 +129,7 @@ spec:
             title: "The payment type of the ELINE"
             source: "@{{productOrderItem[0].product.productConfiguration.paymentType}}"
             sourceLocation: BODY
-            sourceType: discreteStr
+            sourceType: string
             target: "@{{paymentType}}"
             targetLocation: BODY
             requiredMapping: false
@@ -136,7 +137,7 @@ spec:
             title: "The class of Service of the Eline"
             source: "@{{productOrderItem[0].product.productConfiguration.classOfService}}"
             sourceLocation: BODY
-            sourceType: discreteStr
+            sourceType: string
             target: "@{{classOfService}}"
             targetLocation: BODY
             requiredMapping: false
@@ -144,7 +145,7 @@ spec:
             title: "source UNI or ENNI id"
             source: "@{{productOrderItem[0].product.productRelationship[0].id}}"
             sourceLocation: BODY
-            sourceType: discreteStr
+            sourceType: string
             target: "@{{portId}}"
             targetLocation: BODY
             requiredMapping: true
@@ -152,7 +153,7 @@ spec:
             title: "destination UNI id"
             source: "@{{productOrderItem[0].product.productRelationship[1].id}}"
             sourceLocation: BODY
-            sourceType: discreteStr
+            sourceType: string
             target: "@{{destPortId}}"
             targetLocation: BODY
             requiredMapping: true
@@ -160,7 +161,7 @@ spec:
             title: "id of a Product Offering"
             source: "@{{productOrderItem[0].product.productOffering.id}}"
             sourceLocation: BODY
-            sourceType: discreteStr
+            sourceType: string
             target: "ACCESS_E_LINE"
             targetLocation: BODY
             requiredMapping: true
@@ -168,7 +169,7 @@ spec:
             title: "customized product type"
             source: "@{{productOrderItem[0].product.productConfiguration.type}}"
             sourceLocation: BODY
-            sourceType: discreteStr
+            sourceType: string
             target: "@{{type}}"
             targetLocation: BODY
             requiredMapping: false
@@ -176,7 +177,7 @@ spec:
             title: "The metro id of the destination UNI"
             source: "@{{productOrderItem[0].product.productConfiguration.destUNIMetroId}}"
             sourceLocation: BODY
-            sourceType: discreteStr
+            sourceType: string
             target: "@{{destMetroId}}"
             targetLocation: BODY
             requiredMapping: false
@@ -184,7 +185,7 @@ spec:
             title: "The Id of buyer Company"
             source: "@{{productOrderItem[0].product.productConfiguration.buyerCompanyId}}"
             sourceLocation: BODY
-            sourceType: discreteStr
+            sourceType: string
             target: "@{{destCompany}}"
             targetLocation: BODY
             requiredMapping: false

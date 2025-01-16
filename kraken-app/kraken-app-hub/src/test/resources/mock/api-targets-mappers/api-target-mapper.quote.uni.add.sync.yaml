@@ -21,7 +21,7 @@ spec:
           - name: mapper.quote.uni.add.sync.duration.amount
             source: "@{{quoteItem[0].requestedQuoteItemTerm.duration.amount}}"
             sourceLocation: BODY
-            sourceType: constantNumber
+            sourceType: integer
             target: "1"
             targetLocation: BODY
             requiredMapping: true
@@ -57,7 +57,7 @@ spec:
           - name: mapper.quote.uni.add.sync.rollInterval.amount
             source: "@{{quoteItem[0].requestedQuoteItemTerm.rollInterval.amount}}"
             sourceLocation: BODY
-            sourceType: constantNumber
+            sourceType: integer
             target: "1"
             targetLocation: BODY
             requiredMapping: false
@@ -80,14 +80,14 @@ spec:
           - name: mapper.quote.uni.add.sync.place.id
             source: "@{{quoteItem[0].product.place[0].id}}"
             sourceLocation: BODY
-            sourceType: discreteStr
+            sourceType: string
             target: "@{{ports[*].dcf}}"
             targetLocation: BODY
             requiredMapping: true
           - name: mapper.quote.uni.add.sync.place.keyName
             source: "@{{quoteItem[0].product.place[0].keyName}}"
             sourceLocation: BODY
-            sourceType: discreteStr
+            sourceType: string
             target: ""
             targetLocation: BODY
             requiredMapping: false
@@ -95,7 +95,8 @@ spec:
             source: "@{{quoteItem[0].product.productConfiguration.bandwidth}}"
             sourceLocation: BODY
             allowValueLimit: true
-            sourceType: discreteInt
+            sourceType: integer
+            discrete: true
             sourceValues:
               - 1000
               - 10000
@@ -116,7 +117,7 @@ spec:
           - name: mapper.quote.uni.add.sync.productOffering.id
             source: "@{{quoteItem[0].product.productOffering.id}}"
             sourceLocation: BODY
-            sourceType: discreteStr
+            sourceType: string
             target: "UNI"
             targetLocation: BODY
             requiredMapping: false
