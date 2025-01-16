@@ -72,21 +72,25 @@ public class WorkflowTaskConfig implements WorkflowTaskRegister {
   public void logRequestPayload(@InputParam("payload") LogTaskRequest payload) {
     log.info("log payload: {}", JsonToolkit.toJson(payload));
 
-    ApiActivityRequestLog activityRequestLog = ApiActivityLogHelper.extractRequestLog(payload);
-    if (activityRequestLog == null) {
-      log.error("Invalid activity log, empty request");
-      return;
-    }
-    ApiActivityLogEntity entity =
-        backendApiActivityLogService.logApiActivityRequest(activityRequestLog);
+    try {
+      ApiActivityRequestLog activityRequestLog = ApiActivityLogHelper.extractRequestLog(payload);
+      if (activityRequestLog == null) {
+        log.error("Invalid activity log, empty request");
+        return;
+      }
+      ApiActivityLogEntity entity =
+          backendApiActivityLogService.logApiActivityRequest(activityRequestLog);
 
-    ApiActivityResponseLog activityResponseLog = ApiActivityLogHelper.extractResponseLog(payload);
-    if (activityResponseLog == null) {
-      log.error("Invalid activity log, empty response");
-      return;
+      ApiActivityResponseLog activityResponseLog = ApiActivityLogHelper.extractResponseLog(payload);
+      if (activityResponseLog == null) {
+        log.error("Invalid activity log, empty response");
+        return;
+      }
+      activityResponseLog.setApiActivityLog(entity);
+      backendApiActivityLogService.logApiActivityResponse(activityResponseLog);
+    } catch (Exception e) {
+      log.error("Failed to log api activity log", e);
     }
-    activityResponseLog.setApiActivityLog(entity);
-    backendApiActivityLogService.logApiActivityResponse(activityResponseLog);
   }
 
   @WorkerTask(EMPTY_TASK)

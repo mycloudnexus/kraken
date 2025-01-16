@@ -30,10 +30,8 @@ public class ApiActivityLogHelper {
     if (payload.getRequestPayload() == null) {
       return null;
     }
-    Map<String, Object> map =
-        JsonToolkit.fromJson(
-            (String) payload.getRequestPayload(), new TypeReference<Map<String, Object>>() {});
-    Map<String, Object> request = (Map<String, Object>) map.get(INPUT_PARAM_REQUEST);
+    Map<String, Object> map = convertToMap(payload.getRequestPayload());
+    Map<String, Object> request = convertToMap(map.get(INPUT_PARAM_REQUEST));
     String url = getAsString(request, INPUT_PARAM_URI);
     return ApiActivityRequestLog.builder()
         .requestId(payload.getRequestId())
@@ -51,14 +49,27 @@ public class ApiActivityLogHelper {
     if (payload.getResponsePayload() == null) {
       return null;
     }
-    Map<String, Object> map =
-        JsonToolkit.fromJson(
-            (String) payload.getResponsePayload(), new TypeReference<Map<String, Object>>() {});
-    Map<String, Object> response = (Map<String, Object>) map.get(INPUT_PARAM_RESPONSE);
+    Map<String, Object> map = convertToMap(payload.getResponsePayload());
+    Object orgResp = map.get(INPUT_PARAM_RESPONSE);
+    if (orgResp instanceof String) {
+      return ApiActivityResponseLog.builder().build();
+    }
+    Map<String, Object> response = (Map<String, Object>) convertToMap(orgResp);
     return ApiActivityResponseLog.builder()
         .response(JsonToolkit.toJson(getAsMap(response, INPUT_PARAM_BODY)))
         .httpStatusCode(getAsInt(response, INPUT_PARAM_STATUS_CODE))
         .build();
+  }
+
+  private static Map<String, Object> convertToMap(Object payload) {
+    if (payload instanceof String) {
+      return JsonToolkit.fromJson((String) payload, new TypeReference<Map<String, Object>>() {});
+    } else if (payload instanceof Map) {
+      return (java.util.Map<String, Object>) payload;
+    } else {
+      return JsonToolkit.fromJson(
+          JsonToolkit.toJson(payload), new TypeReference<Map<String, Object>>() {});
+    }
   }
 
   private static String parsePath(String query) {
