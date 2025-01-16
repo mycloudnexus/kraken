@@ -116,6 +116,7 @@ app:
     - kraken.component.api-target
     - kraken.component.api-target-mapper
     - kraken.component.api-workflow
+    - kraken.product.mapping.matrix
     - kraken.component.api-server
   unified-asset:
     endpoints:
