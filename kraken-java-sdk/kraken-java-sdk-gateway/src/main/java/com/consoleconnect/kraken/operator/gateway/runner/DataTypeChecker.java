@@ -148,9 +148,7 @@ public interface DataTypeChecker {
 
   default boolean isNumberKind(Boolean allowValueLimit, String sourceType) {
     return Boolean.TRUE.equals(allowValueLimit)
-        && (MappingTypeEnum.DISCRETE_INT.getKind().equals(sourceType)
-            || MappingTypeEnum.CONTINUOUS_DOUBLE.getKind().equals(sourceType)
-            || MappingTypeEnum.CONTINUOUS_INT.getKind().equals(sourceType));
+        && (Constants.INT_VAL.equals(sourceType) || Constants.DOUBLE_VAL.equals(sourceType));
   }
 
   default boolean isConstantType(String target) {
@@ -186,7 +184,7 @@ public interface DataTypeChecker {
   }
 
   default void validateDiscreteString(Object evaluateValue, String paramName, String sourceType) {
-    if (MappingTypeEnum.DISCRETE_STR.getKind().equals(sourceType)) {
+    if (MappingTypeEnum.STRING.getKind().equals(sourceType)) {
       Class<?> dataType = whichDataTypeClass(evaluateValue);
       if (!String.class.equals(dataType)) {
         throw KrakenException.unProcessableEntityInvalidFormat(
@@ -227,7 +225,7 @@ public interface DataTypeChecker {
   default void validateEnumOrDiscreteString(
       Object evaluateValue, String paramName, List<String> valueList, String sourceType) {
     validateDiscreteString(evaluateValue, paramName, sourceType);
-    if ((MappingTypeEnum.DISCRETE_STR.getKind().equals(sourceType)
+    if ((MappingTypeEnum.STRING.getKind().equals(sourceType)
             || (MappingTypeEnum.ENUM.getKind().equals(sourceType)))
         && Objects.nonNull(evaluateValue)
         && CollectionUtils.isNotEmpty(valueList)

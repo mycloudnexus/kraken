@@ -7,6 +7,7 @@ import com.consoleconnect.kraken.operator.core.enums.MappingTypeEnum;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
+import com.consoleconnect.kraken.operator.core.toolkit.Constants;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.core.toolkit.YamlToolkit;
 import com.consoleconnect.kraken.operator.gateway.CustomConfig;
@@ -314,7 +315,7 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
         KrakenException.class,
         () ->
             mappingMatrixCheckerActionRunner.validateDiscreteString(
-                123, "x", MappingTypeEnum.DISCRETE_STR.getKind()));
+                123, "x", MappingTypeEnum.STRING.getKind()));
   }
 
   @Test
@@ -323,7 +324,7 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
         KrakenException.class,
         () ->
             mappingMatrixCheckerActionRunner.validateEnumOrDiscreteString(
-                "4", "x", List.of("1", "2", "3"), MappingTypeEnum.DISCRETE_STR.getKind()));
+                "4", "x", List.of("1", "2", "3"), MappingTypeEnum.STRING.getKind()));
   }
 
   @Test
@@ -382,6 +383,26 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
                 List.of("1.0", "3.9"),
                 MappingTypeEnum.CONTINUOUS_DOUBLE.getKind(),
                 false));
+  }
+
+  @ParameterizedTest
+  @MethodSource(value = "buildNormalSourceTypeAndTarget")
+  void givenNumberSourceTypeAndTarget_whenConvert_thenReturnOK(Pair<String, String> pair) {
+    Object result =
+        mappingMatrixCheckerActionRunner.convertBySourceType(pair.getLeft(), pair.getRight());
+    Assertions.assertNotNull(result);
+  }
+
+  public static List<Pair<String, String>> buildNormalSourceTypeAndTarget() {
+    Pair<String, String> pair1 = Pair.of("123", Constants.INT_VAL);
+    Pair<String, String> pair2 = Pair.of("123.1", Constants.DOUBLE_VAL);
+    return List.of(pair1, pair2);
+  }
+
+  @Test
+  void givenNumberSourceTypeAndStringTarget_whenConvert_thenReturnNothing() {
+    Object result = mappingMatrixCheckerActionRunner.convertBySourceType("abc", Constants.INT_VAL);
+    Assertions.assertNull(result);
   }
 
   @Test

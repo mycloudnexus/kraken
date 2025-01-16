@@ -239,7 +239,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
         continue;
       }
       if (MappingTypeEnum.ENUM.getKind().equals(mapper.getSourceType())
-          || MappingTypeEnum.DISCRETE_STR.getKind().equals(mapper.getSourceType())
+          || MappingTypeEnum.STRING.getKind().equals(mapper.getSourceType())
           || isNumberKind(mapper.getAllowValueLimit(), mapper.getSourceType())) {
         checkEnumValue(documentContext, mapper);
       } else if (isConstantType(mapper.getTarget())) {
