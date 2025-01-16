@@ -239,12 +239,10 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
         continue;
       }
       if (MappingTypeEnum.ENUM.getKind().equals(mapper.getSourceType())
-          || MappingTypeEnum.DISCRETE_STR.getKind().equals(mapper.getSourceType())
-          || MappingTypeEnum.DISCRETE_INT.getKind().equals(mapper.getSourceType())
-          || MappingTypeEnum.CONTINUOUS_DOUBLE.getKind().equals(mapper.getSourceType())
-          || MappingTypeEnum.CONTINUOUS_INT.getKind().equals(mapper.getSourceType())) {
+          || MappingTypeEnum.STRING.getKind().equals(mapper.getSourceType())
+          || isNumberKind(mapper.getAllowValueLimit(), mapper.getSourceType())) {
         checkEnumValue(documentContext, mapper);
-      } else if (mapper.getTarget() != null && !mapper.getTarget().contains("@{{")) {
+      } else if (isConstantType(mapper.getTarget())) {
         checkConstantValue(documentContext, mapper, inputs);
       } else {
         checkMappingValue(documentContext, mapper, inputs);
@@ -284,6 +282,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     Object realValue = readByPathWithException(documentContext, constructedBody, 422, null);
     validateSourceValue(
         mapper.getSourceType(),
+        mapper.getDiscrete(),
         realValue,
         params.get(0),
         mapper.getSourceValues(),
@@ -292,6 +291,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
 
   private void validateSourceValue(
       String sourceType,
+      Boolean discrete,
       Object evaluateValue,
       String paramName,
       List<String> valueList,
@@ -303,13 +303,10 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     validateEnumOrDiscreteString(evaluateValue, paramName, valueList, sourceType);
 
     // Discrete integer checking
-    validateDiscreteInteger(evaluateValue, paramName, valueList, sourceType);
+    validateDiscreteInteger(evaluateValue, paramName, valueList, sourceType, discrete);
 
-    // Continuous integer variables checking
-    validateContinuousInteger(evaluateValue, paramName, valueList, sourceType);
-
-    // Continuous double variables checking
-    validateContinuousDouble(evaluateValue, paramName, valueList, sourceType);
+    // Continuous number variables checking, include integer and double
+    validateContinuousNumber(evaluateValue, paramName, valueList, sourceType, discrete);
   }
 
   private void checkMappingValue(

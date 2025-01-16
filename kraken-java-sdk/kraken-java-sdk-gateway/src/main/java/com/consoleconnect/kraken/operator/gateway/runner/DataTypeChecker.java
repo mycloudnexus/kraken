@@ -4,6 +4,7 @@ import com.consoleconnect.kraken.operator.core.enums.MappingTypeEnum;
 import com.consoleconnect.kraken.operator.core.exception.ErrorResponse;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
+import com.consoleconnect.kraken.operator.core.toolkit.Constants;
 import com.consoleconnect.kraken.operator.core.toolkit.ConstructExpressionUtil;
 import com.consoleconnect.kraken.operator.gateway.dto.PathCheck;
 import com.jayway.jsonpath.DocumentContext;
@@ -145,6 +146,11 @@ public interface DataTypeChecker {
         : String.valueOf(realValue));
   }
 
+  default boolean isNumberKind(Boolean allowValueLimit, String sourceType) {
+    return Boolean.TRUE.equals(allowValueLimit)
+        && (Constants.INT_VAL.equals(sourceType) || Constants.DOUBLE_VAL.equals(sourceType));
+  }
+
   default boolean isConstantType(String target) {
     return StringUtils.isNotBlank(target) && !target.contains("@{{");
   }
@@ -153,15 +159,32 @@ public interface DataTypeChecker {
       String target, Object evaluateValue, String paramName, String sourceType) {
     if (isConstantType(target)) {
       validateDiscreteString(evaluateValue, paramName, sourceType);
-      if (!target.equals(evaluateValue)) {
+      Object targetObj = convertBySourceType(target, sourceType);
+      if (Objects.isNull(targetObj) || !targetObj.equals(evaluateValue)) {
         throw KrakenException.unProcessableEntityInvalidValue(
             String.format(SHOULD_BE_MSG, paramName, evaluateValue, target));
       }
     }
   }
 
+  default Object convertBySourceType(String target, String sourceType) {
+    Object targetObj = null;
+    try {
+      if (Constants.INT_VAL.equals(sourceType)) {
+        targetObj = Integer.valueOf(target);
+      } else if (Constants.DOUBLE_VAL.equals(sourceType)) {
+        targetObj = Double.valueOf(target);
+      } else {
+        targetObj = target;
+      }
+    } catch (Exception e) {
+      LogHolder.log.error("Failed to convert by sourceType", e);
+    }
+    return targetObj;
+  }
+
   default void validateDiscreteString(Object evaluateValue, String paramName, String sourceType) {
-    if (MappingTypeEnum.DISCRETE_STR.getKind().equals(sourceType)) {
+    if (MappingTypeEnum.STRING.getKind().equals(sourceType)) {
       Class<?> dataType = whichDataTypeClass(evaluateValue);
       if (!String.class.equals(dataType)) {
         throw KrakenException.unProcessableEntityInvalidFormat(
@@ -202,7 +225,7 @@ public interface DataTypeChecker {
   default void validateEnumOrDiscreteString(
       Object evaluateValue, String paramName, List<String> valueList, String sourceType) {
     validateDiscreteString(evaluateValue, paramName, sourceType);
-    if ((MappingTypeEnum.DISCRETE_STR.getKind().equals(sourceType)
+    if ((MappingTypeEnum.STRING.getKind().equals(sourceType)
             || (MappingTypeEnum.ENUM.getKind().equals(sourceType)))
         && Objects.nonNull(evaluateValue)
         && CollectionUtils.isNotEmpty(valueList)
@@ -221,8 +244,13 @@ public interface DataTypeChecker {
   }
 
   default void validateDiscreteInteger(
-      Object evaluateValue, String paramName, List<String> valueList, String sourceType) {
-    if (MappingTypeEnum.DISCRETE_INT.getKind().equals(sourceType)) {
+      Object evaluateValue,
+      String paramName,
+      List<String> valueList,
+      String sourceType,
+      Boolean discrete) {
+    if (MappingTypeEnum.DISCRETE_INT.getKind().equals(sourceType)
+        && MappingTypeEnum.DISCRETE_INT.getDiscrete().equals(discrete)) {
       if (Objects.isNull(evaluateValue) || isNotInteger(evaluateValue)) {
         throw KrakenException.unProcessableEntityInvalidValue(
             String.format(
@@ -239,21 +267,22 @@ public interface DataTypeChecker {
     }
   }
 
-  default void validateContinuousInteger(
-      Object evaluateValue, String paramName, List<String> valueList, String sourceType) {
-    if (MappingTypeEnum.CONTINUOUS_INT.getKind().equals(sourceType)) {
+  default void validateContinuousNumber(
+      Object evaluateValue,
+      String paramName,
+      List<String> valueList,
+      String sourceType,
+      Boolean discrete) {
+    if (MappingTypeEnum.CONTINUOUS_INT.getKind().equals(sourceType)
+        && MappingTypeEnum.CONTINUOUS_INT.getDiscrete().equals(discrete)) {
       if (Objects.isNull(evaluateValue) || isNotInteger(evaluateValue)) {
         throw KrakenException.unProcessableEntityInvalidValue(
             String.format(
                 EXPECT_INT_MSG, paramName, evaluateValue, whichDataType(evaluateValue), "Integer"));
       }
       validateContinuousDouble(evaluateValue, paramName, valueList);
-    }
-  }
-
-  default void validateContinuousDouble(
-      Object evaluateValue, String paramName, List<String> valueList, String sourceType) {
-    if (MappingTypeEnum.CONTINUOUS_DOUBLE.getKind().equals(sourceType)) {
+    } else if (MappingTypeEnum.CONTINUOUS_DOUBLE.getKind().equals(sourceType)
+        && MappingTypeEnum.CONTINUOUS_DOUBLE.getDiscrete().equals(discrete)) {
       if (Objects.isNull(evaluateValue) || isNotDouble(evaluateValue)) {
         throw KrakenException.unProcessableEntityInvalidValue(
             String.format(
@@ -280,7 +309,8 @@ public interface DataTypeChecker {
 
   default void validateConstantNumber(
       Object evaluateValue, ComponentAPITargetFacets.Mapper mapper, String paramName) {
-    if (MappingTypeEnum.CONSTANT_NUM.getKind().equals(mapper.getSourceType())) {
+    if (MappingTypeEnum.DISCRETE_INT.getKind().equals(mapper.getSourceType())
+        && NumberUtils.isCreatable(mapper.getTarget())) {
       Class<?> dataType = whichDataTypeClass(evaluateValue);
       if (Objects.isNull(evaluateValue) || isNotNumeric(evaluateValue)) {
         throw KrakenException.unProcessableEntityInvalidValue(
