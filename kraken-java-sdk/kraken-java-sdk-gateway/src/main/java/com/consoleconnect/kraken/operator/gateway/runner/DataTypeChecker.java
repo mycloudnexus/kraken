@@ -110,16 +110,13 @@ public interface DataTypeChecker {
   }
 
   default PathCheck rewritePath(PathCheck pathCheck, int index) {
-    return (StringUtils.isBlank(pathCheck.path())
+    return StringUtils.isBlank(pathCheck.path())
         ? pathCheck
-        : new PathCheck(
-            pathCheck.name(),
-            pathCheck.path().replace("[*]", "[" + index + "]"),
-            pathCheck.expectType(),
-            pathCheck.value(),
-            pathCheck.errorMsg(),
-            pathCheck.code(),
-            pathCheck.expectedValueType()));
+        : pathCheck.withUpdatedPath(replaceWildcard(pathCheck.path(), index));
+  }
+
+  default String replaceWildcard(String path, int index) {
+    return path.replace("[*]", "[" + index + "]");
   }
 
   default void throwException(Integer code, String errorMsg, String defaultMsg) {
