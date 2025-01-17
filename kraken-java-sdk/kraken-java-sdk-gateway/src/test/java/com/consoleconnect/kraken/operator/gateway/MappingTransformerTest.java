@@ -11,7 +11,6 @@ import com.consoleconnect.kraken.operator.gateway.runner.MappingTransformer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.commons.collections4.MapUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -47,7 +46,8 @@ class MappingTransformerTest implements MappingTransformer {
 
   @ParameterizedTest
   @MethodSource(value = "buildUnmatchedTargetMapper")
-  void givenUnmatchedTargetType_whenAddTargetValueMapping_thenReturnNothing(ComponentAPITargetFacets.Mapper mapper) {
+  void givenUnmatchedTargetType_whenAddTargetValueMapping_thenReturnNothing(
+      ComponentAPITargetFacets.Mapper mapper) {
     StateValueMappingDto responseTargetMapperDto = new StateValueMappingDto();
     String target = "";
     addTargetValueMapping(mapper, responseTargetMapperDto, target);
