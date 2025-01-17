@@ -414,37 +414,23 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
 
   public static List<Pair<String, PathCheck>> buildPathCheckList() {
     PathCheck pathCheck1 =
-            new PathCheck(
-                    "EXPECTED_STR",
-                    "$.body.quoteItem[0].product.place[*].@type",
-                    ExpectTypeEnum.EXPECTED_STR,
-                    "",
-                    "",
-                    422,
-                    null);
+        new PathCheck(
+            "EXPECTED_STR",
+            "$.body.quoteItem[0].product.place[*].@type",
+            ExpectTypeEnum.EXPECTED_STR,
+            "",
+            "",
+            422,
+            null);
     String expected1 = "$.body.quoteItem[0].product.place[0].@type";
     Pair<String, PathCheck> pair1 = Pair.of(expected1, pathCheck1);
 
     PathCheck pathCheck2 =
-            new PathCheck(
-                    "EXPECTED_STR",
-                    null,
-                    ExpectTypeEnum.EXPECTED_STR,
-                    "",
-                    "",
-                    422,
-                    null);
+        new PathCheck("EXPECTED_STR", null, ExpectTypeEnum.EXPECTED_STR, "", "", 422, null);
     Pair<String, PathCheck> pair2 = Pair.of(null, pathCheck2);
 
     PathCheck pathCheck3 =
-            new PathCheck(
-                    "EXPECTED_STR",
-                    "",
-                    ExpectTypeEnum.EXPECTED_STR,
-                    "",
-                    "",
-                    422,
-                    null);
+        new PathCheck("EXPECTED_STR", "", ExpectTypeEnum.EXPECTED_STR, "", "", 422, null);
     Pair<String, PathCheck> pair3 = Pair.of("", pathCheck3);
     return List.of(pair1, pair2, pair3);
   }
