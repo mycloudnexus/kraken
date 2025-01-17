@@ -405,20 +405,48 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
     Assertions.assertNull(result);
   }
 
-  @Test
-  void givenIndex_whenRewritePath_thenReturnOK() {
-    PathCheck pathCheck =
-        new PathCheck(
-            "EXPECTED_STR",
-            "$.body.quoteItem[0].product.place[*].@type",
-            ExpectTypeEnum.EXPECTED_STR,
-            "",
-            "",
-            422,
-            null);
-    PathCheck updatedPathCheck = mappingMatrixCheckerActionRunner.rewritePath(pathCheck, 0);
-    String expected = "$.body.quoteItem[0].product.place[0].@type";
-    Assertions.assertEquals(expected, updatedPathCheck.path());
+  @ParameterizedTest
+  @MethodSource(value = "buildPathCheckList")
+  void givenIndex_whenRewritePath_thenReturnOK(Pair<String, PathCheck> pair) {
+    PathCheck updatedPathCheck = mappingMatrixCheckerActionRunner.rewritePath(pair.getRight(), 0);
+    Assertions.assertEquals(pair.getLeft(), updatedPathCheck.path());
+  }
+
+  public static List<Pair<String, PathCheck>> buildPathCheckList() {
+    PathCheck pathCheck1 =
+            new PathCheck(
+                    "EXPECTED_STR",
+                    "$.body.quoteItem[0].product.place[*].@type",
+                    ExpectTypeEnum.EXPECTED_STR,
+                    "",
+                    "",
+                    422,
+                    null);
+    String expected1 = "$.body.quoteItem[0].product.place[0].@type";
+    Pair<String, PathCheck> pair1 = Pair.of(expected1, pathCheck1);
+
+    PathCheck pathCheck2 =
+            new PathCheck(
+                    "EXPECTED_STR",
+                    null,
+                    ExpectTypeEnum.EXPECTED_STR,
+                    "",
+                    "",
+                    422,
+                    null);
+    Pair<String, PathCheck> pair2 = Pair.of(null, pathCheck2);
+
+    PathCheck pathCheck3 =
+            new PathCheck(
+                    "EXPECTED_STR",
+                    "",
+                    ExpectTypeEnum.EXPECTED_STR,
+                    "",
+                    "",
+                    422,
+                    null);
+    Pair<String, PathCheck> pair3 = Pair.of("", pathCheck3);
+    return List.of(pair1, pair2, pair3);
   }
 
   @Test
