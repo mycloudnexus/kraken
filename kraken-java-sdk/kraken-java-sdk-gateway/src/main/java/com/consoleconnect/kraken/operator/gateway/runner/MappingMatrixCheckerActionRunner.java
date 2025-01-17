@@ -175,6 +175,9 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
       return false;
     }
     Object realValue = readByPathCheckWithException(documentContext, pathCheck);
+    // The 'index' indicates the location of elements in an array.
+    // Since we need accurate information about which element has an unexpected value,
+    // the index is a reasonable choice for identification in an array.
     if (realValue instanceof JSONArray array) {
       return IntStream.range(0, array.size())
           .allMatch(
