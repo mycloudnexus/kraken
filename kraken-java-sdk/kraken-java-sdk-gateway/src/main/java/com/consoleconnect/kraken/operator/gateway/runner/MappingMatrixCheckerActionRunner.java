@@ -25,6 +25,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import java.util.*;
+import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
 import org.apache.commons.collections4.CollectionUtils;
@@ -174,8 +175,16 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
       return false;
     }
     Object realValue = readByPathCheckWithException(documentContext, pathCheck);
+    // The 'index' indicates the location of elements in an array.
+    // Since we need accurate information about which element has an unexpected value,
+    // the index is a reasonable choice for identification in an array.
     if (realValue instanceof JSONArray array) {
-      return array.stream().allMatch(value -> checkExpect(pathCheck, value));
+      return IntStream.range(0, array.size())
+          .allMatch(
+              index -> {
+                PathCheck updatedPathCheck = rewritePath(pathCheck, index);
+                return checkExpect(updatedPathCheck, array.get(index));
+              });
     }
     return checkExpect(pathCheck, realValue);
   }
