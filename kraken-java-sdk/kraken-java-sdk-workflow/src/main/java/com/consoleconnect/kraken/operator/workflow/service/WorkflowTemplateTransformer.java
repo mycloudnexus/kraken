@@ -34,7 +34,8 @@ public class WorkflowTemplateTransformer {
   private static final String SUB_REQUEST_URL = "${workflow.input.payload.%s.url}";
   private static final String SUB_REQUEST_HEADER = "${workflow.input.headers}";
   private static final String TERMINATE_TASK = "TERMINATE_TASK_";
-  private static final String EVALUATE_RESULT = "${evaluate_payload_task_%s.output}";
+  private static final String EVALUATE_BODY_RESULT = "${evaluate_payload_task_%s.output.body}";
+  private static final String EVALUATE_URL_RESULT = "${evaluate_payload_task_%s.output.url}";
   private static final String SUB_TASK_OUTPUT = "${%s.output}";
   private static final String SUB_TASK_INPUT = "${%s.input}";
   private static final String SUB_HTTP_TASK_RESPONSE = "${%s.output.response.body}";
@@ -199,7 +200,8 @@ public class WorkflowTemplateTransformer {
                         task.getTaskName(),
                         Map.of("output", String.format(SUB_TASK_OUTPUT, task.getTaskName()))));
         EvaluateObject evaluateObject = new EvaluateObject();
-        evaluateObject.setExpression(String.format(SUB_REQUEST_BODY, httpTask));
+        evaluateObject.setBodyExpression(String.format(SUB_REQUEST_BODY, httpTask));
+        evaluateObject.setUrlExpression(String.format(SUB_REQUEST_URL, httpTask));
         evaluateObject.setValue(value);
         simpleTask
             .getInput()
@@ -233,13 +235,13 @@ public class WorkflowTemplateTransformer {
     ComponentAPITargetFacets.Endpoint endpoint = httpTask.getEndpoint();
     HttpExtend http =
         new HttpExtend(httpTask.getTaskName())
-            .url(String.format(SUB_REQUEST_URL, httpTask.getTaskName()))
+            .url(String.format(EVALUATE_URL_RESULT, httpTask.getTaskName()))
             .method(HttpExtend.Input.HttpMethod.getIgnoreCase(endpoint.getMethod()));
     http.headers(SUB_REQUEST_HEADER);
     http.setOptional(true);
     TaskDef def = new TaskDef(http.getName());
     if (!"GET".equalsIgnoreCase(endpoint.getMethod())) {
-      http.body(String.format(EVALUATE_RESULT, httpTask.getTaskName()));
+      http.body(String.format(EVALUATE_BODY_RESULT, httpTask.getTaskName()));
       def.setRetryCount(0);
     } else {
       // add retry for get request

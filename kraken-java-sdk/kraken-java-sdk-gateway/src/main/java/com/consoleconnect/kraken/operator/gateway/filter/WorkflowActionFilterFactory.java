@@ -7,9 +7,9 @@ import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPIFacets;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentWorkflowFacets;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.gateway.model.WorkflowPayload;
-import com.consoleconnect.kraken.operator.gateway.model.WorkflowResponse;
 import com.consoleconnect.kraken.operator.gateway.runner.AbstractActionRunner;
 import com.netflix.conductor.client.http.MetadataClient;
+import com.netflix.conductor.common.metadata.tasks.Task;
 import com.netflix.conductor.common.metadata.workflow.StartWorkflowRequest;
 import com.netflix.conductor.common.metadata.workflow.WorkflowDef;
 import com.netflix.conductor.common.run.Workflow;
@@ -82,13 +82,8 @@ public class WorkflowActionFilterFactory
   }
 
   private static Map<String, Object> constructResponse(Workflow workflow) {
-    Map<String, Object> result = workflow.getOutput();
-    WorkflowResponse response =
-        JsonToolkit.fromJson(JsonToolkit.toJson(result), WorkflowResponse.class);
-    return response.getResult().values().stream()
-        .collect(
-            Collectors.toMap(
-                WorkflowResponse.ItemResponse::getId, WorkflowResponse.ItemResponse::getResponse));
+    return workflow.getTasks().stream()
+        .collect(Collectors.toMap(Task::getReferenceTaskName, Task::getOutputData));
   }
 
   private Workflow pollingResult(String workflowId, Config config) {
@@ -100,7 +95,7 @@ public class WorkflowActionFilterFactory
       } catch (InterruptedException e) {
         Thread.currentThread().interrupt();
       }
-      workflow = config.getWorkflowClient().getWorkflow(workflowId, false);
+      workflow = config.getWorkflowClient().getWorkflow(workflowId, true);
       log.info("workflow: {} status: {}", workflow.getWorkflowName(), workflow.getStatus());
       if (workflow.getStatus().isSuccessful()) {
         break;

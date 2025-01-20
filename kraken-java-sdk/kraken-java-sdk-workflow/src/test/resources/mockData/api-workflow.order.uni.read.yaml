@@ -1,0 +1,86 @@
+---
+kind: kraken.component.api-workflow
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-workflow.order.uni.add
+  name: Order Management
+  version: 1
+spec:
+  metaData:
+    workflowName: "order.uni.read"
+    externalId: ""
+  validationStage:
+    - taskName: validation_task
+      description: ""
+      taskType: ""
+      endpoint:
+        path: ""
+        method: ""
+        serverKey: ''
+        mappers:
+          request:
+      conditionCheck:
+        caseExpression: ""
+        buildInTask: reject_order_task
+  preparationStage:
+    - taskName: get_order_detail
+      description: "get uni order detail"
+      taskType: http
+      endpoint:
+        path: "/api/company/{companyName}/ports/orders/{orderId}"
+        method: "GET"
+        serverKey: ""
+        mappers:
+          request:
+            - name: mapper.order.uni.read.buyerId
+              title: The unique identifier of the organization that is acting as the a Buyer.
+              source: "@{{buyerId}}"
+              target: "@{{companyName}}"
+              description: ''
+              replaceStar: true
+              sourceLocation: QUERY
+              targetLocation: PATH
+              customizedField: false
+              requiredMapping: false
+            - name: mapper.order.uni.read.orderId
+              title: Order Unique Identifier.
+              source: "@{{id}}"
+              target: "@{{orderId}}"
+              description: ''
+              replaceStar: true
+              convertValue: mef.sonata.api-target-mapper.order.uni.add#mapper.order.uni.add.orderId
+              sourceLocation: PATH
+              targetLocation: PATH
+              customizedField: false
+              requiredMapping: true
+  executionStage:
+    - taskName: get_port_detail
+      description: "get port detail"
+      taskType: http
+      endpoint:
+        path: "/api/company/{companyName}/ports/{portId}"
+        method: "GET"
+        serverKey: ""
+        mappers:
+          request:
+            - name: mapper.order.uni.read.buyerId
+              title: The unique identifier of the organization that is acting as the a Buyer.
+              source: "@{{buyerId}}"
+              target: "@{{companyName}}"
+              description: ''
+              replaceStar: true
+              sourceLocation: QUERY
+              targetLocation: PATH
+              customizedField: false
+              requiredMapping: false
+            - name: mapper.order.uni.read.orderId
+              title: Order Unique Identifier.
+              source: "@{{workflow.get_order_detail.port.id}}"
+              target: "@{{portId}}"
+              description: ''
+              replaceStar: true
+              sourceLocation: BODY
+              targetLocation: PATH
+              customizedField: false
+              requiredMapping: true
+      notificationUrl: https://hooks.slack.com/services/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

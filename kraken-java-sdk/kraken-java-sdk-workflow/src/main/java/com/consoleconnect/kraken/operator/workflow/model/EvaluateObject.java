@@ -6,5 +6,6 @@ import lombok.Data;
 @Data
 public class EvaluateObject {
   private Map<String, Map<String, String>> value;
-  private String expression;
+  private String bodyExpression;
+  private String urlExpression;
 }

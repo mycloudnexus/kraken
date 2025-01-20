@@ -2,6 +2,7 @@ package com.consoleconnect.kraken.operator.workflow.service;
 
 import static com.consoleconnect.kraken.operator.core.toolkit.Constants.*;
 
+import com.consoleconnect.kraken.operator.workflow.model.EvaluateResult;
 import com.consoleconnect.kraken.operator.workflow.model.LogTaskRequest;
 import com.netflix.conductor.sdk.workflow.task.InputParam;
 import com.netflix.conductor.sdk.workflow.task.WorkerTask;
@@ -25,7 +26,10 @@ public interface WorkflowTaskRegister {
   void rejectOrder(String id);
 
   @WorkerTask(EVALUATE_PAYLOAD_TASK)
-  Map<String, Object> evaluateTask(Map<String, Object> value, Object expression);
+  EvaluateResult evaluateTask(
+      @InputParam("value") Map<String, Object> value,
+      @InputParam("url") String urlExpression,
+      @InputParam("expression") Object bodyExpression);
 
   @WorkerTask(LOG_PAYLOAD_TASK)
   void logRequestPayload(LogTaskRequest payload);

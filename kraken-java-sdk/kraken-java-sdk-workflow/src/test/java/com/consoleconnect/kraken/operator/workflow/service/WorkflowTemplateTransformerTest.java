@@ -31,6 +31,7 @@ class WorkflowTemplateTransformerTest extends AbstractIntegrationTest {
   void givenComponentWorkflowFacets_whenTransform_thenSuccess() {
     verifyWorkflow("/mockData/api-workflow.order.uni.add.yaml");
     verifyWorkflow("/mockData/api-workflow.order.eline.delete.yaml");
+    verifyWorkflow("/mockData/api-workflow.order.uni.read.yaml");
   }
 
   private void verifyWorkflow(String workflow) throws IOException {

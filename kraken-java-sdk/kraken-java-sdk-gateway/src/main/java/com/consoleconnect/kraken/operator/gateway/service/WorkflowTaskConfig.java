@@ -7,6 +7,7 @@ import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.gateway.entity.HttpRequestEntity;
 import com.consoleconnect.kraken.operator.gateway.repo.HttpRequestRepository;
 import com.consoleconnect.kraken.operator.gateway.template.SpELEngine;
+import com.consoleconnect.kraken.operator.workflow.model.EvaluateResult;
 import com.consoleconnect.kraken.operator.workflow.model.LogTaskRequest;
 import com.consoleconnect.kraken.operator.workflow.service.WorkflowTaskRegister;
 import com.netflix.conductor.sdk.workflow.task.InputParam;
@@ -53,13 +54,20 @@ public class WorkflowTaskConfig implements WorkflowTaskRegister {
     setOrderState(id, "failed");
   }
 
-  @WorkerTask(EVALUATE_PAYLOAD_TASK)
-  public Map<String, Object> evaluateTask(
-      @InputParam("value") Map<String, Object> value, @InputParam("expression") Object expression) {
-    String evaluate = SpELEngine.evaluate(expression, value);
-    return StringUtils.isBlank(evaluate)
-        ? Collections.emptyMap()
-        : JsonToolkit.fromJson(evaluate, Map.class);
+  @WorkerTask(value = EVALUATE_PAYLOAD_TASK, pollingInterval = 10)
+  public EvaluateResult evaluateTask(
+      @InputParam("value") Map<String, Object> value,
+      @InputParam("urlExpression") String urlExpression,
+      @InputParam("bodyExpression") Object bodyExpression) {
+    String evaluate = SpELEngine.evaluate(bodyExpression, value);
+    String url = SpELEngine.evaluate(urlExpression, value);
+    EvaluateResult result = new EvaluateResult();
+    result.setBody(
+        StringUtils.isBlank(evaluate)
+            ? Collections.emptyMap()
+            : JsonToolkit.fromJson(evaluate, Map.class));
+    result.setUrl(url);
+    return result;
   }
 
   @WorkerTask(LOG_PAYLOAD_TASK)

@@ -51,7 +51,7 @@ spec:
               description: ""
               source: "@{{buyerId}}"
               sourceLocation: "QUERY"
-              target: "@{{username}}"
+              target: "@{{companyName}}"
               targetLocation: "PATH"
               requiredMapping: false
             - name: mapper.order.eline.delete.productId
