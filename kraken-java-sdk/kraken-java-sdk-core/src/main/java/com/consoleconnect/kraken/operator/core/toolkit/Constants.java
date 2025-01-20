@@ -14,6 +14,8 @@ public class Constants {
   public static final String ORDER_KEY_WORD = "order";
   public static final String WORKFLOW_PARAM_PREFIX = "${workflow.input.%s}";
   public static final String EMPTY_TASK = "empty_task";
+  public static final String INT_VAL = "integer";
+  public static final String DOUBLE_VAL = "double";
 
   public static String formatVersion(String version) {
     return version.replaceFirst("[V|v]", "");

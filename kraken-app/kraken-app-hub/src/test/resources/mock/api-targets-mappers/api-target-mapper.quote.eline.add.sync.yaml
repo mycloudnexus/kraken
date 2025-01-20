@@ -21,7 +21,7 @@ spec:
           - name: mapper.quote.uni.add.sync.duration.amount
             source: "@{{quoteItem[0].requestedQuoteItemTerm.duration.amount}}"
             sourceLocation: BODY
-            sourceType: constantNumber
+            sourceType: integer
             target: "@{{connections[*].duration.value}}"
             targetLocation: BODY
             requiredMapping: true
@@ -57,7 +57,7 @@ spec:
           - name: mapper.quote.uni.add.sync.rollInterval.amount
             source: "@{{quoteItem[0].requestedQuoteItemTerm.rollInterval.amount}}"
             sourceLocation: BODY
-            sourceType: constantNumber
+            sourceType: integer
             target: "1"
             targetLocation: BODY
             requiredMapping: false
@@ -80,14 +80,14 @@ spec:
           - name: mapper.quote.uni.add.sync.place0.id
             source: "@{{quoteItem[0].product.place[0].id}}"
             sourceLocation: BODY
-            sourceType: discreteStr
+            sourceType: string
             target: "@{{connections[*].srcDcf}}"
             targetLocation: BODY
             requiredMapping: true
           - name: mapper.quote.uni.add.sync.place1.id
             source: "@{{quoteItem[0].product.place[1].id}}"
             sourceLocation: BODY
-            sourceType: discreteStr
+            sourceType: string
             target: "@{{connections[*].destDcf}}"
             targetLocation: BODY
             requiredMapping: true
@@ -95,7 +95,8 @@ spec:
             source: "@{{quoteItem[0].product.productConfiguration.bandwidth}}"
             sourceLocation: BODY
             allowValueLimit: true
-            sourceType: discreteInt
+            sourceType: integer
+            discrete: true
             sourceValues:
               - 1000
               - 10000
@@ -116,21 +117,21 @@ spec:
           - name: mapper.quote.uni.add.sync.productConfiguration.classOfService
             source: "@{{quoteItem[0].product.productConfiguration.classOfService}}"
             sourceLocation: BODY
-            sourceType: discreteStr
+            sourceType: string
             target: "@{{connections[*].classOfService}}"
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.quote.uni.add.sync.productConfiguration.paymentType
             source: "@{{quoteItem[0].product.productConfiguration.paymentType}}"
             sourceLocation: BODY
-            sourceType: discreteStr
+            sourceType: string
             target: "@{{connections[*].paymentMethod}}"
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.quote.uni.add.sync.productOffering.id
             source: "@{{quoteItem[0].product.productOffering.id}}"
             sourceLocation: BODY
-            sourceType: discreteStr
+            sourceType: string
             target: "ACCESS_E_LINE"
             targetLocation: BODY
             requiredMapping: false

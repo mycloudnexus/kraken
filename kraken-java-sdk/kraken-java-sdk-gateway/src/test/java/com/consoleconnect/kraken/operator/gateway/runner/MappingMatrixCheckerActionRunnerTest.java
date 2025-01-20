@@ -7,6 +7,7 @@ import com.consoleconnect.kraken.operator.core.enums.MappingTypeEnum;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
+import com.consoleconnect.kraken.operator.core.toolkit.Constants;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.core.toolkit.YamlToolkit;
 import com.consoleconnect.kraken.operator.gateway.CustomConfig;
@@ -314,7 +315,7 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
         KrakenException.class,
         () ->
             mappingMatrixCheckerActionRunner.validateDiscreteString(
-                123, "x", MappingTypeEnum.DISCRETE_STR.getKind()));
+                123, "x", MappingTypeEnum.STRING.getKind()));
   }
 
   @Test
@@ -323,7 +324,7 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
         KrakenException.class,
         () ->
             mappingMatrixCheckerActionRunner.validateEnumOrDiscreteString(
-                "4", "x", List.of("1", "2", "3"), MappingTypeEnum.DISCRETE_STR.getKind()));
+                "4", "x", List.of("1", "2", "3"), MappingTypeEnum.STRING.getKind()));
   }
 
   @Test
@@ -332,7 +333,7 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
         KrakenException.class,
         () ->
             mappingMatrixCheckerActionRunner.validateDiscreteInteger(
-                "4", "x", List.of(), MappingTypeEnum.DISCRETE_INT.getKind()));
+                "4", "x", List.of(), MappingTypeEnum.DISCRETE_INT.getKind(), true));
   }
 
   @Test
@@ -341,7 +342,7 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
         KrakenException.class,
         () ->
             mappingMatrixCheckerActionRunner.validateDiscreteInteger(
-                4, "x", List.of("1", "2", "3"), MappingTypeEnum.DISCRETE_INT.getKind()));
+                4, "x", List.of("1", "2", "3"), MappingTypeEnum.DISCRETE_INT.getKind(), true));
   }
 
   @Test
@@ -349,8 +350,8 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
     Assertions.assertThrowsExactly(
         KrakenException.class,
         () ->
-            mappingMatrixCheckerActionRunner.validateContinuousInteger(
-                "4", "x", List.of(), MappingTypeEnum.CONTINUOUS_INT.getKind()));
+            mappingMatrixCheckerActionRunner.validateContinuousNumber(
+                "4", "x", List.of(), MappingTypeEnum.CONTINUOUS_INT.getKind(), false));
   }
 
   @Test
@@ -358,8 +359,8 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
     Assertions.assertThrowsExactly(
         KrakenException.class,
         () ->
-            mappingMatrixCheckerActionRunner.validateContinuousInteger(
-                4, "x", List.of("1", "3"), MappingTypeEnum.CONTINUOUS_INT.getKind()));
+            mappingMatrixCheckerActionRunner.validateContinuousNumber(
+                4, "x", List.of("1", "3"), MappingTypeEnum.CONTINUOUS_INT.getKind(), false));
   }
 
   @Test
@@ -367,8 +368,8 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
     Assertions.assertThrowsExactly(
         KrakenException.class,
         () ->
-            mappingMatrixCheckerActionRunner.validateContinuousDouble(
-                "4", "x", List.of(), MappingTypeEnum.CONTINUOUS_DOUBLE.getKind()));
+            mappingMatrixCheckerActionRunner.validateContinuousNumber(
+                "4", "x", List.of(), MappingTypeEnum.CONTINUOUS_DOUBLE.getKind(), false));
   }
 
   @Test
@@ -376,19 +377,74 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
     Assertions.assertThrowsExactly(
         KrakenException.class,
         () ->
-            mappingMatrixCheckerActionRunner.validateContinuousDouble(
-                4.0, "x", List.of("1.0", "3.9"), MappingTypeEnum.CONTINUOUS_DOUBLE.getKind()));
+            mappingMatrixCheckerActionRunner.validateContinuousNumber(
+                4.0,
+                "x",
+                List.of("1.0", "3.9"),
+                MappingTypeEnum.CONTINUOUS_DOUBLE.getKind(),
+                false));
+  }
+
+  @ParameterizedTest
+  @MethodSource(value = "buildNormalSourceTypeAndTarget")
+  void givenNumberSourceTypeAndTarget_whenConvert_thenReturnOK(Pair<String, String> pair) {
+    Object result =
+        mappingMatrixCheckerActionRunner.convertBySourceType(pair.getLeft(), pair.getRight());
+    Assertions.assertNotNull(result);
+  }
+
+  public static List<Pair<String, String>> buildNormalSourceTypeAndTarget() {
+    Pair<String, String> pair1 = Pair.of("123", Constants.INT_VAL);
+    Pair<String, String> pair2 = Pair.of("123.1", Constants.DOUBLE_VAL);
+    return List.of(pair1, pair2);
+  }
+
+  @Test
+  void givenNumberSourceTypeAndStringTarget_whenConvert_thenReturnNothing() {
+    Object result = mappingMatrixCheckerActionRunner.convertBySourceType("abc", Constants.INT_VAL);
+    Assertions.assertNull(result);
+  }
+
+  @ParameterizedTest
+  @MethodSource(value = "buildPathCheckList")
+  void givenIndex_whenRewritePath_thenReturnOK(Pair<String, PathCheck> pair) {
+    PathCheck updatedPathCheck = mappingMatrixCheckerActionRunner.rewritePath(pair.getRight(), 0);
+    Assertions.assertEquals(pair.getLeft(), updatedPathCheck.path());
+  }
+
+  public static List<Pair<String, PathCheck>> buildPathCheckList() {
+    PathCheck pathCheck1 =
+        new PathCheck(
+            "EXPECTED_STR",
+            "$.body.quoteItem[0].product.place[*].@type",
+            ExpectTypeEnum.EXPECTED_STR,
+            "",
+            "",
+            422,
+            null);
+    String expected1 = "$.body.quoteItem[0].product.place[0].@type";
+    Pair<String, PathCheck> pair1 = Pair.of(expected1, pathCheck1);
+
+    PathCheck pathCheck2 =
+        new PathCheck("EXPECTED_STR", null, ExpectTypeEnum.EXPECTED_STR, "", "", 422, null);
+    Pair<String, PathCheck> pair2 = Pair.of(null, pathCheck2);
+
+    PathCheck pathCheck3 =
+        new PathCheck("EXPECTED_STR", "", ExpectTypeEnum.EXPECTED_STR, "", "", 422, null);
+    Pair<String, PathCheck> pair3 = Pair.of("", pathCheck3);
+    return List.of(pair1, pair2, pair3);
   }
 
   @Test
   void givenNotNumerical_whenValidatingConstantNumber_thenThrowsException() {
     ComponentAPITargetFacets.Mapper mapper = new ComponentAPITargetFacets.Mapper();
-    mapper.setSourceType(MappingTypeEnum.CONSTANT_NUM.getKind());
+    mapper.setSourceType(MappingTypeEnum.DISCRETE_INT.getKind());
+    mapper.setTarget("1");
     Assertions.assertThrowsExactly(
         KrakenException.class,
         () ->
             mappingMatrixCheckerActionRunner.validateConstantNumber(
-                "4", mapper, MappingTypeEnum.CONSTANT_NUM.getKind()));
+                "4", mapper, MappingTypeEnum.DISCRETE_INT.getKind()));
   }
 
   @SneakyThrows
