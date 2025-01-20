@@ -19,7 +19,7 @@ class WorkflowTaskConfigTest extends AbstractIntegrationTest {
   @Autowired private AppProperty appProperty;
 
   @Test
-  void givenDataPlaneContext_whenGetBuildinTasks_thenReturnSuccess() {
+  void givenDataPlaneContext_whenApiClient_thenReturnSuccess() {
     Assertions.assertNotNull(config.getApiClient(appProperty));
   }
 }
