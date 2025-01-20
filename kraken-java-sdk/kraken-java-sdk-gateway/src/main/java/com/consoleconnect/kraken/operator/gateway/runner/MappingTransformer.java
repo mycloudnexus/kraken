@@ -4,6 +4,7 @@ import static com.consoleconnect.kraken.operator.core.toolkit.Constants.DOT;
 import static com.consoleconnect.kraken.operator.core.toolkit.ConstructExpressionUtil.convertToJsonPointer;
 
 import com.consoleconnect.kraken.operator.core.dto.StateValueMappingDto;
+import com.consoleconnect.kraken.operator.core.enums.MappingTypeEnum;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPIFacets;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
@@ -24,7 +25,6 @@ public interface MappingTransformer {
   String ARRAY_FIRST_ELE = "[0]";
   String TARGET_VALUE_MAPPER_KEY = "targetValueMapping";
   String JSON_PATH_EXPRESSION_PREFIX = "$.";
-  String ENUM_KIND = "enum";
   String LENGTH_FUNC = "length()";
   String LEFT_SQUARE_BRACKET = "[";
   String RIGHT_SQUARE_BRACKET = "]";
@@ -92,8 +92,8 @@ public interface MappingTransformer {
       StateValueMappingDto responseTargetMapperDto,
       String target) {
     if (mapper.getTargetType() == null
-        || !ENUM_KIND.equalsIgnoreCase(mapper.getTargetType())
-        || ENUM_KIND.equalsIgnoreCase(mapper.getTargetType())
+        || !MappingTypeEnum.ENUM.getKind().equalsIgnoreCase(mapper.getTargetType())
+        || MappingTypeEnum.ENUM.getKind().equalsIgnoreCase(mapper.getTargetType())
             && MapUtils.isEmpty(mapper.getValueMapping())) {
       return;
     }

@@ -32,7 +32,7 @@ spec:
             description: ""
             source: "@{{productOrderItem[*].product.id}}"
             sourceLocation: "BODY"
-            sourceType: discreteStr
+            sourceType: string
             target: "@{{connectionId}}"
             targetLocation: ""
             requiredMapping: false
@@ -41,7 +41,7 @@ spec:
             description: ""
             source: "@{{productOrderItem[0].product.productOffering.id}}"
             sourceLocation: "BODY"
-            sourceType: discreteStr
+            sourceType: string
             target: "ACCESS_E_LINE"
             targetLocation: ""
             requiredMapping: true
