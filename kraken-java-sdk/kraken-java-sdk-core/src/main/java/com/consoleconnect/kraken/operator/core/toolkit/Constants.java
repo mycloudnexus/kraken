@@ -12,6 +12,8 @@ public class Constants {
   public static final String ENV = "env";
   public static final String QUOTE_KEY_WORD = "quote";
   public static final String ORDER_KEY_WORD = "order";
+  public static final String WORKFLOW_PARAM_PREFIX = "${workflow.input.%s}";
+  public static final String EMPTY_TASK = "empty_task";
 
   public static String formatVersion(String version) {
     return version.replaceFirst("[V|v]", "");
