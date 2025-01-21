@@ -70,7 +70,7 @@ public class KrakenException extends RuntimeException {
 
   public static KrakenException badRequestInvalidBody(String message) {
     return new KrakenException(
-            400, BAD_REQUEST_INVALID_BODY, new IllegalArgumentException(message));
+        400, BAD_REQUEST_INVALID_BODY, new IllegalArgumentException(message));
   }
 
   public static KrakenException unauthorized(String message) {
