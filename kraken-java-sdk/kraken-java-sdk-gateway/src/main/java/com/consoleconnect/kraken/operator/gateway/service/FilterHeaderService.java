@@ -25,7 +25,7 @@ public class FilterHeaderService {
 
   public Map<String, String> filterHeaders(Map<String, String> headers) {
     if (headers == null) {
-      return null;
+      return Map.of();
     }
     Map<String, String> headerNew = new HashMap<>();
     headers.entrySet().stream()
