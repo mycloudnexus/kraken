@@ -470,7 +470,7 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
         KrakenException.class,
         () ->
             mappingMatrixCheckerActionRunner.checkMatrixConstraints(
-                facets, targetKey, requestBody));
+                facets, targetKey, requestBody, Set.of()));
   }
 
   @SneakyThrows
@@ -496,7 +496,7 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
           Assertions.assertDoesNotThrow(
               () ->
                   mappingMatrixCheckerActionRunner.checkMatrixConstraints(
-                      facets, targetKey, requestBody));
+                      facets, targetKey, requestBody, Set.of()));
         });
   }
 }

@@ -8,6 +8,16 @@ metadata:
     mef-api-release: grace
   version: 18
 spec:
+  expect422-if-missing:
+    mef.sonata.api-target.order.eline.add:
+      - $.body.productOrderItem[0].product.productConfiguration.bandwidth
+      - $.body.productOrderItem[0].product.productConfiguration.bandwidthUnit
+      - $.body.productOrderItem[0].product.productConfiguration.name
+      - $.body.productOrderItem[0].product.productConfiguration.paymentType
+      - $.body.productOrderItem[0].product.productConfiguration.classOfService
+      - $.body.productOrderItem[0].product.productConfiguration.buyerCompanyId
+      - $.body.productOrderItem[0].product.productConfiguration.destUNIMetroId
+      - $.body.productOrderItem[0].product.productConfiguration.type
   matrix:
     mef.sonata.api-target.order.eline.add:
       - name: product_type_eline_type

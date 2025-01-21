@@ -104,23 +104,29 @@ public interface DataTypeChecker {
       realValue = documentContext.read(checkPath);
     } catch (Exception e) {
       printJsonPathReadError();
-      String defaultMsg = PARAM_NOT_EXIST_MSG;
-      if (Integer.valueOf(HttpStatus.BAD_REQUEST.value()).equals(code)) {
-        defaultMsg = MISSING_PROPERTY_MSG;
-      }
+      String defaultMsg = getDefaultMessage(code);
       throwException(
           code, errorMsg, String.format(defaultMsg, extractCheckingPath(checkPath)));
     }
     return realValue;
   }
 
+  default String getDefaultMessage(Integer code) {
+    return Integer.valueOf(HttpStatus.BAD_REQUEST.value()).equals(code)
+            ? MISSING_PROPERTY_MSG
+            : PARAM_NOT_EXIST_MSG;
+  }
+
   default PathCheck rewritePath(PathCheck pathCheck, int index) {
     return StringUtils.isBlank(pathCheck.path())
-        ? pathCheck
-        : pathCheck.withUpdatedPath(replaceWildcard(pathCheck.path(), index));
+            ? pathCheck
+            : pathCheck.withUpdatedPath(replaceWildcard(extractCheckingPath(pathCheck.path()), index));
   }
 
   default String replaceWildcard(String path, int index) {
+    if (StringUtils.isBlank(path)) {
+      return path;
+    }
     return path.replace("[*]", "[" + index + "]");
   }
 
@@ -348,6 +354,13 @@ public interface DataTypeChecker {
       return path;
     }
     return path.replace("$.body.", "").replace("$.query.", "");
+  }
+
+  default int determineHttpCode(Set<String> pathsExpected422, String actualPath) {
+    if (CollectionUtils.isEmpty(pathsExpected422)) {
+      return HttpStatus.BAD_REQUEST.value();
+    }
+    return pathsExpected422.contains(actualPath) ? HttpStatus.UNPROCESSABLE_ENTITY.value() : HttpStatus.BAD_REQUEST.value();
   }
 
   void throwException(PathCheck pathCheck, String defaultMsg);

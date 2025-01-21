@@ -52,7 +52,7 @@ public class JavaScriptEngineActionRunner extends AbstractActionRunner {
         JsonToolkit.fromJson(resultJson, new TypeReference<Map<String, Object>>() {});
     String errorMsg = (String) map.get(ERROR_MSG_VAR);
     if (StringUtils.isNotBlank(errorMsg)) {
-      throw KrakenException.unProcessableEntityInvalidFormat(errorMsg);
+      throw KrakenException.badRequestInvalidBody(errorMsg);
     }
   }
 }
