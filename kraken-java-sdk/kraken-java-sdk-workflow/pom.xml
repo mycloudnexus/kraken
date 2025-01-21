@@ -1,0 +1,56 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>kraken-java-sdk-workflow</artifactId>
+    <name>kraken-java-sdk-workflow</name>
+    <version>2.0.0-snapshot.2</version>
+    <packaging>jar</packaging>
+    <parent>
+        <groupId>com.consoleconnect.kraken</groupId>
+        <artifactId>kraken-java-sdk</artifactId>
+        <version>2.0.0-snapshot.2</version>
+    </parent>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <!-- workflow -->
+        <dependency>
+            <groupId>io.orkes.conductor</groupId>
+            <artifactId>orkes-conductor-client</artifactId>
+            <version>2.1.6</version>
+        </dependency>
+        <dependency>
+            <groupId>com.consoleconnect.kraken</groupId>
+            <artifactId>kraken-java-sdk-core</artifactId>
+            <version>2.0.0-snapshot.2</version>
+        </dependency>
+        <!-- workflow dependency -->
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.consoleconnect.kraken</groupId>
+            <artifactId>kraken-java-sdk-test</artifactId>
+            <version>2.0.0-snapshot.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>3.7.0</version>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+</project>
