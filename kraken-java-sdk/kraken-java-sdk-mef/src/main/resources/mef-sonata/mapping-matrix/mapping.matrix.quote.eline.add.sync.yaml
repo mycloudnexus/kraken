@@ -8,6 +8,12 @@ metadata:
     mef-api-release: grace
   version: 14
 spec:
+  expect422-if-missing:
+    mef.sonata.api-target.quote.eline.add.sync:
+      - $.body.quoteItem[0].product.productConfiguration.bandwidth
+      - $.body.quoteItem[0].product.productConfiguration.bandwidthUnit
+      - $.body.quoteItem[0].product.productConfiguration.classOfService
+      - $.body.quoteItem[0].product.productConfiguration.paymentType
   matrix:
     mef.sonata.api-target.quote.eline.add.sync:
       - name: action_add
@@ -26,8 +32,17 @@ spec:
         path: "$.body.quoteItem[0].product.place[0].role"
         expectType: EXPECTED
         value: INSTALL_LOCATION
-      - name: quoteItem[0].product.place[*].@type
-        path: "$.body.quoteItem[0].product.place[*].@type"
+      - name: quoteItem[0].product.place[1].role
+        path: "$.body.quoteItem[0].product.place[1].role"
+        expectType: EXPECTED
+        value: INSTALL_LOCATION
+      - name: quoteItem[0].product.place[0].@type
+        path: "$.body.quoteItem[0].product.place[0].@type"
+        expectType: EXPECTED_STR
+        value: true
+        code: 422
+      - name: quoteItem[0].product.place[1].@type
+        path: "$.body.quoteItem[0].product.place[1].@type"
         expectType: EXPECTED_STR
         value: true
         code: 422

@@ -29,7 +29,11 @@ spec:
         expectType: EXPECTED
         value: firm
       - name: quoteItem[0].product.place[0].role
-        path: "$.body.quoteItem[0].product.place[*].role"
+        path: "$.body.quoteItem[0].product.place[0].role"
+        expectType: EXPECTED
+        value: INSTALL_LOCATION
+      - name: quoteItem[0].product.place[1].role
+        path: "$.body.quoteItem[0].product.place[1].role"
         expectType: EXPECTED
         value: INSTALL_LOCATION
       - name: quoteItem[0].product.place[0].@type

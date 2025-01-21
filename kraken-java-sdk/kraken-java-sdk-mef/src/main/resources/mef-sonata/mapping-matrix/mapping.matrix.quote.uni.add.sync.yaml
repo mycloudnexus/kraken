@@ -8,6 +8,10 @@ metadata:
     mef-api-release: grace
   version: 14
 spec:
+  expect422-if-missing:
+    mef.sonata.api-target.quote.uni.add.sync:
+      - $.body.quoteItem[0].product.productConfiguration.bandwidth
+      - $.body.quoteItem[0].product.productConfiguration.bandwidthUnit
   matrix:
     mef.sonata.api-target.quote.uni.add.sync:
       - name: product_type_UNI
@@ -18,6 +22,7 @@ spec:
         path: "$.body.quoteItem[*].['action']"
         expectType: EXPECTED
         value: add
+        code: 400
       - name: syn_mode_true
         path: "$.body.instantSyncQuote"
         expectType: EXPECTED
