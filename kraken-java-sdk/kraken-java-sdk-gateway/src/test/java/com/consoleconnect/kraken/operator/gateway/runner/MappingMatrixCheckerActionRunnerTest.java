@@ -25,6 +25,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 
 @MockIntegrationTest
@@ -172,8 +173,6 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
     if (Objects.nonNull(krakenException.getCause())) {
       MatcherAssert.assertThat(
           krakenException.getCause().getMessage(), Matchers.containsString(matchedMsg));
-    } else {
-      System.err.println(krakenException);
     }
   }
 
@@ -372,6 +371,21 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
                 List.of("1.0", "3.9"),
                 MappingTypeEnum.CONTINUOUS_DOUBLE.getKind(),
                 false));
+  }
+
+  @Test
+  void givenExpected422Paths_whenDetermineHttpCode_thenReturnOK() {
+    Assertions.assertEquals(
+        HttpStatus.BAD_REQUEST.value(),
+        mappingMatrixCheckerActionRunner.determineHttpCode(Set.of(), ""));
+    String bandwidth = "$.body.productOrderItem[0].product.productConfiguration.bandwidth";
+    Set<String> pathsExpected422 = Set.of(bandwidth);
+    Assertions.assertEquals(
+        HttpStatus.UNPROCESSABLE_ENTITY.value(),
+        mappingMatrixCheckerActionRunner.determineHttpCode(pathsExpected422, bandwidth));
+    Assertions.assertEquals(
+        HttpStatus.BAD_REQUEST.value(),
+        mappingMatrixCheckerActionRunner.determineHttpCode(pathsExpected422, bandwidth + "1"));
   }
 
   @ParameterizedTest
