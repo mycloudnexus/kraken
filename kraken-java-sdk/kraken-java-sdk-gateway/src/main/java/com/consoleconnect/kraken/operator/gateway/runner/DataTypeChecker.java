@@ -9,6 +9,8 @@ import com.consoleconnect.kraken.operator.core.toolkit.ConstructExpressionUtil;
 import com.consoleconnect.kraken.operator.gateway.dto.PathCheck;
 import com.jayway.jsonpath.DocumentContext;
 import java.util.*;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -283,38 +285,61 @@ public interface DataTypeChecker {
       List<String> valueList,
       String sourceType,
       Boolean discrete) {
-    if (MappingTypeEnum.CONTINUOUS_INT.getKind().equals(sourceType)
-        && MappingTypeEnum.CONTINUOUS_INT.getDiscrete().equals(discrete)) {
-      if (Objects.isNull(evaluateValue) || isNotInteger(evaluateValue)) {
-        throw KrakenException.unProcessableEntityInvalidValue(
-            String.format(
-                EXPECT_INT_MSG, paramName, evaluateValue, whichDataType(evaluateValue), "Integer"));
-      }
-      validateContinuousDouble(evaluateValue, paramName, valueList);
-    } else if (MappingTypeEnum.CONTINUOUS_DOUBLE.getKind().equals(sourceType)
-        && MappingTypeEnum.CONTINUOUS_DOUBLE.getDiscrete().equals(discrete)) {
-      if (Objects.isNull(evaluateValue) || isNotDouble(evaluateValue)) {
-        throw KrakenException.unProcessableEntityInvalidValue(
-            String.format(
-                EXPECT_INT_MSG, paramName, evaluateValue, whichDataType(evaluateValue), "Double"));
-      }
-      validateContinuousDouble(evaluateValue, paramName, valueList);
+    if (isContinuousInt(sourceType, discrete)) {
+      validateNumber(
+          evaluateValue, paramName, valueList, Integer::parseInt, "Integer", this::isNotInteger);
+    } else if (isContinuousDouble(sourceType, discrete)) {
+      validateNumber(
+          evaluateValue, paramName, valueList, Double::parseDouble, "Double", this::isNotDouble);
     }
   }
 
-  default void validateContinuousDouble(
-      Object evaluateValue, String paramName, List<String> valueList) {
-    List<Double> values = valueList.stream().map(Double::parseDouble).toList();
-    double min = Collections.min(values);
-    double max = Collections.max(values);
+  private <T extends Number & Comparable<T>> void validateNumber(
+      Object evaluateValue,
+      String paramName,
+      List<String> valueList,
+      Function<String, T> parser,
+      String expectedType,
+      Predicate<Object> invalidCheck) {
+    if (Objects.isNull(evaluateValue) || invalidCheck.test(evaluateValue)) {
+      throw KrakenException.unProcessableEntityInvalidValue(
+          String.format(
+              EXPECT_INT_MSG,
+              paramName,
+              evaluateValue,
+              whichDataType(evaluateValue),
+              expectedType));
+    }
+    validateContinuousValue(evaluateValue, paramName, valueList, parser);
+  }
+
+  private boolean isContinuousInt(String sourceType, Boolean discrete) {
+    return MappingTypeEnum.CONTINUOUS_INT.getKind().equals(sourceType)
+        && MappingTypeEnum.CONTINUOUS_INT.getDiscrete().equals(discrete);
+  }
+
+  private boolean isContinuousDouble(String sourceType, Boolean discrete) {
+    return MappingTypeEnum.CONTINUOUS_DOUBLE.getKind().equals(sourceType)
+        && MappingTypeEnum.CONTINUOUS_DOUBLE.getDiscrete().equals(discrete);
+  }
+
+  default <T extends Number & Comparable<T>> void validateContinuousValue(
+      Object evaluateValue, String paramName, List<String> valueList, Function<String, T> parser) {
+    List<T> values = valueList.stream().map(parser).toList();
+    T min = Collections.min(values);
+    T max = Collections.max(values);
     String valueStr = String.valueOf(evaluateValue);
+
     if (StringUtils.isBlank(valueStr)
         || !NumberUtils.isCreatable(valueStr)
-        || Double.parseDouble(valueStr) < min
-        || Double.parseDouble(valueStr) > max) {
+        || isOutsideRange(parser.apply(valueStr), min, max)) {
       throw KrakenException.unProcessableEntityInvalidValue(
           String.format(SHOULD_BE_INTERVAL, paramName, evaluateValue, min, max));
     }
+  }
+
+  private <T extends Comparable<T>> boolean isOutsideRange(T value, T min, T max) {
+    return value.compareTo(min) < 0 || value.compareTo(max) > 0;
   }
 
   default void validateConstantNumber(

@@ -1,7 +1,7 @@
 {
   "name": "kraken-app-portal",
   "private": true,
-  "version": "2.0.0-snapshot.2",
+  "version": "2.0.0-snapshot.3",
   "type": "module",
   "scripts": {
     "dev": "vite",
