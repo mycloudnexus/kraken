@@ -121,7 +121,7 @@ public interface DataTypeChecker {
   default PathCheck rewritePath(PathCheck pathCheck, int index) {
     return StringUtils.isBlank(pathCheck.path())
         ? pathCheck
-        : pathCheck.withUpdatedPath(replaceWildcard(extractCheckingPath(pathCheck.path()), index));
+        : pathCheck.withUpdatedPath(replaceWildcard(pathCheck.path(), index));
   }
 
   default String replaceWildcard(String path, int index) {

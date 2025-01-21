@@ -203,7 +203,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
         PathCheck updatedPathCheck = rewritePath(pathCheck, 0);
         throwException(
             pathCheck,
-            String.format(getDefaultMessage(updatedPathCheck.code()), updatedPathCheck.path()));
+            String.format(getDefaultMessage(updatedPathCheck.code()), extractCheckingPath(updatedPathCheck.path())));
       }
       return IntStream.range(0, array.size())
           .allMatch(
