@@ -374,6 +374,26 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
   }
 
   @Test
+  void givenDoubleInRange_whenValidatingContinuousDouble_thenNoException() {
+    Assertions.assertDoesNotThrow(
+        () ->
+            mappingMatrixCheckerActionRunner.validateContinuousNumber(
+                3.2,
+                "x",
+                List.of("1.0", "3.9"),
+                MappingTypeEnum.CONTINUOUS_DOUBLE.getKind(),
+                false));
+  }
+
+  @Test
+  void givenIntegerInRange_whenValidatingContinuousInteger_thenNoException() {
+    Assertions.assertDoesNotThrow(
+        () ->
+            mappingMatrixCheckerActionRunner.validateContinuousNumber(
+                3, "x", List.of("1", "4"), MappingTypeEnum.CONTINUOUS_INT.getKind(), false));
+  }
+
+  @Test
   void givenExpected422Paths_whenDetermineHttpCode_thenReturnOK() {
     Assertions.assertEquals(
         HttpStatus.BAD_REQUEST.value(),
