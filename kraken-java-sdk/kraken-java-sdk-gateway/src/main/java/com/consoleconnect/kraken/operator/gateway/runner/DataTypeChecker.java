@@ -286,51 +286,55 @@ public interface DataTypeChecker {
       String sourceType,
       Boolean discrete) {
     if (isContinuousInt(sourceType, discrete)) {
-      validateNumber(evaluateValue, paramName, valueList, Integer::parseInt, "Integer", this::isNotInteger);
+      validateNumber(
+          evaluateValue, paramName, valueList, Integer::parseInt, "Integer", this::isNotInteger);
     } else if (isContinuousDouble(sourceType, discrete)) {
-      validateNumber(evaluateValue, paramName, valueList, Double::parseDouble, "Double", this::isNotDouble);
+      validateNumber(
+          evaluateValue, paramName, valueList, Double::parseDouble, "Double", this::isNotDouble);
     }
   }
 
   private <T extends Number & Comparable<T>> void validateNumber(
-          Object evaluateValue,
-          String paramName,
-          List<String> valueList,
-          Function<String, T> parser,
-          String expectedType,
-          Predicate<Object> invalidCheck) {
+      Object evaluateValue,
+      String paramName,
+      List<String> valueList,
+      Function<String, T> parser,
+      String expectedType,
+      Predicate<Object> invalidCheck) {
     if (Objects.isNull(evaluateValue) || invalidCheck.test(evaluateValue)) {
       throw KrakenException.unProcessableEntityInvalidValue(
-              String.format(EXPECT_INT_MSG, paramName, evaluateValue, whichDataType(evaluateValue), expectedType));
+          String.format(
+              EXPECT_INT_MSG,
+              paramName,
+              evaluateValue,
+              whichDataType(evaluateValue),
+              expectedType));
     }
     validateContinuousValue(evaluateValue, paramName, valueList, parser);
   }
 
   private boolean isContinuousInt(String sourceType, Boolean discrete) {
     return MappingTypeEnum.CONTINUOUS_INT.getKind().equals(sourceType)
-            && MappingTypeEnum.CONTINUOUS_INT.getDiscrete().equals(discrete);
+        && MappingTypeEnum.CONTINUOUS_INT.getDiscrete().equals(discrete);
   }
 
   private boolean isContinuousDouble(String sourceType, Boolean discrete) {
     return MappingTypeEnum.CONTINUOUS_DOUBLE.getKind().equals(sourceType)
-            && MappingTypeEnum.CONTINUOUS_DOUBLE.getDiscrete().equals(discrete);
+        && MappingTypeEnum.CONTINUOUS_DOUBLE.getDiscrete().equals(discrete);
   }
 
   default <T extends Number & Comparable<T>> void validateContinuousValue(
-          Object evaluateValue,
-          String paramName,
-          List<String> valueList,
-          Function<String, T> parser) {
+      Object evaluateValue, String paramName, List<String> valueList, Function<String, T> parser) {
     List<T> values = valueList.stream().map(parser).toList();
     T min = Collections.min(values);
     T max = Collections.max(values);
     String valueStr = String.valueOf(evaluateValue);
 
     if (StringUtils.isBlank(valueStr)
-            || !NumberUtils.isCreatable(valueStr)
-            || isOutsideRange(parser.apply(valueStr), min, max)) {
+        || !NumberUtils.isCreatable(valueStr)
+        || isOutsideRange(parser.apply(valueStr), min, max)) {
       throw KrakenException.unProcessableEntityInvalidValue(
-              String.format(SHOULD_BE_INTERVAL, paramName, evaluateValue, min, max));
+          String.format(SHOULD_BE_INTERVAL, paramName, evaluateValue, min, max));
     }
   }
 
