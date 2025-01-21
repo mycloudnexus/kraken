@@ -106,6 +106,7 @@ app:
   filter-headers:
     - token
     - Authorization
+    - x-sonata-buyer-key
   filter-paths:
     - /mefApi
   cron-job:
