@@ -114,7 +114,8 @@ public class ApiComponentService
                         || Objects.equals(EXECUTION_STAGE, v.getKey())
                         || Objects.equals(VALIDATION_STAGE, v.getKey()))
             .toList();
-    endpointsFacets.stream().forEach(facet -> setFacetsByKeyIfExist(facet.getKey(), asset, facet));
+    endpointsFacets.stream()
+        .forEach(facet -> updateFacetsByKeyIfExist(facet.getKey(), asset, facet));
     if (asset.getMetadata() != null && asset.getMetadata().getLabels() != null) {
       Map<String, String> labels =
           assetEntity.getLabels() == null ? new HashMap<>() : assetEntity.getLabels();
@@ -144,7 +145,7 @@ public class ApiComponentService
     return assetEntity;
   }
 
-  private void setFacetsByKeyIfExist(String key, UnifiedAsset asset, AssetFacetEntity facet) {
+  private void updateFacetsByKeyIfExist(String key, UnifiedAsset asset, AssetFacetEntity facet) {
     if (asset.getFacets().containsKey(key)) {
       facet.setPayload(asset.getFacets().get(key));
       assetFacetRepository.save(facet);

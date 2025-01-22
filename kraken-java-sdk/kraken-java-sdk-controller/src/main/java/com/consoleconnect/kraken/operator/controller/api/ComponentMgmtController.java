@@ -124,7 +124,7 @@ public class ComponentMgmtController {
   @AuditAction(
       resource = AuditConstants.API_MAPPING,
       resourceId = "#pathVariable['id']",
-      description = "update target api mapper")
+      description = "update target api workflow mapper")
   public Mono<IngestionDataResult> updateWorkflowTemplate(
       @PathVariable String productId,
       @PathVariable String id,
