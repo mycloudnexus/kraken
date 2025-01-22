@@ -72,18 +72,50 @@ public class ApiComponentService
     return IngestionDataResult.of(HttpStatus.OK.value(), "success", assetEntity);
   }
 
+  @Transactional
+  public IngestionDataResult updateWorkflowTemplate(
+      SaveWorkflowTemplateRequest template, String id, String updatedBy) {
+    log.info("update mapping template id: {}", id);
+    if (template.getWorkflowTemplate() == null) {
+      throw KrakenException.badRequest("workflow template can not be null");
+    }
+    if (template.getMappingTemplate() == null) {
+      throw KrakenException.badRequest("mapping template can not be null");
+    }
+    UnifiedAssetDto existingAsset = unifiedAssetService.findOne(id);
+    validateMapper(template.getMappingTemplate(), existingAsset);
+
+    ComponentAPITargetFacets facets =
+        UnifiedAsset.getFacets(existingAsset, ComponentAPITargetFacets.class);
+    if (facets.getWorkflow() == null
+        || !Objects.equals(
+            facets.getWorkflow().getKey(), template.getWorkflowTemplate().getMetadata().getKey())) {
+      throw KrakenException.badRequest("workflow template key not match");
+    }
+    updateUnifiedAssetEntity(template.getMappingTemplate(), id, updatedBy);
+    updateUnifiedAssetEntity(
+        template.getWorkflowTemplate(), facets.getWorkflow().getKey(), updatedBy);
+    return IngestionDataResult.of(HttpStatus.OK.value(), "success", null);
+  }
+
   public UnifiedAssetEntity updateUnifiedAssetEntity(
       UnifiedAsset asset, String id, String updatedBy) {
     UnifiedAssetEntity assetEntity = unifiedAssetService.findOneByIdOrKey(id);
     assetEntity.setUpdatedBy(updatedBy);
     Set<AssetFacetEntity> facets = assetEntity.getFacets();
-    Optional<AssetFacetEntity> endpointsFacets =
-        facets.stream().filter(v -> Objects.equals(END_POINTS, v.getKey())).findAny();
-    endpointsFacets.ifPresent(
-        facet -> {
-          facet.setPayload(asset.getFacets().get(END_POINTS));
-          assetFacetRepository.save(facet);
-        });
+
+    List<AssetFacetEntity> endpointsFacets =
+        facets.stream()
+            .filter(
+                v ->
+                    Objects.equals(END_POINTS, v.getKey())
+                        || Objects.equals(META_DATA, v.getKey())
+                        || Objects.equals(PREPARATION_STAGE, v.getKey())
+                        || Objects.equals(EXECUTION_STAGE, v.getKey())
+                        || Objects.equals(VALIDATION_STAGE, v.getKey()))
+            .toList();
+    endpointsFacets.stream()
+        .forEach(facet -> updateFacetsByKeyIfExist(facet.getKey(), asset, facet));
     if (asset.getMetadata() != null && asset.getMetadata().getLabels() != null) {
       Map<String, String> labels =
           assetEntity.getLabels() == null ? new HashMap<>() : assetEntity.getLabels();
@@ -111,6 +143,13 @@ public class ApiComponentService
     assetEntity.setVersion(assetEntity.getVersion() + 1);
     unifiedAssetRepository.save(assetEntity);
     return assetEntity;
+  }
+
+  private void updateFacetsByKeyIfExist(String key, UnifiedAsset asset, AssetFacetEntity facet) {
+    if (asset.getFacets().containsKey(key)) {
+      facet.setPayload(asset.getFacets().get(key));
+      assetFacetRepository.save(facet);
+    }
   }
 
   private void validateMapper(UnifiedAsset request, UnifiedAssetDto origin) {
