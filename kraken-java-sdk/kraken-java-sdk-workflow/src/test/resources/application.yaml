@@ -87,6 +87,9 @@ logging:
     com.consoleconnect.core.beehive: DEBUG
     org.springframework.security: DEBUG
 app:
+  workflow:
+    enabled: false
+    base-url: http://base-url.com
   tenant:
     tenantId: ef90f7e7-dc7d-4538-aa5b-a4a7d8432da2
     mode: SINGLE
@@ -100,7 +103,6 @@ app:
   filter-headers:
     - token
     - Authorization
-    - x-sonata-buyer-key
   filter-paths:
     - /mefApi
   unified-asset:
@@ -115,7 +117,7 @@ app:
     resource-server:
       enabled: false
   initialize-exclude-assets:
-#    - classpath:/mef-sonata/apis/api.product.offering.yaml
+    #    - classpath:/mef-sonata/apis/api.product.offering.yaml
     - classpath:/mef-sonata/api-targets/api-target.quote.eline.add.yaml
     - classpath:/mef-sonata/api-targets/api-target.quote.eline.read.yaml
     - classpath:/mef-sonata/api-targets/api-target.quote.uni.add.yaml
