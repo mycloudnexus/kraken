@@ -109,9 +109,11 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     checkDisabled(facets, targetKey);
 
     List<String> pathsExpected422 = readExpected422Paths(matrixAssets);
-    // matrix checking, body-422, if-missing-400
+    // matrix checking, if-missing-return-400, wrong-value-return-422, paths under
+    // 'expect-http-status-422-if-missing' always return 422
     checkMatrixConstraints(facets, targetKey, inputs, pathsExpected422);
-    // mapper checking, body-422, if-missing-400
+    // mapper checking, if-missing-return-400, wrong-value-return-422, paths under
+    // 'expect-http-status-422-if-missing' always return 422
     checkMapperConstraints(targetKey, inputs, pathsExpected422);
   }
 

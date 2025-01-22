@@ -70,6 +70,7 @@ public interface ResponseCodeTransform {
         StringUtils.isNotBlank(errorCode)
             ? Integer.parseInt(errorCode)
             : HttpStatus.BAD_REQUEST.value();
+    // if-missing-return-400, wrong-value-return-422
     if (StringUtils.isNotBlank(errorMsg)) {
       if (HttpStatus.BAD_REQUEST.value() == errorCodeInt) {
         throw KrakenException.badRequestInvalidBody(errorMsg);
