@@ -421,6 +421,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
 
   public Object readByPathCheckWithException(
       DocumentContext documentContext, PathCheck pathCheck, List<String> pathsExpected422) {
-    return readByPathWithException(documentContext, pathCheck.path(), pathsExpected422, pathCheck.errorMsg());
+    return readByPathWithException(
+        documentContext, pathCheck.path(), pathsExpected422, pathCheck.errorMsg());
   }
 }
