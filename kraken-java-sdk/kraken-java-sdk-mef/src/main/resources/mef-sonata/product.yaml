@@ -103,6 +103,7 @@ spec:
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.inventory.eline.read.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.inventory.uni.list.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.inventory.eline.list.yaml
+    - classpath:/mef-sonata/api-workflow/api-workflow.order.eline.delete.yaml
     - classpath:/mef-sonata/template-upgrade/release.1.7.3.yaml
 
 
@@ -169,6 +170,7 @@ spec:
     - classpath:/mef-sonata/apis/api.order.yaml
     - classpath:/mef-sonata/apis/api.product.offering.yaml
     - classpath:/mef-sonata/apis/api.quote.yaml
+    - classpath:/mef-sonata/api-workflow/api-workflow.order.eline.delete.yaml
   sampleMapperDataPaths:
     - classpath:/mef-sonata/api-targets-mappers-sample-data/api-target-mapper.order.uni.add.yaml
   sampleConfigPaths:
