@@ -23,6 +23,7 @@ public enum AssetKindEnum {
   COMPONENT_API_TARGET("kraken.component.api-target"),
   COMPONENT_API_TARGET_SPEC("kraken.component.api-target-spec"),
   COMPONENT_API_TARGET_MAPPER("kraken.component.api-target-mapper"),
+  COMPONENT_API_WORK_FLOW("kraken.component.api-workflow"),
   COMPONENT_TRANSFORMER("kraken.component.transformer"),
   COMPONENT_WORKFLOW("kraken.component.workflow"),
   PRODUCT_MAPPING_MATRIX("kraken.product.mapping.matrix"),
