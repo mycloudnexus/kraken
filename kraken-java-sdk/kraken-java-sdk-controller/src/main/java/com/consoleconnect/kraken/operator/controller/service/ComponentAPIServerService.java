@@ -62,6 +62,7 @@ public class ComponentAPIServerService extends AssetStatusManager {
     Paging<UnifiedAssetDto> pages =
         this.unifiedAssetService.search(
             componentId, COMPONENT_API_TARGET_SPEC.getKind(), facetIncluded, q, pageRequest);
+    filterFacet(facetIncluded, pages);
     Set<String> serverKeyUsage = queryServerKeyInUsage();
     pages
         .getData()
@@ -71,6 +72,13 @@ public class ComponentAPIServerService extends AssetStatusManager {
               assetDto.setInUse((serverKeyUsage.contains(specKey) ? Boolean.TRUE : Boolean.FALSE));
             });
     return pages;
+  }
+
+  public void filterFacet(boolean facetIncluded, Paging<UnifiedAssetDto> pages) {
+    if (!facetIncluded || pages.getSize() == 0) {
+      return;
+    }
+    pages.getData().forEach(assetDto -> assetDto.setSyncMetadata(null));
   }
 
   public void inUse(UnifiedAssetDto assetDto) {

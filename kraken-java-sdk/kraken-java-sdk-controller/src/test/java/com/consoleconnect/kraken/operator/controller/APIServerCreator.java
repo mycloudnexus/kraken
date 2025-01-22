@@ -72,4 +72,21 @@ public interface APIServerCreator {
             });
     return assetDtoList;
   }
+
+  default List<UnifiedAssetDto> queryAPIServerList(String path, boolean facetIncluded) {
+    List<UnifiedAssetDto> assetDtoList = new ArrayList<>();
+    getTestClientHelper()
+        .getAndVerify(
+            (uriBuilder ->
+                uriBuilder.path(path).queryParam("facetIncluded", facetIncluded).build()),
+            bodyStr -> {
+              assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(greaterThanOrEqualTo(1))));
+              HttpResponse<Paging<UnifiedAssetDto>> assetDtoPages =
+                  JsonToolkit.fromJson(
+                      bodyStr, new TypeReference<HttpResponse<Paging<UnifiedAssetDto>>>() {});
+              UnifiedAssetDto assetDto = assetDtoPages.getData().getData().get(0);
+              assetDtoList.add(assetDto);
+            });
+    return assetDtoList;
+  }
 }
