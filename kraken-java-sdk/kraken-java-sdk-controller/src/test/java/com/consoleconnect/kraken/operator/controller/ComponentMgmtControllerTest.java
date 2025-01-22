@@ -14,6 +14,8 @@ import com.consoleconnect.kraken.operator.core.client.ClientEvent;
 import com.consoleconnect.kraken.operator.core.client.ClientEventTypeEnum;
 import com.consoleconnect.kraken.operator.core.client.ServerAPIDto;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
+import com.consoleconnect.kraken.operator.core.enums.TaskEnum;
+import com.consoleconnect.kraken.operator.core.enums.WorkflowStageEnum;
 import com.consoleconnect.kraken.operator.core.mapper.FacetsMapper;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import com.consoleconnect.kraken.operator.core.model.SyncMetadata;
@@ -97,6 +99,11 @@ public class ComponentMgmtControllerTest extends AbstractIntegrationTest
   @Order(10)
   @Test
   void givenWorkflowRequest_whenUpdateWorkflowTemplate_thenSuccess() {
+    Assertions.assertNotNull(WorkflowStageEnum.EXECUTION_STAGE);
+    Assertions.assertNotNull(WorkflowStageEnum.PREPARATION_STAGE);
+    Assertions.assertNotNull(WorkflowStageEnum.VALIDATION_STAGE);
+    Assertions.assertNotNull(TaskEnum.HTTP);
+    Assertions.assertNotNull(TaskEnum.SWITCH);
     UnifiedAssetDto asset =
         unifiedAssetService.findOne("mef.sonata.api-target-mapper.order.eline.delete");
     UnifiedAssetDto workflow =
