@@ -83,4 +83,4 @@ spec:
               targetLocation: PATH
               customizedField: false
               requiredMapping: true
-      notificationUrl: https://hooks.slack.com/services/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
+      notificationUrl: https://hooks.slack.com

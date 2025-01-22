@@ -24,6 +24,7 @@
         <module>kraken-java-sdk-data</module>
         <module>kraken-java-sdk-sync</module>
         <module>kraken-java-sdk-auth</module>
+        <module>kraken-java-sdk-workflow</module>
     </modules>
 
 
