@@ -9,9 +9,7 @@ metadata:
   version: 14
 spec:
   expect422-if-missing:
-    mef.sonata.api-target.quote.uni.add.sync:
-     - $.body.quoteItem[0].product.productConfiguration.bandwidth
-     - $.body.quoteItem[0].product.productConfiguration.bandwidthUnit
+    - $.body.quoteItem[0].product.productConfiguration
   matrix:
     mef.sonata.api-target.quote.uni.add.sync:
       - name: product_type_UNI

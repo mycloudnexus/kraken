@@ -397,9 +397,9 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
   void givenExpected422Paths_whenDetermineHttpCode_thenReturnOK() {
     Assertions.assertEquals(
         HttpStatus.BAD_REQUEST.value(),
-        mappingMatrixCheckerActionRunner.determineHttpCode(Set.of(), ""));
+        mappingMatrixCheckerActionRunner.determineHttpCode(List.of(), ""));
     String bandwidth = "$.body.productOrderItem[0].product.productConfiguration.bandwidth";
-    Set<String> pathsExpected422 = Set.of(bandwidth);
+    List<String> pathsExpected422 = List.of(bandwidth);
     Assertions.assertEquals(
         HttpStatus.UNPROCESSABLE_ENTITY.value(),
         mappingMatrixCheckerActionRunner.determineHttpCode(pathsExpected422, bandwidth));
@@ -493,7 +493,7 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
         KrakenException.class,
         () ->
             mappingMatrixCheckerActionRunner.checkMatrixConstraints(
-                facets, targetKey, requestBody, Set.of()));
+                facets, targetKey, requestBody, List.of()));
   }
 
   @SneakyThrows
@@ -519,7 +519,7 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
           Assertions.assertDoesNotThrow(
               () ->
                   mappingMatrixCheckerActionRunner.checkMatrixConstraints(
-                      facets, targetKey, requestBody, Set.of()));
+                      facets, targetKey, requestBody, List.of()));
         });
   }
 }

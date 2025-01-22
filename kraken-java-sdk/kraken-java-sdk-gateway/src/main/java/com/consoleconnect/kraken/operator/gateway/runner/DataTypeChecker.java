@@ -380,13 +380,14 @@ public interface DataTypeChecker {
     return path.replace("$.body.", "").replace("$.query.", "");
   }
 
-  default int determineHttpCode(Set<String> pathsExpected422, String actualPath) {
-    if (CollectionUtils.isEmpty(pathsExpected422)) {
-      return HttpStatus.BAD_REQUEST.value();
+  default int determineHttpCode(List<String> pathsExpected422, String actualPath) {
+    if (CollectionUtils.isNotEmpty(pathsExpected422) && StringUtils.isNotBlank(actualPath)) {
+      return pathsExpected422.stream()
+              .anyMatch(actualPath::startsWith)
+              ? HttpStatus.UNPROCESSABLE_ENTITY.value()
+              : HttpStatus.BAD_REQUEST.value();
     }
-    return pathsExpected422.contains(actualPath)
-        ? HttpStatus.UNPROCESSABLE_ENTITY.value()
-        : HttpStatus.BAD_REQUEST.value();
+    return HttpStatus.BAD_REQUEST.value();
   }
 
   void throwException(PathCheck pathCheck, String defaultMsg);
