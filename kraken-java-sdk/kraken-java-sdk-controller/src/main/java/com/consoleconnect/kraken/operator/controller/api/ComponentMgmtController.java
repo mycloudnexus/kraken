@@ -119,6 +119,21 @@ public class ComponentMgmtController {
         .map(userId -> apiComponentService.updateApiTargetMapper(asset, id, userId));
   }
 
+  @Operation(summary = "update workflow template)")
+  @PatchMapping("/components/{id}/workflow")
+  @AuditAction(
+      resource = AuditConstants.API_MAPPING,
+      resourceId = "#pathVariable['id']",
+      description = "update target api mapper")
+  public Mono<IngestionDataResult> updateWorkflowTemplate(
+      @PathVariable String productId,
+      @PathVariable String id,
+      @RequestBody SaveWorkflowTemplateRequest template) {
+    return UserContext.getUserId()
+        .publishOn(Schedulers.boundedElastic())
+        .map(userId -> apiComponentService.updateWorkflowTemplate(template, id, userId));
+  }
+
   @Operation(summary = "The detail of mapping for an api component")
   @GetMapping("/components/{componentId}/mapper-details")
   public HttpResponse<ComponentExpandDTO> detailMapping(
