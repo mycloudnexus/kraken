@@ -75,14 +75,14 @@ spec:
                     }
                   } else if (!actionArr.includes(action) && typeArr.includes(type)) {
                     if (action === undefined) {
-                      code = '400';
+                      errorCode = '400';
                       errorArr.push(`expect productOrderItem.action in [ ${actionArr} ], but missing property`)
                     } else {
-                      code = '422';
+                      errorCode = '422';
                       errorArr.push(`expect @{{productOrderItem.action}} in [ ${actionArr} ], but ${action}`)
                     }
                   } else {
-                    code = '400';
+                    errorCode = '400';
                     errorArr.push(`expect productOrderItem.product.productConfiguration.@type in [ ${typeArr} ], productOrderItem.action in [ ${actionArr} ] but missing property.`);
                   }
                   errorMsg = errorArr.join(' ');
