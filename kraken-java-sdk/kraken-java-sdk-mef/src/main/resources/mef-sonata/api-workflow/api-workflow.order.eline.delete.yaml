@@ -1,0 +1,46 @@
+---
+kind: kraken.component.api-workflow
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-workflow.order.eline.delete
+  name: Order Management
+  version: 1
+spec:
+  metaData:
+    workflowName: "order.eline.delete"
+    externalId: ""
+  validationStage:
+    - taskName: validation_task
+      description: ""
+      taskType: http
+      endpoint:
+          path: ""
+          method: ""
+          serverKey: ''
+          mappers:
+            request:
+      conditionCheck:
+        caseExpression: ""
+        buildInTask: reject_order_task
+  preparationStage:
+    - taskName: preparation_task
+      description: ""
+      taskType: http
+      endpoint:
+          path: ""
+          method: ""
+          serverKey: ''
+          mappers:
+            request:
+  executionStage:
+    - taskName: create_order_task
+      description: ""
+      taskType: http
+      endpoint:
+          path: ""
+          method: ''
+          serverKey: ''
+          mappers:
+            request:
+      notificationUrl:
+
