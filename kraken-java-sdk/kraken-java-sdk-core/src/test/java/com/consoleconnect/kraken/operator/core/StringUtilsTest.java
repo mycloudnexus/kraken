@@ -1,6 +1,8 @@
 package com.consoleconnect.kraken.operator.core;
 
 import com.consoleconnect.kraken.operator.core.enums.RegisterActionTypeEnum;
+import com.consoleconnect.kraken.operator.core.enums.TaskEnum;
+import com.consoleconnect.kraken.operator.core.enums.WorkflowStageEnum;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -16,5 +18,10 @@ class StringUtilsTest {
     System.out.println(read.name());
     RegisterActionTypeEnum type = RegisterActionTypeEnum.fromString("REGISTER");
     Assertions.assertNotNull(type);
+    Assertions.assertNotNull(WorkflowStageEnum.EXECUTION_STAGE);
+    Assertions.assertNotNull(WorkflowStageEnum.PREPARATION_STAGE);
+    Assertions.assertNotNull(WorkflowStageEnum.VALIDATION_STAGE);
+    Assertions.assertNotNull(TaskEnum.HTTP);
+    Assertions.assertNotNull(TaskEnum.SWITCH);
   }
 }
