@@ -47,7 +47,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
   public static final String PARAM_NAME = "param";
   public static final String NOT_FOUND = "notFound";
   public static final String COLON = ":";
-  public static final String EXPECTED422_PATH_KEY = "expect422-if-missing";
+  public static final String EXPECTED422_PATH_KEY = "expect-http-status-422-if-missing";
   private final UnifiedAssetService unifiedAssetService;
   private final UnifiedAssetRepository unifiedAssetRepository;
 
