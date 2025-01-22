@@ -13,7 +13,9 @@ import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.core.toolkit.Paging;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.codec.binary.Base64;
 
 public interface APIServerCreator {
@@ -48,6 +50,10 @@ public interface APIServerCreator {
 
     request.setSelectedAPIs(List.of("/api/v1/xxx get"));
 
+    Map<String, String> environments = new HashMap<>();
+    environments.put("stage", "url1");
+    environments.put("production", "url2");
+    request.setEnvironments(environments);
     getTestClientHelper()
         .postAndVerify(
             (uriBuilder -> uriBuilder.path(path).build()),
@@ -73,12 +79,17 @@ public interface APIServerCreator {
     return assetDtoList;
   }
 
-  default List<UnifiedAssetDto> queryAPIServerList(String path, boolean facetIncluded) {
+  default List<UnifiedAssetDto> queryAPIServerList(
+      String path, boolean facetIncluded, boolean liteSearch) {
     List<UnifiedAssetDto> assetDtoList = new ArrayList<>();
     getTestClientHelper()
         .getAndVerify(
             (uriBuilder ->
-                uriBuilder.path(path).queryParam("facetIncluded", facetIncluded).build()),
+                uriBuilder
+                    .path(path)
+                    .queryParam("facetIncluded", facetIncluded)
+                    .queryParam("liteSearch", liteSearch)
+                    .build()),
             bodyStr -> {
               assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(greaterThanOrEqualTo(1))));
               HttpResponse<Paging<UnifiedAssetDto>> assetDtoPages =

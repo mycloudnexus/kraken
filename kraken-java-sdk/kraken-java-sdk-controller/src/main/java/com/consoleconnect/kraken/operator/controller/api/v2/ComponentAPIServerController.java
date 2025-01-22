@@ -63,6 +63,8 @@ public class ComponentAPIServerController {
       @PathVariable String componentId,
       @RequestParam(value = "facetIncluded", required = false, defaultValue = "false")
           boolean facetIncluded,
+      @RequestParam(value = "liteSearch", required = false, defaultValue = "false")
+          boolean liteSearch,
       @RequestParam(value = "orderBy", required = false, defaultValue = "createdAt") String orderBy,
       @RequestParam(value = "direction", required = false, defaultValue = "DESC")
           Sort.Direction direction,
@@ -83,6 +85,7 @@ public class ComponentAPIServerController {
         this.service.listAPIServers(
             componentId,
             facetIncluded,
+            liteSearch,
             null,
             getSearchPageRequest(page, size, direction, orderBy)));
   }
