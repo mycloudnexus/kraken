@@ -132,13 +132,13 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
         : JsonToolkit.fromJson(JsonToolkit.toJson(obj), new TypeReference<>() {});
   }
 
-  public Paging<UnifiedAssetDto> queryMatrixAssets(String componentKey) {
+  public Paging<UnifiedAssetDto> queryMatrixAssets(String matrixKey) {
     return unifiedAssetService.findBySpecification(
         Tuple2.ofList(
             AssetsConstants.FIELD_KIND,
             PRODUCT_MAPPING_MATRIX.getKind(),
             AssetsConstants.FIELD_KEY,
-            componentKey),
+            matrixKey),
         null,
         null,
         PageRequest.of(0, 1),
