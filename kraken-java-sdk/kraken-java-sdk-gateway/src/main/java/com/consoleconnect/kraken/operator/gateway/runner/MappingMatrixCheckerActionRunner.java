@@ -203,7 +203,9 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
         PathCheck updatedPathCheck = rewritePath(pathCheck, 0);
         throwException(
             pathCheck,
-            String.format(getDefaultMessage(updatedPathCheck.code()), extractCheckingPath(updatedPathCheck.path())));
+            String.format(
+                getDefaultMessage(updatedPathCheck.code()),
+                extractCheckingPath(updatedPathCheck.path())));
       }
       return IntStream.range(0, array.size())
           .allMatch(
@@ -298,7 +300,8 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     List<String> params = extractMapperParam(mapper.getSource());
     String constructedBody = constructJsonPathBody(replaceStarToZero(mapper.getSource()));
     // if path in the excluded400Path, then throws 422, otherwise throws 400
-    Object realValue = readByPathWithException(documentContext, constructedBody, pathsExpected422, null);
+    Object realValue =
+        readByPathWithException(documentContext, constructedBody, pathsExpected422, null);
     validateConstantNumber(
         realValue, mapper, CollectionUtils.isEmpty(params) ? mapper.getSource() : params.get(0));
 
@@ -322,7 +325,8 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     }
     String constructedBody = constructJsonPathBody(replaceStarToZero(mapper.getSource()));
     // if path in the excluded400Path, then throws 422, otherwise throws 400
-    Object realValue = readByPathWithException(documentContext, constructedBody, pathsExpected422, null);
+    Object realValue =
+        readByPathWithException(documentContext, constructedBody, pathsExpected422, null);
     validateSourceValue(
         mapper.getSourceType(),
         mapper.getDiscrete(),
@@ -377,7 +381,8 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     if (BODY.equals(location)) {
       log.info("jsonPathExpression:{}", jsonPathExpression);
       // if path in the excluded400Path, then throws 422, otherwise throws 400
-      Object realValue = readByPathWithException(documentContext, jsonPathExpression, pathsExpected422, null);
+      Object realValue =
+          readByPathWithException(documentContext, jsonPathExpression, pathsExpected422, null);
       // check constant number
       validateConstantNumber(realValue, mapper, paramName);
       // check discrete string
@@ -403,7 +408,11 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     throw route422Exception(msg, "");
   }
 
-  public Object readByPathWithException(DocumentContext documentContext, String jsonPathExpression, List<String> pathsExpected422, String errorMsg) {
+  public Object readByPathWithException(
+      DocumentContext documentContext,
+      String jsonPathExpression,
+      List<String> pathsExpected422,
+      String errorMsg) {
     int code = determineHttpCode(pathsExpected422, jsonPathExpression);
     return readByPathWithException(documentContext, jsonPathExpression, code, errorMsg);
   }

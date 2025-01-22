@@ -382,10 +382,9 @@ public interface DataTypeChecker {
 
   default int determineHttpCode(List<String> pathsExpected422, String actualPath) {
     if (CollectionUtils.isNotEmpty(pathsExpected422) && StringUtils.isNotBlank(actualPath)) {
-      return pathsExpected422.stream()
-              .anyMatch(actualPath::startsWith)
-              ? HttpStatus.UNPROCESSABLE_ENTITY.value()
-              : HttpStatus.BAD_REQUEST.value();
+      return pathsExpected422.stream().anyMatch(actualPath::startsWith)
+          ? HttpStatus.UNPROCESSABLE_ENTITY.value()
+          : HttpStatus.BAD_REQUEST.value();
     }
     return HttpStatus.BAD_REQUEST.value();
   }

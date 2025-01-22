@@ -8,7 +8,6 @@ import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.gateway.template.JavaScriptEngine;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -54,9 +53,10 @@ public class JavaScriptEngineActionRunner extends AbstractActionRunner {
     Map<String, Object> map =
         JsonToolkit.fromJson(resultJson, new TypeReference<Map<String, Object>>() {});
     String errorMsg = (String) map.get(ERROR_MSG_VAR);
-    String errorCode = (String)map.get(ERROR_CODE_VAR);
+    String errorCode = (String) map.get(ERROR_CODE_VAR);
     log.info("errorCode:{}, errorMsg:{}", errorCode, errorMsg);
-    int errorCodeInt = StringUtils.isNotBlank(errorCode)
+    int errorCodeInt =
+        StringUtils.isNotBlank(errorCode)
             ? Integer.parseInt(errorCode)
             : HttpStatus.BAD_REQUEST.value();
     if (StringUtils.isNotBlank(errorMsg)) {

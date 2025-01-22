@@ -399,13 +399,15 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
         HttpStatus.BAD_REQUEST.value(),
         mappingMatrixCheckerActionRunner.determineHttpCode(List.of(), ""));
     String bandwidth = "$.body.productOrderItem[0].product.productConfiguration.bandwidth";
-    List<String> pathsExpected422 = List.of(bandwidth);
+    List<String> pathsExpected422 =
+        List.of("$.body.productOrderItem[0].product.productConfiguration");
     Assertions.assertEquals(
         HttpStatus.UNPROCESSABLE_ENTITY.value(),
         mappingMatrixCheckerActionRunner.determineHttpCode(pathsExpected422, bandwidth));
     Assertions.assertEquals(
         HttpStatus.BAD_REQUEST.value(),
-        mappingMatrixCheckerActionRunner.determineHttpCode(pathsExpected422, bandwidth + "1"));
+        mappingMatrixCheckerActionRunner.determineHttpCode(
+            pathsExpected422, "$.body.productOrderItem[0].product.x"));
   }
 
   @ParameterizedTest
@@ -445,7 +447,7 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
             "",
             422,
             null);
-    String expected1 = "quoteItem[0].product.place[0].@type";
+    String expected1 = "$.body.quoteItem[0].product.place[0].@type";
     Pair<String, PathCheck> pair1 = Pair.of(expected1, pathCheck1);
 
     PathCheck pathCheck2 =
