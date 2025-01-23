@@ -206,7 +206,7 @@ public interface DataTypeChecker {
   }
 
   default void validateDiscreteString(Object evaluateValue, String paramName, String sourceType) {
-    if (MappingTypeEnum.STRING.getKind().equals(sourceType)) {
+    if (MappingTypeEnum.STRING.getKind().equalsIgnoreCase(sourceType)) {
       Class<?> dataType = whichDataTypeClass(evaluateValue);
       if (!String.class.equals(dataType)) {
         throw KrakenException.unProcessableEntityInvalidFormat(
@@ -222,7 +222,7 @@ public interface DataTypeChecker {
 
   default String rewriteCheckingPath(PathCheck pathCheck) {
     String checkingPath = extractCheckingPath(pathCheck.path());
-    if (checkingPath.contains("[*]")) {
+    if (checkingPath.endsWith("]")) {
       List<String> params =
           ConstructExpressionUtil.extractParam(pathCheck.value(), ARRAY_PARAM_PATTERN);
       if (CollectionUtils.isNotEmpty(params)) {
@@ -234,7 +234,7 @@ public interface DataTypeChecker {
 
   default boolean checkExpectDataType(PathCheck pathCheck, Object variable) {
     String dataType = whichDataType(variable);
-    if (Objects.isNull(variable) || !pathCheck.expectedValueType().equals(dataType)) {
+    if (Objects.isNull(variable) || !pathCheck.expectedValueType().equalsIgnoreCase(dataType)) {
       String checkingPath = rewriteCheckingPath(pathCheck);
       throwException(
           pathCheck,
@@ -247,8 +247,8 @@ public interface DataTypeChecker {
   default void validateEnumOrDiscreteString(
       Object evaluateValue, String paramName, List<String> valueList, String sourceType) {
     validateDiscreteString(evaluateValue, paramName, sourceType);
-    if ((MappingTypeEnum.STRING.getKind().equals(sourceType)
-            || (MappingTypeEnum.ENUM.getKind().equals(sourceType)))
+    if ((MappingTypeEnum.STRING.getKind().equalsIgnoreCase(sourceType)
+            || (MappingTypeEnum.ENUM.getKind().equalsIgnoreCase(sourceType)))
         && Objects.nonNull(evaluateValue)
         && CollectionUtils.isNotEmpty(valueList)
         && !valueList.contains(evaluateValue.toString())) {
@@ -271,7 +271,7 @@ public interface DataTypeChecker {
       List<String> valueList,
       String sourceType,
       Boolean discrete) {
-    if (MappingTypeEnum.DISCRETE_INT.getKind().equals(sourceType)
+    if (MappingTypeEnum.DISCRETE_INT.getKind().equalsIgnoreCase(sourceType)
         && MappingTypeEnum.DISCRETE_INT.getDiscrete().equals(discrete)) {
       if (Objects.isNull(evaluateValue) || isNotInteger(evaluateValue)) {
         throw KrakenException.unProcessableEntityInvalidValue(
@@ -324,12 +324,12 @@ public interface DataTypeChecker {
   }
 
   private boolean isContinuousInt(String sourceType, Boolean discrete) {
-    return MappingTypeEnum.CONTINUOUS_INT.getKind().equals(sourceType)
+    return MappingTypeEnum.CONTINUOUS_INT.getKind().equalsIgnoreCase(sourceType)
         && MappingTypeEnum.CONTINUOUS_INT.getDiscrete().equals(discrete);
   }
 
   private boolean isContinuousDouble(String sourceType, Boolean discrete) {
-    return MappingTypeEnum.CONTINUOUS_DOUBLE.getKind().equals(sourceType)
+    return MappingTypeEnum.CONTINUOUS_DOUBLE.getKind().equalsIgnoreCase(sourceType)
         && MappingTypeEnum.CONTINUOUS_DOUBLE.getDiscrete().equals(discrete);
   }
 
@@ -354,7 +354,7 @@ public interface DataTypeChecker {
 
   default void validateConstantNumber(
       Object evaluateValue, ComponentAPITargetFacets.Mapper mapper, String paramName) {
-    if (MappingTypeEnum.DISCRETE_INT.getKind().equals(mapper.getSourceType())
+    if (MappingTypeEnum.DISCRETE_INT.getKind().equalsIgnoreCase(mapper.getSourceType())
         && NumberUtils.isCreatable(mapper.getTarget())) {
       Class<?> dataType = whichDataTypeClass(evaluateValue);
       if (Objects.isNull(evaluateValue) || isNotNumeric(evaluateValue)) {

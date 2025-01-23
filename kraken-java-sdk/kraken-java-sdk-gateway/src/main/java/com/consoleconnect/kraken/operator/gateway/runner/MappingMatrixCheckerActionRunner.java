@@ -237,10 +237,12 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
               SpELEngine.evaluateWithoutSuppressException(
                   pathCheck.value(), Map.of(PARAM_NAME, value), Object.class);
         } catch (Exception e) {
+          // 400-if-not-exist
           String checkingPath = rewriteCheckingPath(pathCheck);
-          throwException(pathCheck, String.format(PARAM_NOT_EXIST_MSG, checkingPath));
+          throw KrakenException.badRequestInvalidBody(String.format(MISSING_PROPERTY_MSG, checkingPath));
         }
         if (StringUtils.isNotBlank(pathCheck.expectedValueType())) {
+          // 422-if-not-matched
           return checkExpectDataType(pathCheck, obj);
         }
         return true;
@@ -385,11 +387,13 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
       // if path in the excluded400Path, then throws 422, otherwise throws 400
       Object realValue =
           readByPathWithException(documentContext, jsonPathExpression, pathsExpected422, null);
-      // check constant number
-      validateConstantNumber(realValue, mapper, paramName);
-      // check discrete string
-      validateEnumOrDiscreteString(
-          realValue, paramName, mapper.getSourceValues(), mapper.getSourceType());
+      validateSourceValue(
+              mapper.getSourceType(),
+              mapper.getDiscrete(),
+              realValue,
+              params.get(0),
+              mapper.getSourceValues(),
+              mapper.getTarget());
     }
     if (QUERY.equals(location) || BODY.equals(location)) {
       try {
