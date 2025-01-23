@@ -56,6 +56,13 @@ public class ComponentAPIServerController {
         .map(HttpResponse::ok);
   }
 
+  // 1.If facetIncluded == true and liteSearch == true, the facet data will be limited to only
+  // include "environment," and the syncMetadata will also be reduced.
+  // 2.If facetIncluded == true and liteSearch == false, no data will be reduced, and facets will be
+  // returned as usual.
+  // 3.If facetIncluded == false, no data will be reduced, the response will not include any facet
+  // data, and the endpoint will behave consistently with other endpoints using the 'facetIncluded'
+  // filter parameter with false.
   @Operation(summary = "list api servers of an api component")
   @GetMapping()
   public HttpResponse<Paging<UnifiedAssetDto>> search(
