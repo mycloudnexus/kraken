@@ -34,6 +34,9 @@ public class ApiActivityLogEntity extends AbstractHttpEntity {
   @Column(name = "call_seq", nullable = true, unique = false)
   private Integer callSeq;
 
+  @Column(name = "triggered_at", nullable = true, unique = false)
+  private ZonedDateTime triggeredAt;
+
   @Column(name = "synced_at", nullable = true, unique = false)
   private ZonedDateTime syncedAt;
 

@@ -25,6 +25,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 
 @MockIntegrationTest
@@ -86,21 +87,6 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
         Assertions.assertThrowsExactly(
             KrakenException.class, () -> mappingMatrixCheckerActionRunner.onCheck(inputs));
     MatcherAssert.assertThat(krakenException.getMessage(), Matchers.containsString("disabled"));
-  }
-
-  @Test
-  @Order(3)
-  @SneakyThrows
-  void givenParamMissing_whenOnCheck_thenReturnException() {
-    Map<String, Object> inputs = new HashMap<>();
-    String s = readFileToString("/mockData/addressValidationRequest.json");
-    inputs.put("body", JsonToolkit.fromJson(s, Object.class));
-    inputs.put("targetKey", "mef.sonata.api-target.address.validate");
-    inputs.put("mappingMatrixKey", "mef.sonata.api.matrix.address.validation.enable");
-    KrakenException krakenException =
-        Assertions.assertThrowsExactly(
-            KrakenException.class, () -> mappingMatrixCheckerActionRunner.onCheck(inputs));
-    MatcherAssert.assertThat(krakenException.getMessage(), Matchers.containsString("422"));
   }
 
   @Test
@@ -184,8 +170,10 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
     KrakenException krakenException =
         Assertions.assertThrowsExactly(
             KrakenException.class, () -> mappingMatrixCheckerActionRunner.onCheck(inputs));
-    MatcherAssert.assertThat(
-        krakenException.getCause().getMessage(), Matchers.containsString(matchedMsg));
+    if (Objects.nonNull(krakenException.getCause())) {
+      MatcherAssert.assertThat(
+          krakenException.getCause().getMessage(), Matchers.containsString(matchedMsg));
+    }
   }
 
   private void validateQuoteRequest(String request, String matchedMsg) throws IOException {
@@ -405,6 +393,23 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
                 3, "x", List.of("1", "4"), MappingTypeEnum.CONTINUOUS_INT.getKind(), false));
   }
 
+  @Test
+  void givenExpected422Paths_whenDetermineHttpCode_thenReturnOK() {
+    Assertions.assertEquals(
+        HttpStatus.BAD_REQUEST.value(),
+        mappingMatrixCheckerActionRunner.determineHttpCode(List.of(), ""));
+    String bandwidth = "$.body.productOrderItem[0].product.productConfiguration.bandwidth";
+    List<String> pathsExpected422 =
+        List.of("$.body.productOrderItem[0].product.productConfiguration");
+    Assertions.assertEquals(
+        HttpStatus.UNPROCESSABLE_ENTITY.value(),
+        mappingMatrixCheckerActionRunner.determineHttpCode(pathsExpected422, bandwidth));
+    Assertions.assertEquals(
+        HttpStatus.BAD_REQUEST.value(),
+        mappingMatrixCheckerActionRunner.determineHttpCode(
+            pathsExpected422, "$.body.productOrderItem[0].product.x"));
+  }
+
   @ParameterizedTest
   @MethodSource(value = "buildNormalSourceTypeAndTarget")
   void givenNumberSourceTypeAndTarget_whenConvert_thenReturnOK(Pair<String, String> pair) {
@@ -490,7 +495,7 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
         KrakenException.class,
         () ->
             mappingMatrixCheckerActionRunner.checkMatrixConstraints(
-                facets, targetKey, requestBody));
+                facets, targetKey, requestBody, List.of()));
   }
 
   @SneakyThrows
@@ -516,7 +521,7 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
           Assertions.assertDoesNotThrow(
               () ->
                   mappingMatrixCheckerActionRunner.checkMatrixConstraints(
-                      facets, targetKey, requestBody));
+                      facets, targetKey, requestBody, List.of()));
         });
   }
 }

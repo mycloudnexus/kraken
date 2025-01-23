@@ -8,6 +8,8 @@ metadata:
     mef-api-release: grace
   version: 18
 spec:
+  expect-http-status-422-if-missing:
+    - $.body.productOrderItem[0].product.productConfiguration
   matrix:
     mef.sonata.api-target.order.eline.add:
       - name: product_type_eline_type

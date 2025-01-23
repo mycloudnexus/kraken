@@ -34,6 +34,7 @@ spec:
             source: "@{{productOrderItem[0].requestedItemTerm.duration.amount}}"
             sourceLocation: BODY
             sourceType: integer
+            discrete: true
             target: "1"
             targetLocation: BODY
             requiredMapping: true
@@ -67,7 +68,8 @@ spec:
             source: "@{{productOrderItem[0].requestedItemTerm.rollInterval.amount}}"
             sourceLocation: BODY
             sourceType: integer
-            target: ""
+            discrete: true
+            target: "1"
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.order.uni.add.rollInterval.units

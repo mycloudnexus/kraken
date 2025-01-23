@@ -34,6 +34,7 @@ spec:
             source: "@{{productOrderItem[0].requestedItemTerm.duration.amount}}"
             sourceLocation: BODY
             sourceType: integer
+            discrete: true
             target: "@{{duration}}"
             targetLocation: BODY
             requiredMapping: true
@@ -72,6 +73,7 @@ spec:
             source: "@{{productOrderItem[0].requestedItemTerm.rollInterval.amount}}"
             sourceLocation: BODY
             sourceType: integer
+            discrete: true
             target: ""
             targetLocation: BODY
             requiredMapping: false

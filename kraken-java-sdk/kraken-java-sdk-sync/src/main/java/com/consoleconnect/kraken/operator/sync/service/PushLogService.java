@@ -1,9 +1,10 @@
 package com.consoleconnect.kraken.operator.sync.service;
 
-import static com.consoleconnect.kraken.operator.core.service.ApiActivityLogService.CREATED_AT;
+import static com.consoleconnect.kraken.operator.core.service.ApiActivityLogService.TRIGGERED_AT;
 
 import com.consoleconnect.kraken.operator.core.client.ClientEvent;
 import com.consoleconnect.kraken.operator.core.client.ClientEventTypeEnum;
+import com.consoleconnect.kraken.operator.core.dto.ApiActivityLog;
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
 import com.consoleconnect.kraken.operator.core.enums.LifeStatusEnum;
 import com.consoleconnect.kraken.operator.core.enums.SyncStatusEnum;
@@ -54,7 +55,7 @@ public class PushLogService extends KrakenServerConnector {
                 SyncStatusEnum.UNDEFINED,
                 LifeStatusEnum.LIVE,
                 createdAt,
-                UnifiedAssetService.getSearchPageRequest(0, 50, Sort.Direction.ASC, CREATED_AT))
+                UnifiedAssetService.getSearchPageRequest(0, 50, Sort.Direction.ASC, TRIGGERED_AT))
             .getContent();
 
     if (logEntities.isEmpty()) {
@@ -68,12 +69,18 @@ public class PushLogService extends KrakenServerConnector {
         ClientEvent.of(
             CLIENT_ID,
             ClientEventTypeEnum.CLIENT_API_AUDIT_LOG,
-            logEntities.stream().map(ApiActivityLogMapper.INSTANCE::map).toList());
+            logEntities.stream().map(this::map).toList());
 
     HttpResponse<Void> res = pushEvent(event);
     if (res.getCode() == 200) {
       ZonedDateTime now = DateTime.nowInUTC();
       this.apiActivityLogService.setSynced(logEntities, now);
     }
+  }
+
+  private ApiActivityLog map(ApiActivityLogEntity entity) {
+    ApiActivityLog dto = ApiActivityLogMapper.INSTANCE.map(entity);
+    dto.setTriggeredAt(entity.getCreatedAt());
+    return dto;
   }
 }
