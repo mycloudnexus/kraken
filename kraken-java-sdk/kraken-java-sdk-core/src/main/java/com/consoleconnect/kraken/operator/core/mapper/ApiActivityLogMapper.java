@@ -23,7 +23,7 @@ public interface ApiActivityLogMapper {
   ApiActivityLog mapOnlySelf(ApiActivityLogEntity entity);
 
   default ApiActivityLog map(ApiActivityLogEntity entity) {
-    var dto = INSTANCE.mapOnlySelf(entity);
+    ApiActivityLog dto = INSTANCE.mapOnlySelf(entity);
     if (entity.getApiLogBodyEntity() != null) {
       dto.setRequest(entity.getApiLogBodyEntity().getRequest());
       dto.setResponse(entity.getApiLogBodyEntity().getResponse());
