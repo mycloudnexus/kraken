@@ -184,6 +184,32 @@ const RequestItem = ({ item, index }: Props) => {
     setRequestMapping(newRequest);
   }, [continuousInput]);
 
+  const LimitTypeDropdown = () => (
+    <Dropdown
+      trigger={["click"]}
+      menu={{
+        items: menuItems,
+        selectable: true,
+        selectedKeys: [limitRangeType],
+        onClick: (e) => {
+          setLimitRangeType(e.key);
+          onChangeLimitType(e.key);
+        },
+      }}
+    >
+      <Button
+        className={styles.discreteSelector}
+        type="link"
+        icon={<DownOutlined />}
+        iconPosition="end"
+      >
+        {limitRangeType === "discrete"
+          ? 'Discrete values (Use "," to separate if multiple values entered)'
+          : "Continuous values"}
+      </Button>
+    </Dropdown>
+  );
+
   return (
     <div
       className={clsx([
@@ -353,29 +379,7 @@ const RequestItem = ({ item, index }: Props) => {
           <Flex className={styles.limitRangeContainer}>
             {editValueLimit ? (
               <div>
-                <Dropdown
-                  trigger={["click"]}
-                  menu={{
-                    items: menuItems,
-                    selectable: true,
-                    selectedKeys: [limitRangeType],
-                    onClick: (e) => {
-                      setLimitRangeType(e.key);
-                      onChangeLimitType(e.key);
-                    },
-                  }}
-                >
-                  <Button
-                    className={styles.discreteSelector}
-                    type="link"
-                    icon={<DownOutlined />}
-                    iconPosition="end"
-                  >
-                    {limitRangeType === "discrete"
-                      ? 'Discrete values (Use "," to separate if multiple values entered)'
-                      : "Continuous values"}
-                  </Button>
-                </Dropdown>
+                <LimitTypeDropdown />
                 <Flex style={{ marginBottom: "12px" }}>
                   {limitRangeType === "discrete" ? (
                     <div>
@@ -428,29 +432,7 @@ const RequestItem = ({ item, index }: Props) => {
         item.sourceType === "integer" && (
           <Flex className={styles.limitRangeContainer}>
             <div>
-              <Dropdown
-                trigger={["click"]}
-                menu={{
-                  items: menuItems,
-                  selectable: true,
-                  selectedKeys: [limitRangeType],
-                  onClick: (e) => {
-                    setLimitRangeType(e.key);
-                    onChangeLimitType(e.key);
-                  },
-                }}
-              >
-                <Button
-                  className={styles.discreteSelector}
-                  type="link"
-                  icon={<DownOutlined />}
-                  iconPosition="end"
-                >
-                  {limitRangeType === "discrete"
-                    ? 'Discrete values (Use "," to separate if multiple values entered)'
-                    : "Continuous values"}
-                </Button>
-              </Dropdown>
+              <LimitTypeDropdown />
               <Flex style={{ marginBottom: "12px" }}>
                 {limitRangeType === "discrete" ? (
                   <div>
