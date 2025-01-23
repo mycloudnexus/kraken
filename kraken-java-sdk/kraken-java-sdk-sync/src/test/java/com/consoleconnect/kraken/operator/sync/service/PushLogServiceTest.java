@@ -44,7 +44,7 @@ class PushLogServiceTest extends AbstractIntegrationTest {
     apiActivityLogEntity.setMethod("GET");
     apiActivityLogEntity.setPath("/api/v1/test");
     apiActivityLogEntity.setUri("http://localhost:8080/api/v1/test");
-    apiActivityLogEntity.setCreatedAt(DateTime.futureInUTC(ChronoUnit.MINUTES, -1));
+    apiActivityLogEntity.setCreatedAt(DateTime.futureInUTC(ChronoUnit.MINUTES, -100));
     apiActivityLogEntity = apiActivityLogRepository.save(apiActivityLogEntity);
 
     // when
