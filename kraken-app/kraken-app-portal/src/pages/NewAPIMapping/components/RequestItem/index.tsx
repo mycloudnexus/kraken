@@ -15,7 +15,7 @@ import { ItemType } from "antd/es/menu/interface";
 import clsx from "clsx";
 import { cloneDeep, difference, isEmpty, set } from "lodash";
 import { nanoid } from "nanoid";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useBoolean } from "usehooks-ts";
 import { SourceInput } from "./SourceInput";
 import { TargetInput } from "./TargetInput";
@@ -38,7 +38,7 @@ const menuItems: ItemType[] = [
 ];
 
 const extractSourceValueString = (
-  sourceValues: Array<number | string> = [0, 0],
+  sourceValues: Array<number | string>,
   discrete: boolean | undefined,
   part?: string
 ) => {
@@ -52,6 +52,40 @@ const extractSourceValueString = (
     return "";
   }
 };
+
+const LimitTypeDropdown = ({
+  limitRangeType,
+  setLimitRangeType,
+  onChangeLimitType,
+}: {
+  limitRangeType: string;
+  setLimitRangeType: Dispatch<SetStateAction<string>>;
+  onChangeLimitType: (key: string) => void;
+}) => (
+  <Dropdown
+    trigger={["click"]}
+    menu={{
+      items: menuItems,
+      selectable: true,
+      selectedKeys: [limitRangeType],
+      onClick: (e) => {
+        setLimitRangeType(e.key);
+        onChangeLimitType(e.key);
+      },
+    }}
+  >
+    <Button
+      className={styles.discreteSelector}
+      type="link"
+      icon={<DownOutlined />}
+      iconPosition="end"
+    >
+      {limitRangeType === "discrete"
+        ? 'Discrete values (Use "," to separate if multiple values entered)'
+        : "Continuous values"}
+    </Button>
+  </Dropdown>
+);
 
 const RequestItem = ({ item, index }: Props) => {
   const {
@@ -183,32 +217,6 @@ const RequestItem = ({ item, index }: Props) => {
     set(newRequest, `[${index}].sourceValues`, Object.values(continuousInput));
     setRequestMapping(newRequest);
   }, [continuousInput]);
-
-  const LimitTypeDropdown = () => (
-    <Dropdown
-      trigger={["click"]}
-      menu={{
-        items: menuItems,
-        selectable: true,
-        selectedKeys: [limitRangeType],
-        onClick: (e) => {
-          setLimitRangeType(e.key);
-          onChangeLimitType(e.key);
-        },
-      }}
-    >
-      <Button
-        className={styles.discreteSelector}
-        type="link"
-        icon={<DownOutlined />}
-        iconPosition="end"
-      >
-        {limitRangeType === "discrete"
-          ? 'Discrete values (Use "," to separate if multiple values entered)'
-          : "Continuous values"}
-      </Button>
-    </Dropdown>
-  );
 
   return (
     <div
@@ -379,7 +387,11 @@ const RequestItem = ({ item, index }: Props) => {
           <Flex className={styles.limitRangeContainer}>
             {editValueLimit ? (
               <div>
-                <LimitTypeDropdown />
+                <LimitTypeDropdown
+                  limitRangeType={limitRangeType}
+                  setLimitRangeType={setLimitRangeType}
+                  onChangeLimitType={onChangeLimitType}
+                />
                 <Flex style={{ marginBottom: "12px" }}>
                   {limitRangeType === "discrete" ? (
                     <div>
@@ -432,13 +444,17 @@ const RequestItem = ({ item, index }: Props) => {
         item.sourceType === "integer" && (
           <Flex className={styles.limitRangeContainer}>
             <div>
-              <LimitTypeDropdown />
+              <LimitTypeDropdown
+                limitRangeType={limitRangeType}
+                setLimitRangeType={setLimitRangeType}
+                onChangeLimitType={onChangeLimitType}
+              />
               <Flex style={{ marginBottom: "12px" }}>
                 {limitRangeType === "discrete" ? (
                   <div>
                     <Input
                       value={extractSourceValueString(
-                        item.sourceValues,
+                        item.sourceValues || [0, 0],
                         item.discrete
                       )}
                       onChange={(value) =>
@@ -454,7 +470,7 @@ const RequestItem = ({ item, index }: Props) => {
                         handleChangeInputContinuousFrom(Number(value))
                       }
                       value={extractSourceValueString(
-                        item.sourceValues,
+                        item.sourceValues || [0, 0],
                         item.discrete,
                         "from"
                       )}
@@ -466,7 +482,7 @@ const RequestItem = ({ item, index }: Props) => {
                         handleChangeInputContinuousTo(Number(value))
                       }
                       value={extractSourceValueString(
-                        item.sourceValues,
+                        item.sourceValues || [0, 0],
                         item.discrete,
                         "to"
                       )}
@@ -537,7 +553,10 @@ const RequestItem = ({ item, index }: Props) => {
               <Flex style={{ marginBottom: "12px" }}>
                 <div>
                   <Input
-                    value={extractSourceValueString(item.sourceValues, true)}
+                    value={extractSourceValueString(
+                      item.sourceValues || [0, 0],
+                      true
+                    )}
                     onChange={(value) =>
                       handleChangeInputDiscrete(value, "string")
                     }
