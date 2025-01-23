@@ -68,7 +68,7 @@ public class PushLogService extends KrakenServerConnector {
         ClientEvent.of(
             CLIENT_ID,
             ClientEventTypeEnum.CLIENT_API_AUDIT_LOG,
-            logEntities.stream().map(ApiActivityLogMapper.INSTANCE::map).toList());
+            logEntities.stream().map(ApiActivityLogMapper.INSTANCE::mapForPush).toList());
 
     HttpResponse<Void> res = pushEvent(event);
     if (res.getCode() == 200) {

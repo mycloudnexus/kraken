@@ -24,11 +24,16 @@ public interface ApiActivityLogMapper {
 
   default ApiActivityLog map(ApiActivityLogEntity entity) {
     ApiActivityLog dto = INSTANCE.mapOnlySelf(entity);
-    dto.setTriggeredAt(entity.getCreatedAt());
     if (entity.getApiLogBodyEntity() != null) {
       dto.setRequest(entity.getApiLogBodyEntity().getRequest());
       dto.setResponse(entity.getApiLogBodyEntity().getResponse());
     }
+    return dto;
+  }
+
+  default ApiActivityLog mapForPush(ApiActivityLogEntity entity) {
+    ApiActivityLog dto = map(entity);
+    dto.setTriggeredAt(entity.getCreatedAt());
     return dto;
   }
 }
