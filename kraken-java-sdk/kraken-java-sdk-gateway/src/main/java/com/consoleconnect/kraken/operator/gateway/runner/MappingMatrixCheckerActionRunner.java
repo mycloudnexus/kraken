@@ -239,7 +239,8 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
         } catch (Exception e) {
           // 400-if-not-exist
           String checkingPath = rewriteCheckingPath(pathCheck);
-          throw KrakenException.badRequestInvalidBody(String.format(MISSING_PROPERTY_MSG, checkingPath));
+          throw KrakenException.badRequestInvalidBody(
+              String.format(MISSING_PROPERTY_MSG, checkingPath));
         }
         if (StringUtils.isNotBlank(pathCheck.expectedValueType())) {
           // 422-if-not-matched
@@ -388,12 +389,12 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
       Object realValue =
           readByPathWithException(documentContext, jsonPathExpression, pathsExpected422, null);
       validateSourceValue(
-              mapper.getSourceType(),
-              mapper.getDiscrete(),
-              realValue,
-              params.get(0),
-              mapper.getSourceValues(),
-              mapper.getTarget());
+          mapper.getSourceType(),
+          mapper.getDiscrete(),
+          realValue,
+          params.get(0),
+          mapper.getSourceValues(),
+          mapper.getTarget());
     }
     if (QUERY.equals(location) || BODY.equals(location)) {
       try {
