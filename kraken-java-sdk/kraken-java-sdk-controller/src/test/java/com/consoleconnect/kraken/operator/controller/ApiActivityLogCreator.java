@@ -3,6 +3,7 @@ package com.consoleconnect.kraken.operator.controller;
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
 import com.google.common.collect.Maps;
+import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.UUID;
 
@@ -22,6 +23,7 @@ public interface ApiActivityLogCreator {
     apiActivityLogEntity.setHeaders(headers);
     apiActivityLogEntity.setBuyer(buyerId);
     apiActivityLogEntity.setCallSeq(0);
+    apiActivityLogEntity.setTriggeredAt(ZonedDateTime.now());
     apiActivityLogEntity = getApiActivityLogRepository().save(apiActivityLogEntity);
     return apiActivityLogEntity;
   }

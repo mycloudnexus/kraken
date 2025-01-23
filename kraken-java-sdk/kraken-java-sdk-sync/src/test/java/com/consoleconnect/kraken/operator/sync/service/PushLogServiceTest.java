@@ -37,15 +37,7 @@ class PushLogServiceTest extends AbstractIntegrationTest {
     doReturn(HttpResponse.ok(null)).when(pushLogService).pushEvent(Mockito.any());
 
     // given
-    ApiActivityLogEntity apiActivityLogEntity = new ApiActivityLogEntity();
-    apiActivityLogEntity.setSyncStatus(SyncStatusEnum.UNDEFINED);
-    apiActivityLogEntity.setLifeStatus(LifeStatusEnum.LIVE);
-    apiActivityLogEntity.setRequestId(UUID.randomUUID().toString());
-    apiActivityLogEntity.setMethod("GET");
-    apiActivityLogEntity.setPath("/api/v1/test");
-    apiActivityLogEntity.setUri("http://localhost:8080/api/v1/test");
-    apiActivityLogEntity.setCreatedAt(DateTime.futureInUTC(ChronoUnit.MINUTES, -1));
-    apiActivityLogEntity = apiActivityLogRepository.save(apiActivityLogEntity);
+    ApiActivityLogEntity apiActivityLogEntity = createApiActivityLogEntity();
 
     // when
     pushLogService.runIt();
@@ -63,5 +55,17 @@ class PushLogServiceTest extends AbstractIntegrationTest {
     // when run it again
     pushLogService.runIt();
     verify(pushLogService, times(1)).pushEvent(Mockito.any());
+  }
+
+  private ApiActivityLogEntity createApiActivityLogEntity() {
+    ApiActivityLogEntity apiActivityLogEntity = new ApiActivityLogEntity();
+    apiActivityLogEntity.setSyncStatus(SyncStatusEnum.UNDEFINED);
+    apiActivityLogEntity.setLifeStatus(LifeStatusEnum.LIVE);
+    apiActivityLogEntity.setRequestId(UUID.randomUUID().toString());
+    apiActivityLogEntity.setMethod("GET");
+    apiActivityLogEntity.setPath("/api/v1/test");
+    apiActivityLogEntity.setUri("http://localhost:8080/api/v1/test");
+    apiActivityLogEntity.setCreatedAt(DateTime.futureInUTC(ChronoUnit.MINUTES, -100));
+    return apiActivityLogRepository.save(apiActivityLogEntity);
   }
 }
