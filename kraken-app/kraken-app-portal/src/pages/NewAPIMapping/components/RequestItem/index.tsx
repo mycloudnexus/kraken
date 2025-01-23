@@ -414,7 +414,7 @@ const RequestItem = ({ item, index }: Props) => {
             ) : (
               <Button
                 style={{ marginBottom: 12 }}
-                data-testid="btn-add-state"
+                data-testid="btn-add-valuelimit-int"
                 type="link"
                 onClick={() => setEditValueLimit(true)}
               >
@@ -533,7 +533,7 @@ const RequestItem = ({ item, index }: Props) => {
             ) : (
               <Button
                 style={{ marginBottom: 12 }}
-                data-testid="btn-add-state"
+                data-testid="btn-add-valuelimit-str"
                 type="link"
                 onClick={() => setEditValueLimit(true)}
               >
