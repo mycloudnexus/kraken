@@ -26,6 +26,7 @@ spec:
             source: "@{{quoteItem[0].requestedQuoteItemTerm.duration.amount}}"
             sourceLocation: BODY
             sourceType: integer
+            discrete: true
             target: ""
             targetLocation: BODY
             requiredMapping: true
@@ -65,6 +66,7 @@ spec:
             source: "@{{quoteItem[0].requestedQuoteItemTerm.rollInterval.amount}}"
             sourceLocation: BODY
             sourceType: integer
+            discrete: true
             target: ""
             targetLocation: BODY
             requiredMapping: false
@@ -107,6 +109,7 @@ spec:
             sourceLocation: BODY
             allowValueLimit: true
             sourceType: integer
+            discrete: true
             sourceValues:
             target: ""
             targetLocation: BODY

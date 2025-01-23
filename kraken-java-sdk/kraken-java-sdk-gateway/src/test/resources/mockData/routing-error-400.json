@@ -1,0 +1,7 @@
+{
+  "orderAction": "add",
+  "targetAPIConfigKey": "targetKey:notFound",
+  "matrixConfigKey": "",
+  "errorMsg": "api use case is not supported : expect productOrderItem.product.productConfiguration.@type in [ UNI,ACCESS_E_LINE ], but missing property.",
+  "errorCode": "400"
+}

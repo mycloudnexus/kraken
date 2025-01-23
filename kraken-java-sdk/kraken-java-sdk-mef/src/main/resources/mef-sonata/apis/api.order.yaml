@@ -45,30 +45,45 @@ spec:
                 let input = JSON.parse(jsonStr);
                 let targetAPIConfigKey = '';
                 let matrixConfigKey = '';
+                let errorCode = '';
                 let errorMsg = '';
                 let type = input.productOrderItem['product']['productConfiguration']['@type'];
                 let action = input.productOrderItem['action'];
                 let typeArr = ['UNI', 'ACCESS_E_LINE'];
                 let actionArr = ['add', 'delete'];
-                if(type == 'UNI' && action == 'add') {
+                if(type === 'UNI' && action === 'add') {
                   targetAPIConfigKey = 'mef.sonata.api-target.order.uni.add';
                   matrixConfigKey = 'mef.sonata.api.matrix.order.uni.add'
-                } else if(type == 'ACCESS_E_LINE' && action == 'add') {
+                } else if(type === 'ACCESS_E_LINE' && action === 'add') {
                   targetAPIConfigKey = 'mef.sonata.api-target.order.eline.add';
                   matrixConfigKey = 'mef.sonata.api.matrix.order.eline.add'
-                } else if(type == 'UNI' && action == 'delete') {
+                } else if(type === 'UNI' && action === 'delete') {
                   targetAPIConfigKey = 'mef.sonata.api-target.order.uni.delete';
                   matrixConfigKey = 'mef.sonata.api.matrix.order.uni.delete'
-                } else if(type == 'ACCESS_E_LINE' && action == 'delete') {
+                } else if(type === 'ACCESS_E_LINE' && action === 'delete') {
                   targetAPIConfigKey = 'mef.sonata.api-target.order.eline.delete';
                   matrixConfigKey = 'mef.sonata.api.matrix.order.eline.delete'
                 } else {
                   errorArr = ['api use case is not supported :'];
-                  if (!typeArr.includes(type)){
-                    errorArr.push(`expect @{{productOrderItem.product.productConfiguration.@type}} in [ ${typeArr} ], but ${type}.`);
-                  }
-                  if (!actionArr.includes(action)) {
-                    errorArr.push(`expect @{{productOrderItem.action}} in [ ${actionArr} ], but ${action}`)
+                  if (!typeArr.includes(type) && actionArr.includes(action)){
+                    if (type === undefined) {
+                      errorCode = '400';
+                      errorArr.push(`expect productOrderItem.product.productConfiguration.@type in [ ${typeArr} ], but missing property.`);
+                    } else {
+                      errorCode = '422';
+                      errorArr.push(`expect @{{productOrderItem.product.productConfiguration.@type}} in [ ${typeArr} ], but ${type}.`);
+                    }
+                  } else if (!actionArr.includes(action) && typeArr.includes(type)) {
+                    if (action === undefined) {
+                      errorCode = '400';
+                      errorArr.push(`expect productOrderItem.action in [ ${actionArr} ], but missing property`)
+                    } else {
+                      errorCode = '422';
+                      errorArr.push(`expect @{{productOrderItem.action}} in [ ${actionArr} ], but ${action}`)
+                    }
+                  } else {
+                    errorCode = '400';
+                    errorArr.push(`expect productOrderItem.product.productConfiguration.@type in [ ${typeArr} ], productOrderItem.action in [ ${actionArr} ] but missing property.`);
                   }
                   errorMsg = errorArr.join(' ');
                   targetAPIConfigKey = 'targetKey:notFound';
@@ -78,7 +93,8 @@ spec:
                   orderAction: input.productOrderItem['action'],
                   targetAPIConfigKey: targetAPIConfigKey,
                   matrixConfigKey: matrixConfigKey,
-                  errorMsg: errorMsg
+                  errorMsg: errorMsg,
+                  errorCode: errorCode
                 };
                 return JSON.stringify(ret);
               }
