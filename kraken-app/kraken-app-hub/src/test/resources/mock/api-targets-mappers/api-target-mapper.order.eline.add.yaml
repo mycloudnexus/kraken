@@ -72,6 +72,11 @@ spec:
             source: "@{{productOrderItem[0].requestedItemTerm.rollInterval.amount}}"
             sourceLocation: BODY
             sourceType: integer
+            sourceDependOn:
+              - key: "@{{productOrderItem[0].requestedItemTerm.endOfTermAction}}"
+                val: roll
+                operator: eq
+                relation: and
             target: ""
             targetLocation: BODY
             requiredMapping: false
