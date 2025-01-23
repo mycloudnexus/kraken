@@ -8,8 +8,10 @@ import {
   CloseOutlined,
   DeleteOutlined,
   EditOutlined,
+  DownOutlined,
 } from "@ant-design/icons";
-import { Button, Flex, Select } from "antd";
+import { Button, Dropdown, Flex, Select } from "antd";
+import { ItemType } from "antd/es/menu/interface";
 import clsx from "clsx";
 import { cloneDeep, difference, isEmpty, set } from "lodash";
 import { nanoid } from "nanoid";
@@ -24,6 +26,33 @@ type Props = {
   index: number;
 };
 
+const menuItems: ItemType[] = [
+  {
+    label: "Continuous values",
+    key: "continuous",
+  },
+  {
+    label: "Discrete values",
+    key: "discrete",
+  },
+];
+
+const extractSourceValueString = (
+  sourceValues: Array<number | string> = [0, 0],
+  discrete: boolean | undefined,
+  part?: string
+) => {
+  if (discrete) {
+    return sourceValues.join();
+  } else if (part === "from") {
+    return sourceValues[0].toString();
+  } else if (part === "to") {
+    return sourceValues[1].toString();
+  } else {
+    return "";
+  }
+};
+
 const RequestItem = ({ item, index }: Props) => {
   const {
     requestMapping,
@@ -33,6 +62,14 @@ const RequestItem = ({ item, index }: Props) => {
   } = useNewApiMappingStore();
   const [titleInput, setTitleInput] = useState("");
   const [descriptionInput, setDescriptionInput] = useState("");
+  const [editValueLimit, setEditValueLimit] = useState(false);
+  const [limitRangeType, setLimitRangeType] = useState(
+    item?.discrete ? "discrete" : "continuous"
+  );
+  const [continuousInput, setContinuousInput] = useState({
+    from: 0,
+    to: 0,
+  });
   const {
     value: isEditTitle,
     setTrue: enableEditTitle,
@@ -74,6 +111,12 @@ const RequestItem = ({ item, index }: Props) => {
     disableEditDescription();
   };
 
+  const onChangeLimitType = (key: string) => {
+    const newRequest = cloneDeep(requestMapping);
+    set(newRequest, `[${index}].discrete`, key === "discrete");
+    setRequestMapping(newRequest);
+  };
+
   const handleDelete = () => {
     const newRequest = cloneDeep(requestMapping);
     newRequest.splice(index, 1);
@@ -109,6 +152,37 @@ const RequestItem = ({ item, index }: Props) => {
     set(cloneArr, `[${itemIndex}].to`, value);
     setListMappingStateRequest(cloneArr);
   };
+
+  const handleChangeInputContinuousFrom = (value: number) => {
+    setContinuousInput({ ...continuousInput, from: value });
+  };
+
+  const handleChangeInputContinuousTo = (value: number) => {
+    setContinuousInput({ ...continuousInput, to: value });
+  };
+
+  const handleChangeInputDiscrete = (value: string, sourceType: string) => {
+    const newRequest = cloneDeep(requestMapping);
+    const discreteArray = value
+      .split(",")
+      .map((item) =>
+        sourceType === "integer" ? Number(item.trim()) : item.trim()
+      );
+    set(newRequest, `[${index}].sourceValues`, discreteArray);
+    setRequestMapping(newRequest);
+  };
+
+  const handleDeleteLimit = () => {
+    const newRequest = cloneDeep(requestMapping);
+    set(newRequest, `[${index}].sourceValues`, undefined);
+    setRequestMapping(newRequest);
+  };
+
+  useEffect(() => {
+    const newRequest = cloneDeep(requestMapping);
+    set(newRequest, `[${index}].sourceValues`, Object.values(continuousInput));
+    setRequestMapping(newRequest);
+  }, [continuousInput]);
 
   return (
     <div
@@ -212,7 +286,7 @@ const RequestItem = ({ item, index }: Props) => {
         {/* Target property mapping */}
         <TargetInput item={item} index={index} />
       </Flex>
-      {!isEmpty(item?.sourceValues) && (
+      {!isEmpty(item?.sourceValues) && !item.allowValueLimit && (
         <Flex vertical gap={20} style={{ marginTop: 8, width: "100%" }}>
           {listMapping
             ?.filter((i) => i.name === item?.name)
@@ -273,6 +347,231 @@ const RequestItem = ({ item, index }: Props) => {
           </Flex>
         </Flex>
       )}
+      {item.allowValueLimit &&
+        isEmpty(item?.sourceValues) &&
+        item.sourceType === "integer" && (
+          <Flex className={styles.limitRangeContainer}>
+            {editValueLimit ? (
+              <div>
+                <Dropdown
+                  trigger={["click"]}
+                  menu={{
+                    items: menuItems,
+                    selectable: true,
+                    selectedKeys: [limitRangeType],
+                    onClick: (e) => {
+                      setLimitRangeType(e.key);
+                      onChangeLimitType(e.key);
+                    },
+                  }}
+                >
+                  <Button
+                    className={styles.discreteSelector}
+                    type="link"
+                    icon={<DownOutlined />}
+                    iconPosition="end"
+                  >
+                    {limitRangeType === "discrete"
+                      ? 'Discrete values (Use "," to separate if multiple values entered)'
+                      : "Continuous values"}
+                  </Button>
+                </Dropdown>
+                <Flex style={{ marginBottom: "12px" }}>
+                  {limitRangeType === "discrete" ? (
+                    <div>
+                      <Input
+                        onChange={(value) =>
+                          handleChangeInputDiscrete(value, "integer")
+                        }
+                      />
+                    </div>
+                  ) : (
+                    <Flex>
+                      <Input
+                        type="number"
+                        onChange={(value) =>
+                          handleChangeInputContinuousFrom(Number(value))
+                        }
+                      />
+                      <span style={{ margin: "0 5px" }}>To</span>
+                      <Input
+                        type="number"
+                        onChange={(value) =>
+                          handleChangeInputContinuousTo(Number(value))
+                        }
+                      />
+                    </Flex>
+                  )}
+                  <Button
+                    className={styles.btnRemoveValueMapping}
+                    type="link"
+                    onClick={() => setEditValueLimit(false)}
+                  >
+                    <DeleteOutlined />
+                  </Button>
+                </Flex>
+              </div>
+            ) : (
+              <Button
+                style={{ marginBottom: 12 }}
+                data-testid="btn-add-state"
+                type="link"
+                onClick={() => setEditValueLimit(true)}
+              >
+                Add value limit
+              </Button>
+            )}
+          </Flex>
+        )}
+      {item.allowValueLimit &&
+        !isEmpty(item?.sourceValues) &&
+        item.sourceType === "integer" && (
+          <Flex className={styles.limitRangeContainer}>
+            <div>
+              <Dropdown
+                trigger={["click"]}
+                menu={{
+                  items: menuItems,
+                  selectable: true,
+                  selectedKeys: [limitRangeType],
+                  onClick: (e) => {
+                    setLimitRangeType(e.key);
+                    onChangeLimitType(e.key);
+                  },
+                }}
+              >
+                <Button
+                  className={styles.discreteSelector}
+                  type="link"
+                  icon={<DownOutlined />}
+                  iconPosition="end"
+                >
+                  {limitRangeType === "discrete"
+                    ? 'Discrete values (Use "," to separate if multiple values entered)'
+                    : "Continuous values"}
+                </Button>
+              </Dropdown>
+              <Flex style={{ marginBottom: "12px" }}>
+                {limitRangeType === "discrete" ? (
+                  <div>
+                    <Input
+                      value={extractSourceValueString(
+                        item.sourceValues,
+                        item.discrete
+                      )}
+                      onChange={(value) =>
+                        handleChangeInputDiscrete(value, "integer")
+                      }
+                    />
+                  </div>
+                ) : (
+                  <Flex>
+                    <Input
+                      type="number"
+                      onChange={(value) =>
+                        handleChangeInputContinuousFrom(Number(value))
+                      }
+                      value={extractSourceValueString(
+                        item.sourceValues,
+                        item.discrete,
+                        "from"
+                      )}
+                    />
+                    <span style={{ margin: "0 5px" }}>To</span>
+                    <Input
+                      type="number"
+                      onChange={(value) =>
+                        handleChangeInputContinuousTo(Number(value))
+                      }
+                      value={extractSourceValueString(
+                        item.sourceValues,
+                        item.discrete,
+                        "to"
+                      )}
+                    />
+                  </Flex>
+                )}
+                <Button
+                  className={styles.btnRemoveValueMapping}
+                  type="link"
+                  onClick={handleDeleteLimit}
+                >
+                  <DeleteOutlined />
+                </Button>
+              </Flex>
+            </div>
+          </Flex>
+        )}
+      {item.allowValueLimit &&
+        isEmpty(item?.sourceValues) &&
+        item.sourceType === "string" && (
+          <Flex className={styles.limitRangeContainer}>
+            {editValueLimit ? (
+              <div>
+                <Button className={styles.discreteSelector} type="link">
+                  {
+                    'Discrete values (Use "," to separate if multiple values entered)'
+                  }
+                </Button>
+                <Flex style={{ marginBottom: "12px" }}>
+                  <div>
+                    <Input
+                      onChange={(value) =>
+                        handleChangeInputDiscrete(value, "string")
+                      }
+                    />
+                  </div>
+                  <Button
+                    className={styles.btnRemoveValueMapping}
+                    type="link"
+                    onClick={() => setEditValueLimit(false)}
+                  >
+                    <DeleteOutlined />
+                  </Button>
+                </Flex>
+              </div>
+            ) : (
+              <Button
+                style={{ marginBottom: 12 }}
+                data-testid="btn-add-state"
+                type="link"
+                onClick={() => setEditValueLimit(true)}
+              >
+                Add value limit
+              </Button>
+            )}
+          </Flex>
+        )}
+      {item.allowValueLimit &&
+        !isEmpty(item?.sourceValues) &&
+        item.sourceType === "string" && (
+          <Flex className={styles.limitRangeContainer}>
+            <div>
+              <Button className={styles.discreteSelector} type="link">
+                {
+                  'Discrete values (Use "," to separate if multiple values entered)'
+                }
+              </Button>
+              <Flex style={{ marginBottom: "12px" }}>
+                <div>
+                  <Input
+                    value={extractSourceValueString(item.sourceValues, true)}
+                    onChange={(value) =>
+                      handleChangeInputDiscrete(value, "string")
+                    }
+                  />
+                </div>
+                <Button
+                  className={styles.btnRemoveValueMapping}
+                  type="link"
+                  onClick={handleDeleteLimit}
+                >
+                  <DeleteOutlined />
+                </Button>
+              </Flex>
+            </div>
+          </Flex>
+        )}
     </div>
   );
 };
