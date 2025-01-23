@@ -47,7 +47,7 @@ const extractSourceValueString = (
   } else if (part === "from") {
     return sourceValues[0].toString();
   } else if (part === "to") {
-    return sourceValues[1].toString();
+    return sourceValues[sourceValues.length - 1].toString();
   } else {
     return "";
   }

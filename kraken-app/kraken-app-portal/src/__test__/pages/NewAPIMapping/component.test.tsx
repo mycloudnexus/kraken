@@ -1337,7 +1337,40 @@ describe("requestItem render", () => {
     const btnAdd = getByTestId("btn-add-state");
     fireEvent.click(btnAdd);
   });
-  it("add value limit integer", () => {
+  it("add value limit integer discrete", () => {
+    const { container, getByTestId } = render(
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <RequestItem
+            index={2}
+            item={{
+              id: "id",
+              description: "",
+              name: "mapper.order.eline.add.duration.unit",
+              title: "order item Term unit",
+              source:
+                "@{{productOrderItem[0].requestedItemTerm.duration.units}}",
+              target: "@{{requestBody.durationUnit}}",
+              valueMapping: {
+                calendarMonths: "calendarMonths",
+                calendarDays: "calendarDays",
+              },
+              sourceLocation: "BODY",
+              targetLocation: "BODY",
+              customizedField: true,
+              requiredMapping: true,
+              allowValueLimit: true,
+              sourceType: "integer",
+            }}
+          />
+        </BrowserRouter>
+      </QueryClientProvider>
+    );
+    expect(container).toBeInTheDocument();
+    const btnAdd = getByTestId("btn-add-valuelimit-int");
+    fireEvent.click(btnAdd);
+  });
+  it("add value limit integer with sourceValue", () => {
     const { container } = render(
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
@@ -1351,6 +1384,7 @@ describe("requestItem render", () => {
               source:
                 "@{{productOrderItem[0].requestedItemTerm.duration.units}}",
               target: "@{{requestBody.durationUnit}}",
+              sourceValues: ["0", "100"],
               valueMapping: {
                 calendarMonths: "calendarMonths",
                 calendarDays: "calendarDays",
@@ -1393,6 +1427,7 @@ describe("requestItem render", () => {
               requiredMapping: true,
               allowValueLimit: true,
               sourceType: "integer",
+              discrete: true,
             }}
           />
         </BrowserRouter>
@@ -1401,7 +1436,7 @@ describe("requestItem render", () => {
     expect(container).toBeInTheDocument();
   });
   it("add value limit string", () => {
-    const { container } = render(
+    const { container, getByTestId } = render(
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
           <RequestItem
@@ -1430,6 +1465,8 @@ describe("requestItem render", () => {
       </QueryClientProvider>
     );
     expect(container).toBeInTheDocument();
+    const btnAdd = getByTestId("btn-add-valuelimit-str");
+    fireEvent.click(btnAdd);
   });
   it("add value limit string with sourceValue", () => {
     const { container } = render(
