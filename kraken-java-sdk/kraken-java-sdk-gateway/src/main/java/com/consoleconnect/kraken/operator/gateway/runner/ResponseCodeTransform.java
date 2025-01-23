@@ -31,12 +31,19 @@ public interface ResponseCodeTransform {
       throw new KrakenException(httpResponseContext.getStatus(), bodyContent);
     }
     if (HttpStatus.valueOf(httpResponseContext.getStatus()).is4xxClientError()) {
+      rewriteStatus(httpResponseContext);
       checkResponseCode(httpResponseContext);
     }
     if (HttpStatus.valueOf(httpResponseContext.getStatus()).is5xxServerError()) {
       checkResponseCode(httpResponseContext);
     }
     return Optional.empty();
+  }
+
+  default void rewriteStatus(HttpResponseContext httpResponseContext) {
+    if (httpResponseContext.getStatus() == HttpStatus.BAD_REQUEST.value()) {
+      httpResponseContext.setStatus(HttpStatus.UNPROCESSABLE_ENTITY.value());
+    }
   }
 
   default void checkResponseCode(HttpResponseContext httpResponseContext) {
