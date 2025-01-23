@@ -1,6 +1,6 @@
 package com.consoleconnect.kraken.operator.sync.service;
 
-import static com.consoleconnect.kraken.operator.core.service.ApiActivityLogService.CREATED_AT;
+import static com.consoleconnect.kraken.operator.core.service.ApiActivityLogService.TRIGGERED_AT;
 
 import com.consoleconnect.kraken.operator.core.client.ClientEvent;
 import com.consoleconnect.kraken.operator.core.client.ClientEventTypeEnum;
@@ -54,7 +54,7 @@ public class PushLogService extends KrakenServerConnector {
                 SyncStatusEnum.UNDEFINED,
                 LifeStatusEnum.LIVE,
                 createdAt,
-                UnifiedAssetService.getSearchPageRequest(0, 50, Sort.Direction.ASC, CREATED_AT))
+                UnifiedAssetService.getSearchPageRequest(0, 50, Sort.Direction.ASC, TRIGGERED_AT))
             .getContent();
 
     if (logEntities.isEmpty()) {

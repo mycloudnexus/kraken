@@ -47,7 +47,7 @@ import org.springframework.transaction.annotation.Transactional;
 @AllArgsConstructor
 @Slf4j
 public class ApiActivityLogService {
-  public static final String CREATED_AT = "createdAt";
+  public static final String TRIGGERED_AT = "triggeredAt";
   private final ApiActivityLogRepository repository;
   private final UnifiedAssetRepository unifiedAssetRepository;
   private final ApiActivityLogBodyRepository apiActivityLogBodyRepository;
@@ -85,11 +85,11 @@ public class ApiActivityLogService {
       addEq("callSeq", "0", predicateList, criteriaBuilder, root);
       if (logSearchRequest.getQueryStart() != null) {
         predicateList.add(
-            criteriaBuilder.greaterThan(root.get(CREATED_AT), logSearchRequest.getQueryStart()));
+            criteriaBuilder.greaterThan(root.get(TRIGGERED_AT), logSearchRequest.getQueryStart()));
       }
       if (logSearchRequest.getQueryEnd() != null) {
         predicateList.add(
-            criteriaBuilder.lessThan(root.get(CREATED_AT), logSearchRequest.getQueryEnd()));
+            criteriaBuilder.lessThan(root.get(TRIGGERED_AT), logSearchRequest.getQueryEnd()));
       }
       if (logSearchRequest.getStatusCode() != null) {
         predicateList.add(
