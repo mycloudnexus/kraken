@@ -1,6 +1,7 @@
 package com.consoleconnect.kraken.operator.controller.v2;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasNoJsonPath;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
@@ -8,6 +9,7 @@ import com.consoleconnect.kraken.operator.config.TestApplication;
 import com.consoleconnect.kraken.operator.controller.APIServerCreator;
 import com.consoleconnect.kraken.operator.controller.WebTestClientHelper;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
+import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import java.util.List;
@@ -53,6 +55,25 @@ class ComponentAPIServerControllerTest extends AbstractIntegrationTest implement
 
   @Order(3)
   @Test
+  void givenLiteSearchWithTrue_whenQueryServerAPIList_thenReturnOK() {
+    String path =
+        String.format(
+            "%s/%s/components/%s/api-servers", PRODUCT_BASE_PATH, PRODUCT_ID, COMPONENT_ID);
+    List<UnifiedAssetDto> assetDtoList = queryAPIServerList(path, false, false);
+    String bodyStr = JsonToolkit.toJson(assetDtoList);
+    assertThat(bodyStr, hasJsonPath("$", hasSize(1)));
+    assertThat(bodyStr, hasJsonPath("$[0].syncMetadata", notNullValue()));
+
+    assetDtoList = queryAPIServerList(path, true, true);
+    bodyStr = JsonToolkit.toJson(assetDtoList);
+    System.out.println(bodyStr);
+    assertThat(bodyStr, hasJsonPath("$", hasSize(1)));
+    assertThat(bodyStr, hasNoJsonPath("$[0].syncMetadata"));
+    assertThat(bodyStr, hasJsonPath("$[0].facets.environments", notNullValue()));
+  }
+
+  @Order(4)
+  @Test
   void givenAPIServer_whenDeleting_thenResponseOK() {
     String path =
         String.format(
@@ -79,7 +100,7 @@ class ComponentAPIServerControllerTest extends AbstractIntegrationTest implement
         Assertions::assertNotNull);
   }
 
-  @Order(4)
+  @Order(5)
   @Test
   void givenAnExistedAPIServerName_whenCheckIt_thenShouldThrowException() {
     String name = "Geographic Address Management";
