@@ -2,18 +2,15 @@ package com.consoleconnect.kraken.operator.sync.service;
 
 import static org.mockito.Mockito.*;
 
-import com.consoleconnect.kraken.operator.core.dto.ApiActivityLog;
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
 import com.consoleconnect.kraken.operator.core.enums.LifeStatusEnum;
 import com.consoleconnect.kraken.operator.core.enums.SyncStatusEnum;
-import com.consoleconnect.kraken.operator.core.mapper.ApiActivityLogMapper;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
 import com.consoleconnect.kraken.operator.core.toolkit.DateTime;
 import com.consoleconnect.kraken.operator.sync.CustomConfig;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
-import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.UUID;
@@ -32,16 +29,6 @@ import org.springframework.test.context.ContextConfiguration;
 class PushLogServiceTest extends AbstractIntegrationTest {
   @Autowired ApiActivityLogRepository apiActivityLogRepository;
   @SpyBean private PushLogService pushLogService;
-
-  @Test
-  void testTriggereAt() {
-    ApiActivityLogEntity apiActivityLogEntity = createApiActivityLogEntity();
-    apiActivityLogEntity = apiActivityLogRepository.save(apiActivityLogEntity);
-    ZonedDateTime createdAt = apiActivityLogEntity.getCreatedAt();
-    Assertions.assertNotNull(createdAt);
-    ApiActivityLog activityLog = ApiActivityLogMapper.INSTANCE.mapForPush(apiActivityLogEntity);
-    Assertions.assertEquals(activityLog.getTriggeredAt(), createdAt);
-  }
 
   @Test
   void givenUnSyncedLogs_whenSync_thenLogsSynced() {

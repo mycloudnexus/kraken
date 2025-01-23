@@ -30,10 +30,4 @@ public interface ApiActivityLogMapper {
     }
     return dto;
   }
-
-  default ApiActivityLog mapForPush(ApiActivityLogEntity entity) {
-    ApiActivityLog dto = map(entity);
-    dto.setTriggeredAt(entity.getCreatedAt());
-    return dto;
-  }
 }
