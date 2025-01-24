@@ -281,11 +281,6 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
         log.info("Skipped mapper due to blank target, source:{}", mapper.getSource());
         continue;
       }
-      checkExist(
-          mapper.getSource(),
-          inputs,
-          mapper.getSourceDependOnExpression(),
-          mapper.getSourceConditions());
       if (MappingTypeEnum.ENUM.getKind().equals(mapper.getSourceType())
           || MappingTypeEnum.STRING.getKind().equals(mapper.getSourceType())
           || isNumberKind(mapper.getAllowValueLimit(), mapper.getSourceType())) {
@@ -295,6 +290,11 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
       } else {
         checkMappingValue(documentContext, mapper, inputs, pathsExpected422);
       }
+      checkExist(
+              mapper.getSource(),
+              inputs,
+              mapper.getSourceDependOnExpression(),
+              mapper.getSourceConditions());
     }
   }
 
