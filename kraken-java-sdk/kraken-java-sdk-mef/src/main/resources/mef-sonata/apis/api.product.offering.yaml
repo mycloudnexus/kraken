@@ -40,15 +40,17 @@ spec:
                 console.log("input: " + jsonStr);
                 let input = JSON.parse(jsonStr);
                 let targetAPIConfigKey = '';
-                if(input.productOfferingQualificationItem['product']['productConfiguration']['@type'] == 'UNI') {
+                let productConfiguration = input.productOfferingQualificationItem?.product?.productConfiguration;
+                let type = productConfiguration?.['@type'];
+                if(type === 'UNI') {
                   targetAPIConfigKey = 'mef.sonata.api-target.poq.uni.add';
-                } else if(input.productOfferingQualificationItem['product']['productConfiguration']['@type'] == 'ACCESS_E_LINE') {
+                } else if(type === 'ACCESS_E_LINE') {
                   targetAPIConfigKey = 'mef.sonata.api-target.poq.eline.add';
                 } else {
                   targetAPIConfigKey = 'targetKey:notFound';
                 }
                 let ret = {
-                  productOfferingType: input.productOfferingQualificationItem['product']['productConfiguration']['@type'],
+                  productOfferingType: type || 'undefined',
                   targetAPIConfigKey: targetAPIConfigKey
                 };
                 return JSON.stringify(ret);
