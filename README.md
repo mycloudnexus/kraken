@@ -4,8 +4,8 @@
 
 ## Overview
 
-MEF LSO API Adaptor is a comprehensive API mapping solution designed to bridge the gap between disparate APIs with varying data structures, enabling seamless communication between systems. It focuses on mapping non-standard or legacy APIs to standardized interfaces, simplifying integration and ensuring interoperability between business systems.
-![MEF LSO API Adaptor-Overview](docs/img/MEF LSO API Adaptor-overview.png)
+MEF LSO API Adaptor(with project name as Kraken) is a comprehensive API mapping solution designed to bridge the gap between disparate APIs with varying data structures, enabling seamless communication between systems. It focuses on mapping non-standard or legacy APIs to standardized interfaces, simplifying integration and ensuring interoperability between business systems.
+![MEF LSO API Adaptor-Overview](docs/img/kraken-overview.png)
 
 ## Core Functionalities
 At its heart, MEF LSO API Adaptor is an API mapping engine. It facilitates communication between a source API (like Sonata API) and a target API (such as proprietary or non-standard seller APIs) by transforming and mapping their data structures. The engine essentially acts as a adapter layer that abstracts the differences between APIs, allowing them to communicate without the need for significant redevelopment.
@@ -13,7 +13,7 @@ At its heart, MEF LSO API Adaptor is an API mapping engine. It facilitates commu
 ## Key Features
 - **Mapping Flexibility**: Users can create mappings between a source Endpoint and a target Endpoint and mapping their request and response properties, allowing data from one API format to be converted and routed to the corresponding fields in another API.
 - **Target API Setup**: The interface also provides functionality to configure the taget API server. This is essential for integrating APIs that have not yet been standardized or exposed to the platform. Users can upload the configuration of the target API and set it up for smooth interaction.
-- **API activity tracking**: All the API calls to Source API through MEF LSO API Adaptor will be captured for future debugging and analysis
+- **API activity tracking**: All the API calls to Source API through MEF LSO API Adaptor will be captured for future debugging and analysis.
 
 ## Benefits
 - **Simplified API Integration**: By abstracting the complexity of different API structures, the solution reduces the development effort required to integrate APIs, offering a plug-and-play model.
@@ -24,33 +24,33 @@ At its heart, MEF LSO API Adaptor is an API mapping engine. It facilitates commu
 ## Architecture
 
 MEF LSO API Adaptor follows a modular architecture, comprising several components that work together to deliver its functionality:
-![MEF LSO API Adaptor-Overview](docs/img/MEF LSO API Adaptor-architecture.png)
+![kraken-Overview](docs/img/kraken-architecture.png)
 
 - **Control Plane**: This layer is responsible for the configuration and management of API mappings. Users interact with this layer to define, map, and deploy APIs.
 - **Data Plane**: The data plane handles the actual data flow, ensuring that requests and responses are properly mapped and delivered between the source and target API Servers.
 
 ### Key Components
 
-- **MEF LSO API Adaptor Hub**: MEF LSO API Adaptor Hub acts as a high-performance Ingress Controller, efficiently routing external traffic to services within your infrastructure. It seamlessly integrates with your existing network infrastructure, providing a reliable entry point for incoming requests.
+- **kraken Hub**: kraken Hub acts as a high-performance Ingress Controller, efficiently routing external traffic to services within your infrastructure. It seamlessly integrates with your existing network infrastructure, providing a reliable entry point for incoming requests.
 
-- **MEF LSO API Adaptor Agent**: Sync all hub's activities to controller server and pull latest configuration from controller server.
+- **kraken Agent**: Sync all hub's activities to controller server and pull latest configuration from controller server.
 
-- **MEF LSO API Adaptor Controller**: Customize API mapping rules, manage mapping versions and release mappings to data plane.
+- **kraken Controller**: Customize API mapping rules, manage mapping versions and release mappings to data plane.
 
-- **MEF LSO API Adaptor Portal**: Management Portal.
+- **kraken Portal**: Management Portal.
 
 ## Get Started
 
 To begin, clone the repository and navigate to the project directory:
 
 ```console
-git clone https://github.com/mycloudnexus/MEF LSO API Adaptor.git
-cd MEF LSO API Adaptor
+git clone https://github.com/mycloudnexus/kraken.git
+cd kraken
 ```
 
 ### Run via docker
 
-The simplest way to get MEF LSO API Adaptor up and running is with Docker. Follow these steps:
+The simplest way to get kraken up and running is with Docker. Follow these steps:
 
 1. Navigate to the docker directory:
 
@@ -98,7 +98,7 @@ You can verify the installed versions with the following commands:
 
 1. From the base of the repository, navigate to the portal directory:
 ```
-cd MEF LSO API Adaptor-app/MEF LSO API Adaptor-app-portal
+cd kraken-app/kraken-app-portal
 ```
 2. Install the dependencies and start the development server:
 ```
@@ -132,7 +132,7 @@ The Control API Server relies on a PostgreSQL database. You can set up a Postgre
 3. **Set up environment variables**:
 
    ```bash
-   export DB_URL=jdbc:postgresql://localhost:5432/MEF LSO API Adaptor-mgmt
+   export DB_URL=jdbc:postgresql://localhost:5432/kraken-mgmt
    export DB_USERNAME=postgresql
    export DB_PASSWORD=password
    ```
@@ -140,7 +140,7 @@ The Control API Server relies on a PostgreSQL database. You can set up a Postgre
 4. **Run the Control API Server**:
 
    ```bash
-   java -jar MEF LSO API Adaptor-app/MEF LSO API Adaptor-app-controller/target/*.jar
+   java -jar kraken-app/kraken-app-controller/target/*.jar
    ```
 
 5. Access the Swagger UI at [http://localhost:8001](http://localhost:8001).  
@@ -153,7 +153,7 @@ If you want to test the data plane features, you can run the Hub and Agent API s
 1. **Set up environment variables** for both servers:
 
    ```bash
-   export DB_URL=jdbc:postgresql://localhost:5432/MEF LSO API Adaptor
+   export DB_URL=jdbc:postgresql://localhost:5432/kraken
    export DB_USERNAME=postgresql
    export DB_PASSWORD=password
    ```
@@ -161,13 +161,13 @@ If you want to test the data plane features, you can run the Hub and Agent API s
 2. **Run the Hub API Server**:
 
    ```bash
-   java -jar MEF LSO API Adaptor-app/MEF LSO API Adaptor-app-hub/target/*.jar
+   java -jar kraken-app/kraken-app-hub/target/*.jar
    ```
 
 3. **Run the Agent API Server**:
 
    ```bash
-   java -jar MEF LSO API Adaptor-app/MEF LSO API Adaptor-app-agent/target/*.jar
+   java -jar kraken-app/kraken-app-agent/target/*.jar
    ```
 
 4. Access the Hub’s Swagger UI at [http://localhost:8000](http://localhost:8000).
@@ -181,31 +181,31 @@ If you want to test the data plane features, you can run the Hub and Agent API s
 
 ### Code Structure
 ```
-MEF LSO API Adaptor/
+kraken/
 │
-├── MEF LSO API Adaptor-app/
-│   └── MEF LSO API Adaptor-app-controller/
+├── kraken-app/
+│   └── kraken-app-controller/
 │   │   └── src
 │   │   │   └── main
 │   │   │   └── test
 │   │   └── pom.xml
-│   └── MEF LSO API Adaptor-app-agent/
-│   └── MEF LSO API Adaptor-app-hub/
-│   └── MEF LSO API Adaptor-app-portal/
+│   └── kraken-app-agent/
+│   └── kraken-app-hub/
+│   └── kraken-app-portal/
 │   └── pom.xml
 │
-├── MEF LSO API Adaptor-java-sdk/
-│   └── MEF LSO API Adaptor-java-sdk-core/
+├── kraken-java-sdk/
+│   └── kraken-java-sdk-core/
 │   │   └── src
 │   │   │   └── main
 │   │   │   └── test
 │   │   └── pom.xml
-│   └── MEF LSO API Adaptor-java-sdk-auth/
-│   └── MEF LSO API Adaptor-java-sdk-controller/
-│   └── MEF LSO API Adaptor-java-sdk-sync/
-│   └── MEF LSO API Adaptor-java-sdk-gateway/
-│   └── MEF LSO API Adaptor-java-sdk-mef/
-│   └── MEF LSO API Adaptor-java-sdk-test/
+│   └── kraken-java-sdk-auth/
+│   └── kraken-java-sdk-controller/
+│   └── kraken-java-sdk-sync/
+│   └── kraken-java-sdk-gateway/
+│   └── kraken-java-sdk-mef/
+│   └── kraken-java-sdk-test/
 │   └── pom.xml
 │
 ├── docs/
@@ -244,12 +244,12 @@ MEF LSO API Adaptor/
 
 ### Configuration
 
-The behavior of the MEF LSO API Adaptor can be customized using command-line arguments or environment variables. Refer to the [Configuration](./docs/configuration.md) documentation for a list of available options and their descriptions.
+The behavior of the kraken can be customized using command-line arguments or environment variables. Refer to the [Configuration](./docs/configuration.md) documentation for a list of available options and their descriptions.
 
 
 ## Contributing
 
-We welcome contributions from the community! If you'd like to contribute to the MEF LSO API Adaptor project, please follow our [Contribution Guidelines](./CONTRIBUTING.md).
+We welcome contributions from the community! If you'd like to contribute to the MEF LSO API Adaptor(kraken) project, please follow our [Contribution Guidelines](./CONTRIBUTING.md).
 
 ## Coding Standards
 
