@@ -281,6 +281,11 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
         log.info("Skipped mapper due to blank target, source:{}", mapper.getSource());
         continue;
       }
+      checkExist(
+          mapper.getSource(),
+          inputs,
+          mapper.getSourceDependOnExpression(),
+          mapper.getSourceConditions());
       if (MappingTypeEnum.ENUM.getKind().equals(mapper.getSourceType())
           || MappingTypeEnum.STRING.getKind().equals(mapper.getSourceType())
           || isNumberKind(mapper.getAllowValueLimit(), mapper.getSourceType())) {
@@ -291,6 +296,53 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
         checkMappingValue(documentContext, mapper, inputs, pathsExpected422);
       }
     }
+  }
+
+  public void checkExist(
+      String source,
+      Map<String, Object> inputs,
+      String sourceDependOnExpression,
+      List<ComponentAPITargetFacets.SourceCondition> sourceConditions) {
+    if (CollectionUtils.isEmpty(sourceConditions)) {
+      return;
+    }
+    if (StringUtils.isBlank(sourceDependOnExpression)) {
+      boolean result =
+          sourceConditions.stream()
+              .filter(
+                  sourceCondition ->
+                      StringUtils.isNotBlank(sourceCondition.getKey())
+                          && StringUtils.isNotBlank(sourceCondition.getVal())
+                          && StringUtils.isNotBlank(sourceCondition.getOperator()))
+              .allMatch(
+                  sourceCondition -> {
+                    String expression = buildSourceConditionExpression(sourceCondition);
+                    return SpELEngine.isTrue(expression, inputs);
+                  });
+      if (result) {
+        try {
+          Object x =
+              SpELEngine.evaluateWithoutSuppressException(
+                  constructBody(source), inputs, Object.class);
+          log.info("Evaluate result of source expression:{}", x);
+        } catch (Exception e) {
+          String errorMsg = String.format("Failed to evaluate expression of source: %s", source);
+          log.error(errorMsg, e);
+          throw KrakenException.badRequestInvalidBody(String.format(SHOULD_BE_EXIST, source, null));
+        }
+      }
+    }
+  }
+
+  private String buildSourceConditionExpression(
+      ComponentAPITargetFacets.SourceCondition sourceCondition) {
+    return "${body."
+        + extractMapperParam(sourceCondition.getKey()).get(0)
+        + " "
+        + sourceCondition.getOperator()
+        + " '"
+        + sourceCondition.getVal()
+        + "'}";
   }
 
   private void checkConstantValue(

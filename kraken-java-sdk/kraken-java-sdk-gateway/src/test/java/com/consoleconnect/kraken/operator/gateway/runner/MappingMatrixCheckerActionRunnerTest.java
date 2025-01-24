@@ -21,6 +21,7 @@ import lombok.SneakyThrows;
 import org.apache.commons.lang3.tuple.Pair;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -523,5 +524,53 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
                   mappingMatrixCheckerActionRunner.checkMatrixConstraints(
                       facets, targetKey, requestBody, List.of()));
         });
+  }
+
+  @Test
+  void givenSourceDependOnExpression_whenEvaluate_thenThrowsException() {
+    String source = "@{{s1}}";
+    Map<String, Object> inputs = new HashMap<>();
+    String sourceDependOnExpression = "";
+    Map<String, Object> body = new HashMap<>();
+    body.put("a1", "roll1");
+    body.put("a2", "roll2");
+    body.put("a3", "roll3");
+    inputs.put("body", body);
+
+    List<ComponentAPITargetFacets.SourceCondition> sourceConditions = getSourceConditions();
+    Assertions.assertThrowsExactly(
+        KrakenException.class,
+        () ->
+            mappingMatrixCheckerActionRunner.checkExist(
+                source, inputs, sourceDependOnExpression, sourceConditions));
+
+    body.put("s1", "s1-value");
+    inputs.put("body", body);
+    Assertions.assertDoesNotThrow(
+        () ->
+            mappingMatrixCheckerActionRunner.checkExist(
+                source, inputs, sourceDependOnExpression, sourceConditions));
+  }
+
+  private static @NotNull List<ComponentAPITargetFacets.SourceCondition> getSourceConditions() {
+    ComponentAPITargetFacets.SourceCondition sourceCondition1 =
+        new ComponentAPITargetFacets.SourceCondition();
+    sourceCondition1.setKey("@{{a1}}");
+    sourceCondition1.setOperator("eq");
+    sourceCondition1.setVal("roll1");
+
+    ComponentAPITargetFacets.SourceCondition sourceCondition2 =
+        new ComponentAPITargetFacets.SourceCondition();
+    sourceCondition2.setKey("@{{a2}}");
+    sourceCondition2.setOperator("eq");
+    sourceCondition2.setVal("roll2");
+
+    ComponentAPITargetFacets.SourceCondition sourceCondition3 =
+        new ComponentAPITargetFacets.SourceCondition();
+    sourceCondition3.setKey("@{{a3}}");
+    sourceCondition3.setOperator("eq");
+    sourceCondition3.setVal("roll3");
+
+    return List.of(sourceCondition1, sourceCondition2, sourceCondition3);
   }
 }
