@@ -58,6 +58,20 @@ spec:
             source: "@{{quoteItem[0].requestedQuoteItemTerm.rollInterval.amount}}"
             sourceLocation: BODY
             sourceType: integer
+            sourceDependOnExpression: A and B and C
+            sourceDependOn:
+              - name: A
+                key: "@{{quoteItem[0].requestedQuoteItemTerm.endOfTermAction1}}"
+                val: roll
+                operator: eq
+              - name: B
+                key: "@{{quoteItem[0].requestedQuoteItemTerm.endOfTermAction2}}"
+                val: roll
+                operator: eq
+              - name: C
+                key: "@{{quoteItem[0].requestedQuoteItemTerm.endOfTermAction3}}"
+                val: roll
+                operator: eq
             target: "1"
             targetLocation: BODY
             requiredMapping: false
@@ -74,6 +88,12 @@ spec:
               - businessHours
               - businessMinutes
             valueMapping: {}
+            sourceDependOnExpression:
+            sourceDependOn:
+              - name: endOfTermAction
+                key: "@{{quoteItem[0].requestedQuoteItemTerm.endOfTermAction}}"
+                val: roll
+                operator: eq
             target: "calendarMonths"
             targetLocation: BODY
             requiredMapping: false

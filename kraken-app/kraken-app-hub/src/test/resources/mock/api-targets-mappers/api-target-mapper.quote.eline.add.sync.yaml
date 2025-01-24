@@ -60,6 +60,12 @@ spec:
             sourceLocation: BODY
             sourceType: integer
             discrete: true
+            sourceDependOnExpression:
+            sourceDependOn:
+              - name: endOfTermAction
+                key: "@{{quoteItem[0].requestedQuoteItemTerm.endOfTermAction}}"
+                val: roll
+                operator: eq
             target: "1"
             targetLocation: BODY
             requiredMapping: false
@@ -76,6 +82,12 @@ spec:
               - businessHours
               - businessMinutes
             valueMapping: {}
+            sourceDependOnExpression:
+            sourceDependOn:
+              - name: endOfTermAction
+                key: "@{{quoteItem[0].requestedQuoteItemTerm.endOfTermAction}}"
+                val: roll
+                operator: eq
             target: "calendarMonths"
             targetLocation: BODY
             requiredMapping: false
