@@ -2,9 +2,7 @@
   "provideAlternative": true,
   "submittedGeographicAddress": {
     "@type": "FieldedAddress",
-    "associatedGeographicAddress": {
-      "country": "AR",
-      "city": "Buenos Aires"
-    }
+    "country": "AR",
+    "city": "Buenos Aires"
   }
 }

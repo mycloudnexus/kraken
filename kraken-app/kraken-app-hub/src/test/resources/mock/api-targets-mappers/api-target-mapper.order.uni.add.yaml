@@ -34,6 +34,7 @@ spec:
             source: "@{{productOrderItem[0].requestedItemTerm.duration.amount}}"
             sourceLocation: BODY
             sourceType: integer
+            discrete: true
             target: "1"
             targetLocation: BODY
             requiredMapping: true
@@ -67,7 +68,14 @@ spec:
             source: "@{{productOrderItem[0].requestedItemTerm.rollInterval.amount}}"
             sourceLocation: BODY
             sourceType: integer
-            target: ""
+            discrete: true
+            sourceDependOnExpression:
+            sourceDependOn:
+              - name: endOfTermAction
+                key: "@{{productOrderItem[0].requestedItemTerm.endOfTermAction}}"
+                val: roll
+                operator: eq
+            target: "1"
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.order.uni.add.rollInterval.units
@@ -75,6 +83,12 @@ spec:
             source: "@{{productOrderItem[0].requestedItemTerm.rollInterval.units}}"
             sourceLocation: BODY
             sourceType: string
+            sourceDependOnExpression:
+            sourceDependOn:
+              - name: endOfTermAction
+                key: "@{{productOrderItem[0].requestedItemTerm.endOfTermAction}}"
+                val: roll
+                operator: eq
             target: "calendarMonths"
             targetLocation: BODY
             requiredMapping: false

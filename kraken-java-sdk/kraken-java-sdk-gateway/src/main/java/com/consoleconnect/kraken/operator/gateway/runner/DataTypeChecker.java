@@ -25,6 +25,7 @@ public interface DataTypeChecker {
   String EXPECT_INF_MSG = "invalidFormat, can not process @{{%s}} = %s, %s found, %s expected";
   String PARAM_NOT_EXIST_MSG =
       "missingProperty, the parameter @{{%s}} does not exist in the request";
+  String MISSING_PROPERTY_MSG = "missingProperty, the parameter %s does not exist in the request";
   String SHOULD_BE_MSG = "invalidValue, can not process @{{%s}} = %s, value should be %s";
   String SHOULD_BE_IN_MSG = "invalidValue, can not process @{{%s}} = %s, value should be in %s";
   String SHOULD_NOT_BE_BLANK =
@@ -105,10 +106,16 @@ public interface DataTypeChecker {
       realValue = documentContext.read(checkPath);
     } catch (Exception e) {
       printJsonPathReadError();
-      throwException(
-          code, errorMsg, String.format(PARAM_NOT_EXIST_MSG, extractCheckingPath(checkPath)));
+      String defaultMsg = getDefaultMessage(code);
+      throwException(code, errorMsg, String.format(defaultMsg, extractCheckingPath(checkPath)));
     }
     return realValue;
+  }
+
+  default String getDefaultMessage(Integer code) {
+    return Integer.valueOf(HttpStatus.BAD_REQUEST.value()).equals(code)
+        ? MISSING_PROPERTY_MSG
+        : PARAM_NOT_EXIST_MSG;
   }
 
   default PathCheck rewritePath(PathCheck pathCheck, int index) {
@@ -118,6 +125,9 @@ public interface DataTypeChecker {
   }
 
   default String replaceWildcard(String path, int index) {
+    if (StringUtils.isBlank(path)) {
+      return path;
+    }
     return path.replace("[*]", "[" + index + "]");
   }
 
@@ -196,7 +206,7 @@ public interface DataTypeChecker {
   }
 
   default void validateDiscreteString(Object evaluateValue, String paramName, String sourceType) {
-    if (MappingTypeEnum.STRING.getKind().equals(sourceType)) {
+    if (MappingTypeEnum.STRING.getKind().equalsIgnoreCase(sourceType)) {
       Class<?> dataType = whichDataTypeClass(evaluateValue);
       if (!String.class.equals(dataType)) {
         throw KrakenException.unProcessableEntityInvalidFormat(
@@ -212,7 +222,7 @@ public interface DataTypeChecker {
 
   default String rewriteCheckingPath(PathCheck pathCheck) {
     String checkingPath = extractCheckingPath(pathCheck.path());
-    if (checkingPath.contains("[*]")) {
+    if (checkingPath.endsWith("]")) {
       List<String> params =
           ConstructExpressionUtil.extractParam(pathCheck.value(), ARRAY_PARAM_PATTERN);
       if (CollectionUtils.isNotEmpty(params)) {
@@ -224,7 +234,7 @@ public interface DataTypeChecker {
 
   default boolean checkExpectDataType(PathCheck pathCheck, Object variable) {
     String dataType = whichDataType(variable);
-    if (Objects.isNull(variable) || !pathCheck.expectedValueType().equals(dataType)) {
+    if (Objects.isNull(variable) || !pathCheck.expectedValueType().equalsIgnoreCase(dataType)) {
       String checkingPath = rewriteCheckingPath(pathCheck);
       throwException(
           pathCheck,
@@ -237,8 +247,8 @@ public interface DataTypeChecker {
   default void validateEnumOrDiscreteString(
       Object evaluateValue, String paramName, List<String> valueList, String sourceType) {
     validateDiscreteString(evaluateValue, paramName, sourceType);
-    if ((MappingTypeEnum.STRING.getKind().equals(sourceType)
-            || (MappingTypeEnum.ENUM.getKind().equals(sourceType)))
+    if ((MappingTypeEnum.STRING.getKind().equalsIgnoreCase(sourceType)
+            || (MappingTypeEnum.ENUM.getKind().equalsIgnoreCase(sourceType)))
         && Objects.nonNull(evaluateValue)
         && CollectionUtils.isNotEmpty(valueList)
         && !valueList.contains(evaluateValue.toString())) {
@@ -261,7 +271,7 @@ public interface DataTypeChecker {
       List<String> valueList,
       String sourceType,
       Boolean discrete) {
-    if (MappingTypeEnum.DISCRETE_INT.getKind().equals(sourceType)
+    if (MappingTypeEnum.DISCRETE_INT.getKind().equalsIgnoreCase(sourceType)
         && MappingTypeEnum.DISCRETE_INT.getDiscrete().equals(discrete)) {
       if (Objects.isNull(evaluateValue) || isNotInteger(evaluateValue)) {
         throw KrakenException.unProcessableEntityInvalidValue(
@@ -314,12 +324,12 @@ public interface DataTypeChecker {
   }
 
   private boolean isContinuousInt(String sourceType, Boolean discrete) {
-    return MappingTypeEnum.CONTINUOUS_INT.getKind().equals(sourceType)
+    return MappingTypeEnum.CONTINUOUS_INT.getKind().equalsIgnoreCase(sourceType)
         && MappingTypeEnum.CONTINUOUS_INT.getDiscrete().equals(discrete);
   }
 
   private boolean isContinuousDouble(String sourceType, Boolean discrete) {
-    return MappingTypeEnum.CONTINUOUS_DOUBLE.getKind().equals(sourceType)
+    return MappingTypeEnum.CONTINUOUS_DOUBLE.getKind().equalsIgnoreCase(sourceType)
         && MappingTypeEnum.CONTINUOUS_DOUBLE.getDiscrete().equals(discrete);
   }
 
@@ -344,7 +354,7 @@ public interface DataTypeChecker {
 
   default void validateConstantNumber(
       Object evaluateValue, ComponentAPITargetFacets.Mapper mapper, String paramName) {
-    if (MappingTypeEnum.DISCRETE_INT.getKind().equals(mapper.getSourceType())
+    if (MappingTypeEnum.DISCRETE_INT.getKind().equalsIgnoreCase(mapper.getSourceType())
         && NumberUtils.isCreatable(mapper.getTarget())) {
       Class<?> dataType = whichDataTypeClass(evaluateValue);
       if (Objects.isNull(evaluateValue) || isNotNumeric(evaluateValue)) {
@@ -368,6 +378,15 @@ public interface DataTypeChecker {
       return path;
     }
     return path.replace("$.body.", "").replace("$.query.", "");
+  }
+
+  default int determineHttpCode(List<String> pathsExpected422, String actualPath) {
+    if (CollectionUtils.isNotEmpty(pathsExpected422) && StringUtils.isNotBlank(actualPath)) {
+      return pathsExpected422.stream().anyMatch(actualPath::startsWith)
+          ? HttpStatus.UNPROCESSABLE_ENTITY.value()
+          : HttpStatus.BAD_REQUEST.value();
+    }
+    return HttpStatus.BAD_REQUEST.value();
   }
 
   void throwException(PathCheck pathCheck, String defaultMsg);
