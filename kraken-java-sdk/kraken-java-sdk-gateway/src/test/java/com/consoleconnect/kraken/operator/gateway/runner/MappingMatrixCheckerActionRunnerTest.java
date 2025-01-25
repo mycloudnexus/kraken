@@ -530,7 +530,6 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
   void givenSourceDependOnExpression_whenEvaluate_thenThrowsException() {
     String source = "@{{s1}}";
     Map<String, Object> inputs = new HashMap<>();
-    String sourceDependOnExpression = "";
     Map<String, Object> body = new HashMap<>();
     body.put("a1", "roll1");
     body.put("a2", "roll2");
@@ -538,18 +537,14 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
     inputs.put("body", body);
 
     List<ComponentAPITargetFacets.SourceCondition> sourceConditions = getSourceConditions();
-    Assertions.assertThrowsExactly(
-        KrakenException.class,
-        () ->
-            mappingMatrixCheckerActionRunner.checkExist(
-                source, inputs, sourceDependOnExpression, sourceConditions));
+    boolean dependOn =
+        mappingMatrixCheckerActionRunner.checkConditionsExist(inputs, sourceConditions);
+    Assertions.assertFalse(dependOn);
 
     body.put("s1", "s1-value");
     inputs.put("body", body);
-    Assertions.assertDoesNotThrow(
-        () ->
-            mappingMatrixCheckerActionRunner.checkExist(
-                source, inputs, sourceDependOnExpression, sourceConditions));
+    dependOn = mappingMatrixCheckerActionRunner.checkConditionsExist(inputs, sourceConditions);
+    Assertions.assertTrue(dependOn);
   }
 
   private static @NotNull List<ComponentAPITargetFacets.SourceCondition> getSourceConditions() {

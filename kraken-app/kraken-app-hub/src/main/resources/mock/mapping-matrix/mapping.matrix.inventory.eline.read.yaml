@@ -1,0 +1,22 @@
+---
+kind: kraken.product.mapping.matrix
+apiVersion: v1
+metadata:
+  key: mef.sonata.api.matrix.inventory.eline.read
+  name: MEF Sonata API
+  labels:
+    mef-api-release: grace
+  version: 18
+spec:
+  matrix:
+    mef.sonata.api-target.inventory.eline.read:
+      - name: query_productType
+        path: "$.query.productType"
+        expectType: EXPECTED_EXIST
+        value: true
+        code: 400
+      - name: query_buyerId
+        path: "$.query.buyerId"
+        expectType: EXPECTED_EXIST
+        value: true
+        code: 400

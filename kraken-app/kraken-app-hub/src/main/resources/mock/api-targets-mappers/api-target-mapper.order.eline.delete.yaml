@@ -1,0 +1,69 @@
+
+---
+kind: kraken.component.api-target-mapper
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target-mapper.order.eline.delete
+  name:  Mapper Of Deleting Order Connection
+  description: This operation deletes a ProductOrder entity
+spec:
+  trigger:
+    path: /mefApi/sonata/productOrderingManagement/v10/productOrder
+    method: post
+    productType: access_e_line
+    actionType: delete
+  endpoints:
+    - id: delete connection by id
+      path: ""
+      method: ""
+      serverKey: mef.sonata.api-target-spec.con1718940696857
+      mappers:
+        request:
+          - name: mapper.order.eline.delete.buyerId
+            title: "The unique identifier of the organization that is acting as the a Buyer."
+            description: ""
+            source: "@{{buyerId}}"
+            sourceLocation: "QUERY"
+            target: ""
+            targetLocation: ""
+            requiredMapping: false
+          - name: mapper.order.eline.delete.productId
+            title: "The unique identifier of an in-service Product that is the ordering subject"
+            description: ""
+            source: "@{{productOrderItem[*].product.id}}"
+            sourceLocation: "BODY"
+            sourceType: string
+            target: "@{{connectionId}}"
+            targetLocation: ""
+            requiredMapping: false
+          - name: mapper.order.uni.delete.productOffering.id
+            title: "id of a Product Offering"
+            description: ""
+            source: "@{{productOrderItem[0].product.productOffering.id}}"
+            sourceLocation: "BODY"
+            sourceType: string
+            target: "ACCESS_E_LINE"
+            targetLocation: ""
+            requiredMapping: true
+        response:
+          - name: mapper.order.eline.delete.state
+            title: Order State Mapping
+            description: order state mapping
+            target: "@{{state}}"
+            targetType: enum
+            targetLocation: BODY
+            targetValues:
+              - acknowledged
+              - assessingCancellation
+              - held.assessingCharge
+              - pending.assessingModification
+              - cancelled
+              - pendingCancellation
+              - completed
+              - failed
+              - inProgress
+              - partial
+              - rejected
+            valueMapping: {}
+            source: ""
+            sourceLocation: ""

@@ -1,0 +1,154 @@
+---
+kind: kraken.component.api-target-mapper
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target-mapper.address.validate
+  name: Mapper Of Validating Geographic Address
+  description: This operation creates a GeographicAddressValidation entity
+  version: 1
+spec:
+  inputs:
+    - mefQuery
+    - mefRequestBody
+  trigger:
+    path: /mefApi/sonata/geographicAddressManagement/v7/geographicAddressValidation
+    method: post
+    provideAlternative: false
+    addressType: FieldedAddress
+  endpoints:
+    - id: validate address
+      path: /v2/data-center-facility
+      method: get
+      serverKey: mef.sonata.api-target-spec.con1718940696857
+      mappers:
+        request:
+          - name: address.validation.city
+            title: "The city that the address is in"
+            description: ""
+            source: "@{{submittedGeographicAddress.city}}"
+            sourceLocation: BODY
+            sourceType: string
+            requiredMapping: true
+            target: "filter={\"where\":{\"company.addresses.country\":\"@{{submittedGeographicAddress.country}}\",\"company.addresses.city\":\"@{{submittedGeographicAddress.city}}\"},\"skip\":0,\"limit\":10}"
+            targetLocation: HYBRID
+          - name: address.validation.country
+            title: "The country that the address is in"
+            description: ""
+            source: "@{{submittedGeographicAddress.country}}"
+            sourceLocation: BODY
+            sourceType: string
+            requiredMapping: true
+            target: "filter={\"where\":{\"company.addresses.country\":\"@{{submittedGeographicAddress.country}}\",\"company.addresses.city\":\"@{{submittedGeographicAddress.city}}\"},\"skip\":0,\"limit\":10}"
+            targetLocation: HYBRID
+          - name: address.validation.streetName
+            title: "Name of the street or other street type"
+            description: ""
+            source: "@{{submittedGeographicAddress.streetName}}"
+            sourceLocation: BODY
+            sourceType: string
+            requiredMapping: false
+            target: ""
+            targetLocation: ""
+        response:
+          - name: mapper.address.validation.id
+            title: "Unique identifier of the identified alternate Geographic Address"
+            description: address validation id mapping
+            source: "@{{[*].id}}"
+            sourceLocation: BODY
+            target: "@{{alternateGeographicAddress[*].id}}"
+            targetType: string
+            targetLocation: BODY
+            requiredMapping: true
+            replaceStar: false
+          - name: mapper.address.validation.country
+            title: "The country of the identified alternate Geographic Address"
+            description: address validation country mapping
+            source: "@{{[*].company.addresses[0].country}}"
+            sourceLocation: BODY
+            target: "@{{alternateGeographicAddress[*].country}}"
+            targetType: string
+            targetLocation: BODY
+            requiredMapping: false
+            replaceStar: false
+          - name: mapper.address.validation.city
+            title: "The city of the identified alternate Geographic Address"
+            description: address validation city mapping
+            source: "@{{[*].company.addresses[0].city}}"
+            sourceLocation: BODY
+            target: "@{{alternateGeographicAddress[*].city}}"
+            targetType: string
+            targetLocation: BODY
+            requiredMapping: false
+            replaceStar: false
+          - name: mapper.address.validation.streetName
+            title: "The street of the identified alternate Geographic Address"
+            description: address validation streetName mapping
+            source: "@{{[*].company.addresses[0].street}}"
+            sourceLocation: BODY
+            target: "@{{alternateGeographicAddress[*].streetName}}"
+            targetType: string
+            targetLocation: BODY
+            requiredMapping: false
+            replaceStar: false
+          - name: mapper.address.validation.locality
+            title: "The metroId of the identified alternate Geographic Address"
+            description: ""
+            source: "@{{[*].dataCenterFacility.metroId}}"
+            sourceLocation: BODY
+            target: "@{{alternateGeographicAddress[*].locality}}"
+            targetType: string
+            targetLocation: BODY
+            requiredMapping: false
+            replaceStar: false
+          - name: mapper.address.validation.bestMatch.id
+            title: "Unique identifier of the identified best match Address"
+            requiredMapping: false
+            description: ""
+            source: "123"
+            sourceLocation: BODY
+            target: "@{{bestMatchGeographicAddress.id}}"
+            targetType: string
+            targetLocation: BODY
+            checkPath: "$.bestMatchGeographicAddress.id"
+            deletePath: "$.bestMatchGeographicAddress"
+            replaceStar: false
+          - name: mapper.address.validation.bestMatch.city
+            title: "The City of the identified best match Address"
+            requiredMapping: false
+            description: ""
+            source: "Sydney"
+            sourceLocation: BODY
+            target: "@{{bestMatchGeographicAddress.city}}"
+            targetType: string
+            targetLocation: BODY
+            replaceStar: false
+          - name: mapper.address.validation.bestMatch.country
+            title: "The Country of the identified best match Address"
+            requiredMapping: false
+            description: "The City of the identified best match Address"
+            source: "Sydney"
+            sourceLocation: BODY
+            target: "@{{bestMatchGeographicAddress.country}}"
+            targetType: string
+            targetLocation: BODY
+            replaceStar: false
+          - name: mapper.address.validation.bestMatch.streetName
+            title: "The streetName of the identified best match Address"
+            requiredMapping: false
+            description: ""
+            source: ""
+            sourceLocation: BODY
+            target: "@{{bestMatchGeographicAddress.streetName}}"
+            targetType: string
+            targetLocation: BODY
+            replaceStar: false
+          - name: mapper.address.validation.tags
+            title: "tags of the identified alternate Geographic Address"
+            description: ""
+            source: "@{{[*].tags}}"
+            sourceLocation: BODY
+            target: "@{{alternateGeographicAddress[*].tags}}"
+            targetType: string
+            targetLocation: BODY
+            requiredMapping: false
+            replaceStar: false

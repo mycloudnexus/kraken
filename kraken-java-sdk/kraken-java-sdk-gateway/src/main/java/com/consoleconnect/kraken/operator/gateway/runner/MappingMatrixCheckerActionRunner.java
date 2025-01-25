@@ -284,65 +284,13 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
       if (MappingTypeEnum.ENUM.getKind().equals(mapper.getSourceType())
           || MappingTypeEnum.STRING.getKind().equals(mapper.getSourceType())
           || isNumberKind(mapper.getAllowValueLimit(), mapper.getSourceType())) {
-        checkEnumValue(documentContext, mapper, pathsExpected422);
+        checkEnumValue(documentContext, mapper, inputs, pathsExpected422);
       } else if (isConstantType(mapper.getTarget())) {
         checkConstantValue(documentContext, mapper, inputs, pathsExpected422);
       } else {
         checkMappingValue(documentContext, mapper, inputs, pathsExpected422);
       }
-      checkExist(
-              mapper.getSource(),
-              inputs,
-              mapper.getSourceDependOnExpression(),
-              mapper.getSourceConditions());
     }
-  }
-
-  public void checkExist(
-      String source,
-      Map<String, Object> inputs,
-      String sourceDependOnExpression,
-      List<ComponentAPITargetFacets.SourceCondition> sourceConditions) {
-    if (CollectionUtils.isEmpty(sourceConditions)) {
-      return;
-    }
-    if (StringUtils.isBlank(sourceDependOnExpression)) {
-      boolean result =
-          sourceConditions.stream()
-              .filter(
-                  sourceCondition ->
-                      StringUtils.isNotBlank(sourceCondition.getKey())
-                          && StringUtils.isNotBlank(sourceCondition.getVal())
-                          && StringUtils.isNotBlank(sourceCondition.getOperator()))
-              .allMatch(
-                  sourceCondition -> {
-                    String expression = buildSourceConditionExpression(sourceCondition);
-                    return SpELEngine.isTrue(expression, inputs);
-                  });
-      if (result) {
-        try {
-          Object x =
-              SpELEngine.evaluateWithoutSuppressException(
-                  constructBody(source), inputs, Object.class);
-          log.info("Evaluate result of source expression:{}", x);
-        } catch (Exception e) {
-          String errorMsg = String.format("Failed to evaluate expression of source: %s", source);
-          log.error(errorMsg, e);
-          throw KrakenException.badRequestInvalidBody(String.format(SHOULD_BE_EXIST, source, null));
-        }
-      }
-    }
-  }
-
-  private String buildSourceConditionExpression(
-      ComponentAPITargetFacets.SourceCondition sourceCondition) {
-    return "${body."
-        + extractMapperParam(sourceCondition.getKey()).get(0)
-        + " "
-        + sourceCondition.getOperator()
-        + " '"
-        + sourceCondition.getVal()
-        + "'}";
   }
 
   private void checkConstantValue(
@@ -354,6 +302,12 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     if (String.valueOf(expectedValue).contains("{{")) {
       return;
     }
+    if (CollectionUtils.isNotEmpty(mapper.getSourceConditions())
+        && !checkConditionsExist(inputs, mapper.getSourceConditions())) {
+      // Skip the checking
+      return;
+    }
+    // Keep normal checking process
     List<String> params = extractMapperParam(mapper.getSource());
     String constructedBody = constructJsonPathBody(replaceStarToZero(mapper.getSource()));
     // if path in the excluded400Path, then throws 422, otherwise throws 400
@@ -361,7 +315,6 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
         readByPathWithException(documentContext, constructedBody, pathsExpected422, null);
     validateConstantNumber(
         realValue, mapper, CollectionUtils.isEmpty(params) ? mapper.getSource() : params.get(0));
-
     String evaluateValue =
         SpELEngine.evaluate(constructBody(mapper.getSource()), inputs, String.class);
     if (!Objects.equals(evaluateValue, expectedValue)) {
@@ -375,11 +328,18 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
   private void checkEnumValue(
       DocumentContext documentContext,
       ComponentAPITargetFacets.Mapper mapper,
+      Map<String, Object> inputs,
       List<String> pathsExpected422) {
     List<String> params = extractMapperParam(mapper.getSource());
     if (CollectionUtils.isEmpty(params)) {
       return;
     }
+    if (CollectionUtils.isNotEmpty(mapper.getSourceConditions())
+        && !checkConditionsExist(inputs, mapper.getSourceConditions())) {
+      // Skip the checking
+      return;
+    }
+
     String constructedBody = constructJsonPathBody(replaceStarToZero(mapper.getSource()));
     // if path in the excluded400Path, then throws 422, otherwise throws 400
     Object realValue =
@@ -434,6 +394,12 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     if (CollectionUtils.isEmpty(params)) {
       return;
     }
+    if (CollectionUtils.isNotEmpty(mapper.getSourceConditions())
+        && !checkConditionsExist(inputs, mapper.getSourceConditions())) {
+      // Skip the checking
+      return;
+    }
+
     String paramName = params.get(0);
     if (BODY.equals(location)) {
       log.info("jsonPathExpression:{}", jsonPathExpression);
@@ -456,6 +422,32 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
             String.format(SHOULD_BE_EXIST, paramName, null));
       }
     }
+  }
+
+  public boolean checkConditionsExist(
+      Map<String, Object> inputs, List<ComponentAPITargetFacets.SourceCondition> sourceConditions) {
+    return sourceConditions.stream()
+        .filter(
+            sourceCondition ->
+                StringUtils.isNotBlank(sourceCondition.getKey())
+                    && StringUtils.isNotBlank(sourceCondition.getVal())
+                    && StringUtils.isNotBlank(sourceCondition.getOperator()))
+        .allMatch(
+            sourceCondition -> {
+              String expression = buildSourceConditionExpression(sourceCondition);
+              return SpELEngine.isTrue(expression, inputs);
+            });
+  }
+
+  private String buildSourceConditionExpression(
+      ComponentAPITargetFacets.SourceCondition sourceCondition) {
+    return "${body."
+        + extractMapperParam(sourceCondition.getKey()).get(0)
+        + " "
+        + sourceCondition.getOperator()
+        + " '"
+        + sourceCondition.getVal()
+        + "'}";
   }
 
   @Override
