@@ -74,8 +74,8 @@ spec:
             sourceLocation: BODY
             sourceType: integer
             discrete: true
-            sourceDependOnExpression:
-            sourceDependOn:
+            sourceConditionExpression:
+            sourceConditions:
               - name: endOfTermAction
                 key: "@{{productOrderItem[0].requestedItemTerm.endOfTermAction}}"
                 val: roll
@@ -97,8 +97,8 @@ spec:
               - businessDays
               - businessHours
               - businessMinutes
-            sourceDependOnExpression:
-            sourceDependOn:
+            sourceConditionExpression:
+            sourceConditions:
               - name: endOfTermAction
                 key: "@{{productOrderItem[0].requestedItemTerm.endOfTermAction}}"
                 val: roll

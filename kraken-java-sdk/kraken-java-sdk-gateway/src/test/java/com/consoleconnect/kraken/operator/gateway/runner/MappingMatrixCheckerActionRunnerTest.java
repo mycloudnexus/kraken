@@ -538,12 +538,12 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
 
     List<ComponentAPITargetFacets.SourceCondition> sourceConditions = getSourceConditions();
     boolean dependOn =
-        mappingMatrixCheckerActionRunner.checkConditionsExist(inputs, sourceConditions);
+        mappingMatrixCheckerActionRunner.checkConditionsMatched(inputs, sourceConditions);
     Assertions.assertFalse(dependOn);
 
     body.put("s1", "s1-value");
     inputs.put("body", body);
-    dependOn = mappingMatrixCheckerActionRunner.checkConditionsExist(inputs, sourceConditions);
+    dependOn = mappingMatrixCheckerActionRunner.checkConditionsMatched(inputs, sourceConditions);
     Assertions.assertTrue(dependOn);
   }
 

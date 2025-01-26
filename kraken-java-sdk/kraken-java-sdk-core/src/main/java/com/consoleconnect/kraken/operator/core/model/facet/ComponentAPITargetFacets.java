@@ -55,7 +55,7 @@ public class ComponentAPITargetFacets {
     private String source;
     private String sourceType;
     private String sourceLocation;
-    private String sourceDependOnExpression;
+    private String sourceConditionExpression;
     private List<SourceCondition> sourceConditions;
     private Boolean allowValueLimit = Boolean.FALSE;
     private Boolean discrete;

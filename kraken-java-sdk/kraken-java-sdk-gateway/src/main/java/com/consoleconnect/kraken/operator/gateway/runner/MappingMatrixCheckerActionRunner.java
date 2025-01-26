@@ -303,7 +303,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
       return;
     }
     if (CollectionUtils.isNotEmpty(mapper.getSourceConditions())
-        && !checkConditionsExist(inputs, mapper.getSourceConditions())) {
+        && !checkConditionsMatched(inputs, mapper.getSourceConditions())) {
       // Skip the checking
       return;
     }
@@ -335,7 +335,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
       return;
     }
     if (CollectionUtils.isNotEmpty(mapper.getSourceConditions())
-        && !checkConditionsExist(inputs, mapper.getSourceConditions())) {
+        && !checkConditionsMatched(inputs, mapper.getSourceConditions())) {
       // Skip the checking
       return;
     }
@@ -395,7 +395,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
       return;
     }
     if (CollectionUtils.isNotEmpty(mapper.getSourceConditions())
-        && !checkConditionsExist(inputs, mapper.getSourceConditions())) {
+        && !checkConditionsMatched(inputs, mapper.getSourceConditions())) {
       // Skip the checking
       return;
     }
@@ -424,7 +424,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     }
   }
 
-  public boolean checkConditionsExist(
+  public boolean checkConditionsMatched(
       Map<String, Object> inputs, List<ComponentAPITargetFacets.SourceCondition> sourceConditions) {
     return sourceConditions.stream()
         .filter(
