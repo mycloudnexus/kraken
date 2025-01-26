@@ -51,7 +51,7 @@ spec:
               - autoDisconnect
               - autoRenew
             valueMapping: {}
-            target: "autoRenew"
+            target: "roll"
             targetLocation: BODY
             requiredMapping: true
           - name: mapper.quote.uni.add.sync.rollInterval.amount
