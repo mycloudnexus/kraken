@@ -21,7 +21,6 @@ import lombok.SneakyThrows;
 import org.apache.commons.lang3.tuple.Pair;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -546,7 +545,7 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
     Assertions.assertFalse(dependOn);
   }
 
-  private static @NotNull List<ComponentAPITargetFacets.SourceCondition> getSourceConditions() {
+  private static List<ComponentAPITargetFacets.SourceCondition> getSourceConditions() {
     ComponentAPITargetFacets.SourceCondition sourceCondition1 =
         new ComponentAPITargetFacets.SourceCondition();
     sourceCondition1.setKey("@{{a1}}");
