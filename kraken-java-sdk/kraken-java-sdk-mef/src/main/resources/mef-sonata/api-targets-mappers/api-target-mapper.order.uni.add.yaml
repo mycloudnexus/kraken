@@ -113,15 +113,6 @@ spec:
             target: ''
             targetLocation: BODY
             requiredMapping: false
-          - name: mapper.order.uni.add.place.name
-            title: the keyName of the place where the products' installation must be done.
-            description: ''
-            source: '@{{productOrderItem[0].product.place[0].keyName}}'
-            sourceLocation: BODY
-            sourceType: string
-            target: ''
-            targetLocation: BODY
-            requiredMapping: false
           - name: mapper.order.uni.add.bandwidthUnit
             title: "The unit of bandwidth"
             source: "@{{productOrderItem[0].product.productConfiguration.bandwidthUnit}}"
