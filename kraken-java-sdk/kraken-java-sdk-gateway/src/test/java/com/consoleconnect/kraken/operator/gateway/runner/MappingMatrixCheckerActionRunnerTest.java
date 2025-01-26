@@ -528,7 +528,6 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
 
   @Test
   void givenSourceDependOnExpression_whenEvaluate_thenThrowsException() {
-    String source = "@{{s1}}";
     Map<String, Object> inputs = new HashMap<>();
     Map<String, Object> body = new HashMap<>();
     body.put("a1", "roll1");
@@ -539,12 +538,12 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
     List<ComponentAPITargetFacets.SourceCondition> sourceConditions = getSourceConditions();
     boolean dependOn =
         mappingMatrixCheckerActionRunner.checkConditionsMatched(inputs, sourceConditions);
-    Assertions.assertFalse(dependOn);
+    Assertions.assertTrue(dependOn);
 
-    body.put("s1", "s1-value");
+    body.put("a1", "roll");
     inputs.put("body", body);
     dependOn = mappingMatrixCheckerActionRunner.checkConditionsMatched(inputs, sourceConditions);
-    Assertions.assertTrue(dependOn);
+    Assertions.assertFalse(dependOn);
   }
 
   private static @NotNull List<ComponentAPITargetFacets.SourceCondition> getSourceConditions() {
