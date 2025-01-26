@@ -293,7 +293,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     }
   }
 
-  private void checkConstantValue(
+  public void checkConstantValue(
       DocumentContext documentContext,
       ComponentAPITargetFacets.Mapper mapper,
       Map<String, Object> inputs,
@@ -303,7 +303,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
       return;
     }
     if (CollectionUtils.isNotEmpty(mapper.getSourceConditions())
-        && !checkConditionsExist(inputs, mapper.getSourceConditions())) {
+        && !checkConditionsMatched(inputs, mapper.getSourceConditions())) {
       // Skip the checking
       return;
     }
@@ -325,7 +325,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     }
   }
 
-  private void checkEnumValue(
+  public void checkEnumValue(
       DocumentContext documentContext,
       ComponentAPITargetFacets.Mapper mapper,
       Map<String, Object> inputs,
@@ -335,7 +335,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
       return;
     }
     if (CollectionUtils.isNotEmpty(mapper.getSourceConditions())
-        && !checkConditionsExist(inputs, mapper.getSourceConditions())) {
+        && !checkConditionsMatched(inputs, mapper.getSourceConditions())) {
       // Skip the checking
       return;
     }
@@ -373,7 +373,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     validateContinuousNumber(evaluateValue, paramName, valueList, sourceType, discrete);
   }
 
-  private void checkMappingValue(
+  public void checkMappingValue(
       DocumentContext documentContext,
       ComponentAPITargetFacets.Mapper mapper,
       Map<String, Object> inputs,
@@ -395,7 +395,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
       return;
     }
     if (CollectionUtils.isNotEmpty(mapper.getSourceConditions())
-        && !checkConditionsExist(inputs, mapper.getSourceConditions())) {
+        && !checkConditionsMatched(inputs, mapper.getSourceConditions())) {
       // Skip the checking
       return;
     }
@@ -424,7 +424,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     }
   }
 
-  public boolean checkConditionsExist(
+  public boolean checkConditionsMatched(
       Map<String, Object> inputs, List<ComponentAPITargetFacets.SourceCondition> sourceConditions) {
     return sourceConditions.stream()
         .filter(

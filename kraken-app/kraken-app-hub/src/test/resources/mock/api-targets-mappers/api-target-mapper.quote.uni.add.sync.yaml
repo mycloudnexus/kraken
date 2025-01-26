@@ -58,8 +58,8 @@ spec:
             source: "@{{quoteItem[0].requestedQuoteItemTerm.rollInterval.amount}}"
             sourceLocation: BODY
             sourceType: integer
-            sourceDependOnExpression:
-            sourceDependOn:
+            sourceConditionExpression:
+            sourceConditions:
               - name: endOfTermAction
                 key: "@{{quoteItem[0].requestedQuoteItemTerm.endOfTermAction}}"
                 val: roll
@@ -80,8 +80,8 @@ spec:
               - businessHours
               - businessMinutes
             valueMapping: {}
-            sourceDependOnExpression:
-            sourceDependOn:
+            sourceConditionExpression:
+            sourceConditions:
               - name: endOfTermAction
                 key: "@{{quoteItem[0].requestedQuoteItemTerm.endOfTermAction}}"
                 val: roll

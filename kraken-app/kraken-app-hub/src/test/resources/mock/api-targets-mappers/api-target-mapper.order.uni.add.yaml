@@ -69,8 +69,8 @@ spec:
             sourceLocation: BODY
             sourceType: integer
             discrete: true
-            sourceDependOnExpression:
-            sourceDependOn:
+            sourceConditionExpression:
+            sourceConditions:
               - name: endOfTermAction
                 key: "@{{productOrderItem[0].requestedItemTerm.endOfTermAction}}"
                 val: roll
@@ -83,8 +83,8 @@ spec:
             source: "@{{productOrderItem[0].requestedItemTerm.rollInterval.units}}"
             sourceLocation: BODY
             sourceType: string
-            sourceDependOnExpression:
-            sourceDependOn:
+            sourceConditionExpression:
+            sourceConditions:
               - name: endOfTermAction
                 key: "@{{productOrderItem[0].requestedItemTerm.endOfTermAction}}"
                 val: roll
@@ -100,15 +100,6 @@ spec:
             sourceLocation: BODY
             sourceType: string
             target: '@{{dataCenterFacilityId}}'
-            targetLocation: BODY
-            requiredMapping: false
-          - name: mapper.order.uni.add.place.name
-            title: the keyName of the place where the products' installation must be done.
-            description: ''
-            source: '@{{productOrderItem[0].product.place[0].keyName}}'
-            sourceLocation: BODY
-            sourceType: string
-            target: '@{{dataCenterFacility}}'
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.order.uni.add.bandwidthUnit
