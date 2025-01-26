@@ -67,6 +67,12 @@ spec:
             sourceLocation: BODY
             sourceType: integer
             discrete: true
+            sourceConditionExpression:
+            sourceConditions:
+              - name: endOfTermAction
+                key: "@{{quoteItem[0].requestedQuoteItemTerm.endOfTermAction}}"
+                val: roll
+                operator: eq
             target: ""
             targetLocation: BODY
             requiredMapping: false
@@ -85,6 +91,12 @@ spec:
               - businessHours
               - businessMinutes
             valueMapping: {}
+            sourceConditionExpression:
+            sourceConditions:
+              - name: endOfTermAction
+                key: "@{{quoteItem[0].requestedQuoteItemTerm.endOfTermAction}}"
+                val: roll
+                operator: eq
             target: ""
             targetLocation: BODY
             requiredMapping: false
