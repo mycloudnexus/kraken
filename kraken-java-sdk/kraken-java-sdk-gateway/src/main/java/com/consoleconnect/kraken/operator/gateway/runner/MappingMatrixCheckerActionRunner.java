@@ -293,7 +293,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     }
   }
 
-  private void checkConstantValue(
+  public void checkConstantValue(
       DocumentContext documentContext,
       ComponentAPITargetFacets.Mapper mapper,
       Map<String, Object> inputs,
@@ -325,7 +325,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     }
   }
 
-  private void checkEnumValue(
+  public void checkEnumValue(
       DocumentContext documentContext,
       ComponentAPITargetFacets.Mapper mapper,
       Map<String, Object> inputs,
@@ -373,7 +373,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     validateContinuousNumber(evaluateValue, paramName, valueList, sourceType, discrete);
   }
 
-  private void checkMappingValue(
+  public void checkMappingValue(
       DocumentContext documentContext,
       ComponentAPITargetFacets.Mapper mapper,
       Map<String, Object> inputs,

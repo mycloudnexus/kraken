@@ -15,6 +15,8 @@ import com.consoleconnect.kraken.operator.gateway.dto.PathCheck;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
 import java.io.IOException;
 import java.util.*;
 import lombok.SneakyThrows;
@@ -526,7 +528,37 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
   }
 
   @Test
-  void givenSourceDependOnExpression_whenEvaluate_thenThrowsException() {
+  void givenNotMatchedSourceConditions_whenChecking_thenNoException() {
+    Map<String, Object> inputs = new HashMap<>();
+    Map<String, Object> body = new HashMap<>();
+    inputs.put("body", body);
+    body.put("a1", "roll3");
+    body.put("a2", "roll1");
+    body.put("a3", "roll2");
+    List<String> pathsExpected422 = List.of();
+    DocumentContext documentContext = JsonPath.parse(inputs);
+    ComponentAPITargetFacets.Mapper mapper = new ComponentAPITargetFacets.Mapper();
+    mapper.setSource("@{{a1}}");
+    mapper.setSourceConditions(getSourceConditions());
+    Assertions.assertDoesNotThrow(
+        () ->
+            mappingMatrixCheckerActionRunner.checkEnumValue(
+                documentContext, mapper, inputs, pathsExpected422));
+
+    Assertions.assertDoesNotThrow(
+        () ->
+            mappingMatrixCheckerActionRunner.checkConstantValue(
+                documentContext, mapper, inputs, pathsExpected422));
+
+    mapper.setSourceLocation("BODY");
+    Assertions.assertDoesNotThrow(
+        () ->
+            mappingMatrixCheckerActionRunner.checkMappingValue(
+                documentContext, mapper, inputs, pathsExpected422));
+  }
+
+  @Test
+  void givenSourceDependOnExpression_whenEvaluate_thenReturnTrue() {
     Map<String, Object> inputs = new HashMap<>();
     Map<String, Object> body = new HashMap<>();
     body.put("a1", "roll1");

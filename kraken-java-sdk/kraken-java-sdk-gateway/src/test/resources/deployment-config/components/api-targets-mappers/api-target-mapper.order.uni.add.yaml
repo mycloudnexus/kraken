@@ -56,15 +56,27 @@ spec:
           - name: mapper.order.eline.add.rollInterval.amount
             title: " quote item Term roll duration"
             source: "@{{productOrderItem[0].requestedItemTerm.rollInterval.amount}}"
-            target: ""
             sourceLocation: BODY
+            sourceConditionExpression:
+            sourceConditions:
+              - name: endOfTermAction
+                key: "@{{productOrderItem[0].requestedItemTerm.endOfTermAction}}"
+                val: roll
+                operator: eq
+            target: ""
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.order.eline.add.rollInterval.units
             title: " quote item Term roll unit"
             source: "@{{productOrderItem[0].requestedItemTerm.rollInterval.units}}"
-            target: ""
             sourceLocation: BODY
+            sourceConditionExpression:
+            sourceConditions:
+              - name: endOfTermAction
+                key: "@{{productOrderItem[0].requestedItemTerm.endOfTermAction}}"
+                val: roll
+                operator: eq
+            target: ""
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.order.uni.add.place.id
