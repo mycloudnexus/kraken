@@ -31,7 +31,7 @@ public class ClientCredentialTokenProvider implements ExternalSystemTokenProvide
 
   private String cachedToken = null;
 
-  private volatile WebClient webClient = null;
+  private WebClient webClient = null;
 
   private final SyncProperty syncProperty;
 
@@ -91,9 +91,6 @@ public class ClientCredentialTokenProvider implements ExternalSystemTokenProvide
   }
 
   private WebClient getWebClient() {
-    if (this.webClient != null) {
-      return this.webClient;
-    }
     synchronized (this) {
       if (this.webClient == null) {
         this.webClient =
