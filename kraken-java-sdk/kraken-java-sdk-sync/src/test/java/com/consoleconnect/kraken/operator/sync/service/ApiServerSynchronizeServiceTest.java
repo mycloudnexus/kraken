@@ -95,9 +95,9 @@ public class ApiServerSynchronizeServiceTest extends AbstractIntegrationTest {
     return new ApiServerSynchronizeService(
         syncProperty,
         webClient,
+        externalSystemTokenProvider,
         dataIngestionJob,
         unifiedAssetRepository,
-        applicationContext,
-        externalSystemTokenProvider);
+        applicationContext);
   }
 }

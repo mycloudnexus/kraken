@@ -6,6 +6,7 @@ import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.sync.MockServerTest;
 import com.consoleconnect.kraken.operator.sync.model.SyncProperty;
+import com.consoleconnect.kraken.operator.sync.service.security.ExternalSystemTokenProvider;
 import java.util.UUID;
 import lombok.SneakyThrows;
 import okhttp3.mockwebserver.MockResponse;
@@ -15,9 +16,12 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.reactive.function.client.WebClient;
 
 class KrakenServiceConnectorTest extends MockServerTest {
+
+  @Autowired ExternalSystemTokenProvider externalSystemTokenProvider;
 
   static MockWebServer mockWebServer = new MockWebServer();
 
@@ -41,7 +45,7 @@ class KrakenServiceConnectorTest extends MockServerTest {
     WebClient webClient = WebClient.builder().baseUrl(mockServerUrl).build();
 
     KrakenServerConnector krakenServerConnector =
-        new KrakenServerConnector(syncProperty, webClient);
+        new KrakenServerConnector(syncProperty, webClient, externalSystemTokenProvider);
 
     MockResponse mockResponse = new MockResponse();
     mockResponse.setResponseCode(200);
@@ -68,7 +72,7 @@ class KrakenServiceConnectorTest extends MockServerTest {
     WebClient webClient = WebClient.builder().baseUrl(mockServerUrl).build();
 
     KrakenServerConnector krakenServerConnector =
-        new KrakenServerConnector(syncProperty, webClient);
+        new KrakenServerConnector(syncProperty, webClient, externalSystemTokenProvider);
 
     MockResponse mockResponse = new MockResponse();
     mockResponse.setResponseCode(400);
