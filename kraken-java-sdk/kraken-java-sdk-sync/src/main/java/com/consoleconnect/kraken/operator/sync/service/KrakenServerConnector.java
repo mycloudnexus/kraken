@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -21,19 +20,22 @@ import org.springframework.web.util.UriBuilder;
 import reactor.core.publisher.Mono;
 
 @Slf4j
-@Service
 public class KrakenServerConnector {
 
   @Getter private final SyncProperty appProperty;
   private final WebClient webClient;
 
-  private volatile ExternalSystemTokenProvider agentTokenProvider = null;
+  private ExternalSystemTokenProvider agentTokenProvider = null;
 
   public static final String CLIENT_ID = IpUtils.getHostAddress();
 
-  public KrakenServerConnector(SyncProperty appProperty, WebClient webClient) {
+  public KrakenServerConnector(
+      SyncProperty appProperty,
+      WebClient webClient,
+      ExternalSystemTokenProvider externalSystemTokenProvider) {
     this.appProperty = appProperty;
     this.webClient = webClient;
+    this.agentTokenProvider = externalSystemTokenProvider;
   }
 
   public HttpResponse<Void> curl(HttpMethod method, String path, Object body) {
@@ -120,20 +122,6 @@ public class KrakenServerConnector {
   }
 
   private String getToken() {
-    return getAgentTokenProvider().getToken();
-  }
-
-  private ExternalSystemTokenProvider getAgentTokenProvider() {
-    if (this.agentTokenProvider != null) {
-      return this.agentTokenProvider;
-    }
-    synchronized (this) {
-      if (this.agentTokenProvider == null) {
-        this.agentTokenProvider =
-            ApplicationContextProvider.getApplicationContext()
-                .getBean(ExternalSystemTokenProvider.class);
-      }
-      return agentTokenProvider;
-    }
+    return agentTokenProvider.getToken();
   }
 }

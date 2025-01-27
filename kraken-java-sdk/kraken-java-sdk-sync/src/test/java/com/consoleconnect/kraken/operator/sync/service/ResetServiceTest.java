@@ -12,21 +12,28 @@ import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.Paging;
 import com.consoleconnect.kraken.operator.sync.MockServerTest;
 import com.consoleconnect.kraken.operator.sync.model.MgmtEvent;
+import com.consoleconnect.kraken.operator.sync.service.security.ExternalSystemTokenProvider;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import reactor.core.publisher.Mono;
 
 class ResetServiceTest extends MockServerTest {
 
+  @Autowired private ExternalSystemTokenProvider externalSystemTokenProvider;
+
   @Test
   void givenEventRecord_thenClearData() {
     final ResetService service =
         new ResetService(
-            syncProperty, mockServer.getWebClient(), Mockito.mock(UnifiedAssetService.class));
+            syncProperty,
+            mockServer.getWebClient(),
+            externalSystemTokenProvider,
+            Mockito.mock(UnifiedAssetService.class));
     MgmtEvent event = new MgmtEvent();
     event.setEventType(MgmtEventType.RESET);
     event.setResourceId("mef.sonata.api-target-mapper.order.uni.add");
@@ -57,7 +64,10 @@ class ResetServiceTest extends MockServerTest {
   void givenEvent_thenUpdateSuccess() {
     final ResetService service =
         new ResetService(
-            syncProperty, mockServer.getWebClient(), Mockito.mock(UnifiedAssetService.class));
+            syncProperty,
+            mockServer.getWebClient(),
+            externalSystemTokenProvider,
+            Mockito.mock(UnifiedAssetService.class));
     MgmtEvent event = new MgmtEvent();
     event.setId("123");
     mockServer
