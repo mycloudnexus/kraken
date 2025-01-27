@@ -89,7 +89,15 @@ app:
     page: 100
   controlPlane:
     url: http://localhost:4567
-    token: 123456
+    auth:
+      internalToken:
+        enabled: true
+        accessToken: ${KRAKEN_CONTROL_PLANE_AGENT_TOKEN:123456}
+      clientCredentials:
+        enabled: false
+        authServerUrl: ${app.controlPlane.url}
+        clientId: ${KRAKEN_CONTROL_PLANE_AGENT_CLIENT_ID:123456}
+        clientSecret: ${KRAKEN_CONTROL_PLANE_AGENT_CLIENT_SECRET:123456}
     push-activity-log-external:
       batch-size: 30
       enabled: true

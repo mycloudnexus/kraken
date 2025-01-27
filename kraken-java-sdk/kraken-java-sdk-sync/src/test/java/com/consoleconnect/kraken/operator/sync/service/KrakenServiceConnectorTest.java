@@ -4,6 +4,7 @@ import com.consoleconnect.kraken.operator.core.client.ClientEvent;
 import com.consoleconnect.kraken.operator.core.client.ClientEventTypeEnum;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
+import com.consoleconnect.kraken.operator.sync.MockServerTest;
 import com.consoleconnect.kraken.operator.sync.model.SyncProperty;
 import java.util.UUID;
 import lombok.SneakyThrows;
@@ -16,7 +17,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.reactive.function.client.WebClient;
 
-class KrakenServiceConnectorTest {
+class KrakenServiceConnectorTest extends MockServerTest {
 
   static MockWebServer mockWebServer = new MockWebServer();
 
@@ -36,9 +37,6 @@ class KrakenServiceConnectorTest {
   @Test
   void givenCorrectRequestPayload_whenPost_thenResponseOK() {
     String mockServerUrl = mockWebServer.url("").toString();
-    SyncProperty syncProperty = new SyncProperty();
-    syncProperty.getControlPlane().setUrl(mockServerUrl);
-    syncProperty.getControlPlane().setToken("Bearer token");
 
     WebClient webClient = WebClient.builder().baseUrl(mockServerUrl).build();
 
@@ -57,7 +55,7 @@ class KrakenServiceConnectorTest {
     Assertions.assertEquals(
         syncProperty.getControlPlane().getPushEventEndpoint(), recordedRequest.getPath());
     Assertions.assertEquals("POST", recordedRequest.getMethod());
-    Assertions.assertEquals("Bearer token", recordedRequest.getHeader("Authorization"));
+    Assertions.assertEquals("Bearer 123456", recordedRequest.getHeader("Authorization"));
   }
 
   @SneakyThrows
@@ -66,7 +64,6 @@ class KrakenServiceConnectorTest {
     String mockServerUrl = mockWebServer.url("").toString();
     SyncProperty syncProperty = new SyncProperty();
     syncProperty.getControlPlane().setUrl(mockServerUrl);
-    syncProperty.getControlPlane().setToken("Bearer token");
 
     WebClient webClient = WebClient.builder().baseUrl(mockServerUrl).build();
 
@@ -85,6 +82,6 @@ class KrakenServiceConnectorTest {
     Assertions.assertEquals(
         syncProperty.getControlPlane().getPushEventEndpoint(), recordedRequest.getPath());
     Assertions.assertEquals("POST", recordedRequest.getMethod());
-    Assertions.assertEquals("Bearer token", recordedRequest.getHeader("Authorization"));
+    Assertions.assertEquals("Bearer 123456", recordedRequest.getHeader("Authorization"));
   }
 }

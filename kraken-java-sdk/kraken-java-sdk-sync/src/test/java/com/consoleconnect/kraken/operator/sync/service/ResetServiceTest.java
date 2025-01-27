@@ -1,5 +1,6 @@
 package com.consoleconnect.kraken.operator.sync.service;
 
+import static com.consoleconnect.kraken.operator.sync.ClientCredentialMockServerTest.ACCESS_TOKEN;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.doNothing;
@@ -23,7 +24,6 @@ class ResetServiceTest extends MockServerTest {
 
   @Test
   void givenEventRecord_thenClearData() {
-    syncProperty.getControlPlane().setToken(ACCESS_TOKEN);
     final ResetService service =
         new ResetService(
             syncProperty, mockServer.getWebClient(), Mockito.mock(UnifiedAssetService.class));
@@ -55,7 +55,6 @@ class ResetServiceTest extends MockServerTest {
 
   @Test
   void givenEvent_thenUpdateSuccess() {
-    syncProperty.getControlPlane().setToken(ACCESS_TOKEN);
     final ResetService service =
         new ResetService(
             syncProperty, mockServer.getWebClient(), Mockito.mock(UnifiedAssetService.class));

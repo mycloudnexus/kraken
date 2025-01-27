@@ -4,6 +4,7 @@ import com.consoleconnect.kraken.operator.core.client.ClientEvent;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import com.consoleconnect.kraken.operator.core.toolkit.IpUtils;
 import com.consoleconnect.kraken.operator.sync.model.SyncProperty;
+import com.consoleconnect.kraken.operator.sync.service.security.ExternalSystemTokenProvider;
 import java.net.URI;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -12,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -19,10 +21,13 @@ import org.springframework.web.util.UriBuilder;
 import reactor.core.publisher.Mono;
 
 @Slf4j
+@Service
 public class KrakenServerConnector {
 
   @Getter private final SyncProperty appProperty;
   private final WebClient webClient;
+
+  private volatile ExternalSystemTokenProvider agentTokenProvider = null;
 
   public static final String CLIENT_ID = IpUtils.getHostAddress();
 
@@ -54,7 +59,7 @@ public class KrakenServerConnector {
         blockCurl(
             method,
             uriBuilder -> uriBuilder.path(path).build(),
-            appProperty.getControlPlane().getToken(),
+            this.getToken(),
             body,
             responseBodyType);
     if (res.getCode() == 200) {
@@ -70,8 +75,7 @@ public class KrakenServerConnector {
       Function<UriBuilder, URI> uriFunction,
       Object body,
       ParameterizedTypeReference<HttpResponse<T>> responseBodyType) {
-    return blockCurl(
-        method, uriFunction, appProperty.getControlPlane().getToken(), body, responseBodyType);
+    return blockCurl(method, uriFunction, this.getToken(), body, responseBodyType);
   }
 
   public <T> HttpResponse<T> blockCurl(
@@ -113,5 +117,23 @@ public class KrakenServerConnector {
 
   public HttpResponse<Void> pushEvent(ClientEvent clientEvent) {
     return curl(HttpMethod.POST, appProperty.getControlPlane().getPushEventEndpoint(), clientEvent);
+  }
+
+  private String getToken() {
+    return getAgentTokenProvider().getToken();
+  }
+
+  private ExternalSystemTokenProvider getAgentTokenProvider() {
+    if (this.agentTokenProvider != null) {
+      return this.agentTokenProvider;
+    }
+    synchronized (this) {
+      if (this.agentTokenProvider == null) {
+        this.agentTokenProvider =
+            ApplicationContextProvider.getApplicationContext()
+                .getBean(ExternalSystemTokenProvider.class);
+      }
+      return agentTokenProvider;
+    }
   }
 }
