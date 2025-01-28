@@ -43,6 +43,7 @@ import {
   getAPIServers,
   getComponentDetailV2,
   getValidateServerName,
+  editContactInformation,
 } from "@/services/products";
 import { STALE_TIME } from "@/utils/constants/common";
 import {
@@ -136,6 +137,7 @@ export const PRODUCT_CACHE_KEYS = {
   upgrade_mapping_template_stage: "upgrade_mapping_template_stage",
   get_validate_api_server_name: "get_validate_api_server_name",
   verify_product: "verify_product",
+  edit_contact_information: "edit_contact_information",
 };
 
 export const useCreateNewComponent = () => {
@@ -793,5 +795,13 @@ export const useGetValidateServerName = () => {
         queryKey: [PRODUCT_CACHE_KEYS.get_validate_api_server_name],
       });
     },
+  });
+};
+
+export const useEditContactInformation = () => {
+  return useMutation<any, Error>({
+    mutationKey: [PRODUCT_CACHE_KEYS.edit_contact_information],
+    mutationFn: ({ productId, componentId, id, data }: any) =>
+      editContactInformation(productId, componentId, id, data),
   });
 };

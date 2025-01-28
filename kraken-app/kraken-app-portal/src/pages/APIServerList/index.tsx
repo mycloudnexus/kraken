@@ -3,11 +3,27 @@ import OrderIcon from "@/assets/standardAPIMapping/order.svg";
 import QuoteIcon from "@/assets/standardAPIMapping/quote.svg";
 import Flex from "@/components/Flex";
 import { Text } from "@/components/Text";
-import { useGetSellerAPIList, useGetSellerContacts } from "@/hooks/product";
+import {
+  useGetSellerAPIList,
+  useGetSellerContacts,
+  useEditContactInformation,
+} from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
 import { IComponent } from "@/utils/types/component.type";
 import { CloseOutlined } from "@ant-design/icons";
-import { Button, Card, Empty, Spin, Tabs, Row, Col, Tag, Drawer } from "antd";
+import {
+  Button,
+  Card,
+  Empty,
+  Spin,
+  Tabs,
+  Row,
+  Col,
+  Tag,
+  Drawer,
+  Input,
+  notification,
+} from "antd";
 import { isEmpty } from "lodash";
 import { Dispatch, SetStateAction, useState } from "react";
 import { useNavigate } from "react-router";
@@ -17,9 +33,11 @@ import styles from "./index.module.scss";
 type DrawerDetails = {
   apiComponent: string;
   productType: string;
-  contactName: string;
-  email: string;
-  phoneNumber: string;
+  contactName?: string;
+  email?: string;
+  phoneNumber?: string;
+  componentKey: string;
+  key: string;
 };
 
 const getCardTitle = (componentKey: string) => {
@@ -47,22 +65,21 @@ const getCardIcon = (componentKey: string) => {
 const ContactInformationSetup = ({
   setDrawerOpen,
   setDrawerDetails,
+  sellerContactsList,
 }: {
   setDrawerOpen: Dispatch<SetStateAction<boolean>>;
   setDrawerDetails: Dispatch<SetStateAction<DrawerDetails>>;
+  sellerContactsList: IComponent[];
 }) => {
-  const { currentProduct } = useAppStore();
-  const { data: dataList } = useGetSellerContacts(currentProduct);
-
   return (
     <>
-      {isEmpty(dataList?.data) ? (
+      {isEmpty(sellerContactsList) ? (
         <Flex style={{ height: "50vh" }}>
           <Empty />
         </Flex>
       ) : (
         <Row gutter={16}>
-          {dataList.data.map((item: IComponent) => (
+          {sellerContactsList.map((item: IComponent) => (
             <Col key={item.id} span={12}>
               <Card
                 title={
@@ -95,9 +112,11 @@ const ContactInformationSetup = ({
                           item.metadata.labels["access.eline"] === "true"
                             ? "Access Eline"
                             : "Internet Access",
-                        contactName: item?.facets?.sellerInfo?.name || "",
-                        email: item?.facets?.sellerInfo?.emailAddress || "",
-                        phoneNumber: item?.facets?.sellerInfo?.number || "",
+                        contactName: item?.facets?.sellerInfo?.name,
+                        email: item?.facets?.sellerInfo?.emailAddress,
+                        phoneNumber: item?.facets?.sellerInfo?.number,
+                        componentKey: item?.metadata?.labels?.componentKey,
+                        key: item?.metadata?.key,
                       });
                       setDrawerOpen(true);
                     }}
@@ -170,15 +189,24 @@ const APIServerList = () => {
     isRefetching,
     refetch,
   } = useGetSellerAPIList(currentProduct);
+  const { data: sellerContactsListResponse, refetch: contactsListRefetch } =
+    useGetSellerContacts(currentProduct);
+  const { mutateAsync: updateContactInformation } = useEditContactInformation();
   const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerDetails, setDrawerDetails] = useState<DrawerDetails>({
     apiComponent: "-",
     productType: "-",
-    contactName: "-",
-    email: "-",
-    phoneNumber: "-",
+    componentKey: "-",
+    key: "-",
   });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDrawerDetails({
+      ...drawerDetails,
+      [e.currentTarget.name]: e.currentTarget.value,
+    });
+  };
 
   return (
     <div style={{ width: "100%" }}>
@@ -228,6 +256,7 @@ const APIServerList = () => {
               <ContactInformationSetup
                 setDrawerOpen={setDrawerOpen}
                 setDrawerDetails={setDrawerDetails}
+                sellerContactsList={sellerContactsListResponse?.data}
               />
             ),
           },
@@ -242,8 +271,97 @@ const APIServerList = () => {
         }
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
+        footer={
+          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <Button
+              style={{ margin: "5px" }}
+              onClick={() => setDrawerOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              style={{ margin: "5px" }}
+              type="primary"
+              onClick={async () => {
+                try {
+                  await updateContactInformation({
+                    productId: currentProduct,
+                    componentId: drawerDetails.componentKey,
+                    id: drawerDetails.key,
+                    data: {
+                      name: drawerDetails.contactName,
+                      emailAddress: drawerDetails.email,
+                      number: drawerDetails.phoneNumber,
+                    },
+                  } as any).then(contactsListRefetch);
+                  notification.success({
+                    message: "Updated contact information",
+                    duration: 3,
+                  });
+                } catch (e) {
+                  notification.error({
+                    message: "Something went wrong",
+                    duration: 3,
+                  });
+                } finally {
+                  setDrawerOpen(false);
+                }
+              }}
+            >
+              Ok
+            </Button>
+          </div>
+        }
       >
-        {JSON.stringify(drawerDetails)}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <Text.LightSmall
+            className={styles["contactInformation-field"]}
+            color="#00000073"
+          >
+            API component
+          </Text.LightSmall>
+          <Text.LightSmall className={styles["contactInformation-field"]}>
+            {drawerDetails.apiComponent || "-"}
+          </Text.LightSmall>
+          <Text.LightSmall
+            className={styles["contactInformation-field"]}
+            color="#00000073"
+          >
+            Product type
+          </Text.LightSmall>
+          <Text.LightSmall className={styles["contactInformation-field"]}>
+            {drawerDetails.productType || "-"}
+          </Text.LightSmall>
+          <Text.LightSmall className={styles["contactInformation-field"]}>
+            Contact name
+          </Text.LightSmall>
+          <Input
+            name="contactName"
+            value={drawerDetails?.contactName}
+            onChange={handleInputChange}
+          />
+          <Text.LightSmall className={styles["contactInformation-field"]}>
+            Email
+          </Text.LightSmall>
+          <Input
+            name="email"
+            value={drawerDetails?.email}
+            onChange={handleInputChange}
+          />
+          <Text.LightSmall className={styles["contactInformation-field"]}>
+            Phone number
+          </Text.LightSmall>
+          <Input
+            name="phoneNumber"
+            value={drawerDetails?.phoneNumber}
+            onChange={handleInputChange}
+          />
+        </div>
       </Drawer>
     </div>
   );
