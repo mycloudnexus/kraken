@@ -63,3 +63,20 @@
     }
   }
 }
+
+.seller-api-tabs-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 15px;
+}
+
+.contactInformation-field {
+  margin: 10px 0;
+}
+
+.contacts-icon {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+}

@@ -49,6 +49,7 @@ import {
   COMPONENT_KIND_API,
   COMPONENT_KIND_API_SPEC,
   COMPONENT_KIND_API_TARGET_SPEC,
+  COMPONENT_KIND_SELLER_CONTACT,
 } from "@/utils/constants/product";
 import { queryClient } from "@/utils/helpers/reactQuery";
 import {
@@ -118,7 +119,8 @@ export const PRODUCT_CACHE_KEYS = {
   get_product_deployment_list: "get_product_deployment_list",
   get_product_env_activity_detail: "get_product_env_activity_detail",
   get_product_env_activity_list: "get_product_env_activity_list",
-  get_product_env_activity_list_mutation: "get_product_env_activity_list_mutation",
+  get_product_env_activity_list_mutation:
+    "get_product_env_activity_list_mutation",
   get_product_push_history_log: "get_product_push_history_log",
   get_release_list: "get_release_list",
   get_running_api_list: "get_running_api_list",
@@ -208,6 +210,19 @@ export const useGetComponentListAPISpec = (productId: string) => {
   });
 };
 
+export const useGetSellerContacts = (productId: string) => {
+  return useQuery<any, Error>({
+    queryKey: [PRODUCT_CACHE_KEYS.get_component_list_api_spec, productId],
+    queryFn: () =>
+      getListComponents(productId, {
+        kind: COMPONENT_KIND_SELLER_CONTACT,
+        size: 500,
+      }),
+    enabled: Boolean(productId),
+    select: (data) => data?.data,
+  });
+};
+
 export const useGetComponentListV2 = (
   productId: string,
   targetMapperKey: string
@@ -245,7 +260,7 @@ export const useGetProductEnvs = (productId: string, enabled = true) => {
 export const useGetProductEnvActivities = (
   productId: string,
   envId: string,
-  params: unknown,
+  params: unknown
 ) => {
   return useQuery<AxiosResponse, Error, IPagingData<IActivityLog>>({
     queryKey: [
@@ -362,12 +377,16 @@ export const useEditComponentV2 = () => {
   return useMutation<any, Error>({
     mutationKey: [PRODUCT_CACHE_KEYS.edit_component_detail],
     mutationFn: ({ productId, componentId, data }: any) =>
-        editComponentDetail(productId, componentId, data),
-    onSuccess:(data:any,variables:any) => {
+      editComponentDetail(productId, componentId, data),
+    onSuccess: (data: any, variables: any) => {
       if (data?.code == 200) {
         queryClient.invalidateQueries({
-          queryKey: [PRODUCT_CACHE_KEYS.get_component_detail, variables?.productId, variables?.componentId],
-        })
+          queryKey: [
+            PRODUCT_CACHE_KEYS.get_component_detail,
+            variables?.productId,
+            variables?.componentId,
+          ],
+        });
       }
     },
   });
@@ -773,6 +792,6 @@ export const useGetValidateServerName = () => {
       queryClient.invalidateQueries({
         queryKey: [PRODUCT_CACHE_KEYS.get_validate_api_server_name],
       });
-    }
+    },
   });
 };
