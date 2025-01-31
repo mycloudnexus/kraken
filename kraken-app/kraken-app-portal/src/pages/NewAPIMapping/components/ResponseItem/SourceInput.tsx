@@ -1,3 +1,4 @@
+import { AutoGrowingInput } from "@/components/form";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { EnumRightType } from "@/utils/types/common.type";
 import { IResponseMapping } from "@/utils/types/component.type";
@@ -7,7 +8,6 @@ import clsx from "clsx";
 import { cloneDeep, set } from "lodash";
 import { LocationSelector } from "../LocationSelector";
 import styles from "./index.module.scss";
-import { AutoGrowingInput } from "@/components/form";
 
 export function SourceInput({
   item,
@@ -47,7 +47,9 @@ export function SourceInput({
           value={item.sourceLocation}
           onChange={(value) => handleChange("sourceLocation", value)}
         />
-      ) : <div className={styles.bloater}></div>}
+      ) : (
+        <div className={styles.bloater}></div>
+      )}
 
       <Tooltip title={item?.source}>
         <AutoGrowingInput
@@ -55,7 +57,7 @@ export function SourceInput({
           id={id}
           variant="filled"
           placeholder="Select or input property"
-          className={clsx(styles.input, {
+          className={clsx({
             [styles.activeInput]: isFocused,
             [styles.error]: errors?.responseIds?.has(item.id!) && !item.source,
           })}
