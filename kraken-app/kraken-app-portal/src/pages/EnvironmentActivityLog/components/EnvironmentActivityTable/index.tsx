@@ -24,6 +24,7 @@ type EnvironmentActivityTablePropsType = {
   openActionModal: (requestId: string) => void;
   size?: Size;
   sizeWrapper?: Size;
+  pathQuery: string;
 };
 
 const initPagination = {
@@ -32,7 +33,7 @@ const initPagination = {
 };
 
 const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
-  const { openActionModal, size, sizeWrapper } = props;
+  const { openActionModal, size, sizeWrapper, pathQuery } = props;
   const { currentProduct } = useAppStore();
   const { envId } = useParams();
 
@@ -270,6 +271,13 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
     }
   }, [data, isLoading]);
 
+  useEffect(() => {
+    setQueryParams({
+      ...queryParams,
+      path: pathQuery,
+    });
+  }, [pathQuery]);
+
   const handleTableChange: TableProps<IActivityLog>["onChange"] = (
     pagination,
     filters
@@ -278,7 +286,8 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
       ...queryParams,
       page: (pagination.current ?? 1) - 1,
       size: pagination.pageSize,
-      ...filters,
+      method: filters.name,
+      statusCode: filters.status,
     });
   };
 

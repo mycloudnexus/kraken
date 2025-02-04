@@ -3,7 +3,7 @@ import { useGetProductEnvs } from "@/hooks/product";
 import { useGetPushButtonEnabled } from "@/hooks/pushApiEvent";
 import useSize from "@/hooks/useSize";
 import { useAppStore } from "@/stores/app.store";
-import { Button, Flex, Tabs } from "antd";
+import { Button, Flex, Tabs, Input } from "antd";
 import { startCase } from "lodash";
 import { useMemo, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -13,6 +13,8 @@ import EnvironmentActivityTable from "./components/EnvironmentActivityTable";
 import PushHistoryList from "./components/PushHistoryList";
 import PushHistoryModal from "./components/PushHistoryModal";
 import styles from "./index.module.scss";
+
+const { Search } = Input;
 
 const EnvironmentActivityLog = () => {
   const { envId } = useParams();
@@ -26,6 +28,7 @@ const EnvironmentActivityLog = () => {
   const sizeWrapper = useSize(refWrapper);
   const [mainTabKey, setMainTabKey] = useState<string>("activityLog");
   const { value: isOpen, setTrue: open, setFalse: close } = useBoolean(false);
+  const [pathQuery, setPathQuery] = useState("");
 
   const envOptions = useMemo(() => {
     return (
@@ -58,11 +61,16 @@ const EnvironmentActivityLog = () => {
             openActionModal={openActionModal}
             size={size}
             sizeWrapper={sizeWrapper}
+            pathQuery={pathQuery}
           />
         ),
       })) ?? []
     );
-  }, [envData]);
+  }, [envData, pathQuery]);
+
+  const searchPathQuery = (value: string) => {
+    setPathQuery(value);
+  };
 
   return (
     <PageLayout title="API activity log">
@@ -107,6 +115,13 @@ const EnvironmentActivityLog = () => {
               onChange={(key) => {
                 navigate(`/env/${key}`);
               }}
+              tabBarExtraContent={
+                <Search
+                  placeholder="Please enter path keywords"
+                  style={{ width: "250px" }}
+                  onSearch={searchPathQuery}
+                />
+              }
             />
           ) : (
             <PushHistoryList />
