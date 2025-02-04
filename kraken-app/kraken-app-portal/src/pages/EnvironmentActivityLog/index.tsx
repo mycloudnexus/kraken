@@ -1,14 +1,9 @@
 import { PageLayout } from "@/components/Layout";
-import LogMethodTag from "@/components/LogMethodTag";
-import TrimmedPath from "@/components/TrimmedPath";
 import { useGetProductEnvs } from "@/hooks/product";
 import { useGetPushButtonEnabled } from "@/hooks/pushApiEvent";
 import useSize from "@/hooks/useSize";
-import { toDateTime } from "@/libs/dayjs";
 import { useAppStore } from "@/stores/app.store";
-import { IActivityLog } from "@/utils/types/env.type";
 import { Button, Flex, Tabs } from "antd";
-import { ColumnsType } from "antd/es/table";
 import { startCase } from "lodash";
 import { useMemo, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -48,59 +43,10 @@ const EnvironmentActivityLog = () => {
     [mainTabKey]
   );
 
-  const columns: ColumnsType<IActivityLog> = [
-    {
-      key: "name",
-      title: "Method",
-      render: (log: IActivityLog) => <LogMethodTag method={log.method} />,
-      width: 100,
-    },
-    {
-      key: "name",
-      title: "Path",
-      width: 300,
-      render: (log: IActivityLog) => (
-        <Flex>
-          <TrimmedPath path={log.path} />
-        </Flex>
-      ),
-    },
-    {
-      key: "buyerName",
-      title: "Buyer name",
-      width: 200,
-      render: (log: IActivityLog) => log.buyerName,
-    },
-    {
-      key: "status",
-      title: "Status code",
-      width: 140,
-      render: (log: IActivityLog) => log.httpStatusCode,
-    },
-    {
-      key: "date",
-      title: "Time",
-      render: (log: IActivityLog) => toDateTime(log.createdAt),
-      width: 200,
-    },
-    {
-      key: "action",
-      title: "Action",
-      width: 160,
-      fixed: "right",
-      render: (log: IActivityLog) => (
-        <Button
-          type="link"
-          onClick={() => {
-            setModalActivityId(log.requestId);
-            setModalOpen(true);
-          }}
-        >
-          View details
-        </Button>
-      ),
-    },
-  ];
+  const openActionModal = (requestId: string) => {
+    setModalActivityId(requestId);
+    setModalOpen(true);
+  };
 
   const envTabs = useMemo(() => {
     return (
@@ -109,7 +55,7 @@ const EnvironmentActivityLog = () => {
         label: `${startCase(env.name)} Environment`,
         children: (
           <EnvironmentActivityTable
-            columns={columns}
+            openActionModal={openActionModal}
             size={size}
             sizeWrapper={sizeWrapper}
           />

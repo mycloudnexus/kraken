@@ -24,7 +24,6 @@
   }
 }
 
-
 .table {
   max-width: 100%;
 
@@ -116,4 +115,19 @@
 
 .tableWrapper {
   flex: 1;
+}
+
+.statusIcon {
+  &-success {
+    padding-right: 3px;
+    color: #389e0d;
+  }
+  &-warn {
+    padding-right: 3px;
+    color: #fa8c16;
+  }
+  &-error {
+    padding-right: 3px;
+    color: #cf1322;
+  }
 }
