@@ -11,7 +11,7 @@ spec:
   matrix:
     mef.sonata.api-target.order.eline.delete:
       - name: product_type_eline
-        path: "$.body.productOrderItem[*].product.productConfiguration.['@type']"
+        path: "$.body.productOrderItem[*].['id']"
         expectType: EXPECTED
         value: ACCESS_E_LINE
       - name: action_delete

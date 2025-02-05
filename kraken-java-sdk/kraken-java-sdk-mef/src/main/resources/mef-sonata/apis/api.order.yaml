@@ -47,8 +47,7 @@ spec:
                 let matrixConfigKey = '';
                 let errorCode = '';
                 let errorMsg = '';
-                let productConfiguration = input.productOrderItem?.product?.productConfiguration;
-                let type = productConfiguration?.['@type'];
+                let type = input.productOrderItem?.id;
                 let action = input.productOrderItem?.action;
                 let typeArr = ['UNI', 'ACCESS_E_LINE'];
                 let actionArr = ['add', 'delete'];
@@ -69,10 +68,10 @@ spec:
                   if (!typeArr.includes(type) && actionArr.includes(action)){
                     if (type === undefined) {
                       errorCode = '400';
-                      errorArr.push(`expect productOrderItem.product.productConfiguration.@type in [ ${typeArr} ], but missing property.`);
+                      errorArr.push(`expect productOrderItem.id in [ ${typeArr} ], but missing property.`);
                     } else {
                       errorCode = '422';
-                      errorArr.push(`expect @{{productOrderItem.product.productConfiguration.@type}} in [ ${typeArr} ], but ${type}.`);
+                      errorArr.push(`expect @{{productOrderItem.id}} in [ ${typeArr} ], but ${type}.`);
                     }
                   } else if (!actionArr.includes(action) && typeArr.includes(type)) {
                     if (action === undefined) {
@@ -84,7 +83,7 @@ spec:
                     }
                   } else {
                     errorCode = '400';
-                    errorArr.push(`expect productOrderItem.product.productConfiguration.@type in [ ${typeArr} ], productOrderItem.action in [ ${actionArr} ] but missing property.`);
+                    errorArr.push(`expect productOrderItem.id in [ ${typeArr} ], productOrderItem.action in [ ${actionArr} ] but missing property.`);
                   }
                   errorMsg = errorArr.join(' ');
                   targetAPIConfigKey = 'targetKey:notFound';
