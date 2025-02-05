@@ -1,8 +1,10 @@
 package com.consoleconnect.kraken.operator.gateway;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasNoJsonPath;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 
 import com.consoleconnect.kraken.operator.core.dto.StateValueMappingDto;
 import com.consoleconnect.kraken.operator.core.enums.MappingTypeEnum;
@@ -11,13 +13,35 @@ import com.consoleconnect.kraken.operator.gateway.runner.MappingTransformer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
+import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
+import lombok.SneakyThrows;
 import org.apache.commons.collections4.MapUtils;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.test.context.ContextConfiguration;
 
-class MappingTransformerTest implements MappingTransformer {
+@MockIntegrationTest
+@ContextConfiguration(classes = CustomConfig.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+class MappingTransformerTest  extends AbstractIntegrationTest implements MappingTransformer {
+
+  @Test
+  @SneakyThrows
+  void givenEmptyOrNegativeDutyFreeAmountValue_whenDeleteNode_thenReturnOK() {
+    Map<String, String> checkPathMap = new HashMap<>();
+    String checkPath = "$['quoteItem'][0]['quoteItemPrice'][0]['price']['dutyFreeAmount']['value']";
+    String deletePath = "$.quoteItem[0].quoteItemPrice";
+    checkPathMap.put(checkPath, deletePath);
+    String input = readFileToString("/mockData/quoteResponseWithNegativeDutyFreeAmountValue.json");
+    String result = deleteNodeByPath(checkPathMap, input);
+    assertThat(result, hasNoJsonPath("$.quoteItem[0].quoteItemPrice"));
+  }
 
   @Test
   void givenJsonInput_whenDeleteNode_thenReturnOK() {
