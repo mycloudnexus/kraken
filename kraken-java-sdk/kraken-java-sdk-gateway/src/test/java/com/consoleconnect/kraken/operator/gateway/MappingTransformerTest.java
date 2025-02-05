@@ -4,18 +4,16 @@ import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasNoJsonPath;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
 
 import com.consoleconnect.kraken.operator.core.dto.StateValueMappingDto;
 import com.consoleconnect.kraken.operator.core.enums.MappingTypeEnum;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
 import com.consoleconnect.kraken.operator.gateway.runner.MappingTransformer;
+import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
+import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
-import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import lombok.SneakyThrows;
 import org.apache.commons.collections4.MapUtils;
 import org.junit.jupiter.api.Assertions;
@@ -29,7 +27,7 @@ import org.springframework.test.context.ContextConfiguration;
 @MockIntegrationTest
 @ContextConfiguration(classes = CustomConfig.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class MappingTransformerTest  extends AbstractIntegrationTest implements MappingTransformer {
+class MappingTransformerTest extends AbstractIntegrationTest implements MappingTransformer {
 
   @Test
   @SneakyThrows
@@ -49,7 +47,7 @@ class MappingTransformerTest  extends AbstractIntegrationTest implements Mapping
     checkPathMap.put("$.key1", "$.key1");
     checkPathMap.put("$.key2", "$.key2");
     checkPathMap.put("$.key3", "$.key3");
-    String input = "{\"key1\":\"\",\"key2\":0,\"key3\":false,\"key\":\"hello kraken\"}";
+    String input = "{\"key1\":\"\",\"key2\":-1,\"key3\":false,\"key\":\"hello kraken\"}";
     String result = deleteNodeByPath(checkPathMap, input);
     Assertions.assertEquals("{\"key\":\"hello kraken\"}", result);
   }
