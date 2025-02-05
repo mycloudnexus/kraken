@@ -94,6 +94,7 @@ class ApiActivityLogServiceTest extends AbstractIntegrationTest {
     apiActivityLogEntity.setHeaders(headers);
     apiActivityLogEntity.setBuyer(buyerId);
     apiActivityLogEntity.setCallSeq(0);
+    apiActivityLogEntity.setTriggeredAt(ZonedDateTime.now());
     apiActivityLogEntity = apiActivityLogRepository.save(apiActivityLogEntity);
     return apiActivityLogEntity;
   }

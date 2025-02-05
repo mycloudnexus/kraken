@@ -47,6 +47,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
   public static final String PARAM_NAME = "param";
   public static final String NOT_FOUND = "notFound";
   public static final String COLON = ":";
+  public static final String EXPECTED422_PATH_KEY = "expect-http-status-422-if-missing";
   private final UnifiedAssetService unifiedAssetService;
   private final UnifiedAssetRepository unifiedAssetRepository;
 
@@ -78,23 +79,24 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
   protected void onCheck(Map<String, Object> inputs) {
     Assert.notNull(inputs.get(MAPPING_MATRIX_KEY), "mappingMatrixKey must not be null");
     Assert.notNull(inputs.get(TARGET_KEY), "targetKey must not be null");
-    String componentKey = inputs.get(MAPPING_MATRIX_KEY).toString();
+    String matrixKey = inputs.get(MAPPING_MATRIX_KEY).toString();
     String targetKey = inputs.get(TARGET_KEY).toString();
     if (unifiedAssetRepository.findOneByKey(targetKey).isEmpty()) {
       throw KrakenException.badRequest(API_CASE_NOT_SUPPORTED.formatted("not deployed"));
     }
-    if (StringUtils.isNotBlank(componentKey)
-        && componentKey.endsWith(NOT_FOUND)
-        && componentKey.contains(COLON)) {
+    if (StringUtils.isNotBlank(matrixKey)
+        && matrixKey.endsWith(NOT_FOUND)
+        && matrixKey.contains(COLON)) {
       throw KrakenException.unProcessableEntityMissingProperty(
-          String.format("%s should exist in request", componentKey.split(COLON)[0]));
+          String.format("%s should exist in request", matrixKey.split(COLON)[0]));
     }
     if (targetKey.contains(ResponseCodeTransform.TARGET_KEY_NOT_FOUND)) {
       throw KrakenException.badRequest(
           API_CASE_NOT_SUPPORTED.formatted(":possibly product not supported"));
     }
-    // <mapper-key,<checkName,(path, expected)
-    Map<String, List<PathCheck>> facets = queryMatrixFacets(componentKey);
+    Paging<UnifiedAssetDto> matrixAssets = queryMatrixAssets(matrixKey);
+    // <mapper-key,[checkName,(path, expected)]>
+    Map<String, List<PathCheck>> facets = readMatrixFacets(matrixAssets);
     if (Objects.isNull(facets) || !facets.containsKey(targetKey)) {
       throw KrakenException.badRequest(
           API_CASE_NOT_SUPPORTED.formatted(":lack in check rules for target key: " + targetKey));
@@ -102,30 +104,45 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     if (unifiedAssetRepository.findOneByKey(targetKey).isEmpty()) {
       throw KrakenException.badRequest(API_CASE_NOT_SUPPORTED.formatted(":not deployed"));
     }
+
     // disable checking, 400
     checkDisabled(facets, targetKey);
-    // matrix checking, body-422, query-400
-    checkMatrixConstraints(facets, targetKey, inputs);
-    // mapper checking, body-422, query-400
-    checkMapperConstraints(targetKey, inputs);
+
+    List<String> pathsExpected422 = readExpected422Paths(matrixAssets);
+    // matrix checking, if-missing-return-400, wrong-value-return-422, paths under
+    // 'expect-http-status-422-if-missing' always return 422
+    checkMatrixConstraints(facets, targetKey, inputs, pathsExpected422);
+    // mapper checking, if-missing-return-400, wrong-value-return-422, paths under
+    // 'expect-http-status-422-if-missing' always return 422
+    checkMapperConstraints(targetKey, inputs, pathsExpected422);
   }
 
-  public Map<String, List<PathCheck>> queryMatrixFacets(String componentKey) {
-    Paging<UnifiedAssetDto> assetDtoPaging =
-        unifiedAssetService.findBySpecification(
-            Tuple2.ofList(
-                AssetsConstants.FIELD_KIND,
-                PRODUCT_MAPPING_MATRIX.getKind(),
-                AssetsConstants.FIELD_KEY,
-                componentKey),
-            null,
-            null,
-            PageRequest.of(0, 1),
-            null);
+  public Map<String, List<PathCheck>> readMatrixFacets(Paging<UnifiedAssetDto> assetDtoPaging) {
     // <mapper-key,<checkName,(path, expected)
     return JsonToolkit.fromJson(
         JsonToolkit.toJson(assetDtoPaging.getData().get(0).getFacets().get(MATRIX)),
         new TypeReference<>() {});
+  }
+
+  public List<String> readExpected422Paths(Paging<UnifiedAssetDto> assetDtoPaging) {
+    Object obj =
+        assetDtoPaging.getData().get(0).getFacets().getOrDefault(EXPECTED422_PATH_KEY, null);
+    return Objects.isNull(obj)
+        ? List.of()
+        : JsonToolkit.fromJson(JsonToolkit.toJson(obj), new TypeReference<>() {});
+  }
+
+  public Paging<UnifiedAssetDto> queryMatrixAssets(String matrixKey) {
+    return unifiedAssetService.findBySpecification(
+        Tuple2.ofList(
+            AssetsConstants.FIELD_KIND,
+            PRODUCT_MAPPING_MATRIX.getKind(),
+            AssetsConstants.FIELD_KEY,
+            matrixKey),
+        null,
+        null,
+        PageRequest.of(0, 1),
+        null);
   }
 
   public void checkDisabled(Map<String, List<PathCheck>> facets, String targetKey) {
@@ -145,22 +162,26 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
   }
 
   public void checkMatrixConstraints(
-      Map<String, List<PathCheck>> facets, String targetKey, Map<String, Object> inputs) {
+      Map<String, List<PathCheck>> facets,
+      String targetKey,
+      Map<String, Object> inputs,
+      List<String> pathsExpected422) {
     DocumentContext documentContext = JsonPath.parse(inputs);
     StringBuilder builder = new StringBuilder();
     boolean allMatch =
         facets.get(targetKey).stream()
             .allMatch(
                 pathCheckEntry -> {
-                  boolean check = check(documentContext, pathCheckEntry);
+                  boolean check = check(documentContext, pathCheckEntry, pathsExpected422);
                   log.info("Evaluate {} : {}", pathCheckEntry.path(), check);
                   if (!check) {
-                    String pathName = extractCheckingPath(pathCheckEntry.path());
+                    String pathName =
+                        replaceWildcard(extractCheckingPath(pathCheckEntry.path()), 0);
                     builder.append(
                         pathCheckEntry.errorMsg() != null
                             ? String.format(": %s", pathCheckEntry.errorMsg())
                             : String.format(
-                                "item:@{{%s}},expected:%s; ", pathName, pathCheckEntry.value()));
+                                "item:@{{%s}},expected:%s", pathName, pathCheckEntry.value()));
                   }
                   return check;
                 });
@@ -170,15 +191,24 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     }
   }
 
-  public boolean check(DocumentContext documentContext, PathCheck pathCheck) {
+  public boolean check(
+      DocumentContext documentContext, PathCheck pathCheck, List<String> pathsExpected422) {
     if (StringUtils.isBlank(pathCheck.path())) {
       return false;
     }
-    Object realValue = readByPathCheckWithException(documentContext, pathCheck);
+    Object realValue = readByPathCheckWithException(documentContext, pathCheck, pathsExpected422);
     // The 'index' indicates the location of elements in an array.
     // Since we need accurate information about which element has an unexpected value,
     // the index is a reasonable choice for identification in an array.
     if (realValue instanceof JSONArray array) {
+      if (array.isEmpty()) {
+        PathCheck updatedPathCheck = rewritePath(pathCheck, 0);
+        throwException(
+            pathCheck,
+            String.format(
+                getDefaultMessage(updatedPathCheck.code()),
+                extractCheckingPath(updatedPathCheck.path())));
+      }
       return IntStream.range(0, array.size())
           .allMatch(
               index -> {
@@ -207,10 +237,13 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
               SpELEngine.evaluateWithoutSuppressException(
                   pathCheck.value(), Map.of(PARAM_NAME, value), Object.class);
         } catch (Exception e) {
+          // 400-if-not-exist
           String checkingPath = rewriteCheckingPath(pathCheck);
-          throwException(pathCheck, String.format(PARAM_NOT_EXIST_MSG, checkingPath));
+          throw KrakenException.badRequestInvalidBody(
+              String.format(MISSING_PROPERTY_MSG, checkingPath));
         }
         if (StringUtils.isNotBlank(pathCheck.expectedValueType())) {
+          // 422-if-not-matched
           return checkExpectDataType(pathCheck, obj);
         }
         return true;
@@ -231,7 +264,8 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     return false;
   }
 
-  public void checkMapperConstraints(String targetKey, Map<String, Object> inputs) {
+  public void checkMapperConstraints(
+      String targetKey, Map<String, Object> inputs, List<String> pathsExpected422) {
     UnifiedAssetDto assetDto = unifiedAssetService.findOne(targetKey);
     UnifiedAssetDto mapperAsset =
         unifiedAssetService.findOne(assetDto.getMetadata().getMapperKey());
@@ -250,45 +284,66 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
       if (MappingTypeEnum.ENUM.getKind().equals(mapper.getSourceType())
           || MappingTypeEnum.STRING.getKind().equals(mapper.getSourceType())
           || isNumberKind(mapper.getAllowValueLimit(), mapper.getSourceType())) {
-        checkEnumValue(documentContext, mapper);
+        checkEnumValue(documentContext, mapper, inputs, pathsExpected422);
       } else if (isConstantType(mapper.getTarget())) {
-        checkConstantValue(documentContext, mapper, inputs);
+        checkConstantValue(documentContext, mapper, inputs, pathsExpected422);
       } else {
-        checkMappingValue(documentContext, mapper, inputs);
+        checkMappingValue(documentContext, mapper, inputs, pathsExpected422);
       }
     }
   }
 
-  private void checkConstantValue(
+  public void checkConstantValue(
       DocumentContext documentContext,
       ComponentAPITargetFacets.Mapper mapper,
-      Map<String, Object> inputs) {
+      Map<String, Object> inputs,
+      List<String> pathsExpected422) {
     String expectedValue = mapper.getTarget();
     if (String.valueOf(expectedValue).contains("{{")) {
       return;
     }
+    if (CollectionUtils.isNotEmpty(mapper.getSourceConditions())
+        && !checkConditionsMatched(inputs, mapper.getSourceConditions())) {
+      // Skip the checking
+      return;
+    }
+    // Keep normal checking process
     List<String> params = extractMapperParam(mapper.getSource());
     String constructedBody = constructJsonPathBody(replaceStarToZero(mapper.getSource()));
-    Object realValue = readByPathWithException(documentContext, constructedBody, 422, null);
+    // if path in the excluded400Path, then throws 422, otherwise throws 400
+    Object realValue =
+        readByPathWithException(documentContext, constructedBody, pathsExpected422, null);
     validateConstantNumber(
         realValue, mapper, CollectionUtils.isEmpty(params) ? mapper.getSource() : params.get(0));
-
     String evaluateValue =
         SpELEngine.evaluate(constructBody(mapper.getSource()), inputs, String.class);
     if (!Objects.equals(evaluateValue, expectedValue)) {
-      throw KrakenException.unProcessableEntityInvalidValue(
-          String.format(SHOULD_BE_MSG, mapper.getSource(), evaluateValue, expectedValue));
+      String msg =
+          String.format(
+              SHOULD_BE_MSG, extractCheckingPath(constructedBody), evaluateValue, expectedValue);
+      throw KrakenException.unProcessableEntityInvalidValue(msg);
     }
   }
 
-  private void checkEnumValue(
-      DocumentContext documentContext, ComponentAPITargetFacets.Mapper mapper) {
+  public void checkEnumValue(
+      DocumentContext documentContext,
+      ComponentAPITargetFacets.Mapper mapper,
+      Map<String, Object> inputs,
+      List<String> pathsExpected422) {
     List<String> params = extractMapperParam(mapper.getSource());
     if (CollectionUtils.isEmpty(params)) {
       return;
     }
+    if (CollectionUtils.isNotEmpty(mapper.getSourceConditions())
+        && !checkConditionsMatched(inputs, mapper.getSourceConditions())) {
+      // Skip the checking
+      return;
+    }
+
     String constructedBody = constructJsonPathBody(replaceStarToZero(mapper.getSource()));
-    Object realValue = readByPathWithException(documentContext, constructedBody, 422, null);
+    // if path in the excluded400Path, then throws 422, otherwise throws 400
+    Object realValue =
+        readByPathWithException(documentContext, constructedBody, pathsExpected422, null);
     validateSourceValue(
         mapper.getSourceType(),
         mapper.getDiscrete(),
@@ -318,10 +373,11 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     validateContinuousNumber(evaluateValue, paramName, valueList, sourceType, discrete);
   }
 
-  private void checkMappingValue(
+  public void checkMappingValue(
       DocumentContext documentContext,
       ComponentAPITargetFacets.Mapper mapper,
-      Map<String, Object> inputs) {
+      Map<String, Object> inputs,
+      List<String> pathsExpected422) {
     String target = null;
     String jsonPathExpression = null;
     ParamLocationEnum location = ParamLocationEnum.valueOf(mapper.getSourceLocation());
@@ -338,15 +394,25 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     if (CollectionUtils.isEmpty(params)) {
       return;
     }
+    if (CollectionUtils.isNotEmpty(mapper.getSourceConditions())
+        && !checkConditionsMatched(inputs, mapper.getSourceConditions())) {
+      // Skip the checking
+      return;
+    }
+
     String paramName = params.get(0);
     if (BODY.equals(location)) {
       log.info("jsonPathExpression:{}", jsonPathExpression);
-      Object realValue = readByPathWithException(documentContext, jsonPathExpression, 422, null);
-      // check constant number
-      validateConstantNumber(realValue, mapper, paramName);
-      // check discrete string
-      validateEnumOrDiscreteString(
-          realValue, paramName, mapper.getSourceValues(), mapper.getSourceType());
+      // if path in the excluded400Path, then throws 422, otherwise throws 400
+      Object realValue =
+          readByPathWithException(documentContext, jsonPathExpression, pathsExpected422, null);
+      validateSourceValue(
+          mapper.getSourceType(),
+          mapper.getDiscrete(),
+          realValue,
+          params.get(0),
+          mapper.getSourceValues(),
+          mapper.getTarget());
     }
     if (QUERY.equals(location) || BODY.equals(location)) {
       try {
@@ -358,6 +424,32 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     }
   }
 
+  public boolean checkConditionsMatched(
+      Map<String, Object> inputs, List<ComponentAPITargetFacets.SourceCondition> sourceConditions) {
+    return sourceConditions.stream()
+        .filter(
+            sourceCondition ->
+                StringUtils.isNotBlank(sourceCondition.getKey())
+                    && StringUtils.isNotBlank(sourceCondition.getVal())
+                    && StringUtils.isNotBlank(sourceCondition.getOperator()))
+        .allMatch(
+            sourceCondition -> {
+              String expression = buildSourceConditionExpression(sourceCondition);
+              return SpELEngine.isTrue(expression, inputs);
+            });
+  }
+
+  private String buildSourceConditionExpression(
+      ComponentAPITargetFacets.SourceCondition sourceCondition) {
+    return "${body."
+        + extractMapperParam(sourceCondition.getKey()).get(0)
+        + " "
+        + sourceCondition.getOperator()
+        + " '"
+        + sourceCondition.getVal()
+        + "'}";
+  }
+
   @Override
   public void throwException(PathCheck pathCheck, String defaultMsg) {
     String msg = pathCheck.errorMsg() == null ? defaultMsg : pathCheck.errorMsg();
@@ -367,8 +459,18 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     throw route422Exception(msg, "");
   }
 
-  public Object readByPathCheckWithException(DocumentContext documentContext, PathCheck pathCheck) {
+  public Object readByPathWithException(
+      DocumentContext documentContext,
+      String jsonPathExpression,
+      List<String> pathsExpected422,
+      String errorMsg) {
+    int code = determineHttpCode(pathsExpected422, jsonPathExpression);
+    return readByPathWithException(documentContext, jsonPathExpression, code, errorMsg);
+  }
+
+  public Object readByPathCheckWithException(
+      DocumentContext documentContext, PathCheck pathCheck, List<String> pathsExpected422) {
     return readByPathWithException(
-        documentContext, pathCheck.path(), pathCheck.code(), pathCheck.errorMsg());
+        documentContext, pathCheck.path(), pathsExpected422, pathCheck.errorMsg());
   }
 }

@@ -56,15 +56,27 @@ spec:
           - name: mapper.order.eline.add.rollInterval.amount
             title: " quote item Term roll duration"
             source: "@{{productOrderItem[0].requestedItemTerm.rollInterval.amount}}"
-            target: ""
             sourceLocation: BODY
+            sourceConditionExpression:
+            sourceConditions:
+              - name: endOfTermAction
+                key: "@{{productOrderItem[0].requestedItemTerm.endOfTermAction}}"
+                val: roll
+                operator: eq
+            target: ""
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.order.eline.add.rollInterval.units
             title: " quote item Term roll unit"
             source: "@{{productOrderItem[0].requestedItemTerm.rollInterval.units}}"
-            target: ""
             sourceLocation: BODY
+            sourceConditionExpression:
+            sourceConditions:
+              - name: endOfTermAction
+                key: "@{{productOrderItem[0].requestedItemTerm.endOfTermAction}}"
+                val: roll
+                operator: eq
+            target: ""
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.order.uni.add.place.id
@@ -72,14 +84,6 @@ spec:
               the id of the place where the products' installation must be done.
             source: '@{{productOrderItem[0].product.place[0].id}}'
             target: '@{{dataCenterFacilityId}}'
-            description: ''
-            sourceLocation: BODY
-            targetLocation: BODY
-            requiredMapping: false
-          - name: mapper.order.uni.add.place.name
-            title: the keyName of the place where the products' installation must be done.
-            source: '@{{productOrderItem[0].product.place[0].keyName}}'
-            target: '@{{dataCenterFacility}}'
             description: ''
             sourceLocation: BODY
             targetLocation: BODY

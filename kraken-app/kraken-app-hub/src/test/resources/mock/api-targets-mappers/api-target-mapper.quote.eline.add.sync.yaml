@@ -22,6 +22,7 @@ spec:
             source: "@{{quoteItem[0].requestedQuoteItemTerm.duration.amount}}"
             sourceLocation: BODY
             sourceType: integer
+            discrete: true
             target: "@{{connections[*].duration.value}}"
             targetLocation: BODY
             requiredMapping: true
@@ -58,6 +59,13 @@ spec:
             source: "@{{quoteItem[0].requestedQuoteItemTerm.rollInterval.amount}}"
             sourceLocation: BODY
             sourceType: integer
+            discrete: true
+            sourceConditionExpression:
+            sourceConditions:
+              - name: endOfTermAction
+                key: "@{{quoteItem[0].requestedQuoteItemTerm.endOfTermAction}}"
+                val: roll
+                operator: eq
             target: "1"
             targetLocation: BODY
             requiredMapping: false
@@ -74,6 +82,12 @@ spec:
               - businessHours
               - businessMinutes
             valueMapping: {}
+            sourceConditionExpression:
+            sourceConditions:
+              - name: endOfTermAction
+                key: "@{{quoteItem[0].requestedQuoteItemTerm.endOfTermAction}}"
+                val: roll
+                operator: eq
             target: "calendarMonths"
             targetLocation: BODY
             requiredMapping: false

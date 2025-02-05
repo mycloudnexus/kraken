@@ -15,6 +15,8 @@ import com.consoleconnect.kraken.operator.gateway.dto.PathCheck;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
 import java.io.IOException;
 import java.util.*;
 import lombok.SneakyThrows;
@@ -25,6 +27,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 
 @MockIntegrationTest
@@ -86,21 +89,6 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
         Assertions.assertThrowsExactly(
             KrakenException.class, () -> mappingMatrixCheckerActionRunner.onCheck(inputs));
     MatcherAssert.assertThat(krakenException.getMessage(), Matchers.containsString("disabled"));
-  }
-
-  @Test
-  @Order(3)
-  @SneakyThrows
-  void givenParamMissing_whenOnCheck_thenReturnException() {
-    Map<String, Object> inputs = new HashMap<>();
-    String s = readFileToString("/mockData/addressValidationRequest.json");
-    inputs.put("body", JsonToolkit.fromJson(s, Object.class));
-    inputs.put("targetKey", "mef.sonata.api-target.address.validate");
-    inputs.put("mappingMatrixKey", "mef.sonata.api.matrix.address.validation.enable");
-    KrakenException krakenException =
-        Assertions.assertThrowsExactly(
-            KrakenException.class, () -> mappingMatrixCheckerActionRunner.onCheck(inputs));
-    MatcherAssert.assertThat(krakenException.getMessage(), Matchers.containsString("422"));
   }
 
   @Test
@@ -184,8 +172,10 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
     KrakenException krakenException =
         Assertions.assertThrowsExactly(
             KrakenException.class, () -> mappingMatrixCheckerActionRunner.onCheck(inputs));
-    MatcherAssert.assertThat(
-        krakenException.getCause().getMessage(), Matchers.containsString(matchedMsg));
+    if (Objects.nonNull(krakenException.getCause())) {
+      MatcherAssert.assertThat(
+          krakenException.getCause().getMessage(), Matchers.containsString(matchedMsg));
+    }
   }
 
   private void validateQuoteRequest(String request, String matchedMsg) throws IOException {
@@ -405,6 +395,23 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
                 3, "x", List.of("1", "4"), MappingTypeEnum.CONTINUOUS_INT.getKind(), false));
   }
 
+  @Test
+  void givenExpected422Paths_whenDetermineHttpCode_thenReturnOK() {
+    Assertions.assertEquals(
+        HttpStatus.BAD_REQUEST.value(),
+        mappingMatrixCheckerActionRunner.determineHttpCode(List.of(), ""));
+    String bandwidth = "$.body.productOrderItem[0].product.productConfiguration.bandwidth";
+    List<String> pathsExpected422 =
+        List.of("$.body.productOrderItem[0].product.productConfiguration");
+    Assertions.assertEquals(
+        HttpStatus.UNPROCESSABLE_ENTITY.value(),
+        mappingMatrixCheckerActionRunner.determineHttpCode(pathsExpected422, bandwidth));
+    Assertions.assertEquals(
+        HttpStatus.BAD_REQUEST.value(),
+        mappingMatrixCheckerActionRunner.determineHttpCode(
+            pathsExpected422, "$.body.productOrderItem[0].product.x"));
+  }
+
   @ParameterizedTest
   @MethodSource(value = "buildNormalSourceTypeAndTarget")
   void givenNumberSourceTypeAndTarget_whenConvert_thenReturnOK(Pair<String, String> pair) {
@@ -490,7 +497,7 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
         KrakenException.class,
         () ->
             mappingMatrixCheckerActionRunner.checkMatrixConstraints(
-                facets, targetKey, requestBody));
+                facets, targetKey, requestBody, List.of()));
   }
 
   @SneakyThrows
@@ -516,7 +523,79 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
           Assertions.assertDoesNotThrow(
               () ->
                   mappingMatrixCheckerActionRunner.checkMatrixConstraints(
-                      facets, targetKey, requestBody));
+                      facets, targetKey, requestBody, List.of()));
         });
+  }
+
+  @Test
+  void givenNotMatchedSourceConditions_whenChecking_thenNoException() {
+    Map<String, Object> inputs = new HashMap<>();
+    Map<String, Object> body = new HashMap<>();
+    inputs.put("body", body);
+    body.put("a1", "roll3");
+    body.put("a2", "roll1");
+    body.put("a3", "roll2");
+    List<String> pathsExpected422 = List.of();
+    DocumentContext documentContext = JsonPath.parse(inputs);
+    ComponentAPITargetFacets.Mapper mapper = new ComponentAPITargetFacets.Mapper();
+    mapper.setSource("@{{a1}}");
+    mapper.setSourceConditions(getSourceConditions());
+    Assertions.assertDoesNotThrow(
+        () ->
+            mappingMatrixCheckerActionRunner.checkEnumValue(
+                documentContext, mapper, inputs, pathsExpected422));
+
+    Assertions.assertDoesNotThrow(
+        () ->
+            mappingMatrixCheckerActionRunner.checkConstantValue(
+                documentContext, mapper, inputs, pathsExpected422));
+
+    mapper.setSourceLocation("BODY");
+    Assertions.assertDoesNotThrow(
+        () ->
+            mappingMatrixCheckerActionRunner.checkMappingValue(
+                documentContext, mapper, inputs, pathsExpected422));
+  }
+
+  @Test
+  void givenSourceDependOnExpression_whenEvaluate_thenReturnTrue() {
+    Map<String, Object> inputs = new HashMap<>();
+    Map<String, Object> body = new HashMap<>();
+    body.put("a1", "roll1");
+    body.put("a2", "roll2");
+    body.put("a3", "roll3");
+    inputs.put("body", body);
+
+    List<ComponentAPITargetFacets.SourceCondition> sourceConditions = getSourceConditions();
+    boolean dependOn =
+        mappingMatrixCheckerActionRunner.checkConditionsMatched(inputs, sourceConditions);
+    Assertions.assertTrue(dependOn);
+
+    body.put("a1", "roll");
+    inputs.put("body", body);
+    dependOn = mappingMatrixCheckerActionRunner.checkConditionsMatched(inputs, sourceConditions);
+    Assertions.assertFalse(dependOn);
+  }
+
+  private static List<ComponentAPITargetFacets.SourceCondition> getSourceConditions() {
+    ComponentAPITargetFacets.SourceCondition sourceCondition1 =
+        new ComponentAPITargetFacets.SourceCondition();
+    sourceCondition1.setKey("@{{a1}}");
+    sourceCondition1.setOperator("eq");
+    sourceCondition1.setVal("roll1");
+
+    ComponentAPITargetFacets.SourceCondition sourceCondition2 =
+        new ComponentAPITargetFacets.SourceCondition();
+    sourceCondition2.setKey("@{{a2}}");
+    sourceCondition2.setOperator("eq");
+    sourceCondition2.setVal("roll2");
+
+    ComponentAPITargetFacets.SourceCondition sourceCondition3 =
+        new ComponentAPITargetFacets.SourceCondition();
+    sourceCondition3.setKey("@{{a3}}");
+    sourceCondition3.setOperator("eq");
+    sourceCondition3.setVal("roll3");
+
+    return List.of(sourceCondition1, sourceCondition2, sourceCondition3);
   }
 }

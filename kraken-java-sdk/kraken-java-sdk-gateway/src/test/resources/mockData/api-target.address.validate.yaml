@@ -33,19 +33,19 @@ spec:
       mappers:
         request:
           - name: address.validation.city
-            source: "@{{submittedGeographicAddress.associatedGeographicAddress.city}}"
+            source: "@{{submittedGeographicAddress.city}}"
             description: "city mapping"
             sourceLocation: BODY
-            target: "criteria={\"locations\":[\"@{{submittedGeographicAddress.associatedGeographicAddress.city}},@{{submittedGeographicAddress.associatedGeographicAddress.country}}\"]}}"
+            target: "criteria={\"locations\":[\"@{{submittedGeographicAddress.city}},@{{submittedGeographicAddress.country}}\"]}}"
             targetLocation: HYBRID
           - name: address.validation.country
             description: "country mapping"
-            source: "@{{submittedGeographicAddress.associatedGeographicAddress.country}}"
+            source: "@{{submittedGeographicAddress.country}}"
             sourceLocation: BODY
-            target: "criteria={\"locations\":[\"@{{submittedGeographicAddress.associatedGeographicAddress.city}},@{{submittedGeographicAddress.associatedGeographicAddress.country}}\"]}}"
+            target: "criteria={\"locations\":[\"@{{submittedGeographicAddress.city}},@{{submittedGeographicAddress.country}}\"]}}"
             targetLocation: HYBRID
           - name: address.validation.streetName
-            source: "@{{submittedGeographicAddress.associatedGeographicAddress.streetName}}"
+            source: "@{{submittedGeographicAddress.streetName}}"
             sourceLocation: BODY
             target: ""
             targetLocation: ""

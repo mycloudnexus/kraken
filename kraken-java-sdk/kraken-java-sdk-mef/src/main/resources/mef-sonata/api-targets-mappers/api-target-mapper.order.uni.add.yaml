@@ -35,6 +35,7 @@ spec:
             source: "@{{productOrderItem[0].requestedItemTerm.duration.amount}}"
             sourceLocation: BODY
             sourceType: integer
+            discrete: true
             target: ""
             targetLocation: ""
             requiredMapping: true
@@ -69,6 +70,13 @@ spec:
             source: "@{{productOrderItem[0].requestedItemTerm.rollInterval.amount}}"
             sourceLocation: BODY
             sourceType: integer
+            discrete: true
+            sourceConditionExpression:
+            sourceConditions:
+              - name: endOfTermAction
+                key: "@{{productOrderItem[0].requestedItemTerm.endOfTermAction}}"
+                val: roll
+                operator: eq
             target: ""
             targetLocation: BODY
             requiredMapping: false
@@ -86,6 +94,12 @@ spec:
               - businessDays
               - businessHours
               - businessMinutes
+            sourceConditionExpression:
+            sourceConditions:
+              - name: endOfTermAction
+                key: "@{{productOrderItem[0].requestedItemTerm.endOfTermAction}}"
+                val: roll
+                operator: eq
             target: ""
             targetLocation: BODY
             requiredMapping: false
@@ -94,15 +108,6 @@ spec:
               the id of the place where the products' installation must be done.
             source: '@{{productOrderItem[0].product.place[0].id}}'
             description: ''
-            sourceLocation: BODY
-            sourceType: string
-            target: ''
-            targetLocation: BODY
-            requiredMapping: false
-          - name: mapper.order.uni.add.place.name
-            title: the keyName of the place where the products' installation must be done.
-            description: ''
-            source: '@{{productOrderItem[0].product.place[0].keyName}}'
             sourceLocation: BODY
             sourceType: string
             target: ''
@@ -125,6 +130,7 @@ spec:
             sourceLocation: BODY
             allowValueLimit: true
             sourceType: integer
+            discrete: true
             sourceValues:
             target: ""
             targetLocation: BODY

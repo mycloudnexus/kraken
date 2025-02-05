@@ -55,6 +55,8 @@ public class ComponentAPITargetFacets {
     private String source;
     private String sourceType;
     private String sourceLocation;
+    private String sourceConditionExpression;
+    private List<SourceCondition> sourceConditions;
     private Boolean allowValueLimit = Boolean.FALSE;
     private Boolean discrete;
     private List<String> sourceValues;
@@ -111,5 +113,13 @@ public class ComponentAPITargetFacets {
     private String addressType;
     private String quoteLevel;
     private Boolean syncMode;
+  }
+
+  @Data
+  public static class SourceCondition {
+    private String name;
+    private String key;
+    private String val;
+    private String operator;
   }
 }
