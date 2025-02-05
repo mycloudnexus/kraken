@@ -120,6 +120,7 @@ const EnvironmentActivityLog = () => {
                   placeholder="Please enter path keywords"
                   style={{ width: "250px" }}
                   onSearch={searchPathQuery}
+                  allowClear
                 />
               }
             />
