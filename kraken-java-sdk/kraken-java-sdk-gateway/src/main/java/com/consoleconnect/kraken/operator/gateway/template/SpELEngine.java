@@ -1,8 +1,5 @@
 package com.consoleconnect.kraken.operator.gateway.template;
 
-import static com.consoleconnect.kraken.operator.core.toolkit.ConstructExpressionUtil.constructParam;
-import static com.consoleconnect.kraken.operator.core.toolkit.ConstructExpressionUtil.extractSpelParam;
-
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.core.toolkit.StringUtils;
 import java.util.LinkedHashMap;
@@ -88,18 +85,6 @@ public class SpELEngine implements BeanFactoryAware {
       String expression, Map<String, Object> variables, Class<T> tClass) {
     SpELEngine spELEngine = new SpELEngine(variables);
     return spELEngine.evaluateWithoutSuppressException(expression, tClass);
-  }
-
-  public static String evaluateString(String expression, Map<String, Object> variables) {
-    List<String> params = extractSpelParam(expression);
-    for (String param : params) {
-      String paramExpression = constructParam(param);
-      String evaluate = evaluate(paramExpression, variables, String.class);
-      if (org.apache.commons.lang3.StringUtils.isNotBlank(evaluate)) {
-        expression = expression.replace(paramExpression, evaluate);
-      }
-    }
-    return expression;
   }
 
   public static boolean isTrue(String expression, Map<String, Object> variables) {
