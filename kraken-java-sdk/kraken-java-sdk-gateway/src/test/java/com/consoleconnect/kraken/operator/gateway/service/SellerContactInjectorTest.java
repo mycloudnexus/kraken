@@ -9,7 +9,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 
 import com.consoleconnect.kraken.operator.core.enums.AssetStatusEnum;
-import com.consoleconnect.kraken.operator.core.enums.ProductCategoryEnum;
+import com.consoleconnect.kraken.operator.core.enums.ParentProductTypeEnum;
 import com.consoleconnect.kraken.operator.core.event.IngestionDataResult;
 import com.consoleconnect.kraken.operator.core.model.SyncMetadata;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
@@ -75,10 +75,10 @@ class SellerContactInjectorTest extends AbstractIntegrationTest implements Selle
   void givenExistedSellerContact_whenInjection_thenReturnOK() {
     String componentKey = "mef.sonata.api.order";
     String productId = "product.mef.sonata.api";
-    String sellerContactKey = componentKey + "." + ProductCategoryEnum.ACCESS_ELINE.getKind();
+    String sellerContactKey = componentKey + "." + ParentProductTypeEnum.ACCESS_ELINE.getKind();
     UnifiedAsset sellerContactAsset =
         createSellerContact(
-            componentKey, sellerContactKey, ProductCategoryEnum.ACCESS_ELINE.getKind());
+            componentKey, sellerContactKey, ParentProductTypeEnum.ACCESS_ELINE.getKind());
     SyncMetadata syncMetadata = new SyncMetadata("", "", DateTime.nowInUTCString(), "test-user");
     IngestionDataResult ingestionDataResult =
         unifiedAssetService.syncAsset(productId, sellerContactAsset, syncMetadata, true);

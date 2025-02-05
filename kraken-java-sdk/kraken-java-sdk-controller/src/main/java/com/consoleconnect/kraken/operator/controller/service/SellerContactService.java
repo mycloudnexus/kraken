@@ -7,7 +7,7 @@ import com.consoleconnect.kraken.operator.controller.dto.CreateSellerContactRequ
 import com.consoleconnect.kraken.operator.controller.dto.UpdateSellerContactRequest;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.enums.AssetStatusEnum;
-import com.consoleconnect.kraken.operator.core.enums.ProductCategoryEnum;
+import com.consoleconnect.kraken.operator.core.enums.ParentProductTypeEnum;
 import com.consoleconnect.kraken.operator.core.event.IngestionDataResult;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.model.SyncMetadata;
@@ -65,7 +65,7 @@ public class SellerContactService {
       String componentKey, List<String> productCategories) {
     if (CollectionUtils.isEmpty(productCategories)) {
       productCategories =
-          Arrays.stream(ProductCategoryEnum.values()).map(ProductCategoryEnum::getKind).toList();
+          Arrays.stream(ParentProductTypeEnum.values()).map(ParentProductTypeEnum::getKind).toList();
     }
     return productCategories.stream()
         .map(item -> Pair.of(componentKey + DOT + item, item))

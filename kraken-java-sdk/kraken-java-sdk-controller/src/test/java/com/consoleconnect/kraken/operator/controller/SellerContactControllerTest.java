@@ -1,7 +1,7 @@
 package com.consoleconnect.kraken.operator.controller;
 
-import static com.consoleconnect.kraken.operator.core.enums.ProductCategoryEnum.ACCESS_ELINE;
-import static com.consoleconnect.kraken.operator.core.enums.ProductCategoryEnum.INTERNET_ACCESS;
+import static com.consoleconnect.kraken.operator.core.enums.ParentProductTypeEnum.ACCESS_ELINE;
+import static com.consoleconnect.kraken.operator.core.enums.ParentProductTypeEnum.INTERNET_ACCESS;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
