@@ -6,7 +6,8 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum ParentProductTypeEnum {
-  ACCESS_ELINE("access.eline", "Access Eline", "including two sub-product-types: access_e_line and uni"),
+  ACCESS_ELINE(
+      "access.eline", "Access Eline", "including two sub-product-types: access_e_line and uni"),
   INTERNET_ACCESS("internet.access", "Internet Access", "not supported yet");
 
   private final String kind;

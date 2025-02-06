@@ -1,7 +1,8 @@
 package com.consoleconnect.kraken.operator.controller;
 
 import static com.consoleconnect.kraken.operator.core.enums.ParentProductTypeEnum.ACCESS_ELINE;
-import static com.consoleconnect.kraken.operator.core.enums.ParentProductTypeEnum.INTERNET_ACCESS;
+import static com.consoleconnect.kraken.operator.core.toolkit.Constants.DOT;
+import static com.consoleconnect.kraken.operator.core.toolkit.Constants.SELLER_CONTACT_SUFFIX;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -65,13 +66,11 @@ class SellerContactControllerTest extends AbstractIntegrationTest {
             bodyStr -> {
               log.info(bodyStr);
               assertThat(bodyStr, hasJsonPath("$.code", is(200)));
-              assertThat(bodyStr, hasJsonPath("$.data", hasSize(2)));
-              assertThat(bodyStr, hasJsonPath("$.data[0].data.key", notNullValue()));
-              assertThat(bodyStr, hasJsonPath("$.data[1].data.key", notNullValue()));
-              assertThat(
-                  bodyStr, hasJsonPath("$.data[0].data.labels.componentKey", notNullValue()));
-              assertThat(
-                  bodyStr, hasJsonPath("$.data[1].data.labels.componentKey", notNullValue()));
+              assertThat(bodyStr, hasJsonPath("$.data", notNullValue()));
+              assertThat(bodyStr, hasJsonPath("$.data.data.key", notNullValue()));
+              assertThat(bodyStr, hasJsonPath("$.data.data.key", notNullValue()));
+              assertThat(bodyStr, hasJsonPath("$.data.data.labels.componentKey", notNullValue()));
+              assertThat(bodyStr, hasJsonPath("$.data.data.labels.componentKey", notNullValue()));
             });
   }
 
@@ -144,10 +143,8 @@ class SellerContactControllerTest extends AbstractIntegrationTest {
 
   public static List<Pair<String, String>> buildSellerContactKeys() {
     return List.of(
-        Pair.of(COMPONENT_KEY_OF_ORDER, ACCESS_ELINE.getKind()),
-        Pair.of(COMPONENT_KEY_OF_ORDER, INTERNET_ACCESS.getKind()),
-        Pair.of(COMPONENT_KEY_OF_QUOTE, ACCESS_ELINE.getKind()),
-        Pair.of(COMPONENT_KEY_OF_QUOTE, INTERNET_ACCESS.getKind()));
+        Pair.of(COMPONENT_KEY_OF_ORDER, ACCESS_ELINE.getKind() + DOT + SELLER_CONTACT_SUFFIX),
+        Pair.of(COMPONENT_KEY_OF_QUOTE, ACCESS_ELINE.getKind() + DOT + SELLER_CONTACT_SUFFIX));
   }
 
   @SneakyThrows
