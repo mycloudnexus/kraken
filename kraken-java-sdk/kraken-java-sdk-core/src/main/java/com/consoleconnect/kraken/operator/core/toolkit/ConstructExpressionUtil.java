@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 public class ConstructExpressionUtil {
 
   public static final String ARRAY_ROOT_PREFIX = "[*].";
+  public static final String DOT = "\\.";
 
   private ConstructExpressionUtil() {}
 
@@ -73,14 +74,14 @@ public class ConstructExpressionUtil {
   }
 
   public static String formatWorkflowExpression(String param) {
-    String[] split = param.split("\\.");
+    String[] split = param.split(DOT);
     return String.format(
         "${%s.output.response.body.%s}",
         split[1], param.substring(split[0].length() + split[1].length() + 2));
   }
 
   public static String formatWorkflowResponseExpression(String param) {
-    String[] split = param.split("\\.");
+    String[] split = param.split(DOT);
     return String.format(
         "${responseBody.%s.response.body.%s}",
         split[1], param.substring(split[0].length() + split[1].length() + 2));
