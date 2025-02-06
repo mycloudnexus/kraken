@@ -157,6 +157,8 @@ spec:
             sourceLocation: BODY
             target: "@{{quoteItem[0].quoteItemPrice[*].price.dutyFreeAmount.value}}"
             targetLocation: BODY
+            checkPath: "$['quoteItem'][0]['quoteItemPrice'][0]['price']['dutyFreeAmount']['value']"
+            deletePath: "$.quoteItem[0].quoteItemPrice"
             requiredMapping: true
           - name: mapper.quote.uni.add.sync.taxRate
             title: Quote taxRate Mapping

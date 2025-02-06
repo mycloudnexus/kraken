@@ -172,6 +172,8 @@ spec:
             source: "@{{responseBody.results[*].price}}"
             sourceLocation: ""
             target: "@{{quoteItem[0].quoteItemPrice[*].price.dutyFreeAmount.value}}"
+            checkPath: "$['quoteItem'][0]['quoteItemPrice'][0]['price']['dutyFreeAmount']['value']"
+            deletePath: "$.quoteItem[0].quoteItemPrice"
             requiredMapping: true
             replaceStar: true
           - name: mapper.quote.eline.add.sync.taxRate
