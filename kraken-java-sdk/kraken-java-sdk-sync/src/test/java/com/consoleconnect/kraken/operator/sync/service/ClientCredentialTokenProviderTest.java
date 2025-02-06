@@ -1,6 +1,7 @@
 package com.consoleconnect.kraken.operator.sync.service;
 
 import com.consoleconnect.kraken.operator.auth.dto.AuthResponse;
+import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import com.consoleconnect.kraken.operator.sync.ClientCredentialMockServerTest;
 import com.consoleconnect.kraken.operator.sync.service.security.ExternalSystemTokenProvider;
 import io.jsonwebtoken.Jwts;
@@ -21,7 +22,7 @@ class ClientCredentialTokenProviderTest extends ClientCredentialMockServerTest {
     AuthResponse authResponse = new AuthResponse();
     authResponse.setAccessToken(token);
     mockServer
-        .responseWith(HttpStatus.OK, authResponse, new HashMap<>())
+        .responseWith(HttpStatus.OK, HttpResponse.ok(authResponse), new HashMap<>())
         .call(
             () -> {
               String resp = externalSystemTokenProvider.getToken();
@@ -30,7 +31,7 @@ class ClientCredentialTokenProviderTest extends ClientCredentialMockServerTest {
         .expectResponse(ExternalSystemTokenProvider.BEARER_TOKEN_PREFIX + token)
         .takeRequest()
         .expectMethod("POST")
-        .expectPath("/auth/token");
+        .expectPath("/tenant/auth/token");
 
     // Return saved token when get token again
     String resp = externalSystemTokenProvider.getToken();

@@ -2,14 +2,17 @@ package com.consoleconnect.kraken.operator.sync.service;
 
 import com.consoleconnect.kraken.operator.auth.dto.AuthResponse;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
+import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import com.consoleconnect.kraken.operator.sync.model.SyncProperty;
 import com.consoleconnect.kraken.operator.sync.service.security.ExternalSystemTokenProvider;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTParser;
 import java.text.ParseException;
+import java.util.Optional;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -26,8 +29,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class ClientCredentialTokenProvider implements ExternalSystemTokenProvider {
 
   private static final long EXPIRATION_BUFFER_IN_SECONDS = 30;
-
-  private static final String ENDPOINT_AUTH_TOKEN = "/auth/token";
 
   private String cachedToken = null;
 
@@ -54,8 +55,8 @@ public class ClientCredentialTokenProvider implements ExternalSystemTokenProvide
 
   @Override
   public String getToken() {
-    if (cachedToken == null || isTokenExpired(cachedToken)) {
-      cachedToken = generateAccessToken().getAccessToken();
+    if (Strings.isBlank(cachedToken) || isTokenExpired(cachedToken)) {
+      cachedToken = generateAccessToken().map(AuthResponse::getAccessToken).orElse(null);
     }
     return ExternalSystemTokenProvider.BEARER_TOKEN_PREFIX + cachedToken;
   }
@@ -71,7 +72,7 @@ public class ClientCredentialTokenProvider implements ExternalSystemTokenProvide
     }
   }
 
-  private AuthResponse generateAccessToken() {
+  private Optional<AuthResponse> generateAccessToken() {
     SyncProperty.ClientCredentials clientCredentials =
         syncProperty.getControlPlane().getAuth().getClientCredentials();
     ClientAuthRequest request =
@@ -79,15 +80,22 @@ public class ClientCredentialTokenProvider implements ExternalSystemTokenProvide
             .clientId(clientCredentials.getClientId())
             .clientSecret(clientCredentials.getClientSecret())
             .build();
-    return getWebClient()
-        .method(HttpMethod.POST)
-        .uri(uriBuilder -> uriBuilder.path(ENDPOINT_AUTH_TOKEN).build())
-        .accept(MediaType.APPLICATION_JSON)
-        .contentType(MediaType.APPLICATION_JSON)
-        .body(BodyInserters.fromValue(request))
-        .retrieve()
-        .bodyToMono(new ParameterizedTypeReference<AuthResponse>() {})
-        .block();
+    try {
+      HttpResponse<AuthResponse> response =
+          getWebClient()
+              .method(HttpMethod.POST)
+              .uri(uriBuilder -> uriBuilder.path(clientCredentials.getAuthTokenEndpoint()).build())
+              .accept(MediaType.APPLICATION_JSON)
+              .contentType(MediaType.APPLICATION_JSON)
+              .body(BodyInserters.fromValue(request))
+              .retrieve()
+              .bodyToMono(new ParameterizedTypeReference<HttpResponse<AuthResponse>>() {})
+              .block();
+      return Optional.ofNullable(response.getData());
+    } catch (Exception e) {
+      log.error("Failed to request token", e);
+      return Optional.empty();
+    }
   }
 
   private WebClient getWebClient() {

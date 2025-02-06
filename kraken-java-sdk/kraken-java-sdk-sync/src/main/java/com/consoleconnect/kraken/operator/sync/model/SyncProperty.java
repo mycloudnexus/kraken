@@ -48,10 +48,13 @@ public class SyncProperty {
     private String accessToken;
   }
 
+  private static final String ENDPOINT_AUTH_TOKEN = "/tenant/auth/token";
+
   @Data
   public static class ClientCredentials {
     private boolean enabled;
     private String authServerUrl;
+    private String authTokenEndpoint = ENDPOINT_AUTH_TOKEN;
     private String clientId;
     private String clientSecret;
   }
