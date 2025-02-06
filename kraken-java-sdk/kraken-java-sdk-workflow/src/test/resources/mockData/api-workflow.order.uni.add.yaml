@@ -1,0 +1,63 @@
+---
+kind: kraken.component.api-workflow
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-workflow.order.uni.add
+  name: Order Management
+  version: 1
+spec:
+  metaData:
+    workflowName: "order.uni.add"
+    externalId: ""
+  validationStage:
+    - taskName: validation_task
+      description: ""
+      taskType: http
+      endpoint:
+        path: ""
+        method: ""
+        serverKey: ''
+        mappers:
+          request:
+      conditionCheck:
+        caseExpression: ""
+        buildInTask: reject_order_task
+  preparationStage:
+    - taskName: preparation_task
+      description: "get datacenter facility name by datacenter id"
+      taskType: http
+      endpoint:
+        path: "/v2/data-center-facility/{id}"
+        method: "GET"
+        serverKey: ''
+        mappers:
+          request:
+            - source: "@{{productOrderItem[0].product.place[0].id}}"
+              sourceLocation: "BODY"
+              target: "@{{id}}"
+              targetLocation: "PATH"
+  executionStage:
+    - taskName: create_order_task
+      description: "create uni order task"
+      taskType: http
+      endpoint:
+        path: "/api/company/{companyName}/ports/order"
+        method: "PUT"
+        serverKey: ""
+        mappers:
+          request:
+            - name: mapper.order.uni.add.buyerId
+              title: >-
+                The unique identifier of the organization that is acting as the a
+                Buyer.
+              source: '@{{buyerId}}'
+              target: '@{{companyName}}'
+              description: ''
+              replaceStar: true
+              sourceLocation: QUERY
+              targetLocation: PATH
+              allowValueLimit: false
+              customizedField: false
+              requiredMapping: false
+      notificationUrl: https://hooks.slack.com
+
