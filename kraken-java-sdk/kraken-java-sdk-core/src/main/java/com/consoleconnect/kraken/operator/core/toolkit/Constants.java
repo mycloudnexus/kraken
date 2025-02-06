@@ -14,6 +14,15 @@ public class Constants {
   public static final String ORDER_KEY_WORD = "order";
   public static final String INT_VAL = "integer";
   public static final String DOUBLE_VAL = "double";
+  public static final String FAIL_ORDER_TASK = "fail_order_task";
+  public static final String EVALUATE_PAYLOAD_TASK = "evaluate_payload_task";
+  public static final String REJECT_ORDER_TASK = "reject_order_task";
+  public static final String EMPTY_TASK = "empty_task";
+  public static final String LOG_PAYLOAD_TASK = "log_payload_task";
+  public static final String PROCESS_ORDER_TASK = "process_order_task";
+  public static final String PERSIST_RESPONSE_TASK = "persist_response_task";
+  public static final String NOTIFY_TASK = "notify_task";
+  public static final String WORKFLOW_PARAM_PREFIX = "${workflow.input.%s}";
 
   public static final String FAIL_ORDER_TASK = "fail_order_task";
   public static final String EVALUATE_PAYLOAD_TASK = "evaluate_payload_task";

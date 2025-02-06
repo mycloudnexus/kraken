@@ -141,7 +141,7 @@ public interface MappingTransformer {
           }
           if (null == obj || (obj instanceof String str && (StringUtils.isBlank(str)))) {
             deleteByPath(value, doc);
-          } else if (obj instanceof Integer i && i <= 0) {
+          } else if (obj instanceof Integer i && i < 0) {
             deleteByPath(value, doc);
           } else if (obj instanceof Boolean b && !b) {
             deleteByPath(value, doc);

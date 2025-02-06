@@ -152,7 +152,7 @@ public class WorkflowTemplateTransformer {
     String caseExpression = conditionCheck.getCaseExpression();
     String buildInTaskName = conditionCheck.getBuildInTask();
     String[] split = caseExpression.trim().split("==");
-    if (split.length < 2) {
+    if (split == null || split.length < 2) {
       throw KrakenException.badRequest(
           String.format("wrong format of case expression: %s", caseExpression));
     }
