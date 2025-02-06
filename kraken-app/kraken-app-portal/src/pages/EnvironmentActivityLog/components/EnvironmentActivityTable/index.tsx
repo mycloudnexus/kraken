@@ -311,13 +311,6 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
       width: 200,
       filterDropdown: ({ close }) =>
         TimeFilter({ dates, setDates, handleTimeFilter, close }),
-      //   (
-      //       <TimeFilter
-      //         dates={dates}
-      //         setDates={setDates}
-      //         handleTimeFilter={handleTimeFilter}
-      //       />
-      //     ),
     },
     {
       key: "action",
