@@ -91,7 +91,10 @@ app:
     workspacePath:
   controlPlane:
     url: http://localhost:8001
-    token: Bearer ${KRAKEN_MGMT_API_ACCESS_TOKEN:FAKE_TOKEN}
+    auth:
+      internalToken:
+        enabled: true
+        accessToken: ${KRAKEN_CONTROL_PLANE_AGENT_TOKEN:FAKE_TOKEN}
     push-activity-log-external:
       enabled: false
       batch-size: ${EXTERNAL_SYSTEM_PUSH_LOG_BATCH_SIZE:200}
