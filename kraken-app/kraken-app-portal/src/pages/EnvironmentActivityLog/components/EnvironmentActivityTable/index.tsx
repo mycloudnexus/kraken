@@ -115,13 +115,20 @@ const getStatusCodeWithIcon = (statusCode: number) => {
           {statusCode}
         </span>
       );
-    default:
+    case 404:
+    case 405:
+    case 406:
+    case 409:
+    case 415:
+    case 422:
       return (
         <span>
           <ExclamationCircleFilled className={styles["statusIcon-warn"]} />
           {statusCode}
         </span>
       );
+    default:
+      return <span>{statusCode}</span>;
   }
 };
 
@@ -246,6 +253,7 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
       render: (log: IActivityLog) => <LogMethodTag method={log.method} />,
       width: 100,
       filters: methodOptions,
+      filterMultiple: false,
     },
     {
       key: "name",
@@ -269,6 +277,7 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
       width: 140,
       render: (log: IActivityLog) => getStatusCodeWithIcon(log.httpStatusCode),
       filters: statusCodeOptions,
+      filterMultiple: false,
     },
     {
       key: "date",
