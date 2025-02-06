@@ -1,9 +1,11 @@
 package com.consoleconnect.kraken.operator.gateway.service.workflow;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.gateway.CustomConfig;
 import com.consoleconnect.kraken.operator.gateway.entity.HttpRequestEntity;
 import com.consoleconnect.kraken.operator.gateway.repo.HttpRequestRepository;
@@ -42,6 +44,11 @@ class WorkflowTaskConfigTest extends AbstractIntegrationTest {
     assertDoesNotThrow(() -> workflowTaskConfig.logRequestPayload(new LogTaskRequest()));
     assertDoesNotThrow(() -> workflowTaskConfig.persistResponse(id, entity));
     assertDoesNotThrow(() -> workflowTaskConfig.failOrder(id));
+    assertDoesNotThrow(() -> workflowTaskConfig.processOrder(id));
+    assertDoesNotThrow(() -> workflowTaskConfig.doNothing());
+    assertDoesNotThrow(() -> workflowTaskConfig.persistResponse(null, entity));
+    assertDoesNotThrow(() -> workflowTaskConfig.evaluateTask(Map.of(), "", entity));
+    assertThrows(KrakenException.class, () -> workflowTaskConfig.notify(id, "http://mock.url.com"));
     assertDoesNotThrow(() -> workflowTaskConfig.rejectOrder(id));
   }
 }
