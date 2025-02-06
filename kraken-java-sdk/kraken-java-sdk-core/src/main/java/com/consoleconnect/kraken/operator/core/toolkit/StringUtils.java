@@ -2,6 +2,8 @@ package com.consoleconnect.kraken.operator.core.toolkit;
 
 import static org.apache.commons.lang3.StringUtils.*;
 
+import com.consoleconnect.kraken.operator.core.exception.KrakenException;
+
 public class StringUtils {
 
   public static final String ESCAPED_DOUBLE_QUOTE = "\"";
@@ -44,6 +46,9 @@ public class StringUtils {
   }
 
   public static String shortenUUID(String uuidString) {
+    if (uuidString.length() < 8) {
+      throw KrakenException.internalError("uuid string length should be greater than 8");
+    }
     // fetch the first 8 characters of the UUID, which is enough to uniquely identify it
     return uuidString.substring(0, 8);
   }
