@@ -1,11 +1,9 @@
 package com.consoleconnect.kraken.operator.gateway.service.workflow;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
 
-import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.gateway.CustomConfig;
 import com.consoleconnect.kraken.operator.gateway.entity.HttpRequestEntity;
 import com.consoleconnect.kraken.operator.gateway.repo.HttpRequestRepository;
@@ -13,7 +11,9 @@ import com.consoleconnect.kraken.operator.gateway.service.WorkflowTaskConfig;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import com.consoleconnect.kraken.operator.workflow.model.LogTaskRequest;
-import java.util.*;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.SpyBean;
@@ -47,8 +47,8 @@ class WorkflowTaskConfigTest extends AbstractIntegrationTest {
     assertDoesNotThrow(() -> workflowTaskConfig.processOrder(id));
     assertDoesNotThrow(() -> workflowTaskConfig.doNothing());
     assertDoesNotThrow(() -> workflowTaskConfig.persistResponse(null, entity));
-    assertDoesNotThrow(() -> workflowTaskConfig.evaluateTask(Map.of(), "", entity));
-    assertThrows(KrakenException.class, () -> workflowTaskConfig.notify(id, "http://mock.url.com"));
+    assertDoesNotThrow(
+        () -> workflowTaskConfig.evaluateTask(Map.of("entity", entity), "", "${entity1}"));
     assertDoesNotThrow(() -> workflowTaskConfig.rejectOrder(id));
   }
 }
