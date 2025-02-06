@@ -65,7 +65,7 @@ public class ClientCredentialTokenProvider implements ExternalSystemTokenProvide
       JWT jwt = JWTParser.parse(token);
       long now = System.currentTimeMillis();
       long expiration = jwt.getJWTClaimsSet().getExpirationTime().getTime();
-      return (expiration - now) < EXPIRATION_BUFFER_IN_SECONDS;
+      return (expiration - now) < EXPIRATION_BUFFER_IN_SECONDS * 1000;
     } catch (ParseException e) {
       throw KrakenException.internalError(e.getMessage());
     }
