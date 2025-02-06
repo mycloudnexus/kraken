@@ -273,6 +273,10 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
         new PathCheck(
             "EXPECTED_NOT_BLANK", "", ExpectTypeEnum.EXPECTED_NOT_BLANK, "", "", 422, null);
 
+    PathCheck pathCheck8 =
+            new PathCheck(
+                    "EXPECTED_START_WITH", "", ExpectTypeEnum.EXPECTED_START_WITH, "UNI", "", 422, null);
+
     Pair<PathCheck, Object> pair1 = Pair.of(pathCheck1, "true");
     Pair<PathCheck, Object> pair2 = Pair.of(pathCheck2, null);
     Pair<PathCheck, Object> pair3 = Pair.of(pathCheck3, "AU");
@@ -280,8 +284,9 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
     Pair<PathCheck, Object> pair5 = Pair.of(pathCheck5, 123);
     Pair<PathCheck, Object> pair6 = Pair.of(pathCheck6, 123.4);
     Pair<PathCheck, Object> pair7 = Pair.of(pathCheck7, "not blank");
+    Pair<PathCheck, Object> pair8 = Pair.of(pathCheck8, "UNI-123");
 
-    return List.of(pair1, pair2, pair3, pair4, pair5, pair6, pair7);
+    return List.of(pair1, pair2, pair3, pair4, pair5, pair6, pair7, pair8);
   }
 
   @ParameterizedTest

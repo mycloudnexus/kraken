@@ -13,7 +13,7 @@ spec:
   matrix:
     mef.sonata.api-target.order.eline.add:
       - name: product_type_eline_type
-        path: "$.body.productOrderItem[*].['id']"
+        path: "$.body.productOrderItem[*].product.productConfiguration.['@type']"
         expectType: EXPECTED
         value: ACCESS_E_LINE
       - name: action_add

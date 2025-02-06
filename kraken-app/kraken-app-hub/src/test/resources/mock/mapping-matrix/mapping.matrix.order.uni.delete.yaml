@@ -12,7 +12,7 @@ spec:
     mef.sonata.api-target.order.uni.delete:
       - name: product_type_uni
         path: "$.body.productOrderItem[*].['id']"
-        expectType: EXPECTED
+        expectType: EXPECTED_START_WITH
         value: UNI
       - name: action_delete
         path: "$.body.productOrderItem[*].['action']"
