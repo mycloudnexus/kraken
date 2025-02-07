@@ -21,6 +21,7 @@ import com.consoleconnect.kraken.operator.core.repo.MgmtEventRepository;
 import com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants;
 import com.consoleconnect.kraken.operator.sync.model.SyncProperty;
 import com.consoleconnect.kraken.operator.sync.service.KrakenServerConnector;
+import com.consoleconnect.kraken.operator.sync.service.security.ExternalSystemTokenProvider;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
@@ -65,9 +66,10 @@ public class PushAPIActivityLogScheduler extends KrakenServerConnector {
   public PushAPIActivityLogScheduler(
       SyncProperty appProperty,
       WebClient webClient,
+      ExternalSystemTokenProvider externalSystemTokenProvider,
       MgmtEventRepository mgmtEventRepository,
       ApiActivityLogRepository apiActivityLogRepository) {
-    super(appProperty, webClient);
+    super(appProperty, webClient, externalSystemTokenProvider);
     this.mgmtEventRepository = mgmtEventRepository;
     this.apiActivityLogRepository = apiActivityLogRepository;
   }
