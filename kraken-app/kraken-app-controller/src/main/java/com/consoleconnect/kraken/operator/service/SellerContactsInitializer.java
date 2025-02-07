@@ -6,7 +6,6 @@ import static com.consoleconnect.kraken.operator.core.toolkit.Constants.SELLER_C
 import com.consoleconnect.kraken.operator.config.AppMgmtProperty;
 import com.consoleconnect.kraken.operator.controller.dto.CreateSellerContactRequest;
 import com.consoleconnect.kraken.operator.controller.service.SellerContactService;
-import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import jakarta.annotation.PostConstruct;
 import java.util.Objects;
@@ -34,7 +33,8 @@ public class SellerContactsInitializer {
     if (Objects.isNull(sellerContact)) {
       return;
     }
-    String finalProductId = checkAssetExist(sellerContact.getKey()) ? sellerContact.getKey() : null;
+    String finalProductId =
+        unifiedAssetService.existed(sellerContact.getKey()) ? sellerContact.getKey() : null;
     sellerContact
         .getSellerContactDetails()
         .forEach(detail -> processSellerContactDetail(finalProductId, detail));
@@ -43,7 +43,7 @@ public class SellerContactsInitializer {
   private void processSellerContactDetail(
       String finalProductId, CreateSellerContactRequest detail) {
     String sellerContactKey = generateSellerContactKey(detail);
-    boolean exist = checkAssetExist(sellerContactKey);
+    boolean exist = unifiedAssetService.existed(sellerContactKey);
     if (exist) {
       log.info("seller contact key has exist:{}, no need to create", sellerContactKey);
       return;
@@ -69,16 +69,5 @@ public class SellerContactsInitializer {
         + detail.getParentProductType()
         + DOT
         + SELLER_CONTACT_SUFFIX;
-  }
-
-  private boolean checkAssetExist(String assetId) {
-    try {
-      unifiedAssetService.findOne(assetId);
-      return true;
-    } catch (KrakenException e) {
-      String error = String.format("Cannot find asset by id: %s", assetId);
-      log.error(error, e);
-      return false;
-    }
   }
 }
