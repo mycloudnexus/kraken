@@ -128,7 +128,7 @@ export const getAPIServers = (
   return request(
     `/v2${PRODUCT}/${productId}/components/${productId}/api-servers`,
     {
-      params: { ...params, facetIncluded: false },
+      params: { ...params, facetIncluded: true, liteSearch: true },
     }
   );
 };
