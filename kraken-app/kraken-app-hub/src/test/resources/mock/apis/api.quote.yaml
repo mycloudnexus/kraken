@@ -48,7 +48,8 @@ spec:
                 let forwardDownstream = true;
                 let typeArr = ['UNI', 'ACCESS_E_LINE'];
                 let syncQuote = input.instantSyncQuote;
-                let typeVal = input.quoteItem['product']['productConfiguration']['@type'];
+                let productConfiguration = input.quoteItem?.product?.productConfiguration;
+                let typeVal = productConfiguration?.['@type'];
                 if(typeVal === 'UNI') {
                   if(syncQuote === true) {
                     targetAPIConfigKey = 'mef.sonata.api-target.quote.uni.add.sync';
@@ -109,8 +110,8 @@ spec:
                 }
                 errorMsg = errorArr.join(' ');
                 let ret = {
-                  quoteType: input.quoteItem['product']['productConfiguration']['@type'],
-                  instantSyncQuote: input.instantSyncQuote,
+                  quoteType: typeVal || 'undefined',
+                  instantSyncQuote: syncQuote !== undefined ? syncQuote : 'undefined',
                   forwardDownstream: forwardDownstream,
                   targetAPIConfigKey: targetAPIConfigKey,
                   matrixConfigKey: matrixConfigKey,
