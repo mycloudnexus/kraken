@@ -22,6 +22,7 @@ public class RewritePathActionRunner extends AbstractActionRunner {
   public static final String INPUT_PATH = "path";
   public static final String INPUT_METHOD = "method";
   public static final String INPUT_URL = "url";
+  public static final String WORKFLOW_ENABLED = "workflowEnabled";
 
   public RewritePathActionRunner(AppProperty appProperty) {
     super(appProperty);
@@ -41,6 +42,13 @@ public class RewritePathActionRunner extends AbstractActionRunner {
     String path = (String) inputs.get(INPUT_PATH);
     String method = (String) inputs.get(INPUT_METHOD);
     String url = (String) inputs.get(INPUT_URL);
+    boolean workflowEnabled =
+        inputs.containsKey(WORKFLOW_ENABLED)
+            ? Boolean.getBoolean((String) inputs.get(WORKFLOW_ENABLED))
+            : Boolean.FALSE;
+    if (workflowEnabled) {
+      return Optional.empty();
+    }
     exchange
         .getAttributes()
         .put(ServerWebExchangeUtils.GATEWAY_REQUEST_URL_ATTR, URI.create(url + path));
