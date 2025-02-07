@@ -6,7 +6,6 @@ import static com.consoleconnect.kraken.operator.core.toolkit.Constants.SELLER_C
 import com.consoleconnect.kraken.operator.config.AppMgmtProperty;
 import com.consoleconnect.kraken.operator.controller.dto.CreateSellerContactRequest;
 import com.consoleconnect.kraken.operator.controller.service.SellerContactService;
-import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import jakarta.annotation.PostConstruct;
@@ -32,7 +31,10 @@ public class SellerContactsInitializer {
   }
 
   private void processSellerContact(AppMgmtProperty.SellerContact sellerContact) {
-    String finalProductId = fetchProduct(sellerContact.getKey());
+    if (Objects.isNull(sellerContact)) {
+      return;
+    }
+    String finalProductId = checkAssetExist(sellerContact.getKey()) ? sellerContact.getKey() : null;
     sellerContact
         .getSellerContactDetails()
         .forEach(detail -> processSellerContactDetail(finalProductId, detail));
@@ -40,14 +42,9 @@ public class SellerContactsInitializer {
 
   private void processSellerContactDetail(
       String finalProductId, CreateSellerContactRequest detail) {
-    UnifiedAssetDto contactAssetDto = null;
     String sellerContactKey = generateSellerContactKey(detail);
-    try {
-      contactAssetDto = unifiedAssetService.findOne(sellerContactKey);
-    } catch (KrakenException e) {
-      log.error("Not found seller contact", e);
-    }
-    if (Objects.nonNull(contactAssetDto)) {
+    boolean exist = checkAssetExist(sellerContactKey);
+    if (exist) {
       log.info("seller contact key has exist:{}, no need to create", sellerContactKey);
       return;
     }
@@ -74,14 +71,14 @@ public class SellerContactsInitializer {
         + SELLER_CONTACT_SUFFIX;
   }
 
-  private String fetchProduct(String productId) {
+  private boolean checkAssetExist(String assetId) {
     try {
-      unifiedAssetService.findOne(productId);
-      return productId;
+      unifiedAssetService.findOne(assetId);
+      return true;
     } catch (KrakenException e) {
-      String error = String.format("Cannot find productId: %s", productId);
+      String error = String.format("Cannot find asset by id: %s", assetId);
       log.error(error, e);
-      return null;
+      return false;
     }
   }
 }
