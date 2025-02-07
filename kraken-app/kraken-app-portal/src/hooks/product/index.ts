@@ -28,6 +28,7 @@ import {
   verifyProduct,
   deployProduction,
   getAuditLogs,
+  getAuditLogDetails,
   getLatestRunningAPI,
   getMappingTemplateReleaseHistory,
   getMappingTemplateCurrentVersion,
@@ -98,6 +99,7 @@ export const PRODUCT_CACHE_KEYS = {
   get_all_api_key: "get_all_api_key",
   get_all_data_plane: "get_all_data_plane",
   get_audit_logs: "get_audit_logs",
+  get_audit_log_details: "get_audit_log_details",
   get_buyer_list: "get_buyer_list",
   get_component_api_doc: "get_component_api_doc",
   get_component_detail: "get_component_detail",
@@ -118,7 +120,8 @@ export const PRODUCT_CACHE_KEYS = {
   get_product_deployment_list: "get_product_deployment_list",
   get_product_env_activity_detail: "get_product_env_activity_detail",
   get_product_env_activity_list: "get_product_env_activity_list",
-  get_product_env_activity_list_mutation: "get_product_env_activity_list_mutation",
+  get_product_env_activity_list_mutation:
+    "get_product_env_activity_list_mutation",
   get_product_push_history_log: "get_product_push_history_log",
   get_release_list: "get_release_list",
   get_running_api_list: "get_running_api_list",
@@ -245,7 +248,7 @@ export const useGetProductEnvs = (productId: string, enabled = true) => {
 export const useGetProductEnvActivities = (
   productId: string,
   envId: string,
-  params: unknown,
+  params: unknown
 ) => {
   return useQuery<AxiosResponse, Error, IPagingData<IActivityLog>>({
     queryKey: [
@@ -362,12 +365,16 @@ export const useEditComponentV2 = () => {
   return useMutation<any, Error>({
     mutationKey: [PRODUCT_CACHE_KEYS.edit_component_detail],
     mutationFn: ({ productId, componentId, data }: any) =>
-        editComponentDetail(productId, componentId, data),
-    onSuccess:(data:any,variables:any) => {
+      editComponentDetail(productId, componentId, data),
+    onSuccess: (data: any, variables: any) => {
       if (data?.code == 200) {
         queryClient.invalidateQueries({
-          queryKey: [PRODUCT_CACHE_KEYS.get_component_detail, variables?.productId, variables?.componentId],
-        })
+          queryKey: [
+            PRODUCT_CACHE_KEYS.get_component_detail,
+            variables?.productId,
+            variables?.componentId,
+          ],
+        });
       }
     },
   });
@@ -594,6 +601,18 @@ export const useGetAuditLogs = (params: Record<string, any>) => {
   });
 };
 
+export const useGetAuditLogDetails = (
+  params: Record<string, any>,
+  id: string
+) => {
+  return useQuery<any, Error>({
+    queryKey: [PRODUCT_CACHE_KEYS.get_audit_log_details, params, id],
+    queryFn: () => getAuditLogDetails(params, id),
+    enabled: Boolean(id),
+    select: (data) => data?.data,
+  });
+};
+
 export const useGetBuyerList = (
   productId: string,
   params: Record<string, any>
@@ -773,6 +792,6 @@ export const useGetValidateServerName = () => {
       queryClient.invalidateQueries({
         queryKey: [PRODUCT_CACHE_KEYS.get_validate_api_server_name],
       });
-    }
+    },
   });
 };
