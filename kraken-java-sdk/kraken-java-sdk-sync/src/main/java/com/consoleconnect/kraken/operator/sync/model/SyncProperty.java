@@ -38,25 +38,26 @@ public class SyncProperty {
 
   @Data
   public static class ExternalAuth {
+    private String authMode;
     private InternalToken internalToken;
     private ClientCredentials clientCredentials;
   }
 
   @Data
   public static class InternalToken {
-    private boolean enabled;
     private String accessToken;
   }
 
+  private static final long EXPIRATION_BUFFER_IN_SECONDS = 30;
   private static final String ENDPOINT_AUTH_TOKEN = "/tenant/auth/token";
 
   @Data
   public static class ClientCredentials {
-    private boolean enabled;
     private String authServerUrl;
     private String authTokenEndpoint = ENDPOINT_AUTH_TOKEN;
     private String clientId;
     private String clientSecret;
+    private Long expirationBufferInSeconds = EXPIRATION_BUFFER_IN_SECONDS;
   }
 
   @Data

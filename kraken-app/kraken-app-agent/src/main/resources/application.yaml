@@ -92,14 +92,15 @@ app:
   controlPlane:
     url: http://localhost:8001
     auth:
+      authMode: internalToken
       internalToken:
-        enabled:  ${KRAKEN_AGENT_ENABLE_INTERNAL_TOKEN:true}
         accessToken: ${KRAKEN_CONTROL_PLANE_AGENT_TOKEN:123456}
       clientCredentials:
-        enabled:  ${KRAKEN_AGENT_ENABLE_CLIENT_CREDENTIAL:false}
         authServerUrl: ${app.controlPlane.url}
+        authTokenEndpoint: "/tenant/auth/token"
         clientId: ${KRAKEN_CONTROL_PLANE_AGENT_CLIENT_ID:123456}
         clientSecret: ${KRAKEN_CONTROL_PLANE_AGENT_CLIENT_SECRET:123456}
+        expirationBufferInSeconds: 30
     push-activity-log-external:
       enabled: false
       batch-size: ${EXTERNAL_SYSTEM_PUSH_LOG_BATCH_SIZE:200}

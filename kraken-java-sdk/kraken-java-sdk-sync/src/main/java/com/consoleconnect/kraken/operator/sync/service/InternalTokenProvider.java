@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 @AllArgsConstructor
 @Service
-@ConditionalOnProperty(value = "app.controlPlane.auth.internalToken.enabled", havingValue = "true")
+@ConditionalOnProperty(value = "app.control-plane.auth.auth-mode", havingValue = "internalToken")
 @Slf4j
 public class InternalTokenProvider implements ExternalSystemTokenProvider {
 

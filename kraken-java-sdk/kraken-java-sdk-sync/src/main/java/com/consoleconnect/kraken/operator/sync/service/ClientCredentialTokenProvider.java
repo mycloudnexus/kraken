@@ -24,11 +24,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Service
 @Slf4j
 @ConditionalOnProperty(
-    value = "app.control-plane.auth.client-credentials.enabled",
-    havingValue = "true")
+    value = "app.control-plane.auth.auth-mode",
+    havingValue = "clientCredentials")
 public class ClientCredentialTokenProvider implements ExternalSystemTokenProvider {
-
-  private static final long EXPIRATION_BUFFER_IN_SECONDS = 30;
 
   private String cachedToken = null;
 
@@ -66,7 +64,13 @@ public class ClientCredentialTokenProvider implements ExternalSystemTokenProvide
       JWT jwt = JWTParser.parse(token);
       long now = System.currentTimeMillis();
       long expiration = jwt.getJWTClaimsSet().getExpirationTime().getTime();
-      return (expiration - now) < EXPIRATION_BUFFER_IN_SECONDS * 1000;
+      return (expiration - now)
+          < syncProperty
+                  .getControlPlane()
+                  .getAuth()
+                  .getClientCredentials()
+                  .getExpirationBufferInSeconds()
+              * 1000;
     } catch (ParseException e) {
       throw KrakenException.internalError(e.getMessage());
     }
