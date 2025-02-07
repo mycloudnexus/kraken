@@ -227,6 +227,9 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
       case EXPECTED -> {
         return pathCheck.value().equalsIgnoreCase(wrapAsString(value));
       }
+      case EXPECTED_START_WITH -> {
+        return wrapAsString(value).startsWith(pathCheck.value());
+      }
       case EXPECTED_EXIST -> {
         if (!Objects.equals(pathCheck.value(), String.valueOf(Boolean.TRUE))) {
           throwException(pathCheck, null);
