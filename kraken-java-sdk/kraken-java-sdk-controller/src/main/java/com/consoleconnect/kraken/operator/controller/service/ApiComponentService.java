@@ -470,7 +470,7 @@ public class ApiComponentService
             .toList();
     componentProductCategoryDTO.setComponentProducts(metadataList);
     componentProductCategoryDTO.setProductCategories(
-        Arrays.stream(ProductCategoryEnum.values())
+        Arrays.stream(ParentProductTypeEnum.values())
             .map(
                 item -> {
                   ComponentProductCategoryDTO.ProductCategoryMetaData metadata =
