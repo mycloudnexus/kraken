@@ -1,34 +1,25 @@
+import { useGetPushActivityLogHistory } from "@/hooks/pushApiEvent";
 import { useCommonListProps } from "@/hooks/useCommonListProps";
 import useSize from "@/hooks/useSize";
+import { useUser } from "@/hooks/user/useUser";
 import { DEFAULT_PAGING } from "@/utils/constants/common";
+import { DAY_FORMAT, DAY_TIME_FORMAT_NORMAL } from "@/utils/constants/format";
+import { getStatusBadge } from "@/utils/helpers/ui";
 import { IPushHistory } from "@/utils/types/env.type";
-import {
-  Badge,
-  Flex,
-  Table,
-} from "antd";
+import { Badge, Flex, Table } from "antd";
 import { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
+import { capitalize } from "lodash";
 import { useEffect, useRef } from "react";
 import styles from "../../index.module.scss";
-import { useGetPushActivityLogHistory } from '@/hooks/pushApiEvent';
-import mockData from "./historyMockData.json"
-import { DAY_FORMAT, DAY_TIME_FORMAT_NORMAL } from '@/utils/constants/format';
-import { capitalize } from 'lodash';
-import { useUser } from '@/hooks/user/useUser';
-import { getStatusBadge } from '@/utils/helpers/ui';
-import { IActivityHistoryLog } from '@/utils/types/common.type';
+import mockData from "./historyMockData.json";
 
 const initPagination = {
   pageSize: DEFAULT_PAGING.size,
   current: DEFAULT_PAGING.page,
 };
 
-type Props = {
-  handleHistoryActivityClick: (record: IActivityHistoryLog) => void;
-}
-
-  const PushHistoryList = ({ handleHistoryActivityClick } : Props) => {
+const PushHistoryList = () => {
   const {
     tableData,
     pagination,
@@ -53,7 +44,6 @@ type Props = {
     }
   }, [data, isLoading]);
 
-
   const ref = useRef<any>();
   const size = useSize(ref);
   const refWrapper = useRef<any>();
@@ -63,7 +53,8 @@ type Props = {
     {
       key: "createdAt",
       title: "Push time",
-      render: (log: IPushHistory) => dayjs(log.createdAt).format(DAY_TIME_FORMAT_NORMAL),
+      render: (log: IPushHistory) =>
+        dayjs(log.createdAt).format(DAY_TIME_FORMAT_NORMAL),
     },
     {
       key: "envName",
@@ -72,8 +63,15 @@ type Props = {
     },
     {
       title: "Time range",
-      render: (log: IPushHistory) => 
-      <>{dayjs(log.startTime).format(DAY_FORMAT)}<span style={{ padding: "0 10px", color: "rgba(0,0,0,0.45)"}}>to</span>{dayjs(log.endTime).format(DAY_FORMAT)}</>,
+      render: (log: IPushHistory) => (
+        <>
+          {dayjs(log.startTime).format(DAY_FORMAT)}
+          <span style={{ padding: "0 10px", color: "rgba(0,0,0,0.45)" }}>
+            to
+          </span>
+          {dayjs(log.endTime).format(DAY_FORMAT)}
+        </>
+      ),
     },
     {
       key: "pushedBy",
@@ -83,8 +81,13 @@ type Props = {
     {
       key: "status",
       title: "Status",
-      render: (log: IPushHistory) => <Flex gap={5}><Badge status={getStatusBadge(log.status)} />{capitalize(log.status)}</Flex>,
-    }
+      render: (log: IPushHistory) => (
+        <Flex gap={5}>
+          <Badge status={getStatusBadge(log.status)} />
+          {capitalize(log.status)}
+        </Flex>
+      ),
+    },
   ];
 
   return (
@@ -92,14 +95,7 @@ type Props = {
       <Table
         dataSource={tableData}
         columns={columns}
-        rowKey={(record) =>
-          `${record.id}_${record.createdAt}`
-        }
-        onRow={(record: IActivityHistoryLog) => {
-          return {
-            onClick: () => handleHistoryActivityClick(record),
-          };
-        }}
+        rowKey={(record) => `${record.id}_${record.createdAt}`}
         loading={isLoading}
         className={styles.table}
         pagination={{

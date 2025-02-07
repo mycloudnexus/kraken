@@ -1,7 +1,7 @@
 package com.consoleconnect.kraken.operator.gateway.runner;
 
 import static com.consoleconnect.kraken.operator.core.toolkit.Constants.DOT;
-import static com.consoleconnect.kraken.operator.core.toolkit.ConstructExpressionUtil.convertToJsonPointer;
+import static com.consoleconnect.kraken.operator.core.toolkit.ConstructExpressionUtil.*;
 
 import com.consoleconnect.kraken.operator.core.dto.StateValueMappingDto;
 import com.consoleconnect.kraken.operator.core.enums.MappingTypeEnum;
@@ -31,6 +31,7 @@ public interface MappingTransformer {
   String FORWARD_DOWNSTREAM = "forwardDownstream";
   String REQUEST_BODY = "requestBody.";
   String RESPONSE_BODY = "responseBody";
+  String WORKFLOW_PREFIX = "workflow.";
 
   @Slf4j
   final class LogHolder {}
@@ -234,6 +235,9 @@ public interface MappingTransformer {
       if (strippedValue.startsWith(ARRAY_FIRST_ELE) || strippedValue.startsWith(ARRAY_WILD_MASK)) {
         strippedValue = RESPONSE_BODY + strippedValue;
       } else {
+        if (strippedValue.startsWith(WORKFLOW_PREFIX)) {
+          return formatWorkflowResponseExpression(strippedValue);
+        }
         strippedValue = RESPONSE_BODY + "." + strippedValue;
       }
     }
