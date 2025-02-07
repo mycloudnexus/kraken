@@ -16,7 +16,7 @@ spec:
         target: UNI
         targetType: ''
         replaceStar: true
-        targetValues: [ ]
+        targetValues: []
         sourceLocation: BODY
         targetLocation: CONSTANT
         customizedField: false
