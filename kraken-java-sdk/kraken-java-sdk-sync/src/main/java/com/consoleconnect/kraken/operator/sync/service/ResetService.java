@@ -10,6 +10,7 @@ import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.core.toolkit.Paging;
 import com.consoleconnect.kraken.operator.sync.model.MgmtEvent;
 import com.consoleconnect.kraken.operator.sync.model.SyncProperty;
+import com.consoleconnect.kraken.operator.sync.service.security.ExternalSystemTokenProvider;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
@@ -30,8 +31,11 @@ public class ResetService extends KrakenServerConnector {
   private final UnifiedAssetService unifiedAssetService;
 
   public ResetService(
-      SyncProperty syncProperty, WebClient webClient, UnifiedAssetService unifiedAssetService) {
-    super(syncProperty, webClient);
+      SyncProperty syncProperty,
+      WebClient webClient,
+      ExternalSystemTokenProvider externalSystemTokenProvider,
+      UnifiedAssetService unifiedAssetService) {
+    super(syncProperty, webClient, externalSystemTokenProvider);
     this.syncProperty = syncProperty;
     this.unifiedAssetService = unifiedAssetService;
   }

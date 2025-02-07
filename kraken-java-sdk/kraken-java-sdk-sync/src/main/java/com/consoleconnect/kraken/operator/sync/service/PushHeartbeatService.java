@@ -6,6 +6,7 @@ import com.consoleconnect.kraken.operator.core.client.ClientInstanceHeartbeat;
 import com.consoleconnect.kraken.operator.data.entity.InstanceHeartbeatEntity;
 import com.consoleconnect.kraken.operator.data.repo.HeartbeatRepository;
 import com.consoleconnect.kraken.operator.sync.model.SyncProperty;
+import com.consoleconnect.kraken.operator.sync.service.security.ExternalSystemTokenProvider;
 import java.time.ZonedDateTime;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -22,8 +23,11 @@ public class PushHeartbeatService extends KrakenServerConnector {
   private ZonedDateTime lastSyncedAt = null;
 
   public PushHeartbeatService(
-      SyncProperty appProperty, WebClient webClient, HeartbeatRepository heartbeatRepository) {
-    super(appProperty, webClient);
+      SyncProperty appProperty,
+      WebClient webClient,
+      ExternalSystemTokenProvider externalSystemTokenProvider,
+      HeartbeatRepository heartbeatRepository) {
+    super(appProperty, webClient, externalSystemTokenProvider);
     this.heartbeatRepository = heartbeatRepository;
   }
 
