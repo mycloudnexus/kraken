@@ -5,7 +5,6 @@ import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import com.consoleconnect.kraken.operator.sync.ClientCredentialMockServerTest;
 import com.consoleconnect.kraken.operator.sync.service.security.ExternalSystemTokenProvider;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,9 +48,6 @@ class ClientCredentialTokenProviderTest extends ClientCredentialMockServerTest {
         .issuedAt(new Date(current))
         .expiration(new Date(current + 100 * 1000))
         .issuer("https://test.issuer")
-        .signWith(
-            SignatureAlgorithm.HS256,
-            "ABCDEFG012345789ABCDEFG012345789ABCDEFG012345789ABCDEFG012345789")
         .compact();
   }
 }
