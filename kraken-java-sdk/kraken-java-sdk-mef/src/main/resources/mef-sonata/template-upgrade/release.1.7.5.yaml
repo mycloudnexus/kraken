@@ -10,4 +10,6 @@ metadata:
     publishDate: 2025-01-26
   description: |
     Support of condition dependencies in request mappers
+    Replace the routing parameter 'productConfiguration.@type' with 'productOrderItem[0].id'
+    Replace the checking path 'dutyFreeAmount.unit' with 'dutyFreeAmount.value'
   version: 1
