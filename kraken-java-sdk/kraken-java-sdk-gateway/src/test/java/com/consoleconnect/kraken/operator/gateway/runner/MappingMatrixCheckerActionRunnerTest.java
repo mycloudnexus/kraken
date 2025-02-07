@@ -15,6 +15,8 @@ import com.consoleconnect.kraken.operator.gateway.dto.PathCheck;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
 import java.io.IOException;
 import java.util.*;
 import lombok.SneakyThrows;
@@ -248,13 +250,26 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
 
   public static List<Pair<PathCheck, Object>> buildLegalPathCheckList() {
     PathCheck pathCheck1 =
-        new PathCheck("EXPECTED", "user", ExpectTypeEnum.EXPECTED, "true", "", null, null);
+        new PathCheck(
+            ExpectTypeEnum.EXPECTED.name(),
+            "user",
+            ExpectTypeEnum.EXPECTED,
+            "true",
+            "",
+            null,
+            null);
     PathCheck pathCheck2 =
         new PathCheck(
-            "EXPECTED_EXIST", "user", ExpectTypeEnum.EXPECTED_EXIST, "true", "", null, null);
+            ExpectTypeEnum.EXPECTED_EXIST.name(),
+            "user",
+            ExpectTypeEnum.EXPECTED_EXIST,
+            "true",
+            "",
+            null,
+            null);
     PathCheck pathCheck3 =
         new PathCheck(
-            "EXPECTED_TRUE",
+            ExpectTypeEnum.EXPECTED_TRUE.name(),
             "$.body.submittedGeographicAddress.['country']",
             ExpectTypeEnum.EXPECTED_TRUE,
             "${param}",
@@ -262,14 +277,39 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
             422,
             null);
     PathCheck pathCheck4 =
-        new PathCheck("EXPECTED_STR", "", ExpectTypeEnum.EXPECTED_STR, "", "", 422, null);
+        new PathCheck(
+            ExpectTypeEnum.EXPECTED_STR.name(), "", ExpectTypeEnum.EXPECTED_STR, "", "", 422, null);
     PathCheck pathCheck5 =
-        new PathCheck("EXPECTED_INT", "", ExpectTypeEnum.EXPECTED_INT, "", "", 422, null);
+        new PathCheck(
+            ExpectTypeEnum.EXPECTED_INT.name(), "", ExpectTypeEnum.EXPECTED_INT, "", "", 422, null);
     PathCheck pathCheck6 =
-        new PathCheck("EXPECTED_NUMERIC", "", ExpectTypeEnum.EXPECTED_NUMERIC, "", "", 422, null);
+        new PathCheck(
+            ExpectTypeEnum.EXPECTED_NUMERIC.name(),
+            "",
+            ExpectTypeEnum.EXPECTED_NUMERIC,
+            "",
+            "",
+            422,
+            null);
     PathCheck pathCheck7 =
         new PathCheck(
-            "EXPECTED_NOT_BLANK", "", ExpectTypeEnum.EXPECTED_NOT_BLANK, "", "", 422, null);
+            ExpectTypeEnum.EXPECTED_NOT_BLANK.name(),
+            "",
+            ExpectTypeEnum.EXPECTED_NOT_BLANK,
+            "",
+            "",
+            422,
+            null);
+
+    PathCheck pathCheck8 =
+        new PathCheck(
+            ExpectTypeEnum.EXPECTED_START_WITH.name(),
+            "",
+            ExpectTypeEnum.EXPECTED_START_WITH,
+            "UNI",
+            "",
+            422,
+            null);
 
     Pair<PathCheck, Object> pair1 = Pair.of(pathCheck1, "true");
     Pair<PathCheck, Object> pair2 = Pair.of(pathCheck2, null);
@@ -278,8 +318,9 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
     Pair<PathCheck, Object> pair5 = Pair.of(pathCheck5, 123);
     Pair<PathCheck, Object> pair6 = Pair.of(pathCheck6, 123.4);
     Pair<PathCheck, Object> pair7 = Pair.of(pathCheck7, "not blank");
+    Pair<PathCheck, Object> pair8 = Pair.of(pathCheck8, "UNI-123");
 
-    return List.of(pair1, pair2, pair3, pair4, pair5, pair6, pair7);
+    return List.of(pair1, pair2, pair3, pair4, pair5, pair6, pair7, pair8);
   }
 
   @ParameterizedTest
@@ -523,5 +564,77 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
                   mappingMatrixCheckerActionRunner.checkMatrixConstraints(
                       facets, targetKey, requestBody, List.of()));
         });
+  }
+
+  @Test
+  void givenNotMatchedSourceConditions_whenChecking_thenNoException() {
+    Map<String, Object> inputs = new HashMap<>();
+    Map<String, Object> body = new HashMap<>();
+    inputs.put("body", body);
+    body.put("a1", "roll3");
+    body.put("a2", "roll1");
+    body.put("a3", "roll2");
+    List<String> pathsExpected422 = List.of();
+    DocumentContext documentContext = JsonPath.parse(inputs);
+    ComponentAPITargetFacets.Mapper mapper = new ComponentAPITargetFacets.Mapper();
+    mapper.setSource("@{{a1}}");
+    mapper.setSourceConditions(getSourceConditions());
+    Assertions.assertDoesNotThrow(
+        () ->
+            mappingMatrixCheckerActionRunner.checkEnumValue(
+                documentContext, mapper, inputs, pathsExpected422));
+
+    Assertions.assertDoesNotThrow(
+        () ->
+            mappingMatrixCheckerActionRunner.checkConstantValue(
+                documentContext, mapper, inputs, pathsExpected422));
+
+    mapper.setSourceLocation("BODY");
+    Assertions.assertDoesNotThrow(
+        () ->
+            mappingMatrixCheckerActionRunner.checkMappingValue(
+                documentContext, mapper, inputs, pathsExpected422));
+  }
+
+  @Test
+  void givenSourceDependOnExpression_whenEvaluate_thenReturnTrue() {
+    Map<String, Object> inputs = new HashMap<>();
+    Map<String, Object> body = new HashMap<>();
+    body.put("a1", "roll1");
+    body.put("a2", "roll2");
+    body.put("a3", "roll3");
+    inputs.put("body", body);
+
+    List<ComponentAPITargetFacets.SourceCondition> sourceConditions = getSourceConditions();
+    boolean dependOn =
+        mappingMatrixCheckerActionRunner.checkConditionsMatched(inputs, sourceConditions);
+    Assertions.assertTrue(dependOn);
+
+    body.put("a1", "roll");
+    inputs.put("body", body);
+    dependOn = mappingMatrixCheckerActionRunner.checkConditionsMatched(inputs, sourceConditions);
+    Assertions.assertFalse(dependOn);
+  }
+
+  private static List<ComponentAPITargetFacets.SourceCondition> getSourceConditions() {
+    ComponentAPITargetFacets.SourceCondition sourceCondition1 =
+        new ComponentAPITargetFacets.SourceCondition();
+    sourceCondition1.setKey("@{{a1}}");
+    sourceCondition1.setOperator("eq");
+    sourceCondition1.setVal("roll1");
+
+    ComponentAPITargetFacets.SourceCondition sourceCondition2 =
+        new ComponentAPITargetFacets.SourceCondition();
+    sourceCondition2.setKey("@{{a2}}");
+    sourceCondition2.setOperator("eq");
+    sourceCondition2.setVal("roll2");
+
+    ComponentAPITargetFacets.SourceCondition sourceCondition3 =
+        new ComponentAPITargetFacets.SourceCondition();
+    sourceCondition3.setKey("@{{a3}}");
+    sourceCondition3.setOperator("eq");
+    sourceCondition3.setVal("roll3");
+
+    return List.of(sourceCondition1, sourceCondition2, sourceCondition3);
   }
 }

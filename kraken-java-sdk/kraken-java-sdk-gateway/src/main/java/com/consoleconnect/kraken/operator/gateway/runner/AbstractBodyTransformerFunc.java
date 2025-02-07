@@ -1,10 +1,13 @@
 package com.consoleconnect.kraken.operator.gateway.runner;
 
+import static com.consoleconnect.kraken.operator.gateway.filter.WorkflowActionFilterFactory.VAR_WORKFLOW_CONFIG;
 import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.GATEWAY_ROUTE_ATTR;
 
 import com.consoleconnect.kraken.operator.core.dto.StateValueMappingDto;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
+import com.consoleconnect.kraken.operator.core.model.HttpTask;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPIFacets;
+import com.consoleconnect.kraken.operator.core.model.facet.ComponentWorkflowFacets;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.gateway.entity.HttpRequestEntity;
 import com.consoleconnect.kraken.operator.gateway.filter.KrakenFilterConstants;
@@ -51,6 +54,10 @@ public abstract class AbstractBodyTransformerFunc
       return Mono.just(s);
     }
     Map<String, Object> context = contextOptional.get();
+    if (context.containsKey(VAR_WORKFLOW_CONFIG) && !postRequest) {
+      transformWorkflowRequest(context);
+      return Mono.just(s);
+    }
     Optional<Integer> responseStatusOpt;
     if (postRequest) {
       Object expectedSuccessStatus = context.getOrDefault(SUCCESS_STATUS, null);
@@ -79,7 +86,8 @@ public abstract class AbstractBodyTransformerFunc
       retJsonString = javaScriptEngine.execute(scriptId, context);
 
     } else if (ENGINE_SPEL.equals(engine)) {
-      retJsonString = rendResponseWithSpEl(context, postRequest);
+      Object o = context.get(SpelEngineActionRunner.INPUT_CODE);
+      retJsonString = rendResponseWithSpEl(o, context, postRequest);
     } else {
       Object expression = context.get(SpelEngineActionRunner.INPUT_CODE);
       if (expression instanceof String exp) {
@@ -101,6 +109,25 @@ public abstract class AbstractBodyTransformerFunc
     }
 
     return Mono.just(retJsonString == null ? StringUtils.EMPTY : retJsonString);
+  }
+
+  private void transformWorkflowRequest(Map<String, Object> context) {
+    ComponentWorkflowFacets workflowFacets =
+        JsonToolkit.fromJson(
+            JsonToolkit.toJson(context.get(VAR_WORKFLOW_CONFIG)), ComponentWorkflowFacets.class);
+    List<HttpTask> taskList = new ArrayList<>();
+    taskList.addAll(workflowFacets.getExecutionStage());
+    taskList.addAll(workflowFacets.getPreparationStage());
+    taskList.addAll(workflowFacets.getValidationStage());
+    taskList.stream()
+        .filter(task -> StringUtils.isNotBlank(task.getEndpoint().getPath()))
+        .forEach(
+            httpTask ->
+                httpTask
+                    .getEndpoint()
+                    .setRequestBody(
+                        rendResponseWithSpEl(
+                            httpTask.getEndpoint().getRequestBody(), context, false)));
   }
 
   private void createRequest(ServerWebExchange exchange, String requestBody) {
@@ -139,9 +166,7 @@ public abstract class AbstractBodyTransformerFunc
     this.httpRequestRepository.save(updatedEntity);
   }
 
-  private String rendResponseWithSpEl(Map<String, Object> context, boolean postRequest) {
-    Object o = context.get(SpelEngineActionRunner.INPUT_CODE);
-
+  private String rendResponseWithSpEl(Object o, Map<String, Object> context, boolean postRequest) {
     SpELEngine.parseToList(o, context, new ArrayList<>());
     String retJsonString =
         SpELEngine.evaluate(o, context, postRequest && !action.isPostResultRender());

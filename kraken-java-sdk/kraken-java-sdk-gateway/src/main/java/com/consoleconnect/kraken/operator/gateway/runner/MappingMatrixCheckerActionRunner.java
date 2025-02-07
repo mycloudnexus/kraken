@@ -224,6 +224,9 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
       case EXPECTED -> {
         return pathCheck.value().equalsIgnoreCase(wrapAsString(value));
       }
+      case EXPECTED_START_WITH -> {
+        return wrapAsString(value).startsWith(pathCheck.value());
+      }
       case EXPECTED_EXIST -> {
         if (!Objects.equals(pathCheck.value(), String.valueOf(Boolean.TRUE))) {
           throwException(pathCheck, null);
@@ -284,7 +287,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
       if (MappingTypeEnum.ENUM.getKind().equals(mapper.getSourceType())
           || MappingTypeEnum.STRING.getKind().equals(mapper.getSourceType())
           || isNumberKind(mapper.getAllowValueLimit(), mapper.getSourceType())) {
-        checkEnumValue(documentContext, mapper, pathsExpected422);
+        checkEnumValue(documentContext, mapper, inputs, pathsExpected422);
       } else if (isConstantType(mapper.getTarget())) {
         checkConstantValue(documentContext, mapper, inputs, pathsExpected422);
       } else {
@@ -293,7 +296,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     }
   }
 
-  private void checkConstantValue(
+  public void checkConstantValue(
       DocumentContext documentContext,
       ComponentAPITargetFacets.Mapper mapper,
       Map<String, Object> inputs,
@@ -302,6 +305,12 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     if (String.valueOf(expectedValue).contains("{{")) {
       return;
     }
+    if (CollectionUtils.isNotEmpty(mapper.getSourceConditions())
+        && !checkConditionsMatched(inputs, mapper.getSourceConditions())) {
+      // Skip the checking
+      return;
+    }
+    // Keep normal checking process
     List<String> params = extractMapperParam(mapper.getSource());
     String constructedBody = constructJsonPathBody(replaceStarToZero(mapper.getSource()));
     // if path in the excluded400Path, then throws 422, otherwise throws 400
@@ -309,7 +318,6 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
         readByPathWithException(documentContext, constructedBody, pathsExpected422, null);
     validateConstantNumber(
         realValue, mapper, CollectionUtils.isEmpty(params) ? mapper.getSource() : params.get(0));
-
     String evaluateValue =
         SpELEngine.evaluate(constructBody(mapper.getSource()), inputs, String.class);
     if (!Objects.equals(evaluateValue, expectedValue)) {
@@ -320,14 +328,21 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     }
   }
 
-  private void checkEnumValue(
+  public void checkEnumValue(
       DocumentContext documentContext,
       ComponentAPITargetFacets.Mapper mapper,
+      Map<String, Object> inputs,
       List<String> pathsExpected422) {
     List<String> params = extractMapperParam(mapper.getSource());
     if (CollectionUtils.isEmpty(params)) {
       return;
     }
+    if (CollectionUtils.isNotEmpty(mapper.getSourceConditions())
+        && !checkConditionsMatched(inputs, mapper.getSourceConditions())) {
+      // Skip the checking
+      return;
+    }
+
     String constructedBody = constructJsonPathBody(replaceStarToZero(mapper.getSource()));
     // if path in the excluded400Path, then throws 422, otherwise throws 400
     Object realValue =
@@ -361,7 +376,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     validateContinuousNumber(evaluateValue, paramName, valueList, sourceType, discrete);
   }
 
-  private void checkMappingValue(
+  public void checkMappingValue(
       DocumentContext documentContext,
       ComponentAPITargetFacets.Mapper mapper,
       Map<String, Object> inputs,
@@ -382,6 +397,12 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     if (CollectionUtils.isEmpty(params)) {
       return;
     }
+    if (CollectionUtils.isNotEmpty(mapper.getSourceConditions())
+        && !checkConditionsMatched(inputs, mapper.getSourceConditions())) {
+      // Skip the checking
+      return;
+    }
+
     String paramName = params.get(0);
     if (BODY.equals(location)) {
       log.info("jsonPathExpression:{}", jsonPathExpression);
@@ -404,6 +425,32 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
             String.format(SHOULD_BE_EXIST, paramName, null));
       }
     }
+  }
+
+  public boolean checkConditionsMatched(
+      Map<String, Object> inputs, List<ComponentAPITargetFacets.SourceCondition> sourceConditions) {
+    return sourceConditions.stream()
+        .filter(
+            sourceCondition ->
+                StringUtils.isNotBlank(sourceCondition.getKey())
+                    && StringUtils.isNotBlank(sourceCondition.getVal())
+                    && StringUtils.isNotBlank(sourceCondition.getOperator()))
+        .allMatch(
+            sourceCondition -> {
+              String expression = buildSourceConditionExpression(sourceCondition);
+              return SpELEngine.isTrue(expression, inputs);
+            });
+  }
+
+  private String buildSourceConditionExpression(
+      ComponentAPITargetFacets.SourceCondition sourceCondition) {
+    return "${body."
+        + extractMapperParam(sourceCondition.getKey()).get(0)
+        + " "
+        + sourceCondition.getOperator()
+        + " '"
+        + sourceCondition.getVal()
+        + "'}";
   }
 
   @Override
