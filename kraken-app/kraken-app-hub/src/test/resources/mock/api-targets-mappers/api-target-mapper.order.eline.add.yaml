@@ -74,6 +74,12 @@ spec:
             sourceLocation: BODY
             sourceType: integer
             discrete: true
+            sourceConditionExpression:
+            sourceConditions:
+              - name: endOfTermAction
+                key: "@{{productOrderItem[0].requestedItemTerm.endOfTermAction}}"
+                val: roll
+                operator: eq
             target: ""
             targetLocation: BODY
             requiredMapping: false
@@ -91,6 +97,12 @@ spec:
               - businessDays
               - businessHours
               - businessMinutes
+            sourceConditionExpression:
+            sourceConditions:
+              - name: endOfTermAction
+                key: "@{{productOrderItem[0].requestedItemTerm.endOfTermAction}}"
+                val: roll
+                operator: eq
             target: ""
             targetLocation: BODY
             requiredMapping: false
