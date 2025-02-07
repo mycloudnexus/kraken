@@ -1,6 +1,7 @@
 package com.consoleconnect.kraken.operator.service;
 
 import static com.consoleconnect.kraken.operator.core.toolkit.Constants.DOT;
+import static com.consoleconnect.kraken.operator.core.toolkit.Constants.SELLER_CONTACT_SUFFIX;
 
 import com.consoleconnect.kraken.operator.config.AppMgmtProperty;
 import com.consoleconnect.kraken.operator.controller.dto.CreateSellerContactRequest;
@@ -31,13 +32,25 @@ public class SellerContactsInitializer {
         .forEach(
             sellerContact -> {
               String productId = sellerContact.getKey();
+              try {
+                unifiedAssetService.findOne(productId);
+              } catch (KrakenException e) {
+                String error = String.format("Cannot find productId: %s", productId);
+                log.error(error, e);
+                productId = null;
+              }
+              String finalProductId = productId;
               sellerContact
                   .getSellerContactDetails()
                   .forEach(
                       detail -> {
                         UnifiedAssetDto contactAssetDto = null;
                         String sellerContactKey =
-                            detail.getComponentKey() + DOT + detail.getParentProductType();
+                            detail.getComponentKey()
+                                + DOT
+                                + detail.getParentProductType()
+                                + DOT
+                                + SELLER_CONTACT_SUFFIX;
                         try {
                           contactAssetDto = unifiedAssetService.findOne(sellerContactKey);
                         } catch (KrakenException e) {
@@ -61,7 +74,7 @@ public class SellerContactsInitializer {
                                 ? ""
                                 : detail.getEmailAddress());
                         sellerContactService.createOneSellerContact(
-                            productId, detail.getComponentKey(), request, "system");
+                            finalProductId, detail.getComponentKey(), request, "system");
                       });
             });
     log.info("initialize seller contacts done");
