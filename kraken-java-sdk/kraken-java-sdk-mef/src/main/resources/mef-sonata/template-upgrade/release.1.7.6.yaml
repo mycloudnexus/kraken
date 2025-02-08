@@ -6,7 +6,7 @@ metadata:
   name: V1.7.6
   labels:
     productSpec: grace
-    productVersion: V1.7.5
+    productVersion: V1.7.6
     publishDate: 2025-02-08
   description: |
     [create delete order] change matrix property
