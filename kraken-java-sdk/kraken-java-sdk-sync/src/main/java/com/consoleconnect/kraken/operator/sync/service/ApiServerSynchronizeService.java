@@ -16,6 +16,7 @@ import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.DateTime;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.sync.model.SyncProperty;
+import com.consoleconnect.kraken.operator.sync.service.security.ExternalSystemTokenProvider;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.HashMap;
 import java.util.List;
@@ -46,10 +47,11 @@ public class ApiServerSynchronizeService extends KrakenServerConnector {
   public ApiServerSynchronizeService(
       SyncProperty syncProperty,
       WebClient webClient,
+      ExternalSystemTokenProvider externalSystemTokenProvider,
       DataIngestionJob dataIngestionJob,
       UnifiedAssetRepository unifiedAssetRepository,
       ApplicationContext applicationContext) {
-    super(syncProperty, webClient);
+    super(syncProperty, webClient, externalSystemTokenProvider);
     this.syncProperty = syncProperty;
     this.dataIngestionJob = dataIngestionJob;
     this.unifiedAssetRepository = unifiedAssetRepository;
