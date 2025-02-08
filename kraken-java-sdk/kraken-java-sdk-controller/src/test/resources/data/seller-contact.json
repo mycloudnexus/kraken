@@ -1,9 +1,6 @@
 {
-  "productCategories": [
-    "access.eline",
-    "internet.access"
-  ],
-  "contactName": "test-contact-name",
-  "contactEmail": "test-contact@gmail.com",
-  "contactPhone": "1234567"
+  "parentProductType": "access.eline",
+  "name": "test-contact-name",
+  "emailAddress": "test-contact@gmail.com",
+  "number": "1234567"
 }

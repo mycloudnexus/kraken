@@ -18,7 +18,7 @@ public class SyncProperty {
   public static class ControlPlane {
     private boolean enabled;
     private String url;
-    private String token;
+    private ExternalAuth auth;
     private String tokenHeader = "Authorization";
     private String retrieveProductReleaseDetailEndpoint =
         "/v2/callback/audits/releases/%s/components";
@@ -34,6 +34,30 @@ public class SyncProperty {
     private String triggerInstallationEndpoint = "/v2/callback/triggers/installation";
 
     private PushActivityLogExternal pushActivityLogExternal;
+  }
+
+  @Data
+  public static class ExternalAuth {
+    private String authMode;
+    private InternalToken internalToken;
+    private ClientCredentials clientCredentials;
+  }
+
+  @Data
+  public static class InternalToken {
+    private String accessToken;
+  }
+
+  private static final long EXPIRATION_BUFFER_IN_SECONDS = 30;
+  private static final String ENDPOINT_AUTH_TOKEN = "/tenant/auth/token";
+
+  @Data
+  public static class ClientCredentials {
+    private String authServerUrl;
+    private String authTokenEndpoint = ENDPOINT_AUTH_TOKEN;
+    private String clientId;
+    private String clientSecret;
+    private Long expirationBufferInSeconds = EXPIRATION_BUFFER_IN_SECONDS;
   }
 
   @Data

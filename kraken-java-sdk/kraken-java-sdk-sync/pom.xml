@@ -30,6 +30,12 @@
         </dependency>
         <dependency>
             <groupId>com.consoleconnect.kraken</groupId>
+            <artifactId>kraken-java-sdk-auth</artifactId>
+            <version>2.0.0-snapshot.3</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.consoleconnect.kraken</groupId>
             <artifactId>kraken-java-sdk-test</artifactId>
             <version>2.0.0-snapshot.3</version>
             <scope>test</scope>
@@ -39,6 +45,11 @@
             <artifactId>lombok</artifactId>
             <optional>true</optional>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.nimbusds</groupId>
+            <artifactId>nimbus-jose-jwt</artifactId>
+            <version>9.37.3</version>
         </dependency>
     </dependencies>
 

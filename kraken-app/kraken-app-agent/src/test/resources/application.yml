@@ -81,7 +81,10 @@ app:
     workspacePath: classpath:mock/kraken.yaml
   controlPlane:
     url: http://localhost:8000
-    token: 123456
+    auth:
+      internalToken:
+        enabled: true
+        accessToken: ${KRAKEN_CONTROL_PLANE_AGENT_TOKEN:123456}
   unified-asset:
     endpoints:
       exposure:

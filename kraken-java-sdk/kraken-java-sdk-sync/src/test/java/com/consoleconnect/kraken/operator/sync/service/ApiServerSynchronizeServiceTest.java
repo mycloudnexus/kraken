@@ -9,6 +9,7 @@ import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.sync.CustomConfig;
 import com.consoleconnect.kraken.operator.sync.model.SyncProperty;
+import com.consoleconnect.kraken.operator.sync.service.security.ExternalSystemTokenProvider;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import java.time.Duration;
@@ -35,6 +36,7 @@ public class ApiServerSynchronizeServiceTest extends AbstractIntegrationTest {
   @Autowired private SyncProperty syncProperty;
   @Autowired private DataIngestionJob dataIngestionJob;
   @Autowired private UnifiedAssetRepository unifiedAssetRepository;
+  @Autowired private ExternalSystemTokenProvider externalSystemTokenProvider;
   @Autowired ApplicationContext applicationContext;
   @Autowired ApiServerSynchronizeService apiServerSynchronizeService;
 
@@ -91,6 +93,11 @@ public class ApiServerSynchronizeServiceTest extends AbstractIntegrationTest {
 
   private ApiServerSynchronizeService get(WebClient webClient) {
     return new ApiServerSynchronizeService(
-        syncProperty, webClient, dataIngestionJob, unifiedAssetRepository, applicationContext);
+        syncProperty,
+        webClient,
+        externalSystemTokenProvider,
+        dataIngestionJob,
+        unifiedAssetRepository,
+        applicationContext);
   }
 }
