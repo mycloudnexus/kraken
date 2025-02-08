@@ -7,6 +7,7 @@ import com.consoleconnect.kraken.operator.core.enums.MappingTypeEnum;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
+import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.Constants;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.core.toolkit.YamlToolkit;
@@ -35,6 +36,7 @@ import org.springframework.test.context.ContextConfiguration;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
   @Autowired MappingMatrixCheckerActionRunner mappingMatrixCheckerActionRunner;
+  @Autowired UnifiedAssetService unifiedAssetService;
 
   @Test
   @Order(1)
@@ -614,6 +616,21 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
     inputs.put("body", body);
     dependOn = mappingMatrixCheckerActionRunner.checkConditionsMatched(inputs, sourceConditions);
     Assertions.assertFalse(dependOn);
+  }
+
+  @Test
+  @SneakyThrows
+  void givenWorkflowMapper_thenValidate_thenThrowException() {
+    Map<String, Object> inputs = new HashMap<>();
+    inputs.put(
+        "body",
+        JsonToolkit.fromJson(readFileToString("mockData/delete.order.eline.json"), Object.class));
+    List<String> emptyList = Collections.emptyList();
+    Assertions.assertThrows(
+        KrakenException.class,
+        () ->
+            mappingMatrixCheckerActionRunner.checkMapperConstraints(
+                "mef.sonata.api-target.order.eline.delete", inputs, emptyList));
   }
 
   private static List<ComponentAPITargetFacets.SourceCondition> getSourceConditions() {
