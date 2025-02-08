@@ -1,0 +1,13 @@
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.1.7.6
+  name: V1.7.6
+  labels:
+    productSpec: grace
+    productVersion: V1.7.5
+    publishDate: 2025-02-08
+  description: |
+    [create delete order] change matrix property
+  version: 1
