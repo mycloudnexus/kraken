@@ -14,7 +14,7 @@ spec:
     productType: access_e_line
     actionType: delete
   workflow:
-    enabled: true
+    enabled: false
     synchronous: false
     key: mef.sonata.api-workflow.order.eline.delete
   endpoints:
