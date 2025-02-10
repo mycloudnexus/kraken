@@ -20,8 +20,8 @@ public class ComponentAPITargetFacets {
 
   @Data
   public static class Workflow {
-    private boolean enabled;
-    private boolean synchronous;
+    private boolean enabled = false;
+    private boolean synchronous = false;
     private String id;
     private String key;
   }
