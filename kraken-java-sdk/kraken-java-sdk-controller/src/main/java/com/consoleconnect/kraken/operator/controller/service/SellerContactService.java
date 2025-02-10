@@ -7,7 +7,7 @@ import com.consoleconnect.kraken.operator.controller.dto.CreateSellerContactRequ
 import com.consoleconnect.kraken.operator.controller.dto.UpdateSellerContactRequest;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.enums.AssetStatusEnum;
-import com.consoleconnect.kraken.operator.core.enums.ProductCategoryEnum;
+import com.consoleconnect.kraken.operator.core.enums.ParentProductTypeEnum;
 import com.consoleconnect.kraken.operator.core.event.IngestionDataResult;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.model.SyncMetadata;
@@ -22,8 +22,7 @@ import java.util.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,41 +41,38 @@ public class SellerContactService {
   @Getter private final UnifiedAssetRepository unifiedAssetRepository;
 
   @Transactional
-  public List<IngestionDataResult> createSellerContact(
+  public IngestionDataResult createSellerContact(
       String productId, String componentId, CreateSellerContactRequest request, String createdBy) {
     UnifiedAssetDto componentAssetDto = unifiedAssetService.findOne(componentId);
-    List<Pair<String, String>> keyList =
-        generateKey(componentAssetDto.getMetadata().getKey(), request.getProductCategories());
-    List<IngestionDataResult> results = new ArrayList<>();
-    keyList.forEach(
-        pair -> {
-          UnifiedAsset sellerAsset =
-              createSellerContact(request, pair.getLeft(), pair.getRight(), componentAssetDto);
-          SyncMetadata syncMetadata =
-              new SyncMetadata("", "", DateTime.nowInUTCString(), createdBy);
-          IngestionDataResult ingestionDataResult =
-              unifiedAssetService.syncAsset(productId, sellerAsset, syncMetadata, true);
-          results.add(ingestionDataResult);
-        });
-    return results;
+    return createOneSellerContact(
+        productId, componentAssetDto.getMetadata().getKey(), request, createdBy);
   }
 
-  private List<Pair<String, String>> generateKey(
-      String componentKey, List<String> productCategories) {
-    if (CollectionUtils.isEmpty(productCategories)) {
-      productCategories =
-          Arrays.stream(ProductCategoryEnum.values()).map(ProductCategoryEnum::getKind).toList();
+  public IngestionDataResult createOneSellerContact(
+      String productId, String componentKey, CreateSellerContactRequest request, String createdBy) {
+    String sellerContactKey = generateKey(componentKey, request.getParentProductType());
+    UnifiedAsset sellerAsset =
+        createSellerContact(
+            request, sellerContactKey, request.getParentProductType(), componentKey);
+    SyncMetadata syncMetadata = new SyncMetadata("", "", DateTime.nowInUTCString(), createdBy);
+    return unifiedAssetService.syncAsset(productId, sellerAsset, syncMetadata, true);
+  }
+
+  private String generateKey(String componentKey, String parentProductType) {
+    if (StringUtils.isBlank(parentProductType)) {
+      return componentKey
+          + DOT
+          + ParentProductTypeEnum.ACCESS_ELINE.getKind()
+          + DOT
+          + SELLER_CONTACT_SUFFIX;
     }
-    return productCategories.stream()
-        .map(item -> Pair.of(componentKey + DOT + item, item))
-        .toList();
+    return componentKey + DOT + parentProductType + DOT + SELLER_CONTACT_SUFFIX;
   }
 
-  private String whichRole(UnifiedAssetDto componentAssetDto) {
-    String key = componentAssetDto.getMetadata().getKey();
-    if (key.contains(QUOTE_KEY_WORD)) {
+  private String whichRole(String componentKey) {
+    if (componentKey.contains(QUOTE_KEY_WORD)) {
       return QUOTE_ROLE;
-    } else if (key.contains(ORDER_KEY_WORD)) {
+    } else if (componentKey.contains(ORDER_KEY_WORD)) {
       return ORDER_ROLE;
     } else {
       return "";
@@ -86,22 +82,19 @@ public class SellerContactService {
   private UnifiedAsset createSellerContact(
       CreateSellerContactRequest request,
       String sellerContactKey,
-      String productCategory,
-      UnifiedAssetDto componentAssetDto) {
+      String parentProductType,
+      String componentKey) {
     UnifiedAsset unifiedAsset =
         UnifiedAsset.of(
             COMPONENT_SELLER_CONTACT.getKind(), sellerContactKey, SELLER_CONTACT_PREFIX);
     unifiedAsset.getMetadata().setDescription(SELLER_CONTACT_DESC);
     unifiedAsset.getMetadata().setStatus(AssetStatusEnum.ACTIVATED.getKind());
-    unifiedAsset
-        .getMetadata()
-        .getLabels()
-        .put(COMPONENT_KEY, componentAssetDto.getMetadata().getKey());
-    unifiedAsset.getMetadata().getLabels().put(productCategory, String.valueOf(Boolean.TRUE));
+    unifiedAsset.getMetadata().getLabels().put(COMPONENT_KEY, componentKey);
+    unifiedAsset.getMetadata().getLabels().put(parentProductType, String.valueOf(Boolean.TRUE));
 
     SellerContactFacets facets = new SellerContactFacets();
     SellerContactFacets.SellerInfo sellerInfo = new SellerContactFacets.SellerInfo();
-    sellerInfo.setRole(whichRole(componentAssetDto));
+    sellerInfo.setRole(whichRole(componentKey));
     sellerInfo.setName(request.getName());
     sellerInfo.setNumber(request.getNumber());
     sellerInfo.setEmailAddress(request.getEmailAddress());

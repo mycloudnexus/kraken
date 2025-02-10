@@ -11,6 +11,7 @@ import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFac
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.LabelConstants;
 import com.consoleconnect.kraken.operator.sync.model.SyncProperty;
+import com.consoleconnect.kraken.operator.sync.service.security.ExternalSystemTokenProvider;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
@@ -31,8 +32,11 @@ public class PushRunningMapperInfoService extends KrakenServerConnector {
   private ZonedDateTime lastSyncedAt = null;
 
   public PushRunningMapperInfoService(
-      SyncProperty appProperty, WebClient webClient, UnifiedAssetService unifiedAssetService) {
-    super(appProperty, webClient);
+      SyncProperty appProperty,
+      WebClient webClient,
+      ExternalSystemTokenProvider externalSystemTokenProvider,
+      UnifiedAssetService unifiedAssetService) {
+    super(appProperty, webClient, externalSystemTokenProvider);
     this.unifiedAssetService = unifiedAssetService;
   }
 
