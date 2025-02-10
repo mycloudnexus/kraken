@@ -77,6 +77,10 @@
   }
 }
 
+.limitRangeContainer {
+  padding: 0 12px;
+}
+
 .flexColumn {
   flex-direction: column;
   flex: 1;
@@ -104,4 +108,8 @@
 
 .bloater {
   height: 21px;
+}
+
+.discreteSelector {
+  color: #00000073;
 }

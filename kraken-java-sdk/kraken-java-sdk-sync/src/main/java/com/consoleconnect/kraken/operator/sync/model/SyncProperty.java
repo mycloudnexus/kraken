@@ -62,9 +62,11 @@ public class SyncProperty {
 
   @Data
   public static class MgmtPlane {
-    private String retrieveProductReleaseEndpoint = "/callback/agent/latest-release-subscription";
-    private String downloadMappingTemplateEndpoint = "/callback/agent/mapping-template-download";
-    private String mgmtPushEventEndpoint = "/callback/agent/events";
+    private String retrieveProductReleaseEndpoint =
+        "/tenant/agent/callback/latest-release-subscription";
+    private String downloadMappingTemplateEndpoint =
+        "/tenant/agent/callback/mapping-template-download";
+    private String mgmtPushEventEndpoint = "/tenant/agent/callback/events";
   }
 
   @Data

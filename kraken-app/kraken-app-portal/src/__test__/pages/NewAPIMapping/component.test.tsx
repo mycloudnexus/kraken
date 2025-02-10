@@ -1114,15 +1114,14 @@ test("parse fnc", () => {
 
 describe("select prop", () => {
   test("component new api map page", async () => {
-    const { container, getByTestId, getAllByTestId } =
-      render(
-        <QueryClientProvider client={queryClient}>
-          <BrowserRouter>
-            <ResponseMapping />
-            <SelectResponseProperty />
-          </BrowserRouter>
-        </QueryClientProvider>
-      );
+    const { container, getByTestId, getAllByTestId } = render(
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <ResponseMapping />
+          <SelectResponseProperty />
+        </BrowserRouter>
+      </QueryClientProvider>
+    );
     expect(container).toBeInTheDocument();
     const element = getByTestId("btn-add-state");
     fireEvent.click(element);
@@ -1259,59 +1258,265 @@ test("SonataResponseMapping", () => {
   expect(container).toBeInTheDocument();
 });
 
-test("requestItem render", () => {
-  const { container, getByTestId } = render(
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <RequestItem
-          index={2}
-          item={{
-            description: "",
-            name: "mapper.order.eline.add.duration.unit",
-            title: "order item Term unit",
-            source: "@{{productOrderItem[0].requestedItemTerm.duration.units}}",
-            target: "@{{requestBody.durationUnit}}",
-            sourceValues: [
-              "calendarMonths",
-              "calendarDays",
-              "calendarHours",
-              "calendarMinutes",
-              "businessDays",
-              "businessHours",
-            ],
-            valueMapping: {
-              calendarMonths: "calendarMonths",
-              calendarDays: "calendarDays",
-            },
-            sourceLocation: "BODY",
-            targetLocation: "BODY",
-            customizedField: true,
-            requiredMapping: true,
-          }}
-        />
-      </BrowserRouter>
-    </QueryClientProvider>
-  );
-  expect(container).toBeInTheDocument();
-  const btnAdd = getByTestId("btn-add-state");
-  fireEvent.click(btnAdd);
+// test("requestItem render", () => {
+//   const { container, getByTestId } = render(
+//     <QueryClientProvider client={queryClient}>
+//       <BrowserRouter>
+//         <RequestItem
+//           index={2}
+//           item={{
+//             id: "id",
+//             description: "",
+//             name: "mapper.order.eline.add.duration.unit",
+//             title: "order item Term unit",
+//             source: "@{{productOrderItem[0].requestedItemTerm.duration.units}}",
+//             target: "@{{requestBody.durationUnit}}",
+//             sourceValues: [
+//               "calendarMonths",
+//               "calendarDays",
+//               "calendarHours",
+//               "calendarMinutes",
+//               "businessDays",
+//               "businessHours",
+//             ],
+//             valueMapping: {
+//               calendarMonths: "calendarMonths",
+//               calendarDays: "calendarDays",
+//             },
+//             sourceLocation: "BODY",
+//             targetLocation: "BODY",
+//             customizedField: true,
+//             requiredMapping: true,
+//           }}
+//         />
+//       </BrowserRouter>
+//     </QueryClientProvider>
+//   );
+//   expect(container).toBeInTheDocument();
+//   const btnAdd = getByTestId("btn-add-state");
+//   fireEvent.click(btnAdd);
+// });
+
+describe("requestItem render", () => {
+  it("add value mapping", () => {
+    const { container, getByTestId } = render(
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <RequestItem
+            index={2}
+            item={{
+              id: "id",
+              description: "",
+              name: "mapper.order.eline.add.duration.unit",
+              title: "order item Term unit",
+              source:
+                "@{{productOrderItem[0].requestedItemTerm.duration.units}}",
+              target: "@{{requestBody.durationUnit}}",
+              sourceValues: [
+                "calendarMonths",
+                "calendarDays",
+                "calendarHours",
+                "calendarMinutes",
+                "businessDays",
+                "businessHours",
+              ],
+              valueMapping: {
+                calendarMonths: "calendarMonths",
+                calendarDays: "calendarDays",
+              },
+              sourceLocation: "BODY",
+              targetLocation: "BODY",
+              customizedField: true,
+              requiredMapping: true,
+            }}
+          />
+        </BrowserRouter>
+      </QueryClientProvider>
+    );
+    expect(container).toBeInTheDocument();
+    const btnAdd = getByTestId("btn-add-state");
+    fireEvent.click(btnAdd);
+  });
+  it("add value limit integer discrete", () => {
+    const { container, getByTestId } = render(
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <RequestItem
+            index={2}
+            item={{
+              id: "id",
+              description: "",
+              name: "mapper.order.eline.add.duration.unit",
+              title: "order item Term unit",
+              source:
+                "@{{productOrderItem[0].requestedItemTerm.duration.units}}",
+              target: "@{{requestBody.durationUnit}}",
+              valueMapping: {
+                calendarMonths: "calendarMonths",
+                calendarDays: "calendarDays",
+              },
+              sourceLocation: "BODY",
+              targetLocation: "BODY",
+              customizedField: true,
+              requiredMapping: true,
+              allowValueLimit: true,
+              sourceType: "integer",
+            }}
+          />
+        </BrowserRouter>
+      </QueryClientProvider>
+    );
+    expect(container).toBeInTheDocument();
+    const btnAdd = getByTestId("btn-add-valuelimit-int");
+    fireEvent.click(btnAdd);
+  });
+  it("add value limit integer with sourceValue", () => {
+    const { container } = render(
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <RequestItem
+            index={2}
+            item={{
+              id: "id",
+              description: "",
+              name: "mapper.order.eline.add.duration.unit",
+              title: "order item Term unit",
+              source:
+                "@{{productOrderItem[0].requestedItemTerm.duration.units}}",
+              target: "@{{requestBody.durationUnit}}",
+              sourceValues: ["0", "100"],
+              valueMapping: {
+                calendarMonths: "calendarMonths",
+                calendarDays: "calendarDays",
+              },
+              sourceLocation: "BODY",
+              targetLocation: "BODY",
+              customizedField: true,
+              requiredMapping: true,
+              allowValueLimit: true,
+              sourceType: "integer",
+            }}
+          />
+        </BrowserRouter>
+      </QueryClientProvider>
+    );
+    expect(container).toBeInTheDocument();
+  });
+  it("add value limit integer with sourceValue", () => {
+    const { container } = render(
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <RequestItem
+            index={2}
+            item={{
+              id: "id",
+              description: "",
+              name: "mapper.order.eline.add.duration.unit",
+              title: "order item Term unit",
+              source:
+                "@{{productOrderItem[0].requestedItemTerm.duration.units}}",
+              target: "@{{requestBody.durationUnit}}",
+              sourceValues: ["0", "100"],
+              valueMapping: {
+                calendarMonths: "calendarMonths",
+                calendarDays: "calendarDays",
+              },
+              sourceLocation: "BODY",
+              targetLocation: "BODY",
+              customizedField: true,
+              requiredMapping: true,
+              allowValueLimit: true,
+              sourceType: "integer",
+              discrete: true,
+            }}
+          />
+        </BrowserRouter>
+      </QueryClientProvider>
+    );
+    expect(container).toBeInTheDocument();
+  });
+  it("add value limit string", () => {
+    const { container, getByTestId } = render(
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <RequestItem
+            index={2}
+            item={{
+              id: "id",
+              description: "",
+              name: "mapper.order.eline.add.duration.unit",
+              title: "order item Term unit",
+              source:
+                "@{{productOrderItem[0].requestedItemTerm.duration.units}}",
+              target: "@{{requestBody.durationUnit}}",
+              valueMapping: {
+                calendarMonths: "calendarMonths",
+                calendarDays: "calendarDays",
+              },
+              sourceLocation: "BODY",
+              targetLocation: "BODY",
+              customizedField: true,
+              requiredMapping: true,
+              allowValueLimit: true,
+              sourceType: "string",
+            }}
+          />
+        </BrowserRouter>
+      </QueryClientProvider>
+    );
+    expect(container).toBeInTheDocument();
+    const btnAdd = getByTestId("btn-add-valuelimit-str");
+    fireEvent.click(btnAdd);
+  });
+  it("add value limit string with sourceValue", () => {
+    const { container } = render(
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <RequestItem
+            index={2}
+            item={{
+              id: "id",
+              description: "",
+              name: "mapper.order.eline.add.duration.unit",
+              title: "order item Term unit",
+              source:
+                "@{{productOrderItem[0].requestedItemTerm.duration.units}}",
+              target: "@{{requestBody.durationUnit}}",
+              sourceValues: ["value1", "value2", "value3"],
+              valueMapping: {
+                calendarMonths: "calendarMonths",
+                calendarDays: "calendarDays",
+              },
+              sourceLocation: "BODY",
+              targetLocation: "BODY",
+              customizedField: true,
+              requiredMapping: true,
+              allowValueLimit: true,
+              sourceType: "string",
+            }}
+          />
+        </BrowserRouter>
+      </QueryClientProvider>
+    );
+    expect(container).toBeInTheDocument();
+  });
 });
 
-describe('should render status icon component', () => {
-  it('should render success status icon', () => {
-    const { getByTestId } = render(<StatusIcon status="SUCCESS" />)
-    const icon = getByTestId('deploymentStatus')
-    expect(icon).toHaveStyle({ color: '#389E0D'})
-  })
+describe("should render status icon component", () => {
+  it("should render success status icon", () => {
+    const { getByTestId } = render(<StatusIcon status="SUCCESS" />);
+    const icon = getByTestId("deploymentStatus");
+    expect(icon).toHaveStyle({ color: "#389E0D" });
+  });
 
-  it('should render failed status icon', () => {
-    const { getByTestId } = render(<StatusIcon status="FAILED" />)
-    const icon = getByTestId('deploymentStatus')
-    expect(icon).toHaveStyle({ color: '#CF1322'})
-  })
+  it("should render failed status icon", () => {
+    const { getByTestId } = render(<StatusIcon status="FAILED" />);
+    const icon = getByTestId("deploymentStatus");
+    expect(icon).toHaveStyle({ color: "#CF1322" });
+  });
 
-  it('should render loading status icon', () => {
-    const { container } = render(<StatusIcon status="IN_PROGRESS" />)
-    expect(container).toBeInTheDocument()
-  })
-})
+  it("should render loading status icon", () => {
+    const { container } = render(<StatusIcon status="IN_PROGRESS" />);
+    expect(container).toBeInTheDocument();
+  });
+});
