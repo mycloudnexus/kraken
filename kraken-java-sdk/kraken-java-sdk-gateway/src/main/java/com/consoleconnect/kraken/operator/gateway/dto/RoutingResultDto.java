@@ -4,8 +4,8 @@ import lombok.Data;
 
 @Data
 public class RoutingResultDto {
-  private String orderType;
-  private String orderAction;
+  private String productType;
+  private String productAction;
   private String targetAPIConfigKey;
   private String matrixConfigKey;
   private String errorCode;
