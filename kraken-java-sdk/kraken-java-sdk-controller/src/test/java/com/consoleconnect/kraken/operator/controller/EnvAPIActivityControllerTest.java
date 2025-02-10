@@ -80,7 +80,7 @@ class EnvAPIActivityControllerTest extends AbstractIntegrationTest
     BuyerOnboardFacets buyerFacets =
         UnifiedAsset.getFacets(buyerAssetDto, BuyerOnboardFacets.class);
     ApiActivityLogEntity apiActivityLogEntity =
-        createApiActivityLog(buyerFacets.getBuyerInfo().getBuyerId(), envStage.getId());
+        createApiActivityLog(buyerFacets.getBuyerInfo().getBuyerId(), envStage.getId(), "UNI");
     log.info("activity log created:{}", JsonToolkit.toJson(apiActivityLogEntity));
     requestId = apiActivityLogEntity.getRequestId();
     webTestClient.requestAndVerify(
@@ -117,6 +117,7 @@ class EnvAPIActivityControllerTest extends AbstractIntegrationTest
                     "requestStartTime", ZonedDateTime.now().minusDays(1).toInstant().toEpochMilli())
                 .queryParam(
                     "requestEndTime", ZonedDateTime.now().plusDays(10).toInstant().toEpochMilli())
+                .queryParam("productType", "UNI")
                 .build(),
         HttpStatus.OK.value(),
         null,
@@ -126,6 +127,7 @@ class EnvAPIActivityControllerTest extends AbstractIntegrationTest
           assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(1)));
           assertThat(
               bodyStr, hasJsonPath("$.data.data[0].buyerName", equalTo("testing-company-name")));
+          assertThat(bodyStr, hasJsonPath("$.data.data[0].productType", equalTo("UNI")));
         });
   }
 
