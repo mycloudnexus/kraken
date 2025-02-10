@@ -2,9 +2,8 @@ package com.consoleconnect.kraken.operator.gateway.runner;
 
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
+import com.consoleconnect.kraken.operator.gateway.dto.RoutingResultDto;
 import com.consoleconnect.kraken.operator.gateway.model.HttpResponseContext;
-import com.fasterxml.jackson.core.type.TypeReference;
-import java.util.Map;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -13,8 +12,6 @@ import org.springframework.http.HttpStatusCode;
 
 public interface ResponseCodeTransform {
   String TARGET_KEY_NOT_FOUND = "targetKey:notFound";
-  String ERROR_MSG_VAR = "errorMsg";
-  String ERROR_CODE_VAR = "errorCode";
 
   @Slf4j
   final class LogHolder {}
@@ -67,12 +64,14 @@ public interface ResponseCodeTransform {
     }
   }
 
-  default void handleRoutingErrorMsg(String resultJson) {
-    Map<String, Object> map =
-        JsonToolkit.fromJson(resultJson, new TypeReference<Map<String, Object>>() {});
-    String errorMsg = (String) map.get(ERROR_MSG_VAR);
-    String errorCode = (String) map.get(ERROR_CODE_VAR);
-    LogHolder.log.info("errorCode:{}, errorMsg:{}", errorCode, errorMsg);
+  default void handleRoutingResult(String resultJson) {
+    RoutingResultDto routingResultDto = JsonToolkit.fromJson(resultJson, RoutingResultDto.class);
+    String errorMsg = routingResultDto.getErrorMsg();
+    String errorCode = routingResultDto.getErrorCode();
+    LogHolder.log.info(
+        "errorCode:{}, errorMsg:{}",
+        routingResultDto.getErrorCode(),
+        routingResultDto.getErrorMsg());
     int errorCodeInt =
         StringUtils.isNotBlank(errorCode)
             ? Integer.parseInt(errorCode)

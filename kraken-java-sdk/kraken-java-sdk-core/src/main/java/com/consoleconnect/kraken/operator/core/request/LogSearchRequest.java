@@ -11,6 +11,7 @@ public class LogSearchRequest {
   String requestId;
   ZonedDateTime queryStart;
   ZonedDateTime queryEnd;
+  String productType;
   String method;
   String path;
   Integer statusCode;
