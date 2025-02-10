@@ -1,0 +1,13 @@
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.1.7.7
+  name: V1.7.7
+  labels:
+    productSpec: grace
+    productVersion: V1.7.7
+    publishDate: 2025-02-10
+  description: |
+    [create delete order] create/delete eline order
+  version: 1

@@ -12,6 +12,10 @@ spec:
     method: post
     productType: uni
     actionType: delete
+  workflow:
+    enabled: false
+    synchronous: false
+    key: mef.sonata.api-workflow.order.uni.delete
   endpoints:
     - id: delete port
       path: ""

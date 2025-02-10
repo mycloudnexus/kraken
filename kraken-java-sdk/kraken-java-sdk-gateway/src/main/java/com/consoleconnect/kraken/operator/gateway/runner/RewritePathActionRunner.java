@@ -1,5 +1,7 @@
 package com.consoleconnect.kraken.operator.gateway.runner;
 
+import static com.consoleconnect.kraken.operator.gateway.filter.WorkflowActionFilterFactory.getBool;
+
 import com.consoleconnect.kraken.operator.core.enums.ActionTypeEnum;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPIFacets;
@@ -42,10 +44,7 @@ public class RewritePathActionRunner extends AbstractActionRunner {
     String path = (String) inputs.get(INPUT_PATH);
     String method = (String) inputs.get(INPUT_METHOD);
     String url = (String) inputs.get(INPUT_URL);
-    boolean workflowEnabled =
-        inputs.containsKey(WORKFLOW_ENABLED)
-            ? Boolean.getBoolean((String) inputs.get(WORKFLOW_ENABLED))
-            : Boolean.FALSE;
+    boolean workflowEnabled = getBool(inputs, WORKFLOW_ENABLED);
     if (workflowEnabled) {
       return Optional.empty();
     }

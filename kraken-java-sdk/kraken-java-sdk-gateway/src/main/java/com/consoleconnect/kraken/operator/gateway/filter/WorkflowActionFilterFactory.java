@@ -54,9 +54,8 @@ public class WorkflowActionFilterFactory
               exchange, action, config.getAppProperty().getEnv());
 
       Map<String, Object> inputs = contextOptional.get();
-      boolean synchronousProcess = (boolean) inputs.getOrDefault(VAR_SYNCHRONOUS, false);
-      boolean workflowEnabled = (boolean) inputs.getOrDefault(VAR_WORKFLOW_ENABLED, false);
-
+      boolean synchronousProcess = getBool(inputs, VAR_SYNCHRONOUS);
+      boolean workflowEnabled = getBool(inputs, VAR_WORKFLOW_ENABLED);
       if (!workflowEnabled) {
         return chain.filter(exchange);
       }
@@ -79,6 +78,13 @@ public class WorkflowActionFilterFactory
         throw KrakenException.internalError("workflow execute error: " + e);
       }
     };
+  }
+
+  public static boolean getBool(Map<String, Object> inputs, String param) {
+    if (inputs.containsKey(param) && inputs.get(param) instanceof Boolean boolVar) {
+      return boolVar;
+    }
+    return Boolean.FALSE;
   }
 
   private static Map<String, Object> constructResponse(Workflow workflow) {
