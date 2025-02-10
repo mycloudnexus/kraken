@@ -9,6 +9,7 @@ import { fireEvent, render, waitFor } from "@testing-library/react";
 const request = {
   requestMapping: [
     {
+      id: "id",
       name: "address.validation.city",
       title: "The city that the address is in",
       source: "@{{hello}}",
@@ -196,26 +197,30 @@ describe("NewAPIMapping > response mapping", () => {
   });
 });
 
-describe('auto growing height input component tests', () => {
-  it('should render with initial value', () => {
-    const handleChange = vi.fn()
-    const { getByRole } = render(<AutoGrowingInput value="hello world" onChange={handleChange} />)
-    
-    const textbox = getByRole('textbox')
-    expect(textbox).toHaveTextContent("hello world")
+describe("auto growing height input component tests", () => {
+  it("should render with initial value", () => {
+    const handleChange = vi.fn();
+    const { getByRole } = render(
+      <AutoGrowingInput value="hello world" onChange={handleChange} />
+    );
 
-    fireEvent.focus(textbox)
-    fireEvent.blur(textbox)
-    expect(handleChange).toHaveBeenCalledTimes(1)
-  })
+    const textbox = getByRole("textbox");
+    expect(textbox).toHaveTextContent("hello world");
 
-  it('should not change value once disabled', () => {
-    const handleChange = vi.fn()
-    const { getByRole } = render(<AutoGrowingInput disabled onChange={handleChange} />)
+    fireEvent.focus(textbox);
+    fireEvent.blur(textbox);
+    expect(handleChange).toHaveBeenCalledTimes(1);
+  });
 
-    const textbox = getByRole('textbox')
-    fireEvent.keyDown(textbox, { key: 'A' })
-    fireEvent.blur(textbox)
-    expect(handleChange).toHaveBeenCalledTimes(0)
-  })
-})
+  it("should not change value once disabled", () => {
+    const handleChange = vi.fn();
+    const { getByRole } = render(
+      <AutoGrowingInput disabled onChange={handleChange} />
+    );
+
+    const textbox = getByRole("textbox");
+    fireEvent.keyDown(textbox, { key: "A" });
+    fireEvent.blur(textbox);
+    expect(handleChange).toHaveBeenCalledTimes(0);
+  });
+});
