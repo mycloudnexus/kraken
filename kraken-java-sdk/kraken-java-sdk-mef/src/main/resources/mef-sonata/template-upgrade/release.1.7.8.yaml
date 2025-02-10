@@ -10,4 +10,5 @@ metadata:
     publishDate: 2025-02-10
   description: |
     Add quote level for quote reading
+    Removed 'productOrderItem[0].product.productOffering.id' in the mapper for deleting order
   version: 1
