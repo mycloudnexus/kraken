@@ -2,6 +2,7 @@ package com.consoleconnect.kraken.operator.gateway.runner;
 
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
+import com.consoleconnect.kraken.operator.gateway.dto.RoutingResultDto;
 import com.consoleconnect.kraken.operator.gateway.model.HttpResponseContext;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.Map;
@@ -85,5 +86,9 @@ public interface ResponseCodeTransform {
         throw KrakenException.unProcessableEntityInvalidValue(errorMsg);
       }
     }
+  }
+
+  default void handleRoutingResult(String resultJson) {
+    RoutingResultDto routingResultDto = JsonToolkit.fromJson(resultJson, RoutingResultDto.class);
   }
 }
