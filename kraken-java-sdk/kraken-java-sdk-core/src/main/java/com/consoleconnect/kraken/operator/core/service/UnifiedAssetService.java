@@ -79,7 +79,12 @@ public class UnifiedAssetService implements UUIDWrapper {
 
   @Transactional(readOnly = true)
   public Paging<UnifiedAssetDto> search(
-      String parentId, String kind, boolean facetIncluded, String q, PageRequest pageRequest) {
+      String parentId,
+      String kind,
+      boolean facetIncluded,
+      String q,
+      String parentProductType,
+      PageRequest pageRequest) {
     log.info(
         "search asset, parentId: {}, kind: {}, q: {}, pageRequest: {}",
         parentId,
