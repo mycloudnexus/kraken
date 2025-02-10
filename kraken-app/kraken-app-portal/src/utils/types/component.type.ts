@@ -24,8 +24,11 @@ export interface IRequestMapping {
   customizedField?: boolean;
   sourceValues?: string[];
   valueMapping?: Record<string, any>;
+  allowValueLimit?: boolean;
+  discrete?: boolean;
+  sourceType?: string;
   // Custom field
-  id?: string;
+  id: string;
 }
 
 export interface IBuyer extends IComponent {

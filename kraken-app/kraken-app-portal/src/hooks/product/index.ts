@@ -28,6 +28,7 @@ import {
   verifyProduct,
   deployProduction,
   getAuditLogs,
+  getAuditLogDetails,
   getLatestRunningAPI,
   getMappingTemplateReleaseHistory,
   getMappingTemplateCurrentVersion,
@@ -100,6 +101,7 @@ export const PRODUCT_CACHE_KEYS = {
   get_all_api_key: "get_all_api_key",
   get_all_data_plane: "get_all_data_plane",
   get_audit_logs: "get_audit_logs",
+  get_audit_log_details: "get_audit_log_details",
   get_buyer_list: "get_buyer_list",
   get_component_api_doc: "get_component_api_doc",
   get_component_detail: "get_component_detail",
@@ -611,6 +613,18 @@ export const useGetAuditLogs = (params: Record<string, any>) => {
     queryKey: [PRODUCT_CACHE_KEYS.get_audit_logs, params],
     queryFn: () => getAuditLogs(params),
     enabled: Boolean(params),
+    select: (data) => data?.data,
+  });
+};
+
+export const useGetAuditLogDetails = (
+  params: Record<string, any>,
+  id: string
+) => {
+  return useQuery<any, Error>({
+    queryKey: [PRODUCT_CACHE_KEYS.get_audit_log_details, params, id],
+    queryFn: () => getAuditLogDetails(params, id),
+    enabled: Boolean(id),
     select: (data) => data?.data,
   });
 };

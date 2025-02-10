@@ -128,7 +128,7 @@ export const getAPIServers = (
   return request(
     `/v2${PRODUCT}/${productId}/components/${productId}/api-servers`,
     {
-      params: { ...params, facetIncluded: false },
+      params: { ...params, facetIncluded: true, liteSearch: true },
     }
   );
 };
@@ -263,6 +263,13 @@ export const getBuyerList = (
 
 export const getAuditLogs = (params: Record<string, any>) => {
   return request(`/audit/logs`, {
+    method: "GET",
+    params,
+  });
+};
+
+export const getAuditLogDetails = (params: Record<string, any>, id: string) => {
+  return request(`/audit/logs/${id}`, {
     method: "GET",
     params,
   });
