@@ -1,0 +1,7 @@
+app:
+  controlPlane:
+    url: http://localhost:4567
+    auth:
+      authMode: internalToken
+      internalToken:
+        accessToken: 123456

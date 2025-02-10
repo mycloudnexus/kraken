@@ -37,7 +37,10 @@ const AuditLog = () => {
     handlePaginationChange,
     handlePaginationShowSizeChange,
   } = useCommonListProps({}, initPagination);
-  const { data, isLoading } = useGetAuditLogs(queryParams);
+  const { data, isLoading } = useGetAuditLogs({
+    ...queryParams,
+    liteSearch: true,
+  });
 
   const handleFormValues = useCallback(
     (values: any) => {
@@ -129,7 +132,7 @@ const AuditLog = () => {
           style={{ padding: 0 }}
           type="link"
           onClick={() => {
-            setModalActivity(log);
+            setModalActivity(log.id);
             setModalOpen(true);
           }}
         >
@@ -195,7 +198,7 @@ const AuditLog = () => {
       </div>
 
       <ActivityDetailModal
-        item={modalActivity}
+        id={modalActivity}
         open={modalOpen}
         onClose={() => setModalOpen(false)}
       />
