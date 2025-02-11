@@ -84,6 +84,7 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
           AssetKindEnum.PRODUCT_DEPLOYMENT.getKind(),
           facetIncluded,
           q,
+          null,
           pageRequest);
     }
     Paging<UnifiedAssetDto> deploymentEntities =
@@ -92,6 +93,7 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
             AssetKindEnum.PRODUCT_DEPLOYMENT.getKind(),
             facetIncluded,
             q,
+            null,
             PageRequest.of(0, 1000, pageRequest.getSort()));
 
     List<UnifiedAssetDto> data = deploymentEntities.getData();
@@ -674,6 +676,7 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
             AssetKindEnum.COMPONENT_API_TARGET_MAPPER.getKind(),
             true,
             null,
+            null,
             PageRequest.of(0, 100))
         .getData()
         .stream()
@@ -684,7 +687,8 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
     // <mapperKey,<componentKey,componentName>>
     Map<String, Pair<String, String>> mapper2Component = new HashMap<>();
     unifiedAssetService
-        .search(null, AssetKindEnum.COMPONENT_API.getKind(), true, null, PageRequest.of(0, 100))
+        .search(
+            null, AssetKindEnum.COMPONENT_API.getKind(), true, null, null, PageRequest.of(0, 100))
         .getData()
         .forEach(
             comAsset ->

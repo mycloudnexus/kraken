@@ -22,7 +22,7 @@ public class ProductEnvironmentService {
 
   public Paging<UnifiedAssetDto> search(String productId, PageRequest pageable) {
     return unifiedAssetService.search(
-        productId, AssetKindEnum.PRODUCT_ENV.getKind(), false, null, pageable);
+        productId, AssetKindEnum.PRODUCT_ENV.getKind(), false, null, null, pageable);
   }
 
   @Transactional

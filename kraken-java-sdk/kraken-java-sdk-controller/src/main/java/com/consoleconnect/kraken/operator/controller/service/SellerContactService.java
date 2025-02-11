@@ -22,6 +22,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,17 +37,19 @@ public class SellerContactService {
   private static final String QUOTE_ROLE = "sellerContactInformation";
   private static final String ORDER_ROLE = "sellerContact";
   private final UnifiedAssetService unifiedAssetService;
-  private final SellerContactService self;
+  private final ApplicationContext applicationContext;
 
   @Autowired
-  public SellerContactService(UnifiedAssetService unifiedAssetService, SellerContactService self) {
+  public SellerContactService(
+      UnifiedAssetService unifiedAssetService, ApplicationContext applicationContext) {
     this.unifiedAssetService = unifiedAssetService;
-    this.self = self;
+    this.applicationContext = applicationContext;
   }
 
   public IngestionDataResult createSellerContact(
       String productId, String componentId, CreateSellerContactRequest request, String createdBy) {
     UnifiedAssetDto componentAssetDto = unifiedAssetService.findOne(componentId);
+    SellerContactService self = applicationContext.getBean(SellerContactService.class);
     return self.createOneSellerContact(
         productId, componentAssetDto.getMetadata().getKey(), request, createdBy);
   }

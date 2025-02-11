@@ -282,7 +282,12 @@ public class ComponentTagService implements TargetMappingChecker, LatestDeployme
   public Paging<UnifiedAssetDto> search(
       String componentId, boolean facetIncluded, String q, PageRequest pageRequest) {
     return this.unifiedAssetService.search(
-        componentId, AssetKindEnum.COMPONENT_API_TAG.getKind(), facetIncluded, q, pageRequest);
+        componentId,
+        AssetKindEnum.COMPONENT_API_TAG.getKind(),
+        facetIncluded,
+        q,
+        null,
+        pageRequest);
   }
 
   private String generateVersionName() {
