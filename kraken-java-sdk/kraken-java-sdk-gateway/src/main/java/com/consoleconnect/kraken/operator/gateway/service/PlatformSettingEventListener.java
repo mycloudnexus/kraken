@@ -1,6 +1,7 @@
 package com.consoleconnect.kraken.operator.gateway.service;
 
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
+import com.consoleconnect.kraken.operator.core.enums.ParentProductTypeEnum;
 import com.consoleconnect.kraken.operator.core.event.PlatformSettingCompletedEvent;
 import com.consoleconnect.kraken.operator.core.ingestion.DataIngestionJob;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
@@ -45,6 +46,7 @@ public class PlatformSettingEventListener {
             AssetKindEnum.COMPONENT_TRANSFORMER.getKind(),
             true,
             null,
+            ParentProductTypeEnum.ACCESS_ELINE.getKind(),
             PageRequest.of(0, 1000))
         .getData()
         .forEach(
