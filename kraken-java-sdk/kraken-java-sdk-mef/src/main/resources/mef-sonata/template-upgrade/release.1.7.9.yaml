@@ -1,0 +1,14 @@
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.1.7.9
+  name: V1.7.9
+  labels:
+    productSpec: grace
+    productVersion: V1.7.9
+    publishDate: 2025-02-11
+  description: |
+    Add support of deleting nodes when the number is a negative double type
+    Removed 'keyName' in the mapper for creating quote
+  version: 1
