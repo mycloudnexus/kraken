@@ -6,8 +6,8 @@ metadata:
   name: Product Inventory Management
   labels:
     mef-api-release: grace
-    inventory-api-version: v7
     parentProductType: access.eline
+    inventory-api-version: v7
   version: 4
 spec:
   supportedProductTypesAndActions:

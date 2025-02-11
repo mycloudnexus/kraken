@@ -6,8 +6,8 @@ metadata:
   name: Geographic Address Management
   labels:
     mef-api-release: grace
-    address-api-version: v7
     parentProductType: access.eline
+    address-api-version: v7
   version: 6
 spec:
   supportedProductTypesAndActions:
