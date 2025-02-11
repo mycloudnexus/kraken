@@ -40,15 +40,6 @@ spec:
             target: ""
             targetLocation: ""
             requiredMapping: true
-          - name: mapper.order.uni.delete.productOffering.id
-            title: "id of a Product Offering"
-            description: ""
-            source: "@{{productOrderItem[0].product.productOffering.id}}"
-            sourceLocation: "BODY"
-            sourceType: string
-            target: ""
-            targetLocation: ""
-            requiredMapping: true
         response:
           - name: mapper.order.uni.delete.state
             title: "Order State"
