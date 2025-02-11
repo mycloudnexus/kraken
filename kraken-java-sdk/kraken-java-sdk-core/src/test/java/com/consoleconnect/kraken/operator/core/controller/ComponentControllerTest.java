@@ -205,7 +205,6 @@ class ComponentControllerTest extends AbstractIntegrationTest {
                 .queryParam("parentProductType", ParentProductTypeEnum.ACCESS_ELINE.getKind())
                 .build()),
         bodyStr -> {
-          System.out.println(bodyStr);
           assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(1)));
           assertThat(
               bodyStr,
