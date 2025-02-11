@@ -36,15 +36,6 @@ spec:
             target: "@{{connectionId}}"
             targetLocation: ""
             requiredMapping: false
-          - name: mapper.order.uni.delete.productOffering.id
-            title: "id of a Product Offering"
-            description: ""
-            source: "@{{productOrderItem[0].product.productOffering.id}}"
-            sourceLocation: "BODY"
-            sourceType: string
-            target: "ACCESS_E_LINE"
-            targetLocation: ""
-            requiredMapping: true
         response:
           - name: mapper.order.eline.delete.state
             title: Order State Mapping

@@ -43,5 +43,6 @@ spec:
          "externalId":"${entity.request[externalId]?:''}",
          "instantSyncQuote":"${entity.request[instantSyncQuote]?:''}",
          "requestedQuoteCompletionDate": "${entity.request[requestedQuoteCompletionDate]?:''}",
+         "quoteLevel": "${entity.request.quoteLevel}",
          "state": "${entity.renderedResponse.state}"
         }
