@@ -110,8 +110,8 @@ spec:
                   targetAPIConfigKey = 'targetKey:notFound';
                 }
                 let ret = {
-                  orderType: type || 'undefined',
-                  orderAction: action || 'undefined',
+                  productType: type || 'undefined',
+                  productAction: action || 'undefined',
                   targetAPIConfigKey: targetAPIConfigKey,
                   matrixConfigKey: matrixConfigKey,
                   errorMsg: errorMsg,
@@ -128,7 +128,7 @@ spec:
         - id: persist_http_request
           actionType: buildin@db
           env:
-            bizType: ${order.orderType}
+            bizType: ${order.productType}
           with:
             action: create
             properties:
@@ -232,7 +232,7 @@ spec:
                   targetAPIConfigKey = 'targetKey:notFound';
                 }
                 let ret = {
-                  orderType: type || 'undefined',
+                  productType: type || 'undefined',
                   targetAPIConfigKey: targetAPIConfigKey,
                   matrixConfigKey: matrixConfigKey
                 };

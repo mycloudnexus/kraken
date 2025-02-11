@@ -111,7 +111,7 @@ spec:
                 }
                 errorMsg = errorArr.join(' ');
                 let ret = {
-                  quoteType: typeVal || 'undefined',
+                  productType: typeVal || 'undefined',
                   instantSyncQuote: syncQuote !== undefined ? syncQuote : 'undefined',
                   forwardDownstream: forwardDownstream,
                   targetAPIConfigKey: targetAPIConfigKey,
@@ -131,7 +131,7 @@ spec:
         - id: persist_http_request
           actionType: buildin@db
           env:
-            bizType: ${quote.quoteType}
+            bizType: ${quote.productType}
           with:
             action: create
             properties:
@@ -251,7 +251,7 @@ spec:
                 }
                 errorMsg = errorArr.join(' ');
                 let ret = {
-                  quoteType: input.bizType,
+                  productType: input.bizType,
                   instantSyncQuote: input.instantSyncQuote,
                   forwardDownstream: forwardDownstream,
                   targetAPIConfigKey: targetAPIConfigKey,

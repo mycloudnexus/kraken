@@ -60,7 +60,7 @@ spec:
                   matrixConfigKey = 'productOrderId:notFound';
                 }
                 let ret = {
-                  orderType: input.bizType,
+                  productType: input.bizType,
                   targetAPIConfigKey: targetAPIConfigKey,
                   matrixConfigKey: matrixConfigKey
                 };
@@ -132,7 +132,7 @@ spec:
                   matrixConfigKey = 'productType:notFound';
                 }
                 let ret = {
-                  orderType: input.bizType,
+                  productType: input.bizType,
                   targetAPIConfigKey: targetAPIConfigKey,
                   matrixConfigKey: matrixConfigKey
                 };

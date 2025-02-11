@@ -51,6 +51,9 @@ public class ApiActivityLogEntity extends AbstractHttpEntity {
   @Column(name = "buyer", nullable = true, unique = false)
   private String buyer;
 
+  @Column(name = "product_type", nullable = true, unique = false)
+  private String productType;
+
   @OneToOne
   @JoinColumn(name = "api_log_body_id")
   private ApiActivityLogBodyEntity apiLogBodyEntity;
