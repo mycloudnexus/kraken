@@ -109,7 +109,7 @@ public class UnifiedAssetService implements UUIDWrapper {
           new PageImpl<>(
               filterList, PageRequest.of(data.getNumber(), data.getSize()), filterList.size());
     }
-    if (API_KINDS.contains(kind)) {
+    if (StringUtils.isNotBlank(kind) && API_KINDS.contains(kind)) {
       data = sortAndPaginate(data, kind);
       if (StringUtils.isNotBlank(parentProductType)) {
         List<UnifiedAssetDto> list =
