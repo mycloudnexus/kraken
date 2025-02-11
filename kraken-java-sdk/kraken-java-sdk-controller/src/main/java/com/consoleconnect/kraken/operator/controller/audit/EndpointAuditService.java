@@ -47,8 +47,7 @@ public class EndpointAuditService implements UUIDWrapper {
         endpointAuditRepository.search(
             query, startTime, endTime, PagingHelper.toPageable(page, size));
     return liteSearch
-        ? PagingHelper.toPage(
-            data.stream().map(this::removeDetails).toList(), page, size, data.getTotalElements())
+        ? PagingHelper.toPaging(data, this::removeDetails)
         : PagingHelper.toPaging(data, x -> x);
   }
 
