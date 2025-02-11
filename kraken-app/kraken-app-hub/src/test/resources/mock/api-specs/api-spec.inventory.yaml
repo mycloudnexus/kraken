@@ -8,6 +8,7 @@ metadata:
   labels:
     mef-api-release: grace
     inventory-api-version: v7
+    parentProductType: access.eline
   version: 1
 spec:
   baseSpec:

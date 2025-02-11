@@ -8,6 +8,7 @@ metadata:
   labels:
     mef-api-release: grace
     order-api-version: v10
+    parentProductType: access.eline
   version: 1
 spec:
   baseSpec:

@@ -8,6 +8,7 @@ metadata:
   labels:
     mef-api-release: grace
     quote-api-version: v8
+    parentProductType: access.eline
   version: 2
 spec:
   baseSpec:

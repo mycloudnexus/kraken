@@ -13,22 +13,20 @@ import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.model.SyncMetadata;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.SellerContactFacets;
-import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.DateTime;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Getter
-@AllArgsConstructor
 @Service
 @Slf4j
 public class SellerContactService {
@@ -38,16 +36,22 @@ public class SellerContactService {
   private static final String QUOTE_ROLE = "sellerContactInformation";
   private static final String ORDER_ROLE = "sellerContact";
   private final UnifiedAssetService unifiedAssetService;
-  @Getter private final UnifiedAssetRepository unifiedAssetRepository;
+  private final SellerContactService self;
 
-  @Transactional
+  @Autowired
+  public SellerContactService(UnifiedAssetService unifiedAssetService, SellerContactService self) {
+    this.unifiedAssetService = unifiedAssetService;
+    this.self = self;
+  }
+
   public IngestionDataResult createSellerContact(
       String productId, String componentId, CreateSellerContactRequest request, String createdBy) {
     UnifiedAssetDto componentAssetDto = unifiedAssetService.findOne(componentId);
-    return createOneSellerContact(
+    return self.createOneSellerContact(
         productId, componentAssetDto.getMetadata().getKey(), request, createdBy);
   }
 
+  @Transactional
   public IngestionDataResult createOneSellerContact(
       String productId, String componentKey, CreateSellerContactRequest request, String createdBy) {
     String sellerContactKey = generateKey(componentKey, request.getParentProductType());

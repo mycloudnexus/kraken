@@ -42,6 +42,10 @@ public class UnifiedAssetService implements UUIDWrapper {
   private static final String DEFAULT_ORDER_SEQ = "1000";
   private static final String MAPPER_REQUEST = "request";
   private static final String MAPPER_RESPONSE = "response";
+  private static final String PARENT_PRODUCT_TYPE_KEY = "parentProductType";
+
+  private static final Set<String> API_KINDS =
+      Set.of(AssetKindEnum.COMPONENT_API_SPEC.getKind(), AssetKindEnum.COMPONENT_API.getKind());
 
   private final UnifiedAssetRepository assetRepository;
   private final AssetFacetRepository assetFacetRepository;
@@ -105,11 +109,22 @@ public class UnifiedAssetService implements UUIDWrapper {
           new PageImpl<>(
               filterList, PageRequest.of(data.getNumber(), data.getSize()), filterList.size());
     }
-    if (AssetKindEnum.COMPONENT_API_SPEC.getKind().equals(kind)
-        || AssetKindEnum.COMPONENT_API.getKind().equals(kind)) {
+    if (API_KINDS.contains(kind)) {
       data = sortAndPaginate(data, kind);
+      if (StringUtils.isNotBlank(parentProductType)) {
+        List<UnifiedAssetDto> list =
+            data.getContent().stream()
+                .map(entity -> toAsset(entity, facetIncluded))
+                .filter(item -> parentProductType.equals(getParentProductType(item)))
+                .toList();
+        return PagingHelper.toPage(list, pageRequest.getPageNumber(), pageRequest.getPageSize());
+      }
     }
     return PagingHelper.toPaging(data, entity -> toAsset(entity, facetIncluded));
+  }
+
+  private String getParentProductType(UnifiedAssetDto item) {
+    return item.getMetadata().getLabels().getOrDefault(PARENT_PRODUCT_TYPE_KEY, null);
   }
 
   private PageImpl<UnifiedAssetEntity> sortAndPaginate(Page<UnifiedAssetEntity> data, String kind) {
