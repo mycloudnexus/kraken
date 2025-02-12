@@ -13,6 +13,10 @@ spec:
     method: post
     productType: uni
     actionType: add
+  workflow:
+    enabled: false
+    synchronous: false
+    key: mef.sonata.api-workflow.order.uni.add
   endpoints:
     - id: create port order
       path: ""

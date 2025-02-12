@@ -12,6 +12,10 @@ spec:
     method: post
     productType: uni
     actionType: delete
+  workflow:
+    enabled: false
+    synchronous: false
+    key: mef.sonata.api-workflow.order.uni.delete
   endpoints:
     - id: delete port
       path: ""
@@ -31,15 +35,6 @@ spec:
             title: "The unique identifier of an in-service Product that is the ordering subject"
             description: ""
             source: "@{{productOrderItem[*].product.id}}"
-            sourceLocation: "BODY"
-            sourceType: string
-            target: ""
-            targetLocation: ""
-            requiredMapping: true
-          - name: mapper.order.uni.delete.productOffering.id
-            title: "id of a Product Offering"
-            description: ""
-            source: "@{{productOrderItem[0].product.productOffering.id}}"
             sourceLocation: "BODY"
             sourceType: string
             target: ""

@@ -11,6 +11,7 @@ import com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants;
 import com.consoleconnect.kraken.operator.core.toolkit.IpUtils;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.sync.model.SyncProperty;
+import com.consoleconnect.kraken.operator.sync.service.security.ExternalSystemTokenProvider;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -46,8 +47,11 @@ public class PushMgmtEventService extends KrakenServerConnector {
       TYPE_MAPPING.keySet().stream().toList();
 
   public PushMgmtEventService(
-      SyncProperty appProperty, WebClient webClient, EventSinkService eventSinkService) {
-    super(appProperty, webClient);
+      SyncProperty appProperty,
+      WebClient webClient,
+      ExternalSystemTokenProvider externalSystemTokenProvider,
+      EventSinkService eventSinkService) {
+    super(appProperty, webClient, externalSystemTokenProvider);
     this.eventSinkService = eventSinkService;
   }
 

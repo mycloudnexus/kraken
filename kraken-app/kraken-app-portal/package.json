@@ -1,7 +1,7 @@
 {
   "name": "kraken-app-portal",
   "private": true,
-  "version": "2.0.0-snapshot.3",
+  "version": "2.0.0-snapshot.4",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -60,8 +60,8 @@
     "@typescript-eslint/eslint-plugin": "^7.2.0",
     "@typescript-eslint/parser": "^7.2.0",
     "@vitejs/plugin-react": "^4.2.1",
-    "@vitest/coverage-v8": "^1.6.0",
-    "@vitest/ui": "^1.6.0",
+    "@vitest/coverage-v8": "^1.6.1",
+    "@vitest/ui": "^1.6.1",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
@@ -75,7 +75,7 @@
     "typescript": "^5.2.2",
     "vite": "^5.4.9",
     "vite-plugin-svgr": "^4.2.0",
-    "vitest": "^1.6.0"
+    "vitest": "^1.6.1"
   },
   "overrides": {
     "esbuild": "^0.24.0",

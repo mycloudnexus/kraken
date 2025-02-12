@@ -10,6 +10,7 @@ import lombok.Setter;
 @Setter
 public class ComponentWorkflowFacets {
   private WorkflowMetaData metaData;
+  private List<ComponentAPITargetFacets.Mapper> validationMapper;
   private List<HttpTask> validationStage;
   private List<HttpTask> preparationStage;
   private List<HttpTask> executionStage;

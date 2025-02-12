@@ -1,5 +1,7 @@
 package com.consoleconnect.kraken.operator.gateway.runner;
 
+import static com.consoleconnect.kraken.operator.gateway.filter.WorkflowActionFilterFactory.getBool;
+
 import com.consoleconnect.kraken.operator.core.enums.ActionTypeEnum;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPIFacets;
@@ -22,6 +24,7 @@ public class RewritePathActionRunner extends AbstractActionRunner {
   public static final String INPUT_PATH = "path";
   public static final String INPUT_METHOD = "method";
   public static final String INPUT_URL = "url";
+  public static final String WORKFLOW_ENABLED = "workflowEnabled";
 
   public RewritePathActionRunner(AppProperty appProperty) {
     super(appProperty);
@@ -41,6 +44,10 @@ public class RewritePathActionRunner extends AbstractActionRunner {
     String path = (String) inputs.get(INPUT_PATH);
     String method = (String) inputs.get(INPUT_METHOD);
     String url = (String) inputs.get(INPUT_URL);
+    boolean workflowEnabled = getBool(inputs, WORKFLOW_ENABLED);
+    if (workflowEnabled) {
+      return Optional.empty();
+    }
     exchange
         .getAttributes()
         .put(ServerWebExchangeUtils.GATEWAY_REQUEST_URL_ATTR, URI.create(url + path));

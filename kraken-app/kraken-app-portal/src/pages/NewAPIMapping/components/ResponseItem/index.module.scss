@@ -29,6 +29,11 @@
 
 .input {
   background: #f0f2f5;
+  .activeInput {
+    border-radius: 2px;
+    border: 1px solid #165dff;
+    background-color: #fff;
+  }
   input {
     overflow: hidden;
     text-overflow: ellipsis;

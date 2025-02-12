@@ -96,13 +96,6 @@ spec:
             target: "@{{ports[*].dcf}}"
             targetLocation: BODY
             requiredMapping: true
-          - name: mapper.quote.uni.add.sync.place.keyName
-            source: "@{{quoteItem[0].product.place[0].keyName}}"
-            sourceLocation: BODY
-            sourceType: string
-            target: ""
-            targetLocation: BODY
-            requiredMapping: false
           - name: mapper.quote.uni.add.sync.productConfiguration.bandwidth
             source: "@{{quoteItem[0].product.productConfiguration.bandwidth}}"
             sourceLocation: BODY
@@ -157,6 +150,8 @@ spec:
             sourceLocation: BODY
             target: "@{{quoteItem[0].quoteItemPrice[*].price.dutyFreeAmount.value}}"
             targetLocation: BODY
+            checkPath: "$['quoteItem'][0]['quoteItemPrice'][0]['price']['dutyFreeAmount']['value']"
+            deletePath: "$.quoteItem[0].quoteItemPrice"
             requiredMapping: true
           - name: mapper.quote.uni.add.sync.taxRate
             title: Quote taxRate Mapping

@@ -17,6 +17,7 @@ import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.data.entity.AssetReleaseEntity;
 import com.consoleconnect.kraken.operator.data.repo.AssetReleaseRepository;
 import com.consoleconnect.kraken.operator.sync.model.SyncProperty;
+import com.consoleconnect.kraken.operator.sync.service.security.ExternalSystemTokenProvider;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -38,11 +39,12 @@ public class PullDeploymentService extends KrakenServerConnector {
   public PullDeploymentService(
       SyncProperty appProperty,
       WebClient webClient,
+      ExternalSystemTokenProvider externalSystemTokenProvider,
       DataIngestionJob dataIngestionJob,
       UnifiedAssetRepository assetRepository,
       AssetReleaseRepository assetReleaseRepository,
       SyncProperty syncProperty) {
-    super(appProperty, webClient);
+    super(appProperty, webClient, externalSystemTokenProvider);
     this.dataIngestionJob = dataIngestionJob;
     this.assetRepository = assetRepository;
     this.assetReleaseRepository = assetReleaseRepository;

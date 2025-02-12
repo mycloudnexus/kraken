@@ -94,6 +94,44 @@ const TimeFilter = ({
   );
 };
 
+const getStatusCodeWithIcon = (statusCode: number) => {
+  switch (statusCode) {
+    case 200:
+    case 201:
+    case 204:
+      return (
+        <span>
+          <CheckCircleFilled className={styles["statusIcon-success"]} />
+          {statusCode}
+        </span>
+      );
+    case 400:
+    case 401:
+    case 403:
+    case 500:
+      return (
+        <span>
+          <CloseCircleFilled className={styles["statusIcon-error"]} />
+          {statusCode}
+        </span>
+      );
+    case 404:
+    case 405:
+    case 406:
+    case 409:
+    case 415:
+    case 422:
+      return (
+        <span>
+          <ExclamationCircleFilled className={styles["statusIcon-warn"]} />
+          {statusCode}
+        </span>
+      );
+    default:
+      return <span>{statusCode}</span>;
+  }
+};
+
 const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
   const { openActionModal, size, sizeWrapper, pathQuery } = props;
   const { currentProduct } = useAppStore();
@@ -148,120 +186,55 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
   const statusCodeOptions = [
     {
       value: 200,
-      text: (
-        <span>
-          <CheckCircleFilled className={styles["statusIcon-success"]} />
-          200
-        </span>
-      ),
+      text: getStatusCodeWithIcon(200),
     },
     {
       value: 201,
-      text: (
-        <span>
-          <CheckCircleFilled className={styles["statusIcon-success"]} />
-          201
-        </span>
-      ),
+      text: getStatusCodeWithIcon(201),
     },
     {
       value: 204,
-      text: (
-        <span>
-          <CheckCircleFilled className={styles["statusIcon-success"]} />
-          204
-        </span>
-      ),
+      text: getStatusCodeWithIcon(204),
     },
     {
       value: 400,
-      text: (
-        <span>
-          <CloseCircleFilled className={styles["statusIcon-error"]} />
-          400
-        </span>
-      ),
+      text: getStatusCodeWithIcon(400),
     },
     {
       value: 401,
-      text: (
-        <span>
-          <CloseCircleFilled className={styles["statusIcon-error"]} />
-          401
-        </span>
-      ),
+      text: getStatusCodeWithIcon(401),
     },
     {
       value: 403,
-      text: (
-        <span>
-          <CloseCircleFilled className={styles["statusIcon-error"]} />
-          403
-        </span>
-      ),
+      text: getStatusCodeWithIcon(403),
     },
     {
       value: 404,
-      text: (
-        <span>
-          <ExclamationCircleFilled className={styles["statusIcon-warn"]} />
-          404
-        </span>
-      ),
+      text: getStatusCodeWithIcon(404),
     },
     {
       value: 405,
-      text: (
-        <span>
-          <ExclamationCircleFilled className={styles["statusIcon-warn"]} />
-          405
-        </span>
-      ),
+      text: getStatusCodeWithIcon(405),
     },
     {
       value: 406,
-      text: (
-        <span>
-          <ExclamationCircleFilled className={styles["statusIcon-warn"]} />
-          406
-        </span>
-      ),
+      text: getStatusCodeWithIcon(406),
     },
     {
       value: 409,
-      text: (
-        <span>
-          <ExclamationCircleFilled className={styles["statusIcon-warn"]} />
-          409
-        </span>
-      ),
+      text: getStatusCodeWithIcon(409),
     },
     {
       value: 415,
-      text: (
-        <span>
-          <ExclamationCircleFilled className={styles["statusIcon-warn"]} />
-          415
-        </span>
-      ),
+      text: getStatusCodeWithIcon(415),
     },
     {
       value: 422,
-      text: (
-        <span>
-          <ExclamationCircleFilled className={styles["statusIcon-warn"]} />
-          422
-        </span>
-      ),
+      text: getStatusCodeWithIcon(422),
     },
     {
       value: 500,
-      text: (
-        <span>
-          <CloseCircleFilled className={styles["statusIcon-error"]} />
-          500
-        </span>
-      ),
+      text: getStatusCodeWithIcon(500),
     },
   ];
 
@@ -302,7 +275,7 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
       key: "status",
       title: "Status code",
       width: 140,
-      render: (log: IActivityLog) => log.httpStatusCode,
+      render: (log: IActivityLog) => getStatusCodeWithIcon(log.httpStatusCode),
       filters: statusCodeOptions,
       filterMultiple: false,
     },
