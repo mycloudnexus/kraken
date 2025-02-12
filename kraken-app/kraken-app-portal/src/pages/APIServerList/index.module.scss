@@ -72,11 +72,21 @@
 }
 
 .contactInformation-field {
-  margin: 10px 0;
+  &-label {
+    margin: 8px 0;
+  }
+  &-value {
+    margin-bottom: 20px;
+  }
 }
 
 .contacts-icon {
   display: flex;
   flex-direction: row-reverse;
   align-items: center;
+}
+
+.alert {
+  margin-bottom: 20px;
+  border: none;
 }

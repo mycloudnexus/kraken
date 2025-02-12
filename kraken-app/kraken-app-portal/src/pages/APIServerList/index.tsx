@@ -23,6 +23,7 @@ import {
   Drawer,
   Input,
   notification,
+  Alert,
 } from "antd";
 import { isEmpty } from "lodash";
 import { Dispatch, SetStateAction, useState } from "react";
@@ -78,7 +79,7 @@ const ContactInformationSetup = ({
           <Empty />
         </Flex>
       ) : (
-        <Row gutter={16}>
+        <Row gutter={[16, 16]}>
           {sellerContactsList.map((item: IComponent) => (
             <Col key={item.id} span={12}>
               <Card
@@ -94,9 +95,11 @@ const ContactInformationSetup = ({
                       {getCardTitle(item.metadata.labels.componentKey)}
                     </Text.BoldMedium>
                     <Tag color="purple" style={{ marginLeft: "10px" }}>
-                      {item.metadata.labels["access.eline"] === "true"
-                        ? "Access Eline"
-                        : "Internet Access"}
+                      <span style={{ fontWeight: "400" }}>
+                        {item.metadata.labels["access.eline"] === "true"
+                          ? "Access Eline"
+                          : "Internet Access"}
+                      </span>
                     </Tag>
                   </div>
                 }
@@ -134,36 +137,34 @@ const ContactInformationSetup = ({
                       }}
                     >
                       <Text.LightSmall
-                        className={styles["contactInformation-field"]}
+                        className={styles["contactInformation-field-label"]}
                         color="#00000073"
                       >
                         Contact name
                       </Text.LightSmall>
                       <Text.LightSmall
-                        className={styles["contactInformation-field"]}
+                        className={styles["contactInformation-field-value"]}
                       >
                         {item?.facets?.sellerInfo?.name || "-"}
                       </Text.LightSmall>
                       <Text.LightSmall
-                        className={styles["contactInformation-field"]}
+                        className={styles["contactInformation-field-label"]}
                         color="#00000073"
                       >
                         Email
                       </Text.LightSmall>
                       <Text.LightSmall
-                        className={styles["contactInformation-field"]}
+                        className={styles["contactInformation-field-value"]}
                       >
                         {item?.facets?.sellerInfo?.emailAddress || "-"}
                       </Text.LightSmall>
                       <Text.LightSmall
-                        className={styles["contactInformation-field"]}
+                        className={styles["contactInformation-field-label"]}
                         color="#00000073"
                       >
                         Phone number
                       </Text.LightSmall>
-                      <Text.LightSmall
-                        className={styles["contactInformation-field"]}
-                      >
+                      <Text.LightSmall>
                         {item?.facets?.sellerInfo?.number || "-"}
                       </Text.LightSmall>
                     </div>
@@ -271,6 +272,8 @@ const APIServerList = () => {
         }
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
+        width={578}
+        destroyOnClose
         footer={
           <div style={{ display: "flex", justifyContent: "flex-end" }}>
             <Button
@@ -319,47 +322,65 @@ const APIServerList = () => {
             flexDirection: "column",
           }}
         >
+          <Alert
+            className={styles.alert}
+            message={
+              <span style={{ fontSize: "12px" }}>
+                To pass MEF certificate, all below three contact fields need to
+                be filled.
+              </span>
+            }
+            type="warning"
+            showIcon
+            closable
+          />
           <Text.LightSmall
-            className={styles["contactInformation-field"]}
+            className={styles["contactInformation-field-label"]}
             color="#00000073"
           >
             API component
           </Text.LightSmall>
-          <Text.LightSmall className={styles["contactInformation-field"]}>
+          <Text.LightSmall className={styles["contactInformation-field-value"]}>
             {drawerDetails.apiComponent || "-"}
           </Text.LightSmall>
           <Text.LightSmall
-            className={styles["contactInformation-field"]}
+            className={styles["contactInformation-field-label"]}
             color="#00000073"
           >
             Product type
           </Text.LightSmall>
-          <Text.LightSmall className={styles["contactInformation-field"]}>
+          <Text.LightSmall className={styles["contactInformation-field-value"]}>
             {drawerDetails.productType || "-"}
           </Text.LightSmall>
-          <Text.LightSmall className={styles["contactInformation-field"]}>
+          <Text.LightSmall className={styles["contactInformation-field-label"]}>
             Contact name
           </Text.LightSmall>
           <Input
             name="contactName"
             value={drawerDetails?.contactName}
             onChange={handleInputChange}
+            placeholder="Please enter"
+            style={{ marginBottom: "20px" }}
           />
-          <Text.LightSmall className={styles["contactInformation-field"]}>
+          <Text.LightSmall className={styles["contactInformation-field-label"]}>
             Email
           </Text.LightSmall>
           <Input
             name="email"
             value={drawerDetails?.email}
             onChange={handleInputChange}
+            placeholder="Please enter"
+            style={{ marginBottom: "20px" }}
           />
-          <Text.LightSmall className={styles["contactInformation-field"]}>
+          <Text.LightSmall className={styles["contactInformation-field-label"]}>
             Phone number
           </Text.LightSmall>
           <Input
             name="phoneNumber"
             value={drawerDetails?.phoneNumber}
             onChange={handleInputChange}
+            placeholder="Please enter"
+            style={{ marginBottom: "20px" }}
           />
         </div>
       </Drawer>
