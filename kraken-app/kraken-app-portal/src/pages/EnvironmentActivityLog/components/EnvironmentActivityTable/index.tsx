@@ -18,13 +18,10 @@ import dayjs, { Dayjs } from "dayjs";
 import { omit } from "lodash";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Size } from "recharts/types/util/types";
 import styles from "../../index.module.scss";
 
 type EnvironmentActivityTablePropsType = {
   openActionModal: (requestId: string) => void;
-  size?: Size;
-  sizeWrapper?: Size;
   pathQuery: string;
 };
 
@@ -133,7 +130,7 @@ const getStatusCodeWithIcon = (statusCode: number) => {
 };
 
 const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
-  const { openActionModal, size, sizeWrapper, pathQuery } = props;
+  const { openActionModal, pathQuery } = props;
   const { currentProduct } = useAppStore();
   const { envId } = useParams();
   const [dates, setDates] = useState<[Dayjs | null, Dayjs | null] | null>(null);

@@ -59,8 +59,6 @@ const EnvironmentActivityLog = () => {
         children: (
           <EnvironmentActivityTable
             openActionModal={openActionModal}
-            size={size}
-            sizeWrapper={sizeWrapper}
             pathQuery={pathQuery}
           />
         ),
