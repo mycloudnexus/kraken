@@ -73,30 +73,37 @@ const EnvironmentActivityLog = () => {
   };
 
   return (
-    <PageLayout title="API activity log">
-      <Flex align="center" justify="space-between">
-        <Tabs
-          activeKey={mainTabKey}
-          hideAdd
-          onChange={setMainTabKey}
-          items={[
-            {
-              label: "Activity log",
-              key: "activityLog",
-            },
-            {
-              label: "Push history",
-              key: "pushHistory",
-            },
-          ]}
-        />
-        {isActivityLogActive && !!isPushButtonEnabledResponse?.enabled && (
-          <Button type="primary" onClick={open}>
-            Push log
-          </Button>
-        )}
-      </Flex>
-
+    <PageLayout
+      title={
+        <Flex
+          align="center"
+          justify="space-between"
+          vertical={false}
+          style={{ width: "100%" }}
+        >
+          <Tabs
+            activeKey={mainTabKey}
+            hideAdd
+            onChange={setMainTabKey}
+            items={[
+              {
+                label: "Activity log",
+                key: "activityLog",
+              },
+              {
+                label: "Push history",
+                key: "pushHistory",
+              },
+            ]}
+          />
+          {isActivityLogActive && !!isPushButtonEnabledResponse?.enabled && (
+            <Button type="primary" onClick={open}>
+              Push log
+            </Button>
+          )}
+        </Flex>
+      }
+    >
       <div className={styles.contentWrapper} ref={refWrapper}>
         {isOpen && (
           <PushHistoryModal

@@ -361,8 +361,9 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
         showQuickJumper: true,
       }}
       scroll={{
-        y: (sizeWrapper?.height ?? 0) - (size?.height ?? 0) - 120,
-        x: 800,
+        y: 640,
+        x: "max-content",
+        scrollToFirstRowOnChange: false,
       }}
       onChange={handleTableChange}
     />
