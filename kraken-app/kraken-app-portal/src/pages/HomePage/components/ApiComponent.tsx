@@ -63,7 +63,7 @@ const ApiComponent = ({
   return (
     <Flex
       className={styles.apiContainer}
-      onClick={(e) => {
+      onClick={() => {
         navigate(`/api-mapping/${item.metadata.key}`);
       }}
     >

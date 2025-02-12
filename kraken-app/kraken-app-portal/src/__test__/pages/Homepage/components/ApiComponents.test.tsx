@@ -1,9 +1,9 @@
-import { render } from "@testing-library/react";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient } from "@/utils/helpers/reactQuery";
-import { BrowserRouter } from "react-router-dom";
-import ApiComponents from "@/pages/HomePage/components/ApiComponents";
 import ApiComponent from "@/pages/HomePage/components/ApiComponent";
+import ApiComponents from "@/pages/HomePage/components/ApiComponents";
+import { queryClient } from "@/utils/helpers/reactQuery";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { render } from "@testing-library/react";
+import { BrowserRouter } from "react-router-dom";
 
 test("ApiComponents test", () => {
   const { container } = render(
@@ -37,6 +37,7 @@ test("ApiComponent test", () => {
               },
             } as any
           }
+          openDrawer={() => {}}
         />
       </BrowserRouter>
     </QueryClientProvider>
