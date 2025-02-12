@@ -143,6 +143,8 @@ public interface MappingTransformer {
             deleteByPath(value, doc);
           } else if (obj instanceof Integer i && i < 0) {
             deleteByPath(value, doc);
+          } else if (obj instanceof Double i && i < 0) {
+            deleteByPath(value, doc);
           } else if (obj instanceof Boolean b && !b) {
             deleteByPath(value, doc);
           } else if (obj instanceof JSONArray array && array.isEmpty()) {
