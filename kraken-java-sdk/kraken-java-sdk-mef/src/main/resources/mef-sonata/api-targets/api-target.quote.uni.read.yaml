@@ -42,5 +42,7 @@ spec:
          "quoteDate": "${T(com.consoleconnect.kraken.operator.core.toolkit.DateTime).nowInUTCFormatted()}",
          "externalId":"${entity.request[externalId]?:''}",
          "instantSyncQuote":"${entity.request[instantSyncQuote]?:''}",
-         "requestedQuoteCompletionDate": "${entity.request[requestedQuoteCompletionDate]?:''}"
+         "requestedQuoteCompletionDate": "${entity.request[requestedQuoteCompletionDate]?:''}",
+         "quoteLevel": "${entity.request.quoteLevel}",
+         "state": "${entity.renderedResponse.state}"
         }

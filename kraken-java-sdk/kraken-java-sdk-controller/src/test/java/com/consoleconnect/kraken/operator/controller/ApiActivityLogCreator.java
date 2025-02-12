@@ -11,7 +11,8 @@ public interface ApiActivityLogCreator {
 
   ApiActivityLogRepository getApiActivityLogRepository();
 
-  default ApiActivityLogEntity createApiActivityLog(String buyerId, String envId) {
+  default ApiActivityLogEntity createApiActivityLog(
+      String buyerId, String envId, String productType) {
     ApiActivityLogEntity apiActivityLogEntity = new ApiActivityLogEntity();
     apiActivityLogEntity.setRequestId(UUID.randomUUID().toString());
     apiActivityLogEntity.setPath("/123");
@@ -23,6 +24,7 @@ public interface ApiActivityLogCreator {
     apiActivityLogEntity.setHeaders(headers);
     apiActivityLogEntity.setBuyer(buyerId);
     apiActivityLogEntity.setCallSeq(0);
+    apiActivityLogEntity.setProductType(productType);
     apiActivityLogEntity.setTriggeredAt(ZonedDateTime.now());
     apiActivityLogEntity = getApiActivityLogRepository().save(apiActivityLogEntity);
     return apiActivityLogEntity;

@@ -50,7 +50,7 @@ spec:
                   targetAPIConfigKey = 'targetKey:notFound';
                 }
                 let ret = {
-                  productOfferingType: type || 'undefined',
+                  productType: type || 'undefined',
                   targetAPIConfigKey: targetAPIConfigKey
                 };
                 return JSON.stringify(ret);
@@ -60,7 +60,7 @@ spec:
         - id: persist_http_request
           actionType: buildin@db
           env:
-            bizType: ${productOfferingQualification.productOfferingType}
+            bizType: ${productOfferingQualification.productType}
           with:
             action: create
             properties:
@@ -150,7 +150,7 @@ spec:
                   targetAPIConfigKey = 'notImplemented';
                 }
                 let ret = {
-                  productOfferingType: input.bizType,
+                  productType: input.bizType,
                   targetAPIConfigKey: targetAPIConfigKey
                 };
                 return JSON.stringify(ret);
