@@ -267,6 +267,7 @@ spec:
         - id: rewrite-path
           actionType: buildin@rewrite-path
           env:
+            workflowEnabled: ${targetApiConfig.workflow.enabled}
             path: ${targetApiConfig.endpoints[0].path}
             method: ${targetApiConfig.endpoints[0].method}
           with:
@@ -395,6 +396,9 @@ links:
     group: mef.sonata.api-target.order.uni.delete
   - targetAssetKey: mef.sonata.api-target-mapper.order.eline.delete
     relationship: implementation.target-mapper
+    group: mef.sonata.api-target.order.eline.delete
+  - targetAssetKey: mef.sonata.api-workflow.order.eline.delete
+    relationship: implementation.workflow
     group: mef.sonata.api-target.order.eline.delete
   - targetAssetKey: mef.sonata.api.matrix.order.eline.delete
     relationship: implementation.matrix

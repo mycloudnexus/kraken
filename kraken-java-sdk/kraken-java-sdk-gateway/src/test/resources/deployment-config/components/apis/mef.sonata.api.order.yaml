@@ -65,10 +65,10 @@ spec:
                 } else {
                   errorArr = ['api use case is not supported :'];
                   if (!typeArr.includes(type)){
-                    errorArr.push(`expect @{{productOrderItem.product.productConfiguration.@type}} in [ ${typeArr} ], but ${type}.`);
+                    errorArr.push(`expect productOrderItem.product.productConfiguration.@type in [ ${typeArr} ], but ${type}.`);
                   }
                   if (!actionArr.includes(action)) {
-                    errorArr.push(`expect @{{productOrderItem.action}} in [ ${actionArr} ], but ${action}`)
+                    errorArr.push(`expect productOrderItem.action in [ ${actionArr} ], but ${action}`)
                   }
                   errorMsg = errorArr.join(' ');
                   targetAPIConfigKey = 'targetKey:notFound';
@@ -285,10 +285,6 @@ spec:
           with:
             render: true
           outputKey: targetApiConfig
-        - id: mock-response
-          actionType: buildin@mock-response
-          with:
-            forwardDownstream: false
 
         - id: modify-response-body
           actionType: buildin@modify-response-body
@@ -358,9 +354,13 @@ links:
   - targetAssetKey: mef.sonata.api-target-mapper.order.eline.delete
     relationship: implementation.target-mapper
     group: mef.sonata.api-target.order.eline.delete
+  - targetAssetKey: mef.sonata.api-workflow.order.eline.delete
+    relationship: implementation.workflow
+    group: mef.sonata.api-target.order.eline.delete
   - targetAssetKey: mef.sonata.api.matrix.order.eline.delete
     relationship: implementation.matrix
     group: mef.sonata.api-target.order.eline.delete
+
   - targetAssetKey: mef.sonata.api.matrix.order.uni.read
     relationship: implementation.matrix
     group: mef.sonata.api-target.order.uni.read
