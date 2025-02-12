@@ -1,7 +1,6 @@
 import { PageLayout } from "@/components/Layout";
 import { useGetProductEnvs } from "@/hooks/product";
 import { useGetPushButtonEnabled } from "@/hooks/pushApiEvent";
-import useSize from "@/hooks/useSize";
 import { useAppStore } from "@/stores/app.store";
 import { Button, Flex, Tabs, Input } from "antd";
 import { startCase } from "lodash";
@@ -22,10 +21,7 @@ const EnvironmentActivityLog = () => {
   const navigate = useNavigate();
   const { data: envData } = useGetProductEnvs(currentProduct);
   const { data: isPushButtonEnabledResponse } = useGetPushButtonEnabled();
-  const ref = useRef<any>();
-  const size = useSize(ref);
   const refWrapper = useRef<any>();
-  const sizeWrapper = useSize(refWrapper);
   const [mainTabKey, setMainTabKey] = useState<string>("activityLog");
   const { value: isOpen, setTrue: open, setFalse: close } = useBoolean(false);
   const [pathQuery, setPathQuery] = useState("");
