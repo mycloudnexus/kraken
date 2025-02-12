@@ -1,0 +1,14 @@
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.1.7.8
+  name: V1.7.8
+  labels:
+    productSpec: grace
+    productVersion: V1.7.8
+    publishDate: 2025-02-10
+  description: |
+    Add quote level for quote reading
+    Removed 'productOrderItem[0].product.productOffering.id' in the mapper for deleting order
+  version: 1

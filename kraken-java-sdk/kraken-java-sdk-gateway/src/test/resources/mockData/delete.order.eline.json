@@ -1,0 +1,116 @@
+{
+  "note": [],
+  "relatedContactInformation": [
+    {
+      "number": "111 222 333",
+      "emailAddress": "productOrderContact@mef.com",
+      "role": "productOrderContact",
+      "postalAddress": null,
+      "organization": "MEF",
+      "name": "Joe Order",
+      "numberExtension": null
+    }
+  ],
+  "externalId": "AEL[9301] General On-net Order - Disconnect",
+  "projectId": "MEF OIT",
+  "productOrderItem": [
+    {
+      "relatedBuyerPON": null,
+      "note": [],
+      "product": {
+        "productOffering": {
+          "href": null,
+          "id": "ACCESS_E_LINE"
+        },
+        "productConfiguration": {
+          "@type": "ACCESS_E_LINE",
+          "bandwidth": 1,
+          "bandwidthUnit": "MBPS",
+          "classOfService": "SILVER",
+          "paymentType": "invoice",
+          "name": "Qe 1 Company Connection 0904",
+          "buyerCompanyId": "qe1company",
+          "destUNIMetroId": "5db65dcf5d545c000bc6884b",
+          "type": "LAYER2"
+        },
+        "productRelationship": [
+          {
+            "relationshipType": "CONNECTS_TO_ENNI",
+            "id": "6371e5fa2fb2fa00155a3535",
+            "href": null
+          },
+          {
+            "relationshipType": "CONNECTS_TO_UNI",
+            "id": "63634cbf11ffdd00151fc6fb",
+            "href": null
+          }
+        ],
+        "id": "66397d963cfa4f56f9135d41",
+        "href": null,
+        "place": []
+      },
+      "relatedContactInformation": [
+        {
+          "number": "+12-345-678-90",
+
+          "role": "buyerProductOrderItemContact",
+          "postalAddress": null,
+          "organization": null,
+          "name": "Buyer Product Order Item Contact",
+          "numberExtension": null
+        },
+        {
+          "number": "+12-345-678-90",
+          "emailAddress": "Buyer.ImplementationContact@mef.com",
+          "role": "buyerImplementationContact",
+          "postalAddress": null,
+          "organization": null,
+          "name": "Buyer Implementation Contact",
+          "numberExtension": null
+        },
+        {
+          "number": "+12-345-678-90",
+          "emailAddress": "Buyer.TechnicalContact@mef.com",
+          "role": "buyerTechnicalContact",
+          "postalAddress": null,
+          "organization": null,
+          "name": "Buyer Technical Contact ",
+          "numberExtension": null
+        }
+      ],
+      "requestedItemTerm": {
+        "name": "ELine Item Term",
+        "duration": {
+          "amount": 1,
+          "units": "calendarMonths"
+        },
+        "endOfTermAction": "roll",
+        "rollInterval": {
+          "amount": 1,
+          "units": "calendarMonths"
+        }
+      },
+      "billingAccount": {
+        "id": "001"
+      },
+      "tspRestorationPriority": null,
+      "productOfferingQualificationItem": {
+        "productOfferingQualificationId": "",
+        "alternateProductProposalId": null,
+        "productOfferingQualificationHref": null,
+        "id": "ELINE"
+      },
+      "coordinatedAction": [],
+      "action": "delete",
+      "quoteItem": {
+        "quoteHref": null,
+        "id": "ELINE",
+        "quoteId": ""
+      },
+      "endCustomerName": null,
+      "expediteIndicator": false,
+      "id": "ELINE",
+      "requestedCompletionDate": "2121-11-30T23:00:00Z"
+    }
+  ]
+}

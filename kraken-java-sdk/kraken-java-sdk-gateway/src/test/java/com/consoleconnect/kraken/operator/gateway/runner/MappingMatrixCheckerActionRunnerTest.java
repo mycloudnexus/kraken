@@ -7,6 +7,7 @@ import com.consoleconnect.kraken.operator.core.enums.MappingTypeEnum;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
+import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.Constants;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.core.toolkit.YamlToolkit;
@@ -35,6 +36,7 @@ import org.springframework.test.context.ContextConfiguration;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
   @Autowired MappingMatrixCheckerActionRunner mappingMatrixCheckerActionRunner;
+  @Autowired UnifiedAssetService unifiedAssetService;
 
   @Test
   @Order(1)
@@ -250,13 +252,26 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
 
   public static List<Pair<PathCheck, Object>> buildLegalPathCheckList() {
     PathCheck pathCheck1 =
-        new PathCheck("EXPECTED", "user", ExpectTypeEnum.EXPECTED, "true", "", null, null);
+        new PathCheck(
+            ExpectTypeEnum.EXPECTED.name(),
+            "user",
+            ExpectTypeEnum.EXPECTED,
+            "true",
+            "",
+            null,
+            null);
     PathCheck pathCheck2 =
         new PathCheck(
-            "EXPECTED_EXIST", "user", ExpectTypeEnum.EXPECTED_EXIST, "true", "", null, null);
+            ExpectTypeEnum.EXPECTED_EXIST.name(),
+            "user",
+            ExpectTypeEnum.EXPECTED_EXIST,
+            "true",
+            "",
+            null,
+            null);
     PathCheck pathCheck3 =
         new PathCheck(
-            "EXPECTED_TRUE",
+            ExpectTypeEnum.EXPECTED_TRUE.name(),
             "$.body.submittedGeographicAddress.['country']",
             ExpectTypeEnum.EXPECTED_TRUE,
             "${param}",
@@ -264,14 +279,39 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
             422,
             null);
     PathCheck pathCheck4 =
-        new PathCheck("EXPECTED_STR", "", ExpectTypeEnum.EXPECTED_STR, "", "", 422, null);
+        new PathCheck(
+            ExpectTypeEnum.EXPECTED_STR.name(), "", ExpectTypeEnum.EXPECTED_STR, "", "", 422, null);
     PathCheck pathCheck5 =
-        new PathCheck("EXPECTED_INT", "", ExpectTypeEnum.EXPECTED_INT, "", "", 422, null);
+        new PathCheck(
+            ExpectTypeEnum.EXPECTED_INT.name(), "", ExpectTypeEnum.EXPECTED_INT, "", "", 422, null);
     PathCheck pathCheck6 =
-        new PathCheck("EXPECTED_NUMERIC", "", ExpectTypeEnum.EXPECTED_NUMERIC, "", "", 422, null);
+        new PathCheck(
+            ExpectTypeEnum.EXPECTED_NUMERIC.name(),
+            "",
+            ExpectTypeEnum.EXPECTED_NUMERIC,
+            "",
+            "",
+            422,
+            null);
     PathCheck pathCheck7 =
         new PathCheck(
-            "EXPECTED_NOT_BLANK", "", ExpectTypeEnum.EXPECTED_NOT_BLANK, "", "", 422, null);
+            ExpectTypeEnum.EXPECTED_NOT_BLANK.name(),
+            "",
+            ExpectTypeEnum.EXPECTED_NOT_BLANK,
+            "",
+            "",
+            422,
+            null);
+
+    PathCheck pathCheck8 =
+        new PathCheck(
+            ExpectTypeEnum.EXPECTED_START_WITH.name(),
+            "",
+            ExpectTypeEnum.EXPECTED_START_WITH,
+            "UNI",
+            "",
+            422,
+            null);
 
     Pair<PathCheck, Object> pair1 = Pair.of(pathCheck1, "true");
     Pair<PathCheck, Object> pair2 = Pair.of(pathCheck2, null);
@@ -280,8 +320,9 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
     Pair<PathCheck, Object> pair5 = Pair.of(pathCheck5, 123);
     Pair<PathCheck, Object> pair6 = Pair.of(pathCheck6, 123.4);
     Pair<PathCheck, Object> pair7 = Pair.of(pathCheck7, "not blank");
+    Pair<PathCheck, Object> pair8 = Pair.of(pathCheck8, "UNI-123");
 
-    return List.of(pair1, pair2, pair3, pair4, pair5, pair6, pair7);
+    return List.of(pair1, pair2, pair3, pair4, pair5, pair6, pair7, pair8);
   }
 
   @ParameterizedTest
@@ -575,6 +616,21 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
     inputs.put("body", body);
     dependOn = mappingMatrixCheckerActionRunner.checkConditionsMatched(inputs, sourceConditions);
     Assertions.assertFalse(dependOn);
+  }
+
+  @Test
+  @SneakyThrows
+  void givenWorkflowMapper_thenValidate_thenThrowException() {
+    Map<String, Object> inputs = new HashMap<>();
+    inputs.put(
+        "body",
+        JsonToolkit.fromJson(readFileToString("mockData/delete.order.eline.json"), Object.class));
+    List<String> emptyList = Collections.emptyList();
+    Assertions.assertThrows(
+        KrakenException.class,
+        () ->
+            mappingMatrixCheckerActionRunner.checkMapperConstraints(
+                "mef.sonata.api-target.order.eline.delete", inputs, emptyList));
   }
 
   private static List<ComponentAPITargetFacets.SourceCondition> getSourceConditions() {

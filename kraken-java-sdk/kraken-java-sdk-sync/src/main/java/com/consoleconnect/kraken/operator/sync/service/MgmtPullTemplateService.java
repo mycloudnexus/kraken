@@ -20,6 +20,7 @@ import com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants;
 import com.consoleconnect.kraken.operator.core.toolkit.DateTime;
 import com.consoleconnect.kraken.operator.core.toolkit.LabelConstants;
 import com.consoleconnect.kraken.operator.sync.model.SyncProperty;
+import com.consoleconnect.kraken.operator.sync.service.security.ExternalSystemTokenProvider;
 import java.time.ZonedDateTime;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -44,11 +45,12 @@ public class MgmtPullTemplateService extends KrakenServerConnector {
   public MgmtPullTemplateService(
       SyncProperty appProperty,
       WebClient webClient,
+      ExternalSystemTokenProvider externalSystemTokenProvider,
       UnifiedAssetService unifiedAssetService,
       ResourceCacheHolder resourceCacheHolder,
       EventSinkService eventSinkService,
       DataIngestionJob dataIngestionJob) {
-    super(appProperty, webClient);
+    super(appProperty, webClient, externalSystemTokenProvider);
     this.unifiedAssetService = unifiedAssetService;
     this.appProperty = appProperty;
     this.resourceCacheHolder = resourceCacheHolder;

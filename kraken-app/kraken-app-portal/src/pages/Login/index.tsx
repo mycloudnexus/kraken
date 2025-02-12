@@ -49,8 +49,8 @@ const Login = () => {
       <Flex flexDirection="column" gap={24} className={styles.formWrapper}>
         <Flex gap={12} className={styles.logoWrapper}>
           <Logo />
-          <Typography.Text style={{ fontSize: 20, fontWeight: 500 }}>
-            KRAKEN
+          <Typography.Text style={{ fontSize: 20, fontWeight: 700 }}>
+            MEF LSO API Adaptor
           </Typography.Text>
         </Flex>
         <Flex flexDirection="column">

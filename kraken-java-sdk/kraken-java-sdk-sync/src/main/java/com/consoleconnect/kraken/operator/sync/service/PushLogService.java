@@ -15,6 +15,7 @@ import com.consoleconnect.kraken.operator.core.service.ApiActivityLogService;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.DateTime;
 import com.consoleconnect.kraken.operator.sync.model.SyncProperty;
+import com.consoleconnect.kraken.operator.sync.service.security.ExternalSystemTokenProvider;
 import java.time.ZonedDateTime;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -34,9 +35,10 @@ public class PushLogService extends KrakenServerConnector {
   public PushLogService(
       SyncProperty appProperty,
       WebClient webClient,
+      ExternalSystemTokenProvider externalSystemTokenProvider,
       ApiActivityLogRepository apiActivityLogRepository,
       ApiActivityLogService apiActivityLogService) {
-    super(appProperty, webClient);
+    super(appProperty, webClient, externalSystemTokenProvider);
     this.apiActivityLogRepository = apiActivityLogRepository;
     this.apiActivityLogService = apiActivityLogService;
   }

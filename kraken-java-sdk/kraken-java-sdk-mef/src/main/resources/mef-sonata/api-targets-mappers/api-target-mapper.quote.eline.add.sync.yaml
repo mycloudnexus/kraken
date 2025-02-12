@@ -189,8 +189,8 @@ spec:
             targetLocation: BODY
             requiredMapping: true
             replaceStar: true
-            checkPath: "$['quoteItem'][0]['quoteItemPrice'][0]['price']['dutyFreeAmount']['unit']"
-            deletePath: "$['quoteItem'][0]['quoteItemPrice']"
+            checkPath: "$['quoteItem'][0]['quoteItemPrice'][0]['price']['dutyFreeAmount']['value']"
+            deletePath: "$.quoteItem[0].quoteItemPrice"
           - name: mapper.quote.eline.add.sync.taxRate
             title: "Price Tax Rate. Unit: [%]. E.g. value 16 stand for 16% tax"
             description: ""

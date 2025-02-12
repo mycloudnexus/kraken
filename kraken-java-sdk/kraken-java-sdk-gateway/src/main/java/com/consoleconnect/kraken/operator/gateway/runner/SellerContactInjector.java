@@ -4,7 +4,7 @@ import static com.consoleconnect.kraken.operator.core.toolkit.Constants.ENV;
 
 import com.consoleconnect.kraken.operator.core.dto.ApiUseCaseDto;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
-import com.consoleconnect.kraken.operator.core.enums.ProductCategoryEnum;
+import com.consoleconnect.kraken.operator.core.enums.ParentProductTypeEnum;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.SellerContactFacets;
 import com.consoleconnect.kraken.operator.core.service.ApiUseCaseSelector;
@@ -29,7 +29,7 @@ public interface SellerContactInjector extends ApiUseCaseSelector {
     String sellerContactKey =
         generateSellerContactKey(
             apiUseCaseDtoOptional.get().getComponentApiKey(),
-            ProductCategoryEnum.ACCESS_ELINE.getKind());
+            ParentProductTypeEnum.ACCESS_ELINE.getKind());
     List<String> sellerContactKeys = List.of(sellerContactKey);
     List<UnifiedAssetDto> sellerContactAssets =
         getUnifiedAssetService().findByAllKeysIn(sellerContactKeys, true);

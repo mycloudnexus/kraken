@@ -22,6 +22,7 @@ public abstract class KrakenFilterConstants {
   public static final String X_LOG_REQUEST_ID = "x-kraken-log-request-id";
   public static final String X_KRAKEN_LOG_CALL_SEQ = "x-kraken-log-call-seq";
   public static final String X_KRAKEN_TARGET_VALUE_MAPPER = "x-kraken-target-value-mapper";
+  public static final String X_KRAKEN_WORKFLOW_CONFIG = "x-kraken-workflow-config";
   public static final String X_KRAKEN_BUYER_ID = "x-kraken-buyer-id";
   public static final String X_KRAKEN_AUTH_KEY = "x-kraken-key";
   public static final String X_KRAKEN_URL = "x-kraken-url";

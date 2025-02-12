@@ -95,6 +95,10 @@ public class ApiActivityLogService {
         predicateList.add(
             criteriaBuilder.equal(root.get("httpStatusCode"), logSearchRequest.getStatusCode()));
       }
+      if (StringUtils.isNotBlank(logSearchRequest.getProductType())) {
+        predicateList.add(
+            criteriaBuilder.equal(root.get("productType"), logSearchRequest.getProductType()));
+      }
       Predicate[] predicateListArray = predicateList.toArray(new Predicate[0]);
       return query.where(predicateListArray).getRestriction();
     };

@@ -11,9 +11,11 @@ import com.consoleconnect.kraken.operator.core.enums.MappingTypeEnum;
 import com.consoleconnect.kraken.operator.core.enums.ParamLocationEnum;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
+import com.consoleconnect.kraken.operator.core.model.HttpTask;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPIFacets;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
+import com.consoleconnect.kraken.operator.core.model.facet.ComponentWorkflowFacets;
 import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants;
@@ -47,6 +49,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
   public static final String PARAM_NAME = "param";
   public static final String NOT_FOUND = "notFound";
   public static final String COLON = ":";
+  public static final String WORKFLOW_PREFIX = "workflow.";
   public static final String EXPECTED422_PATH_KEY = "expect-http-status-422-if-missing";
   private final UnifiedAssetService unifiedAssetService;
   private final UnifiedAssetRepository unifiedAssetRepository;
@@ -224,6 +227,9 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
       case EXPECTED -> {
         return pathCheck.value().equalsIgnoreCase(wrapAsString(value));
       }
+      case EXPECTED_START_WITH -> {
+        return wrapAsString(value).startsWith(pathCheck.value());
+      }
       case EXPECTED_EXIST -> {
         if (!Objects.equals(pathCheck.value(), String.valueOf(Boolean.TRUE))) {
           throwException(pathCheck, null);
@@ -269,12 +275,27 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     UnifiedAssetDto assetDto = unifiedAssetService.findOne(targetKey);
     UnifiedAssetDto mapperAsset =
         unifiedAssetService.findOne(assetDto.getMetadata().getMapperKey());
-    ComponentAPITargetFacets.Mappers mappers =
-        UnifiedAsset.getFacets(mapperAsset, ComponentAPITargetFacets.class)
-            .getEndpoints()
-            .get(0)
-            .getMappers();
-    List<ComponentAPITargetFacets.Mapper> request = mappers.getRequest();
+    ComponentAPITargetFacets facets =
+        UnifiedAsset.getFacets(mapperAsset, ComponentAPITargetFacets.class);
+    List<ComponentAPITargetFacets.Mapper> request = new ArrayList<>();
+    if (facets.getWorkflow() != null && facets.getWorkflow().isEnabled()) {
+      UnifiedAssetDto workflowAsset = unifiedAssetService.findOne(facets.getWorkflow().getKey());
+      ComponentWorkflowFacets workflowFacets =
+          UnifiedAsset.getFacets(workflowAsset, ComponentWorkflowFacets.class);
+      if (workflowFacets.getValidationMapper() != null) {
+        request.addAll(workflowFacets.getValidationMapper());
+        request.addAll(fetchMapper(workflowFacets.getExecutionStage()));
+        request.addAll(fetchMapper(workflowFacets.getValidationStage()));
+        request.addAll(fetchMapper(workflowFacets.getPreparationStage()));
+      }
+    } else {
+      ComponentAPITargetFacets.Mappers mappers =
+          UnifiedAsset.getFacets(mapperAsset, ComponentAPITargetFacets.class)
+              .getEndpoints()
+              .get(0)
+              .getMappers();
+      request.addAll(mappers.getRequest());
+    }
     DocumentContext documentContext = JsonPath.parse(inputs);
     for (ComponentAPITargetFacets.Mapper mapper : request) {
       if (StringUtils.isBlank(mapper.getTarget())) {
@@ -291,6 +312,13 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
         checkMappingValue(documentContext, mapper, inputs, pathsExpected422);
       }
     }
+  }
+
+  private static List<ComponentAPITargetFacets.Mapper> fetchMapper(List<HttpTask> workflowFacets) {
+    return workflowFacets.stream()
+        .flatMap(httpTask -> httpTask.getEndpoint().getMappers().getRequest().stream())
+        .filter(mapper -> !mapper.getTarget().contains(WORKFLOW_PREFIX))
+        .toList();
   }
 
   public void checkConstantValue(

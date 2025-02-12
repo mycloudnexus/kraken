@@ -8,7 +8,6 @@ import com.consoleconnect.kraken.operator.core.event.IngestionDataResult;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -29,7 +28,7 @@ public class SellerContactController {
 
   @Operation(summary = "Create a seller contact")
   @PostMapping()
-  public Mono<HttpResponse<List<IngestionDataResult>>> create(
+  public Mono<HttpResponse<IngestionDataResult>> create(
       @PathVariable("productId") String productId,
       @PathVariable("componentId") String componentId,
       @RequestBody CreateSellerContactRequest request) {
