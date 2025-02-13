@@ -16,6 +16,7 @@ import io.orkes.conductor.client.http.OrkesMetadataClient;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -77,7 +78,7 @@ public class WorkflowDeployService {
     IngestionDataResult result =
         unifiedAssetService.syncAsset(
             workflow.getMetadata().getKey(), deployment, syncMetadata, true);
-    if (result.getCode() != 200) {
+    if (result.getCode() != HttpStatus.OK.value()) {
       throw new KrakenException(result.getCode(), result.getMessage());
     }
     return deployment;
