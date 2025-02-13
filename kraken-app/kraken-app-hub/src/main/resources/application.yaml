@@ -92,6 +92,9 @@ logging:
     # org.springframework.cloud.gateway: DEBUG
     org.springframework.security: DEBUG
 app:
+  workflow:
+    baseUrl: https://external-kraken-conductor.dev.consolecore.io/api
+    enabled: true
   tenant:
     workspacePath: classpath:/mock/kraken.yaml
     componentOperation:
