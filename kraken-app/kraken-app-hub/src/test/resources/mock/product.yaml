@@ -22,6 +22,7 @@ spec:
     #- classpath:/mock/api-targets/api-target.order.eline.read.yaml
     #- classpath:/mock/api-targets/api-target.order.eline.read.delete.yaml
     #- classpath:/mock/api-targets/api-target.order.uni.delete.yaml
+    #- classpath:/mock/api-targets/api-target.order.eline.delete.yaml
     #- classpath:/mock/api-targets/api-target.quote.eline.add.yaml
     #- classpath:/mock/api-targets/api-target.quote.eline.read.yaml
     #- classpath:/mock/api-targets/api-target.quote.uni.add.yaml
@@ -44,6 +45,7 @@ spec:
     #- classpath:/mock/api-targets-mappers/api-target-mapper.order.uni.read.delete.yaml
     #- classpath:/mock/api-targets-mappers/api-target-mapper.order.eline.read.delete.yaml
     #- classpath:/mock/api-targets-mappers/api-target-mapper.order.uni.delete.yaml
+    #- classpath:/mock/api-targets-mappers/api-target-mapper.order.eline.delete.yaml
     #- classpath:/mock/api-targets-mappers/api-target-mapper.quote.eline.add.yaml
     #- classpath:/mock/api-targets-mappers/api-target-mapper.quote.eline.read.yaml
     #- classpath:/mock/api-targets-mappers/api-target-mapper.quote.uni.add.yaml
