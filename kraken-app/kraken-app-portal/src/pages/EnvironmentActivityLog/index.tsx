@@ -117,7 +117,7 @@ const EnvironmentActivityLog = () => {
               }}
               tabBarExtraContent={
                 <Search
-                  placeholder="Please enter path keywords"
+                  placeholder="Please copy full path here"
                   style={{ width: "250px" }}
                   onSearch={searchPathQuery}
                   allowClear
