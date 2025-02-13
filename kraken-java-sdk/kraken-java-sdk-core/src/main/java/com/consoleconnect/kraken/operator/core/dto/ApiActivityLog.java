@@ -20,6 +20,7 @@ public class ApiActivityLog extends AbstractHttpModel {
   private ZonedDateTime triggeredAt;
 
   private ZonedDateTime syncedAt;
+  private ZonedDateTime triggeredAt;
   private SyncStatusEnum syncStatus;
 
   private String clientId;
