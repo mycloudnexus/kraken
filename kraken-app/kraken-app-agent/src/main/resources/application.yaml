@@ -106,9 +106,9 @@ app:
       batch-size: ${EXTERNAL_SYSTEM_PUSH_LOG_BATCH_SIZE:200}
   workflow:
     baseUrl: https://external-kraken-conductor.dev.consolecore.io/api
-    enabled: true
+    enabled: false
     deployment:
-      enabled: true
+      enabled: false
   cron-job:
     pull-api-server-info: 0/20 * * * * *
     pull-server-assets: 0 0/1 * * * *
