@@ -50,10 +50,10 @@ spec:
                 let matrixConfigKey = '';
                 let errorCode = '';
                 let errorMsg = '';
-                if(input.bizType == 'UNI') {
+                if(input.bizType === 'UNI') {
                   targetAPIConfigKey = 'mef.sonata.api-target.inventory.uni.list';
                   matrixConfigKey = 'mef.sonata.api.matrix.inventory.uni.list';
-                } else if(input.bizType == 'ACCESS_E_LINE') {
+                } else if(input.bizType === 'ACCESS_E_LINE') {
                   targetAPIConfigKey = 'mef.sonata.api-target.inventory.eline.list';
                   matrixConfigKey = 'mef.sonata.api.matrix.inventory.eline.list';
                 } else if(input.bizType === undefined) {
