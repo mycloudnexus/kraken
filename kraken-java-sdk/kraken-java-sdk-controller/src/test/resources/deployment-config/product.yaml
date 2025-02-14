@@ -26,6 +26,7 @@ spec:
     - classpath:deployment-config/api-targets-mappers/api-target-mapper.order.eline.add.yaml
     - classpath:deployment-config/api-targets-mappers/api-target-mapper.order.uni.delete.yaml
     - classpath:deployment-config/api-targets-mappers/api-target-mapper.order.eline.delete.yaml
+    - classpath:deployment-config/api-workflow/api-workflow.order.eline.delete.yaml
     - classpath:deployment-config/api-targets-mappers/api-target-mapper.order.uni.read.yaml
     - classpath:deployment-config/api-targets-mappers/api-target-mapper.order.eline.read.yaml
     - classpath:deployment-config/api-workflow/api-workflow.order.eline.delete.yaml
