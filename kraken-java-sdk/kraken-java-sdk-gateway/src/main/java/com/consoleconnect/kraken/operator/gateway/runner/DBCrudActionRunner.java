@@ -143,7 +143,8 @@ public class DBCrudActionRunner extends AbstractActionRunner {
 
     if (Objects.nonNull(config.getProperties())
         && Objects.nonNull(config.getEnv())
-        && config.getProperties().contains(PRODUCT_INSTANCE_ID)) {
+        && config.getProperties().contains(PRODUCT_INSTANCE_ID)
+        && StringUtils.isBlank(updatedEntity.getProductInstanceId())) {
       readCachedData(KrakenFilterConstants.X_KRAKEN_RENDERED_RESPONSE_BODY, exchange)
           .ifPresent(item -> fillInstanceId(config, updatedEntity, item));
     }
