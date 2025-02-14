@@ -368,7 +368,7 @@ public class ApiComponentService
         deployAssetDto.getMetadata().getStatus() == null
             ? ""
             : deployAssetDto.getMetadata().getStatus());
-    detail.setSupportedCase(currentFacet.getSupportedCase().name());
+    detail.setSupportedCase(currentFacet.getSupportedCase().getType());
     detail.setRunningVersion(
         String.valueOf(
             computeMaximumRunningVersion(deployAssetDto, assetDto.getMetadata().getKey(), envId)));

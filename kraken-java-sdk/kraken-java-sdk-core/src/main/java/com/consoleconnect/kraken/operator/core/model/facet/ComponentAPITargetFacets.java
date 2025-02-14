@@ -13,11 +13,16 @@ public class ComponentAPITargetFacets {
   private Trigger trigger;
   private List<Endpoint> endpoints;
   private Workflow workflow;
-  private SupportedCaseEnum supportedCase = SupportedCaseEnum.ONE_TO_ONE;
+  private SupportedCase supportedCase = new SupportedCase();
 
   @Data
   public static class Server {
     private String uri;
+  }
+
+  @Data
+  public static class SupportedCase {
+    private String type = SupportedCaseEnum.ONE_TO_ONE.name();
   }
 
   @Data
