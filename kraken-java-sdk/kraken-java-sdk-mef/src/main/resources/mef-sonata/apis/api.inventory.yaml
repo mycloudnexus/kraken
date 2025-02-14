@@ -147,7 +147,7 @@ spec:
         - id: calculate_type_for_via_javascript
           actionType: engine@javascript
           env:
-            bizType: ${query.productType}
+            bizType: ${entity.bizType}
           with:
             code: |
               (jsonStr) => {
