@@ -96,13 +96,6 @@ spec:
             target: "@{{ports[*].dcf}}"
             targetLocation: BODY
             requiredMapping: true
-          - name: mapper.quote.uni.add.sync.place.keyName
-            source: "@{{quoteItem[0].product.place[0].keyName}}"
-            sourceLocation: BODY
-            sourceType: string
-            target: ""
-            targetLocation: BODY
-            requiredMapping: false
           - name: mapper.quote.uni.add.sync.productConfiguration.bandwidth
             source: "@{{quoteItem[0].product.productConfiguration.bandwidth}}"
             sourceLocation: BODY
