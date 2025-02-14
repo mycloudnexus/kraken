@@ -10,6 +10,7 @@ import com.consoleconnect.kraken.operator.gateway.entity.HttpRequestEntity;
 import com.consoleconnect.kraken.operator.gateway.filter.KrakenFilterConstants;
 import com.consoleconnect.kraken.operator.gateway.repo.HttpRequestRepository;
 import com.consoleconnect.kraken.operator.gateway.service.FilterHeaderService;
+import com.consoleconnect.kraken.operator.gateway.template.SpELEngine;
 import java.util.*;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,8 @@ import org.springframework.web.server.ServerWebExchange;
 @Slf4j
 public class DBCrudActionRunner extends AbstractActionRunner {
   private static final String ENTITY_NOT_FOUND_ERR = "DBCrudFilterFactory: entity not found";
+  private static final String RENDERED_RESPONSE_BODY = "renderedResponseBody";
+  private static final String PRODUCT_INSTANCE_ID = "productInstanceId";
   private static final String ENTITY_ID_ERROR = ENTITY_NOT_FOUND_ERR + ", entityId:%s";
   private final HttpRequestRepository repository;
   private final FilterHeaderService filterHeaderService;
@@ -115,7 +118,7 @@ public class DBCrudActionRunner extends AbstractActionRunner {
 
   private void onUpdate(ServerWebExchange exchange, Config config) {
     String entityId = exchange.getAttribute(KrakenFilterConstants.X_ENTITY_ID);
-    Optional<HttpRequestEntity> optionalEntity = readRequestEntity(entityId);
+    Optional<HttpRequestEntity> optionalEntity = readRequestEntity(entityId, null);
     if (optionalEntity.isEmpty()) {
       return;
     }
@@ -133,16 +136,36 @@ public class DBCrudActionRunner extends AbstractActionRunner {
       updatedEntity.setHttpStatusCode(
           Objects.requireNonNull(exchange.getResponse().getStatusCode()).value());
     }
-    readCachedData(KrakenFilterConstants.X_KRAKEN_RENDERED_RESPONSE_BODY, exchange)
-        .ifPresent(updatedEntity::setRenderedResponse);
+    if (config.getProperties() == null || config.getProperties().contains(RENDERED_RESPONSE_BODY)) {
+      readCachedData(KrakenFilterConstants.X_KRAKEN_RENDERED_RESPONSE_BODY, exchange)
+          .ifPresent(updatedEntity::setRenderedResponse);
+    }
+
+    if (Objects.nonNull(config.getProperties())
+        && Objects.nonNull(config.getEnv())
+        && config.getProperties().contains(PRODUCT_INSTANCE_ID)) {
+      readCachedData(KrakenFilterConstants.X_KRAKEN_RENDERED_RESPONSE_BODY, exchange)
+          .ifPresent(item -> fillInstanceId(config, updatedEntity, item));
+    }
     repository.save(updatedEntity);
+  }
+
+  private void fillInstanceId(Config config, HttpRequestEntity updatedEntity, Object obj) {
+    String expression = config.getEnv().getOrDefault(PRODUCT_INSTANCE_ID, "");
+    Map<String, Object> map = Map.of(RENDERED_RESPONSE_BODY, obj);
+    Object productInstanceIdObj = SpELEngine.evaluate(expression, map, Object.class);
+    log.info("step into productInstanceId, result:{}", productInstanceIdObj);
+    if (Objects.nonNull(productInstanceIdObj)) {
+      updatedEntity.setProductInstanceId((String) productInstanceIdObj);
+    }
   }
 
   private void onRead(ServerWebExchange exchange, Config config) {
     if (StringUtils.isBlank(config.getId()) && StringUtils.isNotBlank(config.getBlankIdErrMsg())) {
       throw KrakenException.badRequest(config.getBlankIdErrMsg());
     }
-    Optional<HttpRequestEntity> optionalEntity = readRequestEntity(config.getId());
+    Optional<HttpRequestEntity> optionalEntity =
+        readRequestEntity(config.getId(), config.getActionField());
     if (optionalEntity.isEmpty()) {
       if (StringUtils.isNotBlank(config.getNotExistedErrMsg())) {
         throw KrakenException.notFound(config.getNotExistedErrMsg());
@@ -155,19 +178,22 @@ public class DBCrudActionRunner extends AbstractActionRunner {
     exchange.getAttributes().put(KrakenFilterConstants.X_ENTITY, JsonToolkit.toJson(entity));
   }
 
-  private Optional<HttpRequestEntity> readRequestEntity(String entityId) {
+  private Optional<HttpRequestEntity> readRequestEntity(String entityId, String actionField) {
     if (StringUtils.isBlank(entityId)) {
       return Optional.empty();
     }
-    UUID entityUUID = null;
-    try {
-      entityUUID = UUID.fromString(entityId);
-    } catch (Exception e) {
-      String error = String.format(ENTITY_ID_ERROR, entityId);
-      log.error(error, e);
-      return Optional.empty();
+    if (StringUtils.isBlank(actionField)) {
+      UUID entityUUID = null;
+      try {
+        entityUUID = UUID.fromString(entityId);
+      } catch (Exception e) {
+        String error = String.format(ENTITY_ID_ERROR, entityId);
+        log.error(error, e);
+        return Optional.empty();
+      }
+      return repository.findById(entityUUID);
     }
-    return repository.findById(entityUUID);
+    return repository.findByProductInstanceId(entityId);
   }
 
   @Data
@@ -176,16 +202,21 @@ public class DBCrudActionRunner extends AbstractActionRunner {
     private DBActionTypeEnum action = DBActionTypeEnum.CREATE;
     private String bizType = "undefined";
     private String id;
+    private String actionField;
     private List<String> properties;
     private String externalId;
     private String blankIdErrMsg;
     private String notExistedErrMsg;
+    private Map<String, String> env;
 
     public static Config of(ComponentAPIFacets.Action action, Map<String, Object> inputs) {
       Map<String, Object> with = action.getWith();
       Config config = JsonToolkit.fromJson(JsonToolkit.toJson(with), Config.class);
       if (config.getId() == null) {
         config.setId((String) inputs.get("id"));
+      }
+      if (config.getActionField() == null) {
+        config.setActionField((String) inputs.get("actionField"));
       }
       if ("undefined".equalsIgnoreCase(config.getBizType())) {
         config.setBizType((String) inputs.get("bizType"));
@@ -195,6 +226,9 @@ public class DBCrudActionRunner extends AbstractActionRunner {
       }
       if (config.getNotExistedErrMsg() == null) {
         config.setNotExistedErrMsg((String) inputs.getOrDefault("notExistedErrMsg", ""));
+      }
+      if (config.getEnv() == null && Objects.nonNull(action.getEnv())) {
+        config.setEnv(action.getEnv());
       }
       return config;
     }
