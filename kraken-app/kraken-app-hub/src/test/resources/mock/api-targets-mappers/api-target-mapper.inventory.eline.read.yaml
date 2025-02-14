@@ -23,14 +23,14 @@ spec:
             description: ""
             source: "@{{id}}"
             sourceLocation: "PATH"
-            target: "@{{portId}}"
+            target: "@{{connectionId}}"
             targetLocation: "PATH"
             requiredMapping: true
           - name: mapper.inventory.eline.read.buyerId
             title: "The unique identifier of the organization that is acting as the a Buyer"
             source: "@{{buyerId}}"
             sourceLocation: "QUERY"
-            target: "@{{companyName}}"
+            target: "@{{username}}"
             targetType: string
             targetLocation: "PATH"
             requiredMapping: false
@@ -51,14 +51,18 @@ spec:
               - suspended
               - suspendedPendingTerminate
               - terminated
-            valueMapping: {}
-            source: ""
-            sourceLocation: ""
+            valueMapping:
+              ACTIVE : active
+              CANCELLED: cancelled
+              DELETED: terminated
+              DISABLED: suspended
+            source: "@{{status}}"
+            sourceLocation: BODY
           - name: mapper.product.inventory.read.startDate
             title: The date from which the product starts
             description: ""
             target: "@{{startDate}}"
             targetLocation: BODY
             requiredMapping: true
-            source: ""
-            sourceLocation: ""
+            source: "@{{createdAt}}"
+            sourceLocation: BODY
