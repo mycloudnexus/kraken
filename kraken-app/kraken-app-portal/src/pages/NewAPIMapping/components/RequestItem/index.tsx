@@ -581,7 +581,6 @@ const RequestItem = ({ item, index }: Props) => {
             </div>
           </Flex>
         )}
-      {/* <Button onClick={handleDeleteLimit}>Delete</Button> */}
     </div>
   );
 };
