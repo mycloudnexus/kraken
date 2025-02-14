@@ -180,11 +180,15 @@ spec:
 
         - id: persist_http_response
           actionType: buildin@db
+          env:
+            productInstanceId: ${renderedResponseBody.productOrderItem[0].product.id?:''}
           with:
             action: update
             properties:
               - responseBody
               - responseStatusCode
+              - renderedResponseBody
+              - productInstanceId
           preRequest: false
           postRequest: true
           order: -4
