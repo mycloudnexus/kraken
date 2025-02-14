@@ -60,6 +60,7 @@ class DBCrudActionRunnerTest extends AbstractIntegrationTest {
     HttpRequestEntity entity = DBCrudActionRunner.generateHttpRequestEntity(exchange);
     String payload = "[{\"id\":\"67ad55a4d3044d46e53dc5ab\"}]";
     exchange.getAttributes().put(KrakenFilterConstants.X_KRAKEN_RENDERED_RESPONSE_BODY, payload);
+    exchange.getAttributes().put(KrakenFilterConstants.X_ORIGINAL_REQUEST_BODY, payload);
     entity.setUri("https://httpbin.org/");
     entity.setPath("/1234");
     entity.setMethod("GET");
@@ -74,10 +75,23 @@ class DBCrudActionRunnerTest extends AbstractIntegrationTest {
 
     List<String> properties = new ArrayList<>();
     properties.add("productInstanceId");
+    properties.add("requestBody");
+    properties.add("renderedResponseBody");
     config.setProperties(properties);
     config.setId(entity.getId().toString());
     config.setAction(DBActionTypeEnum.UPDATE);
     exchange.getAttributes().put(KrakenFilterConstants.X_ENTITY_ID, entity.getId().toString());
     Assertions.assertDoesNotThrow(() -> dbCrudActionRunner.onPersist(exchange, config));
+  }
+
+  @Test
+  void givenBlankIdAndBlankIdError_whenRead_thenThrowsException() {
+    ServerWebExchange exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/1234"));
+    DBCrudActionRunner.Config config = new DBCrudActionRunner.Config();
+    config.setId("");
+    config.setBlankIdErrMsg("blank id");
+    config.setAction(DBActionTypeEnum.READ);
+    Assertions.assertThrowsExactly(
+        KrakenException.class, () -> dbCrudActionRunner.onPersist(exchange, config));
   }
 }
