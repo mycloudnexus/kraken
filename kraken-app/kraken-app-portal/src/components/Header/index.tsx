@@ -2,6 +2,7 @@ import UpgradingIcon from "@/assets/icon/upgrading.svg";
 import Logo from "@/assets/logo.svg";
 import { useUser } from "@/hooks/user/useUser";
 import { useTutorialStore } from "@/stores/tutorial.store";
+import { PRODUCT_NAME } from "@/utils/constants/common";
 import { ISystemInfo } from "@/utils/types/user.type";
 import {
   EditTwoTone,
@@ -70,7 +71,7 @@ const Header = ({ info }: Readonly<{ info?: ISystemInfo }>) => {
       <Flex gap={16} align="center">
         <Link data-testid="logo" to="/" className={styles.logo}>
           <Logo />
-          MEF LSO API Adaptor
+          {PRODUCT_NAME}
         </Link>
 
         <Divider type="vertical" className={styles.divider} />
