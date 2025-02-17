@@ -29,7 +29,7 @@ public class ComponentExpandDTO {
     MappingMatrix mappingMatrix;
     private String orderBy;
     private String supportedCase;
-    private String runningVersion;
+    private String runningMappingType;
   }
 
   @Data

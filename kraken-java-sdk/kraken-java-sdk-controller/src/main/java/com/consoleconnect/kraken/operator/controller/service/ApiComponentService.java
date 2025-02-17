@@ -21,6 +21,7 @@ import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
 import com.consoleconnect.kraken.operator.core.enums.AssetLinkKindEnum;
 import com.consoleconnect.kraken.operator.core.enums.ParentProductTypeEnum;
+import com.consoleconnect.kraken.operator.core.enums.SupportedCaseEnum;
 import com.consoleconnect.kraken.operator.core.event.IngestionDataResult;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
@@ -57,10 +58,7 @@ import org.springframework.transaction.annotation.Transactional;
 @AllArgsConstructor
 @Service
 public class ApiComponentService
-    implements TargetMappingChecker,
-        EndPointUsageCalculator,
-        ApiUseCaseSelector,
-        LatestDeploymentCalculator {
+    implements TargetMappingChecker, EndPointUsageCalculator, ApiUseCaseSelector {
   private static final Logger log = LoggerFactory.getLogger(ApiComponentService.class);
   public static final KrakenException ASSET_NOT_FOUND = KrakenException.notFound("asset not found");
   @Getter private final UnifiedAssetService unifiedAssetService;
@@ -293,6 +291,10 @@ public class ApiComponentService
           detail.setOrderBy(
               appProperty.getApiTargetMapperOrderBy().getOrDefault(k, "<1000, 1000>"));
           mergeLastDeployment(detail, assetDto, envId);
+          ComponentAPITargetFacets currentFacet =
+              UnifiedAsset.getFacets(assetDto, ComponentAPITargetFacets.class);
+          detail.setSupportedCase(currentFacet.getSupportedCase().getType());
+          detail.setRunningMappingType(checkRunningMappingType(currentFacet));
           details.add(detail);
         });
 
@@ -368,10 +370,17 @@ public class ApiComponentService
         deployAssetDto.getMetadata().getStatus() == null
             ? ""
             : deployAssetDto.getMetadata().getStatus());
-    detail.setSupportedCase(currentFacet.getSupportedCase().getType());
-    detail.setRunningVersion(
-        String.valueOf(
-            computeMaximumRunningVersion(deployAssetDto, assetDto.getMetadata().getKey(), envId)));
+  }
+
+  private String checkRunningMappingType(ComponentAPITargetFacets currentFacet) {
+    String type = "";
+    if (currentFacet.getWorkflow() != null && currentFacet.getWorkflow().isEnabled()) {
+      type = SupportedCaseEnum.ONE_TO_MANY.name();
+    } else if (CollectionUtils.isNotEmpty(currentFacet.getEndpoints())
+        && StringUtils.isNotBlank(currentFacet.getEndpoints().get(0).getPath())) {
+      type = SupportedCaseEnum.ONE_TO_ONE.name();
+    }
+    return type;
   }
 
   @Transactional(readOnly = true)
