@@ -101,5 +101,61 @@ class ComponentControllerTest extends AbstractIntegrationTest {
           assertThat(bodyStr, hasJsonPath("$.data.data[0].facets", notNullValue()));
           assertThat(bodyStr, hasJsonPath("$.data.data[0].facets.mappings", notNullValue()));
         });
+    testClientHelper.getAndVerify(
+        (uriBuilder ->
+            uriBuilder
+                .path(path)
+                .queryParam("kind", AssetKindEnum.COMPONENT_API.getKind())
+                .queryParam("facetIncluded", true)
+                .queryParam("parentProductType", ParentProductTypeEnum.ACCESS_ELINE.getKind())
+                .queryParam("page", 0)
+                .queryParam("size", 1)
+                .build()),
+        bodyStr -> {
+          System.out.println(bodyStr);
+          assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(1)));
+        });
+    testClientHelper.getAndVerify(
+        (uriBuilder ->
+            uriBuilder
+                .path(path)
+                .queryParam("kind", AssetKindEnum.COMPONENT_API.getKind())
+                .queryParam("facetIncluded", true)
+                .queryParam("parentProductType", ParentProductTypeEnum.ACCESS_ELINE.getKind())
+                .queryParam("page", 1)
+                .queryParam("size", 1)
+                .build()),
+        bodyStr -> {
+          System.out.println(bodyStr);
+          assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(1)));
+        });
+    testClientHelper.getAndVerify(
+        (uriBuilder ->
+            uriBuilder
+                .path(path)
+                .queryParam("kind", AssetKindEnum.COMPONENT_API.getKind())
+                .queryParam("facetIncluded", true)
+                .queryParam("parentProductType", ParentProductTypeEnum.ACCESS_ELINE.getKind())
+                .queryParam("page", 2)
+                .queryParam("size", 1)
+                .build()),
+        bodyStr -> {
+          System.out.println(bodyStr);
+          assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(1)));
+        });
+    testClientHelper.getAndVerify(
+        (uriBuilder ->
+            uriBuilder
+                .path(path)
+                .queryParam("kind", AssetKindEnum.COMPONENT_API.getKind())
+                .queryParam("facetIncluded", true)
+                .queryParam("parentProductType", ParentProductTypeEnum.ACCESS_ELINE.getKind())
+                .queryParam("page", 3)
+                .queryParam("size", 1)
+                .build()),
+        bodyStr -> {
+          System.out.println(bodyStr);
+          assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(0)));
+        });
   }
 }
