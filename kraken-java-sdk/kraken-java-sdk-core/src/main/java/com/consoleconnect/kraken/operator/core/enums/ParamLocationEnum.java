@@ -5,5 +5,6 @@ public enum ParamLocationEnum {
   QUERY,
   PATH,
   BODY,
+  TASK,
   HYBRID;
 }
