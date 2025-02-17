@@ -10,6 +10,7 @@ import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
 import com.consoleconnect.kraken.operator.core.enums.ParentProductTypeEnum;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
+import java.util.function.BiConsumer;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -81,81 +82,47 @@ class ComponentControllerTest extends AbstractIntegrationTest {
   @Order(3)
   @Test
   void given_componentsAndParentProductType_whenSearchingByPage_thenReturnOK() {
-    String path = String.format("%s/%s/components", PRODUCT_BASE_PATH, PRODUCT_ID);
+    String basePath = String.format("%s/%s/components", PRODUCT_BASE_PATH, PRODUCT_ID);
+
+    BiConsumer<String, Integer> assertPageSize =
+        (bodyStr, expectedSize) -> {
+          assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(expectedSize)));
+          if (expectedSize > 0) {
+            assertThat(
+                bodyStr,
+                hasJsonPath("$.data.data[0].kind", is(AssetKindEnum.COMPONENT_API.getKind())));
+            assertThat(bodyStr, hasJsonPath("$.data.data[0].metadata", notNullValue()));
+            assertThat(bodyStr, hasJsonPath("$.data.data[0].facets", notNullValue()));
+            assertThat(bodyStr, hasJsonPath("$.data.data[0].facets.mappings", notNullValue()));
+          }
+        };
+
     testClientHelper.getAndVerify(
-        (uriBuilder ->
+        uriBuilder ->
             uriBuilder
-                .path(path)
-                .queryParam("kind", AssetKindEnum.COMPONENT_API.getKind())
-                .queryParam("facetIncluded", true)
-                .queryParam("parentProductType", ParentProductTypeEnum.ACCESS_ELINE.getKind())
-                .queryParam("page", "0")
-                .queryParam("size", "4")
-                .build()),
-        bodyStr -> {
-          assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(3)));
-          assertThat(
-              bodyStr,
-              hasJsonPath("$.data.data[0].kind", is(AssetKindEnum.COMPONENT_API.getKind())));
-          assertThat(bodyStr, hasJsonPath("$.data.data[0].metadata", notNullValue()));
-          assertThat(bodyStr, hasJsonPath("$.data.data[0].facets", notNullValue()));
-          assertThat(bodyStr, hasJsonPath("$.data.data[0].facets.mappings", notNullValue()));
-        });
-    testClientHelper.getAndVerify(
-        (uriBuilder ->
-            uriBuilder
-                .path(path)
+                .path(basePath)
                 .queryParam("kind", AssetKindEnum.COMPONENT_API.getKind())
                 .queryParam("facetIncluded", true)
                 .queryParam("parentProductType", ParentProductTypeEnum.ACCESS_ELINE.getKind())
                 .queryParam("page", 0)
-                .queryParam("size", 1)
-                .build()),
-        bodyStr -> {
-          System.out.println(bodyStr);
-          assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(1)));
-        });
-    testClientHelper.getAndVerify(
-        (uriBuilder ->
-            uriBuilder
-                .path(path)
-                .queryParam("kind", AssetKindEnum.COMPONENT_API.getKind())
-                .queryParam("facetIncluded", true)
-                .queryParam("parentProductType", ParentProductTypeEnum.ACCESS_ELINE.getKind())
-                .queryParam("page", 1)
-                .queryParam("size", 1)
-                .build()),
-        bodyStr -> {
-          System.out.println(bodyStr);
-          assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(1)));
-        });
-    testClientHelper.getAndVerify(
-        (uriBuilder ->
-            uriBuilder
-                .path(path)
-                .queryParam("kind", AssetKindEnum.COMPONENT_API.getKind())
-                .queryParam("facetIncluded", true)
-                .queryParam("parentProductType", ParentProductTypeEnum.ACCESS_ELINE.getKind())
-                .queryParam("page", 2)
-                .queryParam("size", 1)
-                .build()),
-        bodyStr -> {
-          System.out.println(bodyStr);
-          assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(1)));
-        });
-    testClientHelper.getAndVerify(
-        (uriBuilder ->
-            uriBuilder
-                .path(path)
-                .queryParam("kind", AssetKindEnum.COMPONENT_API.getKind())
-                .queryParam("facetIncluded", true)
-                .queryParam("parentProductType", ParentProductTypeEnum.ACCESS_ELINE.getKind())
-                .queryParam("page", 3)
-                .queryParam("size", 1)
-                .build()),
-        bodyStr -> {
-          System.out.println(bodyStr);
-          assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(0)));
-        });
+                .queryParam("size", 4)
+                .build(),
+        bodyStr -> assertPageSize.accept(bodyStr, 3));
+
+    for (int page = 0; page <= 3; page++) {
+      int expectedSize = (page < 3) ? 1 : 0; // Last page should return 0
+      int finalPage = page;
+      testClientHelper.getAndVerify(
+          (uriBuilder ->
+              uriBuilder
+                  .path(basePath)
+                  .queryParam("kind", AssetKindEnum.COMPONENT_API.getKind())
+                  .queryParam("facetIncluded", true)
+                  .queryParam("parentProductType", ParentProductTypeEnum.ACCESS_ELINE.getKind())
+                  .queryParam("page", finalPage)
+                  .queryParam("size", 1)
+                  .build()),
+          bodyStr -> assertPageSize.accept(bodyStr, expectedSize));
+    }
   }
 }
