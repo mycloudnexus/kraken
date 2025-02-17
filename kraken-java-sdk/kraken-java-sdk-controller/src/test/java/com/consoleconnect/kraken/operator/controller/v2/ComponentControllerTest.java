@@ -77,4 +77,29 @@ class ComponentControllerTest extends AbstractIntegrationTest {
           assertThat(bodyStr, hasJsonPath("$.data.data[0].facets.mappings", notNullValue()));
         });
   }
+
+  @Order(3)
+  @Test
+  void given_componentsAndParentProductType_whenSearchingByPage_thenReturnOK() {
+    String path = String.format("%s/%s/components", PRODUCT_BASE_PATH, PRODUCT_ID);
+    testClientHelper.getAndVerify(
+        (uriBuilder ->
+            uriBuilder
+                .path(path)
+                .queryParam("kind", AssetKindEnum.COMPONENT_API.getKind())
+                .queryParam("facetIncluded", true)
+                .queryParam("parentProductType", ParentProductTypeEnum.ACCESS_ELINE.getKind())
+                .queryParam("page", "0")
+                .queryParam("size", "4")
+                .build()),
+        bodyStr -> {
+          assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(3)));
+          assertThat(
+              bodyStr,
+              hasJsonPath("$.data.data[0].kind", is(AssetKindEnum.COMPONENT_API.getKind())));
+          assertThat(bodyStr, hasJsonPath("$.data.data[0].metadata", notNullValue()));
+          assertThat(bodyStr, hasJsonPath("$.data.data[0].facets", notNullValue()));
+          assertThat(bodyStr, hasJsonPath("$.data.data[0].facets.mappings", notNullValue()));
+        });
+  }
 }
