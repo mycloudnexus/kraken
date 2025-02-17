@@ -102,6 +102,18 @@ spec:
             target: '@{{dataCenterFacilityId}}'
             targetLocation: BODY
             requiredMapping: false
+          - name: mapper.order.uni.add.productConfiguration.dcfName
+            title: >-
+              the dcfName of the place where the products' installation must be done.
+            description: ''
+            source: '@{{productOrderItem[0].product.productConfiguration.dcfName}}'
+            sourceLocation: BODY
+            sourceType: string
+            target: '@{{dataCenterFacility}}'
+            targetLocation: BODY
+            requiredMapping: false
+            allowValueLimit: false
+            customizedField: true
           - name: mapper.order.uni.add.bandwidthUnit
             title: "The unit of bandwidth"
             source: "@{{productOrderItem[0].product.productConfiguration.bandwidthUnit}}"

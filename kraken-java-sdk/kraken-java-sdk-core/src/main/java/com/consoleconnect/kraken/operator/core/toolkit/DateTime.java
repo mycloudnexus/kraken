@@ -5,6 +5,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 
 /**
  * @author dxiong
@@ -13,6 +14,7 @@ public class DateTime {
 
   private DateTime() {}
 
+  private static final String ZONE_UTC = "UTC";
   private static final DateTimeFormatter FORMATTER =
       DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.systemDefault());
   private static final DateTimeFormatter DEFAULT_FORMATTER =
@@ -25,7 +27,7 @@ public class DateTime {
   }
 
   public static ZonedDateTime nowInUTC() {
-    return ZonedDateTime.now(ZoneId.of("UTC"));
+    return ZonedDateTime.now(ZoneId.of(ZONE_UTC));
   }
 
   public static String nowInUTCString() {
@@ -33,11 +35,11 @@ public class DateTime {
   }
 
   public static ZonedDateTime futureDaysInUTC(int days) {
-    return ZonedDateTime.ofInstant(Instant.now().plus(days, ChronoUnit.DAYS), ZoneId.of("UTC"));
+    return ZonedDateTime.ofInstant(Instant.now().plus(days, ChronoUnit.DAYS), ZoneId.of(ZONE_UTC));
   }
 
   public static ZonedDateTime futureInUTC(ChronoUnit unit, int value) {
-    return ZonedDateTime.ofInstant(Instant.now().plus(value, unit), ZoneId.of("UTC"));
+    return ZonedDateTime.ofInstant(Instant.now().plus(value, unit), ZoneId.of(ZONE_UTC));
   }
 
   public static long futureInDay(int days) {
@@ -45,7 +47,11 @@ public class DateTime {
   }
 
   public static String nowInUTCFormatted() {
-    return ZonedDateTime.now(ZoneId.of("UTC")).format(FORMATTER);
+    return ZonedDateTime.now(ZoneId.of(ZONE_UTC)).format(FORMATTER);
+  }
+
+  public static String nowInUTCFormatted(int amount, TemporalUnit unit) {
+    return ZonedDateTime.now(ZoneId.of(ZONE_UTC)).plus(amount, unit).format(FORMATTER);
   }
 
   public static String format(ZonedDateTime zonedDateTime) {
