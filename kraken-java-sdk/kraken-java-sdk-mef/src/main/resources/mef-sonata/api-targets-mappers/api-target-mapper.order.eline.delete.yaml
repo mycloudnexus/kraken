@@ -13,6 +13,7 @@ spec:
     method: post
     productType: access_e_line
     actionType: delete
+  supportedCase: ONE_TO_ONE_AND_ONE_TO_MANY
   workflow:
     enabled: false
     synchronous: false
