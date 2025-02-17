@@ -180,11 +180,15 @@ spec:
 
         - id: persist_http_response
           actionType: buildin@db
+          env:
+            productInstanceId: ${renderedResponseBody.productOrderItem[0].product.id?:''}
           with:
             action: update
             properties:
               - responseBody
               - responseStatusCode
+              - renderedResponseBody
+              - productInstanceId
           preRequest: false
           postRequest: true
           order: -4
@@ -267,6 +271,7 @@ spec:
         - id: rewrite-path
           actionType: buildin@rewrite-path
           env:
+            workflowEnabled: ${targetApiConfig.workflow.enabled}
             path: ${targetApiConfig.endpoints[0].path}
             method: ${targetApiConfig.endpoints[0].method}
           with:
