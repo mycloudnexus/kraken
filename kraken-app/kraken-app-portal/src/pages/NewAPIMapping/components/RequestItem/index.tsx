@@ -359,13 +359,15 @@ const RequestItem = ({ item, index }: Props) => {
                   </Button>
                 </Flex>
                 <MappingIcon />
-                <Input
+                <Select
+                  popupClassName={styles.selectPopup}
+                  mode="tags"
+                  key={`enum-${key}`}
                   placeholder="Input seller order state"
-                  // key={`enum-${key}`}
-                  value={to?.[0]}
                   style={{ flex: 1 }}
-                  onChange={(value) => handleChangeInput([value], key)}
+                  value={to?.[0]}
                   className={styles.stateSelect}
+                  onChange={(value) => handleChangeInput([value], key)}
                 />
               </Flex>
             ))}
