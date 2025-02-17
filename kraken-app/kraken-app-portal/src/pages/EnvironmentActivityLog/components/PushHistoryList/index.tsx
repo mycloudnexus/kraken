@@ -12,7 +12,6 @@ import dayjs from "dayjs";
 import { capitalize } from "lodash";
 import { useEffect, useRef } from "react";
 import styles from "../../index.module.scss";
-import mockData from "./historyMockData.json";
 
 const initPagination = {
   pageSize: DEFAULT_PAGING.size,
@@ -33,7 +32,7 @@ const PushHistoryList = () => {
 
   useEffect(() => {
     if (!isLoading) {
-      const updatedTableData = data?.data ?? mockData.data.data;
+      const updatedTableData = data?.data ?? [];
       const updatedPagination = {
         current: data?.page ?? initPagination.current,
         pageSize: data?.size ?? initPagination.pageSize,

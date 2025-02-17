@@ -109,8 +109,8 @@ spec:
                   targetAPIConfigKey = 'targetKey:notFound';
                 }
                 let ret = {
-                  orderType: type || 'undefined',
-                  orderAction: action || 'undefined',
+                  productType: type || 'undefined',
+                  productAction: action || 'undefined',
                   targetAPIConfigKey: targetAPIConfigKey,
                   matrixConfigKey: matrixConfigKey,
                   errorMsg: errorMsg,
@@ -127,7 +127,7 @@ spec:
         - id: persist_http_request
           actionType: buildin@db
           env:
-            bizType: ${order.orderType}
+            bizType: ${order.productType}
           with:
             action: create
             properties:
@@ -180,11 +180,15 @@ spec:
 
         - id: persist_http_response
           actionType: buildin@db
+          env:
+            productInstanceId: ${renderedResponseBody.productOrderItem[0].product.id?:''}
           with:
             action: update
             properties:
               - responseBody
               - responseStatusCode
+              - renderedResponseBody
+              - productInstanceId
           preRequest: false
           postRequest: true
           order: -4
@@ -242,7 +246,7 @@ spec:
                   targetAPIConfigKey = 'targetKey:notFound';
                 }
                 let ret = {
-                  orderType: type || 'undefined',
+                  productType: type || 'undefined',
                   targetAPIConfigKey: targetAPIConfigKey,
                   matrixConfigKey: matrixConfigKey
                 };
@@ -267,6 +271,7 @@ spec:
         - id: rewrite-path
           actionType: buildin@rewrite-path
           env:
+            workflowEnabled: ${targetApiConfig.workflow.enabled}
             path: ${targetApiConfig.endpoints[0].path}
             method: ${targetApiConfig.endpoints[0].method}
           with:
@@ -411,3 +416,15 @@ links:
   - targetAssetKey: mef.sonata.api.matrix.order.eline.read.delete
     relationship: implementation.matrix
     group: mef.sonata.api-target.order.eline.read.delete
+  - targetAssetKey: mef.sonata.api-workflow.order.eline.delete
+    relationship: implementation.workflow
+    group: mef.sonata.api-target.order.eline.delete
+  - targetAssetKey: mef.sonata.api-workflow.order.uni.delete
+    relationship: implementation.workflow
+    group: mef.sonata.api-target.order.uni.delete
+  - targetAssetKey: mef.sonata.api-workflow.order.uni.add
+    relationship: implementation.workflow
+    group: mef.sonata.api-target.order.uni.add
+  - targetAssetKey: mef.sonata.api-workflow.order.eline.add
+    relationship: implementation.workflow
+    group: mef.sonata.api-target.order.eline.add

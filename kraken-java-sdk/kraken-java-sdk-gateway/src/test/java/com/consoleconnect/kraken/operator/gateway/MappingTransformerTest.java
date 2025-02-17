@@ -47,7 +47,9 @@ class MappingTransformerTest extends AbstractIntegrationTest implements MappingT
     checkPathMap.put("$.key1", "$.key1");
     checkPathMap.put("$.key2", "$.key2");
     checkPathMap.put("$.key3", "$.key3");
-    String input = "{\"key1\":\"\",\"key2\":-1,\"key3\":false,\"key\":\"hello kraken\"}";
+    checkPathMap.put("$.key4", "$.key4");
+    String input =
+        "{\"key1\":\"\",\"key2\":-1,\"key3\":false,\"key4\":-2.5,\"key\":\"hello kraken\"}";
     String result = deleteNodeByPath(checkPathMap, input);
     Assertions.assertEquals("{\"key\":\"hello kraken\"}", result);
   }

@@ -12,6 +12,10 @@ spec:
     method: post
     actionType: add
     productType: access_e_line
+  workflow:
+    enabled: false
+    synchronous: false
+    key: mef.sonata.api-workflow.order.eline.add
   endpoints:
     - id: create connection order
       path: ""

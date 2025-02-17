@@ -28,6 +28,17 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
 class SpELEngineTest implements MappingTransformer {
+
+  @Test
+  void testRenderArray() {
+    String s = "[{\"id\":\"67ad55a4d3044d46e53dc5ab\"}]";
+    String expression = "${renderedResponseBody[0].id?:''}";
+    Map<String, Object> map =
+        Map.of("renderedResponseBody", JsonToolkit.fromJson(s, new TypeReference<List>() {}));
+    Object obj = SpELEngine.evaluateWithoutSuppressException(expression, map, Object.class);
+    Assertions.assertEquals("67ad55a4d3044d46e53dc5ab", obj);
+  }
+
   @Test
   void testIt() {
     Map<String, Object> data = new HashMap<>();
