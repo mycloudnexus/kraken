@@ -134,7 +134,7 @@ public interface DataTypeChecker {
   default void throwException(Integer code, String errorMsg, String defaultMsg) {
     String msg = errorMsg == null ? defaultMsg : errorMsg;
     if (code != null && code != HttpStatus.UNPROCESSABLE_ENTITY.value()) {
-      throw new KrakenException(code, msg);
+      throw new KrakenException(code, msg, new IllegalArgumentException(msg));
     }
     throw route422Exception(msg);
   }

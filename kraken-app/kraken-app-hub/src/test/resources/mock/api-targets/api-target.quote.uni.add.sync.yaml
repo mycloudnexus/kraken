@@ -33,6 +33,11 @@ spec:
               "product": "${mefRequestBody.quoteItem[0].product}",
               "action": "add",
               "id": "${mefRequestBody.quoteItem[0].id}",
+              "subjectToFeasibilityCheck": false,
+              "quoteItemInstallationInterval":{
+                "amount": 1,
+                "units": "${mefRequestBody.quoteItem[0].product.productConfiguration['@type'] == 'UNI' ? 'calendarMonths' : 'businessMinutes'}"
+              },
               "state": "(((mefResponseBody.quoteItem[0].quoteItemPrice[0].price.dutyFreeAmount.value == '') or (T(java.lang.Double).parseDouble(mefResponseBody.quoteItem[0].quoteItemPrice[0].price.dutyFreeAmount.value) < 0)? 'unableToProvide': 'approved.orderable'))",
               "quoteItemTerm": "${T(java.util.Arrays).asList(mefRequestBody.quoteItem[0].requestedQuoteItemTerm)}",
               "quoteItemPrice": [{
@@ -59,6 +64,11 @@ spec:
           "externalId":"${mefRequestBody[externalId]?:''}",
           "instantSyncQuote":"${mefRequestBody[instantSyncQuote]?:''}",
           "requestedQuoteCompletionDate": "${mefRequestBody[requestedQuoteCompletionDate]?:''}",
+          "effectiveQuoteCompletionDate": "${T(com.consoleconnect.kraken.operator.core.toolkit.DateTime).nowInUTCFormatted()}",
+          "validFor":{
+            "startDateTime": "${T(com.consoleconnect.kraken.operator.core.toolkit.DateTime).nowInUTCFormatted()}",
+            "endDateTime": "${T(com.consoleconnect.kraken.operator.core.toolkit.DateTime).nowInUTCFormatted('1', T(java.time.temporal.ChronoUnit).DAYS)}"
+          },
           "quoteLevel": "${mefRequestBody.buyerRequestedQuoteLevel}",
           "state": "(((mefResponseBody.quoteItem[0].quoteItemPrice[0].price.dutyFreeAmount.value == '') or (T(java.lang.Double).parseDouble(mefResponseBody.quoteItem[0].quoteItemPrice[0].price.dutyFreeAmount.value) < 0)? 'unableToProvide': 'approved.orderable'))"
         }
