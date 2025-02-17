@@ -1,8 +1,8 @@
+import APIServerCard from "@/pages/APIServerList/components/APIServerCard";
 import { queryClient } from "@/utils/helpers/reactQuery";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { render } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
-import APIServerCard from "../components/APIServerCard";
 
 describe("ExpandRow", () => {
   test("renders empty table when selectedAPIs is empty", () => {
