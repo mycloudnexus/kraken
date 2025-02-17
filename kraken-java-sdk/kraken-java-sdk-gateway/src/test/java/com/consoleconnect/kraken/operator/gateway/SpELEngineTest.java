@@ -30,6 +30,21 @@ import org.springframework.core.io.ResourceLoader;
 class SpELEngineTest implements MappingTransformer {
 
   @Test
+  void givenDateTimePlus_whenEvaluate_thenReturnOK() {
+    String s1 =
+        "${T(com.consoleconnect.kraken.operator.core.toolkit.DateTime).nowInUTCFormatted()}";
+    Object obj1 = SpELEngine.evaluate(s1, new HashMap<>());
+    System.out.println(obj1);
+    Assertions.assertNotNull(obj1);
+
+    String s2 =
+        "${T(com.consoleconnect.kraken.operator.core.toolkit.DateTime).nowInUTCFormatted('5', T(java.time.temporal.ChronoUnit).DAYS)}";
+    Object obj2 = SpELEngine.evaluate(s2, new HashMap<>());
+    System.out.println(obj2);
+    Assertions.assertNotNull(obj2);
+  }
+
+  @Test
   void testRenderArray() {
     String s = "[{\"id\":\"67ad55a4d3044d46e53dc5ab\"}]";
     String expression = "${renderedResponseBody[0].id?:''}";
