@@ -83,12 +83,34 @@ public class UnifiedAssetService implements UUIDWrapper {
 
   @Transactional(readOnly = true)
   public Paging<UnifiedAssetDto> search(
+      String parentId,
+      String kind,
+      boolean facetIncluded,
+      String q,
+      String parentProductType,
+      PageRequest pageRequest) {
+    return performSearch(parentId, kind, facetIncluded, q, parentProductType, pageRequest);
+  }
+
+  @Transactional(readOnly = true)
+  public Paging<UnifiedAssetDto> search(
       String parentId, String kind, boolean facetIncluded, String q, PageRequest pageRequest) {
+    return performSearch(parentId, kind, facetIncluded, q, null, pageRequest);
+  }
+
+  private Paging<UnifiedAssetDto> performSearch(
+      String parentId,
+      String kind,
+      boolean facetIncluded,
+      String q,
+      String parentProductType,
+      PageRequest pageRequest) {
     log.info(
-        "search asset, parentId: {}, kind: {}, q: {}, pageRequest: {}",
+        "search asset, parentId: {}, kind: {}, q: {}, parentProductType:{}, pageRequest: {}",
         parentId,
         kind,
         q,
+        parentProductType,
         pageRequest);
     if (parentId != null) {
       parentId = findOneByIdOrKey(parentId).getId().toString();
@@ -96,22 +118,24 @@ public class UnifiedAssetService implements UUIDWrapper {
     Page<UnifiedAssetEntity> data =
         assetRepository.search(parentId, kind, StringUtils.lowerCase(q), pageRequest);
     if (appProperty.getQueryExcludeAssetKinds().contains(kind)) {
-      List<UnifiedAssetEntity> filterList =
-          data.getContent().stream()
-              .filter(entity -> !appProperty.getQueryExcludeAssetKeys().contains(entity.getKey()))
-              .toList();
-      data =
-          new PageImpl<>(
-              filterList, PageRequest.of(data.getNumber(), data.getSize()), filterList.size());
+      data = filterExcludedAssets(data);
     }
     if (StringUtils.isNotBlank(kind) && API_KINDS.contains(kind)) {
       data = sortAndPaginate(data, kind);
+      if (facetIncluded && StringUtils.isNotBlank(parentProductType)) {
+        return filterByParentProductType(data, parentProductType);
+      }
     }
     return PagingHelper.toPaging(data, entity -> toAsset(entity, facetIncluded));
   }
 
-  private String getParentProductType(UnifiedAssetDto item) {
-    return item.getMetadata().getLabels().getOrDefault(PARENT_PRODUCT_TYPE_KEY, null);
+  private Page<UnifiedAssetEntity> filterExcludedAssets(Page<UnifiedAssetEntity> data) {
+    List<UnifiedAssetEntity> filterList =
+        data.getContent().stream()
+            .filter(entity -> !appProperty.getQueryExcludeAssetKeys().contains(entity.getKey()))
+            .toList();
+    return new PageImpl<>(
+        filterList, PageRequest.of(data.getNumber(), data.getSize()), filterList.size());
   }
 
   private PageImpl<UnifiedAssetEntity> sortAndPaginate(Page<UnifiedAssetEntity> data, String kind) {
@@ -125,6 +149,21 @@ public class UnifiedAssetService implements UUIDWrapper {
             .sorted(Comparator.comparing(t -> orderBy.getOrDefault(t.getKey(), DEFAULT_ORDER_SEQ)))
             .toList();
     return new PageImpl<>(sorted, PageRequest.of(data.getNumber(), data.getSize()), sorted.size());
+  }
+
+  private Paging<UnifiedAssetDto> filterByParentProductType(
+      Page<UnifiedAssetEntity> data, String parentProductType) {
+    List<UnifiedAssetDto> filteredList =
+        data.getContent().stream()
+            .map(entity -> toAsset(entity, true))
+            .filter(item -> parentProductType.equals(getParentProductType(item)))
+            .toList();
+
+    return PagingHelper.toPaging(filteredList, x -> x);
+  }
+
+  private String getParentProductType(UnifiedAssetDto item) {
+    return item.getMetadata().getLabels().getOrDefault(PARENT_PRODUCT_TYPE_KEY, null);
   }
 
   @Transactional(readOnly = true)

@@ -2,11 +2,12 @@ package com.consoleconnect.kraken.operator.controller.v2;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 
 import com.consoleconnect.kraken.operator.config.TestApplication;
 import com.consoleconnect.kraken.operator.controller.WebTestClientHelper;
+import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
+import com.consoleconnect.kraken.operator.core.enums.ParentProductTypeEnum;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import org.junit.jupiter.api.*;
@@ -51,6 +52,29 @@ class ComponentControllerTest extends AbstractIntegrationTest {
         (uriBuilder -> uriBuilder.path(path).build()),
         bodyStr -> {
           assertThat(bodyStr, hasJsonPath("$.data", notNullValue()));
+        });
+  }
+
+  @Order(2)
+  @Test
+  void given_componentsAndParentProductType_whenSearching_thenReturnOK() {
+    String path = String.format("%s/%s/components", PRODUCT_BASE_PATH, PRODUCT_ID);
+    testClientHelper.getAndVerify(
+        (uriBuilder ->
+            uriBuilder
+                .path(path)
+                .queryParam("kind", AssetKindEnum.COMPONENT_API.getKind())
+                .queryParam("parentProductType", ParentProductTypeEnum.ACCESS_ELINE.getKind())
+                .build()),
+        bodyStr -> {
+          assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(1)));
+          assertThat(
+              bodyStr,
+              hasJsonPath("$.data.data[0].kind", is(AssetKindEnum.COMPONENT_API.getKind())));
+          assertThat(bodyStr, hasJsonPath("$.data.data[0].metadata", notNullValue()));
+          assertThat(bodyStr, hasJsonPath("$.data.data[0].facets", notNullValue()));
+          assertThat(bodyStr, hasJsonPath("$.data.data[0].facets.mappings", notNullValue()));
+          assertThat(bodyStr, hasJsonPath("$.data.data[0].facets.apiSpec.key", notNullValue()));
         });
   }
 }
