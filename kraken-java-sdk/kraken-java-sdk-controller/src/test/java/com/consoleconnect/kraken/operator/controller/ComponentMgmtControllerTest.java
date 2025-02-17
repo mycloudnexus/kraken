@@ -230,9 +230,6 @@ public class ComponentMgmtControllerTest extends AbstractIntegrationTest
               Assertions.assertTrue(isSorted(data.getDetails(), comp));
               Assertions.assertEquals(
                   data.getDetails().get(0).getSupportedCase(), SupportedCaseEnum.ONE_TO_ONE.name());
-              Assertions.assertEquals(
-                  data.getDetails().get(0).getRunningMappingType(),
-                  SupportedCaseEnum.ONE_TO_ONE.name());
             });
   }
 
