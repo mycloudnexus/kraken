@@ -115,51 +115,46 @@ public class UnifiedAssetService implements UUIDWrapper {
     if (parentId != null) {
       parentId = findOneByIdOrKey(parentId).getId().toString();
     }
-    Page<UnifiedAssetEntity> data =
-        assetRepository.search(parentId, kind, StringUtils.lowerCase(q), pageRequest);
+    List<UnifiedAssetEntity> data =
+        assetRepository.searchWithoutPagination(parentId, kind, StringUtils.lowerCase(q));
     if (appProperty.getQueryExcludeAssetKinds().contains(kind)) {
       data = filterExcludedAssets(data);
     }
     if (StringUtils.isNotBlank(kind) && API_KINDS.contains(kind)) {
-      data = sortAndPaginate(data, kind);
+      data = sortData(data, kind);
       if (facetIncluded && StringUtils.isNotBlank(parentProductType)) {
-        return filterByParentProductType(data, parentProductType);
+        List<UnifiedAssetDto> assetDtoList = filterByParentProductType(data, parentProductType);
+        Page<UnifiedAssetDto> pagedData = PagingHelper.paginateList(assetDtoList, pageRequest);
+        return PagingHelper.toPaging(pagedData, x -> x);
       }
     }
-    return PagingHelper.toPaging(data, entity -> toAsset(entity, facetIncluded));
+    Page<UnifiedAssetEntity> pagedData = PagingHelper.paginateList(data, pageRequest);
+    return PagingHelper.toPaging(pagedData, entity -> toAsset(entity, facetIncluded));
   }
 
-  private Page<UnifiedAssetEntity> filterExcludedAssets(Page<UnifiedAssetEntity> data) {
-    List<UnifiedAssetEntity> filterList =
-        data.getContent().stream()
-            .filter(entity -> !appProperty.getQueryExcludeAssetKeys().contains(entity.getKey()))
-            .toList();
-    return new PageImpl<>(
-        filterList, PageRequest.of(data.getNumber(), data.getSize()), filterList.size());
+  private List<UnifiedAssetEntity> filterExcludedAssets(List<UnifiedAssetEntity> data) {
+    return data.stream()
+        .filter(entity -> !appProperty.getQueryExcludeAssetKeys().contains(entity.getKey()))
+        .toList();
   }
 
-  private PageImpl<UnifiedAssetEntity> sortAndPaginate(Page<UnifiedAssetEntity> data, String kind) {
+  private List<UnifiedAssetEntity> sortData(List<UnifiedAssetEntity> data, String kind) {
     Map<String, Map<String, String>> orderByMap =
         Map.of(
             AssetKindEnum.COMPONENT_API_SPEC.getKind(), appProperty.getApiSpecOrderBy(),
             AssetKindEnum.COMPONENT_API.getKind(), appProperty.getApiOrderBy());
     Map<String, String> orderBy = orderByMap.getOrDefault(kind, Collections.emptyMap());
-    List<UnifiedAssetEntity> sorted =
-        data.getContent().stream()
-            .sorted(Comparator.comparing(t -> orderBy.getOrDefault(t.getKey(), DEFAULT_ORDER_SEQ)))
-            .toList();
-    return new PageImpl<>(sorted, PageRequest.of(data.getNumber(), data.getSize()), sorted.size());
+    return data.stream()
+        .sorted(Comparator.comparing(t -> orderBy.getOrDefault(t.getKey(), DEFAULT_ORDER_SEQ)))
+        .toList();
   }
 
-  private Paging<UnifiedAssetDto> filterByParentProductType(
-      Page<UnifiedAssetEntity> data, String parentProductType) {
-    List<UnifiedAssetDto> filteredList =
-        data.getContent().stream()
-            .map(entity -> toAsset(entity, true))
-            .filter(item -> parentProductType.equals(getParentProductType(item)))
-            .toList();
-
-    return PagingHelper.toPaging(filteredList, x -> x);
+  private List<UnifiedAssetDto> filterByParentProductType(
+      List<UnifiedAssetEntity> data, String parentProductType) {
+    return data.stream()
+        .map(entity -> toAsset(entity, true))
+        .filter(item -> parentProductType.equals(getParentProductType(item)))
+        .toList();
   }
 
   private String getParentProductType(UnifiedAssetDto item) {
