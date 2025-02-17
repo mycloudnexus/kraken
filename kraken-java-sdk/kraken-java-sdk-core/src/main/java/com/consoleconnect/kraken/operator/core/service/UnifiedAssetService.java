@@ -83,12 +83,7 @@ public class UnifiedAssetService implements UUIDWrapper {
 
   @Transactional(readOnly = true)
   public Paging<UnifiedAssetDto> search(
-      String parentId,
-      String kind,
-      boolean facetIncluded,
-      String q,
-      String parentProductType,
-      PageRequest pageRequest) {
+      String parentId, String kind, boolean facetIncluded, String q, PageRequest pageRequest) {
     log.info(
         "search asset, parentId: {}, kind: {}, q: {}, pageRequest: {}",
         parentId,
@@ -111,14 +106,6 @@ public class UnifiedAssetService implements UUIDWrapper {
     }
     if (StringUtils.isNotBlank(kind) && API_KINDS.contains(kind)) {
       data = sortAndPaginate(data, kind);
-      if (StringUtils.isNotBlank(parentProductType) && facetIncluded) {
-        List<UnifiedAssetDto> list =
-            data.getContent().stream()
-                .map(entity -> toAsset(entity, true))
-                .filter(item -> parentProductType.equals(getParentProductType(item)))
-                .toList();
-        return PagingHelper.toPaging(list, x -> x);
-      }
     }
     return PagingHelper.toPaging(data, entity -> toAsset(entity, facetIncluded));
   }

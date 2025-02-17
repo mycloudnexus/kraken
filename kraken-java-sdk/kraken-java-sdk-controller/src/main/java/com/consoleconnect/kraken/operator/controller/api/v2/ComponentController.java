@@ -53,7 +53,6 @@ public class ComponentController {
             AssetKindEnum.COMPONENT_API.getKind(),
             facetIncluded,
             null,
-            parentProductType,
             getSearchPageRequest(page, size, direction, orderBy)));
   }
 

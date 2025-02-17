@@ -834,7 +834,7 @@ public class TemplateUpgradeService implements ApiUseCaseSelector {
   }
 
   private Paging<UnifiedAssetDto> getUnifiedAssetDtoPaging(String kind) {
-    return unifiedAssetService.search(null, kind, true, null, null, PageRequest.of(0, PAGE_SIZE));
+    return unifiedAssetService.search(null, kind, true, null, PageRequest.of(0, PAGE_SIZE));
   }
 
   private List<UnifiedAssetDto> generateDeployedAssets(List<String> keyList) {

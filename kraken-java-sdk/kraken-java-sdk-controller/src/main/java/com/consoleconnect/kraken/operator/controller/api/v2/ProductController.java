@@ -29,6 +29,7 @@ public class ProductController {
   public HttpResponse<Paging<UnifiedAssetDto>> search(
       @RequestParam(value = "facetIncluded", required = false, defaultValue = "false")
           boolean facetIncluded,
+      @RequestParam(value = "parentProductType", required = false) String parentProductType,
       @RequestParam(value = "orderBy", required = false, defaultValue = "createdAt") String orderBy,
       @RequestParam(value = "direction", required = false, defaultValue = "DESC")
           Sort.Direction direction,
@@ -41,7 +42,6 @@ public class ProductController {
             null,
             AssetKindEnum.PRODUCT.getKind(),
             facetIncluded,
-            null,
             null,
             getSearchPageRequest(page, size, direction, orderBy)));
   }

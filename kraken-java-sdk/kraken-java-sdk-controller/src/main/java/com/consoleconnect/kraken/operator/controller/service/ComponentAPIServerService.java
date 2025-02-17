@@ -68,7 +68,7 @@ public class ComponentAPIServerService extends AssetStatusManager {
       PageRequest pageRequest) {
     Paging<UnifiedAssetDto> pages =
         this.unifiedAssetService.search(
-            componentId, COMPONENT_API_TARGET_SPEC.getKind(), facetIncluded, q, null, pageRequest);
+            componentId, COMPONENT_API_TARGET_SPEC.getKind(), facetIncluded, q, pageRequest);
     filterFacet(facetIncluded, liteSearch, pages);
     Set<String> serverKeyUsage = queryServerKeyInUsage();
     pages
@@ -114,7 +114,6 @@ public class ComponentAPIServerService extends AssetStatusManager {
             null,
             COMPONENT_API_TARGET_SPEC.getKind(),
             true,
-            null,
             null,
             UnifiedAssetService.getSearchPageRequest(0, 1000));
     return paging.getData().stream()
@@ -173,7 +172,6 @@ public class ComponentAPIServerService extends AssetStatusManager {
             productId,
             COMPONENT_API_TARGET_SPEC.getKind(),
             false,
-            null,
             null,
             UnifiedAssetService.getSearchPageRequest(0, 1000))
         .getData()

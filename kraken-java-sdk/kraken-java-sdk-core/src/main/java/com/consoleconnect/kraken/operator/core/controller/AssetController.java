@@ -39,7 +39,6 @@ public class AssetController {
       @RequestParam(value = "facetIncluded", required = false, defaultValue = "true")
           boolean facetIncluded,
       @RequestParam(value = "q", required = false) String q,
-      @RequestParam(value = "parentProductType", required = false) String parentProductType,
       @RequestParam(value = "orderBy", required = false, defaultValue = "createdAt") String orderBy,
       @RequestParam(value = "direction", required = false, defaultValue = "DESC")
           Sort.Direction direction,
@@ -56,7 +55,6 @@ public class AssetController {
             kind,
             facetIncluded,
             q,
-            parentProductType,
             getSearchPageRequest(page, size, direction, orderBy)));
   }
 
@@ -74,7 +72,6 @@ public class AssetController {
       @RequestParam(value = "facetIncluded", required = false, defaultValue = "true")
           boolean facetIncluded,
       @RequestParam(value = "q", required = false) String q,
-      @RequestParam(value = "parentProductType", required = false) String parentProductType,
       @RequestParam(value = "orderBy", required = false, defaultValue = "createdAt") String orderBy,
       @RequestParam(value = "direction", required = false, defaultValue = "DESC")
           Sort.Direction direction,
@@ -84,12 +81,7 @@ public class AssetController {
           int size) {
     return HttpResponse.ok(
         service.search(
-            id,
-            kind,
-            facetIncluded,
-            q,
-            parentProductType,
-            getSearchPageRequest(page, size, direction, orderBy)));
+            id, kind, facetIncluded, q, getSearchPageRequest(page, size, direction, orderBy)));
   }
 
   @Operation(summary = "Retrieve a asset's links by id")

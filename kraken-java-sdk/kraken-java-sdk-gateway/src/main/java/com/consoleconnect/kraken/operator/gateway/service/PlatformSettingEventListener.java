@@ -45,7 +45,6 @@ public class PlatformSettingEventListener {
             AssetKindEnum.COMPONENT_TRANSFORMER.getKind(),
             true,
             null,
-            null,
             PageRequest.of(0, 1000))
         .getData()
         .forEach(

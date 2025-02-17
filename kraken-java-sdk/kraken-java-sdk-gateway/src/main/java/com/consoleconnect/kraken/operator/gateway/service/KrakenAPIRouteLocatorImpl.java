@@ -41,12 +41,7 @@ public class KrakenAPIRouteLocatorImpl implements RouteLocator {
   private List<UnifiedAssetDto> listProducts() {
     return service
         .search(
-            null,
-            AssetKindEnum.PRODUCT.getKind(),
-            true,
-            null,
-            null,
-            PageRequest.of(0, Integer.MAX_VALUE))
+            null, AssetKindEnum.PRODUCT.getKind(), true, null, PageRequest.of(0, Integer.MAX_VALUE))
         .getData();
   }
 
@@ -56,7 +51,6 @@ public class KrakenAPIRouteLocatorImpl implements RouteLocator {
             productId,
             AssetKindEnum.COMPONENT_API.getKind(),
             true,
-            null,
             null,
             PageRequest.of(0, Integer.MAX_VALUE))
         .getData();

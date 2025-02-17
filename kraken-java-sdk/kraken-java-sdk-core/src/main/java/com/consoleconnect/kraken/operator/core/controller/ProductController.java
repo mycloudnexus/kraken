@@ -45,7 +45,6 @@ public class ProductController {
             AssetKindEnum.PRODUCT.getKind(),
             facetIncluded,
             q,
-            parentProductType,
             getSearchPageRequest(page, size, direction, orderBy)));
   }
 

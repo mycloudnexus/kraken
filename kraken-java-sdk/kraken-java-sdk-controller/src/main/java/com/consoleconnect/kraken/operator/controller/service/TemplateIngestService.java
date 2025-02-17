@@ -56,7 +56,7 @@ public class TemplateIngestService {
     log.info("Platform Boot Up Event Received, event class:{}", event.getClass());
     Paging<UnifiedAssetDto> assetDtoPaging =
         unifiedAssetService.search(
-            null, AssetKindEnum.PRODUCT.getKind(), false, null, null, PageRequest.of(0, 1));
+            null, AssetKindEnum.PRODUCT.getKind(), false, null, PageRequest.of(0, 1));
     if (mgmtProperty.isMgmtServerEnabled()) {
       // need not init product&workplace
       return;
