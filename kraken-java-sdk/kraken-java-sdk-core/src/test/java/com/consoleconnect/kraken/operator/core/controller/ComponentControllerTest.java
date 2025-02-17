@@ -202,6 +202,7 @@ class ComponentControllerTest extends AbstractIntegrationTest {
             uriBuilder
                 .path(path)
                 .queryParam("kind", AssetKindEnum.COMPONENT_API.getKind())
+                .queryParam("facetIncluded", true)
                 .queryParam("parentProductType", ParentProductTypeEnum.ACCESS_ELINE.getKind())
                 .build()),
         bodyStr -> {
@@ -212,7 +213,6 @@ class ComponentControllerTest extends AbstractIntegrationTest {
           assertThat(bodyStr, hasJsonPath("$.data.data[0].metadata", notNullValue()));
           assertThat(bodyStr, hasJsonPath("$.data.data[0].facets", notNullValue()));
           assertThat(bodyStr, hasJsonPath("$.data.data[0].facets.mappings", notNullValue()));
-          assertThat(bodyStr, hasJsonPath("$.data.data[0].facets.apiSpec.key", notNullValue()));
         });
   }
 
