@@ -7,7 +7,10 @@
       "product": "${entity.request.quoteItem[0].product}",
       "action": "${entity.request.quoteItem[0].action}",
       "id": "${entity.request.quoteItem[0].id}",
+      "subjectToFeasibilityCheck": "${entity.renderedResponse.quoteItem[0].subjectToFeasibilityCheck}",
+      "quoteItemInstallationInterval": "${entity.renderedResponse.quoteItem[0].quoteItemInstallationInterval}",
       "state": "${entity.renderedResponse.quoteItem[0].state}",
+      "quoteItemTerm": "${entity.renderedResponse.quoteItem[0].quoteItemTerm}",
       "quoteItemPrice": "${entity.renderedResponse.quoteItem[0].quoteItemPrice}"
     }
   ],
@@ -15,6 +18,11 @@
   "externalId": "${entity.request[externalId]?:''}",
   "instantSyncQuote": "${entity.request[instantSyncQuote]?:''}",
   "requestedQuoteCompletionDate": "${entity.request[requestedQuoteCompletionDate]?:''}",
+  "effectiveQuoteCompletionDate": "${entity.renderedResponse[effectiveQuoteCompletionDate]?:''}",
+  "validFor":{
+    "startDateTime": "${entity.renderedResponse.validFor[startDateTime]?:''}",
+    "endDateTime": "${entity.renderedResponse.validFor[endDateTime]?:''}"
+  },
   "quoteLevel": "${entity.request.buyerRequestedQuoteLevel}",
   "state": "${entity.renderedResponse.state}"
 }
