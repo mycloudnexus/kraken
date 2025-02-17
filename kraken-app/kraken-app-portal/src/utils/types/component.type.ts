@@ -110,6 +110,6 @@ export interface ILabels {
   stageDeployedStatus: string;
   subVersion: string;
   version: string;
-  "access.eline": string;
+  "access.eline"?: "true";
   componentKey: string;
 }
