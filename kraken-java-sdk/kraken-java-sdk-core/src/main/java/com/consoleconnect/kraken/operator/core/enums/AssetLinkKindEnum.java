@@ -6,6 +6,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum AssetLinkKindEnum {
+  COMPONENT_API("kraken.component.api"),
   IMPLEMENTATION_WORKFLOW("implementation.workflow"),
   IMPLEMENTATION_TARGET("implementation.target"),
   IMPLEMENTATION_TARGET_MAPPER("implementation.target-mapper"),
