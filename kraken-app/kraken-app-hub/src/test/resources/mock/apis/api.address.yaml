@@ -90,6 +90,7 @@ spec:
             properties:
               - responseBody
               - responseStatusCode
+              - renderedResponseBody
           preRequest: false
           postRequest: true
           order: -4

@@ -42,5 +42,11 @@ public class AppProperty {
     private boolean enabled = false;
     // required by conductor workflow definition
     private String email = "kraken@example.com";
+    private WorkflowDeploymentConfig deployment;
+  }
+
+  @Data
+  public static class WorkflowDeploymentConfig {
+    private boolean enabled = false;
   }
 }
