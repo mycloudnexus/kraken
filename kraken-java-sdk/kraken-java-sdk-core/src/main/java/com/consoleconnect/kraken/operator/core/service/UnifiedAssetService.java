@@ -111,13 +111,13 @@ public class UnifiedAssetService implements UUIDWrapper {
     }
     if (StringUtils.isNotBlank(kind) && API_KINDS.contains(kind)) {
       data = sortAndPaginate(data, kind);
-      if (StringUtils.isNotBlank(parentProductType)) {
+      if (StringUtils.isNotBlank(parentProductType) && facetIncluded) {
         List<UnifiedAssetDto> list =
             data.getContent().stream()
-                .map(entity -> toAsset(entity, facetIncluded))
+                .map(entity -> toAsset(entity, true))
                 .filter(item -> parentProductType.equals(getParentProductType(item)))
                 .toList();
-        return PagingHelper.toPage(list, pageRequest.getPageNumber(), pageRequest.getPageSize());
+        return PagingHelper.toPaging(list, x -> x);
       }
     }
     return PagingHelper.toPaging(data, entity -> toAsset(entity, facetIncluded));

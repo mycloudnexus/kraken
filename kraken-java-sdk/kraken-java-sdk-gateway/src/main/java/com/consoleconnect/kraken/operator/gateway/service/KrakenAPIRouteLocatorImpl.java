@@ -2,7 +2,6 @@ package com.consoleconnect.kraken.operator.gateway.service;
 
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
-import com.consoleconnect.kraken.operator.core.enums.ParentProductTypeEnum;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPIFacets;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
@@ -46,7 +45,7 @@ public class KrakenAPIRouteLocatorImpl implements RouteLocator {
             AssetKindEnum.PRODUCT.getKind(),
             true,
             null,
-            ParentProductTypeEnum.ACCESS_ELINE.getKind(),
+            null,
             PageRequest.of(0, Integer.MAX_VALUE))
         .getData();
   }
@@ -58,7 +57,7 @@ public class KrakenAPIRouteLocatorImpl implements RouteLocator {
             AssetKindEnum.COMPONENT_API.getKind(),
             true,
             null,
-            ParentProductTypeEnum.ACCESS_ELINE.getKind(),
+            null,
             PageRequest.of(0, Integer.MAX_VALUE))
         .getData();
   }
