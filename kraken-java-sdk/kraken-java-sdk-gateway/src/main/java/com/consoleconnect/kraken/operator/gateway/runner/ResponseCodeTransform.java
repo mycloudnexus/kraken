@@ -29,7 +29,8 @@ public interface ResponseCodeTransform {
       if (StringUtils.isBlank(bodyContent)) {
         throw KrakenException.notFoundDefault();
       }
-      throw new KrakenException(httpResponseContext.getStatus(), bodyContent);
+      throw new KrakenException(
+          httpResponseContext.getStatus(), bodyContent, new IllegalArgumentException(bodyContent));
     }
     if (HttpStatus.valueOf(httpResponseContext.getStatus()).is4xxClientError()) {
       rewriteStatus(httpResponseContext);
