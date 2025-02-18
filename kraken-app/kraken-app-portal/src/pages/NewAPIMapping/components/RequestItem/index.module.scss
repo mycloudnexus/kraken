@@ -113,3 +113,18 @@
 .discreteSelector {
   color: #00000073;
 }
+
+.selectPopup {
+  visibility: hidden;
+}
+
+.stateSelect {
+  :global {
+    .ant-select-selector {
+      border-radius: 2px !important;
+    }
+  }
+  svg {
+    width: 10px;
+  }
+}
