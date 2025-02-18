@@ -58,8 +58,8 @@ spec:
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.product.offering.eline.add.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.product.offering.uni.read.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.product.offering.eline.read.yaml
-    - classpath:/mef-sonata/environments/dev.yaml
-    - classpath:/mef-sonata/environments/uat.yaml
-    - classpath:/mef-sonata/environments/stage.yaml
-    - classpath:/mef-sonata/environments/prod.yaml
-    - classpath:/mef-sonata/template-upgrade/release.1.0.1.yaml
+    - classpath:/assets/environments/dev.yaml
+    - classpath:/assets/environments/uat.yaml
+    - classpath:/assets/environments/stage.yaml
+    - classpath:/assets/environments/prod.yaml
+    - classpath:/assets/template-upgrade/release.1.0.1.yaml
