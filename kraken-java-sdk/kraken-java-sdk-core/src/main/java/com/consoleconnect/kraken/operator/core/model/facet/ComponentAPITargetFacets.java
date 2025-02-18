@@ -1,5 +1,6 @@
 package com.consoleconnect.kraken.operator.core.model.facet;
 
+import com.consoleconnect.kraken.operator.core.enums.SupportedCaseEnum;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -12,10 +13,16 @@ public class ComponentAPITargetFacets {
   private Trigger trigger;
   private List<Endpoint> endpoints;
   private Workflow workflow;
+  private SupportedCase supportedCase = new SupportedCase();
 
   @Data
   public static class Server {
     private String uri;
+  }
+
+  @Data
+  public static class SupportedCase {
+    private String type = SupportedCaseEnum.ONE_TO_ONE.name();
   }
 
   @Data

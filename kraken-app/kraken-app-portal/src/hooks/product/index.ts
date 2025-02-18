@@ -44,12 +44,14 @@ import {
   getAPIServers,
   getComponentDetailV2,
   getValidateServerName,
+  editContactInformation,
 } from "@/services/products";
 import { STALE_TIME } from "@/utils/constants/common";
 import {
   COMPONENT_KIND_API,
   COMPONENT_KIND_API_SPEC,
   COMPONENT_KIND_API_TARGET_SPEC,
+  COMPONENT_KIND_SELLER_CONTACT,
 } from "@/utils/constants/product";
 import { queryClient } from "@/utils/helpers/reactQuery";
 import {
@@ -137,6 +139,7 @@ export const PRODUCT_CACHE_KEYS = {
   upgrade_mapping_template_stage: "upgrade_mapping_template_stage",
   get_validate_api_server_name: "get_validate_api_server_name",
   verify_product: "verify_product",
+  edit_contact_information: "edit_contact_information",
 };
 
 export const useCreateNewComponent = () => {
@@ -204,6 +207,19 @@ export const useGetComponentListAPISpec = (productId: string) => {
     queryFn: () =>
       getListComponents(productId, {
         kind: COMPONENT_KIND_API_TARGET_SPEC,
+        size: 500,
+      }),
+    enabled: Boolean(productId),
+    select: (data) => data?.data,
+  });
+};
+
+export const useGetSellerContacts = (productId: string) => {
+  return useQuery<any, Error>({
+    queryKey: [PRODUCT_CACHE_KEYS.get_component_list_api_spec, productId],
+    queryFn: () =>
+      getListComponents(productId, {
+        kind: COMPONENT_KIND_SELLER_CONTACT,
         size: 500,
       }),
     enabled: Boolean(productId),
@@ -793,5 +809,13 @@ export const useGetValidateServerName = () => {
         queryKey: [PRODUCT_CACHE_KEYS.get_validate_api_server_name],
       });
     },
+  });
+};
+
+export const useEditContactInformation = () => {
+  return useMutation<any, Error>({
+    mutationKey: [PRODUCT_CACHE_KEYS.edit_contact_information],
+    mutationFn: ({ productId, componentId, id, data }: any) =>
+      editContactInformation(productId, componentId, id, data),
   });
 };
