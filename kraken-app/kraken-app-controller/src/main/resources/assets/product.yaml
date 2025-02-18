@@ -27,11 +27,12 @@ spec:
     - classpath:/mef-sonata/api-targets/api-target.order.eline.delete.yaml
     - classpath:/mef-sonata/api-targets/api-target.quote.eline.add.yaml
     - classpath:/mef-sonata/api-targets/api-target.quote.eline.add.sync.yaml
-    - classpath:/mef-sonata/api-targets/api-target.quote.eline.add.yaml
+    - classpath:/mef-sonata/api-targets/api-target.quote.eline.read.yaml
+    - classpath:/mef-sonata/api-targets/api-target.quote.eline.read.sync.yaml
     - classpath:/mef-sonata/api-targets/api-target.quote.uni.add.yaml
     - classpath:/mef-sonata/api-targets/api-target.quote.uni.add.sync.yaml
     - classpath:/mef-sonata/api-targets/api-target.quote.uni.read.yaml
-    - classpath:/mef-sonata/api-targets/api-target.quote.eline.read.yaml
+    - classpath:/mef-sonata/api-targets/api-target.quote.uni.read.sync.yaml
     - classpath:/mef-sonata/api-targets/api-target.address.validate.yaml
     - classpath:/mef-sonata/api-targets/api-target.address.retrieve.yaml
     - classpath:/mef-sonata/api-targets/api-target.product.offering.uni.add.yaml
@@ -48,9 +49,12 @@ spec:
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.order.eline.delete.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.eline.add.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.eline.add.sync.yaml
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.eline.read.yaml
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.eline.read.sync.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.uni.add.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.uni.add.sync.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.uni.read.yaml
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.uni.read.sync.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.eline.read.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.address.validate.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.address.retrieve.yaml
