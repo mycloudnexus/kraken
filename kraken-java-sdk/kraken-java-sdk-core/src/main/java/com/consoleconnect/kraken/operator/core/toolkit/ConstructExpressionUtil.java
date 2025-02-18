@@ -80,6 +80,12 @@ public class ConstructExpressionUtil {
         split[1], param.substring(split[0].length() + split[1].length() + 2));
   }
 
+  public static String formatTaskExpression(String param) {
+    String[] split = param.split(DOT);
+    return String.format(
+        "%s.output.response.body.%s", split[0], param.substring(split[0].length() + 1));
+  }
+
   public static String formatWorkflowResponseExpression(String param) {
     String[] split = param.split(DOT);
     return String.format(
