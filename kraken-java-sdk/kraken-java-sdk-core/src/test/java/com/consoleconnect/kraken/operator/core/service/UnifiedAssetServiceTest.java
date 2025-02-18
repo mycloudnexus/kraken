@@ -176,6 +176,6 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
             s, new TypeReference<Map<String, Map<String, ComponentAPITargetFacets.Mapper>>>() {});
     UnifiedAssetService.mergeMappers(existMapperMap, existMapperMap);
     String result = JsonToolkit.toJson(existMapperMap);
-    System.out.println(result);
+    Assertions.assertNotNull(result);
   }
 }
