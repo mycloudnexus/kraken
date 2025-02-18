@@ -26,8 +26,10 @@ spec:
     - classpath:/mef-sonata/api-targets/api-target.order.uni.delete.yaml
     - classpath:/mef-sonata/api-targets/api-target.order.eline.delete.yaml
     - classpath:/mef-sonata/api-targets/api-target.quote.eline.add.yaml
+    - classpath:/mef-sonata/api-targets/api-target.quote.eline.add.sync.yaml
     - classpath:/mef-sonata/api-targets/api-target.quote.eline.add.yaml
     - classpath:/mef-sonata/api-targets/api-target.quote.uni.add.yaml
+    - classpath:/mef-sonata/api-targets/api-target.quote.uni.add.sync.yaml
     - classpath:/mef-sonata/api-targets/api-target.quote.uni.read.yaml
     - classpath:/mef-sonata/api-targets/api-target.quote.eline.read.yaml
     - classpath:/mef-sonata/api-targets/api-target.address.validate.yaml
@@ -45,7 +47,9 @@ spec:
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.order.uni.delete.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.order.eline.delete.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.eline.add.yaml
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.eline.add.sync.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.uni.add.yaml
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.uni.add.sync.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.uni.read.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.eline.read.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.address.validate.yaml
@@ -54,8 +58,8 @@ spec:
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.product.offering.eline.add.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.product.offering.uni.read.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.product.offering.eline.read.yaml
-    - classpath:/assets/environments/dev.yaml
-    - classpath:/assets/environments/uat.yaml
-    - classpath:/assets/environments/stage.yaml
-    - classpath:/assets/environments/prod.yaml
-    - classpath:/assets/template-upgrade/release.1.0.1.yaml
+    - classpath:/mef-sonata/environments/dev.yaml
+    - classpath:/mef-sonata/environments/uat.yaml
+    - classpath:/mef-sonata/environments/stage.yaml
+    - classpath:/mef-sonata/environments/prod.yaml
+    - classpath:/mef-sonata/template-upgrade/release.1.0.1.yaml

@@ -155,7 +155,7 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
         JsonToolkit.fromJson(
             s, new TypeReference<Map<String, Map<String, ComponentAPITargetFacets.Mapper>>>() {});
     int beforeSize = existMapperMap.size();
-    unifiedAssetService.mergeMappers(existMapperMap, existMapperMap);
+    UnifiedAssetService.mergeMappers(existMapperMap, existMapperMap);
     int afterSize = existMapperMap.size();
     Assertions.assertEquals(beforeSize, afterSize);
   }
@@ -165,5 +165,17 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
     UUID uuid = UUID.randomUUID();
     Assertions.assertFalse(unifiedAssetService.existed(uuid.toString()));
     Assertions.assertFalse(unifiedAssetService.existed("mef.sonata.test"));
+  }
+
+  @SneakyThrows
+  @Test
+  void givenSourceValues_whenMerge_thenReturnOK() {
+    String s = readFileToString("data/mapper_1.json");
+    Map<String, Map<String, ComponentAPITargetFacets.Mapper>> existMapperMap =
+        JsonToolkit.fromJson(
+            s, new TypeReference<Map<String, Map<String, ComponentAPITargetFacets.Mapper>>>() {});
+    UnifiedAssetService.mergeMappers(existMapperMap, existMapperMap);
+    String result = JsonToolkit.toJson(existMapperMap);
+    System.out.println(result);
   }
 }

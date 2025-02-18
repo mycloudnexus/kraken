@@ -1,7 +1,0 @@
----
-kind: kraken.product-env
-apiVersion: v1
-metadata:
-  key: mef.sonata.env.prod
-  name: Prod
-  version: 1
