@@ -25,7 +25,7 @@ import org.springframework.mock.web.server.MockServerWebExchange;
 
 @MockIntegrationTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class BackendServerLogServiceTest extends AbstractIntegrationTest {
+class BackendServerLogServiceTest extends AbstractIntegrationTest {
 
   @Autowired private BackendServerLogService backendServerLogService;
 

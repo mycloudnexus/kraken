@@ -12,8 +12,10 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
+@Slf4j
 public class ApiActivityLogHelper {
 
   private ApiActivityLogHelper() {}
@@ -47,6 +49,7 @@ public class ApiActivityLogHelper {
 
   public static ApiActivityResponseLog extractResponseLog(LogTaskRequest payload) {
     if (payload.getResponsePayload() == null) {
+      log.warn("No response payload");
       return null;
     }
     Map<String, Object> map = convertToMap(payload.getResponsePayload());
@@ -57,7 +60,7 @@ public class ApiActivityLogHelper {
     if (orgResp instanceof String) {
       return ApiActivityResponseLog.builder().build();
     }
-    Map<String, Object> response = (Map<String, Object>) convertToMap(orgResp);
+    Map<String, Object> response = convertToMap(orgResp);
     return ApiActivityResponseLog.builder()
         .response(JsonToolkit.toJson(getAsMap(response, INPUT_PARAM_BODY)))
         .httpStatusCode(getAsInt(response, INPUT_PARAM_STATUS_CODE))
@@ -65,12 +68,11 @@ public class ApiActivityLogHelper {
   }
 
   private static Map<String, Object> convertToMap(Object payload) {
-    if (payload instanceof String) {
-      return JsonToolkit.fromJson((String) payload, new TypeReference<Map<String, Object>>() {});
-    } else if (payload instanceof Map) {
-      return (java.util.Map<String, Object>) payload;
+    if (payload instanceof String strPayload) {
+      return JsonToolkit.fromJson(strPayload, new TypeReference<Map<String, Object>>() {});
+    } else if (payload instanceof Map mapPayload) {
+      return mapPayload;
     } else {
-      String s = JsonToolkit.toJson(payload);
       return JsonToolkit.fromJson(
           JsonToolkit.toJson(payload), new TypeReference<Map<String, Object>>() {});
     }
