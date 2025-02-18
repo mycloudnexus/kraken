@@ -23,7 +23,7 @@ test("Buyer modal", () => {
     description: "update target api mapper",
     resource: "api mapping use case",
     resourceId: "4e51-b34b-1119649642d2",
-    remoteAddress: "207.226.139.140",
+    remoteAddress: "0.0.0.0",
     statusCode: 200,
     ignoreRequestParams: [],
     request: {},

@@ -3,10 +3,7 @@ package com.consoleconnect.kraken.operator.core.toolkit;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 
 public class PagingHelper {
 
@@ -59,6 +56,13 @@ public class PagingHelper {
     result.setPage(page);
     result.setTotal(total);
     return result;
+  }
+
+  public static <T> Page<T> paginateList(List<T> data, PageRequest pageRequest) {
+    int start = (int) pageRequest.getOffset();
+    int end = Math.min(start + pageRequest.getPageSize(), data.size());
+    List<T> paginatedList = (start < end) ? data.subList(start, end) : Collections.emptyList();
+    return new PageImpl<>(paginatedList, pageRequest, data.size());
   }
 
   public static <T> List<T> toList(List<T> data, Integer page, Integer size) {

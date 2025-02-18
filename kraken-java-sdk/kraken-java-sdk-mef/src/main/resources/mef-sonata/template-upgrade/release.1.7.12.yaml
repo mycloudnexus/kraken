@@ -1,0 +1,13 @@
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.1.7.12
+  name: V1.7.12
+  labels:
+    productSpec: grace
+    productVersion: V1.7.12
+    publishDate: 2025-02-14
+  description: |
+    Added some properties in quote templates
+  version: 1

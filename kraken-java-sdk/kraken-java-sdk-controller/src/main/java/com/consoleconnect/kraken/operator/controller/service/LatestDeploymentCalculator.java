@@ -5,7 +5,6 @@ import static com.consoleconnect.kraken.operator.core.toolkit.LabelConstants.*;
 import static com.consoleconnect.kraken.operator.core.toolkit.LabelConstants.LABEL_ENV_ID;
 
 import com.consoleconnect.kraken.operator.controller.dto.ApiMapperDeploymentDTO;
-import com.consoleconnect.kraken.operator.controller.model.Environment;
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
@@ -13,9 +12,7 @@ import com.consoleconnect.kraken.operator.core.enums.DeployStatusEnum;
 import com.consoleconnect.kraken.operator.core.enums.ReleaseKindEnum;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.Paging;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -75,13 +72,13 @@ public interface LatestDeploymentCalculator {
   }
 
   default double computeMaximumRunningVersion(
-      UnifiedAssetDto deploymentAssetDto, String mapperKey, Environment env) {
+      UnifiedAssetDto deploymentAssetDto, String mapperKey, String envId) {
     String status = deploymentAssetDto.getMetadata().getStatus();
     if (DeployStatusEnum.SUCCESS.name().equals(status)) {
       return computeMaximumRunningVersion(deploymentAssetDto);
     } else {
       return DeployStatusEnum.FAILED.name().equals(status)
-          ? queryLatestSuccessDeploymentAsset(mapperKey, env.getId())
+          ? queryLatestSuccessDeploymentAsset(mapperKey, envId)
               .map(this::computeMaximumRunningVersion)
               .orElse(INIT_VERSION)
           : INIT_VERSION;
