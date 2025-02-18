@@ -50,6 +50,9 @@ public class ApiActivityLogHelper {
       return null;
     }
     Map<String, Object> map = convertToMap(payload.getResponsePayload());
+    if (!map.containsKey(INPUT_PARAM_RESPONSE)) {
+      return ApiActivityResponseLog.builder().build();
+    }
     Object orgResp = map.get(INPUT_PARAM_RESPONSE);
     if (orgResp instanceof String) {
       return ApiActivityResponseLog.builder().build();
@@ -67,6 +70,7 @@ public class ApiActivityLogHelper {
     } else if (payload instanceof Map) {
       return (java.util.Map<String, Object>) payload;
     } else {
+      String s = JsonToolkit.toJson(payload);
       return JsonToolkit.fromJson(
           JsonToolkit.toJson(payload), new TypeReference<Map<String, Object>>() {});
     }

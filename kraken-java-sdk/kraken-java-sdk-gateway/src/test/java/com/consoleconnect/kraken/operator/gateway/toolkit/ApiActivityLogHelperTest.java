@@ -45,6 +45,23 @@ public class ApiActivityLogHelperTest {
     Assertions.assertEquals("Console Connect - Hermes House", body.get("name"));
   }
 
+  @Test
+  void testExtractNullResponsePayload() {
+    LogTaskRequest logTaskRequest = new LogTaskRequest();
+    ApiActivityResponseLog responseLog = ApiActivityLogHelper.extractResponseLog(logTaskRequest);
+    Assertions.assertNull(responseLog);
+  }
+
+  @Test
+  void testExtractObjectResponsePayload() {
+    LogTaskRequest logTaskRequest = new LogTaskRequest();
+    ApiActivityRequestLog payload = new ApiActivityRequestLog();
+    payload.setRequestId("");
+    logTaskRequest.setResponsePayload(payload);
+    ApiActivityResponseLog responseLog = ApiActivityLogHelper.extractResponseLog(logTaskRequest);
+    Assertions.assertNotNull(responseLog);
+  }
+
   @SneakyThrows
   private String readFileToString(String path) {
     ResourceLoader resourceLoader = new DefaultResourceLoader();

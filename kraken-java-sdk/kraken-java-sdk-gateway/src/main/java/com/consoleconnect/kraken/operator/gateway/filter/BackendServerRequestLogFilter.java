@@ -39,7 +39,6 @@ public class BackendServerRequestLogFilter extends AbstractGlobalFilter {
     backendServerLogService.recordRequestParameter(exchange);
     ServerHttpRequestDecorator requestMutated =
         new ServerHttpRequestDecorator(exchange.getRequest()) {
-
           @Override
           public Flux<DataBuffer> getBody() {
             return Flux.from(
