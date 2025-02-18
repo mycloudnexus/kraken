@@ -6,6 +6,7 @@ metadata:
   name: Product Ordering Management
   labels:
     mef-api-release: grace
+    parentProductType: access.eline
     order-api-version: v10
 spec:
   baseSpec:
