@@ -1,0 +1,13 @@
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.1.7.14
+  name: V1.7.14
+  labels:
+    productSpec: grace
+    productVersion: V1.7.14
+    publishDate: 2025-02-18
+  description: |
+    Add supported type
+  version: 1

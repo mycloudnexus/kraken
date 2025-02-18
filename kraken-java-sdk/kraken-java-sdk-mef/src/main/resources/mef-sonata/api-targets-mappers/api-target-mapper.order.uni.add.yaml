@@ -13,7 +13,8 @@ spec:
     method: post
     productType: uni
     actionType: add
-  supportedCase: ONE_TO_ONE_AND_ONE_TO_MANY
+  supportedCase:
+    type: ONE_TO_ONE_AND_ONE_TO_MANY
   workflow:
     enabled: false
     synchronous: false
