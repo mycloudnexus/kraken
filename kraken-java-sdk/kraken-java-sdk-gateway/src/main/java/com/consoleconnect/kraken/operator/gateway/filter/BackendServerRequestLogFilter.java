@@ -9,7 +9,6 @@ import com.consoleconnect.kraken.operator.gateway.service.BackendServerLogServic
 import com.consoleconnect.kraken.operator.gateway.service.FilterHeaderService;
 import java.nio.charset.Charset;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.core.Ordered;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -49,16 +48,7 @@ public class BackendServerRequestLogFilter extends AbstractGlobalFilter {
                         db ->
                             backendServerLogService.recordRequestBody(
                                 exchange,
-                                () -> {
-                                  String request = null;
-                                  if (db != null) {
-                                    String payload = db.toString(Charset.defaultCharset());
-                                    if (StringUtils.isNotBlank(payload)) {
-                                      request = payload;
-                                    }
-                                  }
-                                  return request;
-                                })));
+                                () -> db != null ? db.toString(Charset.defaultCharset()) : null)));
           }
         };
     return chain.filter(exchange.mutate().request(requestMutated).build());

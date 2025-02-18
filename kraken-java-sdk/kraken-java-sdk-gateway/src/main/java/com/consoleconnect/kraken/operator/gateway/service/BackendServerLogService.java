@@ -79,7 +79,12 @@ public class BackendServerLogService {
       String entityId =
           (String) exchange.getAttributes().get(KrakenFilterConstants.X_LOG_TRANSFORMED_ENTITY_ID);
 
-      String request = fnGetRequest.get();
+      String request = null;
+      String payload = fnGetRequest.get();
+      if (StringUtils.isNotBlank(payload)) {
+        request = payload;
+      }
+
       String uri = null;
       Route route = exchange.getRequiredAttribute(GATEWAY_ROUTE_ATTR);
       if (route != null) {
