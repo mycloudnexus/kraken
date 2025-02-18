@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.*;
     value = "/v2/products/{productId}/envs/{envId}/api-activities",
     produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "API Activities ", description = "API Activities")
-public class EnvAPIActivityController {
+public class EnvAPIActivityControllerV2 {
   private final ApiActivityLogService apiActivityLogService;
 
   @Operation(summary = "search activities")
