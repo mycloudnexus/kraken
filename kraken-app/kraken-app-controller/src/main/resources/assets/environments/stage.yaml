@@ -1,0 +1,7 @@
+---
+kind: kraken.product-env
+apiVersion: v1
+metadata:
+  key: mef.sonata.env.stage
+  name: Stage
+  version: 1
