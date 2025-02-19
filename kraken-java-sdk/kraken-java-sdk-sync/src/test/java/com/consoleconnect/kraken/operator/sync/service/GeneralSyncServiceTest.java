@@ -58,13 +58,13 @@ public class GeneralSyncServiceTest extends AbstractIntegrationTest {
   @Test
   @Order(1)
   void givenAssetKind_whenSyncTrue_thenOK() {
-    startSync(true);
+    startSync(false);
   }
 
   @Test
   @Order(2)
   void givenAssetKind_whenSyncFalse_thenOK() {
-    startSync(false);
+    startSync(true);
   }
 
   @SneakyThrows
@@ -83,7 +83,7 @@ public class GeneralSyncServiceTest extends AbstractIntegrationTest {
             }
             return switch (assetKindEnum) {
               case PRODUCT_BUYER -> mockerBuyer();
-              case COMPONENT_SELLER_CONTACT -> mockerSellerContact(true);
+              case COMPONENT_SELLER_CONTACT -> mockerSellerContact(isEmpty);
               default -> new MockResponse().setResponseCode(404);
             };
           }
