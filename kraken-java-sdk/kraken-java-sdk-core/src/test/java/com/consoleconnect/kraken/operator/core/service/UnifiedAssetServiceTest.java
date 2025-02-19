@@ -170,12 +170,18 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
   @SneakyThrows
   @Test
   void givenSourceValues_whenMerge_thenReturnOK() {
-    String s = readFileToString("data/mapper_1.json");
+    String s1 = readFileToString("data/mapper_1.json");
     Map<String, Map<String, ComponentAPITargetFacets.Mapper>> existMapperMap =
-        JsonToolkit.fromJson(
-            s, new TypeReference<Map<String, Map<String, ComponentAPITargetFacets.Mapper>>>() {});
-    UnifiedAssetService.mergeMappers(existMapperMap, existMapperMap);
-    String result = JsonToolkit.toJson(existMapperMap);
-    Assertions.assertNotNull(result);
+        JsonToolkit.fromJson(s1, new TypeReference<>() {});
+    String s2 = readFileToString("data/mapper_2.json");
+    Map<String, Map<String, ComponentAPITargetFacets.Mapper>> newMapperMap =
+        JsonToolkit.fromJson(s2, new TypeReference<>() {});
+    UnifiedAssetService.mergeMappers(existMapperMap, newMapperMap);
+    String existMapperStr = JsonToolkit.toJson(existMapperMap);
+    Assertions.assertNotNull(existMapperStr);
+    System.out.println(existMapperStr);
+    String newMapperStr = JsonToolkit.toJson(existMapperMap);
+    Assertions.assertNotNull(newMapperStr);
+    System.out.println(newMapperStr);
   }
 }
