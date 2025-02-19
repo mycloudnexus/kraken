@@ -7,4 +7,5 @@ import lombok.Data;
 public class EvaluateResult {
   private String url;
   private Map<String, Object> body;
+  private String singleResult;
 }
