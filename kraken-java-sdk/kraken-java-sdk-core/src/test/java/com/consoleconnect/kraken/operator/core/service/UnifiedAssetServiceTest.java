@@ -1,6 +1,6 @@
 package com.consoleconnect.kraken.operator.core.service;
 
-import static org.testcontainers.shaded.org.hamcrest.Matchers.hasSize;
+import static org.testcontainers.shaded.org.hamcrest.Matchers.*;
 
 import com.consoleconnect.kraken.operator.core.CustomConfig;
 import com.consoleconnect.kraken.operator.core.dto.SimpleApiServerDto;
@@ -179,9 +179,7 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
     UnifiedAssetService.mergeMappers(existMapperMap, newMapperMap);
     String existMapperStr = JsonToolkit.toJson(existMapperMap);
     Assertions.assertNotNull(existMapperStr);
-    System.out.println(existMapperStr);
     String newMapperStr = JsonToolkit.toJson(existMapperMap);
     Assertions.assertNotNull(newMapperStr);
-    System.out.println(newMapperStr);
   }
 }

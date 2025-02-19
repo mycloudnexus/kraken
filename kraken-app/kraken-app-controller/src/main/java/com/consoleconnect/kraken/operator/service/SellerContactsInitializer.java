@@ -1,6 +1,5 @@
 package com.consoleconnect.kraken.operator.service;
 
-
 import com.consoleconnect.kraken.operator.config.AppMgmtProperty;
 import com.consoleconnect.kraken.operator.controller.dto.CreateSellerContactRequest;
 import com.consoleconnect.kraken.operator.controller.service.SellerContactService;

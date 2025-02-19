@@ -69,15 +69,10 @@ public class GeneralSyncService extends KrakenServerConnector {
           HttpResponse<Object> res =
               blockCurl(HttpMethod.GET, uriFunction, null, new ParameterizedTypeReference<>() {});
           if (Objects.nonNull(res) && res.getCode() == HttpStatus.OK.value()) {
+            log.info("Start to sync asset, kind:{}", kind.getKind());
             Optional.ofNullable(res.getData())
                 .map(this::toAssetDtoList)
                 .ifPresent(handler::handleAssets);
-          } else {
-            log.warn(
-                "Failed to sync server assets, kind:{}, code:{}, error:{}",
-                kind,
-                res.getCode(),
-                res.getMessage());
           }
         });
   }
