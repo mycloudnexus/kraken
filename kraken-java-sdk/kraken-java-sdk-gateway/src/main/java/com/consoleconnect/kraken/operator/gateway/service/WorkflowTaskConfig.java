@@ -2,11 +2,15 @@ package com.consoleconnect.kraken.operator.gateway.service;
 
 import static com.consoleconnect.kraken.operator.core.toolkit.Constants.*;
 
+import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
+import com.consoleconnect.kraken.operator.core.model.ApiActivityRequestLog;
+import com.consoleconnect.kraken.operator.core.model.ApiActivityResponseLog;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.gateway.entity.HttpRequestEntity;
 import com.consoleconnect.kraken.operator.gateway.repo.HttpRequestRepository;
 import com.consoleconnect.kraken.operator.gateway.template.SpELEngine;
+import com.consoleconnect.kraken.operator.gateway.toolkit.ApiActivityLogHelper;
 import com.consoleconnect.kraken.operator.workflow.model.EvaluateResult;
 import com.consoleconnect.kraken.operator.workflow.model.LogTaskRequest;
 import com.consoleconnect.kraken.operator.workflow.service.WorkflowTaskRegister;
@@ -27,6 +31,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Getter
 public class WorkflowTaskConfig implements WorkflowTaskRegister {
   private final HttpRequestRepository repository;
+
+  private final BackendApiActivityLogService backendApiActivityLogService;
 
   @WorkerTask(NOTIFY_TASK)
   public void notify(
@@ -73,6 +79,26 @@ public class WorkflowTaskConfig implements WorkflowTaskRegister {
   @WorkerTask(LOG_PAYLOAD_TASK)
   public void logRequestPayload(@InputParam("payload") LogTaskRequest payload) {
     log.info("log payload: {}", JsonToolkit.toJson(payload));
+
+    try {
+      ApiActivityRequestLog activityRequestLog = ApiActivityLogHelper.extractRequestLog(payload);
+      if (activityRequestLog == null) {
+        log.error("Invalid activity log, empty request");
+        return;
+      }
+      ApiActivityLogEntity entity =
+          backendApiActivityLogService.logApiActivityRequest(activityRequestLog);
+
+      ApiActivityResponseLog activityResponseLog = ApiActivityLogHelper.extractResponseLog(payload);
+      if (activityResponseLog == null) {
+        log.error("Invalid activity log, empty response");
+        return;
+      }
+      activityResponseLog.setApiActivityLog(entity);
+      backendApiActivityLogService.logApiActivityResponse(activityResponseLog);
+    } catch (Exception e) {
+      log.error("Failed to log api activity log", e);
+    }
   }
 
   @WorkerTask(EMPTY_TASK)

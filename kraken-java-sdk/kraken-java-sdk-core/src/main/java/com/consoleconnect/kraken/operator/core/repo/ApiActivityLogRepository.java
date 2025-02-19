@@ -26,6 +26,12 @@ public interface ApiActivityLogRepository
 
   Page<ApiActivityLogEntity> findAll(Pageable pageable);
 
+  @Query(
+      "select e from #{#entityName} e "
+          + " where ( :requestId is not null and e.requestId = :requestId) "
+          + " order by e.callSeq desc limit 1")
+  Optional<ApiActivityLogEntity> findLatestSeq(String requestId);
+
   @Query(value = "SELECT e FROM #{#entityName} e where e.lifeStatus is null ")
   Page<ApiActivityLogEntity> findAllByMigrateStatus(Pageable pageable);
 
