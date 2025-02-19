@@ -100,10 +100,17 @@ const RequestItem = ({ item, index }: Props) => {
   const [limitRangeType, setLimitRangeType] = useState(
     item?.discrete ? "discrete" : "continuous"
   );
-  const [continuousInput, setContinuousInput] = useState({
-    from: 0,
-    to: 0,
-  });
+  const [continuousInput, setContinuousInput] = useState(
+    item.allowValueLimit && !item.discrete
+      ? {
+          from: item.sourceValues?.[0] ?? 0,
+          to: item.sourceValues?.[1] ?? 0,
+        }
+      : {
+          from: 0,
+          to: 0,
+        }
+  );
 
   const {
     value: isEditTitle,
