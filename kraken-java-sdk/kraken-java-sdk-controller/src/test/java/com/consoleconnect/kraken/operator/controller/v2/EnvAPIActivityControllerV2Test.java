@@ -22,6 +22,7 @@ import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import java.time.ZonedDateTime;
+import java.util.List;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.MethodOrderer;
@@ -56,7 +57,7 @@ class EnvAPIActivityControllerV2Test extends AbstractIntegrationTest
   }
 
   @Test
-  @Order(2)
+  @Order(1)
   void givenExistedActivityId_whenSearchDetail_thenReturnOK() {
     Environment envStage = createStage(PRODUCT_ID);
     String activityBaseUrl = String.format(ACTIVITY_BASE_URL, PRODUCT_ID, envStage.getId());
@@ -84,10 +85,15 @@ class EnvAPIActivityControllerV2Test extends AbstractIntegrationTest
   }
 
   @Test
-  @Order(3)
+  @Order(2)
   void givenTimeRange_whenSearchActivities_thenReturnOK() {
     Environment envStage = createStage(PRODUCT_ID);
     log.info("envId:{}", envStage.getId());
+    for (int i = 0; i < 3; i++) {
+      createApiActivityLog("buyer-" + i, envStage.getId(), "UNI", "/x-" + i, "localhost", "POST");
+    }
+    List<String> methods = List.of("GET", "POST");
+
     String activityBaseUrl = String.format(ACTIVITY_BASE_URL, PRODUCT_ID, envStage.getId());
     webTestClient.requestAndVerify(
         HttpMethod.GET,
@@ -95,8 +101,7 @@ class EnvAPIActivityControllerV2Test extends AbstractIntegrationTest
             uriBuilder
                 .path(activityBaseUrl)
                 .queryParam("envId", envStage.getId())
-                .queryParam("path", "/123")
-                .queryParam("method", "GET")
+                .queryParam("methods", methods.toArray())
                 .queryParam(
                     "requestStartTime", ZonedDateTime.now().minusDays(1).toInstant().toEpochMilli())
                 .queryParam(
@@ -108,9 +113,8 @@ class EnvAPIActivityControllerV2Test extends AbstractIntegrationTest
         bodyStr -> {
           log.info(bodyStr);
           assertThat(bodyStr, hasJsonPath("$.data", notNullValue()));
-          assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(1)));
-          assertThat(
-              bodyStr, hasJsonPath("$.data.data[0].buyerName", equalTo("testing-company-name")));
+          assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(4)));
+          assertThat(bodyStr, hasJsonPath("$.data.data[0].buyer", notNullValue()));
           assertThat(bodyStr, hasJsonPath("$.data.data[0].productType", equalTo("UNI")));
         });
   }
