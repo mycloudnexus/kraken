@@ -47,7 +47,7 @@ public class SellerContactSyncHandler implements ClientSyncHandler, ParentIdSele
           event.setFullPath(
               ResourceLoaderTypeEnum.generatePath(
                   ResourceLoaderTypeEnum.RAW, JsonToolkit.toJson(assetDto)));
-          event.setEnforceSync(true);
+          event.setEnforceSync(syncProperty.isAssetConfigOverwriteFlag());
           event.setKind(AssetKindEnum.COMPONENT_SELLER_CONTACT);
           event.setFullPath("raw:" + JsonToolkit.toJson(assetDto));
           dataIngestionJob.ingestData(event);
