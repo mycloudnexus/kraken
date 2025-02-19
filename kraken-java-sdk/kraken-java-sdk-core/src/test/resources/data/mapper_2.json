@@ -1,30 +1,4 @@
 {
-  "219549677": {
-    "request": {
-      "title": "Title of Property Mapping",
-      "description": "description",
-      "source": "@{{externalId}}",
-      "sourceLocation": "QUERY",
-      "target": "@{{requestBody.orderId}}",
-      "targetLocation": "BODY",
-      "requiredMapping": false,
-      "replaceStar": true,
-      "customizedField": true
-    }
-  },
-  "order.eline.add.buyerId.mapper": {
-    "request": {
-      "title": "",
-      "name": "order.eline.add.buyerId.mapper",
-      "description": "",
-      "source": "@{{buyerId}}",
-      "sourceLocation": "QUERY",
-      "target": "@{{companyName}}",
-      "targetLocation": "PATH",
-      "replaceStar": true,
-      "customizedField": false
-    }
-  },
   "mapper.order.uni.add.bandwidth": {
     "request": {
       "title": "Bandwidth of the UNI",
@@ -33,10 +7,6 @@
       "discrete": false,
       "sourceType": "integer",
       "replaceStar": true,
-      "sourceValues": [
-        1,
-        10000
-      ],
       "sourceLocation": "BODY",
       "targetLocation": "BODY",
       "allowValueLimit": true,
@@ -76,28 +46,6 @@
         "CANCELLED": "disabled,",
         "ACTIVATING": "inProgress,"
       },
-      "customizedField": false
-    }
-  },
-  "mapper.order.eline.add.orderId": {
-    "response": {
-      "title": "Order Id location",
-      "name": "mapper.order.eline.add.orderId",
-      "description": "orderId mapping",
-      "source": "",
-      "sourceLocation": "",
-      "replaceStar": true,
-      "customizedField": false
-    }
-  },
-  "mapper.order.eline.add.instanceId": {
-    "response": {
-      "title": "Instance Id location",
-      "name": "mapper.order.eline.add.instanceId",
-      "description": "order instanceId mapping",
-      "source": "",
-      "sourceLocation": "",
-      "replaceStar": true,
       "customizedField": false
     }
   }
