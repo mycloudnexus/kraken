@@ -12,6 +12,7 @@ import java.util.List;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -30,6 +31,10 @@ public class SellerContactSyncHandler implements ClientSyncHandler, ParentIdSele
 
   @Override
   public void handleAssets(List<UnifiedAssetDto> assets) {
+    if (CollectionUtils.isEmpty(assets)) {
+      log.warn("handle seller contacts, no assets returned");
+      return;
+    }
     handleSellerContacts(assets);
   }
 
@@ -42,7 +47,9 @@ public class SellerContactSyncHandler implements ClientSyncHandler, ParentIdSele
           event.setFullPath(
               ResourceLoaderTypeEnum.generatePath(
                   ResourceLoaderTypeEnum.RAW, JsonToolkit.toJson(assetDto)));
-          event.setEnforceSync(syncProperty.isAssetConfigOverwriteFlag());
+          event.setEnforceSync(true);
+          event.setKind(AssetKindEnum.COMPONENT_SELLER_CONTACT);
+          event.setFullPath("raw:" + JsonToolkit.toJson(assetDto));
           dataIngestionJob.ingestData(event);
         });
   }
