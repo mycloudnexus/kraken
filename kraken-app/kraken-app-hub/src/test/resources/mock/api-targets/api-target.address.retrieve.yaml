@@ -21,10 +21,8 @@ spec:
         {
           "id": "",
           "@type": "FieldedAddress",
-          "associatedGeographicAddress": {
-            "country": "",
-            "city": "",
-            "streetName": "",
-            "locality": ""
-          }
+          "country": "",
+          "city": "",
+          "streetName": "",
+          "locality": ""
         }

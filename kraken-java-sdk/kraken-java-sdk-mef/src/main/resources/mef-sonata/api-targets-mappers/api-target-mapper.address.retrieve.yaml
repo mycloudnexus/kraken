@@ -41,7 +41,7 @@ spec:
             description: ""
             source: ""
             sourceLocation: ""
-            target: "@{{associatedGeographicAddress.country}}"
+            target: "@{{country}}"
             targetType: string
             targetLocation: BODY
             requiredMapping: false
@@ -50,7 +50,7 @@ spec:
             description: ""
             source: ""
             sourceLocation: ""
-            target: "@{{associatedGeographicAddress.city}}"
+            target: "@{{city}}"
             targetType: string
             targetLocation: BODY
             requiredMapping: false
@@ -59,7 +59,7 @@ spec:
             description: ""
             source: ""
             sourceLocation: ""
-            target: "@{{associatedGeographicAddress.streetName}}"
+            target: "@{{streetName}}"
             targetType: string
             targetLocation: BODY
             requiredMapping: false
@@ -68,7 +68,7 @@ spec:
             description: ""
             source: ""
             sourceLocation: ""
-            target: "@{{associatedGeographicAddress.locality}}"
+            target: "@{{locality}}"
             targetType: string
             targetLocation: BODY
             requiredMapping: false

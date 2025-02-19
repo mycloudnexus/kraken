@@ -1,0 +1,101 @@
+{
+  "id": "ccd517a1-3a59-4d29-b4f2-0a586501f105",
+  "buyerRequestedQuoteLevel": "firm",
+  "relatedContactInformation": [
+    {
+      "number": "111 222 333",
+      "emailAddress": "buyerContact@mef.com",
+      "role": "buyerContactInformation",
+      "organization": "MEF",
+      "name": "Joe Buyer"
+    },
+    {
+      "number": "N/A",
+      "emailAddress": "support@kraken.com",
+      "role": "sellerContactInformation",
+      "name": "kraken"
+    }
+  ],
+  "quoteItem": [
+    {
+      "requestedQuoteItemTerm": {
+        "name": "UNI Item Term",
+        "duration": {
+          "amount": 1,
+          "units": "calendarMonths"
+        },
+        "endOfTermAction": "roll",
+        "description": "no description",
+        "rollInterval": {
+          "amount": 1,
+          "units": "calendarMonths"
+        }
+      },
+      "product": {
+        "place": [
+          {
+            "role": "INSTALL_LOCATION",
+            "id": "6356792a4806220015488631",
+            "keyName": "qe-dcf-1",
+            "@type": "GeographicAddressRefExt"
+          }
+        ],
+        "productConfiguration": {
+          "@type": "UNI",
+          "bandwidth": 10000,
+          "bandwidthUnit": "MBPS",
+          "name": "test-qc01",
+          "paymentType": "invoice"
+        },
+        "productOffering": {
+          "id": "UNI"
+        },
+        "productRelationship": []
+      },
+      "action": "add",
+      "id": "UNI",
+      "state": "approved.orderable",
+      "quoteItemTerm": [
+        {
+          "name": "UNI Item Term",
+          "duration": {
+            "amount": 1,
+            "units": "calendarMonths"
+          },
+          "endOfTermAction": "roll",
+          "description": "no description",
+          "rollInterval": {
+            "amount": 1,
+            "units": "calendarMonths"
+          }
+        }
+      ],
+      "quoteItemPrice": [
+        {
+          "unitOfMeasure": "Gb",
+          "price": {
+            "dutyFreeAmount": {
+              "unit": "USD",
+              "value": -1
+            },
+            "taxRate": "16",
+            "taxIncludedAmount": {
+              "unit": "USD",
+              "value": "100"
+            }
+          },
+          "name": "name-here",
+          "priceType": "recurring",
+          "description": "",
+          "recurringChargePeriod": "month"
+        }
+      ]
+    }
+  ],
+  "quoteDate": "2025-02-05 09:52:29",
+  "externalId": "ORDERABLE_ALTERNATE [8203] Sync Quote FIRM - ADD",
+  "instantSyncQuote": true,
+  "requestedQuoteCompletionDate": "2027-12-31T23:00:00Z",
+  "quoteLevel": "firm",
+  "state": "approved.orderable"
+}

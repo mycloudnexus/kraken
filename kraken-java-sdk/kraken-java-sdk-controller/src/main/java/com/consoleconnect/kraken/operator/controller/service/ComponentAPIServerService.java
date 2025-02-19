@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.MapUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +29,8 @@ import org.springframework.util.Assert;
 @Service
 @Slf4j
 public class ComponentAPIServerService extends AssetStatusManager {
+  private static final String ENVIRONMENTS_KEY = "environments";
+  private static final String SELECTED_API_KEY = "selectedAPIs";
   private final UnifiedAssetService unifiedAssetService;
 
   @Transactional
@@ -49,8 +52,8 @@ public class ComponentAPIServerService extends AssetStatusManager {
     tagAsset.getMetadata().setDescription(request.getDescription());
     tagAsset.getMetadata().setStatus(AssetStatusEnum.ACTIVATED.getKind());
     Map<String, Object> facets = new HashMap<>();
-    facets.put("selectedAPIs", request.getSelectedAPIs());
-    facets.put("environments", request.getEnvironments());
+    facets.put(SELECTED_API_KEY, request.getSelectedAPIs());
+    facets.put(ENVIRONMENTS_KEY, request.getEnvironments());
     tagAsset.setFacets(facets);
     SyncMetadata syncMetadata = new SyncMetadata("", "", DateTime.nowInUTCString(), createdBy);
     return unifiedAssetService.syncAsset(
@@ -58,10 +61,15 @@ public class ComponentAPIServerService extends AssetStatusManager {
   }
 
   public Paging<UnifiedAssetDto> listAPIServers(
-      String componentId, boolean facetIncluded, String q, PageRequest pageRequest) {
+      String componentId,
+      boolean facetIncluded,
+      boolean liteSearch,
+      String q,
+      PageRequest pageRequest) {
     Paging<UnifiedAssetDto> pages =
         this.unifiedAssetService.search(
             componentId, COMPONENT_API_TARGET_SPEC.getKind(), facetIncluded, q, pageRequest);
+    filterFacet(facetIncluded, liteSearch, pages);
     Set<String> serverKeyUsage = queryServerKeyInUsage();
     pages
         .getData()
@@ -71,6 +79,26 @@ public class ComponentAPIServerService extends AssetStatusManager {
               assetDto.setInUse((serverKeyUsage.contains(specKey) ? Boolean.TRUE : Boolean.FALSE));
             });
     return pages;
+  }
+
+  public void filterFacet(
+      boolean facetIncluded, boolean liteSearch, Paging<UnifiedAssetDto> pages) {
+    if (!facetIncluded || !liteSearch || pages.getSize() == 0) {
+      return;
+    }
+    pages
+        .getData()
+        .forEach(
+            assetDto -> {
+              assetDto.setSyncMetadata(null);
+              Map<String, Object> facets = assetDto.getFacets();
+              if (MapUtils.isEmpty(facets) || Objects.isNull(facets.get(ENVIRONMENTS_KEY))) {
+                return;
+              }
+              Object env = facets.get(ENVIRONMENTS_KEY);
+              assetDto.setFacets(new HashMap<>());
+              assetDto.getFacets().put(ENVIRONMENTS_KEY, env);
+            });
   }
 
   public void inUse(UnifiedAssetDto assetDto) {
@@ -94,7 +122,7 @@ public class ComponentAPIServerService extends AssetStatusManager {
               // <name,url>
               Map<String, String> apiServerMap =
                   JsonToolkit.fromJson(
-                      JsonToolkit.toJson(dto.getFacets().get("environments")),
+                      JsonToolkit.toJson(dto.getFacets().get(ENVIRONMENTS_KEY)),
                       new TypeReference<Map<String, String>>() {});
 
               return apiServerMap.entrySet().stream()

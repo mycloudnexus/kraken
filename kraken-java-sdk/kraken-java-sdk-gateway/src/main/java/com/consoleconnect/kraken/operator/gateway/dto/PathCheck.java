@@ -9,4 +9,9 @@ public record PathCheck(
     String value,
     String errorMsg,
     Integer code,
-    String expectedValueType) {}
+    String expectedValueType) {
+
+  public PathCheck withUpdatedPath(String updatedPath) {
+    return new PathCheck(name, updatedPath, expectType, value, errorMsg, code, expectedValueType);
+  }
+}

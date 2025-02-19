@@ -128,7 +128,7 @@ export const getAPIServers = (
   return request(
     `/v2${PRODUCT}/${productId}/components/${productId}/api-servers`,
     {
-      params: { ...params, facetIncluded: true },
+      params: { ...params, facetIncluded: true, liteSearch: true },
     }
   );
 };
@@ -268,6 +268,13 @@ export const getAuditLogs = (params: Record<string, any>) => {
   });
 };
 
+export const getAuditLogDetails = (params: Record<string, any>, id: string) => {
+  return request(`/audit/logs/${id}`, {
+    method: "GET",
+    params,
+  });
+};
+
 export const createBuyer = (productId: string, data: any) => {
   return request(`${PRODUCT}/${productId}/buyers`, {
     method: "POST",
@@ -371,14 +378,26 @@ export const regenerateBuyerAccessToken = (productId: string, id: string) => {
   });
 };
 
-export const getValidateServerName = (
-  productId: string,
-  name: string
-) => {
+export const getValidateServerName = (productId: string, name: string) => {
   return request(
     `/v2${PRODUCT}/${productId}/components/${productId}/api-servers/${name}`,
     {
       method: "GET",
+    }
+  );
+};
+
+export const editContactInformation = (
+  productId: string,
+  componentId: string,
+  id: string,
+  data: any
+) => {
+  return request(
+    `${PRODUCT}/${productId}/components/${componentId}/seller-contacts/${id}`,
+    {
+      method: "PATCH",
+      data,
     }
   );
 };

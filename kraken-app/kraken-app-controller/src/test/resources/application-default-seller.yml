@@ -1,0 +1,15 @@
+---
+app:
+  seller-contacts:
+    - key: mef.sonata
+      seller-contact-details:
+        - parentProductType: access.eline
+          componentKey: mef.sonata.api.order
+          name:
+          emailAddress:
+          number:
+        - parentProductType: access.eline
+          componentKey: mef.sonata.api.quote
+          name:
+          emailAddress:
+          number:

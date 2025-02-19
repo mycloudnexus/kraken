@@ -14,13 +14,14 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.server.ServerWebExchange;
 
+@Getter
 @AllArgsConstructor
 @Slf4j
 public abstract class AbstractActionRunner implements ResponseCodeTransform, MappingTransformer {
 
   public static final String ATTRIBUTE_KEY_PREFIX = "x-kraken-";
 
-  @Getter private final AppProperty appProperty;
+  private final AppProperty appProperty;
 
   public abstract boolean canHandle(ComponentAPIFacets.Action action);
 

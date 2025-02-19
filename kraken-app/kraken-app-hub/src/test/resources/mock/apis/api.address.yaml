@@ -6,6 +6,7 @@ metadata:
   name: Geographic Address Management
   labels:
     mef-api-release: grace
+    parentProductType: access.eline
     address-api-version: v7
   version: 6
 spec:
@@ -89,6 +90,7 @@ spec:
             properties:
               - responseBody
               - responseStatusCode
+              - renderedResponseBody
           preRequest: false
           postRequest: true
           order: -4

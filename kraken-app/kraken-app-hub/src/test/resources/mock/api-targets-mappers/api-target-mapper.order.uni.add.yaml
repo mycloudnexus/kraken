@@ -33,7 +33,8 @@ spec:
             title: "order item Term duration"
             source: "@{{productOrderItem[0].requestedItemTerm.duration.amount}}"
             sourceLocation: BODY
-            sourceType: constantNumber
+            sourceType: integer
+            discrete: true
             target: "1"
             targetLocation: BODY
             requiredMapping: true
@@ -58,23 +59,36 @@ spec:
             title: "MEFEndOfTermAction"
             source: "@{{productOrderItem[0].requestedItemTerm.endOfTermAction}}"
             sourceLocation: BODY
-            sourceType: discreteStr
+            sourceType: string
             target: "roll"
             targetLocation: BODY
             requiredMapping: true
-          - name: mapper.order.eline.add.rollInterval.amount
+          - name: mapper.order.uni.add.rollInterval.amount
             title: " quote item Term roll duration"
             source: "@{{productOrderItem[0].requestedItemTerm.rollInterval.amount}}"
             sourceLocation: BODY
-            sourceType: constantNumber
-            target: ""
+            sourceType: integer
+            discrete: true
+            sourceConditionExpression:
+            sourceConditions:
+              - name: endOfTermAction
+                key: "@{{productOrderItem[0].requestedItemTerm.endOfTermAction}}"
+                val: roll
+                operator: eq
+            target: "1"
             targetLocation: BODY
             requiredMapping: false
-          - name: mapper.order.eline.add.rollInterval.units
+          - name: mapper.order.uni.add.rollInterval.units
             title: " quote item Term roll unit"
             source: "@{{productOrderItem[0].requestedItemTerm.rollInterval.units}}"
             sourceLocation: BODY
-            sourceType: discreteStr
+            sourceType: string
+            sourceConditionExpression:
+            sourceConditions:
+              - name: endOfTermAction
+                key: "@{{productOrderItem[0].requestedItemTerm.endOfTermAction}}"
+                val: roll
+                operator: eq
             target: "calendarMonths"
             targetLocation: BODY
             requiredMapping: false
@@ -84,19 +98,22 @@ spec:
             description: ''
             source: '@{{productOrderItem[0].product.place[0].id}}'
             sourceLocation: BODY
-            sourceType: discreteStr
+            sourceType: string
             target: '@{{dataCenterFacilityId}}'
             targetLocation: BODY
             requiredMapping: false
-          - name: mapper.order.uni.add.place.name
-            title: the keyName of the place where the products' installation must be done.
+          - name: mapper.order.uni.add.productConfiguration.dcfName
+            title: >-
+              the dcfName of the place where the products' installation must be done.
             description: ''
-            source: '@{{productOrderItem[0].product.place[0].keyName}}'
+            source: '@{{productOrderItem[0].product.productConfiguration.dcfName}}'
             sourceLocation: BODY
-            sourceType: discreteStr
+            sourceType: string
             target: '@{{dataCenterFacility}}'
             targetLocation: BODY
             requiredMapping: false
+            allowValueLimit: false
+            customizedField: true
           - name: mapper.order.uni.add.bandwidthUnit
             title: "The unit of bandwidth"
             source: "@{{productOrderItem[0].product.productConfiguration.bandwidthUnit}}"
@@ -112,7 +129,9 @@ spec:
             title: "Bandwidth of the UNI"
             source: "@{{productOrderItem[0].product.productConfiguration.bandwidth}}"
             sourceLocation: BODY
-            sourceType: discreteInt
+            allowValueLimit: true
+            sourceType: integer
+            discrete: true
             sourceValues:
               - 1000
               - 10000
@@ -123,7 +142,7 @@ spec:
             title: "The name of the UNI"
             source: "@{{productOrderItem[0].product.productConfiguration.name}}"
             sourceLocation: BODY
-            sourceType: discreteStr
+            sourceType: string
             target: "@{{portName}}"
             targetLocation: BODY
             requiredMapping: false
@@ -131,7 +150,7 @@ spec:
             title: "The payment type of the UNI"
             source: "@{{productOrderItem[0].product.productConfiguration.paymentType}}"
             sourceLocation: BODY
-            sourceType: discreteStr
+            sourceType: string
             target: "@{{paymentType}}"
             targetLocation: BODY
             requiredMapping: false

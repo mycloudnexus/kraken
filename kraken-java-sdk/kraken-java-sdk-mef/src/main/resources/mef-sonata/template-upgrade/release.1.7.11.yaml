@@ -1,0 +1,13 @@
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.1.7.11
+  name: V1.7.11
+  labels:
+    productSpec: grace
+    productVersion: V1.7.11
+    publishDate: 2025-02-14
+  description: |
+    Added support for ID-based routing in inventory details by retrieving productType from the database
+  version: 1

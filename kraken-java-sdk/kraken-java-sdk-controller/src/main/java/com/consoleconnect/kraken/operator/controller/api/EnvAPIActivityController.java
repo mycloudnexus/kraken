@@ -44,6 +44,7 @@ public class EnvAPIActivityController {
           int size,
       @RequestParam(value = "requestStartTime", required = false) Instant requestStartTime,
       @RequestParam(value = "requestEndTime", required = false) Instant requestEndTime,
+      @RequestParam(value = "productType", required = false) String productType,
       @RequestParam(value = "path", required = false) String path,
       @RequestParam(value = "method", required = false) String method,
       @RequestParam(value = "statusCode", required = false) Integer statusCode) {
@@ -65,6 +66,7 @@ public class EnvAPIActivityController {
                 .path(path)
                 .queryStart(startTime)
                 .queryEnd(endTime)
+                .productType(productType)
                 .statusCode(statusCode)
                 .build(),
             getSearchPageRequest(page, size, direction, orderBy)));

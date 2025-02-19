@@ -246,6 +246,7 @@ test("NewAPIMapping page", () => {
       <BrowserRouter>
         <RequestItem
           item={{
+            id: "id",
             name: "address.validation.country",
             title: "The country that the address is in",
             source: "@{{submittedGeographicAddress.country}}",

@@ -2,7 +2,8 @@ import EmptyIcon from "@/assets/newAPIServer/empty.svg";
 import Flex from "@/components/Flex";
 import RequestMethod from "@/components/Method";
 import { Text } from "@/components/Text";
-import { useGetSellerAPIList } from "@/hooks/product";
+import TrimmedPath from "@/components/TrimmedPath";
+import { useGetSellerAPIList, useGetComponentDetailV2 } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { extractOpenApiStrings } from "@/utils/helpers/schema";
@@ -19,7 +20,6 @@ import swaggerClient from "swagger-client";
 import { useBoolean } from "usehooks-ts";
 import useGetApiSpec from "../useGetApiSpec";
 import styles from "./index.module.scss";
-import TrimmedPath from "@/components/TrimmedPath";
 
 type ItemProps = {
   item: IComponent;
@@ -37,6 +37,7 @@ export const APIItem = ({
   setSelectedServer,
 }: ItemProps) => {
   const { sellerApi } = useNewApiMappingStore();
+  const { currentProduct } = useAppStore();
   const { value: isOpen, toggle: toggleOpen, setTrue } = useBoolean(false);
   const [searchValue, setSearchValue] = useState("");
   const { value: firstOpen, setFalse } = useBoolean(true);
@@ -53,9 +54,14 @@ export const APIItem = ({
     }
   }, [sellerApi]);
 
+  const { data: componentDetail } = useGetComponentDetailV2(
+    currentProduct,
+    item?.metadata?.id || ""
+  );
+
   const baseSpec = useMemo(() => {
     try {
-      const encoded = item?.facets?.baseSpec?.content;
+      const encoded = componentDetail?.facets?.baseSpec?.content;
       if (!encoded) return undefined;
       const yamlContent = extractOpenApiStrings(decode(encoded));
       return jsYaml.load(yamlContent);
@@ -124,12 +130,12 @@ export const APIItem = ({
 
   const selectedAPIs = useMemo(() => {
     if (isEmpty(searchValue)) {
-      return item?.facets?.selectedAPIs;
+      return componentDetail?.facets?.selectedAPIs;
     }
-    return item?.facets?.selectedAPIs?.filter((api: string) =>
+    return componentDetail?.facets?.selectedAPIs?.filter((api: string) =>
       api?.toLocaleLowerCase?.().includes(searchValue?.toLocaleLowerCase?.())
     );
-  }, [searchValue]);
+  }, [searchValue, componentDetail]);
 
   const getDescription = useCallback(
     (path: string, method: string) => {
@@ -236,8 +242,7 @@ const SelectAPI = ({
     setListMappingStateResponse,
   } = useNewApiMappingStore();
   const navigate = useNavigate();
-  const { data: dataList, isLoading } =
-    useGetSellerAPIList(currentProduct);
+  const { data: dataList, isLoading } = useGetSellerAPIList(currentProduct);
   const queryData = JSON.parse(query ?? "{}");
 
   const { mappers } = useGetApiSpec(

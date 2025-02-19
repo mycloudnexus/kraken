@@ -1,0 +1,8 @@
+{
+  "productType": "UNI",
+  "productAction": "add",
+  "targetAPIConfigKey": "mef.sonata.api-target.order.uni.add",
+  "matrixConfigKey": "mef.sonata.api.matrix.order.uni.add",
+  "errorMsg": "",
+  "errorCode": ""
+}

@@ -4,10 +4,13 @@ import com.consoleconnect.kraken.operator.core.enums.MappingTypeEnum;
 import com.consoleconnect.kraken.operator.core.exception.ErrorResponse;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
+import com.consoleconnect.kraken.operator.core.toolkit.Constants;
 import com.consoleconnect.kraken.operator.core.toolkit.ConstructExpressionUtil;
 import com.consoleconnect.kraken.operator.gateway.dto.PathCheck;
 import com.jayway.jsonpath.DocumentContext;
 import java.util.*;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -22,6 +25,7 @@ public interface DataTypeChecker {
   String EXPECT_INF_MSG = "invalidFormat, can not process @{{%s}} = %s, %s found, %s expected";
   String PARAM_NOT_EXIST_MSG =
       "missingProperty, the parameter @{{%s}} does not exist in the request";
+  String MISSING_PROPERTY_MSG = "missingProperty, the parameter %s does not exist in the request";
   String SHOULD_BE_MSG = "invalidValue, can not process @{{%s}} = %s, value should be %s";
   String SHOULD_BE_IN_MSG = "invalidValue, can not process @{{%s}} = %s, value should be in %s";
   String SHOULD_NOT_BE_BLANK =
@@ -102,16 +106,35 @@ public interface DataTypeChecker {
       realValue = documentContext.read(checkPath);
     } catch (Exception e) {
       printJsonPathReadError();
-      throwException(
-          code, errorMsg, String.format(PARAM_NOT_EXIST_MSG, extractCheckingPath(checkPath)));
+      String defaultMsg = getDefaultMessage(code);
+      throwException(code, errorMsg, String.format(defaultMsg, extractCheckingPath(checkPath)));
     }
     return realValue;
+  }
+
+  default String getDefaultMessage(Integer code) {
+    return Integer.valueOf(HttpStatus.BAD_REQUEST.value()).equals(code)
+        ? MISSING_PROPERTY_MSG
+        : PARAM_NOT_EXIST_MSG;
+  }
+
+  default PathCheck rewritePath(PathCheck pathCheck, int index) {
+    return StringUtils.isBlank(pathCheck.path())
+        ? pathCheck
+        : pathCheck.withUpdatedPath(replaceWildcard(pathCheck.path(), index));
+  }
+
+  default String replaceWildcard(String path, int index) {
+    if (StringUtils.isBlank(path)) {
+      return path;
+    }
+    return path.replace("[*]", "[" + index + "]");
   }
 
   default void throwException(Integer code, String errorMsg, String defaultMsg) {
     String msg = errorMsg == null ? defaultMsg : errorMsg;
     if (code != null && code != HttpStatus.UNPROCESSABLE_ENTITY.value()) {
-      throw new KrakenException(code, msg);
+      throw new KrakenException(code, msg, new IllegalArgumentException(msg));
     }
     throw route422Exception(msg);
   }
@@ -145,6 +168,11 @@ public interface DataTypeChecker {
         : String.valueOf(realValue));
   }
 
+  default boolean isNumberKind(Boolean allowValueLimit, String sourceType) {
+    return Boolean.TRUE.equals(allowValueLimit)
+        && (Constants.INT_VAL.equals(sourceType) || Constants.DOUBLE_VAL.equals(sourceType));
+  }
+
   default boolean isConstantType(String target) {
     return StringUtils.isNotBlank(target) && !target.contains("@{{");
   }
@@ -153,15 +181,32 @@ public interface DataTypeChecker {
       String target, Object evaluateValue, String paramName, String sourceType) {
     if (isConstantType(target)) {
       validateDiscreteString(evaluateValue, paramName, sourceType);
-      if (!target.equals(evaluateValue)) {
+      Object targetObj = convertBySourceType(target, sourceType);
+      if (Objects.isNull(targetObj) || !targetObj.equals(evaluateValue)) {
         throw KrakenException.unProcessableEntityInvalidValue(
             String.format(SHOULD_BE_MSG, paramName, evaluateValue, target));
       }
     }
   }
 
+  default Object convertBySourceType(String target, String sourceType) {
+    Object targetObj = null;
+    try {
+      if (Constants.INT_VAL.equals(sourceType)) {
+        targetObj = Integer.valueOf(target);
+      } else if (Constants.DOUBLE_VAL.equals(sourceType)) {
+        targetObj = Double.valueOf(target);
+      } else {
+        targetObj = target;
+      }
+    } catch (Exception e) {
+      LogHolder.log.error("Failed to convert by sourceType", e);
+    }
+    return targetObj;
+  }
+
   default void validateDiscreteString(Object evaluateValue, String paramName, String sourceType) {
-    if (MappingTypeEnum.DISCRETE_STR.getKind().equals(sourceType)) {
+    if (MappingTypeEnum.STRING.getKind().equalsIgnoreCase(sourceType)) {
       Class<?> dataType = whichDataTypeClass(evaluateValue);
       if (!String.class.equals(dataType)) {
         throw KrakenException.unProcessableEntityInvalidFormat(
@@ -177,7 +222,7 @@ public interface DataTypeChecker {
 
   default String rewriteCheckingPath(PathCheck pathCheck) {
     String checkingPath = extractCheckingPath(pathCheck.path());
-    if (checkingPath.contains("[*]")) {
+    if (checkingPath.endsWith("]")) {
       List<String> params =
           ConstructExpressionUtil.extractParam(pathCheck.value(), ARRAY_PARAM_PATTERN);
       if (CollectionUtils.isNotEmpty(params)) {
@@ -189,7 +234,7 @@ public interface DataTypeChecker {
 
   default boolean checkExpectDataType(PathCheck pathCheck, Object variable) {
     String dataType = whichDataType(variable);
-    if (Objects.isNull(variable) || !pathCheck.expectedValueType().equals(dataType)) {
+    if (Objects.isNull(variable) || !pathCheck.expectedValueType().equalsIgnoreCase(dataType)) {
       String checkingPath = rewriteCheckingPath(pathCheck);
       throwException(
           pathCheck,
@@ -202,8 +247,8 @@ public interface DataTypeChecker {
   default void validateEnumOrDiscreteString(
       Object evaluateValue, String paramName, List<String> valueList, String sourceType) {
     validateDiscreteString(evaluateValue, paramName, sourceType);
-    if ((MappingTypeEnum.DISCRETE_STR.getKind().equals(sourceType)
-            || (MappingTypeEnum.ENUM.getKind().equals(sourceType)))
+    if ((MappingTypeEnum.STRING.getKind().equalsIgnoreCase(sourceType)
+            || (MappingTypeEnum.ENUM.getKind().equalsIgnoreCase(sourceType)))
         && Objects.nonNull(evaluateValue)
         && CollectionUtils.isNotEmpty(valueList)
         && !valueList.contains(evaluateValue.toString())) {
@@ -221,8 +266,13 @@ public interface DataTypeChecker {
   }
 
   default void validateDiscreteInteger(
-      Object evaluateValue, String paramName, List<String> valueList, String sourceType) {
-    if (MappingTypeEnum.DISCRETE_INT.getKind().equals(sourceType)) {
+      Object evaluateValue,
+      String paramName,
+      List<String> valueList,
+      String sourceType,
+      Boolean discrete) {
+    if (MappingTypeEnum.DISCRETE_INT.getKind().equalsIgnoreCase(sourceType)
+        && MappingTypeEnum.DISCRETE_INT.getDiscrete().equals(discrete)) {
       if (Objects.isNull(evaluateValue) || isNotInteger(evaluateValue)) {
         throw KrakenException.unProcessableEntityInvalidValue(
             String.format(
@@ -239,48 +289,73 @@ public interface DataTypeChecker {
     }
   }
 
-  default void validateContinuousInteger(
-      Object evaluateValue, String paramName, List<String> valueList, String sourceType) {
-    if (MappingTypeEnum.CONTINUOUS_INT.getKind().equals(sourceType)) {
-      if (Objects.isNull(evaluateValue) || isNotInteger(evaluateValue)) {
-        throw KrakenException.unProcessableEntityInvalidValue(
-            String.format(
-                EXPECT_INT_MSG, paramName, evaluateValue, whichDataType(evaluateValue), "Integer"));
-      }
-      validateContinuousDouble(evaluateValue, paramName, valueList);
+  default void validateContinuousNumber(
+      Object evaluateValue,
+      String paramName,
+      List<String> valueList,
+      String sourceType,
+      Boolean discrete) {
+    if (isContinuousInt(sourceType, discrete)) {
+      validateNumber(
+          evaluateValue, paramName, valueList, Integer::parseInt, "Integer", this::isNotInteger);
+    } else if (isContinuousDouble(sourceType, discrete)) {
+      validateNumber(
+          evaluateValue, paramName, valueList, Double::parseDouble, "Double", this::isNotDouble);
     }
   }
 
-  default void validateContinuousDouble(
-      Object evaluateValue, String paramName, List<String> valueList, String sourceType) {
-    if (MappingTypeEnum.CONTINUOUS_DOUBLE.getKind().equals(sourceType)) {
-      if (Objects.isNull(evaluateValue) || isNotDouble(evaluateValue)) {
-        throw KrakenException.unProcessableEntityInvalidValue(
-            String.format(
-                EXPECT_INT_MSG, paramName, evaluateValue, whichDataType(evaluateValue), "Double"));
-      }
-      validateContinuousDouble(evaluateValue, paramName, valueList);
+  private <T extends Number & Comparable<T>> void validateNumber(
+      Object evaluateValue,
+      String paramName,
+      List<String> valueList,
+      Function<String, T> parser,
+      String expectedType,
+      Predicate<Object> invalidCheck) {
+    if (Objects.isNull(evaluateValue) || invalidCheck.test(evaluateValue)) {
+      throw KrakenException.unProcessableEntityInvalidValue(
+          String.format(
+              EXPECT_INT_MSG,
+              paramName,
+              evaluateValue,
+              whichDataType(evaluateValue),
+              expectedType));
     }
+    validateContinuousValue(evaluateValue, paramName, valueList, parser);
   }
 
-  default void validateContinuousDouble(
-      Object evaluateValue, String paramName, List<String> valueList) {
-    List<Double> values = valueList.stream().map(Double::parseDouble).toList();
-    double min = Collections.min(values);
-    double max = Collections.max(values);
+  private boolean isContinuousInt(String sourceType, Boolean discrete) {
+    return MappingTypeEnum.CONTINUOUS_INT.getKind().equalsIgnoreCase(sourceType)
+        && MappingTypeEnum.CONTINUOUS_INT.getDiscrete().equals(discrete);
+  }
+
+  private boolean isContinuousDouble(String sourceType, Boolean discrete) {
+    return MappingTypeEnum.CONTINUOUS_DOUBLE.getKind().equalsIgnoreCase(sourceType)
+        && MappingTypeEnum.CONTINUOUS_DOUBLE.getDiscrete().equals(discrete);
+  }
+
+  default <T extends Number & Comparable<T>> void validateContinuousValue(
+      Object evaluateValue, String paramName, List<String> valueList, Function<String, T> parser) {
+    List<T> values = valueList.stream().map(parser).toList();
+    T min = Collections.min(values);
+    T max = Collections.max(values);
     String valueStr = String.valueOf(evaluateValue);
+
     if (StringUtils.isBlank(valueStr)
         || !NumberUtils.isCreatable(valueStr)
-        || Double.parseDouble(valueStr) < min
-        || Double.parseDouble(valueStr) > max) {
+        || isOutsideRange(parser.apply(valueStr), min, max)) {
       throw KrakenException.unProcessableEntityInvalidValue(
           String.format(SHOULD_BE_INTERVAL, paramName, evaluateValue, min, max));
     }
   }
 
+  private <T extends Comparable<T>> boolean isOutsideRange(T value, T min, T max) {
+    return value.compareTo(min) < 0 || value.compareTo(max) > 0;
+  }
+
   default void validateConstantNumber(
       Object evaluateValue, ComponentAPITargetFacets.Mapper mapper, String paramName) {
-    if (MappingTypeEnum.CONSTANT_NUM.getKind().equals(mapper.getSourceType())) {
+    if (MappingTypeEnum.DISCRETE_INT.getKind().equalsIgnoreCase(mapper.getSourceType())
+        && NumberUtils.isCreatable(mapper.getTarget())) {
       Class<?> dataType = whichDataTypeClass(evaluateValue);
       if (Objects.isNull(evaluateValue) || isNotNumeric(evaluateValue)) {
         throw KrakenException.unProcessableEntityInvalidValue(
@@ -303,6 +378,15 @@ public interface DataTypeChecker {
       return path;
     }
     return path.replace("$.body.", "").replace("$.query.", "");
+  }
+
+  default int determineHttpCode(List<String> pathsExpected422, String actualPath) {
+    if (CollectionUtils.isNotEmpty(pathsExpected422) && StringUtils.isNotBlank(actualPath)) {
+      return pathsExpected422.stream().anyMatch(actualPath::startsWith)
+          ? HttpStatus.UNPROCESSABLE_ENTITY.value()
+          : HttpStatus.BAD_REQUEST.value();
+    }
+    return HttpStatus.BAD_REQUEST.value();
   }
 
   void throwException(PathCheck pathCheck, String defaultMsg);

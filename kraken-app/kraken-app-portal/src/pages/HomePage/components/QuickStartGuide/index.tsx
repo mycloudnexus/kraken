@@ -13,8 +13,7 @@ const step = [
     icon: <OneIcon />,
     propKey: "sellerApiServerRegistrationInfo",
     goals: {
-      atLeastOneSellerApiRegistered:
-        "Register one seller Proprietary API in Kraken",
+      atLeastOneSellerApiRegistered: "Register one seller Proprietary API",
     },
   },
   {
@@ -70,7 +69,9 @@ const QuickStartGuide = () => {
       <div className={styles.stepContainer}>
         <div className={styles.diagram} />
       </div>
-      <Text.NormalLarge style={{ margin: '16px 0 12px 0' }}>Quick start guide</Text.NormalLarge>
+      <Text.NormalLarge style={{ margin: "16px 0 12px 0" }}>
+        Quick start guide
+      </Text.NormalLarge>
       <Flex className={styles.guideContainer}>
         <Spin spinning={isLoading}>
           <Row gutter={[24, 24]}>

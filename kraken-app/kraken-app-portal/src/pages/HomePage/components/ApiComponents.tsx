@@ -6,15 +6,28 @@ import {
 import { useAppStore } from "@/stores/app.store";
 import { SPEC_VALUE } from "@/utils/constants/product";
 import type { IUnifiedAsset } from "@/utils/types/common.type";
-import { Col, Row, Spin } from "antd";
+import { CloseOutlined } from "@ant-design/icons";
+import { Card, Col, Drawer, Flex, Row, Spin } from "antd";
 import { decode } from "js-base64";
 import yaml from "js-yaml";
-import { get, isEmpty, isUndefined, min } from "lodash";
-import { useCallback, useMemo } from "react";
+import { get, isEmpty } from "lodash";
+import { useCallback, useState } from "react";
 import ApiComponent from "./ApiComponent";
+
+export type DrawerDetails = {
+  apiTitle: string;
+  documentTitle: string;
+  documentContent: string;
+};
 
 const ApiComponents = () => {
   const { currentProduct } = useAppStore();
+  const [open, setOpen] = useState(false);
+  const [drawerDetails, setDrawerDetails] = useState<DrawerDetails>({
+    apiTitle: "",
+    documentTitle: "",
+    documentContent: "",
+  });
 
   const { data: componentList, isLoading } =
     useGetComponentListAPI(currentProduct);
@@ -58,49 +71,61 @@ const ApiComponents = () => {
     [componentList, componentWithSpec]
   );
 
-  const countComponent = useMemo(() => {
-    if (
-      !isUndefined(componentList?.data?.length) &&
-      !isUndefined(componentWithSpec?.data?.length)
-    ) {
-      return `(${min([
-        componentList?.data?.length,
-        componentWithSpec?.data?.length,
-      ])})`;
-    }
-    if (specLoading || isLoading) {
-      return "";
-    }
-    return "(0)";
-  }, [componentList?.data, componentWithSpec?.data, specLoading, isLoading]);
+  const openDrawer = (details: DrawerDetails) => {
+    setDrawerDetails(details);
+    setOpen(true);
+  };
+
+  const closeDrawer = () => {
+    setOpen(false);
+  };
 
   return (
-    <PageLayout title={`Standard API components ${countComponent}`}>
+    <PageLayout title={`Standard API Mapping`}>
       <Spin spinning={specLoading || isLoading}>
-        <Row gutter={[24, 24]} style={{ marginBottom: 24 }}>
-          {componentList?.data?.map((i: IUnifiedAsset) => {
-            const { targetSpec = {}, targetYaml = {} } = getTargetSpecItem(i);
-            const supportInfo = getSupportInfo(i);
-            const title = targetYaml.info?.title;
-            const apis =
-              i?.facets?.supportedProductTypesAndActions?.length ?? 0;
-            if (isEmpty(targetSpec)) {
-              return null;
-            }
-            return (
-              <Col lg={12} xl={8} sm={24} key={i.id}>
-                <ApiComponent
-                  item={i}
-                  title={title}
-                  apis={apis}
-                  targetSpec={targetSpec}
-                  targetYaml={targetYaml}
-                  supportInfo={supportInfo}
-                />
-              </Col>
-            );
-          })}
-        </Row>
+        <Card style={{ height: "100%", borderRadius: "4px" }}>
+          <Row gutter={[24, 24]} style={{ marginBottom: 24 }}>
+            {componentList?.data?.map((i: IUnifiedAsset) => {
+              const { targetSpec = {}, targetYaml = {} } = getTargetSpecItem(i);
+              const supportInfo = getSupportInfo(i);
+              const title = targetYaml.info?.title;
+              const apis =
+                i?.facets?.supportedProductTypesAndActions?.length ?? 0;
+              if (isEmpty(targetSpec)) {
+                return null;
+              }
+              return (
+                <Col lg={12} xl={8} sm={24} key={i.id}>
+                  <ApiComponent
+                    item={i}
+                    title={title}
+                    apis={apis}
+                    targetSpec={targetSpec}
+                    targetYaml={targetYaml}
+                    supportInfo={supportInfo}
+                    openDrawer={openDrawer}
+                  />
+                </Col>
+              );
+            })}
+          </Row>
+        </Card>
+        <Drawer
+          width={576}
+          title={
+            <Flex justify="space-between">
+              {drawerDetails.apiTitle}
+              <CloseOutlined onClick={closeDrawer} />
+            </Flex>
+          }
+          onClose={closeDrawer}
+          open={open}
+        >
+          <b>{drawerDetails.documentTitle}</b>
+          <p style={{ whiteSpace: "pre-wrap", margin: "0" }}>
+            {drawerDetails.documentContent}
+          </p>
+        </Drawer>
       </Spin>
     </PageLayout>
   );

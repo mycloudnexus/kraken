@@ -35,6 +35,16 @@ public interface UnifiedAssetRepository
       @Param("q") String q,
       Pageable pageable);
 
+  @Query(
+      value =
+          "select e from #{#entityName} e "
+              + " where ( (:parentId) is null or  e.parentId = :parentId )"
+              + " and ( (:kind) is null or  e.kind = :kind )"
+              + " and ( (:q) is null or LOWER(e.name) like %:q% )")
+  @Transactional(readOnly = true)
+  List<UnifiedAssetEntity> searchWithoutPagination(
+      @Param("parentId") String parentId, @Param("kind") String kind, @Param("q") String q);
+
   List<UnifiedAssetEntity> findAllByParentId(String parentId);
 
   List<UnifiedAssetEntity> findAllByKeyIn(List<String> keys);

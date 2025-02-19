@@ -21,7 +21,6 @@ class AppTest extends AbstractIntegrationTest {
 
   @Test
   void home() {
-
     WebTestClient.RequestBodySpec requestBodySpec =
         webTestClient
             .method(HttpMethod.GET)

@@ -1,0 +1,15 @@
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.1.7.2
+  name: V1.7.2
+  labels:
+    productSpec: grace
+    productVersion: V1.7.2
+    publishDate: 2025-01-14
+  description: |
+    Split source property type and value range type in mapping template.
+    Removed the associatedGeographicAddress in templates of the address retrieve.
+    Replaced the validation type in quoteItem[].product.place[].@type for Eline ADD quote.
+  version: 1

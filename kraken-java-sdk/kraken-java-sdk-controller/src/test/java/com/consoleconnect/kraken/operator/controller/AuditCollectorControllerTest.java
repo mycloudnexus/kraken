@@ -148,7 +148,31 @@ class AuditCollectorControllerTest extends AbstractIntegrationTest {
   }
 
   @Test
-  @Order(6)
+  @Order(7)
+  void testSyncSellerContacts() {
+    webTestClient
+        .mutate()
+        .responseTimeout(Duration.ofSeconds(600))
+        .build()
+        .get()
+        .uri(
+            uriBuilder ->
+                uriBuilder
+                    .path(SYNC_FROM_SERVER)
+                    .queryParam("kind", AssetKindEnum.COMPONENT_SELLER_CONTACT.getKind())
+                    .build())
+        .header("Authorization", accessToken)
+        .exchange()
+        .expectBody()
+        .consumeWith(
+            response -> {
+              String bodyStr = new String(Objects.requireNonNull(response.getResponseBody()));
+              assertThat(bodyStr, Matchers.notNullValue());
+            });
+  }
+
+  @Test
+  @Order(7)
   void test4xxHttpGet() {
     webTestClient
         .mutate()

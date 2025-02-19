@@ -28,6 +28,9 @@ public class HttpRequestEntity extends AbstractHttpEntity {
   @Column(name = "external_id", nullable = true, unique = false)
   private String externalId;
 
+  @Column(name = "product_instance_id", nullable = true, unique = false)
+  private String productInstanceId;
+
   @Column(name = "buyer_id", nullable = true, unique = false)
   private String buyerId;
 

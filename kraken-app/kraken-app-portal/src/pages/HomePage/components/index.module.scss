@@ -44,11 +44,14 @@
 }
 
 .apiContainer {
-  box-sizing: border-box;
-  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 262px;
   padding: 16px 24px;
   border-radius: 8px;
-  background: var(--Page-container-bg, #fff);
+  background: #f6f7fa;
+
   img {
     width: 48px;
     height: 48px;
@@ -104,7 +107,7 @@
     display: -webkit-box;
     -webkit-box-orient: vertical;
     line-clamp: 3;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 4;
     margin: 8px 0 4px;
   }
 
@@ -135,8 +138,20 @@
       padding: 1px 8px;
       justify-content: center;
       align-items: center;
+      color: black;
     }
   }
+}
+
+.apiContainer:hover {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 262px;
+  padding: 16px 24px;
+  border-radius: 8px;
+  background: #f6f7fa;
+  box-shadow: #e2e2e2 3px 3px 3px;
 }
 
 .tags {
@@ -145,7 +160,7 @@
   justify-content: center;
   align-items: center;
   border-radius: 4px;
-  background: var(--Neutral-3, #f5f5f5);
+  background: var(--Neutral-3, #ffffff);
   color: var(--Neutral-8, var(--Icon-Clickable-Normal, #595959));
   font-size: 12px;
   font-style: normal;
@@ -186,6 +201,5 @@
   :global(.ant-tooltip-content .ant-tooltip-inner) {
     max-height: 250px;
     overflow-y: auto;
-    //width: 150%;
   }
 }

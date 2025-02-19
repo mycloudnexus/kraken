@@ -1,28 +1,22 @@
-import {
-  Button,
-  Card,
-  Divider,
-  Dropdown,
-  Flex,
-  Tag,
-} from "antd";
-import styles from "./index.module.scss";
+import UpgradingIcon from "@/assets/icon/upgrading.svg";
 import Logo from "@/assets/logo.svg";
+import { useUser } from "@/hooks/user/useUser";
+import { useTutorialStore } from "@/stores/tutorial.store";
+import { PRODUCT_NAME } from "@/utils/constants/common";
+import { ISystemInfo } from "@/utils/types/user.type";
 import {
   EditTwoTone,
   LogoutOutlined,
   QuestionCircleOutlined,
 } from "@ant-design/icons";
-import { useTutorialStore } from "@/stores/tutorial.store";
-import { useUser } from "@/hooks/user/useUser";
-import { Text } from "../Text";
+import { Button, Card, Divider, Dropdown, Flex, Tag } from "antd";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Text } from "../Text";
 import { UserAvatar } from "./UserAvatar";
-import { ISystemInfo } from "@/utils/types/user.type";
-import UpgradingIcon from '@/assets/icon/upgrading.svg'
+import styles from "./index.module.scss";
 
 const Header = ({ info }: Readonly<{ info?: ISystemInfo }>) => {
-  const location = useLocation()
+  const location = useLocation();
   const { currentUser } = useUser();
   const { toggleTutorial } = useTutorialStore();
   const navigate = useNavigate();
@@ -52,7 +46,11 @@ const Header = ({ info }: Readonly<{ info?: ISystemInfo }>) => {
       >
         <Flex justify="center" align="center" vertical gap={8}>
           <div style={{ position: "relative" }}>
-            <UserAvatar size={64} className={styles.avatarLg} user={currentUser} />
+            <UserAvatar
+              size={64}
+              className={styles.avatarLg}
+              user={currentUser}
+            />
             <div className={styles.edit}>
               <EditTwoTone style={{ fontSize: 12 }} />
             </div>
@@ -73,20 +71,35 @@ const Header = ({ info }: Readonly<{ info?: ISystemInfo }>) => {
       <Flex gap={16} align="center">
         <Link data-testid="logo" to="/" className={styles.logo}>
           <Logo />
-          Kraken
+          {PRODUCT_NAME}
         </Link>
 
         <Divider type="vertical" className={styles.divider} />
 
-        <Text.LightMedium data-testid="productName">{info?.productName || info?.productKey}</Text.LightMedium>
-        <Tag data-testid="productSpec" style={{ background: 'var(--bg)', color: 'var(--text-secondary)', border: 'none' }}>{info?.productSpec}</Tag>
+        <Text.LightMedium data-testid="productName">
+          {info?.productName || info?.productKey}
+        </Text.LightMedium>
+        <Tag
+          data-testid="productSpec"
+          style={{
+            background: "var(--bg)",
+            color: "var(--text-secondary)",
+            border: "none",
+          }}
+        >
+          {info?.productSpec}
+        </Tag>
       </Flex>
 
       <div className={styles.rightMenu}>
         {/* This mean the template mapping is in Upgrading process */}
-        {info?.status && info.status !== 'RUNNING' && (
+        {info?.status && info.status !== "RUNNING" && (
           <>
-            <Link data-testid="mappingInProgress" to="/mapping-template" className={styles.mappingInProgress}>
+            <Link
+              data-testid="mappingInProgress"
+              to="/mapping-template"
+              className={styles.mappingInProgress}
+            >
               <UpgradingIcon />
               Mapping template upgrading
             </Link>
@@ -97,8 +110,11 @@ const Header = ({ info }: Readonly<{ info?: ISystemInfo }>) => {
         {/^\/api-mapping/.test(location.pathname) && (
           <Button
             type="link"
-            style={{ color: 'var(--text)', padding: '0 4px' }}
-            onClick={toggleTutorial}><QuestionCircleOutlined /></Button>
+            style={{ color: "var(--text)", padding: "0 4px" }}
+            onClick={toggleTutorial}
+          >
+            <QuestionCircleOutlined />
+          </Button>
         )}
 
         <Dropdown

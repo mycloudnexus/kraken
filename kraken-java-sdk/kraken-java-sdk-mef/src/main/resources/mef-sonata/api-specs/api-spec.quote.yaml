@@ -7,6 +7,7 @@ metadata:
   icon: https://storage.googleapis.com/console-connect-static-assets/krakenUI/quote-202409.png
   labels:
     mef-api-release: grace
+    parentProductType: access.eline
     quote-api-version: v8
   version: 2
 spec:

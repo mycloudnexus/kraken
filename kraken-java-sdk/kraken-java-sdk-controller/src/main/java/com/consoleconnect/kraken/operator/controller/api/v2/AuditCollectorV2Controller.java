@@ -7,6 +7,7 @@ import com.consoleconnect.kraken.operator.controller.service.*;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
+import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.core.toolkit.Paging;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class AuditCollectorV2Controller {
 
+  private final UnifiedAssetService unifiedAssetService;
   private final APITokenService apiTokenService;
   private final BuyerService buyerService;
   private final ProductDeploymentService productDeploymentService;
@@ -72,9 +74,7 @@ public class AuditCollectorV2Controller {
       @RequestParam(value = "updatedAt", required = false) ZonedDateTime lastUpdateTime,
       @RequestParam(value = "env", required = false) String env,
       @Autowired(required = false) JwtAuthenticationToken authenticationToken) {
-
     String envId = apiTokenService.findEnvId(authenticationToken, env);
-
     if (AssetKindEnum.COMPONENT_API_SERVER.getKind().equals(kind)) {
       List<APIServerEnvDTO> apiServerEnvs = environment2APIServerCache.getAPIServerEnvs(envId);
       return HttpResponse.ok(apiServerEnvs);
@@ -95,6 +95,10 @@ public class AuditCollectorV2Controller {
           "syncServerAsset end to query buyers, result:{}",
           Objects.nonNull(pages) ? JsonToolkit.toJson(pages.getData()) : "");
       return HttpResponse.ok(Objects.nonNull(pages) ? pages.getData() : List.of());
+    } else if (AssetKindEnum.COMPONENT_SELLER_CONTACT.getKind().equals(kind)) {
+      List<UnifiedAssetDto> assetDtoList =
+          unifiedAssetService.findByKind(AssetKindEnum.COMPONENT_SELLER_CONTACT.getKind());
+      return HttpResponse.ok(assetDtoList);
     } else {
       return HttpResponse.of(
           HttpStatus.NOT_IMPLEMENTED.value(),

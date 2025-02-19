@@ -21,41 +21,43 @@ spec:
       requestBody:
       responseBody: |
         {
-            "validationResult": "((mefResponseBody.bestMatchGeographicAddress.id == '' ? (mefResponseBody.alternateGeographicAddress.size() == 0 ?'fail':'partial'): 'success'))",
-            "alternateGeographicAddress": [
-                {
-                    "id": "@{{alternateGeographicAddress[*].id}}",
-                    "@type": "FieldedAddress",
-                    "country": "@{{alternateGeographicAddress[*].country}}",
-                    "city": "@{{alternateGeographicAddress[*].city}}",
-                    "streetName": "@{{alternateGeographicAddress[*].streetName}}"
-                }
-            ],
-            "provideAlternative": "${mefRequestBody.provideAlternative}",
-            "submittedGeographicAddress": "${mefRequestBody.submittedGeographicAddress}",
-            "bestMatchGeographicAddress": {
-                "id": "@{{bestMatchGeographicAddress.id}}",
-                "type": "FieldedAddress",
-                "city": "@{{bestMatchGeographicAddress.city}}",
-                "country": "@{{bestMatchGeographicAddress.country}}"
-            }
+           "validationResult": "((mefResponseBody.bestMatchGeographicAddress.id == '' ? (mefResponseBody.alternateGeographicAddress.size() == 0 ?'fail':'partial'): 'success'))",
+           "alternateGeographicAddress": [
+               {
+                   "id": "",
+                   "@type": "FieldedAddress",
+                   "country": "",
+                   "city": "",
+                   "streetName": "",
+                   "locality": ""
+               }
+           ],
+           "provideAlternative": "${mefRequestBody.provideAlternative}",
+           "submittedGeographicAddress": "${mefRequestBody.submittedGeographicAddress}",
+           "bestMatchGeographicAddress": {
+               "id": "",
+               "@type": "FieldedAddress",
+               "city": "",
+               "country": "",
+               "streetName": ""
+           }
         }
       mappers:
         request:
           - name: address.validation.city
-            source: "@{{submittedGeographicAddress.associatedGeographicAddress.city}}"
+            source: "@{{submittedGeographicAddress.city}}"
             description: "city mapping"
             sourceLocation: BODY
-            target: "criteria={\"locations\":[\"@{{submittedGeographicAddress.associatedGeographicAddress.city}},@{{submittedGeographicAddress.associatedGeographicAddress.country}}\"]}}"
+            target: "criteria={\"locations\":[\"@{{submittedGeographicAddress.city}},@{{submittedGeographicAddress.country}}\"]}}"
             targetLocation: HYBRID
           - name: address.validation.country
             description: "country mapping"
-            source: "@{{submittedGeographicAddress.associatedGeographicAddress.country}}"
+            source: "@{{submittedGeographicAddress.country}}"
             sourceLocation: BODY
-            target: "criteria={\"locations\":[\"@{{submittedGeographicAddress.associatedGeographicAddress.city}},@{{submittedGeographicAddress.associatedGeographicAddress.country}}\"]}}"
+            target: "criteria={\"locations\":[\"@{{submittedGeographicAddress.city}},@{{submittedGeographicAddress.country}}\"]}}"
             targetLocation: HYBRID
           - name: address.validation.streetName
-            source: "@{{submittedGeographicAddress.associatedGeographicAddress.streetName}}"
+            source: "@{{submittedGeographicAddress.streetName}}"
             sourceLocation: BODY
             target: ""
             targetLocation: ""

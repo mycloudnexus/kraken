@@ -35,6 +35,7 @@ public class ComponentController {
       @RequestParam(value = "facetIncluded", required = false, defaultValue = "true")
           boolean facetIncluded,
       @RequestParam(value = "q", required = false) String q,
+      @RequestParam(value = "parentProductType", required = false) String parentProductType,
       @RequestParam(value = "orderBy", required = false, defaultValue = "createdAt") String orderBy,
       @RequestParam(value = "direction", required = false, defaultValue = "DESC")
           Sort.Direction direction,
@@ -49,6 +50,7 @@ public class ComponentController {
             kind,
             facetIncluded,
             q,
+            parentProductType,
             getSearchPageRequest(page, size, direction, orderBy)));
   }
 

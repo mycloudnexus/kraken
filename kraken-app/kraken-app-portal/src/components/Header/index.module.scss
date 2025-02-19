@@ -31,14 +31,14 @@
 }
 
 .logo {
-  color: var(--primary) !important;
+  color: #292929 !important;
   display: flex;
   gap: 10px;
   align-items: center;
   font-size: 20px;
-  font-weight: 500;
+  font-weight: bold;
   line-height: 28px;
-  font-family: "Inter", sans-serif;
+  font-family: "Montserrat", sans-serif;
 }
 
 .rightMenu {
@@ -126,7 +126,7 @@
   color: var(--primary) !important;
   text-decoration: none;
   font-weight: 400;
-  font-size : 14px;
+  font-size: 14px;
   display: flex;
   align-items: center;
   gap: 4px;

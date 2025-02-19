@@ -38,6 +38,7 @@ public class ComponentController {
       @PathVariable("productId") String productId,
       @RequestParam(value = "facetIncluded", required = false, defaultValue = "false")
           boolean facetIncluded,
+      @RequestParam(value = "parentProductType", required = false) String parentProductType,
       @RequestParam(value = "orderBy", required = false, defaultValue = "createdAt") String orderBy,
       @RequestParam(value = "direction", required = false, defaultValue = "DESC")
           Sort.Direction direction,
@@ -52,6 +53,7 @@ public class ComponentController {
             AssetKindEnum.COMPONENT_API.getKind(),
             facetIncluded,
             null,
+            parentProductType,
             getSearchPageRequest(page, size, direction, orderBy)));
   }
 

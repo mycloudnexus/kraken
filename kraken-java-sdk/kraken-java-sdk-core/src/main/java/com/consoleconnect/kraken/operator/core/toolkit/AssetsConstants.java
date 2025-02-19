@@ -15,7 +15,6 @@ public final class AssetsConstants {
   public static final String FIELD_KEY = "key";
   public static final String FIELD_TAGS = "tags";
   public static final String MAPPER_KIND = "kraken.component.api-target-mapper";
-  public static final String VALUE_USER_SYSTEM = "system";
   public static final String SERVER_KIND = "kraken.component.api-target-spec";
   public static final String END_POINTS = "endpoints";
   public static final String FIELD_NAME = "name";

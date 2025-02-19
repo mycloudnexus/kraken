@@ -92,6 +92,19 @@ app:
           name: stage
         - id: e1f5d4f6-1cd9-4071-b08c-da72aadc05fe
           name: production
+  seller-contacts:
+    - key: mef.sonata
+      seller-contact-details:
+        - parentProductType: access.eline
+          componentKey: mef.sonata.api.order
+          name:
+          emailAddress:
+          number:
+        - parentProductType: access.eline
+          componentKey: mef.sonata.api.quote
+          name:
+          emailAddress:
+          number:
   mgmt:
     enabled: true
     apiToken:

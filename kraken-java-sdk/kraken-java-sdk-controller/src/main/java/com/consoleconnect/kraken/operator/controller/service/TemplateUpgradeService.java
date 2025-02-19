@@ -14,6 +14,7 @@ import com.consoleconnect.kraken.operator.controller.event.TemplateUpgradeEvent;
 import com.consoleconnect.kraken.operator.controller.model.*;
 import com.consoleconnect.kraken.operator.controller.service.upgrade.UpgradeSourceService;
 import com.consoleconnect.kraken.operator.controller.service.upgrade.UpgradeSourceServiceFactory;
+import com.consoleconnect.kraken.operator.core.dto.ApiUseCaseDto;
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.entity.AssetLinkEntity;
@@ -26,6 +27,7 @@ import com.consoleconnect.kraken.operator.core.ingestion.DataIngestionJob;
 import com.consoleconnect.kraken.operator.core.model.*;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
 import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
+import com.consoleconnect.kraken.operator.core.service.ApiUseCaseSelector;
 import com.consoleconnect.kraken.operator.core.service.CompatibilityCheckService;
 import com.consoleconnect.kraken.operator.core.service.EventSinkService;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
@@ -39,6 +41,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
@@ -53,8 +56,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @AllArgsConstructor
 @Slf4j
-public class TemplateUpgradeService {
-  private final UnifiedAssetService unifiedAssetService;
+public class TemplateUpgradeService implements ApiUseCaseSelector {
+  @Getter private final UnifiedAssetService unifiedAssetService;
   private final EnvironmentService environmentService;
   private final ProductDeploymentService productDeploymentService;
   private final UserService userService;
@@ -329,7 +332,7 @@ public class TemplateUpgradeService {
 
   public List<MapperTagVO> templateDeploymentDetailsFromControlDeployment(
       UnifiedAssetDto templateDeployment) {
-    Map<String, List<Tuple2>> apiUseCases = apiComponentService.findApiUseCase();
+    Map<String, List<Tuple2>> apiUseCases = findApiUseCase();
     ControlDeploymentFacet controlDeploymentFacet =
         UnifiedAsset.getFacets(templateDeployment, ControlDeploymentFacet.class);
     UpgradeTuple upgradeTuple = controlDeploymentFacet.getUpgradeTuple();
@@ -339,9 +342,7 @@ public class TemplateUpgradeService {
             upgradeTuple.directSaves())
         .filter(Objects::nonNull)
         .flatMap(Collection::stream)
-        .map(
-            upgradeRecord ->
-                apiComponentService.findRelatedApiUse(upgradeRecord.key(), apiUseCases))
+        .map(upgradeRecord -> findRelatedApiUse(upgradeRecord.key(), apiUseCases))
         .filter(Optional::isPresent)
         .map(Optional::get)
         .map(ApiUseCaseDto::getMapperKey)
@@ -783,15 +784,14 @@ public class TemplateUpgradeService {
     Set<String> changedMappers = new HashSet<>();
     Set<String> dealSet = new HashSet<>();
 
-    Map<String, List<Tuple2>> apiUseCase = apiComponentService.findApiUseCase();
+    Map<String, List<Tuple2>> apiUseCase = findApiUseCase();
     Map<String, ApiMapperDeploymentDTO> stageMappers =
         productDeploymentService.listRunningApiMapperDeploymentV3(event.getEnvId()).stream()
             .collect(Collectors.toMap(ApiMapperDeploymentDTO::getTargetMapperKey, t -> t));
     keyList.forEach(
         key -> {
           if (stageMappers.containsKey(key)) {
-            apiComponentService
-                .findRelatedApiUse(key, apiUseCase)
+            findRelatedApiUse(key, apiUseCase)
                 .ifPresent(
                     relatedApiUse -> {
                       changedMappers.add(relatedApiUse.getMapperKey());
@@ -800,8 +800,7 @@ public class TemplateUpgradeService {
                     });
 
           } else {
-            apiComponentService
-                .findRelatedApiUse(key, apiUseCase)
+            findRelatedApiUse(key, apiUseCase)
                 .ifPresent(
                     relatedApiUse -> {
                       dealSet.add(relatedApiUse.getComponentApiKey());

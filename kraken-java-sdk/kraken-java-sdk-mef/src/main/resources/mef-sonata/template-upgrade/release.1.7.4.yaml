@@ -1,0 +1,13 @@
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.1.7.4
+  name: V1.7.4
+  labels:
+    productSpec: grace
+    productVersion: V1.7.4
+    publishDate: 2025-01-24
+  description: |
+    Fixed the internal server error in component routing
+  version: 1

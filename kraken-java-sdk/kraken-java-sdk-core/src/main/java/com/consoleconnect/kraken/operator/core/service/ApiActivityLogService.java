@@ -83,6 +83,10 @@ public class ApiActivityLogService {
         predicateList.add(
             criteriaBuilder.equal(root.get("httpStatusCode"), logSearchRequest.getStatusCode()));
       }
+      if (StringUtils.isNotBlank(logSearchRequest.getProductType())) {
+        predicateList.add(
+            criteriaBuilder.equal(root.get("productType"), logSearchRequest.getProductType()));
+      }
       Predicate[] predicateListArray = predicateList.toArray(new Predicate[0]);
       return query.where(predicateListArray).getRestriction();
     };
@@ -129,5 +133,10 @@ public class ApiActivityLogService {
       composedHttpRequest.setBranches(httpRequests.subList(1, httpRequests.size()));
     }
     return Optional.of(composedHttpRequest);
+  }
+
+  @Transactional(rollbackFor = Exception.class)
+  public ApiActivityLogEntity save(ApiActivityLogEntity apiActivityLogEntity) {
+    return this.repository.save(apiActivityLogEntity);
   }
 }

@@ -10,11 +10,6 @@ metadata:
 spec:
   matrix:
     mef.sonata.api-target.inventory.eline.read:
-      - name: query_productType
-        path: "$.query.productType"
-        expectType: EXPECTED_EXIST
-        value: true
-        code: 400
       - name: query_buyerId
         path: "$.query.buyerId"
         expectType: EXPECTED_EXIST

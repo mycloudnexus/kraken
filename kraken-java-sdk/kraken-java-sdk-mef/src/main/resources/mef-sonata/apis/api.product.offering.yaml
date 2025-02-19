@@ -6,6 +6,7 @@ metadata:
   name: Product Offering Qualification (POQ) API Management
   labels:
     mef-api-release: grace
+    parentProductType: access.eline
     poq-api-version: v7
   version: 3
 spec:
@@ -40,15 +41,17 @@ spec:
                 console.log("input: " + jsonStr);
                 let input = JSON.parse(jsonStr);
                 let targetAPIConfigKey = '';
-                if(input.productOfferingQualificationItem['product']['productConfiguration']['@type'] == 'UNI') {
+                let productConfiguration = input.productOfferingQualificationItem?.product?.productConfiguration;
+                let type = productConfiguration?.['@type'];
+                if(type === 'UNI') {
                   targetAPIConfigKey = 'mef.sonata.api-target.poq.uni.add';
-                } else if(input.productOfferingQualificationItem['product']['productConfiguration']['@type'] == 'ACCESS_E_LINE') {
+                } else if(type === 'ACCESS_E_LINE') {
                   targetAPIConfigKey = 'mef.sonata.api-target.poq.eline.add';
                 } else {
                   targetAPIConfigKey = 'targetKey:notFound';
                 }
                 let ret = {
-                  productOfferingType: input.productOfferingQualificationItem['product']['productConfiguration']['@type'],
+                  productType: type || 'undefined',
                   targetAPIConfigKey: targetAPIConfigKey
                 };
                 return JSON.stringify(ret);
@@ -58,7 +61,7 @@ spec:
         - id: persist_http_request
           actionType: buildin@db
           env:
-            bizType: ${productOfferingQualification.productOfferingType}
+            bizType: ${productOfferingQualification.productType}
           with:
             action: create
             properties:
@@ -148,7 +151,7 @@ spec:
                   targetAPIConfigKey = 'notImplemented';
                 }
                 let ret = {
-                  productOfferingType: input.bizType,
+                  productType: input.bizType,
                   targetAPIConfigKey: targetAPIConfigKey
                 };
                 return JSON.stringify(ret);

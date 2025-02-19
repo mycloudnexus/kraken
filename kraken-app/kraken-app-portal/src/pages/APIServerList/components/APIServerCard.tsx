@@ -1,24 +1,10 @@
 import TitleIcon from "@/assets/title-icon.svg";
 import DeleteApiButton from "@/components/DeleteApiButton";
-import SpecDrawer from "@/components/SpecDrawer";
 import { SecondaryText, Text } from "@/components/Text";
 import { useDeleteApiServer } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
-import { decodeFileContent } from "@/utils/helpers/base64";
 import { IComponent } from "@/utils/types/component.type";
-import { PaperClipOutlined } from "@ant-design/icons";
-import {
-  Button,
-  Card,
-  Col,
-  Flex,
-  Row,
-  Spin,
-  Tag,
-  Typography,
-  notification,
-} from "antd";
-import jsYaml from "js-yaml";
+import { Button, Card, Col, Flex, Row, Spin, Tag, Typography } from "antd";
 import { get } from "lodash";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -40,11 +26,6 @@ const APIServerCard = ({ item, refetchList }: Props) => {
   const { mutateAsync: deleteApiServer, isPending } = useDeleteApiServer();
 
   const navigate = useNavigate();
-  const {
-    value: isOpenDrawer,
-    setTrue: openDrawer,
-    setFalse: closeDrawer,
-  } = useBoolean(false);
   const handleEdit = () => {
     navigate(`/component/${currentProduct}/edit/${get(item, "metadata.key")}`);
   };
@@ -58,30 +39,10 @@ const APIServerCard = ({ item, refetchList }: Props) => {
     return keys?.map((k: string) => ({ name: k, url: env[k] }));
   }, [item]);
 
-  const fileName = useMemo(() => {
-    try {
-      const content = get(item, "facets.baseSpec.content");
-      if (!content) {
-        return "";
-      }
-      const swaggerData = jsYaml.load(decodeFileContent(content));
-      return get(swaggerData, "info.title");
-    } catch (error) {
-      notification.error({ message: "Can not load yaml" });
-    }
-  }, [item]);
-
   const isApiInUse = useMemo(() => !!item?.inUse, [item]);
 
   return (
     <Spin spinning={isPending}>
-      {isOpenDrawer && (
-        <SpecDrawer
-          onClose={closeDrawer}
-          isOpen={isOpenDrawer}
-          content={get(item, "facets.baseSpec.content")}
-        />
-      )}
       <Card
         style={{ borderRadius: 4, width: "100%" }}
         title={
@@ -150,9 +111,7 @@ const APIServerCard = ({ item, refetchList }: Props) => {
               </Typography.Text>
             </Flex>
             <Flex vertical align="flex-start" gap={8}>
-              <Text.LightMedium color="#00000073">
-                Description
-              </Text.LightMedium>
+              <Text.LightMedium color="#00000073">Description</Text.LightMedium>
               <Typography.Text
                 ellipsis={{
                   tooltip: {
@@ -165,10 +124,12 @@ const APIServerCard = ({ item, refetchList }: Props) => {
             </Flex>
           </Group>
 
-          <Group title="Base URL for environment variables">
+          <Group title="Base URL of Environments">
             {environmentData?.map((e) => (
               <Flex gap={8} vertical justify="flex-start" key={e.name}>
-                <SecondaryText.LightNormal style={{ textTransform: 'capitalize' }}>
+                <SecondaryText.LightNormal
+                  style={{ textTransform: "capitalize" }}
+                >
                   {e.name} URL
                 </SecondaryText.LightNormal>
                 <Typography.Text style={{ whiteSpace: "break-spaces" }}>
@@ -176,23 +137,6 @@ const APIServerCard = ({ item, refetchList }: Props) => {
                 </Typography.Text>
               </Flex>
             ))}
-          </Group>
-
-          <Group title="API spec">
-            <Flex vertical gap={8}>
-              <Text.NormalMedium color="#000000D9">
-                API spec in yaml format
-              </Text.NormalMedium>
-
-              <Text.LightMedium
-                color="#2962FF"
-                style={{ cursor: "pointer" }}
-                role="none"
-                onClick={openDrawer}
-              >
-                <PaperClipOutlined style={{ color: "#000000D9" }} /> {fileName}
-              </Text.LightMedium>
-            </Flex>
           </Group>
         </Row>
       </Card>
@@ -202,9 +146,12 @@ const APIServerCard = ({ item, refetchList }: Props) => {
 
 export default APIServerCard;
 
-function Group({ title, children }: Readonly<React.PropsWithChildren<{ title?: React.ReactNode }>>) {
+function Group({
+  title,
+  children,
+}: Readonly<React.PropsWithChildren<{ title?: React.ReactNode }>>) {
   return (
-    <Col lg={8} md={24}>
+    <Col lg={12} md={24}>
       <Flex gap={8} justify="flex-start" align="center">
         <TitleIcon />
         <Text.NormalLarge>{title}</Text.NormalLarge>
@@ -213,5 +160,5 @@ function Group({ title, children }: Readonly<React.PropsWithChildren<{ title?: R
         {children}
       </Flex>
     </Col>
-  )
+  );
 }

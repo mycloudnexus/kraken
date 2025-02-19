@@ -4,6 +4,7 @@ import static com.consoleconnect.kraken.operator.core.enums.ParamLocationEnum.*;
 import static com.consoleconnect.kraken.operator.core.toolkit.ConstructExpressionUtil.*;
 
 import com.consoleconnect.kraken.operator.core.dto.StateValueMappingDto;
+import com.consoleconnect.kraken.operator.core.enums.MappingTypeEnum;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
@@ -118,7 +119,7 @@ public class RenderRequestService implements MappingTransformer {
             source,
             mapper.getTarget(),
             requestBody);
-        if (ENUM_KIND.equalsIgnoreCase(mapper.getSourceType())
+        if (MappingTypeEnum.ENUM.getKind().equalsIgnoreCase(mapper.getSourceType())
             && StringUtils.isNotBlank(mapper.getTarget())
             && MapUtils.isNotEmpty(mapper.getValueMapping())) {
           stateValueMappingDto
