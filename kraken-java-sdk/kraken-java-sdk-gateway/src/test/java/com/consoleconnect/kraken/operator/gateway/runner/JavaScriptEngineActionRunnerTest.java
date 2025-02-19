@@ -2,7 +2,6 @@ package com.consoleconnect.kraken.operator.gateway.runner;
 
 import static com.consoleconnect.kraken.operator.gateway.runner.SpelEngineActionRunner.INPUT_CODE;
 
-import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogBodyEntity;
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPIFacets;
@@ -86,15 +85,12 @@ class JavaScriptEngineActionRunnerTest extends AbstractIntegrationTest {
   @Test
   void givenRequestWithProductType_whenRunning_thenProductTypeSavedOK() {
     String resultInJson = readFileToString("/mockData/routing-ok.json");
-    ApiActivityLogBodyEntity apiLogBodyEntity = new ApiActivityLogBodyEntity();
-    apiLogBodyEntity.setRequest(resultInJson);
 
     ApiActivityLogEntity entity = new ApiActivityLogEntity();
     entity.setRequestId(UUID.randomUUID().toString());
     entity.setPath("/mefApi/sonata/quoteManagement/v8/quote");
     entity.setMethod("POST");
     entity.setUri("localhost");
-    entity.setApiLogBodyEntity(apiLogBodyEntity);
     entity.setCallSeq(0);
     entity.setRequest(resultInJson);
     entity = apiActivityLogService.save(entity);

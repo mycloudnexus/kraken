@@ -14,7 +14,5 @@ spec:
   customizedSpec:
     path: classpath:/deployment-config/openapi/order/productOrderManagement.api.customized.yaml
 links:
-  - targetAssetKey: mef.sonata.api.order
-    relationship: implementation.workflow
   - targetAssetKey: api.target.order.add.eLine
     relationship: implementation.target

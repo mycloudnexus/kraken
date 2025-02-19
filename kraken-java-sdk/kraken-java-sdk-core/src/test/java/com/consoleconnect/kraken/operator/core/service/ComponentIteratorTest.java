@@ -7,7 +7,6 @@ import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import java.util.*;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,8 +37,6 @@ class ComponentIteratorTest extends AbstractIntegrationTest implements ApiUseCas
         (k, v) -> {
           Assertions.assertTrue(set.contains(k));
           Assertions.assertEquals(4, v.size());
-          Set<String> values = v.stream().map(Tuple2::value).collect(Collectors.toSet());
-          Assertions.assertTrue(values.contains("implementation.workflow"));
         });
   }
 

@@ -31,7 +31,6 @@ public interface MappingTransformer {
   String FORWARD_DOWNSTREAM = "forwardDownstream";
   String REQUEST_BODY = "requestBody.";
   String RESPONSE_BODY = "responseBody";
-  String WORKFLOW_PREFIX = "workflow.";
 
   @Slf4j
   final class LogHolder {}

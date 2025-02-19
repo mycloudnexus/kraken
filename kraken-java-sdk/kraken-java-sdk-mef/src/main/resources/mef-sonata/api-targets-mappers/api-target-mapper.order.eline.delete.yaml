@@ -13,10 +13,6 @@ spec:
     method: post
     productType: access_e_line
     actionType: delete
-  workflow:
-    enabled: false
-    synchronous: false
-    key: mef.sonata.api-workflow.order.eline.delete
   endpoints:
     - id: delete connection by id
       path: ""
