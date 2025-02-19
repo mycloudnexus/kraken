@@ -25,7 +25,8 @@ spec:
             title: "quote item Term duration"
             source: "@{{quoteItem[0].requestedQuoteItemTerm.duration.amount}}"
             sourceLocation: BODY
-            sourceType: constantNumber
+            sourceType: integer
+            discrete: true
             target: ""
             targetLocation: BODY
             requiredMapping: true
@@ -64,7 +65,14 @@ spec:
             title: "quote item Term roll duration"
             source: "@{{quoteItem[0].requestedQuoteItemTerm.rollInterval.amount}}"
             sourceLocation: BODY
-            sourceType: constantNumber
+            sourceType: integer
+            discrete: true
+            sourceConditionExpression:
+            sourceConditions:
+              - name: endOfTermAction
+                key: "@{{quoteItem[0].requestedQuoteItemTerm.endOfTermAction}}"
+                val: roll
+                operator: eq
             target: ""
             targetLocation: BODY
             requiredMapping: false
@@ -83,6 +91,12 @@ spec:
               - businessHours
               - businessMinutes
             valueMapping: {}
+            sourceConditionExpression:
+            sourceConditions:
+              - name: endOfTermAction
+                key: "@{{quoteItem[0].requestedQuoteItemTerm.endOfTermAction}}"
+                val: roll
+                operator: eq
             target: ""
             targetLocation: BODY
             requiredMapping: false
@@ -90,7 +104,7 @@ spec:
             title: "The id of the place where source location of the quoted product"
             source: "@{{quoteItem[0].product.place[0].id}}"
             sourceLocation: BODY
-            sourceType: discreteStr
+            sourceType: string
             target: ""
             targetLocation: BODY
             requiredMapping: true
@@ -98,7 +112,7 @@ spec:
             title: "The id of the place where destination location of the quoted product"
             source: "@{{quoteItem[0].product.place[1].id}}"
             sourceLocation: BODY
-            sourceType: discreteStr
+            sourceType: string
             target: ""
             targetLocation: BODY
             requiredMapping: true
@@ -106,7 +120,9 @@ spec:
             title: "Bandwidth of the Eline"
             source: "@{{quoteItem[0].product.productConfiguration.bandwidth}}"
             sourceLocation: BODY
-            sourceType: discreteInt
+            allowValueLimit: true
+            sourceType: integer
+            discrete: true
             sourceValues:
             target: ""
             targetLocation: BODY
@@ -127,7 +143,7 @@ spec:
             title: "The class of Service of the Eline"
             source: "@{{quoteItem[0].product.productConfiguration.classOfService}}"
             sourceLocation: BODY
-            sourceType: discreteStr
+            sourceType: string
             target: ""
             targetLocation: BODY
             requiredMapping: false
@@ -135,7 +151,7 @@ spec:
             title: "The payment type of the Eline"
             source: "@{{quoteItem[0].product.productConfiguration.paymentType}}"
             sourceLocation: BODY
-            sourceType: discreteStr
+            sourceType: string
             target: ""
             targetLocation: BODY
             requiredMapping: false
@@ -143,7 +159,7 @@ spec:
             title: "The id of the quoted product offering"
             source: "@{{quoteItem[0].product.productOffering.id}}"
             sourceLocation: BODY
-            sourceType: discreteStr
+            sourceType: string
             target: ""
             targetLocation: BODY
             requiredMapping: false
@@ -173,8 +189,8 @@ spec:
             targetLocation: BODY
             requiredMapping: true
             replaceStar: true
-            checkPath: "$['quoteItem'][0]['quoteItemPrice'][0]['price']['dutyFreeAmount']['unit']"
-            deletePath: "$['quoteItem'][0]['quoteItemPrice']"
+            checkPath: "$['quoteItem'][0]['quoteItemPrice'][0]['price']['dutyFreeAmount']['value']"
+            deletePath: "$.quoteItem[0].quoteItemPrice"
           - name: mapper.quote.eline.add.sync.taxRate
             title: "Price Tax Rate. Unit: [%]. E.g. value 16 stand for 16% tax"
             description: ""

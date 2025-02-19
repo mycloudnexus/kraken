@@ -1,5 +1,7 @@
 .content {
   border-radius: 4px;
+  overflow-y: auto;
+  height: calc(100vh - 164px);
 
   :global {
     .ant-card-head,
@@ -62,4 +64,31 @@
       }
     }
   }
+}
+
+.seller-api-tabs-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 15px;
+}
+
+.contactInformation-field {
+  &-label {
+    margin: 8px 0;
+  }
+  &-value {
+    margin-bottom: 20px;
+  }
+}
+
+.contacts-icon {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+}
+
+.alert {
+  margin-bottom: 20px;
+  border: none;
 }

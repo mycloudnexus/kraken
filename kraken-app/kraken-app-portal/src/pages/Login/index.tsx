@@ -2,6 +2,7 @@ import loginBg from "@/assets/login/login-bg.svg?url";
 import Logo from "@/assets/logo.svg";
 import Flex from "@/components/Flex";
 import { useLogin } from "@/hooks/login";
+import { PRODUCT_NAME } from "@/utils/constants/common";
 import { storeData } from "@/utils/helpers/token";
 import { Alert, Button, Form, Input, Typography } from "antd";
 import { get } from "lodash";
@@ -49,8 +50,14 @@ const Login = () => {
       <Flex flexDirection="column" gap={24} className={styles.formWrapper}>
         <Flex gap={12} className={styles.logoWrapper}>
           <Logo />
-          <Typography.Text style={{ fontSize: 20, fontWeight: 500 }}>
-            KRAKEN
+          <Typography.Text
+            style={{
+              fontSize: 20,
+              fontWeight: "bold",
+              fontFamily: "Montserrat, sans-serif",
+            }}
+          >
+            {PRODUCT_NAME}
           </Typography.Text>
         </Flex>
         <Flex flexDirection="column">
@@ -83,12 +90,6 @@ const Login = () => {
             Login
           </Button>
         </Form>
-        <Typography.Text
-          style={{ fontSize: 12, color: "#828282", textAlign: "center" }}
-        >
-          By clicking continue, you agree to our Terms of Service
-          <br /> and Privacy Policy
-        </Typography.Text>
       </Flex>
     </Flex>
   );

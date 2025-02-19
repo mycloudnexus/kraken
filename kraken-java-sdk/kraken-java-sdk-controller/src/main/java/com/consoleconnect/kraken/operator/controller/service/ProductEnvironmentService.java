@@ -27,7 +27,6 @@ public class ProductEnvironmentService {
 
   @Transactional
   public UnifiedAssetDto create(String productId, CreateEnvRequest request, String createdBy) {
-
     UnifiedAssetDto product = unifiedAssetService.findOne(productId);
     String key = product.getMetadata().getKey() + ".env." + System.currentTimeMillis();
     UnifiedAsset unifiedAsset =
