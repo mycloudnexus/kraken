@@ -16,6 +16,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import java.net.URI;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -66,7 +68,8 @@ public class GeneralSyncService extends KrakenServerConnector {
           // order.
           HttpResponse<Object> res =
               blockCurl(HttpMethod.GET, uriFunction, null, new ParameterizedTypeReference<>() {});
-          if (res.getCode() == 200) {
+          if (Objects.nonNull(res) && res.getCode() == HttpStatus.OK.value()) {
+            log.info("Start to sync asset, kind:{}", kind.getKind());
             Optional.ofNullable(res.getData())
                 .map(this::toAssetDtoList)
                 .ifPresent(handler::handleAssets);

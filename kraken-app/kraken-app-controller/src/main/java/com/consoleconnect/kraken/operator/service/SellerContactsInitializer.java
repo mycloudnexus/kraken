@@ -1,11 +1,9 @@
 package com.consoleconnect.kraken.operator.service;
 
-import static com.consoleconnect.kraken.operator.core.toolkit.Constants.DOT;
-import static com.consoleconnect.kraken.operator.core.toolkit.Constants.SELLER_CONTACT_SUFFIX;
-
 import com.consoleconnect.kraken.operator.config.AppMgmtProperty;
 import com.consoleconnect.kraken.operator.controller.dto.CreateSellerContactRequest;
 import com.consoleconnect.kraken.operator.controller.service.SellerContactService;
+import com.consoleconnect.kraken.operator.core.service.AssetKeyGenerator;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import jakarta.annotation.PostConstruct;
 import java.util.Objects;
@@ -17,7 +15,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 @Service
 @Slf4j
-public class SellerContactsInitializer {
+public class SellerContactsInitializer implements AssetKeyGenerator {
   private final AppMgmtProperty mgmtProperty;
   private final SellerContactService sellerContactService;
   private final UnifiedAssetService unifiedAssetService;
@@ -42,7 +40,8 @@ public class SellerContactsInitializer {
 
   private void processSellerContactDetail(
       String finalProductId, CreateSellerContactRequest detail) {
-    String sellerContactKey = generateSellerContactKey(detail);
+    String sellerContactKey =
+        generateSellerContactKey(detail.getComponentKey(), detail.getParentProductType());
     boolean exist = unifiedAssetService.existed(sellerContactKey);
     if (exist) {
       log.info("seller contact key has exist:{}, no need to create", sellerContactKey);
@@ -61,13 +60,5 @@ public class SellerContactsInitializer {
         StringUtils.isBlank(detail.getEmailAddress()) ? "" : detail.getEmailAddress());
     sellerContactService.createOneSellerContact(
         finalProductId, detail.getComponentKey(), request, "system");
-  }
-
-  private String generateSellerContactKey(CreateSellerContactRequest detail) {
-    return detail.getComponentKey()
-        + DOT
-        + detail.getParentProductType()
-        + DOT
-        + SELLER_CONTACT_SUFFIX;
   }
 }
