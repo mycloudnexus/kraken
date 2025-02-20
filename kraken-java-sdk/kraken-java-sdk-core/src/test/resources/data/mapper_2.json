@@ -4,7 +4,7 @@
       "title": "Bandwidth of the UNI",
       "source": "@{{productOrderItem[0].product.productConfiguration.bandwidth}}",
       "target": "@{{speed}}",
-      "discrete": false,
+      "discrete": true,
       "sourceType": "integer",
       "replaceStar": true,
       "sourceLocation": "BODY",
