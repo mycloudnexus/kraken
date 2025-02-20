@@ -3,6 +3,7 @@ package com.consoleconnect.kraken.operator.core.service;
 import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.PRODUCT_BUYER;
 import static com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants.*;
 import static com.consoleconnect.kraken.operator.core.toolkit.Constants.COMMA_SPACE_EXPRESSION;
+import static com.consoleconnect.kraken.operator.core.toolkit.Constants.ZERO_SEQ;
 import static com.consoleconnect.kraken.operator.core.toolkit.LabelConstants.LABEL_BUYER_ID;
 
 import com.consoleconnect.kraken.operator.core.client.ClientEvent;
@@ -105,7 +106,7 @@ public class ApiActivityLogService {
           root,
           StringUtils::isNotBlank);
       addEqualityPredicate(
-          CALL_SEQ, "0", predicateList, criteriaBuilder, root, StringUtils::isNotBlank);
+          CALL_SEQ, ZERO_SEQ, predicateList, criteriaBuilder, root, StringUtils::isNotBlank);
       addEqualityPredicate(
           PRODUCT_TYPE,
           logSearchRequest.getProductType(),
