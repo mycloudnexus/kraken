@@ -72,6 +72,8 @@ class ApiActivityLogServiceTest extends AbstractIntegrationTest {
         LogSearchRequest.builder()
             .env(STAGE_ENV)
             .requestId(entity.getRequestId())
+            .statusCode("200, 201")
+            .method("GET, POST")
             .queryStart(ZonedDateTime.now().minusDays(1))
             .queryEnd(ZonedDateTime.now().plusDays(10))
             .statusCode(200)
@@ -99,6 +101,7 @@ class ApiActivityLogServiceTest extends AbstractIntegrationTest {
     apiActivityLogEntity.setHttpStatusCode(200);
     apiActivityLogEntity.setTriggeredAt(ZonedDateTime.now());
     apiActivityLogEntity.setProductType("access.eline");
+    apiActivityLogEntity.setHttpStatusCode(200);
     apiActivityLogEntity = apiActivityLogRepository.save(apiActivityLogEntity);
     return apiActivityLogEntity;
   }

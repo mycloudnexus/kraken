@@ -1,6 +1,6 @@
 package com.consoleconnect.kraken.operator.sync.service;
 
-import static com.consoleconnect.kraken.operator.core.service.ApiActivityLogService.TRIGGERED_AT;
+import static com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants.TRIGGERED_AT;
 
 import com.consoleconnect.kraken.operator.core.client.ClientEvent;
 import com.consoleconnect.kraken.operator.core.client.ClientEventTypeEnum;

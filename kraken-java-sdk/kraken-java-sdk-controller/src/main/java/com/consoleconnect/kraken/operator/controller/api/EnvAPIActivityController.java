@@ -47,7 +47,7 @@ public class EnvAPIActivityController {
       @RequestParam(value = "productType", required = false) String productType,
       @RequestParam(value = "path", required = false) String path,
       @RequestParam(value = "method", required = false) String method,
-      @RequestParam(value = "statusCode", required = false) Integer statusCode) {
+      @RequestParam(value = "statusCode", required = false) String statusCode) {
     ZonedDateTime startTime =
         requestStartTime == null
             ? null

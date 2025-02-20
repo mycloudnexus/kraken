@@ -1,6 +1,6 @@
 package com.consoleconnect.kraken.operator.core.service;
 
-import static com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants.MAPPER_KIND;
+import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.COMPONENT_API_TARGET_MAPPER;
 import static com.consoleconnect.kraken.operator.core.toolkit.LabelConstants.FUNCTION_JSON_EXTRACT_PATH_TEXT;
 
 import com.consoleconnect.kraken.operator.core.dto.AssetLinkDto;
@@ -299,7 +299,8 @@ public class UnifiedAssetService implements UUIDWrapper {
 
     log.info("syncing asset facets, assetId: {}", assetEntity.getKey());
 
-    if (Objects.equals(assetEntity.getKind(), MAPPER_KIND) && entityOptional.isPresent()) {
+    if (Objects.equals(assetEntity.getKind(), COMPONENT_API_TARGET_MAPPER.getKind())
+        && entityOptional.isPresent()) {
       data.setFacets(mergeService.mergeFacets(entityOptional.get(), data.getFacets()));
     }
     if (data.getFacets() != null) {

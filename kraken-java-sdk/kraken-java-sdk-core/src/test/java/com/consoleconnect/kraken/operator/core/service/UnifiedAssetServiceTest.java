@@ -1,5 +1,6 @@
 package com.consoleconnect.kraken.operator.core.service;
 
+import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.COMPONENT_API_TARGET_SPEC;
 import static org.testcontainers.shaded.org.hamcrest.Matchers.*;
 
 import com.consoleconnect.kraken.operator.core.CustomConfig;
@@ -19,6 +20,7 @@ import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.*;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -29,6 +31,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import org.testcontainers.shaded.org.hamcrest.MatcherAssert;
 
+@Slf4j
 @MockIntegrationTest
 @ContextConfiguration(classes = CustomConfig.class)
 class UnifiedAssetServiceTest extends AbstractIntegrationTest {
@@ -110,7 +113,8 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
 
   @Test
   void givenNewMapper_whenEnforce_thenUpdateSuccess() {
-    List<UnifiedAssetDto> list = unifiedAssetService.findByKind(AssetsConstants.SERVER_KIND);
+    List<UnifiedAssetDto> list =
+        unifiedAssetService.findByKind(COMPONENT_API_TARGET_SPEC.getKind());
     Assertions.assertEquals(0, list.size());
     UnifiedAssetDto data =
         unifiedAssetService.findOne("mef.sonata.api-target-mapper.order.eline.add");
@@ -178,8 +182,10 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
         JsonToolkit.fromJson(s2, new TypeReference<>() {});
     UnifiedAssetService.mergeMappers(existMapperMap, newMapperMap);
     String existMapperStr = JsonToolkit.toJson(existMapperMap);
+    log.info(existMapperStr);
     Assertions.assertNotNull(existMapperStr);
-    String newMapperStr = JsonToolkit.toJson(existMapperMap);
+    String newMapperStr = JsonToolkit.toJson(newMapperMap);
+    log.info(newMapperStr);
     Assertions.assertNotNull(newMapperStr);
   }
 }

@@ -24,6 +24,8 @@ public class Constants {
   public static final String PERSIST_RESPONSE_TASK = "persist_response_task";
   public static final String NOTIFY_TASK = "notify_task";
   public static final String WORKFLOW_PARAM_PREFIX = "${workflow.input.%s}";
+  public static final String COMMA_SPACE_EXPRESSION = "[\\s,]+";
+  public static final String ZERO_SEQ = "0";
 
   public static String formatVersion(String version) {
     return version.replaceFirst("[V|v]", "");
