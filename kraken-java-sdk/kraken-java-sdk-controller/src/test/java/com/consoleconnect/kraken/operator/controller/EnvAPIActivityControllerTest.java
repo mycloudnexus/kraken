@@ -41,7 +41,6 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 class EnvAPIActivityControllerTest extends AbstractIntegrationTest
     implements ApiActivityLogCreator, EnvCreator, BuyerCreator {
   private static final String ACTIVITY_BASE_URL = "/products/%s/envs/%s/api-activities";
-  private static final String ACTIVITY_BASE_URL_V2 = "/v2/products/%s/envs/%s/api-activities";
   WebTestClientHelper webTestClient;
   @Autowired ApiActivityLogRepository apiActivityLogRepository;
   @Autowired EnvironmentService environmentService;
@@ -113,6 +112,7 @@ class EnvAPIActivityControllerTest extends AbstractIntegrationTest
                 .queryParam("envId", envStage.getId())
                 .queryParam("path", "/123")
                 .queryParam("method", "GET")
+                .queryParam("statusCode", "200")
                 .queryParam(
                     "requestStartTime", ZonedDateTime.now().minusDays(1).toInstant().toEpochMilli())
                 .queryParam(
@@ -146,48 +146,26 @@ class EnvAPIActivityControllerTest extends AbstractIntegrationTest
 
   @Test
   @Order(5)
-  void givenExistedActivityId_whenSearchV2Detail_thenReturnOK() {
-    Environment envStage = createStage(PRODUCT_ID);
-    String activityBaseUrl = String.format(ACTIVITY_BASE_URL_V2, PRODUCT_ID, envStage.getId());
-    BuyerAssetDto buyerAssetDto =
-        createBuyer(BUYER_ID + "-" + System.currentTimeMillis(), envStage.getId(), COMPANY_NAME);
-    BuyerOnboardFacets buyerFacets =
-        UnifiedAsset.getFacets(buyerAssetDto, BuyerOnboardFacets.class);
-    ApiActivityLogEntity apiActivityLogEntity =
-        createApiActivityLog(buyerFacets.getBuyerInfo().getBuyerId(), envStage.getId(), "UNI");
-    requestId = apiActivityLogEntity.getRequestId();
-    webTestClient.requestAndVerify(
-        HttpMethod.GET,
-        uriBuilder ->
-            uriBuilder
-                .path(activityBaseUrl + "/{activityId}")
-                .build(apiActivityLogEntity.getRequestId()),
-        HttpStatus.OK.value(),
-        null,
-        bodyStr -> {
-          log.info(bodyStr);
-          assertThat(bodyStr, hasJsonPath("$.data", notNullValue()));
-          assertThat(bodyStr, hasJsonPath("$.data.main.buyer", notNullValue()));
-        });
-  }
-
-  @Test
-  @Order(6)
   void givenTimeRange_whenSearchV2Activities_thenReturnOK() {
     Environment envStage = createStage(PRODUCT_ID);
-    for (int i = 0; i < 3; i++) {
-      createApiActivityLog("buyer-" + i, envStage.getId(), "UNI", "/x-" + i, "localhost", "POST");
+    for (int i = 0; i < 4; i++) {
+      if (i < 2) {
+        createApiActivityLog(
+            "buyer-" + i, envStage.getId(), "UNI", "/x-" + i, "localhost", "POST", 200);
+      } else {
+        createApiActivityLog(
+            "buyer-" + i, envStage.getId(), "UNI", "/x-" + i, "localhost", "POST", 201);
+      }
     }
-    List<String> methods = List.of("GET", "POST");
-
-    String activityBaseUrl = String.format(ACTIVITY_BASE_URL_V2, PRODUCT_ID, envStage.getId());
+    String activityBaseUrl = String.format(ACTIVITY_BASE_URL, PRODUCT_ID, envStage.getId());
     webTestClient.requestAndVerify(
         HttpMethod.GET,
         uriBuilder ->
             uriBuilder
                 .path(activityBaseUrl)
                 .queryParam("envId", envStage.getId())
-                .queryParam("methods", methods.toArray())
+                .queryParam("method", String.join(",", "GET", "POST"))
+                .queryParam("statusCode", String.join(",", "200", "201"))
                 .queryParam(
                     "requestStartTime", ZonedDateTime.now().minusDays(1).toInstant().toEpochMilli())
                 .queryParam(

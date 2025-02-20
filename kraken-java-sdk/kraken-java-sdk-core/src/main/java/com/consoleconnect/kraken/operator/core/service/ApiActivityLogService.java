@@ -32,6 +32,8 @@ import jakarta.persistence.criteria.Root;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -93,13 +95,7 @@ public class ApiActivityLogService {
           criteriaBuilder,
           root,
           StringUtils::isNotBlank);
-      addEqualityPredicate(
-          "method",
-          logSearchRequest.getMethod(),
-          predicateList,
-          criteriaBuilder,
-          root,
-          StringUtils::isNotBlank);
+
       addEqualityPredicate(
           "path",
           logSearchRequest.getPath(),
@@ -116,13 +112,6 @@ public class ApiActivityLogService {
           criteriaBuilder,
           root,
           StringUtils::isNotBlank);
-      addEqualityPredicate(
-          "httpStatusCode",
-          logSearchRequest.getStatusCode(),
-          predicateList,
-          criteriaBuilder,
-          root,
-          Objects::nonNull);
       addComparisonPredicate(
           TRIGGERED_AT,
           logSearchRequest.getQueryStart(),
@@ -137,14 +126,22 @@ public class ApiActivityLogService {
           criteriaBuilder,
           root,
           (cb, path) -> cb.lessThan(path, logSearchRequest.getQueryEnd()));
-
-      addInPredicate("method", logSearchRequest.getMethods(), predicateList, criteriaBuilder, root);
-      addInPredicate(
-          "httpStatusCode",
-          logSearchRequest.getStatusCodes(),
+      addFieldCondition(
+          "method",
+          logSearchRequest.getMethod(),
           predicateList,
           criteriaBuilder,
-          root);
+          root,
+          Objects::nonNull,
+          null);
+      addFieldCondition(
+          "httpStatusCode",
+          logSearchRequest.getStatusCode(),
+          predicateList,
+          criteriaBuilder,
+          root,
+          Objects::nonNull,
+          Integer::valueOf);
       jakarta.persistence.criteria.Predicate[] predicateListArray =
           predicateList.toArray(new jakarta.persistence.criteria.Predicate[0]);
       return query.where(predicateListArray).getRestriction();
@@ -186,6 +183,37 @@ public class ApiActivityLogService {
       CriteriaBuilder.In<T> inClause = criteriaBuilder.in(root.get(fieldName));
       values.forEach(inClause::value);
       predicateList.add(inClause);
+    }
+  }
+
+  private void addFieldCondition(
+      String field,
+      String fieldValue,
+      List<jakarta.persistence.criteria.Predicate> predicateList,
+      CriteriaBuilder criteriaBuilder,
+      Root<ApiActivityLogEntity> root,
+      Predicate<Object> condition,
+      Function<String, ?> valueConverter) {
+    if (StringUtils.isBlank(fieldValue)) {
+      return;
+    }
+    String[] values = fieldValue.split(",");
+    if (values.length == 1) {
+      Object convertedValue =
+          (valueConverter != null) ? valueConverter.apply(values[0]) : values[0];
+      addEqualityPredicate(
+          field,
+          convertedValue,
+          predicateList,
+          criteriaBuilder,
+          root,
+          val -> condition.test(convertedValue));
+    } else {
+      List<Object> convertedValues =
+          Arrays.stream(values)
+              .map(value -> valueConverter != null ? valueConverter.apply(value) : value)
+              .toList();
+      addInPredicate(field, convertedValues, predicateList, criteriaBuilder, root);
     }
   }
 

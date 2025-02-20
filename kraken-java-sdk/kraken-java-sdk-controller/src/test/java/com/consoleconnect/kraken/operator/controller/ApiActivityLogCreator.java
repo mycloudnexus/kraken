@@ -13,16 +13,23 @@ public interface ApiActivityLogCreator {
 
   default ApiActivityLogEntity createApiActivityLog(
       String buyerId, String envId, String productType) {
-    return createApiActivityLog(buyerId, envId, productType, "/123", "localhost", "GET");
+    return createApiActivityLog(buyerId, envId, productType, "/123", "localhost", "GET", 200);
   }
 
   default ApiActivityLogEntity createApiActivityLog(
-      String buyerId, String envId, String productType, String path, String uri, String method) {
+      String buyerId,
+      String envId,
+      String productType,
+      String path,
+      String uri,
+      String method,
+      Integer httpStatusCode) {
     ApiActivityLogEntity apiActivityLogEntity = new ApiActivityLogEntity();
     apiActivityLogEntity.setRequestId(UUID.randomUUID().toString());
     apiActivityLogEntity.setPath(path);
     apiActivityLogEntity.setUri(uri);
     apiActivityLogEntity.setMethod(method);
+    apiActivityLogEntity.setHttpStatusCode(httpStatusCode);
     apiActivityLogEntity.setEnv(envId);
     Map<String, String> headers = Maps.newHashMap();
     headers.put("acces_token", "2334");
