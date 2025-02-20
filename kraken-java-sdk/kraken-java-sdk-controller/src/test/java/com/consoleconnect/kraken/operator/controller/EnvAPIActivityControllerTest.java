@@ -19,7 +19,6 @@ import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import java.time.ZonedDateTime;
-import java.util.*;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
@@ -74,8 +73,7 @@ class EnvAPIActivityControllerTest extends AbstractIntegrationTest
   void givenExistedActivityId_whenSearchDetail_thenReturnOK() {
     Environment envStage = createStage(PRODUCT_ID);
     String activityBaseUrl = String.format(ACTIVITY_BASE_URL, PRODUCT_ID, envStage.getId());
-    BuyerAssetDto buyerAssetDto =
-        createBuyer(BUYER_ID + "-" + System.currentTimeMillis(), envStage.getId(), COMPANY_NAME);
+    BuyerAssetDto buyerAssetDto = createBuyer(BUYER_ID, envStage.getId(), COMPANY_NAME);
     BuyerOnboardFacets buyerFacets =
         UnifiedAsset.getFacets(buyerAssetDto, BuyerOnboardFacets.class);
     ApiActivityLogEntity apiActivityLogEntity =
@@ -146,15 +144,15 @@ class EnvAPIActivityControllerTest extends AbstractIntegrationTest
 
   @Test
   @Order(5)
-  void givenTimeRange_whenSearchV2Activities_thenReturnOK() {
+  void givenTimeRange_whenSearchWithMethodAndStatusCode_thenReturnOK() {
     Environment envStage = createStage(PRODUCT_ID);
     for (int i = 0; i < 4; i++) {
       if (i < 2) {
         createApiActivityLog(
-            "buyer-" + i, envStage.getId(), "UNI", "/x-" + i, "localhost", "POST", 200);
+            BUYER_ID, envStage.getId(), "UNI", "/xyz" + i, "localhost", "POST", 200);
       } else {
         createApiActivityLog(
-            "buyer-" + i, envStage.getId(), "UNI", "/x-" + i, "localhost", "POST", 201);
+            BUYER_ID, envStage.getId(), "UNI", "/xyz" + i, "localhost", "POST", 201);
       }
     }
     String activityBaseUrl = String.format(ACTIVITY_BASE_URL, PRODUCT_ID, envStage.getId());
@@ -164,6 +162,7 @@ class EnvAPIActivityControllerTest extends AbstractIntegrationTest
             uriBuilder
                 .path(activityBaseUrl)
                 .queryParam("envId", envStage.getId())
+                .queryParam("buyer", BUYER_ID)
                 .queryParam("method", String.join(",", "GET", "POST"))
                 .queryParam("statusCode", String.join(",", "200", "201"))
                 .queryParam(
@@ -179,6 +178,8 @@ class EnvAPIActivityControllerTest extends AbstractIntegrationTest
           assertThat(bodyStr, hasJsonPath("$.data", notNullValue()));
           assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(5)));
           assertThat(bodyStr, hasJsonPath("$.data.data[0].buyer", notNullValue()));
+          assertThat(bodyStr, hasJsonPath("$.data.data[0].method", notNullValue()));
+          assertThat(bodyStr, hasJsonPath("$.data.data[0].httpStatusCode", notNullValue()));
           assertThat(bodyStr, hasJsonPath("$.data.data[0].productType", equalTo("UNI")));
         });
   }

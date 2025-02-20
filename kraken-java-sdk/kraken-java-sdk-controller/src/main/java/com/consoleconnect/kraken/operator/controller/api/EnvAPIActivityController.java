@@ -45,6 +45,7 @@ public class EnvAPIActivityController {
       @RequestParam(value = "requestStartTime", required = false) Instant requestStartTime,
       @RequestParam(value = "requestEndTime", required = false) Instant requestEndTime,
       @RequestParam(value = "productType", required = false) String productType,
+      @RequestParam(value = "buyer", required = false) String buyer,
       @RequestParam(value = "path", required = false) String path,
       @RequestParam(value = "method", required = false) String method,
       @RequestParam(value = "statusCode", required = false) String statusCode) {
@@ -66,6 +67,7 @@ public class EnvAPIActivityController {
                 .path(path)
                 .queryStart(startTime)
                 .queryEnd(endTime)
+                .buyer(buyer)
                 .productType(productType)
                 .statusCode(statusCode)
                 .build(),
