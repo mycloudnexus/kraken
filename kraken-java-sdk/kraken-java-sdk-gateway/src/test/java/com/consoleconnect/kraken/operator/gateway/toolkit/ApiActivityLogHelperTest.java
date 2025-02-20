@@ -42,7 +42,7 @@ class ApiActivityLogHelperTest {
 
     Map<String, Object> body =
         (Map<String, Object>) JsonToolkit.fromJson((String) responseLog.getResponse(), Map.class);
-    Assertions.assertEquals("Console Connect - Hermes House", body.get("name"));
+    Assertions.assertEquals("Mock company name", body.get("name"));
   }
 
   @Test
