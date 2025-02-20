@@ -1,0 +1,36 @@
+{
+  "kind": "kraken.component.seller-contact",
+  "apiVersion": "v1",
+  "metadata": {
+    "id": "049c3d53-1569-4788-9527-3b1cb603984c",
+    "name": "mef.sonata.seller.contact",
+    "version": 0,
+    "key": "mef.sonata.api.quote.access.eline.seller.contact",
+    "description": "seller contact information",
+    "status": "activated",
+    "labels": {
+      "access.eline": "true",
+      "internet.access": "true",
+      "componentKey": "mef.sonata.api.quote"
+    }
+  },
+  "facets": {
+    "sellerInfo": {
+      "contactName": "test-contact-name",
+      "contactEmail": "test-contact@gmail.com",
+      "contactPhone": "1234567"
+    }
+  },
+  "links": [],
+  "id": "049c3d53-1569-4788-9527-3b1cb603984c",
+  "parentId": "dc3b6239-e842-4c6f-a6c3-8b2bfdd76677",
+  "createdAt": "2024-12-24T23:34:28.106556Z",
+  "createdBy": "anonymous",
+  "updatedAt": "2024-12-24T23:34:28.107612Z",
+  "syncMetadata": {
+    "fullPath": "",
+    "syncedSha": "",
+    "syncedAt": "2024-12-24T23:34:28.102542429Z",
+    "syncedBy": "anonymous"
+  }
+}

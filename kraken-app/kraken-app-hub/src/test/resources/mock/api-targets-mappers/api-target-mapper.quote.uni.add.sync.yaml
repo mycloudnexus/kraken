@@ -21,7 +21,7 @@ spec:
           - name: mapper.quote.uni.add.sync.duration.amount
             source: "@{{quoteItem[0].requestedQuoteItemTerm.duration.amount}}"
             sourceLocation: BODY
-            sourceType: constantNumber
+            sourceType: integer
             target: "1"
             targetLocation: BODY
             requiredMapping: true
@@ -57,7 +57,13 @@ spec:
           - name: mapper.quote.uni.add.sync.rollInterval.amount
             source: "@{{quoteItem[0].requestedQuoteItemTerm.rollInterval.amount}}"
             sourceLocation: BODY
-            sourceType: constantNumber
+            sourceType: integer
+            sourceConditionExpression:
+            sourceConditions:
+              - name: endOfTermAction
+                key: "@{{quoteItem[0].requestedQuoteItemTerm.endOfTermAction}}"
+                val: roll
+                operator: eq
             target: "1"
             targetLocation: BODY
             requiredMapping: false
@@ -74,27 +80,28 @@ spec:
               - businessHours
               - businessMinutes
             valueMapping: {}
+            sourceConditionExpression:
+            sourceConditions:
+              - name: endOfTermAction
+                key: "@{{quoteItem[0].requestedQuoteItemTerm.endOfTermAction}}"
+                val: roll
+                operator: eq
             target: "calendarMonths"
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.quote.uni.add.sync.place.id
             source: "@{{quoteItem[0].product.place[0].id}}"
             sourceLocation: BODY
-            sourceType: discreteStr
+            sourceType: string
             target: "@{{ports[*].dcf}}"
             targetLocation: BODY
             requiredMapping: true
-          - name: mapper.quote.uni.add.sync.place.keyName
-            source: "@{{quoteItem[0].product.place[0].keyName}}"
-            sourceLocation: BODY
-            sourceType: discreteStr
-            target: ""
-            targetLocation: BODY
-            requiredMapping: false
           - name: mapper.quote.uni.add.sync.productConfiguration.bandwidth
             source: "@{{quoteItem[0].product.productConfiguration.bandwidth}}"
             sourceLocation: BODY
-            sourceType: discreteInt
+            allowValueLimit: true
+            sourceType: integer
+            discrete: true
             sourceValues:
               - 1000
               - 10000
@@ -115,7 +122,7 @@ spec:
           - name: mapper.quote.uni.add.sync.productOffering.id
             source: "@{{quoteItem[0].product.productOffering.id}}"
             sourceLocation: BODY
-            sourceType: discreteStr
+            sourceType: string
             target: "UNI"
             targetLocation: BODY
             requiredMapping: false
@@ -143,6 +150,8 @@ spec:
             sourceLocation: BODY
             target: "@{{quoteItem[0].quoteItemPrice[*].price.dutyFreeAmount.value}}"
             targetLocation: BODY
+            checkPath: "$['quoteItem'][0]['quoteItemPrice'][0]['price']['dutyFreeAmount']['value']"
+            deletePath: "$.quoteItem[0].quoteItemPrice"
             requiredMapping: true
           - name: mapper.quote.uni.add.sync.taxRate
             title: Quote taxRate Mapping

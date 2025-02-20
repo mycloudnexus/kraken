@@ -6,6 +6,7 @@ metadata:
   name: Product Ordering Management
   labels:
     mef-api-release: grace
+    parentProductType: access.eline
     order-api-version: v10
 spec:
   baseSpec:
@@ -13,7 +14,5 @@ spec:
   customizedSpec:
     path: classpath:/deployment-config/openapi/order/productOrderManagement.api.customized.yaml
 links:
-  - targetAssetKey: mef.sonata.api.order
-    relationship: implementation.workflow
   - targetAssetKey: api.target.order.add.eLine
     relationship: implementation.target

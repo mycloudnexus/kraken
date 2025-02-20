@@ -49,10 +49,10 @@ class RequestMapperTest implements MappingTransformer {
   void requestParserTest() throws IOException {
     ComponentAPITargetFacets facets = renderFacets("mockData/api-target.address.validate.yaml");
     runner.encodeUrlParam(facets.getEndpoints().get(0).getPath());
-    System.out.println("test address validation");
+    log.info("test address validation");
     Assertions.assertTrue(facets.getEndpoints().get(0).getPath().contains("criteria"));
 
-    System.out.println("test order add");
+    log.info("test order add");
     ComponentAPITargetFacets orderFacets = renderFacets("mockData/api-target.order.eline.add.yaml");
     Assertions.assertTrue(orderFacets.getEndpoints().get(0).getPath().contains("mefQuery"));
 
@@ -65,7 +65,8 @@ class RequestMapperTest implements MappingTransformer {
     ComponentAPITargetFacets orderReadFacets =
         renderFacets("mockData/api-target.order.eline.read.yaml");
     Assertions.assertNotNull(orderReadFacets);
-    System.out.println("test notify");
+
+    log.info("test notify");
     UnifiedAssetDto notifyAsset =
         YamlToolkit.parseYaml(
                 readFileToString("mockData/api-target.order.notification.state.change.yaml"),

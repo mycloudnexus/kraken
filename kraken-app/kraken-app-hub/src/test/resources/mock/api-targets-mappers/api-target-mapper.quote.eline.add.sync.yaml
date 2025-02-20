@@ -21,7 +21,8 @@ spec:
           - name: mapper.quote.uni.add.sync.duration.amount
             source: "@{{quoteItem[0].requestedQuoteItemTerm.duration.amount}}"
             sourceLocation: BODY
-            sourceType: constantNumber
+            sourceType: integer
+            discrete: true
             target: "@{{connections[*].duration.value}}"
             targetLocation: BODY
             requiredMapping: true
@@ -57,7 +58,14 @@ spec:
           - name: mapper.quote.uni.add.sync.rollInterval.amount
             source: "@{{quoteItem[0].requestedQuoteItemTerm.rollInterval.amount}}"
             sourceLocation: BODY
-            sourceType: constantNumber
+            sourceType: integer
+            discrete: true
+            sourceConditionExpression:
+            sourceConditions:
+              - name: endOfTermAction
+                key: "@{{quoteItem[0].requestedQuoteItemTerm.endOfTermAction}}"
+                val: roll
+                operator: eq
             target: "1"
             targetLocation: BODY
             requiredMapping: false
@@ -74,27 +82,35 @@ spec:
               - businessHours
               - businessMinutes
             valueMapping: {}
+            sourceConditionExpression:
+            sourceConditions:
+              - name: endOfTermAction
+                key: "@{{quoteItem[0].requestedQuoteItemTerm.endOfTermAction}}"
+                val: roll
+                operator: eq
             target: "calendarMonths"
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.quote.uni.add.sync.place0.id
             source: "@{{quoteItem[0].product.place[0].id}}"
             sourceLocation: BODY
-            sourceType: discreteStr
+            sourceType: string
             target: "@{{connections[*].srcDcf}}"
             targetLocation: BODY
             requiredMapping: true
           - name: mapper.quote.uni.add.sync.place1.id
             source: "@{{quoteItem[0].product.place[1].id}}"
             sourceLocation: BODY
-            sourceType: discreteStr
+            sourceType: string
             target: "@{{connections[*].destDcf}}"
             targetLocation: BODY
             requiredMapping: true
           - name: mapper.quote.uni.add.sync.productConfiguration.bandwidth
             source: "@{{quoteItem[0].product.productConfiguration.bandwidth}}"
             sourceLocation: BODY
-            sourceType: discreteInt
+            allowValueLimit: true
+            sourceType: integer
+            discrete: true
             sourceValues:
               - 1000
               - 10000
@@ -115,21 +131,21 @@ spec:
           - name: mapper.quote.uni.add.sync.productConfiguration.classOfService
             source: "@{{quoteItem[0].product.productConfiguration.classOfService}}"
             sourceLocation: BODY
-            sourceType: discreteStr
+            sourceType: string
             target: "@{{connections[*].classOfService}}"
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.quote.uni.add.sync.productConfiguration.paymentType
             source: "@{{quoteItem[0].product.productConfiguration.paymentType}}"
             sourceLocation: BODY
-            sourceType: discreteStr
+            sourceType: string
             target: "@{{connections[*].paymentMethod}}"
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.quote.uni.add.sync.productOffering.id
             source: "@{{quoteItem[0].product.productOffering.id}}"
             sourceLocation: BODY
-            sourceType: discreteStr
+            sourceType: string
             target: "ACCESS_E_LINE"
             targetLocation: BODY
             requiredMapping: false
@@ -156,6 +172,8 @@ spec:
             source: "@{{responseBody.results[*].price}}"
             sourceLocation: ""
             target: "@{{quoteItem[0].quoteItemPrice[*].price.dutyFreeAmount.value}}"
+            checkPath: "$['quoteItem'][0]['quoteItemPrice'][0]['price']['dutyFreeAmount']['value']"
+            deletePath: "$.quoteItem[0].quoteItemPrice"
             requiredMapping: true
             replaceStar: true
           - name: mapper.quote.eline.add.sync.taxRate

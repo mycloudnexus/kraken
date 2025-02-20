@@ -1,6 +1,6 @@
 package com.consoleconnect.kraken.operator.core.service;
 
-import static org.testcontainers.shaded.org.hamcrest.Matchers.hasSize;
+import static org.testcontainers.shaded.org.hamcrest.Matchers.*;
 
 import com.consoleconnect.kraken.operator.core.CustomConfig;
 import com.consoleconnect.kraken.operator.core.dto.SimpleApiServerDto;
@@ -155,7 +155,7 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
         JsonToolkit.fromJson(
             s, new TypeReference<Map<String, Map<String, ComponentAPITargetFacets.Mapper>>>() {});
     int beforeSize = existMapperMap.size();
-    unifiedAssetService.mergeMappers(existMapperMap, existMapperMap);
+    UnifiedAssetService.mergeMappers(existMapperMap, existMapperMap);
     int afterSize = existMapperMap.size();
     Assertions.assertEquals(beforeSize, afterSize);
   }
@@ -165,5 +165,21 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
     UUID uuid = UUID.randomUUID();
     Assertions.assertFalse(unifiedAssetService.existed(uuid.toString()));
     Assertions.assertFalse(unifiedAssetService.existed("mef.sonata.test"));
+  }
+
+  @SneakyThrows
+  @Test
+  void givenSourceValues_whenMerge_thenReturnOK() {
+    String s1 = readFileToString("data/mapper_1.json");
+    Map<String, Map<String, ComponentAPITargetFacets.Mapper>> existMapperMap =
+        JsonToolkit.fromJson(s1, new TypeReference<>() {});
+    String s2 = readFileToString("data/mapper_2.json");
+    Map<String, Map<String, ComponentAPITargetFacets.Mapper>> newMapperMap =
+        JsonToolkit.fromJson(s2, new TypeReference<>() {});
+    UnifiedAssetService.mergeMappers(existMapperMap, newMapperMap);
+    String existMapperStr = JsonToolkit.toJson(existMapperMap);
+    Assertions.assertNotNull(existMapperStr);
+    String newMapperStr = JsonToolkit.toJson(existMapperMap);
+    Assertions.assertNotNull(newMapperStr);
   }
 }

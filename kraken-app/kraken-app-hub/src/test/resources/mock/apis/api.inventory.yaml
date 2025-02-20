@@ -6,6 +6,7 @@ metadata:
   name: Product Inventory Management
   labels:
     mef-api-release: grace
+    parentProductType: access.eline
     inventory-api-version: v7
   version: 4
 spec:
@@ -48,20 +49,35 @@ spec:
                 let input = JSON.parse(jsonStr);
                 let targetAPIConfigKey = '';
                 let matrixConfigKey = '';
-                if(input.bizType == 'UNI') {
+                let errorCode = '';
+                let errorMsg = '';
+                if(input.bizType === 'UNI') {
                   targetAPIConfigKey = 'mef.sonata.api-target.inventory.uni.list';
                   matrixConfigKey = 'mef.sonata.api.matrix.inventory.uni.list';
-                } else if(input.bizType == 'ACCESS_E_LINE') {
+                } else if(input.bizType === 'ACCESS_E_LINE') {
                   targetAPIConfigKey = 'mef.sonata.api-target.inventory.eline.list';
                   matrixConfigKey = 'mef.sonata.api.matrix.inventory.eline.list';
+                } else if(input.bizType === undefined) {
+                  let errorArr = ['api use case is not supported :'];
+                  errorCode = '400';
+                  errorArr.push(`expect bizType for entity ${entity.id}, but missing property.`);
+                  errorMsg = errorArr.join(' ');
+                  targetAPIConfigKey = 'targetKey:notFound';
+                  matrixConfigKey = 'productOrderId:notFound';
                 } else {
+                  let errorArr = ['api use case is not supported :'];
+                  errorCode = '422';
+                  errorArr.push(`expect @{{entity.bizType}} for entity ${entity.id}, but ${input.bizType}.`);
+                  errorMsg = errorArr.join(' ');
                   targetAPIConfigKey = 'targetKey:notFound';
                   matrixConfigKey = 'productOrderId:notFound';
                 }
                 let ret = {
-                  orderType: input.bizType,
+                  productType: input.bizType || 'undefined',
                   targetAPIConfigKey: targetAPIConfigKey,
-                  matrixConfigKey: matrixConfigKey
+                  matrixConfigKey: matrixConfigKey,
+                  errorMsg: errorMsg,
+                  errorCode: errorCode
                 };
                 return JSON.stringify(ret);
               }
@@ -71,6 +87,7 @@ spec:
           env:
             mappingMatrixKey: ${order.matrixConfigKey}
             targetKey: ${order.targetAPIConfigKey}
+
         - id: load-downstream-api-config
           actionType: buildin@load-target-api-config
           env:
@@ -96,6 +113,19 @@ spec:
             code: ${targetApiConfig.endpoints[0].responseBody}
             inputs: ${targetApiConfig.inputs}
           postResultRender: true
+
+        - id: persist_http_response
+          actionType: buildin@db
+          env:
+            productInstanceId: ${renderedResponseBody[0].id?:''}
+          with:
+            action: update
+            properties:
+              - productInstanceId
+          preRequest: false
+          postRequest: true
+          order: -4
+
     - uri: ${env.target.url}
       trigger:
         path: /mefApi/sonata/productInventory/v7/product/**
@@ -109,10 +139,22 @@ spec:
           env:
             input: ${path}
             pattern: /mefApi/sonata/productInventory/v7/product/(?<segment>.*)
+
+        - id: read request payload by id
+          actionType: buildin@db
+          env:
+            id: ${segment}
+            blankIdErrMsg: "productInstanceId cannot be blank"
+            notExistedErrMsg: "productInstanceId does not exist"
+          with:
+            action: read
+            actionField: productInstanceId
+
+          preRequest: true
         - id: calculate_type_for_via_javascript
           actionType: engine@javascript
           env:
-            bizType: ${query.productType}
+            bizType: ${entity.bizType}
           with:
             code: |
               (jsonStr) => {
@@ -120,20 +162,34 @@ spec:
                 let input = JSON.parse(jsonStr);
                 let targetAPIConfigKey = '';
                 let matrixConfigKey = '';
-                if(input.bizType == 'UNI') {
+                let errorCode = '';
+                let errorMsg = '';
+                if(input.bizType === 'UNI') {
                   targetAPIConfigKey = 'mef.sonata.api-target.inventory.uni.read';
                   matrixConfigKey = 'mef.sonata.api.matrix.inventory.uni.read';
-                } else if(input.bizType == 'ACCESS_E_LINE') {
+                } else if(input.bizType === 'ACCESS_E_LINE') {
                   targetAPIConfigKey = 'mef.sonata.api-target.inventory.eline.read';
                   matrixConfigKey = 'mef.sonata.api.matrix.inventory.eline.read';
+                } else if (input.bizType === undefined) {
+                  errorCode = '400';
+                  errorArr.push(`expect bizType for entity ${entity.id}, but missing property.`);
+                  errorMsg = errorArr.join(' ');
+                  targetAPIConfigKey = 'targetKey:notFound';
+                  matrixConfigKey = 'productOrderId:notFound';
                 } else {
+                  let errorArr = ['api use case is not supported :'];
+                  errorCode = '422';
+                  errorArr.push(`expect @{{entity.bizType}} for entity ${entity.id}, but ${input.bizType}.`);
+                  errorMsg = errorArr.join(' ');
                   targetAPIConfigKey = 'targetKey:notFound';
                   matrixConfigKey = 'productType:notFound';
                 }
                 let ret = {
-                  orderType: input.bizType,
+                  productType: input.bizType || 'undefined',
                   targetAPIConfigKey: targetAPIConfigKey,
-                  matrixConfigKey: matrixConfigKey
+                  matrixConfigKey: matrixConfigKey,
+                  errorMsg: errorMsg,
+                  errorCode: errorCode
                 };
                 return JSON.stringify(ret);
               }

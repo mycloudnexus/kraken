@@ -1,23 +1,25 @@
-import { Flex, Drawer, Table, Typography } from "antd";
-import { Text } from "@/components/Text";
-import styles from "./index.module.scss";
-import { ILogActivity } from "@/utils/types/env.type";
 import LogMethodTag from "@/components/LogMethodTag";
+import { Text } from "@/components/Text";
 import TrimmedPath from "@/components/TrimmedPath";
+import { useGetAuditLogDetails } from "@/hooks/product";
 import { CloseOutlined } from "@ant-design/icons";
+import { Flex, Drawer, Table, Typography } from "antd";
 import { get } from "lodash";
+import styles from "./index.module.scss";
 
 type Props = {
   open: boolean;
   onClose: () => void;
-  item: ILogActivity;
+  id: string;
 };
 
-const AuditLogDetailsModal = ({ open, onClose, item }: Props) => {
+const AuditLogDetailsModal = ({ open, onClose, id }: Props) => {
+  const { data: item } = useGetAuditLogDetails({}, id);
+
   if (!item) return null;
 
   const paramsTableData = () => {
-    const hash = item.pathVariables as any;
+    const hash = item.pathVariables;
     return Object.keys(hash).map((key: string) => ({
       name: key,
       value: hash[key],
