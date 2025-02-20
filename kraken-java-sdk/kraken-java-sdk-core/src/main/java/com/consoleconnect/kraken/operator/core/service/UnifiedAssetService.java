@@ -372,7 +372,6 @@ public class UnifiedAssetService implements UUIDWrapper {
             } else {
               FacetsMapper.INSTANCE.toResponseMapper(existMapperEntry.getValue(), mapper);
             }
-            newMapperMap.get(name).put(existMapperEntry.getKey(), mapper);
           }
         });
   }
