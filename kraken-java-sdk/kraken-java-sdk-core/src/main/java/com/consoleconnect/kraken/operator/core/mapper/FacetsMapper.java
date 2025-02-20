@@ -20,7 +20,6 @@ public interface FacetsMapper {
   @Mapping(target = "targetType", source = "targetType")
   @Mapping(target = "sourceValues", source = "sourceValues")
   @Mapping(target = "targetValues", source = "targetValues")
-  @Mapping(target = "sourceValues", source = "sourceValues")
   @Mapping(target = "valueMapping", source = "valueMapping")
   void toRequestMapper(
       ComponentAPITargetFacets.Mapper mapper,
