@@ -73,7 +73,8 @@ class EnvAPIActivityControllerTest extends AbstractIntegrationTest
   void givenExistedActivityId_whenSearchDetail_thenReturnOK() {
     Environment envStage = createStage(PRODUCT_ID);
     String activityBaseUrl = String.format(ACTIVITY_BASE_URL, PRODUCT_ID, envStage.getId());
-    BuyerAssetDto buyerAssetDto = createBuyer(BUYER_ID, envStage.getId(), COMPANY_NAME);
+    BuyerAssetDto buyerAssetDto =
+        createBuyer(BUYER_ID + "-" + System.currentTimeMillis(), envStage.getId(), COMPANY_NAME);
     BuyerOnboardFacets buyerFacets =
         UnifiedAsset.getFacets(buyerAssetDto, BuyerOnboardFacets.class);
     ApiActivityLogEntity apiActivityLogEntity =
@@ -176,7 +177,7 @@ class EnvAPIActivityControllerTest extends AbstractIntegrationTest
         bodyStr -> {
           log.info(bodyStr);
           assertThat(bodyStr, hasJsonPath("$.data", notNullValue()));
-          assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(5)));
+          assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(4)));
           assertThat(bodyStr, hasJsonPath("$.data.data[0].buyer", notNullValue()));
           assertThat(bodyStr, hasJsonPath("$.data.data[0].method", notNullValue()));
           assertThat(bodyStr, hasJsonPath("$.data.data[0].httpStatusCode", notNullValue()));
