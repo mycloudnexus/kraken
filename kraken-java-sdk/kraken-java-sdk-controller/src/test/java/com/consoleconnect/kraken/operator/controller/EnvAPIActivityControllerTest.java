@@ -40,6 +40,8 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @ActiveProfiles("test-rs256")
 class EnvAPIActivityControllerTest extends AbstractIntegrationTest
     implements ApiActivityLogCreator, EnvCreator, BuyerCreator {
+  private static final String ACTIVITY_BASE_URL = "/products/%s/envs/%s/api-activities";
+  private static final String ACTIVITY_BASE_URL_V2 = "/v2/products/%s/envs/%s/api-activities";
   WebTestClientHelper webTestClient;
   @Autowired ApiActivityLogRepository apiActivityLogRepository;
   @Autowired EnvironmentService environmentService;
@@ -55,8 +57,7 @@ class EnvAPIActivityControllerTest extends AbstractIntegrationTest
   @Order(1)
   void givenFakedActivityId_whenSearchActivityDetail_thenReturnEmpty() {
     Environment envStage = createStage(PRODUCT_ID);
-    String activityBaseUrl =
-        String.format("/products/%s/envs/%s/api-activities", PRODUCT_ID, envStage.getId());
+    String activityBaseUrl = String.format(ACTIVITY_BASE_URL, PRODUCT_ID, envStage.getId());
     webTestClient.requestAndVerify(
         HttpMethod.GET,
         uriBuilder -> uriBuilder.path(activityBaseUrl + "/{activityId}").build("11"),
@@ -73,8 +74,7 @@ class EnvAPIActivityControllerTest extends AbstractIntegrationTest
   @Order(2)
   void givenExistedActivityId_whenSearchDetail_thenReturnOK() {
     Environment envStage = createStage(PRODUCT_ID);
-    String activityBaseUrl =
-        String.format("/products/%s/envs/%s/api-activities", PRODUCT_ID, envStage.getId());
+    String activityBaseUrl = String.format(ACTIVITY_BASE_URL, PRODUCT_ID, envStage.getId());
     BuyerAssetDto buyerAssetDto =
         createBuyer(BUYER_ID + "-" + System.currentTimeMillis(), envStage.getId(), COMPANY_NAME);
     BuyerOnboardFacets buyerFacets =
@@ -142,5 +142,66 @@ class EnvAPIActivityControllerTest extends AbstractIntegrationTest
             .build();
     String ip = IpUtils.getIP(serverHttpRequest);
     assertThat(ip, notNullValue());
+  }
+
+  @Test
+  @Order(5)
+  void givenExistedActivityId_whenSearchV2Detail_thenReturnOK() {
+    Environment envStage = createStage(PRODUCT_ID);
+    String activityBaseUrl = String.format(ACTIVITY_BASE_URL_V2, PRODUCT_ID, envStage.getId());
+    BuyerAssetDto buyerAssetDto =
+        createBuyer(BUYER_ID + "-" + System.currentTimeMillis(), envStage.getId(), COMPANY_NAME);
+    BuyerOnboardFacets buyerFacets =
+        UnifiedAsset.getFacets(buyerAssetDto, BuyerOnboardFacets.class);
+    ApiActivityLogEntity apiActivityLogEntity =
+        createApiActivityLog(buyerFacets.getBuyerInfo().getBuyerId(), envStage.getId(), "UNI");
+    requestId = apiActivityLogEntity.getRequestId();
+    webTestClient.requestAndVerify(
+        HttpMethod.GET,
+        uriBuilder ->
+            uriBuilder
+                .path(activityBaseUrl + "/{activityId}")
+                .build(apiActivityLogEntity.getRequestId()),
+        HttpStatus.OK.value(),
+        null,
+        bodyStr -> {
+          log.info(bodyStr);
+          assertThat(bodyStr, hasJsonPath("$.data", notNullValue()));
+          assertThat(bodyStr, hasJsonPath("$.data.main.buyer", notNullValue()));
+        });
+  }
+
+  @Test
+  @Order(6)
+  void givenTimeRange_whenSearchV2Activities_thenReturnOK() {
+    Environment envStage = createStage(PRODUCT_ID);
+    for (int i = 0; i < 3; i++) {
+      createApiActivityLog("buyer-" + i, envStage.getId(), "UNI", "/x-" + i, "localhost", "POST");
+    }
+    List<String> methods = List.of("GET", "POST");
+
+    String activityBaseUrl = String.format(ACTIVITY_BASE_URL_V2, PRODUCT_ID, envStage.getId());
+    webTestClient.requestAndVerify(
+        HttpMethod.GET,
+        uriBuilder ->
+            uriBuilder
+                .path(activityBaseUrl)
+                .queryParam("envId", envStage.getId())
+                .queryParam("methods", methods.toArray())
+                .queryParam(
+                    "requestStartTime", ZonedDateTime.now().minusDays(1).toInstant().toEpochMilli())
+                .queryParam(
+                    "requestEndTime", ZonedDateTime.now().plusDays(10).toInstant().toEpochMilli())
+                .queryParam("productType", "UNI")
+                .build(),
+        HttpStatus.OK.value(),
+        null,
+        bodyStr -> {
+          log.info(bodyStr);
+          assertThat(bodyStr, hasJsonPath("$.data", notNullValue()));
+          assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(5)));
+          assertThat(bodyStr, hasJsonPath("$.data.data[0].buyer", notNullValue()));
+          assertThat(bodyStr, hasJsonPath("$.data.data[0].productType", equalTo("UNI")));
+        });
   }
 }
