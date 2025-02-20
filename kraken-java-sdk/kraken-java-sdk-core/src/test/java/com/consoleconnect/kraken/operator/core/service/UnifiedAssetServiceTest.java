@@ -19,6 +19,7 @@ import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.*;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -29,6 +30,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import org.testcontainers.shaded.org.hamcrest.MatcherAssert;
 
+@Slf4j
 @MockIntegrationTest
 @ContextConfiguration(classes = CustomConfig.class)
 class UnifiedAssetServiceTest extends AbstractIntegrationTest {
@@ -178,10 +180,10 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
         JsonToolkit.fromJson(s2, new TypeReference<>() {});
     UnifiedAssetService.mergeMappers(existMapperMap, newMapperMap);
     String existMapperStr = JsonToolkit.toJson(existMapperMap);
-    System.out.println(existMapperStr);
-    String newMapperStr = JsonToolkit.toJson(newMapperMap);
-    System.out.println(newMapperStr);
+    log.info(existMapperStr);
     Assertions.assertNotNull(existMapperStr);
+    String newMapperStr = JsonToolkit.toJson(newMapperMap);
+    log.info(newMapperStr);
     Assertions.assertNotNull(newMapperStr);
   }
 }
