@@ -1,5 +1,6 @@
 package com.consoleconnect.kraken.operator.core.service;
 
+import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.COMPONENT_API_TARGET_SPEC;
 import static org.testcontainers.shaded.org.hamcrest.Matchers.*;
 
 import com.consoleconnect.kraken.operator.core.CustomConfig;
@@ -112,7 +113,8 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
 
   @Test
   void givenNewMapper_whenEnforce_thenUpdateSuccess() {
-    List<UnifiedAssetDto> list = unifiedAssetService.findByKind(AssetsConstants.SERVER_KIND);
+    List<UnifiedAssetDto> list =
+        unifiedAssetService.findByKind(COMPONENT_API_TARGET_SPEC.getKind());
     Assertions.assertEquals(0, list.size());
     UnifiedAssetDto data =
         unifiedAssetService.findOne("mef.sonata.api-target-mapper.order.eline.add");

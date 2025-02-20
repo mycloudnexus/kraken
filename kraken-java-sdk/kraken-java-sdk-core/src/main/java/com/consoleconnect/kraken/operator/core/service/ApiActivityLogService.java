@@ -1,6 +1,7 @@
 package com.consoleconnect.kraken.operator.core.service;
 
 import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.PRODUCT_BUYER;
+import static com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants.*;
 import static com.consoleconnect.kraken.operator.core.toolkit.Constants.COMMA_SPACE_EXPRESSION;
 import static com.consoleconnect.kraken.operator.core.toolkit.LabelConstants.LABEL_BUYER_ID;
 
@@ -51,7 +52,6 @@ import org.springframework.transaction.annotation.Transactional;
 @AllArgsConstructor
 @Slf4j
 public class ApiActivityLogService {
-  public static final String TRIGGERED_AT = "triggeredAt";
   private final ApiActivityLogRepository repository;
   private final UnifiedAssetRepository unifiedAssetRepository;
   private final ApiActivityLogBodyRepository apiActivityLogBodyRepository;
@@ -83,14 +83,14 @@ public class ApiActivityLogService {
     return (root, query, criteriaBuilder) -> {
       List<jakarta.persistence.criteria.Predicate> predicateList = new ArrayList<>();
       addEqualityPredicate(
-          "env",
+          ENV_KEY,
           logSearchRequest.getEnv(),
           predicateList,
           criteriaBuilder,
           root,
           StringUtils::isNotBlank);
       addEqualityPredicate(
-          "requestId",
+          REQUEST_ID,
           logSearchRequest.getRequestId(),
           predicateList,
           criteriaBuilder,
@@ -98,16 +98,16 @@ public class ApiActivityLogService {
           StringUtils::isNotBlank);
 
       addEqualityPredicate(
-          "path",
+          PATH,
           logSearchRequest.getPath(),
           predicateList,
           criteriaBuilder,
           root,
           StringUtils::isNotBlank);
       addEqualityPredicate(
-          "callSeq", "0", predicateList, criteriaBuilder, root, StringUtils::isNotBlank);
+          CALL_SEQ, "0", predicateList, criteriaBuilder, root, StringUtils::isNotBlank);
       addEqualityPredicate(
-          "productType",
+          PRODUCT_TYPE,
           logSearchRequest.getProductType(),
           predicateList,
           criteriaBuilder,
@@ -128,7 +128,7 @@ public class ApiActivityLogService {
           root,
           (cb, path) -> cb.lessThan(path, logSearchRequest.getQueryEnd()));
       addFieldCondition(
-          "method",
+          METHOD,
           logSearchRequest.getMethod(),
           predicateList,
           criteriaBuilder,
@@ -136,7 +136,7 @@ public class ApiActivityLogService {
           Objects::nonNull,
           null);
       addFieldCondition(
-          "httpStatusCode",
+          HTTP_STATUS_CODE,
           logSearchRequest.getStatusCode(),
           predicateList,
           criteriaBuilder,
