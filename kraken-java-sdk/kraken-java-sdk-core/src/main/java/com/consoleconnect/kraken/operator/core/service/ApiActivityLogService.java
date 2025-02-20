@@ -22,6 +22,7 @@ import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogBodyRepository
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
 import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
 import com.consoleconnect.kraken.operator.core.request.LogSearchRequest;
+import com.consoleconnect.kraken.operator.core.toolkit.Constants;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.core.toolkit.Paging;
 import com.consoleconnect.kraken.operator.core.toolkit.PagingHelper;
@@ -197,7 +198,7 @@ public class ApiActivityLogService {
     if (StringUtils.isBlank(fieldValue)) {
       return;
     }
-    String[] values = fieldValue.split(",");
+    String[] values = fieldValue.split(Constants.COMMA);
     if (values.length == 1) {
       Object convertedValue =
           (valueConverter != null) ? valueConverter.apply(values[0]) : values[0];
