@@ -7,6 +7,7 @@ import com.consoleconnect.kraken.operator.core.model.ApiActivityResponseLog;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.workflow.model.LogTaskRequest;
 import com.fasterxml.jackson.core.type.TypeReference;
+import io.netty.util.internal.StringUtil;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -70,8 +71,8 @@ public class ApiActivityLogHelper {
   private static Map<String, Object> convertToMap(Object payload) {
     if (payload instanceof String strPayload) {
       return JsonToolkit.fromJson(strPayload, new TypeReference<Map<String, Object>>() {});
-    } else if (payload instanceof Map mapPayload) {
-      return mapPayload;
+    } else if (payload instanceof Map<?, ?> mapPayload) {
+      return (Map<String, Object>) mapPayload;
     } else {
       return JsonToolkit.fromJson(
           JsonToolkit.toJson(payload), new TypeReference<Map<String, Object>>() {});
@@ -83,7 +84,7 @@ public class ApiActivityLogHelper {
       URL url = new URL(query);
       return url.getPath();
     } catch (MalformedURLException e) {
-      return "";
+      return StringUtil.EMPTY_STRING;
     }
   }
 

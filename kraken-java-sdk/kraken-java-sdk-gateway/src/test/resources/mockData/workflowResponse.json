@@ -56,14 +56,14 @@
     "body":
     {
       "id": "507f1f77bcf86cd799439011",
-      "name": "Console Connect - Hermes House",
-      "username": "pccwg-hermes-house",
+      "name": "Mock company name",
+      "username": "mock-user-name",
       "company":
       {
         "addresses":
         [
           {
-            "street": "5/F, Hermes House,10 Middle Road,Tsim Sha Tsui",
+            "street": "Mock street",
             "city": "Hong Kong",
             "country": "CN"
           }
