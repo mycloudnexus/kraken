@@ -1,6 +1,7 @@
 package com.consoleconnect.kraken.operator.core.service;
 
 import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.PRODUCT_BUYER;
+import static com.consoleconnect.kraken.operator.core.toolkit.Constants.COMMA_SPACE_EXPRESSION;
 import static com.consoleconnect.kraken.operator.core.toolkit.LabelConstants.LABEL_BUYER_ID;
 
 import com.consoleconnect.kraken.operator.core.client.ClientEvent;
@@ -197,7 +198,7 @@ public class ApiActivityLogService {
     if (StringUtils.isBlank(fieldValue)) {
       return;
     }
-    String[] values = fieldValue.split("[ ,]+");
+    String[] values = fieldValue.split(COMMA_SPACE_EXPRESSION);
     if (values.length == 1) {
       Object convertedValue =
           (valueConverter != null) ? valueConverter.apply(values[0]) : values[0];
