@@ -84,7 +84,7 @@ class WorkflowTaskConfigTest extends AbstractIntegrationTest {
 
     Map<String, String> response =
         (Map<String, String>) activityLog.getApiLogBodyEntity().getResponse();
-    Assertions.assertEquals("Console Connect - Hermes House", response.get("name"));
+    Assertions.assertEquals("Mock company name", response.get("name"));
     Assertions.assertEquals(200, activityLog.getHttpStatusCode());
   }
 }
