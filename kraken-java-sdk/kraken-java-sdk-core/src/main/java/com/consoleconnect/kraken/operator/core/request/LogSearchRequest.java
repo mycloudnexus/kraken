@@ -14,5 +14,5 @@ public class LogSearchRequest {
   String productType;
   String method;
   String path;
-  Integer statusCode;
+  String statusCode;
 }

@@ -1,6 +1,9 @@
 package com.consoleconnect.kraken.operator.core.service;
 
 import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.PRODUCT_BUYER;
+import static com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants.*;
+import static com.consoleconnect.kraken.operator.core.toolkit.Constants.COMMA_SPACE_EXPRESSION;
+import static com.consoleconnect.kraken.operator.core.toolkit.Constants.ZERO_SEQ;
 import static com.consoleconnect.kraken.operator.core.toolkit.LabelConstants.LABEL_BUYER_ID;
 
 import com.consoleconnect.kraken.operator.core.client.ClientEvent;
@@ -27,10 +30,13 @@ import com.consoleconnect.kraken.operator.core.toolkit.Paging;
 import com.consoleconnect.kraken.operator.core.toolkit.PagingHelper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Root;
 import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +53,6 @@ import org.springframework.transaction.annotation.Transactional;
 @AllArgsConstructor
 @Slf4j
 public class ApiActivityLogService {
-  public static final String TRIGGERED_AT = "triggeredAt";
   private final ApiActivityLogRepository repository;
   private final UnifiedAssetRepository unifiedAssetRepository;
   private final ApiActivityLogBodyRepository apiActivityLogBodyRepository;
@@ -77,31 +82,141 @@ public class ApiActivityLogService {
 
   private Specification<ApiActivityLogEntity> buildSearchQuery(LogSearchRequest logSearchRequest) {
     return (root, query, criteriaBuilder) -> {
-      List<Predicate> predicateList = new ArrayList<>();
-      addEq("env", logSearchRequest.getEnv(), predicateList, criteriaBuilder, root);
-      addEq("requestId", logSearchRequest.getRequestId(), predicateList, criteriaBuilder, root);
-      addEq("method", logSearchRequest.getMethod(), predicateList, criteriaBuilder, root);
-      addEq("path", logSearchRequest.getPath(), predicateList, criteriaBuilder, root);
-      addEq("callSeq", "0", predicateList, criteriaBuilder, root);
-      if (logSearchRequest.getQueryStart() != null) {
-        predicateList.add(
-            criteriaBuilder.greaterThan(root.get(TRIGGERED_AT), logSearchRequest.getQueryStart()));
-      }
-      if (logSearchRequest.getQueryEnd() != null) {
-        predicateList.add(
-            criteriaBuilder.lessThan(root.get(TRIGGERED_AT), logSearchRequest.getQueryEnd()));
-      }
-      if (logSearchRequest.getStatusCode() != null) {
-        predicateList.add(
-            criteriaBuilder.equal(root.get("httpStatusCode"), logSearchRequest.getStatusCode()));
-      }
-      if (StringUtils.isNotBlank(logSearchRequest.getProductType())) {
-        predicateList.add(
-            criteriaBuilder.equal(root.get("productType"), logSearchRequest.getProductType()));
-      }
-      Predicate[] predicateListArray = predicateList.toArray(new Predicate[0]);
+      List<jakarta.persistence.criteria.Predicate> predicateList = new ArrayList<>();
+      addEqualityPredicate(
+          ENV_KEY,
+          logSearchRequest.getEnv(),
+          predicateList,
+          criteriaBuilder,
+          root,
+          StringUtils::isNotBlank);
+      addEqualityPredicate(
+          REQUEST_ID,
+          logSearchRequest.getRequestId(),
+          predicateList,
+          criteriaBuilder,
+          root,
+          StringUtils::isNotBlank);
+
+      addEqualityPredicate(
+          PATH,
+          logSearchRequest.getPath(),
+          predicateList,
+          criteriaBuilder,
+          root,
+          StringUtils::isNotBlank);
+      addEqualityPredicate(
+          CALL_SEQ, ZERO_SEQ, predicateList, criteriaBuilder, root, StringUtils::isNotBlank);
+      addEqualityPredicate(
+          PRODUCT_TYPE,
+          logSearchRequest.getProductType(),
+          predicateList,
+          criteriaBuilder,
+          root,
+          StringUtils::isNotBlank);
+      addComparisonPredicate(
+          TRIGGERED_AT,
+          logSearchRequest.getQueryStart(),
+          predicateList,
+          criteriaBuilder,
+          root,
+          (cb, path) -> cb.greaterThan(path, logSearchRequest.getQueryStart()));
+      addComparisonPredicate(
+          TRIGGERED_AT,
+          logSearchRequest.getQueryEnd(),
+          predicateList,
+          criteriaBuilder,
+          root,
+          (cb, path) -> cb.lessThan(path, logSearchRequest.getQueryEnd()));
+      addFieldCondition(
+          METHOD,
+          logSearchRequest.getMethod(),
+          predicateList,
+          criteriaBuilder,
+          root,
+          Objects::nonNull,
+          null);
+      addFieldCondition(
+          HTTP_STATUS_CODE,
+          logSearchRequest.getStatusCode(),
+          predicateList,
+          criteriaBuilder,
+          root,
+          Objects::nonNull,
+          Integer::valueOf);
+      jakarta.persistence.criteria.Predicate[] predicateListArray =
+          predicateList.toArray(new jakarta.persistence.criteria.Predicate[0]);
       return query.where(predicateListArray).getRestriction();
     };
+  }
+
+  private <T> void addEqualityPredicate(
+      String fieldName,
+      T value,
+      List<jakarta.persistence.criteria.Predicate> predicateList,
+      CriteriaBuilder criteriaBuilder,
+      Root<ApiActivityLogEntity> root,
+      java.util.function.Predicate<T> condition) {
+    if (condition.test(value)) {
+      predicateList.add(criteriaBuilder.equal(root.get(fieldName), value));
+    }
+  }
+
+  private <T extends Comparable<T>> void addComparisonPredicate(
+      String fieldName,
+      T value,
+      List<jakarta.persistence.criteria.Predicate> predicateList,
+      CriteriaBuilder criteriaBuilder,
+      Root<ApiActivityLogEntity> root,
+      BiFunction<CriteriaBuilder, Path<T>, jakarta.persistence.criteria.Predicate>
+          comparisonFunction) {
+    if (value != null) {
+      predicateList.add(comparisonFunction.apply(criteriaBuilder, root.get(fieldName)));
+    }
+  }
+
+  private <T> void addInPredicate(
+      String fieldName,
+      List<T> values,
+      List<jakarta.persistence.criteria.Predicate> predicateList,
+      CriteriaBuilder criteriaBuilder,
+      Root<?> root) {
+    if (CollectionUtils.isNotEmpty(values)) {
+      CriteriaBuilder.In<T> inClause = criteriaBuilder.in(root.get(fieldName));
+      values.forEach(inClause::value);
+      predicateList.add(inClause);
+    }
+  }
+
+  private void addFieldCondition(
+      String field,
+      String fieldValue,
+      List<jakarta.persistence.criteria.Predicate> predicateList,
+      CriteriaBuilder criteriaBuilder,
+      Root<ApiActivityLogEntity> root,
+      Predicate<Object> condition,
+      Function<String, ?> valueConverter) {
+    if (StringUtils.isBlank(fieldValue)) {
+      return;
+    }
+    String[] values = fieldValue.split(COMMA_SPACE_EXPRESSION);
+    if (values.length == 1) {
+      Object convertedValue =
+          (valueConverter != null) ? valueConverter.apply(values[0]) : values[0];
+      addEqualityPredicate(
+          field,
+          convertedValue,
+          predicateList,
+          criteriaBuilder,
+          root,
+          val -> condition.test(convertedValue));
+    } else {
+      List<Object> convertedValues =
+          Arrays.stream(values)
+              .map(value -> valueConverter != null ? valueConverter.apply(value) : value)
+              .toList();
+      addInPredicate(field, convertedValues, predicateList, criteriaBuilder, root);
+    }
   }
 
   public Map<String, UnifiedAssetDto> searchBuyers(String envId) {
@@ -228,17 +343,6 @@ public class ApiActivityLogService {
         logEntities.stream().map(ApiActivityLogEntity::getApiLogBodyEntity).toList());
 
     repository.saveAll(logEntities);
-  }
-
-  private void addEq(
-      String fieldName,
-      String value,
-      List<Predicate> predicateList,
-      CriteriaBuilder criteriaBuilder,
-      Root<ApiActivityLogEntity> root) {
-    if (StringUtils.isNotBlank(value)) {
-      predicateList.add(criteriaBuilder.equal(root.get(fieldName), value));
-    }
   }
 
   public Optional<ComposedHttpRequest> getDetail(String requestId) {
