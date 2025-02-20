@@ -76,7 +76,7 @@ class ApiActivityLogServiceTest extends AbstractIntegrationTest {
             .method("GET, POST")
             .queryStart(ZonedDateTime.now().minusDays(1))
             .queryEnd(ZonedDateTime.now().plusDays(10))
-            .statusCode(200)
+            .statusCode("200")
             .productType("access.eline")
             .build();
     Paging<ApiActivityLog> pages =
