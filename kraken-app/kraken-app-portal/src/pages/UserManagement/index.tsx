@@ -42,7 +42,7 @@ const UserManagement = () => {
     ...userParams,
     ...parseFiltersObj(filters),
   });
-
+  q;
   const { value: isOpen, setTrue: open, setFalse: close } = useBoolean(false);
   const { mutateAsync: runEnable, isPending: pendingEnable } = useEnableUser();
   const { mutateAsync: runDisable, isPending: pendingDisable } =
@@ -116,8 +116,9 @@ const UserManagement = () => {
           },
         ],
         filterMultiple: false,
-        render: (state: string, record: IUser) => (
+        render: (state: string, record: IUser, index: number) => (
           <Switch
+            data-testid={`switch-${index}`}
             loading={pendingEnable || pendingDisable}
             onChange={(e) => handleSwitch(record.id, e)}
             disabled={!isAdmin}
