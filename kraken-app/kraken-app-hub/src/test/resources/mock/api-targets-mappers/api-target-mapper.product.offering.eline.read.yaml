@@ -1,0 +1,62 @@
+---
+kind: kraken.component.api-target-mapper
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target-mapper.poq.eline.read
+  name: Product Offering Qualification (POQ) API
+  description: |
+    The Buyer requests a list of POQs from the Seller based on a set of POQ
+    filter criteria (as described in MEF79). For each POQ returned, the
+    Seller also provides a POQ Identifier that uniquely identifies this POQ
+    within the Seller's system. The order of the elements returned to the
+    Buyer is defined by the Seller (e.g. natural order) and does not change
+    between the pages. If criteria for attribute X are provided, all
+    returned items must match it.
+spec:
+  trigger:
+    path: /mefApi/sonata/productOfferingQualification/v7/productOfferingQualification/{id}
+    method: get
+    productType: access_e_line
+  endpoints:
+    - id: Retrieves a product offering qualification by id for connection
+      path: ""
+      method: ""
+      mappers:
+        request:
+        response:
+          - name: mapper.poq.eline.read.itemState
+            title: POQ Item State Mapping
+            description: POQ Item state mapping
+            source: ""
+            sourceLocation: ""
+            target: "@{{itemState}}"
+            targetType: enum
+            targetLocation: BODY
+            targetValues:
+              - acknowledged
+              - done.ready
+              - done.abandoned
+              - terminatedWithError
+              - approved.orderableAlternate
+              - inProgress
+            valueMapping: {}
+            defaultValue: "done.ready"
+            requiredMapping: false
+          - name: mapper.poq.eline.read.state
+            title: POQ State Mapping
+            description: quote state mapping
+            source: ""
+            sourceLocation: ""
+            target: "@{{state}}"
+            targetType: enum
+            targetLocation: BODY
+            targetValues:
+              - acknowledged
+              - done.ready
+              - done.unableToProvide
+              - terminatedWithError
+              - approved.orderableAlternate
+              - inProgress
+            valueMapping: {}
+            defaultValue: "done.ready"
+            requiredMapping: false
