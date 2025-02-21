@@ -1,0 +1,52 @@
+{
+  "mapper.order.uni.add.bandwidth": {
+    "request": {
+      "title": "Bandwidth of the UNI",
+      "source": "@{{productOrderItem[0].product.productConfiguration.bandwidth}}",
+      "target": "@{{speed}}",
+      "discrete": true,
+      "sourceType": "integer",
+      "replaceStar": true,
+      "sourceLocation": "BODY",
+      "targetLocation": "BODY",
+      "allowValueLimit": true,
+      "customizedField": false,
+      "requiredMapping": true
+    }
+  },
+  "mapper.order.eline.add.state": {
+    "response": {
+      "title": "Order State Mapping",
+      "name": "mapper.order.eline.add.state",
+      "description": "order state mapping",
+      "source": "@{{responseBody.status}}",
+      "sourceLocation": "BODY",
+      "target": "@{{state}}",
+      "targetType": "enum",
+      "targetLocation": "BODY",
+      "requiredMapping": true,
+      "replaceStar": true,
+      "targetValues": [
+        "acknowledged",
+        "assessingCancellation",
+        "held.assessingCharge",
+        "pending.assessingModification",
+        "cancelled",
+        "pendingCancellation",
+        "completed",
+        "failed",
+        "inProgress",
+        "partial",
+        "rejected"
+      ],
+      "valueMapping": {
+        "PENDING": "pending,",
+        "CREATING": "acknowledged,",
+        "DISABLED": "disabled,",
+        "CANCELLED": "disabled,",
+        "ACTIVATING": "inProgress,"
+      },
+      "customizedField": false
+    }
+  }
+}

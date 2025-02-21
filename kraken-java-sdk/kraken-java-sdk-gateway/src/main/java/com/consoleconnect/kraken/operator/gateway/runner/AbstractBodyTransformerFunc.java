@@ -63,6 +63,7 @@ public abstract class AbstractBodyTransformerFunc
       Object expectedSuccessStatus = context.getOrDefault(SUCCESS_STATUS, null);
       HttpResponseContext httpResponseContext = new HttpResponseContext();
       httpResponseContext.setBody(JsonToolkit.fromJson(s, Object.class));
+      httpResponseContext.setDeletePaths(appProperty.getDeletePaths());
       httpResponseContext.setStatus(
           Objects.requireNonNull(exchange.getResponse().getStatusCode()).value());
 
