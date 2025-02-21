@@ -18,7 +18,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
-public interface MappingTransformer {
+public interface MappingTransformer extends PathOperator {
   String REPLACEMENT_KEY_PREFIX = "@{{";
   String REPLACEMENT_KEY_SUFFIX = "}}";
   String ARRAY_WILD_MASK = "[*]";
@@ -153,14 +153,6 @@ public interface MappingTransformer {
           }
         });
     return doc.jsonString();
-  }
-
-  default void deleteByPath(String path, DocumentContext doc) {
-    try {
-      doc.delete(path);
-    } catch (Exception e) {
-      LogHolder.log.warn("Delete path {} error: {}", path, e.getMessage());
-    }
   }
 
   default String calculateBasedOnResponseBody(String responseBody, Map<String, Object> context) {
