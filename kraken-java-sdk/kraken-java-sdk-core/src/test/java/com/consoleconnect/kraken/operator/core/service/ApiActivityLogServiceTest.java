@@ -79,6 +79,8 @@ class ApiActivityLogServiceTest extends AbstractIntegrationTest {
             .method("GET, POST")
             .queryStart(ZonedDateTime.now().minusDays(1))
             .queryEnd(ZonedDateTime.now().plusDays(10))
+            .statusCode("200")
+            .productType("access.eline")
             .build();
     Paging<ApiActivityLog> pages =
         apiActivityLogService.search(logSearchRequest, PageRequest.of(0, 10));
@@ -99,7 +101,9 @@ class ApiActivityLogServiceTest extends AbstractIntegrationTest {
     apiActivityLogEntity.setHeaders(headers);
     apiActivityLogEntity.setBuyer(buyerId);
     apiActivityLogEntity.setCallSeq(0);
+    apiActivityLogEntity.setHttpStatusCode(200);
     apiActivityLogEntity.setTriggeredAt(ZonedDateTime.now());
+    apiActivityLogEntity.setProductType("access.eline");
     apiActivityLogEntity.setHttpStatusCode(200);
     apiActivityLogEntity = apiActivityLogRepository.save(apiActivityLogEntity);
     return apiActivityLogEntity;
