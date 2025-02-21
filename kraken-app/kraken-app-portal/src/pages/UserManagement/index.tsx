@@ -42,7 +42,6 @@ const UserManagement = () => {
     ...userParams,
     ...parseFiltersObj(filters),
   });
-  q;
   const { value: isOpen, setTrue: open, setFalse: close } = useBoolean(false);
   const { mutateAsync: runEnable, isPending: pendingEnable } = useEnableUser();
   const { mutateAsync: runDisable, isPending: pendingDisable } =
