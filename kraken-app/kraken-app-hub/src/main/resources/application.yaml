@@ -108,6 +108,9 @@ app:
     - Authorization
   filter-paths:
     - /mefApi
+  delete-paths:
+    - $.error.status
+    - $.error.statusCode
   cron-job:
     push-heartbeat: 0/5 * * * * *
     check-release: 0/20 * * * * *

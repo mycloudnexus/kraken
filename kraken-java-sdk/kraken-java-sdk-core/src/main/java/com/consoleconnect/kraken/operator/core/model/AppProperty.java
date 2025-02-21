@@ -13,6 +13,7 @@ public class AppProperty {
 
   private List<String> filterHeaders;
   private List<String> filterPaths;
+  private List<String> deletePaths;
   private List<String> initializeExcludeAssets = new ArrayList<>();
   private List<String> queryExcludeAssetKeys = new ArrayList<>();
   private List<String> queryExcludeAssetKinds = new ArrayList<>();
