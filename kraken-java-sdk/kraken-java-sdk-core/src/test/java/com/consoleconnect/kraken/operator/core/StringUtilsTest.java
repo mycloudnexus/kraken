@@ -33,6 +33,15 @@ class StringUtilsTest {
   }
 
   @Test
+  void givenBlankRawMsg_whenTruncate_thenReturnOK() {
+    String raw = "    ";
+    String r1 = StringUtils.truncate(raw, 255);
+    Assertions.assertEquals(raw, r1);
+    String r2 = StringUtils.removeEscapedCharacter(raw, " ");
+    Assertions.assertEquals(raw, r2);
+  }
+
+  @Test
   void givenRawMsg_whenTruncate_thenReturnOK() {
     String raw =
         "{\"error\":{\"message\":\"The request/portId must match pattern \\\"^[a-f0-9]{24}$\\\"\",\"status\":400,\"statusCode\":400}}";
@@ -46,8 +55,12 @@ class StringUtilsTest {
         "{\"error\":{\"message\":\"The request/portId must match pattern \\\"^[a-f0-9]{24}$\\\"\",\"status\":400,\"statusCode\":400}}";
     ErrorResponse errorResponse = new ErrorResponse();
     StringUtils.processRawMessage(errorResponse, raw);
-    String result = errorResponse.getMessage();
-    Assertions.assertEquals(EXPECTED_RAW, result);
+    String r1 = errorResponse.getMessage();
+    Assertions.assertEquals(EXPECTED_RAW, r1);
+    raw = "   ";
+    StringUtils.processRawMessage(errorResponse, raw);
+    String r2 = errorResponse.getMessage();
+    Assertions.assertEquals("", r2);
   }
 
   @Test
