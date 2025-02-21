@@ -31,6 +31,7 @@ public final class AssetsConstants {
   public static final String TRIGGERED_AT = "triggeredAt";
   public static final String REQUEST_ID = "requestId";
   public static final String ENV_KEY = "env";
+  public static final String BUYER_KEY = "buyer";
   public static final String CALL_SEQ = "callSeq";
   public static final String PRODUCT_TYPE = "productType";
   public static final String HTTP_STATUS_CODE = "httpStatusCode";

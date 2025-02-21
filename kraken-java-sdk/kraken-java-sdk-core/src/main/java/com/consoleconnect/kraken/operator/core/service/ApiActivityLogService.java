@@ -97,7 +97,6 @@ public class ApiActivityLogService {
           criteriaBuilder,
           root,
           StringUtils::isNotBlank);
-
       addEqualityPredicate(
           PATH,
           logSearchRequest.getPath(),
@@ -110,6 +109,13 @@ public class ApiActivityLogService {
       addEqualityPredicate(
           PRODUCT_TYPE,
           logSearchRequest.getProductType(),
+          predicateList,
+          criteriaBuilder,
+          root,
+          StringUtils::isNotBlank);
+      addEqualityPredicate(
+          BUYER_KEY,
+          logSearchRequest.getBuyer(),
           predicateList,
           criteriaBuilder,
           root,
