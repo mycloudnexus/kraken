@@ -1,5 +1,6 @@
 package com.consoleconnect.kraken.operator.gateway.runner;
 
+import static com.consoleconnect.kraken.operator.core.toolkit.Constants.COMMA;
 import static com.consoleconnect.kraken.operator.core.toolkit.Constants.COMMA_SPACE_EXPRESSION;
 
 import com.jayway.jsonpath.DocumentContext;
@@ -13,7 +14,7 @@ public interface PathOperator {
 
   default void deleteByPath(String path, DocumentContext doc) {
     try {
-      if (path.contains(",")) {
+      if (path.contains(COMMA)) {
         Arrays.stream(path.split(COMMA_SPACE_EXPRESSION)).forEach(doc::delete);
       } else {
         doc.delete(path);
