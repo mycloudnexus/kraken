@@ -11,6 +11,7 @@ import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFac
 import com.consoleconnect.kraken.operator.gateway.runner.MappingTransformer;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,6 +67,31 @@ class MappingTransformerTest extends AbstractIntegrationTest implements MappingT
     checkPathMap.put("$.notFound", "$.notFound");
     String s = deleteNodeByPath(checkPathMap, input);
     assertThat(s, hasJsonPath("$.productOrderItem[0].completionDate"), notNullValue());
+  }
+
+  @Test
+  void givenQuoteJson_whenUnableToProvide_thenDeletePathOK() {
+    Map<String, String> checkPathMap = new HashMap<>();
+    checkPathMap.put("$[?(@.state != 'unableToProvide')]", "$.validFor,  $.quoteLevel");
+    String input =
+        "{\"id\":\"id-here\",\"validFor\":{\"startDateTime\":\"123\",\"endDateTime\":\"456\"},\"quoteLevel\":\"hello\",\"state\":\"unableToProvide\"}";
+    String result = deleteNodeByPath(checkPathMap, input);
+    String expected = "{\"id\":\"id-here\",\"state\":\"unableToProvide\"}";
+    Assertions.assertEquals(expected, result);
+  }
+
+  @Test
+  void givenPathRules_whenFilling_thenReturnOK() {
+    List<ComponentAPITargetFacets.PathRule> pathRules = new ArrayList<>();
+    StateValueMappingDto stateValueMappingDto = new StateValueMappingDto();
+    fillPathRulesIfExist(pathRules, stateValueMappingDto);
+    Assertions.assertTrue(MapUtils.isEmpty(stateValueMappingDto.getTargetCheckPathMapper()));
+    ComponentAPITargetFacets.PathRule pathRule = new ComponentAPITargetFacets.PathRule();
+    pathRule.setCheckPath("$[?(@.state != 'unableToProvide')]");
+    pathRule.setDeletePath("$.validFor,  $.quoteLevel");
+    pathRules.add(pathRule);
+    fillPathRulesIfExist(pathRules, stateValueMappingDto);
+    Assertions.assertFalse(MapUtils.isEmpty(stateValueMappingDto.getTargetCheckPathMapper()));
   }
 
   @ParameterizedTest
