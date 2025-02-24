@@ -20,6 +20,10 @@ spec:
       method: post
       serverKey: mef.sonata.api-target-spec.con1718940696857
       mappers:
+        pathRules:
+          - name: mapper.quite.unit.add.sync.pathRule.state
+            checkPath: "$[?(@.state != 'unableToProvide')]"
+            deletePath: "$.validFor,  $.quoteLevel"
         request:
           - name: mapper.quote.eline.add.sync.duration.amount
             title: "quote item Term duration"

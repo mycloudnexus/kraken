@@ -20,6 +20,10 @@ spec:
       method: ""
       serverKey: ""
       mappers:
+        pathRules:
+          - name: mapper.quite.unit.add.sync.pathRule.state
+            checkPath: "$[?(@.state != 'unableToProvide')]"
+            deletePath: "$.validFor,  $.quoteLevel"
         request:
           - name: mapper.quote.uni.add.sync.duration.amount
             title: "quote item Term duration"

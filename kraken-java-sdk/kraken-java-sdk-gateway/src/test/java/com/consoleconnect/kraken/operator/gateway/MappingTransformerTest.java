@@ -65,7 +65,19 @@ class MappingTransformerTest extends AbstractIntegrationTest implements MappingT
         "$.productOrderItem[?(@.state != 'completed')].completionDate");
     checkPathMap.put("$.notFound", "$.notFound");
     String s = deleteNodeByPath(checkPathMap, input);
+    System.out.println(s);
     assertThat(s, hasJsonPath("$.productOrderItem[0].completionDate"), notNullValue());
+  }
+
+  @Test
+  void givenQuoteJson_whenUnableToProvide_thenDeletePathOK() {
+    Map<String, String> checkPathMap = new HashMap<>();
+    checkPathMap.put("$[?(@.state != 'unableToProvide')]", "$.validFor,  $.quoteLevel");
+    String input =
+        "{\"id\":\"id-here\",\"validFor\":{\"startDateTime\":\"123\",\"endDateTime\":\"456\"},\"quoteLevel\":\"hello\",\"state\":\"unableToProvide\"}";
+    String result = deleteNodeByPath(checkPathMap, input);
+    String expected = "{\"id\":\"id-here\",\"state\":\"unableToProvide\"}";
+    Assertions.assertEquals(expected, result);
   }
 
   @ParameterizedTest

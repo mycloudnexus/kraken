@@ -80,6 +80,8 @@ spec:
             targetLocation: BODY
             customizedField: false
             requiredMapping: false
+            checkPath: "$[?(@.state == 'completed'||@.state == 'failed'||@.state == 'partial'||@.state == 'rejected'||@.state == 'cancelled')]"
+            deletePath: "$.completionDate"
           - name: mapper.order.eline.read.delete.instanceId
             title: instance id from seller
             source: '@{{id}}'

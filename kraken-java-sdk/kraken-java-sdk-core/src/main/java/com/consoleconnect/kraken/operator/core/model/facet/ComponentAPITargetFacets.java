@@ -50,6 +50,7 @@ public class ComponentAPITargetFacets {
 
   @Data
   public static class Mappers {
+    private List<PathRule> pathRules;
     private List<Mapper> request;
     private List<Mapper> response;
   }
@@ -128,5 +129,12 @@ public class ComponentAPITargetFacets {
     private String key;
     private String val;
     private String operator;
+  }
+
+  @Data
+  public static class PathRule {
+    private String name;
+    private String checkPath;
+    private String deletePath;
   }
 }
