@@ -274,4 +274,17 @@ public interface MappingTransformer extends PathOperator {
     }
     return Boolean.TRUE;
   }
+
+  default void fillPathRulesIfExist(
+      List<ComponentAPITargetFacets.PathRule> pathRules,
+      StateValueMappingDto stateValueMappingDto) {
+    if (CollectionUtils.isEmpty(pathRules)) {
+      return;
+    }
+    pathRules.forEach(
+        pathRule ->
+            stateValueMappingDto
+                .getTargetCheckPathMapper()
+                .put(pathRule.getCheckPath(), pathRule.getDeletePath()));
+  }
 }
