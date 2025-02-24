@@ -1,5 +1,7 @@
 package com.consoleconnect.kraken.operator.core.toolkit;
 
+import static com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants.CUSTOMIZED_PLACE_HOLDER;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -14,8 +16,7 @@ public class ConstructExpressionUtil {
   private ConstructExpressionUtil() {}
 
   public static List<String> extractMapperParam(String param) {
-    String patternStr = "\\@\\{\\{(.*?)\\}\\}";
-    return extractParam(param, patternStr);
+    return extractParam(param, CUSTOMIZED_PLACE_HOLDER);
   }
 
   public static List<String> extractParam(String param, String patternStr) {

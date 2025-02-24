@@ -35,4 +35,5 @@ public final class AssetsConstants {
   public static final String CALL_SEQ = "callSeq";
   public static final String PRODUCT_TYPE = "productType";
   public static final String HTTP_STATUS_CODE = "httpStatusCode";
+  public static final String CUSTOMIZED_PLACE_HOLDER = "\\@\\{\\{(.*?)\\}\\}";
 }
