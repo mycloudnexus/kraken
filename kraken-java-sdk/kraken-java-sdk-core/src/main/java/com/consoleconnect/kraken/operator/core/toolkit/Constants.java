@@ -17,6 +17,7 @@ public class Constants {
   public static final String SELLER_CONTACT_SUFFIX = "seller.contact";
   public static final String FAIL_ORDER_TASK = "fail_order_task";
   public static final String EVALUATE_PAYLOAD_TASK = "evaluate_payload_task";
+  public static final String EVALUATE_EXPRESSION_TASK = "evaluate_expression_task";
   public static final String REJECT_ORDER_TASK = "reject_order_task";
   public static final String EMPTY_TASK = "empty_task";
   public static final String LOG_PAYLOAD_TASK = "log_payload_task";
