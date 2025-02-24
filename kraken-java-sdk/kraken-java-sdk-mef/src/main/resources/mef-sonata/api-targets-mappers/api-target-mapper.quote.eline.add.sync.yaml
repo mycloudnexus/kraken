@@ -21,7 +21,7 @@ spec:
       serverKey: mef.sonata.api-target-spec.con1718940696857
       mappers:
         pathRules:
-          - name: mapper.quite.unit.add.sync.pathRule.state
+          - name: mapper.quite.eline.add.sync.pathRule.state
             checkPath: "$[?(@.state != 'unableToProvide')]"
             deletePath: "$.validFor,  $.quoteLevel"
         request:

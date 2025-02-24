@@ -66,7 +66,6 @@ class MappingTransformerTest extends AbstractIntegrationTest implements MappingT
         "$.productOrderItem[?(@.state != 'completed')].completionDate");
     checkPathMap.put("$.notFound", "$.notFound");
     String s = deleteNodeByPath(checkPathMap, input);
-    System.out.println(s);
     assertThat(s, hasJsonPath("$.productOrderItem[0].completionDate"), notNullValue());
   }
 

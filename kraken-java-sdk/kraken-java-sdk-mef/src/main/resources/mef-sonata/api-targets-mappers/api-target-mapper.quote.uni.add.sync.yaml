@@ -21,7 +21,7 @@ spec:
       serverKey: ""
       mappers:
         pathRules:
-          - name: mapper.quite.unit.add.sync.pathRule.state
+          - name: mapper.quite.uni.add.sync.pathRule.state
             checkPath: "$[?(@.state != 'unableToProvide')]"
             deletePath: "$.validFor,  $.quoteLevel"
         request:
