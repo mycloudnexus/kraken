@@ -135,6 +135,8 @@ public class ComponentAPITargetFacets {
   public static class PathRule {
     private String name;
     private String checkPath;
+    private String operators;
     private String deletePath;
+    private String insertPath;
   }
 }

@@ -20,7 +20,9 @@ spec:
         pathRules:
           - name: mapper.quite.uni.add.sync.pathRule.state
             checkPath: "$[?(@.state != 'unableToProvide')]"
+            operators: delete, insert
             deletePath: "$.validFor,  $.quoteLevel"
+            insertPath:
         request:
           - name: mapper.quote.uni.add.sync.duration.amount
             source: "@{{quoteItem[0].requestedQuoteItemTerm.duration.amount}}"
