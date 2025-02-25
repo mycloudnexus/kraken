@@ -124,7 +124,7 @@ public interface MappingTransformer extends PathOperator {
     return responseBody;
   }
 
-  default String deleteNodeByPath(Map<String, String> checkPathMap, String json) {
+  default String deleteAndInsertNodeByPath(Map<String, String> checkPathMap, String json) {
     DocumentContext doc = JsonPath.parse(json);
     checkPathMap.forEach(
         (key, value) -> {

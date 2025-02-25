@@ -38,7 +38,7 @@ class MappingTransformerTest extends AbstractIntegrationTest implements MappingT
     String deletePath = "$.quoteItem[0].quoteItemPrice";
     checkPathMap.put(checkPath, deletePath);
     String input = readFileToString("/mockData/quoteResponseWithNegativeDutyFreeAmountValue.json");
-    String result = deleteNodeByPath(checkPathMap, input);
+    String result = deleteAndInsertNodeByPath(checkPathMap, input);
     assertThat(result, hasNoJsonPath("$.quoteItem[0].quoteItemPrice"));
   }
 
@@ -51,7 +51,7 @@ class MappingTransformerTest extends AbstractIntegrationTest implements MappingT
     checkPathMap.put("$.key4", "$.key4");
     String input =
         "{\"key1\":\"\",\"key2\":-1,\"key3\":false,\"key4\":-2.5,\"key\":\"hello kraken\"}";
-    String result = deleteNodeByPath(checkPathMap, input);
+    String result = deleteAndInsertNodeByPath(checkPathMap, input);
     Assertions.assertEquals("{\"key\":\"hello kraken\"}", result);
   }
 
@@ -65,7 +65,7 @@ class MappingTransformerTest extends AbstractIntegrationTest implements MappingT
         "$.productOrderItem[?(@.state == 'completed')]",
         "$.productOrderItem[?(@.state != 'completed')].completionDate");
     checkPathMap.put("$.notFound", "$.notFound");
-    String s = deleteNodeByPath(checkPathMap, input);
+    String s = deleteAndInsertNodeByPath(checkPathMap, input);
     assertThat(s, hasJsonPath("$.productOrderItem[0].completionDate"), notNullValue());
   }
 
@@ -75,7 +75,7 @@ class MappingTransformerTest extends AbstractIntegrationTest implements MappingT
     checkPathMap.put("$[?(@.state != 'unableToProvide')]", "$.validFor,  $.quoteLevel");
     String input =
         "{\"id\":\"id-here\",\"validFor\":{\"startDateTime\":\"123\",\"endDateTime\":\"456\"},\"quoteLevel\":\"hello\",\"state\":\"unableToProvide\"}";
-    String result = deleteNodeByPath(checkPathMap, input);
+    String result = deleteAndInsertNodeByPath(checkPathMap, input);
     String expected = "{\"id\":\"id-here\",\"state\":\"unableToProvide\"}";
     Assertions.assertEquals(expected, result);
   }
