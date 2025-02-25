@@ -11,6 +11,7 @@ import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
 import com.consoleconnect.kraken.operator.core.enums.AssetStatusEnum;
 import com.consoleconnect.kraken.operator.core.event.IngestionDataResult;
+import com.consoleconnect.kraken.operator.core.mapper.FacetsMapper;
 import com.consoleconnect.kraken.operator.core.model.SyncMetadata;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
@@ -187,5 +188,25 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
     String newMapperStr = JsonToolkit.toJson(newMapperMap);
     log.info(newMapperStr);
     Assertions.assertNotNull(newMapperStr);
+  }
+
+  @SneakyThrows
+  @Test
+  void givenQuoteRules_whenCopy_thenReturnOK() {
+    String targetApiPath =
+        "deployment-config/components/api-targets-mappers/api-target-mapper.quote.uni.add.yaml";
+    Optional<UnifiedAsset> unifiedAsset =
+        YamlToolkit.parseYaml(readFileToString(targetApiPath), UnifiedAsset.class);
+    unifiedAsset.ifPresent(
+        asset -> {
+          ComponentAPITargetFacets facets =
+              UnifiedAsset.getFacets(asset, ComponentAPITargetFacets.class);
+          ComponentAPITargetFacets.Endpoint source = facets.getEndpoints().get(0);
+          ComponentAPITargetFacets.Endpoint target = new ComponentAPITargetFacets.Endpoint();
+          FacetsMapper.INSTANCE.toEndpoint(source, target);
+          String result = JsonToolkit.toJson(target);
+          System.out.println(result);
+          Assertions.assertNotNull(result);
+        });
   }
 }
