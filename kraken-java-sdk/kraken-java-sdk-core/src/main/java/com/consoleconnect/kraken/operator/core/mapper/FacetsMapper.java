@@ -46,6 +46,7 @@ public interface FacetsMapper {
   @Mapping(target = "serverKey", source = "serverKey")
   @Mapping(target = "pathReferId", source = "pathReferId")
   @Mapping(target = "method", source = "method")
+  @Mapping(target = "mappers", source = "mappers")
   void toEndpoint(
       ComponentAPITargetFacets.Endpoint endpoint,
       @MappingTarget ComponentAPITargetFacets.Endpoint endpointTarget);
