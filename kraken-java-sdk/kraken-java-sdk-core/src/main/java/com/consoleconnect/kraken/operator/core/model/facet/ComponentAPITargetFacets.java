@@ -135,8 +135,13 @@ public class ComponentAPITargetFacets {
   public static class PathRule {
     private String name;
     private String checkPath;
-    private String operators;
     private String deletePath;
-    private String insertPath;
+    private List<KVPair> insertPath;
+  }
+
+  @Data
+  public static class KVPair {
+    private String key;
+    private String val;
   }
 }
