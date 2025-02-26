@@ -363,20 +363,20 @@ public class UnifiedAssetService implements UUIDWrapper {
   }
 
   public static void mergeMappers(
-      Map<String, Map<String, ComponentAPITargetFacets.Mapper>> mapperOldMap,
-      Map<String, Map<String, ComponentAPITargetFacets.Mapper>> mapperNewMap) {
-    mapperOldMap.forEach(
+      Map<String, Map<String, ComponentAPITargetFacets.Mapper>> mapperMapOld,
+      Map<String, Map<String, ComponentAPITargetFacets.Mapper>> mapperMapNew) {
+    mapperMapOld.forEach(
         (name, value) -> {
           Map.Entry<String, ComponentAPITargetFacets.Mapper> existMapperEntry =
               value.entrySet().iterator().next();
           if (Objects.equals(Boolean.TRUE, existMapperEntry.getValue().getCustomizedField())) {
             String mapperHashCode = String.valueOf(existMapperEntry.getValue().hashCode());
-            mapperNewMap.putIfAbsent(
+            mapperMapNew.putIfAbsent(
                 mapperHashCode,
                 new HashMap<>(Map.of(existMapperEntry.getKey(), existMapperEntry.getValue())));
-          } else if (mapperNewMap.containsKey(name)) {
+          } else if (mapperMapNew.containsKey(name)) {
             ComponentAPITargetFacets.Mapper mapper =
-                mapperNewMap.get(name).get(existMapperEntry.getKey());
+                mapperMapNew.get(name).get(existMapperEntry.getKey());
             if (Objects.equals(MAPPER_REQUEST, existMapperEntry.getKey())) {
               FacetsMapper.INSTANCE.toRequestMapper(existMapperEntry.getValue(), mapper);
             } else {
