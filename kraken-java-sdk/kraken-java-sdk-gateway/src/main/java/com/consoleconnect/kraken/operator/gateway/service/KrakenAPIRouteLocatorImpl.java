@@ -4,6 +4,7 @@ import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPIFacets;
+import com.consoleconnect.kraken.operator.core.repo.WorkflowInstanceRepository;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.gateway.func.KrakenGatewayFilterSpecFunc;
@@ -37,6 +38,7 @@ public class KrakenAPIRouteLocatorImpl implements RouteLocator {
   private final FilterHeaderService filterHeaderService;
   private final OrkesWorkflowClient workflowClient;
   private final OrkesMetadataClient metadataClient;
+  private final WorkflowInstanceRepository workflowInstanceRepository;
 
   private List<UnifiedAssetDto> listProducts() {
     return service
@@ -78,7 +80,8 @@ public class KrakenAPIRouteLocatorImpl implements RouteLocator {
                                 appProperty,
                                 filterHeaderService,
                                 workflowClient,
-                                metadataClient)
+                                metadataClient,
+                                workflowInstanceRepository)
                             .apply(f))
                 .uri("no://op");
           });
