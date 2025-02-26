@@ -224,4 +224,13 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
           result2, hasJsonPath("$.endpoints[0].mappers.pathRules[0].checkPath", notNullValue()));
     }
   }
+
+  @SneakyThrows
+  @Test
+  void givenTargetFile_whenCopy_thenReturnOK() {
+    String targetApiPath1 =
+        "deployment-config/components/api-targets/mef.sonata.api.order.eline.add.yaml";
+    Optional<UnifiedAsset> unifiedAssetOptOld =
+        YamlToolkit.parseYaml(readFileToString(targetApiPath1), UnifiedAsset.class);
+  }
 }
