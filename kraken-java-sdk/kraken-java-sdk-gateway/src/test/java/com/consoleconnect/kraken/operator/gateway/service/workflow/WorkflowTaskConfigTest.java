@@ -53,7 +53,7 @@ class WorkflowTaskConfigTest extends AbstractIntegrationTest {
     workflowInstanceEntity.setWorkflowInstanceId(UUID.randomUUID().toString());
     workflowInstanceRepository.save(workflowInstanceEntity);
 
-    doReturn(Optional.of(List.of(new ApiActivityLogEntity())))
+    doReturn(Optional.of(new ApiActivityLogEntity()))
         .when(apiActivityLogRepository)
         .findByRequestIdAndCallSeq(anyString(), anyInt());
     doReturn(new ApiActivityLogEntity()).when(apiActivityLogRepository).save(any());
