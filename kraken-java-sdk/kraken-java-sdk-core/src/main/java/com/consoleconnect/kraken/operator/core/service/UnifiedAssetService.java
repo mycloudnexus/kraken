@@ -20,6 +20,7 @@ import com.consoleconnect.kraken.operator.core.repo.AssetFacetRepository;
 import com.consoleconnect.kraken.operator.core.repo.AssetLinkRepository;
 import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
 import com.consoleconnect.kraken.operator.core.toolkit.*;
+import com.fasterxml.jackson.core.type.TypeReference;
 import jakarta.persistence.criteria.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -333,41 +334,49 @@ public class UnifiedAssetService implements UUIDWrapper {
     UnifiedAssetDto assetDto = UnifiedAssetService.toAsset(unifiedAssetEntity, true);
     ComponentAPITargetFacets existFacets =
         UnifiedAsset.getFacets(assetDto, ComponentAPITargetFacets.class);
-    ComponentAPITargetFacets.Endpoint existEndpoints = existFacets.getEndpoints().get(0);
-
     ComponentAPITargetFacets newFacets =
         JsonToolkit.fromJson(JsonToolkit.toJson(facetsUpdated), ComponentAPITargetFacets.class);
-    ComponentAPITargetFacets.Endpoint newEndpoint = newFacets.getEndpoints().get(0);
-    FacetsMapper.INSTANCE.toEndpoint(existEndpoints, newEndpoint);
+    return mergeFacets(existFacets, newFacets);
+  }
 
-    Map<String, Map<String, ComponentAPITargetFacets.Mapper>> existMapperMap =
-        constructMapperMap(existEndpoints);
-    Map<String, Map<String, ComponentAPITargetFacets.Mapper>> newMapperMap =
-        constructMapperMap(newEndpoint);
-    mergeMappers(existMapperMap, newMapperMap);
-    Map<String, List<ComponentAPITargetFacets.Mapper>> finalMap = toFinalMapper(newMapperMap);
+  public static Map<String, Object> mergeFacets(
+      ComponentAPITargetFacets facetsOld, ComponentAPITargetFacets facetsNew) {
+    ComponentAPITargetFacets.Endpoint endpointOld = facetsOld.getEndpoints().get(0);
+    ComponentAPITargetFacets.Endpoint endpointNew = facetsNew.getEndpoints().get(0);
+    List<PathRule> pathRules = endpointNew.getMappers().getPathRules();
+    FacetsMapper.INSTANCE.toEndpoint(endpointOld, endpointNew);
+
+    Map<String, Map<String, ComponentAPITargetFacets.Mapper>> mapperOldMap =
+        constructMapperMap(endpointOld);
+    Map<String, Map<String, ComponentAPITargetFacets.Mapper>> mapperNewMap =
+        constructMapperMap(endpointNew);
+    mergeMappers(mapperOldMap, mapperNewMap);
+
+    Map<String, List<ComponentAPITargetFacets.Mapper>> finalMap = toFinalMapper(mapperNewMap);
     ComponentAPITargetFacets.Mappers mappers = new ComponentAPITargetFacets.Mappers();
     mappers.setResponse(finalMap.getOrDefault(MAPPER_RESPONSE, Collections.emptyList()));
     mappers.setRequest(finalMap.getOrDefault(MAPPER_REQUEST, Collections.emptyList()));
-    newEndpoint.setMappers(mappers);
+    mappers.setPathRules(pathRules);
+    endpointNew.setMappers(mappers);
 
-    return JsonToolkit.fromJson(JsonToolkit.toJson(newFacets), Map.class);
+    return JsonToolkit.fromJson(JsonToolkit.toJson(facetsNew), new TypeReference<>() {});
   }
 
   public static void mergeMappers(
-      Map<String, Map<String, ComponentAPITargetFacets.Mapper>> existMapperMap,
-      Map<String, Map<String, ComponentAPITargetFacets.Mapper>> newMapperMap) {
-    existMapperMap.forEach(
+      Map<String, Map<String, ComponentAPITargetFacets.Mapper>> mapperMapOld,
+      Map<String, Map<String, ComponentAPITargetFacets.Mapper>> mapperMapNew) {
+    mapperMapOld.forEach(
         (name, value) -> {
           Map.Entry<String, ComponentAPITargetFacets.Mapper> existMapperEntry =
               value.entrySet().iterator().next();
           if (Objects.equals(Boolean.TRUE, existMapperEntry.getValue().getCustomizedField())) {
             String mapperHashCode = String.valueOf(existMapperEntry.getValue().hashCode());
-            newMapperMap.putIfAbsent(
-                mapperHashCode, Map.of(existMapperEntry.getKey(), existMapperEntry.getValue()));
-          } else if (newMapperMap.containsKey(name)) {
+            mapperMapNew.putIfAbsent(
+                mapperHashCode,
+                new HashMap<>(Map.of(existMapperEntry.getKey(), existMapperEntry.getValue())));
+          } else if (mapperMapNew.containsKey(name)) {
             ComponentAPITargetFacets.Mapper mapper =
-                newMapperMap.get(name).get(existMapperEntry.getKey());
+                mapperMapNew.get(name).get(existMapperEntry.getKey());
             if (Objects.equals(MAPPER_REQUEST, existMapperEntry.getKey())) {
               FacetsMapper.INSTANCE.toRequestMapper(existMapperEntry.getValue(), mapper);
             } else {
@@ -391,7 +400,7 @@ public class UnifiedAssetService implements UUIDWrapper {
   public static Map<String, Map<String, ComponentAPITargetFacets.Mapper>> constructMapperMap(
       ComponentAPITargetFacets.Endpoint endpoint) {
     if (Objects.isNull(endpoint) || Objects.isNull(endpoint.getMappers())) {
-      return Map.of();
+      return new LinkedHashMap<>();
     }
 
     Map<String, Map<String, ComponentAPITargetFacets.Mapper>> mapperMap = new LinkedHashMap<>();

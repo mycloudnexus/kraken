@@ -1,6 +1,7 @@
 package com.consoleconnect.kraken.operator.core.model.facet;
 
 import com.consoleconnect.kraken.operator.core.enums.SupportedCaseEnum;
+import com.consoleconnect.kraken.operator.core.model.PathRule;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -129,12 +130,5 @@ public class ComponentAPITargetFacets {
     private String key;
     private String val;
     private String operator;
-  }
-
-  @Data
-  public static class PathRule {
-    private String name;
-    private String checkPath;
-    private String deletePath;
   }
 }
