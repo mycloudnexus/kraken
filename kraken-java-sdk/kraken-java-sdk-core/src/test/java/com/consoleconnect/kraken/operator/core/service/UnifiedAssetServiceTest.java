@@ -1,7 +1,10 @@
 package com.consoleconnect.kraken.operator.core.service;
 
 import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.COMPONENT_API_TARGET_SPEC;
-import static org.testcontainers.shaded.org.hamcrest.Matchers.*;
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.notNullValue;
 
 import com.consoleconnect.kraken.operator.core.CustomConfig;
 import com.consoleconnect.kraken.operator.core.dto.SimpleApiServerDto;
@@ -11,7 +14,6 @@ import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
 import com.consoleconnect.kraken.operator.core.enums.AssetStatusEnum;
 import com.consoleconnect.kraken.operator.core.event.IngestionDataResult;
-import com.consoleconnect.kraken.operator.core.mapper.FacetsMapper;
 import com.consoleconnect.kraken.operator.core.model.SyncMetadata;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
@@ -30,7 +32,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
-import org.testcontainers.shaded.org.hamcrest.MatcherAssert;
 
 @Slf4j
 @MockIntegrationTest
@@ -109,7 +110,7 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
         PageRequest.of(0, 1, Sort.Direction.DESC, AssetsConstants.FIELD_CREATE_AT);
     Paging<UnifiedAssetDto> assetDtoPaging =
         unifiedAssetService.findBySpecification(tuple2List, tuple3List, tags, pageRequest, null);
-    MatcherAssert.assertThat(assetDtoPaging.getData(), hasSize(0));
+    assertThat(assetDtoPaging.getData(), hasSize(0));
   }
 
   @Test
@@ -193,20 +194,34 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
   @SneakyThrows
   @Test
   void givenQuoteRules_whenCopy_thenReturnOK() {
-    String targetApiPath =
-        "deployment-config/components/api-targets-mappers/api-target-mapper.quote.uni.add.yaml";
-    Optional<UnifiedAsset> unifiedAsset =
-        YamlToolkit.parseYaml(readFileToString(targetApiPath), UnifiedAsset.class);
-    unifiedAsset.ifPresent(
-        asset -> {
-          ComponentAPITargetFacets facets =
-              UnifiedAsset.getFacets(asset, ComponentAPITargetFacets.class);
-          ComponentAPITargetFacets.Endpoint source = facets.getEndpoints().get(0);
-          ComponentAPITargetFacets.Endpoint target = new ComponentAPITargetFacets.Endpoint();
-          FacetsMapper.INSTANCE.toEndpoint(source, target);
-          String result = JsonToolkit.toJson(target);
-          System.out.println(result);
-          Assertions.assertNotNull(result);
-        });
+    String targetApiPath1 = "data/target-mapper.quote.uni.add.sync-1.yaml";
+    Optional<UnifiedAsset> unifiedAssetOptOld =
+        YamlToolkit.parseYaml(readFileToString(targetApiPath1), UnifiedAsset.class);
+    String targetApiPath2 = "data/target-mapper.quote.uni.add.sync-2.yaml";
+    Optional<UnifiedAsset> unifiedAssetOptNew =
+        YamlToolkit.parseYaml(readFileToString(targetApiPath2), UnifiedAsset.class);
+    if (unifiedAssetOptOld.isPresent() && unifiedAssetOptNew.isPresent()) {
+      UnifiedAsset assetOld = unifiedAssetOptOld.get();
+      UnifiedAsset assetNew = unifiedAssetOptNew.get();
+
+      ComponentAPITargetFacets facetsOld =
+          UnifiedAsset.getFacets(assetOld, ComponentAPITargetFacets.class);
+      ComponentAPITargetFacets facetsNew =
+          UnifiedAsset.getFacets(assetNew, ComponentAPITargetFacets.class);
+
+      String result1 = JsonToolkit.toJson(facetsOld);
+      Assertions.assertNotNull(result1);
+      Map<String, Object> map = UnifiedAssetService.mergeFacets(facetsOld, facetsNew);
+      String result2 = JsonToolkit.toJson(map);
+      Assertions.assertNotNull(result2);
+      assertThat(result2, hasJsonPath("$.endpoints[0].mappers.request", hasSize(9)));
+      assertThat(result2, hasJsonPath("$.endpoints[0].mappers.response", hasSize(10)));
+      assertThat(result2, hasJsonPath("$.endpoints[0].mappers.pathRules", hasSize(1)));
+      assertThat(
+          result2, hasJsonPath("$.endpoints[0].mappers.request[1].sourceValues", notNullValue()));
+      assertThat(result2, hasJsonPath("$.endpoints[0].mappers.response[0].target", notNullValue()));
+      assertThat(
+          result2, hasJsonPath("$.endpoints[0].mappers.pathRules[0].checkPath", notNullValue()));
+    }
   }
 }

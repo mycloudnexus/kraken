@@ -24,6 +24,11 @@ spec:
           - name: mapper.quite.eline.add.sync.pathRule.state
             checkPath: "$[?(@.state != 'unableToProvide')]"
             deletePath: "$.validFor,  $.quoteLevel"
+            insertPath:
+              - key: "$.quoteItem[0].terminationError.code"
+                val: "otherIssue"
+              - key: "$.quoteItem[0].terminationError.value"
+                val: "the quoted item is not available"
         request:
           - name: mapper.quote.eline.add.sync.duration.amount
             title: "quote item Term duration"

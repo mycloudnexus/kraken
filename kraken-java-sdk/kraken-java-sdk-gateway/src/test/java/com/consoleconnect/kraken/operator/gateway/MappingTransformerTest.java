@@ -3,7 +3,7 @@ package com.consoleconnect.kraken.operator.gateway;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasNoJsonPath;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 
 import com.consoleconnect.kraken.operator.core.dto.StateValueMappingDto;
 import com.consoleconnect.kraken.operator.core.enums.MappingTypeEnum;
@@ -11,6 +11,8 @@ import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFac
 import com.consoleconnect.kraken.operator.gateway.runner.MappingTransformer;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,7 +40,10 @@ class MappingTransformerTest extends AbstractIntegrationTest implements MappingT
     String deletePath = "$.quoteItem[0].quoteItemPrice";
     checkPathMap.put(checkPath, deletePath);
     String input = readFileToString("/mockData/quoteResponseWithNegativeDutyFreeAmountValue.json");
-    String result = deleteAndInsertNodeByPath(checkPathMap, input);
+
+    StateValueMappingDto stateValueMappingDto = new StateValueMappingDto();
+    stateValueMappingDto.setTargetCheckPathMapper(checkPathMap);
+    String result = deleteAndInsertNodeByPath(stateValueMappingDto, input);
     assertThat(result, hasNoJsonPath("$.quoteItem[0].quoteItemPrice"));
   }
 
@@ -51,7 +56,10 @@ class MappingTransformerTest extends AbstractIntegrationTest implements MappingT
     checkPathMap.put("$.key4", "$.key4");
     String input =
         "{\"key1\":\"\",\"key2\":-1,\"key3\":false,\"key4\":-2.5,\"key\":\"hello kraken\"}";
-    String result = deleteAndInsertNodeByPath(checkPathMap, input);
+
+    StateValueMappingDto stateValueMappingDto = new StateValueMappingDto();
+    stateValueMappingDto.setTargetCheckPathMapper(checkPathMap);
+    String result = deleteAndInsertNodeByPath(stateValueMappingDto, input);
     Assertions.assertEquals("{\"key\":\"hello kraken\"}", result);
   }
 
@@ -65,7 +73,9 @@ class MappingTransformerTest extends AbstractIntegrationTest implements MappingT
         "$.productOrderItem[?(@.state == 'completed')]",
         "$.productOrderItem[?(@.state != 'completed')].completionDate");
     checkPathMap.put("$.notFound", "$.notFound");
-    String s = deleteAndInsertNodeByPath(checkPathMap, input);
+    StateValueMappingDto stateValueMappingDto = new StateValueMappingDto();
+    stateValueMappingDto.setTargetCheckPathMapper(checkPathMap);
+    String s = deleteAndInsertNodeByPath(stateValueMappingDto, input);
     assertThat(s, hasJsonPath("$.productOrderItem[0].completionDate"), notNullValue());
   }
 
@@ -75,7 +85,9 @@ class MappingTransformerTest extends AbstractIntegrationTest implements MappingT
     checkPathMap.put("$[?(@.state != 'unableToProvide')]", "$.validFor,  $.quoteLevel");
     String input =
         "{\"id\":\"id-here\",\"validFor\":{\"startDateTime\":\"123\",\"endDateTime\":\"456\"},\"quoteLevel\":\"hello\",\"state\":\"unableToProvide\"}";
-    String result = deleteAndInsertNodeByPath(checkPathMap, input);
+    StateValueMappingDto stateValueMappingDto = new StateValueMappingDto();
+    stateValueMappingDto.setTargetCheckPathMapper(checkPathMap);
+    String result = deleteAndInsertNodeByPath(stateValueMappingDto, input);
     String expected = "{\"id\":\"id-here\",\"state\":\"unableToProvide\"}";
     Assertions.assertEquals(expected, result);
   }
@@ -113,5 +125,83 @@ class MappingTransformerTest extends AbstractIntegrationTest implements MappingT
 
     ComponentAPITargetFacets.Mapper mapper3 = new ComponentAPITargetFacets.Mapper();
     return List.of(mapper1, mapper2, mapper3);
+  }
+
+  @Test
+  void givenJson_whenAddNode_thenReturnOK() {
+    String json = "{}";
+    String key1 = "$.quoteItem[0].terminationError.code";
+    String val1 = "otherIssue";
+    String key2 = "$.quoteItem[0].terminationError.value";
+    String val2 = "hello";
+    String key3 = "$.state";
+    String val3 = "success";
+    String key4 = "$.quoteItem[0].quoteItemPrice[0].dutyFreeAmount.unit";
+    String val4 = "16";
+    String key5 = "$.quoteItem[0].quoteItemPrice[1].dutyFreeAmount.unit";
+    String val5 = "15";
+
+    DocumentContext doc = JsonPath.parse(json);
+    ensurePathExists(doc, key1);
+    ensurePathExists(doc, key2);
+    ensurePathExists(doc, key3);
+    ensurePathExists(doc, key4);
+    ensurePathExists(doc, key5);
+    doc.set(key1, val1);
+    doc.set(key2, val2);
+    doc.set(key3, val3);
+    doc.set(key4, val4);
+    doc.set(key5, val5);
+    String result = doc.jsonString();
+    Assertions.assertNotNull(result);
+    assertThat(result, hasJsonPath("$.quoteItem", hasSize(1)));
+    assertThat(result, hasJsonPath(key1, notNullValue()));
+    assertThat(result, hasJsonPath(key2, notNullValue()));
+    assertThat(result, hasJsonPath(key3, notNullValue()));
+    assertThat(result, hasJsonPath(key4, notNullValue()));
+    assertThat(result, hasJsonPath(key5, notNullValue()));
+  }
+
+  @Test
+  @SneakyThrows
+  void givenJson_whenDeleteAndInsertNodeByPath_thenReturnOK() {
+    String json = readFileToString("mockData/quote.eline.response.json");
+    StateValueMappingDto stateValueMappingDto = new StateValueMappingDto();
+    ComponentAPITargetFacets.PathRule pathRule = new ComponentAPITargetFacets.PathRule();
+    pathRule.setCheckPath("$[?(@.state != 'unableToProvide')]");
+    String d1 = "$.validFor";
+    String d2 = "$.quoteLevel";
+    pathRule.setDeletePath(d1 + ",    " + d2);
+
+    List<ComponentAPITargetFacets.KVPair> insertPath = new ArrayList<>();
+    ComponentAPITargetFacets.KVPair p1 = new ComponentAPITargetFacets.KVPair();
+    String key1 = "$.quoteItem[0].terminationError.code";
+    p1.setKey(key1);
+    p1.setVal("otherIssue");
+    ComponentAPITargetFacets.KVPair p2 = new ComponentAPITargetFacets.KVPair();
+    String key2 = "$.quoteItem[0].terminationError.value";
+    p2.setKey(key2);
+    p2.setVal("the quoted item is not available");
+
+    insertPath.add(p1);
+    insertPath.add(p2);
+
+    pathRule.setInsertPath(insertPath);
+    List<ComponentAPITargetFacets.PathRule> pathRules = new ArrayList<>();
+    pathRules.add(pathRule);
+    fillPathRulesIfExist(pathRules, stateValueMappingDto);
+
+    String key3 = "$['quoteItem'][0]['quoteItemPrice'][0]['price']['dutyFreeAmount']['value']";
+    String val3 = "$.quoteItem[0].quoteItemPrice";
+    stateValueMappingDto.getTargetCheckPathMapper().put(key3, val3);
+    String result = deleteAndInsertNodeByPath(stateValueMappingDto, json);
+    System.out.println(result);
+    Assertions.assertNotNull(result);
+
+    assertThat(result, hasJsonPath(key1, notNullValue()));
+    assertThat(result, hasJsonPath(key2, notNullValue()));
+    assertThat(result, hasJsonPath(val3, notNullValue()));
+    assertThat(result, hasNoJsonPath(d1));
+    assertThat(result, hasNoJsonPath(d2));
   }
 }

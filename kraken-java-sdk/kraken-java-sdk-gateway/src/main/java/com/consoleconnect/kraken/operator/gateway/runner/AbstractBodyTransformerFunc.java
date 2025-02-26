@@ -191,7 +191,6 @@ public abstract class AbstractBodyTransformerFunc
       retJsonString = calculateBasedOnResponseBody(retJsonString, context);
     }
     // clear empty attribute
-    return deleteAndInsertNodeByPath(
-        responseTargetMapperDto.getTargetCheckPathMapper(), retJsonString);
+    return deleteAndInsertNodeByPath(responseTargetMapperDto, retJsonString);
   }
 }
