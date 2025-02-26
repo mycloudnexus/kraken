@@ -344,7 +344,7 @@ public class UnifiedAssetService implements UUIDWrapper {
     ComponentAPITargetFacets.Endpoint endpointOld = facetsOld.getEndpoints().get(0);
     ComponentAPITargetFacets.Endpoint endpointNew = facetsNew.getEndpoints().get(0);
     List<PathRule> pathRules =
-        (Objects.isNull(endpointNew.getMappers()))
+        (Objects.isNull(endpointNew) || Objects.isNull(endpointNew.getMappers()))
             ? new ArrayList<>()
             : endpointNew.getMappers().getPathRules();
     FacetsMapper.INSTANCE.toEndpoint(endpointOld, endpointNew);
@@ -360,8 +360,9 @@ public class UnifiedAssetService implements UUIDWrapper {
     mappers.setResponse(finalMap.getOrDefault(MAPPER_RESPONSE, Collections.emptyList()));
     mappers.setRequest(finalMap.getOrDefault(MAPPER_REQUEST, Collections.emptyList()));
     mappers.setPathRules(pathRules);
-    endpointNew.setMappers(mappers);
-
+    if (Objects.nonNull(endpointNew)) {
+      endpointNew.setMappers(mappers);
+    }
     return JsonToolkit.fromJson(JsonToolkit.toJson(facetsNew), new TypeReference<>() {});
   }
 
