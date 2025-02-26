@@ -1,5 +1,6 @@
 package com.consoleconnect.kraken.operator.core.dto;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,5 +15,5 @@ public class StateValueMappingDto {
   /** delete specified field when key filed is empty */
   private Map<String, String> targetCheckPathMapper = new HashMap<>();
 
-  private List<PathRuleDto> pathRules;
+  private List<PathRuleDto> pathRules = new ArrayList<>();
 }

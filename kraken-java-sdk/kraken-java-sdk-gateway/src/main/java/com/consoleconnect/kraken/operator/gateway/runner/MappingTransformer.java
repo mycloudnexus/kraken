@@ -127,11 +127,10 @@ public interface MappingTransformer extends PathOperator {
     return responseBody;
   }
 
-  default String deleteAndInsertNodeByPath(
-      StateValueMappingDto responseTargetMapperDto, String json) {
+  default String deleteAndInsertNodeByPath(StateValueMappingDto stateValueMappingDto, String json) {
     DocumentContext doc = JsonPath.parse(json);
     // Delete and insert operations based on path rules
-    responseTargetMapperDto.getPathRules().stream()
+    stateValueMappingDto.getPathRules().stream()
         .filter(pathRuleDto -> StringUtils.isNotBlank(pathRuleDto.getCheckPath()))
         .forEach(
             pathRuleDto -> {
@@ -149,7 +148,7 @@ public interface MappingTransformer extends PathOperator {
                               kvPair -> insertNodeByPath(doc, kvPair.getKey(), kvPair.getVal())));
             });
     // Perform final deletion based on target check path mapping
-    Optional.ofNullable(responseTargetMapperDto.getTargetCheckPathMapper())
+    Optional.ofNullable(stateValueMappingDto.getTargetCheckPathMapper())
         .filter(MapUtils::isNotEmpty)
         .ifPresent(checkPathMap -> deleteNodeByPath(checkPathMap, doc));
 
@@ -367,17 +366,19 @@ public interface MappingTransformer extends PathOperator {
           dto.setName(item.getName());
           dto.setCheckPath(item.getCheckPath());
           dto.setDeletePath(item.getDeletePath());
-          List<PathRuleDto.KVPair> insertPath =
-              item.getInsertPath().stream()
-                  .map(
-                      p -> {
-                        PathRuleDto.KVPair pair = new PathRuleDto.KVPair();
-                        pair.setKey(p.getKey());
-                        pair.setVal(p.getVal());
-                        return pair;
-                      })
-                  .toList();
-          dto.setInsertPath(insertPath);
+          if (CollectionUtils.isNotEmpty(item.getInsertPath())) {
+            List<PathRuleDto.KVPair> insertPath =
+                item.getInsertPath().stream()
+                    .map(
+                        p -> {
+                          PathRuleDto.KVPair pair = new PathRuleDto.KVPair();
+                          pair.setKey(p.getKey());
+                          pair.setVal(p.getVal());
+                          return pair;
+                        })
+                    .toList();
+            dto.setInsertPath(insertPath);
+          }
           pathRules.add(dto);
         });
     stateValueMappingDto.setPathRules(pathRules);

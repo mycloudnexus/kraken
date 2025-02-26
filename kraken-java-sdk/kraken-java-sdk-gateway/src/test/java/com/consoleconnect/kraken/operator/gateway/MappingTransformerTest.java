@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.SneakyThrows;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer;
@@ -103,7 +104,7 @@ class MappingTransformerTest extends AbstractIntegrationTest implements MappingT
     pathRule.setDeletePath("$.validFor,  $.quoteLevel");
     pathRules.add(pathRule);
     fillPathRulesIfExist(pathRules, stateValueMappingDto);
-    Assertions.assertFalse(MapUtils.isEmpty(stateValueMappingDto.getTargetCheckPathMapper()));
+    Assertions.assertTrue(CollectionUtils.isNotEmpty(stateValueMappingDto.getPathRules()));
   }
 
   @ParameterizedTest
