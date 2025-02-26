@@ -1,12 +1,16 @@
 package com.consoleconnect.kraken.operator.controller.v2;
 
+import static org.mockito.ArgumentMatchers.*;
+
 import com.consoleconnect.kraken.operator.config.TestApplication;
 import com.consoleconnect.kraken.operator.controller.APITokenCreator;
 import com.consoleconnect.kraken.operator.controller.WebTestClientHelper;
 import com.consoleconnect.kraken.operator.controller.service.APITokenService;
 import com.consoleconnect.kraken.operator.core.client.*;
 import com.consoleconnect.kraken.operator.core.dto.ApiActivityLog;
+import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
 import com.consoleconnect.kraken.operator.core.enums.WorkflowStatusEnum;
+import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
 import com.consoleconnect.kraken.operator.core.request.LogSearchRequest;
 import com.consoleconnect.kraken.operator.core.service.ApiActivityLogService;
 import com.consoleconnect.kraken.operator.core.toolkit.DateTime;
@@ -17,7 +21,9 @@ import java.util.*;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -33,6 +39,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 class ClientPubSubControllerTest extends AbstractIntegrationTest implements APITokenCreator {
   @Getter @Autowired APITokenService apiTokenService;
   @Autowired ApiActivityLogService apiActivityLogService;
+  @SpyBean ApiActivityLogRepository apiActivityLogRepository;
 
   public static final String PRODUCT_ID = "mef.sonata";
   public static final String CLIENT_EVENT_ENDPOINT = "/client/events";
@@ -193,7 +200,10 @@ class ClientPubSubControllerTest extends AbstractIntegrationTest implements APIT
             UUID.randomUUID().toString(),
             ClientEventTypeEnum.CLIENT_TERMINATE_WORKFLOW,
             List.of(terminate));
-
+    Mockito.doReturn(Optional.of(new ApiActivityLogEntity()))
+        .when(apiActivityLogRepository)
+        .findByRequestIdAndCallSeq(anyString(), anyInt());
+    Mockito.doReturn(new ApiActivityLogEntity()).when(apiActivityLogRepository).save(any());
     Map<String, String> headers = new HashMap<>();
     headers.put("Authorization", accessToken);
     webTestClientHelper.requestAndVerify(

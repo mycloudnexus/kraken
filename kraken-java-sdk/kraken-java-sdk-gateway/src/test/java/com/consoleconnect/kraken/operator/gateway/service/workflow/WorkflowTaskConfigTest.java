@@ -1,7 +1,7 @@
 package com.consoleconnect.kraken.operator.gateway.service.workflow;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doReturn;
 
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
@@ -31,7 +31,7 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration(classes = CustomConfig.class)
 class WorkflowTaskConfigTest extends AbstractIntegrationTest {
   @SpyBean HttpRequestRepository httpRequestRepository;
-  @Autowired ApiActivityLogRepository apiActivityLogRepository;
+  @SpyBean ApiActivityLogRepository apiActivityLogRepository;
   @Autowired WorkflowTaskConfig workflowTaskConfig;
   @Autowired WorkflowInstanceRepository workflowInstanceRepository;
 
@@ -52,6 +52,11 @@ class WorkflowTaskConfigTest extends AbstractIntegrationTest {
     workflowInstanceEntity.setSynced(false);
     workflowInstanceEntity.setWorkflowInstanceId(UUID.randomUUID().toString());
     workflowInstanceRepository.save(workflowInstanceEntity);
+
+    doReturn(Optional.of(List.of(new ApiActivityLogEntity())))
+        .when(apiActivityLogRepository)
+        .findByRequestIdAndCallSeq(anyString(), anyInt());
+    doReturn(new ApiActivityLogEntity()).when(apiActivityLogRepository).save(any());
 
     HttpRequestEntity entity = new HttpRequestEntity();
     entity.setRenderedResponse(Map.of("state", "active"));
