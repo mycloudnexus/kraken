@@ -22,6 +22,7 @@ import java.util.Map;
 import lombok.SneakyThrows;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -170,7 +171,7 @@ class MappingTransformerTest extends AbstractIntegrationTest implements MappingT
   void givenJson_whenDeleteAndInsertNodeByPath_thenReturnOK() {
     String json = readFileToString("mockData/quote.eline.response.json");
     StateValueMappingDto stateValueMappingDto = new StateValueMappingDto();
-    PathRule pathRule = new PathRule();
+    PathRule pathRule = getPathRule();
     pathRule.setCheckPath("$[?(@.state != 'unableToProvide')]");
     String d1 = "$.validFor";
     String d2 = "$.quoteLevel";
@@ -198,7 +199,6 @@ class MappingTransformerTest extends AbstractIntegrationTest implements MappingT
     String val3 = "$.quoteItem[0].quoteItemPrice";
     stateValueMappingDto.getTargetCheckPathMapper().put(key3, val3);
     String result = deleteAndInsertNodeByPath(stateValueMappingDto, json);
-    System.out.println(result);
     Assertions.assertNotNull(result);
 
     assertThat(result, hasJsonPath(key1, notNullValue()));
@@ -206,5 +206,44 @@ class MappingTransformerTest extends AbstractIntegrationTest implements MappingT
     assertThat(result, hasJsonPath(val3, notNullValue()));
     assertThat(result, hasNoJsonPath(d1));
     assertThat(result, hasNoJsonPath(d2));
+  }
+
+  @Test
+  @SneakyThrows
+  void givenCanProvideQuote_whenInsertNodes_thenReturnOK() {
+    String json = readFileToString("mockData/quote.eline.can.provide.response.json");
+    StateValueMappingDto stateValueMappingDto = new StateValueMappingDto();
+    PathRule pathRule = getPathRule();
+    List<PathRule> pathRules = new ArrayList<>();
+    pathRules.add(pathRule);
+    fillPathRulesIfExist(pathRules, stateValueMappingDto);
+
+    String result = deleteAndInsertNodeByPath(stateValueMappingDto, json);
+    Assertions.assertNotNull(result);
+    assertThat(result, hasNoJsonPath("$.quoteItem[0].terminationError"));
+  }
+
+  private static @NotNull PathRule getPathRule() {
+    PathRule pathRule = new PathRule();
+    pathRule.setCheckPath("$[?(@.state != 'unableToProvide')]");
+    String d1 = "$.validFor";
+    String d2 = "$.quoteLevel";
+    pathRule.setDeletePath(d1 + ",    " + d2);
+
+    List<KVPair> insertPath = new ArrayList<>();
+    KVPair p1 = new KVPair();
+    String key1 = "$.quoteItem[0].terminationError.code";
+    p1.setKey(key1);
+    p1.setVal("otherIssue");
+    KVPair p2 = new KVPair();
+    String key2 = "$.quoteItem[0].terminationError.value";
+    p2.setKey(key2);
+    p2.setVal("the quoted item is not available");
+
+    insertPath.add(p1);
+    insertPath.add(p2);
+
+    pathRule.setInsertPath(insertPath);
+    return pathRule;
   }
 }
