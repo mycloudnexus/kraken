@@ -5,7 +5,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
+import com.consoleconnect.kraken.operator.core.entity.WorkflowInstanceEntity;
+import com.consoleconnect.kraken.operator.core.enums.WorkflowStatusEnum;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
+import com.consoleconnect.kraken.operator.core.repo.WorkflowInstanceRepository;
 import com.consoleconnect.kraken.operator.gateway.CustomConfig;
 import com.consoleconnect.kraken.operator.gateway.entity.HttpRequestEntity;
 import com.consoleconnect.kraken.operator.gateway.repo.HttpRequestRepository;
@@ -30,6 +33,7 @@ class WorkflowTaskConfigTest extends AbstractIntegrationTest {
   @SpyBean HttpRequestRepository httpRequestRepository;
   @Autowired ApiActivityLogRepository apiActivityLogRepository;
   @Autowired WorkflowTaskConfig workflowTaskConfig;
+  @Autowired WorkflowInstanceRepository workflowInstanceRepository;
 
   @Test
   void givenUrlAndId_whenNotify_thenSuccess() {
@@ -41,6 +45,14 @@ class WorkflowTaskConfigTest extends AbstractIntegrationTest {
   @Test
   void givenId_whenFailAndRejectOrder_thenSuccess() {
     String id = UUID.randomUUID().toString();
+    WorkflowInstanceEntity workflowInstanceEntity = new WorkflowInstanceEntity();
+    workflowInstanceEntity.setStatus(WorkflowStatusEnum.FAILED.name());
+    workflowInstanceEntity.setErrorMsg("error");
+    workflowInstanceEntity.setRequestId(id);
+    workflowInstanceEntity.setSynced(false);
+    workflowInstanceEntity.setWorkflowInstanceId(UUID.randomUUID().toString());
+    workflowInstanceRepository.save(workflowInstanceEntity);
+
     HttpRequestEntity entity = new HttpRequestEntity();
     entity.setRenderedResponse(Map.of("state", "active"));
     doReturn(Optional.of(entity)).when(httpRequestRepository).findById(any());
@@ -55,6 +67,8 @@ class WorkflowTaskConfigTest extends AbstractIntegrationTest {
     assertDoesNotThrow(() -> workflowTaskConfig.processOrder(id));
     assertDoesNotThrow(() -> workflowTaskConfig.doNothing());
     assertDoesNotThrow(() -> workflowTaskConfig.persistResponse(null, entity));
+    assertDoesNotThrow(() -> workflowTaskConfig.workflowFailedTask(id, "unexpected error"));
+    assertDoesNotThrow(() -> workflowTaskConfig.workflowSuccessTask(id));
     assertDoesNotThrow(
         () -> workflowTaskConfig.evaluateTask(Map.of("entity", entity), "", "${entity1}"));
     assertDoesNotThrow(() -> workflowTaskConfig.rejectOrder(id));

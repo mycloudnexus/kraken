@@ -7,6 +7,7 @@ import static org.springframework.cloud.gateway.support.RouteMetadataUtils.RESPO
 import com.consoleconnect.kraken.operator.core.enums.ActionTypeEnum;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPIFacets;
+import com.consoleconnect.kraken.operator.core.repo.WorkflowInstanceRepository;
 import com.consoleconnect.kraken.operator.gateway.filter.*;
 import com.consoleconnect.kraken.operator.gateway.repo.HttpRequestRepository;
 import com.consoleconnect.kraken.operator.gateway.runner.*;
@@ -38,6 +39,7 @@ public class KrakenGatewayFilterSpecFunc implements Function<GatewayFilterSpec, 
   private final FilterHeaderService filterHeaderService;
   private final OrkesWorkflowClient workflowClient;
   private final OrkesMetadataClient metaDataClient;
+  private final WorkflowInstanceRepository workflowInstanceRepository;
 
   @Override
   public UriSpec apply(GatewayFilterSpec gatewayFilterSpec) {
@@ -108,7 +110,7 @@ public class KrakenGatewayFilterSpecFunc implements Function<GatewayFilterSpec, 
           config.setBaseUri(mapping.getUri());
           config.setAppProperty(appProperty);
           gatewayFilterSpec.filter(
-              new WorkflowActionFilterFactory().apply(config),
+              new WorkflowActionFilterFactory(workflowInstanceRepository).apply(config),
               RouteToRequestUrlFilter.ROUTE_TO_URL_FILTER_ORDER + 1);
         }
         default -> gatewayFilterSpec.filter(

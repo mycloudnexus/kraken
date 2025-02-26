@@ -6,6 +6,7 @@ import com.consoleconnect.kraken.operator.controller.WebTestClientHelper;
 import com.consoleconnect.kraken.operator.controller.service.APITokenService;
 import com.consoleconnect.kraken.operator.core.client.*;
 import com.consoleconnect.kraken.operator.core.dto.ApiActivityLog;
+import com.consoleconnect.kraken.operator.core.enums.WorkflowStatusEnum;
 import com.consoleconnect.kraken.operator.core.request.LogSearchRequest;
 import com.consoleconnect.kraken.operator.core.service.ApiActivityLogService;
 import com.consoleconnect.kraken.operator.core.toolkit.DateTime;
@@ -178,6 +179,29 @@ class ClientPubSubControllerTest extends AbstractIntegrationTest implements APIT
         headers,
         HttpStatus.OK.value(),
         event,
+        Assertions::assertNotNull);
+  }
+
+  @Test
+  void givenClientWorkflowStatusEvent_whenTriggerEvent_thenResponseOK() {
+    ClientWorkflowTerminate terminate = new ClientWorkflowTerminate();
+    terminate.setErrorMessage("unexpected error");
+    terminate.setStatus(WorkflowStatusEnum.FAILED.name());
+    terminate.setRequestId(UUID.randomUUID().toString());
+    ClientEvent clientEvent =
+        ClientEvent.of(
+            UUID.randomUUID().toString(),
+            ClientEventTypeEnum.CLIENT_TERMINATE_WORKFLOW,
+            List.of(terminate));
+
+    Map<String, String> headers = new HashMap<>();
+    headers.put("Authorization", accessToken);
+    webTestClientHelper.requestAndVerify(
+        HttpMethod.POST,
+        uriBuilder -> uriBuilder.path(CLIENT_EVENT_ENDPOINT).build(),
+        headers,
+        HttpStatus.OK.value(),
+        clientEvent,
         Assertions::assertNotNull);
   }
 }
