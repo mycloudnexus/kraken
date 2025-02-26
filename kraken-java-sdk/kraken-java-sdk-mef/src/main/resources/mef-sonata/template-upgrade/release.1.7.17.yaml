@@ -1,0 +1,14 @@
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.1.7.17
+  name: V1.7.17
+  labels:
+    productSpec: grace
+    productVersion: V1.7.17
+    publishDate: 2025-02-25
+  description: |
+    When the quote state is 'unableToProvide', remove the 'validFor' and 'quoteLevel' nodes.
+    Added copy of mappers
+  version: 1
