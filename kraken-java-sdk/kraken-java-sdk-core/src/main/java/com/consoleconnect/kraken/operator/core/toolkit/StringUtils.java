@@ -1,12 +1,12 @@
 package com.consoleconnect.kraken.operator.core.toolkit;
 
+import static com.consoleconnect.kraken.operator.core.toolkit.Constants.ESCAPED_DOUBLE_QUOTE;
 import static org.apache.commons.lang3.StringUtils.*;
 
+import com.consoleconnect.kraken.operator.core.exception.ErrorResponse;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 
 public class StringUtils {
-
-  public static final String ESCAPED_DOUBLE_QUOTE = "\"";
 
   private StringUtils() {}
 
@@ -38,11 +38,30 @@ public class StringUtils {
     if (null == raw || raw.trim().isEmpty() || upperLength <= 0) {
       return raw;
     }
-
-    if (raw.trim().length() < upperLength) {
-      return raw.trim().replace(ESCAPED_DOUBLE_QUOTE, EMPTY);
+    String trimmed = raw.trim();
+    if (trimmed.length() <= upperLength) {
+      return removeEscapedCharacter(trimmed, ESCAPED_DOUBLE_QUOTE);
     }
-    return raw.trim().substring(0, upperLength).replace(ESCAPED_DOUBLE_QUOTE, EMPTY);
+    return removeEscapedCharacter(trimmed.substring(0, upperLength), ESCAPED_DOUBLE_QUOTE);
+  }
+
+  public static String removeEscapedCharacter(String raw, String escapedCharacters) {
+    if (isBlank(raw) || isBlank(escapedCharacters)) {
+      return raw;
+    }
+    return raw.contains(escapedCharacters) ? raw.replace(escapedCharacters, EMPTY) : raw;
+  }
+
+  public static void processRawMessage(ErrorResponse errorResponse, String rawMsg) {
+    if (org.apache.commons.lang3.StringUtils.isBlank(rawMsg)) {
+      errorResponse.setMessage("");
+    } else {
+      String cleanedMessage = rawMsg;
+      if (rawMsg.contains("@{{")) {
+        cleanedMessage = rawMsg.replace("@{{", "").replace("}}", "");
+      }
+      errorResponse.setMessage(removeEscapedCharacter(cleanedMessage, ESCAPED_DOUBLE_QUOTE));
+    }
   }
 
   public static String shortenUUID(String uuidString) {

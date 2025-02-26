@@ -47,6 +47,8 @@ class WorkflowTaskConfigTest extends AbstractIntegrationTest {
     doReturn(entity).when(httpRequestRepository).save(any());
     assertDoesNotThrow(
         () -> workflowTaskConfig.evaluateTask(Map.of("entity", entity), "", "${entity}"));
+    assertDoesNotThrow(
+        () -> workflowTaskConfig.evaluateExpressionTask(Map.of("entity", entity), null));
     assertDoesNotThrow(() -> workflowTaskConfig.logRequestPayload(new LogTaskRequest()));
     assertDoesNotThrow(() -> workflowTaskConfig.persistResponse(id, entity));
     assertDoesNotThrow(() -> workflowTaskConfig.failOrder(id));

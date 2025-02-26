@@ -100,6 +100,7 @@ public class RenderRequestService implements MappingTransformer {
     if (CollectionUtils.isEmpty(request)) {
       return;
     }
+    fillPathRulesIfExist(endpoints.get(0).getMappers().getPathRules(), stateValueMappingDto);
     for (ComponentAPITargetFacets.Mapper mapper : request) {
       if (Objects.equals(BODY.name(), mapper.getTargetLocation())) {
         // Skipping constant target

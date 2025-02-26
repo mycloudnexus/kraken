@@ -6,6 +6,7 @@ import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.model.ApiActivityRequestLog;
 import com.consoleconnect.kraken.operator.core.model.ApiActivityResponseLog;
+import com.consoleconnect.kraken.operator.core.toolkit.ConstructExpressionUtil;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.gateway.entity.HttpRequestEntity;
 import com.consoleconnect.kraken.operator.gateway.repo.HttpRequestRepository;
@@ -73,6 +74,17 @@ public class WorkflowTaskConfig implements WorkflowTaskRegister {
             ? Collections.emptyMap()
             : JsonToolkit.fromJson(evaluate, Map.class));
     result.setUrl(url);
+    return result;
+  }
+
+  @WorkerTask(value = EVALUATE_EXPRESSION_TASK, pollingInterval = 10)
+  public EvaluateResult evaluateExpressionTask(
+      @InputParam("value") Map<String, Object> value, @InputParam("expression") String expression) {
+    EvaluateResult result = new EvaluateResult();
+    String evaluate =
+        SpELEngine.evaluate(ConstructExpressionUtil.constructParam(expression), value);
+
+    result.setSingleResult(StringUtils.isBlank(evaluate) ? Boolean.FALSE.toString() : evaluate);
     return result;
   }
 

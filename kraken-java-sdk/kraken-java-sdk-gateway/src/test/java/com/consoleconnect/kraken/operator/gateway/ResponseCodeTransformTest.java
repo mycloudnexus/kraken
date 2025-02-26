@@ -9,6 +9,8 @@ import com.consoleconnect.kraken.operator.gateway.runner.ResponseCodeTransform;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
 import java.util.List;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
@@ -52,5 +54,21 @@ class ResponseCodeTransformTest extends AbstractIntegrationTest implements Respo
     httpResponseContext.setDeletePaths(list);
     Assertions.assertThrowsExactly(
         KrakenException.class, () -> checkResponseCode(httpResponseContext));
+  }
+
+  @SneakyThrows
+  @Test
+  void givenErrorJson_whenDeletes_thenReturnOK() {
+    String json = readFileToString("mockData/downstream.error.json");
+    DocumentContext doc = JsonPath.parse(json);
+    List<String> list = List.of("$.error.status", "$.error.statusCode");
+    list.forEach(
+        item -> {
+          deleteByPath(item, doc);
+          ;
+        });
+    String result = doc.jsonString();
+    System.out.println(result);
+    Assertions.assertNotNull(result);
   }
 }
