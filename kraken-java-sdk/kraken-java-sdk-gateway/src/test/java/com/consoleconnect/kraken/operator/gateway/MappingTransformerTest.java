@@ -7,6 +7,8 @@ import static org.hamcrest.Matchers.*;
 
 import com.consoleconnect.kraken.operator.core.dto.StateValueMappingDto;
 import com.consoleconnect.kraken.operator.core.enums.MappingTypeEnum;
+import com.consoleconnect.kraken.operator.core.model.KVPair;
+import com.consoleconnect.kraken.operator.core.model.PathRule;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
 import com.consoleconnect.kraken.operator.gateway.runner.MappingTransformer;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
@@ -95,11 +97,11 @@ class MappingTransformerTest extends AbstractIntegrationTest implements MappingT
 
   @Test
   void givenPathRules_whenFilling_thenReturnOK() {
-    List<ComponentAPITargetFacets.PathRule> pathRules = new ArrayList<>();
+    List<PathRule> pathRules = new ArrayList<>();
     StateValueMappingDto stateValueMappingDto = new StateValueMappingDto();
     fillPathRulesIfExist(pathRules, stateValueMappingDto);
     Assertions.assertTrue(MapUtils.isEmpty(stateValueMappingDto.getTargetCheckPathMapper()));
-    ComponentAPITargetFacets.PathRule pathRule = new ComponentAPITargetFacets.PathRule();
+    PathRule pathRule = new PathRule();
     pathRule.setCheckPath("$[?(@.state != 'unableToProvide')]");
     pathRule.setDeletePath("$.validFor,  $.quoteLevel");
     pathRules.add(pathRule);
@@ -168,18 +170,18 @@ class MappingTransformerTest extends AbstractIntegrationTest implements MappingT
   void givenJson_whenDeleteAndInsertNodeByPath_thenReturnOK() {
     String json = readFileToString("mockData/quote.eline.response.json");
     StateValueMappingDto stateValueMappingDto = new StateValueMappingDto();
-    ComponentAPITargetFacets.PathRule pathRule = new ComponentAPITargetFacets.PathRule();
+    PathRule pathRule = new PathRule();
     pathRule.setCheckPath("$[?(@.state != 'unableToProvide')]");
     String d1 = "$.validFor";
     String d2 = "$.quoteLevel";
     pathRule.setDeletePath(d1 + ",    " + d2);
 
-    List<ComponentAPITargetFacets.KVPair> insertPath = new ArrayList<>();
-    ComponentAPITargetFacets.KVPair p1 = new ComponentAPITargetFacets.KVPair();
+    List<KVPair> insertPath = new ArrayList<>();
+    KVPair p1 = new KVPair();
     String key1 = "$.quoteItem[0].terminationError.code";
     p1.setKey(key1);
     p1.setVal("otherIssue");
-    ComponentAPITargetFacets.KVPair p2 = new ComponentAPITargetFacets.KVPair();
+    KVPair p2 = new KVPair();
     String key2 = "$.quoteItem[0].terminationError.value";
     p2.setKey(key2);
     p2.setVal("the quoted item is not available");
@@ -188,7 +190,7 @@ class MappingTransformerTest extends AbstractIntegrationTest implements MappingT
     insertPath.add(p2);
 
     pathRule.setInsertPath(insertPath);
-    List<ComponentAPITargetFacets.PathRule> pathRules = new ArrayList<>();
+    List<PathRule> pathRules = new ArrayList<>();
     pathRules.add(pathRule);
     fillPathRulesIfExist(pathRules, stateValueMappingDto);
 

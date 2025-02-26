@@ -3,9 +3,10 @@ package com.consoleconnect.kraken.operator.gateway.runner;
 import static com.consoleconnect.kraken.operator.core.toolkit.Constants.DOT;
 import static com.consoleconnect.kraken.operator.core.toolkit.ConstructExpressionUtil.*;
 
-import com.consoleconnect.kraken.operator.core.dto.PathRuleDto;
 import com.consoleconnect.kraken.operator.core.dto.StateValueMappingDto;
 import com.consoleconnect.kraken.operator.core.enums.MappingTypeEnum;
+import com.consoleconnect.kraken.operator.core.model.KVPair;
+import com.consoleconnect.kraken.operator.core.model.PathRule;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPIFacets;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
@@ -354,24 +355,23 @@ public interface MappingTransformer extends PathOperator {
   }
 
   default void fillPathRulesIfExist(
-      List<ComponentAPITargetFacets.PathRule> pathRuleList,
-      StateValueMappingDto stateValueMappingDto) {
+      List<PathRule> pathRuleList, StateValueMappingDto stateValueMappingDto) {
     if (CollectionUtils.isEmpty(pathRuleList)) {
       return;
     }
-    List<PathRuleDto> pathRules = new ArrayList<>();
+    List<PathRule> pathRules = new ArrayList<>();
     pathRuleList.forEach(
         item -> {
-          PathRuleDto dto = new PathRuleDto();
+          PathRule dto = new PathRule();
           dto.setName(item.getName());
           dto.setCheckPath(item.getCheckPath());
           dto.setDeletePath(item.getDeletePath());
           if (CollectionUtils.isNotEmpty(item.getInsertPath())) {
-            List<PathRuleDto.KVPair> insertPath =
+            List<KVPair> insertPath =
                 item.getInsertPath().stream()
                     .map(
                         p -> {
-                          PathRuleDto.KVPair pair = new PathRuleDto.KVPair();
+                          KVPair pair = new KVPair();
                           pair.setKey(p.getKey());
                           pair.setVal(p.getVal());
                           return pair;

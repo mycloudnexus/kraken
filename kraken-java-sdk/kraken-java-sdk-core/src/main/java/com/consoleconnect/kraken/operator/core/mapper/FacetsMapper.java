@@ -49,14 +49,4 @@ public interface FacetsMapper {
   void toEndpoint(
       ComponentAPITargetFacets.Endpoint endpoint,
       @MappingTarget ComponentAPITargetFacets.Endpoint endpointTarget);
-
-  @BeanMapping(
-      ignoreByDefault = true,
-      ignoreUnmappedSourceProperties = {})
-  @Mapping(target = "name", source = "name")
-  @Mapping(target = "checkPath", source = "checkPath")
-  @Mapping(target = "deletePath", source = "deletePath")
-  void toPathRule(
-      ComponentAPITargetFacets.PathRule pathRule,
-      @MappingTarget ComponentAPITargetFacets.PathRule pathRuleTarget);
 }
