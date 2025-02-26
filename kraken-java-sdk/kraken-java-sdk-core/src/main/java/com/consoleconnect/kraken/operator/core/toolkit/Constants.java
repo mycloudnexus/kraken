@@ -25,6 +25,7 @@ public class Constants {
   public static final String NOTIFY_TASK = "notify_task";
   public static final String WORKFLOW_PARAM_PREFIX = "${workflow.input.%s}";
   public static final String ESCAPED_DOUBLE_QUOTE = "\"";
+  public static final String COMMA_SPACE_EXPRESSION = "[\\s,]+";
 
   public static String formatVersion(String version) {
     return version.replaceFirst("[V|v]", "");
