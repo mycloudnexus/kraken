@@ -2,6 +2,7 @@ package com.consoleconnect.kraken.operator.core;
 
 import com.consoleconnect.kraken.operator.core.enums.RegisterActionTypeEnum;
 import com.consoleconnect.kraken.operator.core.exception.ErrorResponse;
+import com.consoleconnect.kraken.operator.core.toolkit.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
