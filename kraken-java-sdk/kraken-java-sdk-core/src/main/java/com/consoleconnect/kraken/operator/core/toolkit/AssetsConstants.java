@@ -26,4 +26,5 @@ public final class AssetsConstants {
   public static final String MAPPING_MATRIX = "mapping-matrix";
   public static final String SPEC = "spec";
   public static final String API_USE_CASES = "use-cases";
+  public static final String CUSTOMIZED_PLACE_HOLDER = "\\@\\{\\{(.*?)\\}\\}";
 }
