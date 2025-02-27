@@ -1,0 +1,15 @@
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.1.7.19
+  name: V1.7.19
+  labels:
+    productSpec: grace
+    productVersion: V1.7.19
+    publishDate: 2025-02-27
+  description: |
+    When the quote state is 'unableToProvide', remove the 'validFor' and 'quoteLevel' nodes, 
+    insert the 'quoteItem[0].terminationError' node.
+    Appended quote read state validation
+  version: 1
