@@ -19,7 +19,7 @@ spec:
         pathRules:
           - name: mapper.quite.uni.read.sync.pathRule.state
             checkPath: "$[?(@.state != 'unableToProvide')]"
-            deletePath: "$.validFor,  $.quoteLevel"
+            deletePath: "$.validFor"
             insertPath:
               - key: "$.quoteItem[0].terminationError.code"
                 val: "otherIssue"
