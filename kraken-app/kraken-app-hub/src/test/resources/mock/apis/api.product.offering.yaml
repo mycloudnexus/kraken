@@ -7,18 +7,18 @@ metadata:
   labels:
     mef-api-release: grace
     parentProductType: access.eline
-    poq-api-version: v8
+    poq-api-version: v7
   version: 3
 spec:
   supportedProductTypesAndActions:
-    - path: /mefApi/sonata/productOfferingQualification/v8/productOfferingQualification
+    - path: /mefApi/sonata/productOfferingQualification/v7/productOfferingQualification
       method: post
       actionTypes:
         - add
       productTypes:
         - UNI
         - ACCESS_E_LINE
-    - path: /mefApi/sonata/productOfferingQualification/v8/productOfferingQualification/{id}
+    - path: /mefApi/sonata/productOfferingQualification/v7/productOfferingQualification/{id}
       method: get
       productTypes:
         - UNI
@@ -26,7 +26,7 @@ spec:
   mappings:
     - uri: ${env.target.url}
       trigger:
-        path: /mefApi/sonata/productOfferingQualification/v8/productOfferingQualification
+        path: /mefApi/sonata/productOfferingQualification/v7/productOfferingQualification
         method: post
       metadata:
         cacheRequestBody: true
@@ -114,7 +114,7 @@ spec:
 
     - uri: ${env.target.url}
       trigger:
-        path: /mefApi/sonata/productOfferingQualification/v8/productOfferingQualification/**
+        path: /mefApi/sonata/productOfferingQualification/v7/productOfferingQualification/**
         method: get
       metadata:
         cacheRequestBody: false
@@ -123,7 +123,7 @@ spec:
           actionType: buildin@pattern
           env:
             input: ${path}
-            pattern: /mefApi/sonata/productOfferingQualification/v8/productOfferingQualification/(?<segment>.*)
+            pattern: /mefApi/sonata/productOfferingQualification/v7/productOfferingQualification/(?<segment>.*)
 
         - id: read request payload by id
           actionType: buildin@db
@@ -188,7 +188,7 @@ spec:
             inputs: ${targetApiConfig.inputs}
 
     - trigger:
-        path: /mefApi/sonata/productOfferingQualification/v8/productOfferingQualification/hub
+        path: /mefApi/sonata/productOfferingQualification/v7/productOfferingQualification/hub
         method: post
       metadata:
         cacheRequestBody: true
