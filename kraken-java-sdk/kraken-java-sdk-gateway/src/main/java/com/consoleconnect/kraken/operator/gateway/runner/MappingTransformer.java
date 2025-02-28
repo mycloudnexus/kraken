@@ -128,6 +128,10 @@ public interface MappingTransformer extends PathOperator {
   }
 
   default String deleteAndInsertNodeByPath(StateValueMappingDto stateValueMappingDto, String json) {
+    if (CollectionUtils.isEmpty(stateValueMappingDto.getPathRules())
+        && MapUtils.isEmpty(stateValueMappingDto.getTargetCheckPathMapper())) {
+      return json;
+    }
     DocumentContext doc = JsonPath.parse(json);
     // Delete and insert operations based on path rules
     stateValueMappingDto.getPathRules().stream()
