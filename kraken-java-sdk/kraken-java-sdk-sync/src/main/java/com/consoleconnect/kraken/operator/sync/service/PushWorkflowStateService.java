@@ -57,12 +57,14 @@ public class PushWorkflowStateService extends KrakenServerConnector {
 
     HttpResponse<Void> res = pushEvent(event);
     if (res.getCode() == HttpStatus.OK.value()) {
-      workflowInstanceEntities.stream()
-          .forEach(
-              entity -> {
-                entity.setSynced(true);
-                workflowInstanceRepository.save(entity);
-              });
+      workflowInstanceRepository.saveAll(
+          workflowInstanceEntities.stream()
+              .map(
+                  entity -> {
+                    entity.setSynced(true);
+                    return entity;
+                  })
+              .toList());
     }
   }
 }
