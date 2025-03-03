@@ -3,6 +3,7 @@ package com.consoleconnect.kraken.operator.core;
 import com.consoleconnect.kraken.operator.core.enums.RegisterActionTypeEnum;
 import com.consoleconnect.kraken.operator.core.enums.TaskEnum;
 import com.consoleconnect.kraken.operator.core.enums.WorkflowStageEnum;
+import com.consoleconnect.kraken.operator.core.enums.WorkflowStatusEnum;
 import com.consoleconnect.kraken.operator.core.exception.ErrorResponse;
 import com.consoleconnect.kraken.operator.core.toolkit.StringUtils;
 import java.util.UUID;
@@ -29,6 +30,9 @@ class StringUtilsTest {
     Assertions.assertNotNull(WorkflowStageEnum.VALIDATION_STAGE);
     Assertions.assertNotNull(TaskEnum.HTTP);
     Assertions.assertNotNull(TaskEnum.SWITCH);
+    Assertions.assertNotNull(WorkflowStatusEnum.FAILED);
+    Assertions.assertNotNull(WorkflowStatusEnum.IN_PROGRESS);
+    Assertions.assertNotNull(WorkflowStatusEnum.SUCCESS);
     Assertions.assertEquals(8, shortId.length());
   }
 
