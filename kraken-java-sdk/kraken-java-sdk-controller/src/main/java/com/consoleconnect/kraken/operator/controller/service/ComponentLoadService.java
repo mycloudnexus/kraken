@@ -1,5 +1,7 @@
 package com.consoleconnect.kraken.operator.controller.service;
 
+import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.COMPONENT_API_TARGET_SPEC;
+
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.entity.MgmtEventEntity;
@@ -136,7 +138,8 @@ public class ComponentLoadService {
 
   private String getServerKey() {
     String serverKey = "";
-    List<UnifiedAssetDto> assetDtos = unifiedAssetService.findByKind(AssetsConstants.SERVER_KIND);
+    List<UnifiedAssetDto> assetDtos =
+        unifiedAssetService.findByKind(COMPONENT_API_TARGET_SPEC.getKind());
     if (assetDtos == null) {
       return StringUtils.EMPTY;
     }

@@ -1,0 +1,19 @@
+{
+  "asyncComplete": false,
+  "http_request": {
+    "headers": {
+      "TEST_HEADER": ["HEADER_VAL1", "HEADER_VAL2"]
+    },
+    "method": "PUT",
+    "body": {
+      "durationUnit": "m",
+      "dataCenterFacility": "Mock data center facility",
+      "speed": 1000,
+      "portName": "test-qc01",
+      "paymentType": "invoice"
+    },
+    "uri": "https://localhost/qe1company/ports/order?q=v",
+    "contentType": "application/json",
+    "accept": "application/json"
+  }
+}

@@ -17,6 +17,8 @@ public interface HttpRequestRepository
         JpaSpecificationExecutor<HttpRequestEntity> {
   List<HttpRequestEntity> findByExternalId(String externalId);
 
+  List<HttpRequestEntity> findByProductInstanceId(String productInstanceId);
+
   @Query(
       value =
           "select e from #{#entityName} e "

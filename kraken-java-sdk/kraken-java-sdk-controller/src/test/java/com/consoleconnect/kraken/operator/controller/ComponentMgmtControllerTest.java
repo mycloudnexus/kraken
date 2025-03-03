@@ -14,6 +14,7 @@ import com.consoleconnect.kraken.operator.core.client.ClientEvent;
 import com.consoleconnect.kraken.operator.core.client.ClientEventTypeEnum;
 import com.consoleconnect.kraken.operator.core.client.ServerAPIDto;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
+import com.consoleconnect.kraken.operator.core.enums.SupportedCaseEnum;
 import com.consoleconnect.kraken.operator.core.mapper.FacetsMapper;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import com.consoleconnect.kraken.operator.core.model.SyncMetadata;
@@ -227,6 +228,8 @@ public class ComponentMgmtControllerTest extends AbstractIntegrationTest
                     return t1.getOrderBy().compareTo(t2.getOrderBy());
                   };
               Assertions.assertTrue(isSorted(data.getDetails(), comp));
+              Assertions.assertEquals(
+                  data.getDetails().get(0).getSupportedCase(), SupportedCaseEnum.ONE_TO_ONE.name());
             });
   }
 

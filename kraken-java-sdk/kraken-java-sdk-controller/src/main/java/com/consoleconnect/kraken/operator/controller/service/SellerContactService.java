@@ -7,66 +7,62 @@ import com.consoleconnect.kraken.operator.controller.dto.CreateSellerContactRequ
 import com.consoleconnect.kraken.operator.controller.dto.UpdateSellerContactRequest;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.enums.AssetStatusEnum;
-import com.consoleconnect.kraken.operator.core.enums.ParentProductTypeEnum;
 import com.consoleconnect.kraken.operator.core.event.IngestionDataResult;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.model.SyncMetadata;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.SellerContactFacets;
-import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
+import com.consoleconnect.kraken.operator.core.service.AssetKeyGenerator;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.DateTime;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Getter
-@AllArgsConstructor
 @Service
 @Slf4j
-public class SellerContactService {
+public class SellerContactService implements AssetKeyGenerator {
   private static final String SELLER_CONTACT_PREFIX = "mef.sonata.seller.contact";
   private static final String SELLER_CONTACT_DESC = "seller contact information";
   private static final String COMPONENT_KEY = "componentKey";
   private static final String QUOTE_ROLE = "sellerContactInformation";
   private static final String ORDER_ROLE = "sellerContact";
   private final UnifiedAssetService unifiedAssetService;
-  @Getter private final UnifiedAssetRepository unifiedAssetRepository;
+  private final ApplicationContext applicationContext;
 
-  @Transactional
+  @Autowired
+  public SellerContactService(
+      UnifiedAssetService unifiedAssetService, ApplicationContext applicationContext) {
+    this.unifiedAssetService = unifiedAssetService;
+    this.applicationContext = applicationContext;
+  }
+
   public IngestionDataResult createSellerContact(
       String productId, String componentId, CreateSellerContactRequest request, String createdBy) {
     UnifiedAssetDto componentAssetDto = unifiedAssetService.findOne(componentId);
-    return createOneSellerContact(
+    SellerContactService self = applicationContext.getBean(SellerContactService.class);
+    return self.createOneSellerContact(
         productId, componentAssetDto.getMetadata().getKey(), request, createdBy);
   }
 
+  @Transactional
   public IngestionDataResult createOneSellerContact(
       String productId, String componentKey, CreateSellerContactRequest request, String createdBy) {
-    String sellerContactKey = generateKey(componentKey, request.getParentProductType());
+    String sellerContactKey =
+        generateSellerContactKey(componentKey, request.getParentProductType());
     UnifiedAsset sellerAsset =
         createSellerContact(
             request, sellerContactKey, request.getParentProductType(), componentKey);
     SyncMetadata syncMetadata = new SyncMetadata("", "", DateTime.nowInUTCString(), createdBy);
     return unifiedAssetService.syncAsset(productId, sellerAsset, syncMetadata, true);
-  }
-
-  private String generateKey(String componentKey, String parentProductType) {
-    if (StringUtils.isBlank(parentProductType)) {
-      return componentKey
-          + DOT
-          + ParentProductTypeEnum.ACCESS_ELINE.getKind()
-          + DOT
-          + SELLER_CONTACT_SUFFIX;
-    }
-    return componentKey + DOT + parentProductType + DOT + SELLER_CONTACT_SUFFIX;
   }
 
   private String whichRole(String componentKey) {

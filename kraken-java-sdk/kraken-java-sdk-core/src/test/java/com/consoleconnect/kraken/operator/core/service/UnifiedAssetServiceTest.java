@@ -1,6 +1,10 @@
 package com.consoleconnect.kraken.operator.core.service;
 
-import static org.testcontainers.shaded.org.hamcrest.Matchers.hasSize;
+import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.COMPONENT_API_TARGET_SPEC;
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.notNullValue;
 
 import com.consoleconnect.kraken.operator.core.CustomConfig;
 import com.consoleconnect.kraken.operator.core.dto.SimpleApiServerDto;
@@ -19,6 +23,7 @@ import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.*;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -27,8 +32,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
-import org.testcontainers.shaded.org.hamcrest.MatcherAssert;
 
+@Slf4j
 @MockIntegrationTest
 @ContextConfiguration(classes = CustomConfig.class)
 class UnifiedAssetServiceTest extends AbstractIntegrationTest {
@@ -105,12 +110,13 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
         PageRequest.of(0, 1, Sort.Direction.DESC, AssetsConstants.FIELD_CREATE_AT);
     Paging<UnifiedAssetDto> assetDtoPaging =
         unifiedAssetService.findBySpecification(tuple2List, tuple3List, tags, pageRequest, null);
-    MatcherAssert.assertThat(assetDtoPaging.getData(), hasSize(0));
+    assertThat(assetDtoPaging.getData(), hasSize(0));
   }
 
   @Test
   void givenNewMapper_whenEnforce_thenUpdateSuccess() {
-    List<UnifiedAssetDto> list = unifiedAssetService.findByKind(AssetsConstants.SERVER_KIND);
+    List<UnifiedAssetDto> list =
+        unifiedAssetService.findByKind(COMPONENT_API_TARGET_SPEC.getKind());
     Assertions.assertEquals(0, list.size());
     UnifiedAssetDto data =
         unifiedAssetService.findOne("mef.sonata.api-target-mapper.order.eline.add");
@@ -155,7 +161,7 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
         JsonToolkit.fromJson(
             s, new TypeReference<Map<String, Map<String, ComponentAPITargetFacets.Mapper>>>() {});
     int beforeSize = existMapperMap.size();
-    unifiedAssetService.mergeMappers(existMapperMap, existMapperMap);
+    UnifiedAssetService.mergeMappers(existMapperMap, existMapperMap);
     int afterSize = existMapperMap.size();
     Assertions.assertEquals(beforeSize, afterSize);
   }
@@ -165,5 +171,57 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
     UUID uuid = UUID.randomUUID();
     Assertions.assertFalse(unifiedAssetService.existed(uuid.toString()));
     Assertions.assertFalse(unifiedAssetService.existed("mef.sonata.test"));
+  }
+
+  @SneakyThrows
+  @Test
+  void givenSourceValues_whenMerge_thenReturnOK() {
+    String s1 = readFileToString("data/mapper_1.json");
+    Map<String, Map<String, ComponentAPITargetFacets.Mapper>> existMapperMap =
+        JsonToolkit.fromJson(s1, new TypeReference<>() {});
+    String s2 = readFileToString("data/mapper_2.json");
+    Map<String, Map<String, ComponentAPITargetFacets.Mapper>> newMapperMap =
+        JsonToolkit.fromJson(s2, new TypeReference<>() {});
+    UnifiedAssetService.mergeMappers(existMapperMap, newMapperMap);
+    String existMapperStr = JsonToolkit.toJson(existMapperMap);
+    log.info(existMapperStr);
+    Assertions.assertNotNull(existMapperStr);
+    String newMapperStr = JsonToolkit.toJson(newMapperMap);
+    log.info(newMapperStr);
+    Assertions.assertNotNull(newMapperStr);
+  }
+
+  @SneakyThrows
+  @Test
+  void givenQuoteRules_whenCopy_thenReturnOK() {
+    String targetApiPath1 = "data/target-mapper.quote.uni.add.sync-1.yaml";
+    Optional<UnifiedAsset> unifiedAssetOptOld =
+        YamlToolkit.parseYaml(readFileToString(targetApiPath1), UnifiedAsset.class);
+    String targetApiPath2 = "data/target-mapper.quote.uni.add.sync-2.yaml";
+    Optional<UnifiedAsset> unifiedAssetOptNew =
+        YamlToolkit.parseYaml(readFileToString(targetApiPath2), UnifiedAsset.class);
+    if (unifiedAssetOptOld.isPresent() && unifiedAssetOptNew.isPresent()) {
+      UnifiedAsset assetOld = unifiedAssetOptOld.get();
+      UnifiedAsset assetNew = unifiedAssetOptNew.get();
+
+      ComponentAPITargetFacets facetsOld =
+          UnifiedAsset.getFacets(assetOld, ComponentAPITargetFacets.class);
+      ComponentAPITargetFacets facetsNew =
+          UnifiedAsset.getFacets(assetNew, ComponentAPITargetFacets.class);
+
+      String result1 = JsonToolkit.toJson(facetsOld);
+      Assertions.assertNotNull(result1);
+      Map<String, Object> map = UnifiedAssetService.mergeFacets(facetsOld, facetsNew);
+      String result2 = JsonToolkit.toJson(map);
+      Assertions.assertNotNull(result2);
+      assertThat(result2, hasJsonPath("$.endpoints[0].mappers.request", hasSize(9)));
+      assertThat(result2, hasJsonPath("$.endpoints[0].mappers.response", hasSize(10)));
+      assertThat(result2, hasJsonPath("$.endpoints[0].mappers.pathRules", hasSize(1)));
+      assertThat(
+          result2, hasJsonPath("$.endpoints[0].mappers.request[1].sourceValues", notNullValue()));
+      assertThat(result2, hasJsonPath("$.endpoints[0].mappers.response[0].target", notNullValue()));
+      assertThat(
+          result2, hasJsonPath("$.endpoints[0].mappers.pathRules[0].checkPath", notNullValue()));
+    }
   }
 }

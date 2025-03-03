@@ -1,0 +1,128 @@
+{
+  "id": "ddddf331-17ee-4520-847d-bac27930f996",
+  "buyerRequestedQuoteLevel": "firm",
+  "relatedContactInformation": [
+    {
+      "number": "111 222 333",
+      "emailAddress": "buyerContact@mef.com",
+      "role": "buyerContactInformation",
+      "organization": "MEF",
+      "name": "Joe Buyer"
+    },
+    {
+      "number": "N/A",
+      "emailAddress": "support@kraken.com",
+      "role": "sellerContactInformation",
+      "name": "kraken"
+    }
+  ],
+  "quoteItem": [
+    {
+      "requestedQuoteItemTerm": {
+        "name": "ELine Item Term",
+        "duration": {
+          "amount": 1,
+          "units": "calendarMonths"
+        },
+        "endOfTermAction": "roll",
+        "description": "no description",
+        "rollInterval": {
+          "amount": 1,
+          "units": "calendarMonths"
+        }
+      },
+      "product": {
+        "place": [
+          {
+            "role": "INSTALL_LOCATION",
+            "id": "6360d0915064cc00157f7984",
+            "@type": "GeographicAddressRef"
+          },
+          {
+            "role": "INSTALL_LOCATION",
+            "id": "6356792a4806220015488631",
+            "@type": "GeographicAddressRef"
+          }
+        ],
+        "productConfiguration": {
+          "@type": "ACCESS_E_LINE",
+          "bandwidth": 1,
+          "bandwidthUnit": "MBPS",
+          "classOfService": "SILVER",
+          "paymentType": "invoice",
+          "name": "Qe 1 Company Connection 0904",
+          "buyerCompanyId": "qe1company",
+          "destUNIMetroId": "5db65dcf5d545c000bc6884b",
+          "type": "LAYER2"
+        },
+        "productOffering": {
+          "id": "ACCESS_E_LINE"
+        },
+        "productRelationship": [
+          {
+            "relationshipType": "CONNECTS_TO_ENNI",
+            "id": "6371e5fa2fb2fa00155a3535"
+          },
+          {
+            "relationshipType": "CONNECTS_TO_UNI",
+            "id": "63634cbf11ffdd00151fc6fb"
+          }
+        ]
+      },
+      "action": "add",
+      "id": "ELINE",
+      "subjectToFeasibilityCheck": false,
+      "quoteItemInstallationInterval": {
+        "amount": 1,
+        "units": "businessMinutes"
+      },
+      "state": "unableToProvide",
+      "quoteItemTerm": [
+        {
+          "name": "ELine Item Term",
+          "duration": {
+            "amount": 1,
+            "units": "calendarMonths"
+          },
+          "endOfTermAction": "roll",
+          "description": "no description",
+          "rollInterval": {
+            "amount": 1,
+            "units": "calendarMonths"
+          }
+        }
+      ],
+      "quoteItemPrice": [
+        {
+          "unitOfMeasure": "Gb",
+          "price": {
+            "dutyFreeAmount": {
+              "unit": "USD",
+              "value": 100
+            },
+            "taxRate": "16",
+            "taxIncludedAmount": {
+              "unit": "USD",
+              "value": "100"
+            }
+          },
+          "name": "name-here",
+          "priceType": "recurring",
+          "description": "",
+          "recurringChargePeriod": "month"
+        }
+      ]
+    }
+  ],
+  "quoteDate": "2025-02-24 17:36:16",
+  "externalId": "ORDERABLE_ALTERNATE [8203] Sync Quote FIRM - ADD",
+  "instantSyncQuote": true,
+  "requestedQuoteCompletionDate": "2027-12-31T23:00:00Z",
+  "effectiveQuoteCompletionDate": "2025-02-24 17:36:16",
+  "validFor": {
+    "startDateTime": "2025-02-24 17:36:16",
+    "endDateTime": "2025-02-25 17:36:16"
+  },
+  "quoteLevel": "firm",
+  "state": "unableToProvide"
+}

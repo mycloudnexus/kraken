@@ -386,3 +386,18 @@ export const getValidateServerName = (productId: string, name: string) => {
     }
   );
 };
+
+export const editContactInformation = (
+  productId: string,
+  componentId: string,
+  id: string,
+  data: any
+) => {
+  return request(
+    `${PRODUCT}/${productId}/components/${componentId}/seller-contacts/${id}`,
+    {
+      method: "PATCH",
+      data,
+    }
+  );
+};

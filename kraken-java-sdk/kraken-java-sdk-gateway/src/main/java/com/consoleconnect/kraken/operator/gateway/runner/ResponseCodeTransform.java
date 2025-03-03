@@ -4,13 +4,16 @@ import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.gateway.dto.RoutingResultDto;
 import com.consoleconnect.kraken.operator.gateway.model.HttpResponseContext;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 
-public interface ResponseCodeTransform {
+public interface ResponseCodeTransform extends PathOperator {
   String TARGET_KEY_NOT_FOUND = "targetKey:notFound";
 
   @Slf4j
@@ -29,7 +32,8 @@ public interface ResponseCodeTransform {
       if (StringUtils.isBlank(bodyContent)) {
         throw KrakenException.notFoundDefault();
       }
-      throw new KrakenException(httpResponseContext.getStatus(), bodyContent);
+      throw new KrakenException(
+          httpResponseContext.getStatus(), bodyContent, new IllegalArgumentException(bodyContent));
     }
     if (HttpStatus.valueOf(httpResponseContext.getStatus()).is4xxClientError()) {
       rewriteStatus(httpResponseContext);
@@ -55,7 +59,18 @@ public interface ResponseCodeTransform {
           httpResponseContext.getStatus(),
           HttpStatus.valueOf(httpResponseContext.getStatus()).getReasonPhrase());
     }
-    throw new KrakenException(httpResponseContext.getStatus(), bodyContent);
+    String bodyResult = processJsonDeletions(httpResponseContext, bodyContent);
+    throw new KrakenException(
+        httpResponseContext.getStatus(), bodyResult, new IllegalArgumentException(bodyResult));
+  }
+
+  default String processJsonDeletions(HttpResponseContext httpResponseContext, String bodyContent) {
+    if (CollectionUtils.isNotEmpty(httpResponseContext.getDeletePaths())) {
+      DocumentContext doc = JsonPath.parse(bodyContent);
+      httpResponseContext.getDeletePaths().forEach(item -> deleteByPath(item, doc));
+      return doc.jsonString();
+    }
+    return bodyContent;
   }
 
   default void checkOutputKey(String res) {

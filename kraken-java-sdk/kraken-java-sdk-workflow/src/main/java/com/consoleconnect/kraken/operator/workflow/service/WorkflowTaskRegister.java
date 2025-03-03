@@ -36,4 +36,14 @@ public interface WorkflowTaskRegister {
 
   @WorkerTask(PERSIST_RESPONSE_TASK)
   void persistResponse(@InputParam("id") String id, @InputParam("payload") Object payload);
+
+  @WorkerTask(value = EVALUATE_EXPRESSION_TASK, pollingInterval = 10)
+  EvaluateResult evaluateExpressionTask(
+      @InputParam("value") Map<String, Object> value, @InputParam("expression") String expression);
+
+  @WorkerTask(WORKFLOW_SUCCESS_TASK)
+  void workflowSuccessTask(@InputParam("id") String id);
+
+  @WorkerTask(WORKFLOW_FAILED_TASK)
+  void workflowFailedTask(@InputParam("id") String id, @InputParam("errorMsg") String errorMsg);
 }

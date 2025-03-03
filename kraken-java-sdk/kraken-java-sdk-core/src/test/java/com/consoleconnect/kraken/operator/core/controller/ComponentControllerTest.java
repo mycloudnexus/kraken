@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.*;
 
 import com.consoleconnect.kraken.operator.core.CustomConfig;
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
+import com.consoleconnect.kraken.operator.core.enums.ParentProductTypeEnum;
 import com.consoleconnect.kraken.operator.core.helper.WebTestClientHelper;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
@@ -189,6 +190,29 @@ class ComponentControllerTest extends AbstractIntegrationTest {
         (uriBuilder -> uriBuilder.path(path).build()),
         bodyStr -> {
           assertThat(bodyStr, hasJsonPath("$.data", notNullValue()));
+        });
+  }
+
+  @Order(6)
+  @Test
+  void given_componentsAndParentProductType_whenSearching_thenReturnOK() {
+    String path = String.format("%s/%s/components", PRODUCT_BASE_PATH, PRODUCT_ID);
+    testClientHelper.getAndVerify(
+        (uriBuilder ->
+            uriBuilder
+                .path(path)
+                .queryParam("kind", AssetKindEnum.COMPONENT_API.getKind())
+                .queryParam("facetIncluded", true)
+                .queryParam("parentProductType", ParentProductTypeEnum.ACCESS_ELINE.getKind())
+                .build()),
+        bodyStr -> {
+          assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(1)));
+          assertThat(
+              bodyStr,
+              hasJsonPath("$.data.data[0].kind", is(AssetKindEnum.COMPONENT_API.getKind())));
+          assertThat(bodyStr, hasJsonPath("$.data.data[0].metadata", notNullValue()));
+          assertThat(bodyStr, hasJsonPath("$.data.data[0].facets", notNullValue()));
+          assertThat(bodyStr, hasJsonPath("$.data.data[0].facets.mappings", notNullValue()));
         });
   }
 

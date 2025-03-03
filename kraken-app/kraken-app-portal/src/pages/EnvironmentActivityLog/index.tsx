@@ -1,7 +1,6 @@
 import { PageLayout } from "@/components/Layout";
 import { useGetProductEnvs } from "@/hooks/product";
 import { useGetPushButtonEnabled } from "@/hooks/pushApiEvent";
-import useSize from "@/hooks/useSize";
 import { useAppStore } from "@/stores/app.store";
 import { Button, Flex, Tabs, Input } from "antd";
 import { startCase } from "lodash";
@@ -22,10 +21,7 @@ const EnvironmentActivityLog = () => {
   const navigate = useNavigate();
   const { data: envData } = useGetProductEnvs(currentProduct);
   const { data: isPushButtonEnabledResponse } = useGetPushButtonEnabled();
-  const ref = useRef<any>();
-  const size = useSize(ref);
   const refWrapper = useRef<any>();
-  const sizeWrapper = useSize(refWrapper);
   const [mainTabKey, setMainTabKey] = useState<string>("activityLog");
   const { value: isOpen, setTrue: open, setFalse: close } = useBoolean(false);
   const [pathQuery, setPathQuery] = useState("");
@@ -59,8 +55,6 @@ const EnvironmentActivityLog = () => {
         children: (
           <EnvironmentActivityTable
             openActionModal={openActionModal}
-            size={size}
-            sizeWrapper={sizeWrapper}
             pathQuery={pathQuery}
           />
         ),
@@ -73,30 +67,37 @@ const EnvironmentActivityLog = () => {
   };
 
   return (
-    <PageLayout title="API activity log">
-      <Flex align="center" justify="space-between">
-        <Tabs
-          activeKey={mainTabKey}
-          hideAdd
-          onChange={setMainTabKey}
-          items={[
-            {
-              label: "Activity log",
-              key: "activityLog",
-            },
-            {
-              label: "Push history",
-              key: "pushHistory",
-            },
-          ]}
-        />
-        {isActivityLogActive && !!isPushButtonEnabledResponse?.enabled && (
-          <Button type="primary" onClick={open}>
-            Push log
-          </Button>
-        )}
-      </Flex>
-
+    <PageLayout
+      title={
+        <Flex
+          align="center"
+          justify="space-between"
+          vertical={false}
+          style={{ width: "100%" }}
+        >
+          <Tabs
+            activeKey={mainTabKey}
+            hideAdd
+            onChange={setMainTabKey}
+            items={[
+              {
+                label: "Activity log",
+                key: "activityLog",
+              },
+              {
+                label: "Push history",
+                key: "pushHistory",
+              },
+            ]}
+          />
+          {isActivityLogActive && !!isPushButtonEnabledResponse?.enabled && (
+            <Button type="primary" onClick={open}>
+              Push log
+            </Button>
+          )}
+        </Flex>
+      }
+    >
       <div className={styles.contentWrapper} ref={refWrapper}>
         {isOpen && (
           <PushHistoryModal
