@@ -11,7 +11,7 @@ However, snapshots may be unstable and contain bugs.
 | 2.0.0-snapshot.1 | https://github.com/mycloudnexus/kraken/releases/tag/v2.0.0-snapshot.1 |      Jan-3-2025     |       Jan-9-2025              |
 | 2.0.0-snapshot.2 | https://github.com/mycloudnexus/kraken/releases/tag/v2.0.0-snapshot.2            |      Jan-17-2025    |  Jan-21-2025                   |
 | 2.0.0-snapshot.3 | https://github.com/mycloudnexus/kraken/releases/tag/v2.0.0-snapshot.3              |      Feb-7-2025     |     Feb-11-2025               |
-| 2.0.0-snapshot.4 | - to be added               |      Feb-21-2025     |                     |
+| 2.0.0-snapshot.4 |https://github.com/mycloudnexus/kraken/releases/tag/v2.0.0-snapshot.4      |      Feb-21-2025     |      Feb-28-2025               |
 | 2.0.0-snapshot.5 | - to be added               |      Mar-7-2025     |                     |
 | 2.0.0-snapshot.6 | - to be added               |      Mar-21-2025     |                     |
 
