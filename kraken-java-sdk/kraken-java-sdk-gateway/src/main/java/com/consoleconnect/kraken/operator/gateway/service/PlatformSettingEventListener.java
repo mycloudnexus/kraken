@@ -3,13 +3,10 @@ package com.consoleconnect.kraken.operator.gateway.service;
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
 import com.consoleconnect.kraken.operator.core.event.PlatformSettingCompletedEvent;
 import com.consoleconnect.kraken.operator.core.ingestion.DataIngestionJob;
-import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentTransformerFacets;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.gateway.template.JavaScriptEngine;
-import com.consoleconnect.kraken.operator.workflow.service.WorkflowTaskRegister;
-import io.orkes.conductor.client.ApiClient;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.util.encoders.Base64;
@@ -28,9 +25,6 @@ public class PlatformSettingEventListener {
   private final ApplicationEventPublisher publisher;
   private final UnifiedAssetService unifiedAssetService;
   private final DataIngestionJob dataIngestionJob;
-  private final ApiClient apiClient;
-  private final WorkflowTaskRegister workflowTaskConfig;
-  private final AppProperty appProperty;
 
   @EventListener(PlatformSettingCompletedEvent.class)
   public void handlePlatformSettingCompletedEvent(PlatformSettingCompletedEvent event) {
