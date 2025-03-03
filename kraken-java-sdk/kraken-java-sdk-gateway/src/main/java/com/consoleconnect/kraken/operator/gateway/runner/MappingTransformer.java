@@ -129,6 +129,10 @@ public interface MappingTransformer extends PathOperator {
   }
 
   default String deleteAndInsertNodeByPath(StateValueMappingDto stateValueMappingDto, String json) {
+    if (CollectionUtils.isEmpty(stateValueMappingDto.getPathRules())
+        && MapUtils.isEmpty(stateValueMappingDto.getTargetCheckPathMapper())) {
+      return json;
+    }
     DocumentContext doc = JsonPath.parse(json);
     // Delete and insert operations based on path rules
     stateValueMappingDto.getPathRules().stream()
@@ -146,7 +150,12 @@ public interface MappingTransformer extends PathOperator {
                   .ifPresent(
                       insertPath ->
                           insertPath.forEach(
-                              kvPair -> insertNodeByPath(doc, kvPair.getKey(), kvPair.getVal())));
+                              kvPair ->
+                                  insertNodeIfMatched(
+                                      doc,
+                                      pathRuleDto.getCheckPath(),
+                                      kvPair.getKey(),
+                                      kvPair.getVal())));
             });
     // Perform final deletion based on target check path mapping
     Optional.ofNullable(stateValueMappingDto.getTargetCheckPathMapper())
@@ -154,6 +163,23 @@ public interface MappingTransformer extends PathOperator {
         .ifPresent(checkPathMap -> deleteNodeByPath(checkPathMap, doc));
 
     return doc.jsonString();
+  }
+
+  default void insertNodeIfMatched(
+      DocumentContext doc, String checkPath, String insertKey, String insertVal) {
+    if (canInsert(doc, checkPath)) {
+      insertNodeByPath(doc, insertKey, insertVal);
+    }
+  }
+
+  default boolean canInsert(DocumentContext doc, String key) {
+    try {
+      return Optional.ofNullable(doc.read(key)).map(this::matchCondition).orElse(false);
+    } catch (Exception e) {
+      String err = String.format("Json Path read key error, key:%s", key);
+      LogHolder.log.error(err, e);
+    }
+    return false;
   }
 
   default void insertNodeByPath(DocumentContext doc, String key, String val) {
@@ -211,28 +237,27 @@ public interface MappingTransformer extends PathOperator {
           Object obj = null;
           try {
             obj = doc.read(key);
+            if (matchCondition(obj)) {
+              deleteByPath(value, doc);
+            } else {
+              LogHolder.log.warn("Reserved key:{}, value:{}", key, value);
+            }
           } catch (Exception e) {
             String err =
                 String.format(
                     "Json Path read key error, key:%s, value:%s will be deleted", key, value);
             LogHolder.log.error(err, e);
             deleteByPath(value, doc);
-            return;
-          }
-          if (null == obj || (obj instanceof String str && (StringUtils.isBlank(str)))) {
-            deleteByPath(value, doc);
-          } else if (obj instanceof Integer i && i < 0) {
-            deleteByPath(value, doc);
-          } else if (obj instanceof Double i && i < 0) {
-            deleteByPath(value, doc);
-          } else if (obj instanceof Boolean b && !b) {
-            deleteByPath(value, doc);
-          } else if (obj instanceof JSONArray array && array.isEmpty()) {
-            deleteByPath(value, doc);
-          } else {
-            LogHolder.log.warn("Reserved key:{}, value:{}", key, value);
           }
         });
+  }
+
+  default boolean matchCondition(Object obj) {
+    return obj == null
+        || (obj instanceof String str && StringUtils.isBlank(str))
+        || (obj instanceof Number num && num.doubleValue() < 0)
+        || (obj instanceof Boolean b && !b)
+        || (obj instanceof JSONArray array && array.isEmpty());
   }
 
   default String calculateBasedOnResponseBody(String responseBody, Map<String, Object> context) {
