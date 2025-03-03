@@ -54,6 +54,15 @@ public class ApiActivityLogEntity extends AbstractHttpEntity {
   @Column(name = "product_type", nullable = true, unique = false)
   private String productType;
 
+  @Column(name = "workflow_instance_id", nullable = true, unique = false)
+  private String workflowInstanceId;
+
+  @Column(name = "workflow_status", nullable = true, unique = false)
+  private String workflowStatus;
+
+  @Column(name = "error_msg", nullable = true, unique = false)
+  private String errorMsg;
+
   @OneToOne
   @JoinColumn(name = "api_log_body_id")
   private ApiActivityLogBodyEntity apiLogBodyEntity;
