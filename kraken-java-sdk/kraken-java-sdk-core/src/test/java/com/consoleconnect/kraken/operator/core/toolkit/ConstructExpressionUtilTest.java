@@ -36,6 +36,8 @@ class ConstructExpressionUtilTest {
     assertThat(s6).isNotNull();
     String s7 = ConstructExpressionUtil.formatWorkflowResponseExpression("@{{workflow.param.a}}");
     assertThat(s7).isNotNull();
+    String s8 = ConstructExpressionUtil.formatTaskExpression("${task.a.b}");
+    assertThat(s8).isNotNull();
     ExpectTypeEnum expected = ExpectTypeEnum.EXPECTED;
     ExpectTypeEnum expectedExist = ExpectTypeEnum.EXPECTED_EXIST;
     ExpectTypeEnum expectedTrue = ExpectTypeEnum.EXPECTED_TRUE;

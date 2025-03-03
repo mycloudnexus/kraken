@@ -16,5 +16,14 @@ spec:
       method: post
       serverKey: mef.sonata.api-target-spec.con1718940696857
       mappers:
+        pathRules:
+          - name: mapper.quite.uni.read.sync.pathRule.state
+            checkPath: "$[?(@.state != 'unableToProvide')]"
+            deletePath: "$.validFor"
+            insertPath:
+              - key: "$.quoteItem[0].terminationError.code"
+                val: "otherIssue"
+              - key: "$.quoteItem[0].terminationError.value"
+                val: "the quoted item is not available"
         request:
         response:

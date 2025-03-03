@@ -8,4 +8,5 @@ public class EvaluateObject {
   private Map<String, Map<String, String>> value;
   private String bodyExpression;
   private String urlExpression;
+  private String expression;
 }
