@@ -2,6 +2,8 @@ package com.consoleconnect.kraken.operator.gateway.runner;
 
 import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.PRODUCT_MAPPING_MATRIX;
 import static com.consoleconnect.kraken.operator.core.enums.ParamLocationEnum.*;
+import static com.consoleconnect.kraken.operator.core.toolkit.Constants.COMMA;
+import static com.consoleconnect.kraken.operator.core.toolkit.Constants.COMMA_SPACE_EXPRESSION;
 import static com.consoleconnect.kraken.operator.core.toolkit.ConstructExpressionUtil.*;
 
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
@@ -225,7 +227,12 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
   public boolean checkExpect(PathCheck pathCheck, Object value) {
     switch (pathCheck.expectType()) {
       case EXPECTED -> {
-        return pathCheck.value().equalsIgnoreCase(wrapAsString(value));
+        if (pathCheck.value().contains(COMMA)) {
+          return Arrays.stream(pathCheck.value().split(COMMA_SPACE_EXPRESSION))
+              .anyMatch(item -> item.equalsIgnoreCase(wrapAsString(value)));
+        } else {
+          return pathCheck.value().equalsIgnoreCase(wrapAsString(value));
+        }
       }
       case EXPECTED_START_WITH -> {
         return wrapAsString(value).startsWith(pathCheck.value());

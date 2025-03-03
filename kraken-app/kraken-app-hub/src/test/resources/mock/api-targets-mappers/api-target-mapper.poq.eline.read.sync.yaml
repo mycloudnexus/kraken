@@ -2,28 +2,29 @@
 kind: kraken.component.api-target-mapper
 apiVersion: v1
 metadata:
-  key: mef.sonata.api-target-mapper.poq.uni.add
+  key: mef.sonata.api-target-mapper.poq.eline.read.sync
   name: Product Offering Qualification (POQ) API
   description: |
-    A request initiated by the Buyer to determine whether the Seller is
-    able to deliver a product or set of products from among their product
-    offerings, at the Buyer's location(s); or modify a previously purchased
-    product. The Seller also provides estimated time intervals to complete
-    these deliveries. Reference: MEF 79 (Sn 8.4).
+    The Buyer requests a list of POQs from the Seller based on a set of POQ
+    filter criteria (as described in MEF79). For each POQ returned, the
+    Seller also provides a POQ Identifier that uniquely identifies this POQ
+    within the Seller's system. The order of the elements returned to the
+    Buyer is defined by the Seller (e.g. natural order) and does not change
+    between the pages. If criteria for attribute X are provided, all
+    returned items must match it.
 spec:
   trigger:
-    path: /mefApi/sonata/productOfferingQualification/v7/productOfferingQualification
-    method: post
-    productType: uni
-    actionType: add
+    path: /mefApi/sonata/productOfferingQualification/v7/productOfferingQualification/{id}
+    method: get
+    productType: access_e_line
   endpoints:
-    - id: create a product offering qualification for port
-      path: ""
-      method: ""
+    - id: Retrieves a product offering qualification by id for connection
+      path: /api/pricing/calculate
+      method: post
       mappers:
         request:
         response:
-          - name: mapper.poq.uni.add.itemState
+          - name: mapper.poq.eline.read.itemState
             title: POQ Item State Mapping
             description: POQ Item state mapping
             source: ""
@@ -41,9 +42,9 @@ spec:
             valueMapping: {}
             defaultValue: "done.ready"
             requiredMapping: false
-          - name: mapper.poq.uni.add.state
+          - name: mapper.poq.eline.read.state
             title: POQ State Mapping
-            description: POQ state mapping
+            description: quote state mapping
             source: ""
             sourceLocation: ""
             target: "@{{state}}"

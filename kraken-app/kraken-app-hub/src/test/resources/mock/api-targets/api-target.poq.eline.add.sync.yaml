@@ -1,0 +1,39 @@
+---
+kind: kraken.component.api-target
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target.poq.eline.add.sync
+  name: Product Offering Qualification (POQ) API
+  mapperKey: mef.sonata.api-target-mapper.poq.eline.add.sync
+  version: 1
+spec:
+  inputs:
+    - mefQuery
+    - mefRequestBody
+  trigger:
+    path: /mefApi/sonata/productOfferingQualification/v7/productOfferingQualification
+    method: post
+    productType: access_e_line
+    actionType: add
+  endpoints:
+    - id: create a product offering qualification for connection
+      path: ""
+      method: ""
+      requestBody: |
+        {}
+      responseBody: |
+        {
+         "id":  "${entity.id}",
+         "projectId": "${mefRequestBody[projectId]?:''}",
+         "externalId":"${mefRequestBody[externalId]?:''}",
+         "instantSyncQualification": "${mefRequestBody[instantSyncQualification]?:''}",
+         "provideAlternative": "${mefRequestBody[provideAlternative]?:''}",
+         "relatedContactInformation": "${T(com.consoleconnect.kraken.operator.gateway.func.SpelFunc).appendSellerInformation(env.seller.role, env.seller.name, env.seller.emailAddress, env.seller.number, mefRequestBody.relatedContactInformation)}",
+         "productOfferingQualificationItem": [{
+             "product": "${mefRequestBody.productOfferingQualificationItem[0].product}",
+             "action": "${mefRequestBody.productOfferingQualificationItem[0].action}",
+             "id":"${mefRequestBody.productOfferingQualificationItem[0].id}",
+             "state":"done.ready"
+          }],
+         "state": "done.ready"
+        }

@@ -2,9 +2,9 @@
 kind: kraken.component.api-target
 apiVersion: v1
 metadata:
-  key: mef.sonata.api-target.poq.uni.read
+  key: mef.sonata.api-target.poq.uni.read.sync
   name: Product Offering Qualification (POQ) API
-  mapperKey: mef.sonata.api-target-mapper.poq.uni.read
+  mapperKey: mef.sonata.api-target-mapper.poq.uni.read.sync
   version: 1
 spec:
   inputs:
@@ -22,12 +22,16 @@ spec:
       responseBody: |
         {
           "id": "${entity.id}",
+          "projectId": "${entity.request.projectId}",
+          "externalId":"${entity.request.externalId}",
+          "instantSyncQualification": "${entity.request.instantSyncQualification}",
+          "provideAlternative": "${entity.request.provideAlternative}",
+          "relatedContactInformation": "${entity.request.relatedContactInformation}",
           "productOfferingQualificationItem": [{
               "product": "${entity.request.productOfferingQualificationItem[0].product}",
               "action": "${entity.request.productOfferingQualificationItem[0].action}",
               "id":"${entity.request.productOfferingQualificationItem[0].id}",
-              "state":"@{{itemState}}"
+              "state":"${entity.renderedResponse.productOfferingQualificationItem[0].state}"
            }],
-          "relatedContactInformation": "${entity.request.relatedContactInformation}",
-          "state": "@{{state}}"
+          "state": "${entity.renderedResponse.state}"
         }
