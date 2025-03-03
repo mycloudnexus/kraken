@@ -37,6 +37,7 @@ public class AppProperty {
   @Data
   public static class WorkflowConfig {
     private String baseUrl = "http://base-url.com";
+    private List<String> clusterUrl = new ArrayList<>();
     private String key;
     private String secret;
     private Integer pollTimes = 30;

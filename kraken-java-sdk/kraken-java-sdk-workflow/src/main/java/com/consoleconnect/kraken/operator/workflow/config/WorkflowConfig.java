@@ -4,10 +4,13 @@ import static com.consoleconnect.kraken.operator.core.toolkit.Constants.WORKFLOW
 
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.workflow.service.WorkflowTaskRegister;
+import com.netflix.conductor.sdk.workflow.executor.task.AnnotatedWorkerExecutor;
 import com.netflix.conductor.sdk.workflow.task.WorkerTask;
 import io.orkes.conductor.client.ApiClient;
+import io.orkes.conductor.client.OrkesClients;
 import io.orkes.conductor.client.http.OrkesMetadataClient;
 import io.orkes.conductor.client.http.OrkesWorkflowClient;
+import jakarta.annotation.PostConstruct;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
@@ -17,6 +20,8 @@ import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,7 +30,11 @@ import org.springframework.context.annotation.Configuration;
 @AutoConfigureAfter(AppProperty.class)
 @Getter
 @AllArgsConstructor
+@Slf4j
 public class WorkflowConfig {
+  private final AppProperty appProperty;
+  private final WorkflowTaskRegister workflowTaskConfig;
+
   @Bean
   public OrkesWorkflowClient getWorkflowClient(AppProperty appProperty) {
     return new OrkesWorkflowClient(getApiClient(appProperty));
@@ -65,5 +74,30 @@ public class WorkflowConfig {
 
     buildInTask.setParams(task2InputParamMap);
     return buildInTask;
+  }
+
+  @PostConstruct
+  void init() {
+    if (appProperty.getWorkflow() != null && appProperty.getWorkflow().isEnabled()) {
+      if (CollectionUtils.isNotEmpty(appProperty.getWorkflow().getClusterUrl())) {
+        appProperty.getWorkflow().getClusterUrl().stream().forEach(nodeUrl -> initWorker(nodeUrl));
+      } else {
+        initWorker(appProperty.getWorkflow().getBaseUrl());
+      }
+    }
+  }
+
+  private void initWorker(String nodeUrl) {
+    try {
+      ApiClient apiClient = new ApiClient(nodeUrl);
+      log.info("register worker");
+      OrkesClients oc = new OrkesClients(apiClient);
+      AnnotatedWorkerExecutor annotatedWorkerExecutor =
+          new AnnotatedWorkerExecutor(oc.getTaskClient(), 10);
+      annotatedWorkerExecutor.addBean(workflowTaskConfig);
+      annotatedWorkerExecutor.initWorkers("com.consoleconnect.kraken.operator.workflow.service");
+    } catch (Exception e) {
+      log.error("register worker failed for {}, error: {}", nodeUrl, e.getMessage());
+    }
   }
 }
