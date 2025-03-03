@@ -9,9 +9,7 @@ import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.gateway.template.JavaScriptEngine;
 import com.consoleconnect.kraken.operator.workflow.service.WorkflowTaskRegister;
-import com.netflix.conductor.sdk.workflow.executor.task.AnnotatedWorkerExecutor;
 import io.orkes.conductor.client.ApiClient;
-import io.orkes.conductor.client.OrkesClients;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.util.encoders.Base64;
@@ -65,18 +63,6 @@ public class PlatformSettingEventListener {
     log.info("PlatformSettingCompletedEvent publishing RefreshRoutesEvent");
     publisher.publishEvent(new RefreshRoutesEvent(this));
     log.info("PlatformSettingCompletedEvent completed");
-  }
-
-  @EventListener(classes = PlatformSettingCompletedEvent.class)
-  public void initWorkerTask() {
-    if (appProperty.getWorkflow() != null && appProperty.getWorkflow().isEnabled()) {
-      log.info("init worker task");
-      OrkesClients oc = new OrkesClients(apiClient);
-      AnnotatedWorkerExecutor annotatedWorkerExecutor =
-          new AnnotatedWorkerExecutor(oc.getTaskClient(), 10);
-      annotatedWorkerExecutor.addBean(workflowTaskConfig);
-      annotatedWorkerExecutor.initWorkers("com.consoleconnect.kraken.operator.workflow.service");
-    }
   }
 
   @EventListener(classes = ApplicationReadyEvent.class)
