@@ -243,4 +243,12 @@ class MappingTransformerTest extends AbstractIntegrationTest implements MappingT
     pathRule.setInsertPath(insertPath);
     return pathRule;
   }
+
+  @Test
+  void givenEmptyCheckRules_whenDeleteNodes_thenReturnOK() {
+    String json = "Are you ok?";
+    StateValueMappingDto stateValueMappingDto = new StateValueMappingDto();
+    String result = deleteAndInsertNodeByPath(stateValueMappingDto, json);
+    Assertions.assertEquals(json, result);
+  }
 }

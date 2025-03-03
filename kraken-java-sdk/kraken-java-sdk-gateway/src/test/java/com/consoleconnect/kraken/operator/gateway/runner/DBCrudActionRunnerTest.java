@@ -9,6 +9,7 @@ import com.consoleconnect.kraken.operator.gateway.repo.HttpRequestRepository;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import java.util.*;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -68,6 +69,18 @@ class DBCrudActionRunnerTest extends AbstractIntegrationTest {
     entity.setBizType("db persist");
     httpRequestRepository.save(entity);
 
+    DBCrudActionRunner.Config configUpdate = getConfig(entity, DBActionTypeEnum.UPDATE);
+    exchange.getAttributes().put(KrakenFilterConstants.X_ENTITY_ID, entity.getId().toString());
+    Assertions.assertDoesNotThrow(() -> dbCrudActionRunner.onPersist(exchange, configUpdate));
+
+    DBCrudActionRunner.Config configRead = getConfig(entity, DBActionTypeEnum.READ);
+    configRead.setActionField("productInstanceId");
+    configRead.setId("67ad55a4d3044d46e53dc5ab");
+    Assertions.assertDoesNotThrow(() -> dbCrudActionRunner.onPersist(exchange, configRead));
+  }
+
+  private static DBCrudActionRunner.@NotNull Config getConfig(
+      HttpRequestEntity entity, DBActionTypeEnum actionType) {
     DBCrudActionRunner.Config config = new DBCrudActionRunner.Config();
     Map<String, String> env = new HashMap<>();
     env.put("productInstanceId", "${renderedResponseBody[0].id?:''}");
@@ -79,9 +92,8 @@ class DBCrudActionRunnerTest extends AbstractIntegrationTest {
     properties.add("renderedResponseBody");
     config.setProperties(properties);
     config.setId(entity.getId().toString());
-    config.setAction(DBActionTypeEnum.UPDATE);
-    exchange.getAttributes().put(KrakenFilterConstants.X_ENTITY_ID, entity.getId().toString());
-    Assertions.assertDoesNotThrow(() -> dbCrudActionRunner.onPersist(exchange, config));
+    config.setAction(actionType);
+    return config;
   }
 
   @Test

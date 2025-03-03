@@ -44,6 +44,7 @@ spec:
             value: 1
             expression: status_checking_task.count
         buildInTask: reject_order_task
+        errorMsg: "unexpected error"
   preparationStage:
     - taskName: disable_order_task
       taskType: http

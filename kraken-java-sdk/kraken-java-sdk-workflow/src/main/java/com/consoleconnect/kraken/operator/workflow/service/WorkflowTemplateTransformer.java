@@ -19,6 +19,7 @@ import com.consoleconnect.kraken.operator.workflow.config.WorkflowConfig;
 import com.consoleconnect.kraken.operator.workflow.model.EvaluateObject;
 import com.consoleconnect.kraken.operator.workflow.model.HttpExtend;
 import com.consoleconnect.kraken.operator.workflow.model.LogTaskRequest;
+import com.consoleconnect.kraken.operator.workflow.model.WorkflowTerminateEvent;
 import com.google.common.collect.Streams;
 import com.netflix.conductor.common.metadata.tasks.TaskDef;
 import com.netflix.conductor.common.metadata.workflow.WorkflowDef;
@@ -55,7 +56,6 @@ public class WorkflowTemplateTransformer {
   private static final String OUT_PUT = "output";
   private static final String REQUEST_ID = "requestId";
   private static final String PAYLOAD = "payload";
-
   private static final int RETRY_COUNT = 3;
   private static final String SWITCH_HTTP_CHECK_NAME_PREFIX = "switch_http_check_%s";
   private static final String SWITCH_CUSTOMIZED_CHECK_PREFIX = "switch_%s";
@@ -108,7 +108,7 @@ public class WorkflowTemplateTransformer {
                 tasks.addAll(
                     constructSimpleTask(LOG_PAYLOAD_TASK, task, httpTasks).getWorkflowDefTasks());
                 // add check http status task for each http task
-                tasks.addAll(constructHttpCheckSwitchTask(task.getTaskName(), stage));
+                tasks.addAll(constructHttpCheckSwitchTask(task, stage));
                 if (task.getConditionCheck() != null
                     && CollectionUtils.isNotEmpty(task.getConditionCheck().getConditionItems())) {
                   tasks.addAll(
@@ -132,15 +132,17 @@ public class WorkflowTemplateTransformer {
       workflowDef
           .getTasks()
           .addAll(constructSimpleTask(PERSIST_RESPONSE_TASK, httpTask, null).getWorkflowDefTasks());
+      workflowDef
+          .getTasks()
+          .addAll(constructSimpleTask(WORKFLOW_SUCCESS_TASK, httpTask, null).getWorkflowDefTasks());
     }
   }
 
-  private List<WorkflowTask> constructHttpCheckSwitchTask(
-      String taskName, WorkflowStageEnum stage) {
+  private List<WorkflowTask> constructHttpCheckSwitchTask(HttpTask task, WorkflowStageEnum stage) {
     Switch switchTask =
         new Switch(
-            String.format(SWITCH_HTTP_CHECK_NAME_PREFIX, taskName),
-            String.format(HTTP_STATUS_SWITCH_CASE_EXPRESSION, taskName));
+            String.format(SWITCH_HTTP_CHECK_NAME_PREFIX, task.getTaskName()),
+            String.format(HTTP_STATUS_SWITCH_CASE_EXPRESSION, task.getTaskName()));
     Map<String, List<Task<?>>> branches = new HashMap<>();
     branches.put(
         String.valueOf(HttpStatus.OK.value()),
@@ -148,6 +150,7 @@ public class WorkflowTemplateTransformer {
     switchTask.decisionCases(branches);
     switchTask.defaultCase(
         constructSimpleTask(stage == EXECUTION_STAGE ? NOTIFY_TASK : FAIL_ORDER_TASK, null, null),
+        constructSimpleTask(WORKFLOW_FAILED_TASK, task, null),
         new Terminate(getUniqueTaskRef(TERMINATE_TASK), Workflow.WorkflowStatus.COMPLETED, null));
     return switchTask.getWorkflowDefTasks();
   }
@@ -162,8 +165,11 @@ public class WorkflowTemplateTransformer {
         Boolean.FALSE.toString(),
         List.of(
             constructSimpleTask(task.getConditionCheck().getBuildInTask(), null, null),
+            constructSimpleTask(WORKFLOW_FAILED_TASK, task, null),
             new Terminate(
-                getUniqueTaskRef(TERMINATE_TASK), Workflow.WorkflowStatus.COMPLETED, null)));
+                getUniqueTaskRef(TERMINATE_TASK),
+                Workflow.WorkflowStatus.COMPLETED,
+                task.getConditionCheck().getErrorMsg())));
     switchTask.decisionCases(branches);
     switchTask.setOptional(true);
     return switchTask.getWorkflowDefTasks();
@@ -226,6 +232,13 @@ public class WorkflowTemplateTransformer {
         simpleTask
             .getInput()
             .putAll(JsonToolkit.fromJson(JsonToolkit.toJson(evaluateObject), Map.class));
+      }
+      case WORKFLOW_FAILED_TASK, WORKFLOW_SUCCESS_TASK -> {
+        HttpTask.ConditionCheck conditionCheck = httpTask.getConditionCheck();
+        WorkflowTerminateEvent payload = new WorkflowTerminateEvent();
+        payload.setErrorMsg(conditionCheck.getErrorMsg());
+        payload.setId(String.format(WORKFLOW_PARAM_PREFIX, REQUEST_ID));
+        simpleTask.getInput().putAll(JsonToolkit.fromJson(JsonToolkit.toJson(payload), Map.class));
       }
       default -> simpleTask.getInput().putAll(input);
     }

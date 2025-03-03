@@ -78,6 +78,7 @@ public class ClientHeartbeatEventHandler extends ClientEventHandler {
       environmentClientEntity.setStatus(HttpStatus.OK.name());
       environmentClientEntity.setUpdatedAt(instance.getUpdatedAt());
       environmentClientEntity.setUpdatedBy(userId);
+      environmentClientEntity.setAppVersion(instance.getAppVersion());
       environmentClientRepository.save(environmentClientEntity);
       updateAppVersion(envId, instance);
     }
