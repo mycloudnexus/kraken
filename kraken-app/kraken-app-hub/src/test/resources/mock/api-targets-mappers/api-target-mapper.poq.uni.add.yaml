@@ -23,14 +23,14 @@ spec:
       serverKey: mef.sonata.api-target-spec.con1718940696857
       mappers:
         request:
-          - name: mapper.poq.uni.add.sync.place.id
+          - name: mapper.poq.uni.add.place.id
             source: "@{{productOfferingQualificationItem[0].product.place[0].id}}"
             sourceLocation: BODY
             sourceType: string
             target: "@{{ports[*].dcf}}"
             targetLocation: BODY
             requiredMapping: true
-          - name: mapper.poq.uni.add.sync.productConfiguration.bandwidth
+          - name: mapper.poq.uni.add.productConfiguration.bandwidth
             source: "@{{productOfferingQualificationItem[0].product.productConfiguration.bandwidth}}"
             sourceLocation: BODY
             allowValueLimit: true
@@ -42,7 +42,7 @@ spec:
             target: "@{{ports[*].speed}}"
             targetLocation: BODY
             requiredMapping: true
-          - name: mapper.poq.uni.add.sync.productConfiguration.bandwidthUnit
+          - name: mapper.poq.uni.add.productConfiguration.bandwidthUnit
             source: "@{{productOfferingQualificationItem[0].product.productConfiguration.bandwidthUnit}}"
             sourceLocation: BODY
             sourceType: enum
@@ -53,14 +53,14 @@ spec:
             target: "MBPS"
             targetLocation: BODY
             requiredMapping: true
-          - name: mapper.poq.uni.add.sync.productOffering.id
+          - name: mapper.poq.uni.add.productOffering.id
             source: "@{{productOfferingQualificationItem[0].product.productOffering.id}}"
             sourceLocation: BODY
             sourceType: string
             target: "UNI"
             targetLocation: BODY
             requiredMapping: false
-          - name: mapper.poq.uni.add.sync.productConfiguration.durationUnit
+          - name: mapper.poq.uni.add.productConfiguration.durationUnit
             source: "@{{productOfferingQualificationItem[0].product.productConfiguration.durationUnit}}"
             sourceLocation: BODY
             sourceType: enum
