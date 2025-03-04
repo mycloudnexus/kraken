@@ -23,6 +23,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -33,7 +34,7 @@ import org.springframework.context.annotation.Configuration;
 @Slf4j
 public class WorkflowConfig {
   private final AppProperty appProperty;
-  private final WorkflowTaskRegister workflowTaskConfig;
+  private final ApplicationContext context;
 
   @Bean
   public OrkesWorkflowClient getWorkflowClient(AppProperty appProperty) {
@@ -80,7 +81,7 @@ public class WorkflowConfig {
   void init() {
     if (appProperty.getWorkflow() != null && appProperty.getWorkflow().isEnabled()) {
       if (CollectionUtils.isNotEmpty(appProperty.getWorkflow().getClusterUrl())) {
-        appProperty.getWorkflow().getClusterUrl().stream().forEach(nodeUrl -> initWorker(nodeUrl));
+        appProperty.getWorkflow().getClusterUrl().stream().forEach(this::initWorker);
       } else {
         initWorker(appProperty.getWorkflow().getBaseUrl());
       }
@@ -94,6 +95,7 @@ public class WorkflowConfig {
       OrkesClients oc = new OrkesClients(apiClient);
       AnnotatedWorkerExecutor annotatedWorkerExecutor =
           new AnnotatedWorkerExecutor(oc.getTaskClient(), 10);
+      WorkflowTaskRegister workflowTaskConfig = context.getBean(WorkflowTaskRegister.class);
       annotatedWorkerExecutor.addBean(workflowTaskConfig);
       annotatedWorkerExecutor.initWorkers("com.consoleconnect.kraken.operator.workflow.service");
     } catch (Exception e) {
