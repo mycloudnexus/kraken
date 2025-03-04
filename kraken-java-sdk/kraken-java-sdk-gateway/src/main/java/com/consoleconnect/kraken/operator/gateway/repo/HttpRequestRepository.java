@@ -2,7 +2,6 @@ package com.consoleconnect.kraken.operator.gateway.repo;
 
 import com.consoleconnect.kraken.operator.gateway.entity.HttpRequestEntity;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,7 +17,7 @@ public interface HttpRequestRepository
         JpaSpecificationExecutor<HttpRequestEntity> {
   List<HttpRequestEntity> findByExternalId(String externalId);
 
-  Optional<HttpRequestEntity> findByProductInstanceId(String productInstanceId);
+  List<HttpRequestEntity> findByProductInstanceId(String productInstanceId);
 
   @Query(
       value =
