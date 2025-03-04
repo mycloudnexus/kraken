@@ -35,10 +35,10 @@ spec:
     #- classpath:/mock/api-targets/api-target.quote.uni.read.sync.yaml
     #- classpath:/mock/api-targets/api-target.address.validate.yaml
     #- classpath:/mock/api-targets/api-target.address.retrieve.yaml
-    #- classpath:/mock/api-targets/api-target.poq.uni.add.sync.yaml
-    #- classpath:/mock/api-targets/api-target.poq.eline.add.sync.yaml
-    #- classpath:/mock/api-targets/api-target.poq.uni.read.sync.yaml
-    #- classpath:/mock/api-targets/api-target.poq.eline.read.sync.yaml
+    #- classpath:/mock/api-targets/api-target.poq.uni.add.yaml
+    #- classpath:/mock/api-targets/api-target.poq.eline.add.yaml
+    #- classpath:/mock/api-targets/api-target.poq.uni.read.yaml
+    #- classpath:/mock/api-targets/api-target.poq.eline.read.yaml
     #- classpath:/mock/api-targets/api-target.inventory.uni.list.yaml
     #- classpath:/mock/api-targets/api-target.inventory.uni.read.yaml
     #- classpath:/mock/api-targets/api-target.inventory.eline.list.yaml
@@ -61,17 +61,17 @@ spec:
     #- classpath:/mock/api-targets-mappers/api-target-mapper.quote.uni.read.sync.yaml
     #- classpath:/mock/api-targets-mappers/api-target-mapper.address.validate.yaml
     #- classpath:/mock/api-targets-mappers/api-target-mapper.address.retrieve.yaml
-    #- classpath:/mock/api-targets-mappers/api-target-mapper.poq.uni.add.sync.yaml
-    #- classpath:/mock/api-targets-mappers/api-target-mapper.poq.eline.add.sync.yaml
-    #- classpath:/mock/api-targets-mappers/api-target-mapper.poq.uni.read.sync.yaml
-    #- classpath:/mock/api-targets-mappers/api-target-mapper.poq.eline.read.sync.yaml
+    #- classpath:/mock/api-targets-mappers/api-target-mapper.poq.uni.add.yaml
+    #- classpath:/mock/api-targets-mappers/api-target-mapper.poq.eline.add.yaml
+    #- classpath:/mock/api-targets-mappers/api-target-mapper.poq.uni.read.yaml
+    #- classpath:/mock/api-targets-mappers/api-target-mapper.poq.eline.read.yaml
     #- classpath:/mock/api-targets-mappers/api-target-mapper.inventory.eline.list.yaml
     #- classpath:/mock/api-targets-mappers/api-target-mapper.inventory.eline.read.yaml
     #- classpath:/mock/api-targets-mappers/api-target-mapper.inventory.uni.list.yaml
     #- classpath:/mock/api-targets-mappers/api-target-mapper.inventory.uni.read.yaml
     #- classpath:/mock/mapping-matrix/mapping.matrix.address.validation.yaml
-    #- classpath:/mock/mapping-matrix/mapping.matrix.poq.eline.add.sync.yaml
-    #- classpath:/mock/mapping-matrix/mapping.matrix.poq.uni.add.sync.yaml
+    #- classpath:/mock/mapping-matrix/mapping.matrix.poq.eline.add.yaml
+    #- classpath:/mock/mapping-matrix/mapping.matrix.poq.uni.add.yaml
     #- classpath:/mock/mapping-matrix/mapping.matrix.order.uni.add.yaml
     #- classpath:/mock/mapping-matrix/mapping.matrix.order.uni.delete.yaml
     #- classpath:/mock/mapping-matrix/mapping.matrix.order.eline.delete.yaml

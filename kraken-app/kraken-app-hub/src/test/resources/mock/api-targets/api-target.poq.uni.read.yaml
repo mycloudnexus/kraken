@@ -2,9 +2,9 @@
 kind: kraken.component.api-target
 apiVersion: v1
 metadata:
-  key: mef.sonata.api-target.poq.uni.read.sync
+  key: mef.sonata.api-target.poq.uni.read
   name: Product Offering Qualification (POQ) API
-  mapperKey: mef.sonata.api-target-mapper.poq.uni.read.sync
+  mapperKey: mef.sonata.api-target-mapper.poq.uni.read
   version: 1
 spec:
   inputs:

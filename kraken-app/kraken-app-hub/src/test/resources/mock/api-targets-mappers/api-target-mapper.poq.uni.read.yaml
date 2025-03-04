@@ -2,7 +2,7 @@
 kind: kraken.component.api-target-mapper
 apiVersion: v1
 metadata:
-  key: mef.sonata.api-target-mapper.poq.uni.read.sync
+  key: mef.sonata.api-target-mapper.poq.uni.read
   name: Product Offering Qualification (POQ) API
   description: |
     The Buyer requests a list of POQs from the Seller based on a set of POQ

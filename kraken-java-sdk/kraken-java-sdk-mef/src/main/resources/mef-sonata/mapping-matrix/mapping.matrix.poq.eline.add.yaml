@@ -11,7 +11,7 @@ spec:
   expect-http-status-422-if-missing:
     - $.body.productOfferingQualificationItem[0].product.productConfiguration
   matrix:
-    mef.sonata.api-target.poq.eline.add.sync:
+    mef.sonata.api-target.poq.eline.add:
       - name: action_add
         path: "$.body.productOfferingQualificationItem[*].['action']"
         expectType: EXPECTED

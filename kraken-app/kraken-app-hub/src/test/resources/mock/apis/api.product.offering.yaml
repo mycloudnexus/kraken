@@ -53,8 +53,8 @@ spec:
                 let typeVal = productConfiguration?.['@type'];
                 if(typeVal === 'UNI') {
                   if(syncMode === true) {
-                    targetAPIConfigKey = 'mef.sonata.api-target.poq.uni.add.sync';
-                    matrixConfigKey = 'mef.sonata.api.matrix.poq.uni.add.sync';
+                    targetAPIConfigKey = 'mef.sonata.api-target.poq.uni.add';
+                    matrixConfigKey = 'mef.sonata.api.matrix.poq.uni.add';
                   } else if (syncMode === false) {
                     targetAPIConfigKey = 'targetKey:notFound';
                     matrixConfigKey = 'matrixKey:notFound';
@@ -68,8 +68,8 @@ spec:
                   }
                 } else if(typeVal === 'ACCESS_E_LINE') {
                   if(syncMode === true) {
-                    targetAPIConfigKey = 'mef.sonata.api-target.poq.eline.add.sync';
-                    matrixConfigKey = 'mef.sonata.api.matrix.poq.eline.add.sync';
+                    targetAPIConfigKey = 'mef.sonata.api-target.poq.eline.add';
+                    matrixConfigKey = 'mef.sonata.api.matrix.poq.eline.add';
                   } else if (syncMode === false) {
                     targetAPIConfigKey = 'targetKey:notFound';
                     matrixConfigKey = 'matrixKey:notFound';
@@ -229,7 +229,7 @@ spec:
                 let syncMode = input.instantSync;
                 if(input.bizType === 'UNI') {
                   if (syncMode === true) {
-                    targetAPIConfigKey = 'mef.sonata.api-target.poq.uni.read.sync';
+                    targetAPIConfigKey = 'mef.sonata.api-target.poq.uni.read';
                     forwardDownstream = false;
                   } else {
                     targetAPIConfigKey = 'targetKey:notFound';
@@ -237,7 +237,7 @@ spec:
                   }
                 } else if(input.bizType === 'ACCESS_E_LINE') {
                   if (syncMode === true) {
-                    targetAPIConfigKey = 'mef.sonata.api-target.poq.eline.read.sync';
+                    targetAPIConfigKey = 'mef.sonata.api-target.poq.eline.read';
                     forwardDownstream = false;
                   } else {
                     targetAPIConfigKey = 'targetKey:notFound';
@@ -349,35 +349,35 @@ spec:
             code: ${targetApiConfig.endpoints[0].responseBody}
             inputs: ${targetApiConfig.inputs}
 links:
-  - targetAssetKey: mef.sonata.api-target.poq.eline.add.sync
+  - targetAssetKey: mef.sonata.api-target.poq.eline.add
     relationship: implementation.target
-    group: mef.sonata.api-target.poq.eline.add.sync
-  - targetAssetKey: mef.sonata.api-target.poq.eline.read.sync
+    group: mef.sonata.api-target.poq.eline.add
+  - targetAssetKey: mef.sonata.api-target.poq.eline.read
     relationship: implementation.target
-    group: mef.sonata.api-target.poq.eline.read.sync
-  - targetAssetKey: mef.sonata.api-target.poq.uni.add.sync
+    group: mef.sonata.api-target.poq.eline.read
+  - targetAssetKey: mef.sonata.api-target.poq.uni.add
     relationship: implementation.target
-    group: mef.sonata.api-target.poq.uni.add.sync
-  - targetAssetKey: mef.sonata.api-target.poq.uni.read.sync
+    group: mef.sonata.api-target.poq.uni.add
+  - targetAssetKey: mef.sonata.api-target.poq.uni.read
     relationship: implementation.target
-    group: mef.sonata.api-target.poq.uni.read.sync
-  - targetAssetKey: mef.sonata.api-target-mapper.poq.eline.add.sync
+    group: mef.sonata.api-target.poq.uni.read
+  - targetAssetKey: mef.sonata.api-target-mapper.poq.eline.add
     relationship: implementation.target-mapper
-    group: mef.sonata.api-target.poq.eline.add.sync
-  - targetAssetKey: mef.sonata.api-target-mapper.poq.eline.read.sync
+    group: mef.sonata.api-target.poq.eline.add
+  - targetAssetKey: mef.sonata.api-target-mapper.poq.eline.read
     relationship: implementation.target-mapper
-    group: mef.sonata.api-target.poq.eline.read.sync
-  - targetAssetKey: mef.sonata.api-target-mapper.poq.uni.add.sync
+    group: mef.sonata.api-target.poq.eline.read
+  - targetAssetKey: mef.sonata.api-target-mapper.poq.uni.add
     relationship: implementation.target-mapper
-    group: mef.sonata.api-target.poq.uni.add.sync
-  - targetAssetKey: mef.sonata.api-target-mapper.poq.uni.read.sync
+    group: mef.sonata.api-target.poq.uni.add
+  - targetAssetKey: mef.sonata.api-target-mapper.poq.uni.read
     relationship: implementation.target-mapper
-    group: mef.sonata.api-target.poq.uni.read.sync
-  - targetAssetKey: mef.sonata.api.matrix.poq.uni.add.sync
+    group: mef.sonata.api-target.poq.uni.read
+  - targetAssetKey: mef.sonata.api.matrix.poq.uni.add
     relationship: implementation.matrix
-    group: mef.sonata.api-target.poq.uni.add.sync
-  - targetAssetKey: mef.sonata.api.matrix.poq.eline.add.sync
+    group: mef.sonata.api-target.poq.uni.add
+  - targetAssetKey: mef.sonata.api.matrix.poq.eline.add
     relationship: implementation.matrix
-    group: mef.sonata.api-target.poq.eline.add.sync
+    group: mef.sonata.api-target.poq.eline.add
   - targetAssetKey: mef.sonata.api-spec.product.offering.qualification
     relationship: implementation.standard.api-spec

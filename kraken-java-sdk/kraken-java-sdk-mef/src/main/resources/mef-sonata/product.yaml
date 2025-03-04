@@ -22,10 +22,10 @@ spec:
     - classpath:/mef-sonata/api-specs/api-spec.inventory.yaml
     - classpath:/mef-sonata/api-targets/api-target.address.validate.yaml
     - classpath:/mef-sonata/api-targets/api-target.address.retrieve.yaml
-    - classpath:/mef-sonata/api-targets/api-target.poq.uni.add.sync.yaml
-    - classpath:/mef-sonata/api-targets/api-target.poq.uni.read.sync.yaml
-    - classpath:/mef-sonata/api-targets/api-target.poq.eline.add.sync.yaml
-    - classpath:/mef-sonata/api-targets/api-target.poq.eline.read.sync.yaml
+    - classpath:/mef-sonata/api-targets/api-target.poq.uni.add.yaml
+    - classpath:/mef-sonata/api-targets/api-target.poq.uni.read.yaml
+    - classpath:/mef-sonata/api-targets/api-target.poq.eline.add.yaml
+    - classpath:/mef-sonata/api-targets/api-target.poq.eline.read.yaml
     - classpath:/mef-sonata/api-targets/api-target.quote.uni.add.yaml
     - classpath:/mef-sonata/api-targets/api-target.quote.uni.add.sync.yaml
     - classpath:/mef-sonata/api-targets/api-target.quote.uni.read.yaml
@@ -52,10 +52,10 @@ spec:
     - classpath:/mef-sonata/api-targets/api-target.order.notification.state.change.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.address.validate.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.address.retrieve.yaml
-    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.poq.uni.add.sync.yaml
-    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.poq.uni.read.sync.yaml
-    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.poq.eline.add.sync.yaml
-    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.poq.eline.read.sync.yaml
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.poq.uni.add.yaml
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.poq.uni.read.yaml
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.poq.eline.add.yaml
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.poq.eline.read.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.uni.add.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.uni.read.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.uni.add.sync.yaml
@@ -82,8 +82,8 @@ spec:
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.hub.add.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.address.validation.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.address.retrieve.yaml
-    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.poq.uni.add.sync.yaml
-    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.poq.eline.add.sync.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.poq.uni.add.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.poq.eline.add.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.quote.uni.add.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.quote.uni.add.sync.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.quote.eline.add.yaml
@@ -115,10 +115,10 @@ spec:
     - classpath:/mef-sonata/apis/api.notification.yaml
     - classpath:/mef-sonata/api-targets/api-target.address.validate.yaml
     - classpath:/mef-sonata/api-targets/api-target.address.retrieve.yaml
-    - classpath:/mef-sonata/api-targets/api-target.poq.uni.add.sync.yaml
-    - classpath:/mef-sonata/api-targets/api-target.poq.uni.read.sync.yaml
-    - classpath:/mef-sonata/api-targets/api-target.poq.eline.add.sync.yaml
-    - classpath:/mef-sonata/api-targets/api-target.poq.eline.read.sync.yaml
+    - classpath:/mef-sonata/api-targets/api-target.poq.uni.add.yaml
+    - classpath:/mef-sonata/api-targets/api-target.poq.uni.read.yaml
+    - classpath:/mef-sonata/api-targets/api-target.poq.eline.add.yaml
+    - classpath:/mef-sonata/api-targets/api-target.poq.eline.read.yaml
     - classpath:/mef-sonata/api-targets/api-target.quote.uni.add.sync.yaml
     - classpath:/mef-sonata/api-targets/api-target.quote.uni.read.sync.yaml
     - classpath:/mef-sonata/api-targets/api-target.quote.eline.add.sync.yaml
@@ -137,10 +137,10 @@ spec:
     - classpath:/mef-sonata/api-targets/api-target.inventory.eline.read.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.address.validate.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.address.retrieve.yaml
-    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.poq.uni.add.sync.yaml
-    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.poq.uni.read.sync.yaml
-    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.poq.eline.add.sync.yaml
-    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.poq.eline.read.sync.yaml
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.poq.uni.add.yaml
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.poq.uni.read.yaml
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.poq.eline.add.yaml
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.poq.eline.read.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.uni.add.sync.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.uni.read.sync.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.eline.add.sync.yaml
@@ -159,8 +159,8 @@ spec:
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.inventory.eline.read.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.address.validation.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.address.retrieve.yaml
-    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.poq.uni.add.sync.yaml
-    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.poq.eline.add.sync.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.poq.uni.add.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.poq.eline.add.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.quote.uni.add.sync.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.quote.uni.add.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.quote.eline.add.sync.yaml

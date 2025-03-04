@@ -2,7 +2,7 @@
 kind: kraken.product.mapping.matrix
 apiVersion: v1
 metadata:
-  key: mef.sonata.api.matrix.poq.uni.add.sync
+  key: mef.sonata.api.matrix.poq.uni.add
   name: MEF Sonata API
   labels:
     mef-api-release: grace
@@ -11,7 +11,7 @@ spec:
   expect-http-status-422-if-missing:
     - $.body.productOfferingQualificationItem[0].product.productConfiguration
   matrix:
-    mef.sonata.api-target.poq.uni.add.sync:
+    mef.sonata.api-target.poq.uni.add:
       - name: syn_mode
         path: "$.body.instantSyncQualification"
         expectType: EXPECTED
