@@ -35,6 +35,7 @@ import org.springframework.context.annotation.Configuration;
 public class WorkflowConfig {
   private final AppProperty appProperty;
   private final ApplicationContext context;
+  private static final String TASK_LOCATION = "com.consoleconnect.kraken.operator.workflow.service";
 
   @Bean
   public OrkesWorkflowClient getWorkflowClient(AppProperty appProperty) {
@@ -94,10 +95,11 @@ public class WorkflowConfig {
       log.info("register worker");
       OrkesClients oc = new OrkesClients(apiClient);
       AnnotatedWorkerExecutor annotatedWorkerExecutor =
-          new AnnotatedWorkerExecutor(oc.getTaskClient(), 10);
+          new AnnotatedWorkerExecutor(
+              oc.getTaskClient(), appProperty.getWorkflow().getPollingIntervalMills());
       WorkflowTaskRegister workflowTaskConfig = context.getBean(WorkflowTaskRegister.class);
       annotatedWorkerExecutor.addBean(workflowTaskConfig);
-      annotatedWorkerExecutor.initWorkers("com.consoleconnect.kraken.operator.workflow.service");
+      annotatedWorkerExecutor.initWorkers(TASK_LOCATION);
     } catch (Exception e) {
       log.error("register worker failed for {}, error: {}", nodeUrl, e.getMessage());
     }
