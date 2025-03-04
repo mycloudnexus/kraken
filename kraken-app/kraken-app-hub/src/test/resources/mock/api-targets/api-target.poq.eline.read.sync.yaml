@@ -18,7 +18,8 @@ spec:
     - id: Retrieves a product offering qualification by id for connection
       path: ""
       method: ""
-      requestBody: ${entity.request.productOfferingQualificationItem[0].product.productConfiguration.access_e_line}
+      requestBody: |
+        {}
       responseBody: |
         {
           "id": "${entity.id}",
