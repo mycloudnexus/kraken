@@ -9,6 +9,7 @@ metadata:
     mef-api-release: grace
     parentProductType: access.eline
     poq-api-version: v7
+  version: 2
 spec:
   baseSpec:
     path: classpath:/mef-sonata/openapi/productOfferingQualificationManagement.api.yaml
