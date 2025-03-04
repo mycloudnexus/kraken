@@ -211,7 +211,6 @@ app:
       enabled: false
 
   initialize-exclude-assets:
-    - classpath:/mef-sonata/apis/api.product.offering.yaml
     - classpath:/mef-sonata/api-targets/api-target.quote.eline.add.yaml
     - classpath:/mef-sonata/api-targets/api-target.quote.eline.read.yaml
     - classpath:/mef-sonata/api-targets/api-target.quote.uni.add.yaml
@@ -225,8 +224,6 @@ app:
     - kraken.component.api
     - kraken.component.api-spec
   query-exclude-asset-keys:
-    - mef.sonata.api.poq
-    - mef.sonata.api-spec.product.offering.qualification
     - mef.sonata.api-target-mapper.quote.eline.add
     - mef.sonata.api-target-mapper.quote.uni.add
     - mef.sonata.api-target-mapper.quote.uni.read
