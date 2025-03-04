@@ -20,4 +20,17 @@ public class AppProperty {
   private Map<String, String> apiSpecOrderBy = new HashMap<>();
   private Map<String, String> apiOrderBy = new HashMap<>();
   private Map<String, String> apiTargetMapperOrderBy = new HashMap<>();
+  private DualVersionConfig dualVersionConfig = new DualVersionConfig();
+
+  @Data
+  public static class DualVersionConfig {
+    boolean enabled = false;
+    Map<String, String> tableMaps = new HashMap<>();
+
+    public DualVersionConfig() {
+      tableMaps.put("kraken_asset", "kraken_asset_v2");
+      tableMaps.put("kraken_asset_link", "kraken_asset_link_v2");
+      tableMaps.put("kraken_asset_facet", "kraken_asset_facet_v2");
+    }
+  }
 }
