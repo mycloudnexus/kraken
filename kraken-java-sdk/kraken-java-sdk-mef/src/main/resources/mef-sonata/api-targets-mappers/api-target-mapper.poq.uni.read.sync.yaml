@@ -19,8 +19,8 @@ spec:
     productType: uni
   endpoints:
     - id: Retrieves a product offering qualification by id for port
-      path: /api/pricing/calculate
-      method: post
+      path: ""
+      method: ""
       mappers:
         request:
         response:

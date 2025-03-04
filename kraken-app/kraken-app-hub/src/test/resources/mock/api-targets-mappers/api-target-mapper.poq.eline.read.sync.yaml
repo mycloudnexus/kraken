@@ -24,39 +24,3 @@ spec:
       mappers:
         request:
         response:
-          - name: mapper.poq.eline.read.itemState
-            title: POQ Item State Mapping
-            description: POQ Item state mapping
-            source: ""
-            sourceLocation: ""
-            target: "@{{itemState}}"
-            targetType: enum
-            targetLocation: BODY
-            targetValues:
-              - acknowledged
-              - done.ready
-              - done.abandoned
-              - terminatedWithError
-              - approved.orderableAlternate
-              - inProgress
-            valueMapping: {}
-            defaultValue: "done.ready"
-            requiredMapping: false
-          - name: mapper.poq.eline.read.state
-            title: POQ State Mapping
-            description: quote state mapping
-            source: ""
-            sourceLocation: ""
-            target: "@{{state}}"
-            targetType: enum
-            targetLocation: BODY
-            targetValues:
-              - acknowledged
-              - done.ready
-              - done.unableToProvide
-              - terminatedWithError
-              - approved.orderableAlternate
-              - inProgress
-            valueMapping: {}
-            defaultValue: "done.ready"
-            requiredMapping: false

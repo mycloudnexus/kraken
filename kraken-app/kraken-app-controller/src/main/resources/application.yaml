@@ -243,10 +243,10 @@ app:
   api-target-mapper-order-by:
     mef.sonata.api-target-mapper.address.validate: <1,1>
     mef.sonata.api-target-mapper.address.retrieve: <2,1>
-    mef.sonata.api-target-mapper.poq.uni.add: <1,1>
-    mef.sonata.api-target-mapper.poq.eline.add: <1,2>
-    mef.sonata.api-target-mapper.poq.uni.read: <2,1>
-    mef.sonata.api-target-mapper.poq.eline.read: <2,2>
+    mef.sonata.api-target-mapper.poq.uni.add.sync: <1,1>
+    mef.sonata.api-target-mapper.poq.eline.add.sync: <1,2>
+    mef.sonata.api-target-mapper.poq.uni.read.sync: <2,1>
+    mef.sonata.api-target-mapper.poq.eline.read.sync: <2,2>
     mef.sonata.api-target-mapper.quote.uni.add.sync: <1,1>
     mef.sonata.api-target-mapper.quote.eline.add.sync: <1,2>
     mef.sonata.api-target-mapper.quote.uni.read.sync: <2,1>
