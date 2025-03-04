@@ -27,14 +27,14 @@ spec:
             sourceLocation: BODY
             sourceType: string
             target: ""
-            targetLocation: BODY
+            targetLocation: ""
             requiredMapping: true
           - name: mapper.poq.eline.add.sync.place1.id
             source: "@{{productOfferingQualificationItem[0].product.place[1].id}}"
             sourceLocation: BODY
             sourceType: string
             target: ""
-            targetLocation: BODY
+            targetLocation: ""
             requiredMapping: true
           - name: mapper.poq.eline.add.sync.productConfiguration.bandwidth
             source: "@{{productOfferingQualificationItem[0].product.productConfiguration.bandwidth}}"
@@ -44,7 +44,7 @@ spec:
             discrete: true
             sourceValues:
             target: ""
-            targetLocation: BODY
+            targetLocation: ""
             requiredMapping: true
           - name: mapper.poq.eline.add.sync.productConfiguration.bandwidthUnit
             source: "@{{productOfferingQualificationItem[0].product.productConfiguration.bandwidthUnit}}"
@@ -55,7 +55,7 @@ spec:
               - MBPS
             valueMapping: {}
             target: ""
-            targetLocation: BODY
+            targetLocation: ""
             requiredMapping: true
           - name: mapper.poq.eline.add.sync.productOffering.id
             source: "@{{productOfferingQualificationItem[0].product.productOffering.id}}"
