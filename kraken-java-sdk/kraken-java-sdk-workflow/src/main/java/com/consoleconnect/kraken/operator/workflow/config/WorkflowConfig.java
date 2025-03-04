@@ -82,6 +82,7 @@ public class WorkflowConfig {
   void init() {
     if (appProperty.getWorkflow() != null && appProperty.getWorkflow().isEnabled()) {
       if (CollectionUtils.isNotEmpty(appProperty.getWorkflow().getClusterUrl())) {
+        log.info("start to init worker for cluster");
         appProperty.getWorkflow().getClusterUrl().stream().forEach(this::initWorker);
       } else {
         initWorker(appProperty.getWorkflow().getBaseUrl());
@@ -92,7 +93,7 @@ public class WorkflowConfig {
   private void initWorker(String nodeUrl) {
     try {
       ApiClient apiClient = new ApiClient(nodeUrl);
-      log.info("register worker");
+      log.info("register worker for node: {}", nodeUrl);
       OrkesClients oc = new OrkesClients(apiClient);
       AnnotatedWorkerExecutor annotatedWorkerExecutor =
           new AnnotatedWorkerExecutor(
