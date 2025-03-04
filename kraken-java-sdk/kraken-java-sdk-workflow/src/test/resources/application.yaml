@@ -88,7 +88,7 @@ logging:
     org.springframework.security: DEBUG
 app:
   workflow:
-    enabled: false
+    enabled: true
     base-url: http://base-url.com
     deployment:
       enabled: true
