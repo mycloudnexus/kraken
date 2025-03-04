@@ -61,8 +61,8 @@ spec:
             source: "@{{productOfferingQualificationItem[0].product.productOffering.id}}"
             sourceLocation: BODY
             sourceType: string
-            target: "ACCESS_E_LINE"
-            targetLocation: BODY
+            target: ""
+            targetLocation: ""
             requiredMapping: false
         response:
           - name: mapper.poq.eline.add.serviceabilityConfidence
