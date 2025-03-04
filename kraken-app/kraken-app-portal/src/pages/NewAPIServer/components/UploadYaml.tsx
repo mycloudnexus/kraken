@@ -19,24 +19,20 @@ const uploadYamlFile = async (value: any) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = function (evt) {
-      const content = evt.target?.result as string
+      const content = evt.target?.result as string;
 
-      const isOpenApi = content?.startsWith("openapi:");
-      const isSwagger = content?.startsWith("swagger:");
+      const isOpenApi = content?.includes("openapi:");
+      const isSwagger = content?.includes("swagger:");
       if (!isOpenApi && !isSwagger) {
-        reject(
-          new Error("Please upload valid open api spec in yaml format")
-        );
+        reject(new Error("Please upload valid open api spec in yaml format"));
       }
 
       resolve(true);
     };
-    reader.onerror = function (error) {
-      reject(error)
-    };
-    reader.readAsText(value.file, 'utf-8');
-  })
-}
+    reader.onerror = reject;
+    reader.readAsText(value.file, "utf-8");
+  });
+};
 
 const UploadYaml = ({ form }: Props) => {
   const {
@@ -119,7 +115,7 @@ const UploadYaml = ({ form }: Props) => {
                 return Promise.resolve();
               }
 
-              return uploadYamlFile(value)
+              return uploadYamlFile(value);
             },
           }),
         ]}
@@ -138,7 +134,9 @@ const UploadYaml = ({ form }: Props) => {
             return false;
           }}
         >
-          <Button data-testid="btnUpload" icon={<UploadOutlined />}>Click to upload</Button>
+          <Button data-testid="btnUpload" icon={<UploadOutlined />}>
+            Click to upload
+          </Button>
         </Upload>
       </Form.Item>
 
@@ -147,7 +145,11 @@ const UploadYaml = ({ form }: Props) => {
         label="Upload API Spec in yaml format :"
         style={{ display: !file?.file ? "none" : "block" }}
       >
-        <Button data-testid="btnUploadReplace" icon={<UploadOutlined />} onClick={openModal}>
+        <Button
+          data-testid="btnUploadReplace"
+          icon={<UploadOutlined />}
+          onClick={openModal}
+        >
           Click to upload
         </Button>
       </Form.Item>
