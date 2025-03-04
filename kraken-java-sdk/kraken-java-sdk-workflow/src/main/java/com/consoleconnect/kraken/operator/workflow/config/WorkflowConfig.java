@@ -4,10 +4,13 @@ import static com.consoleconnect.kraken.operator.core.toolkit.Constants.WORKFLOW
 
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.workflow.service.WorkflowTaskRegister;
+import com.netflix.conductor.sdk.workflow.executor.task.AnnotatedWorkerExecutor;
 import com.netflix.conductor.sdk.workflow.task.WorkerTask;
 import io.orkes.conductor.client.ApiClient;
+import io.orkes.conductor.client.OrkesClients;
 import io.orkes.conductor.client.http.OrkesMetadataClient;
 import io.orkes.conductor.client.http.OrkesWorkflowClient;
+import jakarta.annotation.PostConstruct;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
@@ -17,7 +20,10 @@ import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -25,7 +31,12 @@ import org.springframework.context.annotation.Configuration;
 @AutoConfigureAfter(AppProperty.class)
 @Getter
 @AllArgsConstructor
+@Slf4j
 public class WorkflowConfig {
+  private final AppProperty appProperty;
+  private final ApplicationContext context;
+  private static final String TASK_LOCATION = "com.consoleconnect.kraken.operator.workflow.service";
+
   @Bean
   public OrkesWorkflowClient getWorkflowClient(AppProperty appProperty) {
     return new OrkesWorkflowClient(getApiClient(appProperty));
@@ -65,5 +76,33 @@ public class WorkflowConfig {
 
     buildInTask.setParams(task2InputParamMap);
     return buildInTask;
+  }
+
+  @PostConstruct
+  void init() {
+    if (appProperty.getWorkflow() != null && appProperty.getWorkflow().isEnabled()) {
+      if (CollectionUtils.isNotEmpty(appProperty.getWorkflow().getClusterUrl())) {
+        log.info("start to init worker for cluster");
+        appProperty.getWorkflow().getClusterUrl().stream().forEach(this::initWorker);
+      } else {
+        initWorker(appProperty.getWorkflow().getBaseUrl());
+      }
+    }
+  }
+
+  private void initWorker(String nodeUrl) {
+    try {
+      ApiClient apiClient = new ApiClient(nodeUrl);
+      log.info("register worker for node: {}", nodeUrl);
+      OrkesClients oc = new OrkesClients(apiClient);
+      AnnotatedWorkerExecutor annotatedWorkerExecutor =
+          new AnnotatedWorkerExecutor(
+              oc.getTaskClient(), appProperty.getWorkflow().getPollingIntervalMills());
+      WorkflowTaskRegister workflowTaskConfig = context.getBean(WorkflowTaskRegister.class);
+      annotatedWorkerExecutor.addBean(workflowTaskConfig);
+      annotatedWorkerExecutor.initWorkers(TASK_LOCATION);
+    } catch (Exception e) {
+      log.error("register worker failed for {}, error: {}", nodeUrl, e.getMessage());
+    }
   }
 }
