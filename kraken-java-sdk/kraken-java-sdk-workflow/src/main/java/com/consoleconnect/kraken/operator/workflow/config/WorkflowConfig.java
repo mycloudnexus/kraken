@@ -85,6 +85,7 @@ public class WorkflowConfig {
         log.info("start to init worker for cluster");
         appProperty.getWorkflow().getClusterUrl().stream().forEach(this::initWorker);
       } else {
+        log.info("start to init worker for standalone conductor");
         initWorker(appProperty.getWorkflow().getBaseUrl());
       }
     }
