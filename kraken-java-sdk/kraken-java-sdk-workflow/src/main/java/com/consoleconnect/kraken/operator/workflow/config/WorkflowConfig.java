@@ -2,6 +2,7 @@ package com.consoleconnect.kraken.operator.workflow.config;
 
 import static com.consoleconnect.kraken.operator.core.toolkit.Constants.WORKFLOW_PARAM_PREFIX;
 
+import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.workflow.service.WorkflowTaskRegister;
 import com.netflix.conductor.sdk.workflow.executor.task.AnnotatedWorkerExecutor;
@@ -103,7 +104,8 @@ public class WorkflowConfig {
       annotatedWorkerExecutor.addBean(workflowTaskConfig);
       annotatedWorkerExecutor.initWorkers(TASK_LOCATION);
     } catch (Exception e) {
-      log.error("register worker failed for {}, error: {}", nodeUrl, e.getMessage());
+      throw KrakenException.internalError(
+          String.format("Failed to register worker for %s, error: %s", nodeUrl, e.getMessage()));
     }
   }
 }
