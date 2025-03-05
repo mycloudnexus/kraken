@@ -5,3 +5,5 @@ app:
     deployment:
       enabled: true
     cluster-url:
+      - http://mock1.com
+      - http://mock2.com

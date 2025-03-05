@@ -88,13 +88,10 @@ logging:
     org.springframework.security: DEBUG
 app:
   workflow:
-    enabled: true
+    enabled: false
     base-url: http://base-url.com
     deployment:
       enabled: true
-    cluster-url:
-      - http://mock1.com
-      - http://mock2.com
   tenant:
     tenantId: ef90f7e7-dc7d-4538-aa5b-a4a7d8432da2
     mode: SINGLE

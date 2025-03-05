@@ -80,7 +80,7 @@ public class WorkflowConfig {
   }
 
   @PostConstruct
-  void init() {
+  public void init() {
     if (appProperty.getWorkflow() != null && appProperty.getWorkflow().isEnabled()) {
       if (CollectionUtils.isNotEmpty(appProperty.getWorkflow().getClusterUrl())) {
         log.info("start to init worker for cluster");
