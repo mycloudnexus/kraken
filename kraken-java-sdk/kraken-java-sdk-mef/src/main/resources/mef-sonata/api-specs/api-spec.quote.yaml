@@ -9,7 +9,7 @@ metadata:
     mef-api-release: grace
     parentProductType: access.eline
     quote-api-version: v8
-  version: 2
+  version: 3
 spec:
   baseSpec:
     path: classpath:/mef-sonata/openapi/quoteManagement.api.yaml
