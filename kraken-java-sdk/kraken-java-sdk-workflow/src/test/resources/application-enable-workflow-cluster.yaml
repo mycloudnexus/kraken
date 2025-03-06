@@ -1,0 +1,9 @@
+app:
+  workflow:
+    enabled: true
+    base-url: http://base-url.com
+    deployment:
+      enabled: true
+    cluster-url:
+      - http://mock1.com
+      - http://mock2.com

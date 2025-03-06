@@ -11,7 +11,6 @@ import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.gateway.model.WorkflowResponse;
-import com.consoleconnect.kraken.operator.gateway.repo.HttpRequestRepository;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import com.netflix.conductor.common.metadata.workflow.WorkflowDef;
@@ -31,7 +30,6 @@ import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -43,7 +41,6 @@ class GatewayTest extends AbstractIntegrationTest {
   @Autowired WebTestClient webTestClient;
   @Autowired ApiActivityLogRepository repository;
 
-  @SpyBean HttpRequestRepository requestRepository;
   @MockBean OrkesWorkflowClient workflowClient;
   @MockBean OrkesMetadataClient metaDataClient;
 

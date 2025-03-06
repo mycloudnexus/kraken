@@ -12,6 +12,8 @@ spec:
     method: post
     productType: uni
     actionType: delete
+  supportedCase:
+    type: ONE_TO_ONE_AND_ONE_TO_MANY
   workflow:
     enabled: false
     synchronous: false

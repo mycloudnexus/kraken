@@ -7,13 +7,13 @@ metadata:
   version: 1
 spec:
   metaData:
-    workflowName: "order.eline.delete"
+    workflowName: "order.eline.delete1"
     externalId: ""
   validationStage:
     - taskName: status_checking_task
       taskType: http
       endpoint:
-        path: ""
+        path: "/api/v2/company/{username}/connections/{connectionId}"
         method: GET
         serverKey: ''
         mappers:
@@ -35,8 +35,16 @@ spec:
               targetLocation: "PATH"
               requiredMapping: true
       conditionCheck:
-        caseExpression: "${status_checking_task.output.response.body.state}==DELETED"
+        join: OR
+        conditionItems:
+          - operator: IN
+            value: DELETED
+            expression: status_checking_task.stateList
+          - operator: GREATER_THAN
+            value: 1
+            expression: status_checking_task.count
         buildInTask: reject_order_task
+        errorMsg: "unexpected error"
   preparationStage:
     - taskName: disable_order_task
       taskType: http

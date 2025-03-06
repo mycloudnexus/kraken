@@ -75,7 +75,8 @@ class SellerContactInjectorTest extends AbstractIntegrationTest implements Selle
   void givenExistedSellerContact_whenInjection_thenReturnOK() {
     String componentKey = "mef.sonata.api.order";
     String productId = "product.mef.sonata.api";
-    String sellerContactKey = componentKey + "." + ParentProductTypeEnum.ACCESS_ELINE.getKind();
+    String sellerContactKey =
+        generateSellerContactKey(componentKey, ParentProductTypeEnum.ACCESS_ELINE.getKind());
     UnifiedAsset sellerContactAsset =
         createSellerContact(
             componentKey, sellerContactKey, ParentProductTypeEnum.ACCESS_ELINE.getKind());

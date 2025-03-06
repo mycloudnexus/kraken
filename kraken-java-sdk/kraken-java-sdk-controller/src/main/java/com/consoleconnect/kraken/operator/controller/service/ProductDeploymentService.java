@@ -877,7 +877,8 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
                   .ifPresent(
                       deploymentAssetDto -> {
                         double runningVersion =
-                            computeMaximumRunningVersion(deploymentAssetDto, mapperKey, env);
+                            computeMaximumRunningVersion(
+                                deploymentAssetDto, mapperKey, env.getId());
                         latestDeploymentDTO.setRunningVersion(
                             INIT_VERSION == runningVersion ? "" : String.valueOf(runningVersion));
                         latestDeploymentDTO.setStatus(deploymentAssetDto.getMetadata().getStatus());

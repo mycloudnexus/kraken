@@ -4,7 +4,10 @@ import static com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants.*;
 import static com.consoleconnect.kraken.operator.core.toolkit.LabelConstants.*;
 
 import com.consoleconnect.kraken.operator.auth.security.UserContext;
-import com.consoleconnect.kraken.operator.controller.dto.*;
+import com.consoleconnect.kraken.operator.controller.dto.ComponentExpandDTO;
+import com.consoleconnect.kraken.operator.controller.dto.ComponentProductCategoryDTO;
+import com.consoleconnect.kraken.operator.controller.dto.EndPointUsageDTO;
+import com.consoleconnect.kraken.operator.controller.dto.SaveWorkflowTemplateRequest;
 import com.consoleconnect.kraken.operator.controller.model.ComponentTag;
 import com.consoleconnect.kraken.operator.controller.model.ComponentTagFacet;
 import com.consoleconnect.kraken.operator.controller.model.DeploymentFacet;
@@ -13,18 +16,27 @@ import com.consoleconnect.kraken.operator.controller.tools.VersionHelper;
 import com.consoleconnect.kraken.operator.core.dto.ApiUseCaseDto;
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
-import com.consoleconnect.kraken.operator.core.entity.*;
-import com.consoleconnect.kraken.operator.core.enums.*;
+import com.consoleconnect.kraken.operator.core.entity.AssetFacetEntity;
+import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
+import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
+import com.consoleconnect.kraken.operator.core.enums.AssetLinkKindEnum;
+import com.consoleconnect.kraken.operator.core.enums.ParentProductTypeEnum;
+import com.consoleconnect.kraken.operator.core.enums.SupportedCaseEnum;
 import com.consoleconnect.kraken.operator.core.event.IngestionDataResult;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
-import com.consoleconnect.kraken.operator.core.model.*;
+import com.consoleconnect.kraken.operator.core.model.AppProperty;
+import com.consoleconnect.kraken.operator.core.model.AssetLink;
+import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
 import com.consoleconnect.kraken.operator.core.repo.AssetFacetRepository;
 import com.consoleconnect.kraken.operator.core.repo.EnvironmentClientRepository;
 import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
 import com.consoleconnect.kraken.operator.core.service.ApiUseCaseSelector;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
-import com.consoleconnect.kraken.operator.core.toolkit.*;
+import com.consoleconnect.kraken.operator.core.toolkit.JsonDiffTool;
+import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
+import com.consoleconnect.kraken.operator.core.toolkit.LabelConstants;
+import com.consoleconnect.kraken.operator.core.toolkit.Paging;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -279,6 +291,10 @@ public class ApiComponentService
           detail.setOrderBy(
               appProperty.getApiTargetMapperOrderBy().getOrDefault(k, "<1000, 1000>"));
           mergeLastDeployment(detail, assetDto, envId);
+          ComponentAPITargetFacets currentFacet =
+              UnifiedAsset.getFacets(assetDto, ComponentAPITargetFacets.class);
+          detail.setSupportedCase(currentFacet.getSupportedCase().getType());
+          detail.setRunningMappingType(checkRunningMappingType(currentFacet));
           details.add(detail);
         });
 
@@ -354,6 +370,17 @@ public class ApiComponentService
         deployAssetDto.getMetadata().getStatus() == null
             ? ""
             : deployAssetDto.getMetadata().getStatus());
+  }
+
+  private String checkRunningMappingType(ComponentAPITargetFacets currentFacet) {
+    String type = "";
+    if (currentFacet.getWorkflow() != null && currentFacet.getWorkflow().isEnabled()) {
+      type = SupportedCaseEnum.ONE_TO_MANY.name();
+    } else if (CollectionUtils.isNotEmpty(currentFacet.getEndpoints())
+        && StringUtils.isNotBlank(currentFacet.getEndpoints().get(0).getPath())) {
+      type = SupportedCaseEnum.ONE_TO_ONE.name();
+    }
+    return type;
   }
 
   @Transactional(readOnly = true)

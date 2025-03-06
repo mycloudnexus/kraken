@@ -194,7 +194,7 @@ public class DBCrudActionRunner extends AbstractActionRunner {
       }
       return repository.findById(entityUUID);
     }
-    return repository.findByProductInstanceId(entityId);
+    return repository.findByProductInstanceId(entityId).stream().findAny();
   }
 
   @Data

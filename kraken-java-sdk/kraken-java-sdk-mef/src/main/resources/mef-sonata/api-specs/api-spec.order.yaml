@@ -7,8 +7,9 @@ metadata:
   icon: https://storage.googleapis.com/console-connect-static-assets/krakenUI/order.png
   labels:
     mef-api-release: grace
+    parentProductType: access.eline
     order-api-version: v10
-  version: 1
+  version: 2
 spec:
   baseSpec:
     path: classpath:/mef-sonata/openapi/productOrderManagement.api.yaml
