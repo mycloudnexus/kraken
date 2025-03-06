@@ -16,6 +16,8 @@ spec:
     method: post
     productType: access_e_line
     actionType: add
+    provideAlternative: false
+    syncMode: true
   endpoints:
     - id: create a product offering qualification for connection
       path: ""
@@ -39,7 +41,7 @@ spec:
           - name: mapper.poq.eline.add.productConfiguration.bandwidth
             source: "@{{productOfferingQualificationItem[0].product.productConfiguration.bandwidth}}"
             sourceLocation: BODY
-            allowValueLimit: true
+            allowValueLimit: false
             sourceType: integer
             discrete: true
             sourceValues:
