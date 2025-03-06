@@ -49,6 +49,7 @@ public class ComponentTagService implements TargetMappingChecker, LatestDeployme
   @Getter private final UnifiedAssetService unifiedAssetService;
   private final UnifiedAssetRepository unifiedAssetRepository;
   private final ApiComponentService apiComponentService;
+  private final AppProperty appProperty;
 
   @Transactional
   public IngestionDataResult createTag(
@@ -183,7 +184,7 @@ public class ComponentTagService implements TargetMappingChecker, LatestDeployme
       throw KrakenException.badRequest("No difference with currently running version ");
     }
     UnifiedAssetDto assetDto = UnifiedAssetService.toAsset(mapperEntity, true);
-    fillMappingStatus(assetDto);
+    fillMappingStatus(assetDto, appProperty.getNoRequiredMappingKeys());
     if (MappingStatusEnum.INCOMPLETE.getDesc().equals(assetDto.getMappingStatus())) {
       throw KrakenException.badRequest(
           "deployed failed due to the mapping was incomplete:" + mapperKey);
