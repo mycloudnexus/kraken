@@ -82,6 +82,8 @@ public class ComponentAPITargetFacets {
     private String deletePath;
     private Boolean customizedField = false;
     private String convertValue;
+    private String sourceTaskName;
+    private String targetTaskName;
 
     @Override
     public int hashCode() {
