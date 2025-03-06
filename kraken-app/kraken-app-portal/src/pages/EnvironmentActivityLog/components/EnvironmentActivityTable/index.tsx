@@ -10,6 +10,7 @@ import {
   CheckCircleFilled,
   ExclamationCircleFilled,
   CloseCircleFilled,
+  FilterFilled,
 } from "@ant-design/icons";
 import { Table, Flex, Button, DatePicker, Divider } from "antd";
 import { ColumnsType, TableProps } from "antd/es/table";
@@ -37,11 +38,13 @@ const TimeFilter = ({
   setDates,
   handleTimeFilter,
   close,
+  setIsTimeFiltered,
 }: {
   dates: [Dayjs | null, Dayjs | null] | null;
   setDates: Dispatch<SetStateAction<[Dayjs | null, Dayjs | null] | null>>;
   handleTimeFilter: () => void;
   close: FilterDropdownProps["close"];
+  setIsTimeFiltered: Dispatch<SetStateAction<boolean>>;
 }) => {
   return (
     <div style={{ padding: "8px" }}>
@@ -80,6 +83,7 @@ const TimeFilter = ({
         <Button
           onClick={() => {
             handleTimeFilter();
+            setIsTimeFiltered(!!dates);
             close();
           }}
           type="primary"
@@ -134,6 +138,7 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
   const { currentProduct } = useAppStore();
   const { envId } = useParams();
   const [dates, setDates] = useState<[Dayjs | null, Dayjs | null] | null>(null);
+  const [isTimeFiltered, setIsTimeFiltered] = useState(false);
 
   const {
     tableData,
@@ -282,7 +287,18 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
       render: (log: IActivityLog) => toDateTime(log.createdAt),
       width: 200,
       filterDropdown: ({ close }) =>
-        TimeFilter({ dates, setDates, handleTimeFilter, close }),
+        TimeFilter({
+          dates,
+          setDates,
+          handleTimeFilter,
+          close,
+          setIsTimeFiltered,
+        }),
+      filterIcon: isTimeFiltered ? (
+        <FilterFilled style={{ color: "#1677ff" }} />
+      ) : (
+        <FilterFilled />
+      ),
     },
     {
       key: "action",
