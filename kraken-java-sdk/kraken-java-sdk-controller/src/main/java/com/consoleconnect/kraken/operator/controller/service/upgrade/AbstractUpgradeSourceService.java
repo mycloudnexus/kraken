@@ -150,6 +150,7 @@ public abstract class AbstractUpgradeSourceService implements UpgradeSourceServi
             .toList();
     return apiComponentService.convert(
         appProperty.getQueryExcludeAssetKeys(),
+        appProperty.getNoRequiredMappingKeys(),
         componentList,
         assetMap.get(AssetKindEnum.COMPONENT_API_TARGET_MAPPER.getKind()));
   }

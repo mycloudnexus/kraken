@@ -267,6 +267,7 @@ public class ApiComponentService
           "The current componentId has no links, componentId:" + componentId);
     }
     List<String> queryExcludeAssets = appProperty.getQueryExcludeAssetKeys();
+    List<String> noRequiredMappingKeys = appProperty.getNoRequiredMappingKeys();
     List<String> assetKeyList =
         links.stream()
             .filter(
@@ -287,7 +288,8 @@ public class ApiComponentService
     List<ComponentExpandDTO.TargetMappingDetail> details = new ArrayList<>();
     assetEntityMap.forEach(
         (k, assetDto) -> {
-          ComponentExpandDTO.TargetMappingDetail detail = getTargetMappingDetail(k, assetDto);
+          ComponentExpandDTO.TargetMappingDetail detail =
+              getTargetMappingDetail(k, assetDto, noRequiredMappingKeys);
           detail.setOrderBy(
               appProperty.getApiTargetMapperOrderBy().getOrDefault(k, "<1000, 1000>"));
           mergeLastDeployment(detail, assetDto, envId);
@@ -393,11 +395,16 @@ public class ApiComponentService
             .toList();
     List<UnifiedAssetDto> mapperAssetList =
         unifiedAssetService.findByKind(AssetKindEnum.COMPONENT_API_TARGET_MAPPER.getKind());
-    return convert(appProperty.getQueryExcludeAssetKeys(), componentAssetList, mapperAssetList);
+    return convert(
+        appProperty.getQueryExcludeAssetKeys(),
+        appProperty.getNoRequiredMappingKeys(),
+        componentAssetList,
+        mapperAssetList);
   }
 
   public List<ComponentExpandDTO> convert(
       List<String> queryExcludeAssets,
+      List<String> noRequiredMappingKeys,
       List<UnifiedAssetDto> componentList,
       List<UnifiedAssetDto> mapperList) {
     Map<String, UnifiedAssetDto> mapper2ComponentMap = new HashMap<>();
@@ -413,7 +420,8 @@ public class ApiComponentService
         .forEach(mapper -> mapperAssetMap.put(mapper.getMetadata().getKey(), mapper));
     mapperAssetMap.forEach(
         (k, assetDto) -> {
-          ComponentExpandDTO.TargetMappingDetail detail = getTargetMappingDetail(k, assetDto);
+          ComponentExpandDTO.TargetMappingDetail detail =
+              getTargetMappingDetail(k, assetDto, noRequiredMappingKeys);
           UnifiedAssetDto componentAsset = mapper2ComponentMap.get(detail.getTargetMapperKey());
           if (componentAsset == null) {
             return;
@@ -436,8 +444,8 @@ public class ApiComponentService
   }
 
   private ComponentExpandDTO.TargetMappingDetail getTargetMappingDetail(
-      String mapperKey, UnifiedAssetDto mapperAsset) {
-    fillMappingStatus(mapperAsset);
+      String mapperKey, UnifiedAssetDto mapperAsset, List<String> noRequiredMappingKeys) {
+    fillMappingStatus(mapperAsset, noRequiredMappingKeys);
     ComponentAPITargetFacets mapperFacets =
         UnifiedAsset.getFacets(mapperAsset, ComponentAPITargetFacets.class);
     ComponentAPITargetFacets.Trigger trigger = mapperFacets.getTrigger();
@@ -451,7 +459,7 @@ public class ApiComponentService
       BeanUtils.copyProperties(trigger, mappingMatrix);
       detail.setMappingMatrix(mappingMatrix);
     }
-    if (containsKeywords(mapperAsset.getMetadata().getKey())) {
+    if (containsKeywords(noRequiredMappingKeys, mapperAsset.getMetadata().getKey())) {
       detail.setRequiredMapping(false);
     }
     detail.setDescription(mapperAsset.getMetadata().getDescription());

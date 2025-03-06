@@ -228,6 +228,11 @@ app:
     - mef.sonata.api-target-mapper.quote.uni.add
     - mef.sonata.api-target-mapper.quote.uni.read
     - mef.sonata.api-target-mapper.quote.eline.read
+  no-required-mapping-keys:
+    - mef.sonata.api-target-mapper.poq.eline.read
+    - mef.sonata.api-target-mapper.poq.uni.read
+    - mef.sonata.api-target-mapper.quote.eline.read.sync
+    - mef.sonata.api-target-mapper.quote.uni.read.sync
   api-spec-order-by:
     mef.sonata.api-spec.serviceability.address: 1
     mef.sonata.api-spec.quote: 2
@@ -236,8 +241,8 @@ app:
     mef.sonata.api-spec.inventory: 5
   api-order-by:
     mef.sonata.api.serviceability.address: 1
-    mef.sonata.api.quote: 2
-    mef.sonata.api.poq: 3
+    mef.sonata.api.poq: 2
+    mef.sonata.api.quote: 3
     mef.sonata.api.order: 4
     mef.sonata.api.inventory: 5
   api-target-mapper-order-by:

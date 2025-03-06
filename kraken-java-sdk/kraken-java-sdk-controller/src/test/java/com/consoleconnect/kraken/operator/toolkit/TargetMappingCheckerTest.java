@@ -160,9 +160,17 @@ class TargetMappingCheckerTest extends AbstractIntegrationTest implements Target
 
   @Test
   void givenKeywords_whenCheckContains_thenOK() {
-    Assertions.assertFalse(containsKeywords(""));
-    Assertions.assertFalse(containsKeywords("quote read"));
-    Assertions.assertTrue(containsKeywords("quote read sync"));
+    List<String> noRequiredMappingKeys = new ArrayList<>();
+    noRequiredMappingKeys.add("mef.sonata.api-target-mapper.poq.eline.read");
+    noRequiredMappingKeys.add("mef.sonata.api-target-mapper.poq.uni.read");
+    noRequiredMappingKeys.add("mef.sonata.api-target-mapper.quote.eline.read.sync");
+    noRequiredMappingKeys.add("mef.sonata.api-target-mapper.quote.uni.read.sync");
+    Assertions.assertFalse(containsKeywords(List.of(), "123"));
+    Assertions.assertFalse(containsKeywords(noRequiredMappingKeys, ""));
+    Assertions.assertFalse(
+        containsKeywords(noRequiredMappingKeys, "mef.sonata.api-target-mapper.quote.uni.read"));
+    Assertions.assertTrue(
+        containsKeywords(noRequiredMappingKeys, "mef.sonata.api-target-mapper.poq.uni.read"));
   }
 
   @SneakyThrows
