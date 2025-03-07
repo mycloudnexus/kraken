@@ -16,6 +16,8 @@ spec:
     method: post
     productType: uni
     actionType: add
+    provideAlternative: false
+    syncMode: true
   endpoints:
     - id: create a product offering qualification for port
       path: /api/pricing/calculate
@@ -33,7 +35,7 @@ spec:
           - name: mapper.poq.uni.add.productConfiguration.bandwidth
             source: "@{{productOfferingQualificationItem[0].product.productConfiguration.bandwidth}}"
             sourceLocation: BODY
-            allowValueLimit: true
+            allowValueLimit: false
             sourceType: integer
             discrete: true
             sourceValues:
