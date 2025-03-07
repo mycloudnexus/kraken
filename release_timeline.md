@@ -23,5 +23,5 @@ However, snapshots may be unstable and contain bugs.
 | -----------------|:---------------------| --------------------:|--------------------:|
 | 1.0.0 | [1.0.0 release note](https://github.com/mycloudnexus/kraken/releases/tag/v1.0.0)  |    Nov-21-2024       |           Nov-25-2024          |
 | 1.1.0 | (https://github.com/mycloudnexus/kraken/releases/tag/v1.1.0)  |      Dec-27-2024     |       Dec-30-2024              |
-| 1.2.0 | Performance issues on some pages | Jan-24-2025 | |
+| 1.2.0 | (https://github.com/Console-Core/kraken-enterprise/releases/tag/v1.2.0) | Mar-05-2025 | |
 
