@@ -81,9 +81,10 @@ public class WorkflowConfig {
 
   @PostConstruct
   public void init() {
-    if (appProperty.getWorkflow() != null
-        && appProperty.getWorkflow().isEnabled()
-        && appProperty.getWorkflow().isEnableRegisterWorker()) {
+    if (!appProperty.getWorkflow().isEnableRegisterWorker()) {
+      return;
+    }
+    if (appProperty.getWorkflow() != null && appProperty.getWorkflow().isEnabled()) {
       if (CollectionUtils.isNotEmpty(appProperty.getWorkflow().getClusterUrl())) {
         log.info("start to init worker for cluster");
         appProperty.getWorkflow().getClusterUrl().stream().forEach(this::initWorker);
