@@ -43,6 +43,7 @@ public class AppProperty {
     private Integer pollTimes = 30;
     private Long pollInterval = 2000l;
     private boolean enabled = false;
+    private boolean enableRegisterWorker = false;
     private Integer pollingIntervalMills = 100;
     // required by conductor workflow definition
     private String email = "kraken@example.com";
