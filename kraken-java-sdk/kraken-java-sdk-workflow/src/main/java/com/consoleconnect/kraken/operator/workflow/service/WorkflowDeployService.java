@@ -101,7 +101,7 @@ public class WorkflowDeployService {
         return INIT_WORKFLOW_DEF_VERSION;
       } else {
         log.error(ERR_LOG_WORKFLOW_QUERY_DEF, e);
-        KrakenException.internalError(
+        throw KrakenException.internalError(
             String.format(ERR_MSG_WORKFLOW_QUERY_DEF, e.getStatusCode(), e.getMessage()));
       }
     }
