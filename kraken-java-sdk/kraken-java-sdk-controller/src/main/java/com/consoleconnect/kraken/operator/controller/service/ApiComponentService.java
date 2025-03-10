@@ -122,6 +122,7 @@ public class ApiComponentService
                 v ->
                     Objects.equals(END_POINTS, v.getKey())
                         || Objects.equals(META_DATA, v.getKey())
+                        || Objects.equals(WORKFLOW, v.getKey())
                         || Objects.equals(PREPARATION_STAGE, v.getKey())
                         || Objects.equals(EXECUTION_STAGE, v.getKey())
                         || Objects.equals(VALIDATION_STAGE, v.getKey()))
