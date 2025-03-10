@@ -12,23 +12,21 @@ import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
 import com.consoleconnect.kraken.operator.core.event.IngestionDataResult;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
+import com.consoleconnect.kraken.operator.core.ingestion.ResourceLoaderFactory;
 import com.consoleconnect.kraken.operator.core.mapper.AssetMapper;
-import com.consoleconnect.kraken.operator.core.mapper.FacetsMapper;
 import com.consoleconnect.kraken.operator.core.model.*;
-import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
 import com.consoleconnect.kraken.operator.core.repo.AssetFacetRepository;
 import com.consoleconnect.kraken.operator.core.repo.AssetLinkRepository;
 import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
 import com.consoleconnect.kraken.operator.core.toolkit.*;
-import com.fasterxml.jackson.core.type.TypeReference;
 import jakarta.persistence.criteria.*;
 import java.util.*;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -38,11 +36,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class UnifiedAssetService implements UUIDWrapper {
+public class UnifiedAssetService implements UUIDWrapper, FacetsMerger {
 
   private static final String DEFAULT_ORDER_SEQ = "1000";
-  private static final String MAPPER_REQUEST = "request";
-  private static final String MAPPER_RESPONSE = "response";
   private static final String PARENT_PRODUCT_TYPE_KEY = "parentProductType";
 
   private static final Set<String> API_KINDS =
@@ -52,8 +48,7 @@ public class UnifiedAssetService implements UUIDWrapper {
   private final AssetFacetRepository assetFacetRepository;
   private final AssetLinkRepository assetLinkRepository;
   private final AppProperty appProperty;
-  private final ApplicationContext applicationContext;
-  private final MergeService mergeService;
+  @Getter private final ResourceLoaderFactory resourceLoaderFactory;
 
   public static PageRequest getSearchPageRequest() {
     return getSearchPageRequest(PagingHelper.DEFAULT_PAGE, PagingHelper.DEFAULT_SIZE, null, null);
@@ -302,7 +297,7 @@ public class UnifiedAssetService implements UUIDWrapper {
 
     if (Objects.equals(assetEntity.getKind(), COMPONENT_API_TARGET_MAPPER.getKind())
         && entityOptional.isPresent()) {
-      data.setFacets(mergeService.mergeFacets(entityOptional.get(), data.getFacets()));
+      data.setFacets(mergeFacets(entityOptional.get(), data.getFacets()));
     }
     if (data.getFacets() != null) {
       syncFacets(assetEntity, data.getFacets());
@@ -327,114 +322,6 @@ public class UnifiedAssetService implements UUIDWrapper {
 
   private String getParentId(String parentKey) {
     return parentKey == null ? null : findOneByIdOrKey(parentKey).getId().toString();
-  }
-
-  public static Map<String, Object> mergeFacets(
-      UnifiedAssetEntity unifiedAssetEntity, Map<String, Object> facetsUpdated) {
-    UnifiedAssetDto assetDto = UnifiedAssetService.toAsset(unifiedAssetEntity, true);
-    ComponentAPITargetFacets existFacets =
-        UnifiedAsset.getFacets(assetDto, ComponentAPITargetFacets.class);
-    ComponentAPITargetFacets newFacets =
-        JsonToolkit.fromJson(JsonToolkit.toJson(facetsUpdated), ComponentAPITargetFacets.class);
-    return mergeFacets(existFacets, newFacets);
-  }
-
-  public static Map<String, Object> mergeFacets(
-      ComponentAPITargetFacets facetsOld, ComponentAPITargetFacets facetsNew) {
-    ComponentAPITargetFacets.Endpoint endpointOld = facetsOld.getEndpoints().get(0);
-    ComponentAPITargetFacets.Endpoint endpointNew = facetsNew.getEndpoints().get(0);
-    List<PathRule> pathRules =
-        (Objects.isNull(endpointNew) || Objects.isNull(endpointNew.getMappers()))
-            ? new ArrayList<>()
-            : endpointNew.getMappers().getPathRules();
-    FacetsMapper.INSTANCE.toEndpoint(endpointOld, endpointNew);
-
-    Map<String, Map<String, ComponentAPITargetFacets.Mapper>> mapperOldMap =
-        constructMapperMap(endpointOld);
-    Map<String, Map<String, ComponentAPITargetFacets.Mapper>> mapperNewMap =
-        constructMapperMap(endpointNew);
-    mergeMappers(mapperOldMap, mapperNewMap);
-
-    Map<String, List<ComponentAPITargetFacets.Mapper>> finalMap = toFinalMapper(mapperNewMap);
-    ComponentAPITargetFacets.Mappers mappers = new ComponentAPITargetFacets.Mappers();
-    mappers.setResponse(finalMap.getOrDefault(MAPPER_RESPONSE, Collections.emptyList()));
-    mappers.setRequest(finalMap.getOrDefault(MAPPER_REQUEST, Collections.emptyList()));
-    mappers.setPathRules(pathRules);
-    if (Objects.nonNull(endpointNew)) {
-      endpointNew.setMappers(mappers);
-    }
-    return JsonToolkit.fromJson(JsonToolkit.toJson(facetsNew), new TypeReference<>() {});
-  }
-
-  public static void mergeMappers(
-      Map<String, Map<String, ComponentAPITargetFacets.Mapper>> mapperMapOld,
-      Map<String, Map<String, ComponentAPITargetFacets.Mapper>> mapperMapNew) {
-    mapperMapOld.forEach(
-        (name, value) -> {
-          Map.Entry<String, ComponentAPITargetFacets.Mapper> existMapperEntry =
-              value.entrySet().iterator().next();
-          if (Objects.equals(Boolean.TRUE, existMapperEntry.getValue().getCustomizedField())) {
-            String mapperHashCode = String.valueOf(existMapperEntry.getValue().hashCode());
-            mapperMapNew.putIfAbsent(
-                mapperHashCode,
-                new HashMap<>(Map.of(existMapperEntry.getKey(), existMapperEntry.getValue())));
-          } else if (mapperMapNew.containsKey(name)) {
-            ComponentAPITargetFacets.Mapper mapper =
-                mapperMapNew.get(name).get(existMapperEntry.getKey());
-            if (Objects.equals(MAPPER_REQUEST, existMapperEntry.getKey())) {
-              FacetsMapper.INSTANCE.toRequestMapper(existMapperEntry.getValue(), mapper);
-            } else {
-              FacetsMapper.INSTANCE.toResponseMapper(existMapperEntry.getValue(), mapper);
-            }
-          }
-        });
-  }
-
-  public static Map<String, List<ComponentAPITargetFacets.Mapper>> toFinalMapper(
-      Map<String, Map<String, ComponentAPITargetFacets.Mapper>> newMapperMap) {
-    return newMapperMap.values().stream()
-        .collect(
-            Collectors.groupingBy(
-                map -> map.entrySet().iterator().next().getKey(),
-                Collectors.mapping(
-                    nested -> nested.entrySet().iterator().next().getValue(),
-                    Collectors.toList())));
-  }
-
-  public static Map<String, Map<String, ComponentAPITargetFacets.Mapper>> constructMapperMap(
-      ComponentAPITargetFacets.Endpoint endpoint) {
-    if (Objects.isNull(endpoint) || Objects.isNull(endpoint.getMappers())) {
-      return new LinkedHashMap<>();
-    }
-
-    Map<String, Map<String, ComponentAPITargetFacets.Mapper>> mapperMap = new LinkedHashMap<>();
-    Map<ComponentAPITargetFacets.Mapper, Boolean> seenMappers = new HashMap<>();
-    removeDuplicatedNodes(
-        endpoint.getMappers().getRequest(), mapperMap, seenMappers, MAPPER_REQUEST);
-    removeDuplicatedNodes(
-        endpoint.getMappers().getResponse(), mapperMap, seenMappers, MAPPER_RESPONSE);
-
-    return mapperMap;
-  }
-
-  public static void removeDuplicatedNodes(
-      List<ComponentAPITargetFacets.Mapper> mappers,
-      Map<String, Map<String, ComponentAPITargetFacets.Mapper>> mapperMap,
-      Map<ComponentAPITargetFacets.Mapper, Boolean> seenMappers,
-      String mapperSection) {
-    if (CollectionUtils.isNotEmpty(mappers)) {
-      for (ComponentAPITargetFacets.Mapper mapper : mappers) {
-        if (seenMappers.containsKey(mapper)) {
-          continue;
-        }
-        String key =
-            StringUtils.isBlank(mapper.getName())
-                ? String.valueOf(mapper.hashCode())
-                : mapper.getName();
-        mapperMap.computeIfAbsent(key, k -> new LinkedHashMap<>()).put(mapperSection, mapper);
-        seenMappers.put(mapper, true);
-      }
-    }
   }
 
   public void removeNotExistingChildren(String assetId) {

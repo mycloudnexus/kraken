@@ -1,0 +1,20 @@
+---
+kind: kraken.component.api-target-mapper
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target-mapper.inventory.uni.list
+  name: Inventory Connection API
+  version: 1
+spec:
+  endpoints:
+    - id: list uni product
+      path: /api/company/{companyName}/ports/orders/{orderId}
+      method: get
+      mappers:
+        schema:
+          ref: "classpath:/mef-sonata/api-targets-mappers/api-target-mapper.inventory.common.list.yaml"
+          params:
+            - key: productType
+              val: uni
+        request:
+        response:
