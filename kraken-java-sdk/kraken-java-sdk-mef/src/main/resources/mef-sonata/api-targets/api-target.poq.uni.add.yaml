@@ -28,6 +28,7 @@ spec:
           "externalId":"${mefRequestBody[externalId]?:''}",
           "instantSyncQualification": "${mefRequestBody[instantSyncQualification]?:''}",
           "provideAlternative": "${mefRequestBody[provideAlternative]?:''}",
+          "requestedPOQCompletionDate": "${mefRequestBody[requestedPOQCompletionDate]?:''}",
           "relatedContactInformation": "${T(com.consoleconnect.kraken.operator.gateway.func.SpelFunc).appendSellerInformation(env.seller.role, env.seller.name, env.seller.emailAddress, env.seller.number, mefRequestBody.relatedContactInformation)}",
           "productOfferingQualificationItem": [{
               "product": "${mefRequestBody.productOfferingQualificationItem[0].product}",
