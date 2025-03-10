@@ -3,9 +3,10 @@ import { useMappingUiStore } from "@/stores/mappingUi.store";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { GroupedByPath } from "@/utils/helpers/groupByPath";
 import { IMapperDetails } from "@/utils/types/env.type";
-import { Collapse, Spin } from "antd";
+import { Collapse, Select, Spin } from "antd";
 import { useMemo, useEffect, useState, useCallback } from "react";
 import { CollapseItem, CollapseLabel } from "./components";
+import DropdownOption from "./components/DropdownOption";
 import styles from "./index.module.scss";
 
 type MappingDetailsListProps = {
@@ -45,8 +46,8 @@ const MappingDetailsList = ({
       // Auto select the corresponding api
       const initialMapItem = targetMapperKey
         ? (apis.find(
-          (mapping) => mapping.targetMapperKey === targetMapperKey
-        ) ?? apis[0])
+            (mapping) => mapping.targetMapperKey === targetMapperKey
+          ) ?? apis[0])
         : apis[0];
 
       setSelectedKey(initialMapItem.path);
@@ -68,46 +69,66 @@ const MappingDetailsList = ({
     [setActiveSelected, setSelectedKey]
   );
 
-  const listMapping = useMemo(() => {
-    return Object.keys(groupedPaths).map((path) => {
-      const labelProps = groupedPaths[path][0];
-      const isActiveLabel = activeLabel.includes(path);
-      const isOneChild = groupedPaths[path].length <= 1;
-      const highlighted = groupedPaths[path].some(
-        (item) => item.path === activePath
-      );
+  // const listMapping = useMemo(() => {
+  //   return Object.keys(groupedPaths).map((path) => {
+  //     const labelProps = groupedPaths[path][0];
+  //     const isActiveLabel = activeLabel.includes(path);
+  //     const isOneChild = groupedPaths[path].length <= 1;
+  //     const highlighted = groupedPaths[path].some(
+  //       (item) => item.path === activePath
+  //     );
 
-      return {
-        key: path,
-        showArrow: !isOneChild,
-        label: (
-          <CollapseLabel
-            labelProps={labelProps}
-            handleSelection={handleSelection}
-            size={groupedPaths[path].length}
-            isActive={isActiveLabel}
-            isOneChild={isOneChild}
-            highlighted={highlighted}
-          />
-        ),
-        children: isOneChild ? null : (
-          <CollapseItem
-            data={groupedPaths[path]}
-            setActiveSelected={handleSelection}
-            selectedKey={selectedKey}
-          />
-        ),
-      };
-    });
-  }, [activeLabel, activePath, groupedPaths, handleSelection, selectedKey]);
+  //     return {
+  //       key: path,
+  //       showArrow: !isOneChild,
+  //       label: (
+  //         <CollapseLabel
+  //           labelProps={labelProps}
+  //           handleSelection={handleSelection}
+  //           size={groupedPaths[path].length}
+  //           isActive={isActiveLabel}
+  //           isOneChild={isOneChild}
+  //           highlighted={highlighted}
+  //         />
+  //       ),
+  //       children: isOneChild ? null : (
+  //         <CollapseItem
+  //           data={groupedPaths[path]}
+  //           setActiveSelected={handleSelection}
+  //           selectedKey={selectedKey}
+  //         />
+  //       ),
+  //     };
+  //   });
+  // }, [activeLabel, activePath, groupedPaths, handleSelection, selectedKey]);
+
+  const optionsList = useMemo(() => {
+    const list = [];
+    for (const path in groupedPaths) {
+      for (const item of groupedPaths[path]) {
+        const optionProps = {
+          ...item,
+          size: groupedPaths[path].length,
+          value: `${path} ${item.targetKey}`,
+        };
+        list.push({
+          label: <DropdownOption {...optionProps} />,
+          value: `${path} ${item.targetKey}`,
+        });
+      }
+    }
+    return list;
+  }, [groupedPaths]);
 
   const handleChange = useCallback((e: string[] | string) => {
     setActiveLabel(Array.isArray(e) ? e : [e]);
   }, []);
 
+  // console.log(">>>>>groupedPaths", groupedPaths);
+
   return (
     <Spin spinning={!groupedPaths}>
-      <Collapse
+      {/* <Collapse
         activeKey={activeLabel}
         onChange={handleChange}
         className={styles.collapseBox}
@@ -115,6 +136,11 @@ const MappingDetailsList = ({
         ghost
         expandIconPosition="end"
         items={listMapping}
+      /> */}
+      <Select
+        options={optionsList}
+        defaultValue={optionsList[0].value}
+        variant="borderless"
       />
     </Spin>
   );
