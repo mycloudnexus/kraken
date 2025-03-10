@@ -16,6 +16,7 @@ public final class AssetsConstants {
   public static final String FIELD_TAGS = "tags";
   public static final String END_POINTS = "endpoints";
   public static final String META_DATA = "metaData";
+  public static final String WORKFLOW = "workflow";
   public static final String PREPARATION_STAGE = "preparationStage";
   public static final String EXECUTION_STAGE = "executionStage";
   public static final String VALIDATION_STAGE = "validationStage";
