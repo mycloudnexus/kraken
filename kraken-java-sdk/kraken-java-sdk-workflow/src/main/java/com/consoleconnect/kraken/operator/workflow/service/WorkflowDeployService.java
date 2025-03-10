@@ -12,6 +12,7 @@ import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.workflow.model.WorkflowDeploymentFacets;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.netflix.conductor.common.metadata.workflow.WorkflowDef;
+import io.orkes.conductor.client.http.ApiException;
 import io.orkes.conductor.client.http.OrkesMetadataClient;
 import java.util.Map;
 import lombok.AllArgsConstructor;
@@ -25,6 +26,13 @@ import org.springframework.stereotype.Service;
 public class WorkflowDeployService {
 
   public static final String LABEL_WORKFLOW_DEF_VERSION = "workflow-def-version";
+
+  private static final String ERR_LOG_WORKFLOW_QUERY_DEF = "Failed to query workflow definition";
+
+  private static final String ERR_MSG_WORKFLOW_QUERY_DEF =
+      "Failed to query workflow definition, status: %s, error: %s";
+
+  public static final int INIT_WORKFLOW_DEF_VERSION = 1;
 
   private final OrkesMetadataClient metadataClient;
 
@@ -85,7 +93,18 @@ public class WorkflowDeployService {
   }
 
   private int computeNewVersion(UnifiedAsset asset, String processName) {
-    WorkflowDef workflowDef = metadataClient.getWorkflowDef(processName, null);
+    WorkflowDef workflowDef = null;
+    try {
+      workflowDef = metadataClient.getWorkflowDef(processName, null);
+    } catch (ApiException e) {
+      if (e.getStatusCode() == HttpStatus.NOT_FOUND.value()) {
+        return INIT_WORKFLOW_DEF_VERSION;
+      } else {
+        log.error(ERR_LOG_WORKFLOW_QUERY_DEF, e);
+        KrakenException.internalError(
+            String.format(ERR_MSG_WORKFLOW_QUERY_DEF, e.getStatusCode(), e.getMessage()));
+      }
+    }
     return workflowDef != null ? workflowDef.getVersion() + 1 : asset.getMetadata().getVersion();
   }
 }
