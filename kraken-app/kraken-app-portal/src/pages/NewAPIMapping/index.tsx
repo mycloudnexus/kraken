@@ -2,7 +2,7 @@ import { Alert } from "@/components/Alert";
 import Flex from "@/components/Flex";
 import StepBar from "@/components/StepBar";
 import { Text } from "@/components/Text";
-import { PRODUCT_CACHE_KEYS, useUpdateTargetMapper } from "@/hooks/product";
+import { PRODUCT_CACHE_KEYS } from "@/hooks/product";
 import { usePathQuery } from "@/hooks/usePathQuery";
 import { useAppStore } from "@/stores/app.store";
 import { useMappingUiStore } from "@/stores/mappingUi.store";
@@ -12,24 +12,15 @@ import buildInitListMapping from "@/utils/helpers/buildInitListMapping";
 import { isElementInViewport } from "@/utils/helpers/html";
 import { queryClient } from "@/utils/helpers/reactQuery";
 import { EnumRightType } from "@/utils/types/common.type";
-import { IMappers } from "@/utils/types/component.type";
 import { InfoCircleOutlined } from "@ant-design/icons";
-import { Tabs, TabsProps, notification } from "antd";
-import {
-  chain,
-  cloneDeep,
-  flatMap,
-  get,
-  isEmpty,
-  reduce,
-  uniqBy,
-} from "lodash";
+import { Tabs, TabsProps } from "antd";
+import { isEmpty, uniqBy } from "lodash";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import HeaderMapping from "./components/HeaderMapping";
 import NotRequired from "./components/NotRequired";
 import RequestMapping from "./components/RequestMapping";
-import ResponseMapping, { IMapping } from "./components/ResponseMapping";
+import ResponseMapping from "./components/ResponseMapping";
 import { RightSide } from "./components/RightSide";
 import useGetApiSpec from "./components/useGetApiSpec";
 import useGetDefaultSellerApi from "./components/useGetDefaultSellerApi";
@@ -48,7 +39,6 @@ const NewAPIMapping = ({
     rightSide,
     serverKey,
     requestMapping,
-    responseMapping,
     rightSideInfo,
     sellerApi,
     setRequestMapping,
@@ -57,9 +47,7 @@ const NewAPIMapping = ({
     setSellerApi,
     setServerKey,
     setListMappingStateResponse,
-    listMappingStateResponse,
     setListMappingStateRequest,
-    listMappingStateRequest,
     setRightSideInfo,
     // setErrors,
   } = useNewApiMappingStore();
@@ -69,16 +57,13 @@ const NewAPIMapping = ({
   const [activeKey, setActiveKey] = useState<string | string[]>("0");
   const [step, setStep] = useState(0);
 
-  const { mutateAsync: updateTargetMapper } = useUpdateTargetMapper();
   const {
     serverKeyInfo,
     mappers,
-    mapperResponse,
     loadingMapper,
     resetMapping,
     resetResponseMapping,
     jsonSpec,
-    refreshMappingDetail,
   } = useGetApiSpec(currentProduct, queryData.targetMapperKey ?? "");
 
   const { sellerApi: defaultSellerApi, serverKey: defaultServerKey } =
@@ -249,132 +234,6 @@ const NewAPIMapping = ({
     },
     [rightSideInfo, requestMapping, setRequestMapping]
   );
-
-  const transformListMappingItem = (
-    item: IMapping[],
-    type: "request" | "response"
-  ) => {
-    return chain(item)
-      .groupBy("name")
-      .map((items, name) => ({
-        name,
-        valueMapping: flatMap(items, (item) =>
-          // item?.to?.map((to) => ({ [to]: item.from }))
-          type === "request"
-            ? [{ [item.from as string]: item.to?.[0] }]
-            : item?.to?.map((to) => ({ [to]: item.from }))
-        ),
-      }))
-      .value();
-  };
-
-  const handleSave = async (callback?: () => void) => {
-    try {
-      const newDataResponse = transformListMappingItem(
-        listMappingStateResponse,
-        "response"
-      );
-      const newDataRequest = transformListMappingItem(
-        listMappingStateRequest,
-        "request"
-      );
-
-      let newResponse = cloneDeep(responseMapping);
-      if (!isEmpty(newDataResponse)) {
-        newDataResponse.forEach((it) => {
-          newResponse = newResponse.map((rm) => {
-            if (rm.name === it.name) {
-              rm.valueMapping = reduce(
-                it.valueMapping,
-                (acc, obj) => ({ ...acc, ...obj }),
-                {}
-              );
-            }
-            return rm;
-          });
-        });
-      }
-      let newRequest = cloneDeep(requestMapping);
-      if (!isEmpty(newDataRequest)) {
-        newDataRequest.forEach((it) => {
-          newRequest = newRequest.map((rm) => {
-            if (rm.name === it.name) {
-              rm.valueMapping = reduce(
-                it.valueMapping,
-                (acc, obj) => ({ ...acc, ...obj }),
-                {}
-              );
-            }
-            return rm;
-          });
-        });
-      }
-
-      const mappers: IMappers = {
-        request: newRequest.map((rm) => ({
-          ...rm,
-          target: get(rm, "target", ""),
-          source: get(rm, "source", ""),
-          targetLocation:
-            isEmpty(rm?.target) && rm?.targetLocation === "HYBRID"
-              ? ""
-              : get(rm, "targetLocation", ""),
-          sourceLocation: get(rm, "sourceLocation", ""),
-          requiredMapping: Boolean(rm.requiredMapping),
-          id: undefined, // Omit id from patch payload
-        })),
-        response: newResponse.map((rm) => ({
-          ...rm,
-          targetLocation: get(rm, "targetLocation", ""),
-          sourceLocation: get(rm, "sourceLocation", ""),
-          target: get(rm, "target", ""),
-          source: get(rm, "source", ""),
-          requiredMapping: Boolean(rm.requiredMapping),
-          id: undefined, // Omit id from patch payload
-        })),
-      };
-
-      const data = cloneDeep(mapperResponse)!;
-      data.facets.endpoints[0] = {
-        ...data.facets.endpoints[0],
-        serverKey: serverKey as any,
-        method: sellerApi.method,
-        path: sellerApi.url,
-        mappers,
-      };
-
-      const res = await updateTargetMapper({
-        productId: currentProduct,
-        componentId: data.metadata.id,
-        data,
-      } as any);
-      notification.success({ message: res.message });
-      refreshMappingDetail();
-      setStep(1);
-      setActiveKey("1");
-      callback && callback();
-      return true;
-    } catch (error) {
-      notification.error({
-        message: get(
-          error,
-          "reason",
-          get(error, "message", "Error on creating/updating mapping")
-        ),
-      });
-    }
-  };
-
-  const handleRevert = () => {
-    setRequestMapping(resetMapping() ?? []);
-    setResponseMapping(mappers?.response);
-    setListMappingStateResponse(
-      buildInitListMapping(mappers?.response as any, "response")
-    );
-    // Store to default seller api?
-    setSellerApi(defaultSellerApi);
-    setActiveTab("request");
-  };
 
   const handleTabSwitch = useCallback(
     (tabName: string) => {

@@ -143,14 +143,6 @@ const StandardAPIMapping = () => {
 
   const { left = 0 } = leftPanelRef.current?.getBoundingClientRect() ?? {};
 
-  const handleMouseDown: React.MouseEventHandler<HTMLDivElement> = (e) => {
-    setIsMouseDown(true);
-
-    if (bar.current) {
-      bar.current.style.left = e.clientX - left + "px";
-    }
-  };
-
   const handleMouseMove: React.MouseEventHandler<HTMLDivElement> = (e) => {
     e.stopPropagation();
     e.preventDefault();
