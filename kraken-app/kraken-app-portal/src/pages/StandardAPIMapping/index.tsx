@@ -9,6 +9,7 @@ import {
   useUpdateTargetMapper,
   useGetLatestRunningList,
 } from "@/hooks/product";
+import useSize from "@/hooks/useSize";
 import { useAppStore } from "@/stores/app.store";
 import { useMappingUiStore } from "@/stores/mappingUi.store";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
@@ -16,14 +17,14 @@ import buildInitListMapping from "@/utils/helpers/buildInitListMapping";
 import groupByPath from "@/utils/helpers/groupByPath";
 import { IMappers } from "@/utils/types/component.type";
 import { IMapperDetails } from "@/utils/types/env.type";
-import { Flex, Spin, Button, Tooltip, notification } from "antd";
-// import classNames from "classnames";
+import { Flex, Spin, Button, Tooltip, notification, Drawer } from "antd";
 import dayjs from "dayjs";
 import { delay, get, isEmpty, chain, cloneDeep, flatMap, reduce } from "lodash";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router";
 import { useBoolean } from "usehooks-ts";
 import NewAPIMapping from "../NewAPIMapping";
+import DeployHistory from "../NewAPIMapping/components/DeployHistory";
 import { Deployment } from "../NewAPIMapping/components/Deployment";
 import { IMapping } from "../NewAPIMapping/components/ResponseMapping";
 import useGetApiSpec from "../NewAPIMapping/components/useGetApiSpec";
@@ -51,7 +52,6 @@ const StandardAPIMapping = () => {
     setSellerApi,
     setListMappingStateResponse,
     listMappingStateResponse,
-    setListMappingStateRequest,
     listMappingStateRequest,
   } = useNewApiMappingStore();
   const queryData = useMemo(() => JSON.parse(query ?? "{}"), [query]);
@@ -79,11 +79,17 @@ const StandardAPIMapping = () => {
     refreshMappingDetail,
   } = useGetApiSpec(currentProduct, queryData.targetMapperKey ?? "");
 
-  const { sellerApi: defaultSellerApi, serverKey: defaultServerKey } =
-    useGetDefaultSellerApi(currentProduct, serverKeyInfo as any);
+  const { sellerApi: defaultSellerApi } = useGetDefaultSellerApi(
+    currentProduct,
+    serverKeyInfo as any
+  );
 
   const { mutateAsync: updateTargetMapper, isPending } =
     useUpdateTargetMapper();
+
+  const [open, setOpen] = useState(false);
+  const ref = useRef<any>();
+  const size = useSize(ref);
 
   const resetState = (mapItem: IMapperDetails) => {
     reset();
@@ -183,7 +189,6 @@ const StandardAPIMapping = () => {
       .map((items, name) => ({
         name,
         valueMapping: flatMap(items, (item) =>
-          // item?.to?.map((to) => ({ [to]: item.from }))
           type === "request"
             ? [{ [item.from as string]: item.to?.[0] }]
             : item?.to?.map((to) => ({ [to]: item.from }))
@@ -318,19 +323,6 @@ const StandardAPIMapping = () => {
           vertical={true}
         >
           <Flex className={styles.leftWrapper} ref={leftPanelRef}>
-            {/* {!isLoading && (
-              <div
-                data-testid="resizableBar"
-                tabIndex={0}
-                role="button"
-                className={classNames(
-                  styles.draggableSide,
-                  isMouseDown && styles.interactive
-                )}
-                onMouseDown={handleMouseDown}
-                ref={bar}
-              />
-            )} */}
             <Flex vertical style={{ width: "100%" }} gap={20}>
               <Flex className={styles.breadcrumb} justify="space-between">
                 {!isGroupedPathsEmpty && (
@@ -342,7 +334,7 @@ const StandardAPIMapping = () => {
                 <Flex
                   justify="flex-end"
                   gap={8}
-                  className={styles.bottomWrapper}
+                  style={{ paddingRight: "10px" }}
                 >
                   {isRequiredMapping && (
                     <>
@@ -385,17 +377,19 @@ const StandardAPIMapping = () => {
                   />
                 </Flex>
               </Flex>
-              <Flex className={styles.infoBox}>
+              <Flex className={styles.infoBox} justify="space-between">
                 {queryData?.lastDeployedAt && (
                   <Deployment
                     deploymentData={runningDeploymentData}
                     loading={isFetchingDeploymentData}
                   />
                 )}
+                <Button type="link" onClick={() => setOpen(true)}>
+                  Deploy History
+                </Button>
               </Flex>
             </Flex>
           </Flex>
-
           {!isGroupedPathsEmpty && (
             <Flex
               align="center"
@@ -403,14 +397,22 @@ const StandardAPIMapping = () => {
               className={styles.versionListWrapper}
             >
               {activePath && !isChangeMappingKey && (
-                <NewAPIMapping
-                  refetch={refetch}
-                  isRequiredMapping={isRequiredMapping}
-                />
+                <NewAPIMapping isRequiredMapping={isRequiredMapping} />
               )}
             </Flex>
           )}
         </Flex>
+        <Drawer
+          title="Deploy History"
+          open={open}
+          onClose={() => setOpen(false)}
+          width={1200}
+        >
+          <DeployHistory
+            targetMapperKey={queryData.targetMapperKey}
+            scrollHeight={get(size, "height", 0) + 70}
+          />
+        </Drawer>
       </Spin>
     </PageLayout>
   );

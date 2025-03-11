@@ -1,16 +1,9 @@
-import RollbackIcon from "@/assets/newAPIMapping/Rollback.svg";
 import { Alert } from "@/components/Alert";
-import DeployStage from "@/components/DeployStage";
 import Flex from "@/components/Flex";
 import StepBar from "@/components/StepBar";
 import { Text } from "@/components/Text";
-import {
-  PRODUCT_CACHE_KEYS,
-  useGetLatestRunningList,
-  useUpdateTargetMapper,
-} from "@/hooks/product";
+import { PRODUCT_CACHE_KEYS, useUpdateTargetMapper } from "@/hooks/product";
 import { usePathQuery } from "@/hooks/usePathQuery";
-import useSize from "@/hooks/useSize";
 import { useAppStore } from "@/stores/app.store";
 import { useMappingUiStore } from "@/stores/mappingUi.store";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
@@ -21,8 +14,7 @@ import { queryClient } from "@/utils/helpers/reactQuery";
 import { EnumRightType } from "@/utils/types/common.type";
 import { IMappers } from "@/utils/types/component.type";
 import { InfoCircleOutlined } from "@ant-design/icons";
-import { Button, Tabs, TabsProps, Tooltip, notification } from "antd";
-import dayjs from "dayjs";
+import { Tabs, TabsProps, notification } from "antd";
 import {
   chain,
   cloneDeep,
@@ -34,9 +26,6 @@ import {
 } from "lodash";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import DeployHistory from "./components/DeployHistory";
-import { Deployment } from "./components/Deployment";
-import DeploymentInfo from "./components/DeploymentInfo";
 import HeaderMapping from "./components/HeaderMapping";
 import NotRequired from "./components/NotRequired";
 import RequestMapping from "./components/RequestMapping";
@@ -46,16 +35,9 @@ import useGetApiSpec from "./components/useGetApiSpec";
 import useGetDefaultSellerApi from "./components/useGetDefaultSellerApi";
 import styles from "./index.module.scss";
 
-enum EMainTab {
-  mapping = "mapping",
-  deploy = "deploy",
-}
-
 const NewAPIMapping = ({
-  refetch,
   isRequiredMapping,
 }: {
-  refetch?: () => void;
   isRequiredMapping: boolean;
 }) => {
   const pathQuery = usePathQuery();
@@ -87,14 +69,12 @@ const NewAPIMapping = ({
   const [activeKey, setActiveKey] = useState<string | string[]>("0");
   const [step, setStep] = useState(0);
 
-  const { mutateAsync: updateTargetMapper, isPending } =
-    useUpdateTargetMapper();
+  const { mutateAsync: updateTargetMapper } = useUpdateTargetMapper();
   const {
     serverKeyInfo,
     mappers,
     mapperResponse,
     loadingMapper,
-    metadataKey,
     resetMapping,
     resetResponseMapping,
     jsonSpec,
@@ -104,13 +84,9 @@ const NewAPIMapping = ({
   const { sellerApi: defaultSellerApi, serverKey: defaultServerKey } =
     useGetDefaultSellerApi(currentProduct, serverKeyInfo as any);
 
-  const [mainTabKey, setMainTabKey] = useState<string>(EMainTab.mapping);
   const [firstTimeLoadSellerAPI, setFirstTimeLoadSellerAPI] = useState(true);
 
   const ref = useRef<any>();
-  const size = useSize(ref);
-  const { data: runningDeploymentData, isFetching: isFetchingDeploymentData } =
-    useGetLatestRunningList(currentProduct, queryData?.targetMapperKey);
 
   useEffect(() => {
     if (!sellerApi && defaultSellerApi && firstTimeLoadSellerAPI) {
@@ -429,93 +405,6 @@ const NewAPIMapping = ({
         justifyContent="flex-start"
         className={styles.newMainWrapper}
       >
-        <Flex
-          justifyContent="space-between"
-          style={{ width: "100%", paddingBottom: 16 }}
-        >
-          {/* <Tabs
-            id="tab-mapping"
-            activeKey={mainTabKey}
-            onChange={setMainTabKey}
-            items={[
-              {
-                label: (
-                  <Flex gap={4} alignItems="center">
-                    Mapping
-                    {queryData.mappingStatus === "incomplete" && (
-                      <Tooltip title="Incomplete mapping">
-                        <InfoCircleOutlined style={{ color: "#FAAD14" }} />
-                      </Tooltip>
-                    )}
-                  </Flex>
-                ),
-                key: EMainTab.mapping,
-              },
-              { label: "Deploy history", key: EMainTab.deploy },
-            ]}
-          /> */}
-          <DeploymentInfo
-            runningData={runningDeploymentData as any}
-            loading={isFetchingDeploymentData}
-          />
-        </Flex>
-        (
-        <Flex className={styles.breadcrumb} justifyContent="space-between">
-          <Flex className={styles.infoBox}>
-            {queryData?.lastDeployedAt && (
-              <Deployment
-                deploymentData={runningDeploymentData}
-                loading={isFetchingDeploymentData}
-              />
-            )}
-          </Flex>
-          <Flex
-            justifyContent="flex-end"
-            gap={8}
-            className={styles.bottomWrapper}
-          >
-            {isRequiredMapping && (
-              <>
-                <Tooltip title="Restore">
-                  <Button
-                    disabled={!isRequiredMapping}
-                    className={styles.revertButton}
-                    onClick={handleRevert}
-                  >
-                    <RollbackIcon />
-                  </Button>
-                </Tooltip>
-                <Tooltip
-                  title={
-                    queryData?.updatedAt
-                      ? dayjs
-                          .utc(queryData?.updatedAt)
-                          .local()
-                          .format("YYYY-MM-DD HH:mm:ss")
-                      : undefined
-                  }
-                >
-                  <Button
-                    disabled={!isRequiredMapping}
-                    data-testid="btn-save"
-                    type="default"
-                    onClick={() => handleSave(refetch)}
-                    loading={isPending}
-                    className={styles.btnSave}
-                  >
-                    Save
-                  </Button>
-                </Tooltip>
-              </>
-            )}
-            <DeployStage
-              inComplete={queryData.mappingStatus === "incomplete"}
-              diffWithStage={queryData.diffWithStage}
-              metadataKey={metadataKey as any}
-            />
-          </Flex>
-        </Flex>
-        )
         <div ref={ref} className={styles.newContent}>
           {upgradingVersion && (
             <Alert
@@ -531,7 +420,6 @@ const NewAPIMapping = ({
               }
             />
           )}
-          (
           <Flex gap={12} className={styles.mainWrapper} alignItems="start">
             <div className={styles.center}>
               {!isRequiredMapping && (
@@ -556,7 +444,6 @@ const NewAPIMapping = ({
                 onChange={handleTabSwitch}
               />
             </div>
-
             {isRequiredMapping && (
               <div className={styles.right}>
                 <RightSide
@@ -570,7 +457,6 @@ const NewAPIMapping = ({
               </div>
             )}
           </Flex>
-          )
         </div>
       </Flex>
     </main>
