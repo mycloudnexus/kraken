@@ -16,6 +16,7 @@ spec:
     productType: uni
   endpoints:
     - id: Retrieves a product offering qualification by id for port
+      url: ${env.target.url}
       path: ""
       method: ""
       requestBody: |
@@ -27,6 +28,7 @@ spec:
           "externalId":"${entity.request.externalId}",
           "instantSyncQualification": "${entity.request.instantSyncQualification}",
           "provideAlternative": "${entity.request.provideAlternative}",
+          "requestedPOQCompletionDate": "${entity.request.requestedPOQCompletionDate}",
           "relatedContactInformation": "${entity.request.relatedContactInformation}",
           "productOfferingQualificationItem": [{
               "product": "${entity.request.productOfferingQualificationItem[0].product}",
