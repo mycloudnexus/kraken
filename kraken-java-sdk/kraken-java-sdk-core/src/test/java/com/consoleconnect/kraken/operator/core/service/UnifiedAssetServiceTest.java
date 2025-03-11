@@ -248,6 +248,7 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
       Map<String, Object> map = unifiedAssetService.mergeFacets(facetsOld, facetsNew);
       String result2 = JsonToolkit.toJson(map);
       Assertions.assertNotNull(result2);
+      Assertions.assertEquals(result1.hashCode(), result2.hashCode());
     }
   }
 }

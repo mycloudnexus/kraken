@@ -7,58 +7,59 @@ metadata:
   version: 1
 spec:
   endpoints:
-    mappers:
-      request:
-        - name: mapper.inventory.@{{productType}}.list.buyerId
-          title: "The unique identifier of the organization that is acting as the a Buyer. MUST be specified in the request only when the requester represents more than one Buyer."
-          source: "@{{buyerId}}"
-          sourceLocation: QUERY
-          target: ""
-          targetLocation: PATH
-          requiredMapping: false
-        - name: mapper.inventory.@{{productType}}.list.orderId
-          title: "associated order Id."
-          source: "@{{productOrderId}}"
-          sourceLocation: "QUERY"
-          target: ""
-          targetType: string
-          targetLocation: "PATH"
-          convertValue: "mef.sonata.api-target-mapper.order.@{{productType}}.add#mapper.order.@{{productType}}.add.orderId"
-          requiredMapping: true
-      response:
-        - name: mapper.inventory.@{{productType}}.list.id
-          title: "Unique identifier of the product"
-          source: ""
-          sourceLocation:
-          target: "@{{id}}"
-          targetType: string
-          targetLocation: BODY
-          requiredMapping: true
-          checkPath: "$[0]['id']"
-          deletePath: "$[*]"
-        - name: mapper.inventory.@{{productType}}.list.startDate
-          title: "The date from which the product starts"
-          description: "BODY"
-          source: ""
-          sourceLocation:
-          target: "@{{startDate}}"
-          targetType: string
-          targetLocation: BODY
-          requiredMapping: true
-        - name: mapper.inventory.@{{productType}}.list.status
-          title: "Possible values for the status of a MEF product"
-          source: ""
-          sourceLocation:
-          target: "@{{[*].status}}"
-          targetType: enum
-          targetLocation: BODY
-          requiredMapping: true
-          targetValues:
-            - active
-            - active.pendingChange
-            - cancelled
-            - pendingActive
-            - pendingTerminate
-            - suspended
-            - suspendedPendingTerminate
-            - terminated
+    - id: list uni product
+      mappers:
+        request:
+          - name: mapper.inventory.@{{productType}}.list.buyerId
+            title: "The unique identifier of the organization that is acting as the a Buyer. MUST be specified in the request only when the requester represents more than one Buyer."
+            source: "@{{buyerId}}"
+            sourceLocation: QUERY
+            target: ""
+            targetLocation: PATH
+            requiredMapping: false
+          - name: mapper.inventory.@{{productType}}.list.orderId
+            title: "associated order Id."
+            source: "@{{productOrderId}}"
+            sourceLocation: "QUERY"
+            target: ""
+            targetType: string
+            targetLocation: "PATH"
+            convertValue: "mef.sonata.api-target-mapper.order.@{{productType}}.add#mapper.order.@{{productType}}.add.orderId"
+            requiredMapping: true
+        response:
+          - name: mapper.inventory.@{{productType}}.list.id
+            title: "Unique identifier of the product"
+            source: ""
+            sourceLocation:
+            target: "@{{id}}"
+            targetType: string
+            targetLocation: BODY
+            requiredMapping: true
+            checkPath: "$[0]['id']"
+            deletePath: "$[*]"
+          - name: mapper.inventory.@{{productType}}.list.startDate
+            title: "The date from which the product starts"
+            description: "BODY"
+            source: ""
+            sourceLocation:
+            target: "@{{startDate}}"
+            targetType: string
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.inventory.@{{productType}}.list.status
+            title: "Possible values for the status of a MEF product"
+            source: ""
+            sourceLocation:
+            target: "@{{[*].status}}"
+            targetType: enum
+            targetLocation: BODY
+            requiredMapping: true
+            targetValues:
+              - active
+              - active.pendingChange
+              - cancelled
+              - pendingActive
+              - pendingTerminate
+              - suspended
+              - suspendedPendingTerminate
+              - terminated

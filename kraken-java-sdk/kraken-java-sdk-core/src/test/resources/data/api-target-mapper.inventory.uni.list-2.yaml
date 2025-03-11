@@ -4,15 +4,23 @@ apiVersion: v1
 metadata:
   key: mef.sonata.api-target-mapper.inventory.uni.list
   name: Inventory Connection API
-  version: 1
+  version: 2
 spec:
+  inputs:
+    - mefQuery
+    - mefRequestBody
+    - entity
+  trigger:
+    path: /mefApi/sonata/productInventory/v7/product
+    method: get
+    productType: uni
   endpoints:
     - id: list uni product
       path: /api/company/{companyName}/ports/orders/{orderId}
       method: get
       mappers:
-        schema:
-          ref: "classpath:/mef-sonata/api-targets-mappers/api-target-mapper.inventory.common.list.yaml"
+        schemaRef:
+          ref: "classpath:/data/api-target-mapper.inventory.common.list.yaml"
           params:
             - key: productType
               val: uni
