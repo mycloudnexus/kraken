@@ -4,7 +4,6 @@ import * as mappingStore from "@/stores/mappingUi.store";
 import { queryClient } from "@/utils/helpers/reactQuery";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render } from "@testing-library/react";
-import { message } from "antd";
 import { BrowserRouter } from "react-router-dom";
 
 test("StandardAPIMapping btn-create-version", () => {
