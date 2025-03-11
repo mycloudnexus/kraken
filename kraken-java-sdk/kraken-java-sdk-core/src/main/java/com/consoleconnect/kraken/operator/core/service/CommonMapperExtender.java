@@ -7,21 +7,57 @@ import com.consoleconnect.kraken.operator.core.model.CommonMapperRef;
 import com.consoleconnect.kraken.operator.core.model.KVPair;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
+import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
 public interface CommonMapperExtender extends AssetReader {
 
+  @Slf4j
+  final class LogHolder {}
+
+  default void tryExtendCommonMappers(UnifiedAsset data) {
+    Map<String, Object> facetsUpdated = data.getFacets();
+    if (MapUtils.isEmpty(facetsUpdated)) {
+      LogHolder.log.info("skip facetsUpdated");
+      return;
+    }
+    ComponentAPITargetFacets facetsNew = null;
+    try {
+      facetsNew =
+          JsonToolkit.fromJson(JsonToolkit.toJson(facetsUpdated), ComponentAPITargetFacets.class);
+    } catch (Exception e) {
+      LogHolder.log.error("Reading facets updated failed", e);
+    }
+    if (Objects.isNull(facetsNew) || CollectionUtils.isEmpty(facetsNew.getEndpoints())) {
+      LogHolder.log.info("skip facetsNew");
+      return;
+    }
+    ComponentAPITargetFacets.Endpoint endpointNew = facetsNew.getEndpoints().get(0);
+    extendCommonMapper(endpointNew);
+    facetsNew.getEndpoints().set(0, endpointNew);
+
+    Map<String, Object> resultUpdated =
+        JsonToolkit.fromJson(JsonToolkit.toJson(facetsNew), new TypeReference<>() {});
+    LogHolder.log.info("facets updated result:{}", JsonToolkit.toJson(resultUpdated));
+    data.setFacets(resultUpdated);
+  }
+
   default void extendCommonMapper(ComponentAPITargetFacets.Endpoint endpointNew) {
     if (Objects.isNull(endpointNew) || Objects.isNull(endpointNew.getMappers())) {
+      LogHolder.log.info("skip endpointNew");
       return;
     }
     CommonMapperRef schemaRef = endpointNew.getMappers().getSchemaRef();
     if (Objects.isNull(schemaRef) || StringUtils.isBlank(schemaRef.getRef())) {
+      LogHolder.log.info("skip schemaRef");
       return;
     }
     String refPath = schemaRef.getRef();
@@ -31,28 +67,29 @@ public interface CommonMapperExtender extends AssetReader {
           ComponentAPITargetFacets commonFacet =
               UnifiedAsset.getFacets(commonAsset, ComponentAPITargetFacets.class);
           if (Objects.isNull(commonFacet) || CollectionUtils.isEmpty(commonFacet.getEndpoints())) {
+            LogHolder.log.info("skip commonFacet");
             return;
           }
           ComponentAPITargetFacets.Endpoint commonEndpoint = commonFacet.getEndpoints().get(0);
           if (Objects.isNull(commonEndpoint.getMappers())) {
+            LogHolder.log.info("skip commonEndpoint");
             return;
           }
-          endpointNew
-              .getMappers()
-              .setRequest(
-                  restoreMapper(
-                      commonEndpoint.getMappers().getRequest(),
-                      schemaRef.getParams(),
-                      endpointNew.getMappers().getRequest()));
+          List<ComponentAPITargetFacets.Mapper> request =
+              restoreMapper(
+                  commonEndpoint.getMappers().getRequest(),
+                  schemaRef.getParams(),
+                  endpointNew.getMappers().getRequest());
+          endpointNew.getMappers().setRequest(request);
 
-          endpointNew
-              .getMappers()
-              .setResponse(
-                  restoreMapper(
-                      commonEndpoint.getMappers().getResponse(),
-                      schemaRef.getParams(),
-                      endpointNew.getMappers().getResponse()));
+          List<ComponentAPITargetFacets.Mapper> response =
+              restoreMapper(
+                  commonEndpoint.getMappers().getResponse(),
+                  schemaRef.getParams(),
+                  endpointNew.getMappers().getResponse());
+          endpointNew.getMappers().setResponse(response);
         });
+    LogHolder.log.info("endpointNew result:{}", JsonToolkit.toJson(endpointNew));
   }
 
   default List<ComponentAPITargetFacets.Mapper> restoreMapper(
@@ -60,6 +97,7 @@ public interface CommonMapperExtender extends AssetReader {
       List<KVPair> params,
       List<ComponentAPITargetFacets.Mapper> specificMappers) {
     if (CollectionUtils.isEmpty(commonMappers) || CollectionUtils.isEmpty(params)) {
+      LogHolder.log.info("skip commonMappers");
       return List.of();
     }
     Map<String, String> paramMap =
@@ -73,6 +111,7 @@ public interface CommonMapperExtender extends AssetReader {
     }
     for (ComponentAPITargetFacets.Mapper mapper : commonMappers) {
       if (Objects.isNull(mapper)) {
+        LogHolder.log.info("skip empty mapper");
         continue;
       }
       // To update values based on paramMap
@@ -82,6 +121,8 @@ public interface CommonMapperExtender extends AssetReader {
             if (CollectionUtils.isNotEmpty(extractedParams)) {
               String replacement = paramMap.getOrDefault(extractedParams.get(0), "");
               setter.accept(original.replaceAll(CUSTOMIZED_PLACE_HOLDER, replacement));
+            } else {
+              setter.accept(original);
             }
           };
 

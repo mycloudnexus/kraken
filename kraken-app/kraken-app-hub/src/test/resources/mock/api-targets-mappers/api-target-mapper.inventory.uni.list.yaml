@@ -19,7 +19,7 @@ spec:
       path: /api/company/{companyName}/ports/orders/{orderId}
       method: get
       mappers:
-        schema:
+        schemaRef:
           ref: "classpath:/mef-sonata/api-targets-mappers/api-target-mapper.inventory.common.list.yaml"
           params:
             - key: productType
