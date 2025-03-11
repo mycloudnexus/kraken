@@ -19,6 +19,11 @@ spec:
       path: /api/company/{companyName}/ports/orders/{orderId}
       method: get
       mappers:
+        schema:
+          ref: "classpath:/mef-sonata/api-targets-mappers/api-target-mapper.inventory.common.list.yaml"
+          params:
+            - key: productType
+              val: uni
         request:
           - name: mapper.inventory.uni.list.buyerId
             title: "The unique identifier of the organization that is acting as the a Buyer. MUST be specified in the request only when the requester represents more than one Buyer."
