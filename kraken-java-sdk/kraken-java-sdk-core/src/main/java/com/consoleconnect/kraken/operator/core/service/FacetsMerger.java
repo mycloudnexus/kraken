@@ -1,10 +1,7 @@
 package com.consoleconnect.kraken.operator.core.service;
 
-import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
-import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
 import com.consoleconnect.kraken.operator.core.mapper.FacetsMapper;
 import com.consoleconnect.kraken.operator.core.model.PathRule;
-import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -17,16 +14,6 @@ public interface FacetsMerger extends CommonMapperExtender {
 
   String MAPPER_REQUEST = "request";
   String MAPPER_RESPONSE = "response";
-
-  default Map<String, Object> mergeFacets(
-      UnifiedAssetEntity unifiedAssetEntity, Map<String, Object> facetsUpdated) {
-    UnifiedAssetDto assetDto = UnifiedAssetService.toAsset(unifiedAssetEntity, true);
-    ComponentAPITargetFacets existFacets =
-        UnifiedAsset.getFacets(assetDto, ComponentAPITargetFacets.class);
-    ComponentAPITargetFacets newFacets =
-        JsonToolkit.fromJson(JsonToolkit.toJson(facetsUpdated), ComponentAPITargetFacets.class);
-    return mergeFacets(existFacets, newFacets);
-  }
 
   default Map<String, Object> mergeFacets(
       ComponentAPITargetFacets facetsOld, ComponentAPITargetFacets facetsNew) {

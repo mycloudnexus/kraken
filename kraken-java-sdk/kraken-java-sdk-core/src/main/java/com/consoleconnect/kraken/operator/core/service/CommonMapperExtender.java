@@ -75,19 +75,22 @@ public interface CommonMapperExtender extends AssetReader {
             LogHolder.log.info("skip commonEndpoint");
             return;
           }
-          List<ComponentAPITargetFacets.Mapper> request =
-              restoreMapper(
-                  commonEndpoint.getMappers().getRequest(),
-                  schemaRef.getParams(),
-                  endpointNew.getMappers().getRequest());
-          endpointNew.getMappers().setRequest(request);
 
-          List<ComponentAPITargetFacets.Mapper> response =
-              restoreMapper(
-                  commonEndpoint.getMappers().getResponse(),
-                  schemaRef.getParams(),
-                  endpointNew.getMappers().getResponse());
-          endpointNew.getMappers().setResponse(response);
+          endpointNew
+              .getMappers()
+              .setRequest(
+                  restoreMapper(
+                      commonEndpoint.getMappers().getRequest(),
+                      schemaRef.getParams(),
+                      endpointNew.getMappers().getRequest()));
+
+          endpointNew
+              .getMappers()
+              .setResponse(
+                  restoreMapper(
+                      commonEndpoint.getMappers().getResponse(),
+                      schemaRef.getParams(),
+                      endpointNew.getMappers().getResponse()));
         });
     LogHolder.log.info("endpointNew result:{}", JsonToolkit.toJson(endpointNew));
   }

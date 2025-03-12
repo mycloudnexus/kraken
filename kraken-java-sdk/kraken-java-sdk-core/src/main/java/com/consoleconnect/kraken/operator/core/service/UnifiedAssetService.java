@@ -15,6 +15,7 @@ import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.ingestion.ResourceLoaderFactory;
 import com.consoleconnect.kraken.operator.core.mapper.AssetMapper;
 import com.consoleconnect.kraken.operator.core.model.*;
+import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
 import com.consoleconnect.kraken.operator.core.repo.AssetFacetRepository;
 import com.consoleconnect.kraken.operator.core.repo.AssetLinkRepository;
 import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
@@ -298,7 +299,7 @@ public class UnifiedAssetService implements UUIDWrapper, FacetsMerger {
     if (Objects.equals(assetEntity.getKind(), COMPONENT_API_TARGET_MAPPER.getKind())) {
       tryExtendCommonMappers(data);
       entityOptional
-          .map(entity -> mergeFacets(entity, data.getFacets()))
+          .map(entity -> mergeFacetsInternal(entity, data.getFacets()))
           .ifPresent(data::setFacets);
     }
     if (data.getFacets() != null) {
@@ -324,6 +325,16 @@ public class UnifiedAssetService implements UUIDWrapper, FacetsMerger {
 
   private String getParentId(String parentKey) {
     return parentKey == null ? null : findOneByIdOrKey(parentKey).getId().toString();
+  }
+
+  public Map<String, Object> mergeFacetsInternal(
+      UnifiedAssetEntity unifiedAssetEntity, Map<String, Object> facetsUpdated) {
+    UnifiedAssetDto assetDto = UnifiedAssetService.toAsset(unifiedAssetEntity, true);
+    ComponentAPITargetFacets existFacets =
+        UnifiedAsset.getFacets(assetDto, ComponentAPITargetFacets.class);
+    ComponentAPITargetFacets newFacets =
+        JsonToolkit.fromJson(JsonToolkit.toJson(facetsUpdated), ComponentAPITargetFacets.class);
+    return mergeFacets(existFacets, newFacets);
   }
 
   public void removeNotExistingChildren(String assetId) {
