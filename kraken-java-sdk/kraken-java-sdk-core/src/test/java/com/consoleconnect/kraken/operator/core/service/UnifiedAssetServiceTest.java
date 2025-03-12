@@ -251,4 +251,12 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
       Assertions.assertEquals(result1.hashCode(), result2.hashCode());
     }
   }
+
+  @SneakyThrows
+  @Test
+  void givenBlankClassPath_whenReading_thenReturnEmpty() {
+    String path = "classpath:/data/api-target-mapper.inventory.common.list-1.yaml";
+    Optional<UnifiedAsset> opt = unifiedAssetService.readFromPath(path);
+    Assertions.assertTrue(opt.isEmpty());
+  }
 }
