@@ -295,12 +295,19 @@ const StandardAPIMapping = () => {
           <BreadCrumb
             mainTitle="Standard API mapping"
             mainUrl="/components"
-            lastItem={
-              <ComponentSelect
-                componentList={componentList}
-                componentName={componentName}
-              />
-            }
+            items={[
+              {
+                title: (
+                  <ComponentSelect
+                    componentList={componentList}
+                    componentName={componentName}
+                    middle={true}
+                  />
+                ),
+                url: "",
+              },
+            ]}
+            lastItem="Mapping details"
           />
         </Flex>
       }
