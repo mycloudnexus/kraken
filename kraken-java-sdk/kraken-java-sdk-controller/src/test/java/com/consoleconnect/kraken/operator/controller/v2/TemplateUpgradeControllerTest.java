@@ -16,7 +16,6 @@ import com.consoleconnect.kraken.operator.controller.dto.CreateUpgradeRequest;
 import com.consoleconnect.kraken.operator.controller.enums.SystemStateEnum;
 import com.consoleconnect.kraken.operator.controller.model.SystemInfo;
 import com.consoleconnect.kraken.operator.controller.service.*;
-import com.consoleconnect.kraken.operator.controller.service.upgrade.MgmtSourceUpgradeService;
 import com.consoleconnect.kraken.operator.core.client.ClientEvent;
 import com.consoleconnect.kraken.operator.core.client.ClientEventTypeEnum;
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
@@ -71,7 +70,6 @@ class TemplateUpgradeControllerTest {
     @Autowired ClientMapperVersionCreator clientMapperVersionCreator;
     @Autowired ProductDeploymentService productDeploymentService;
     @Autowired MgmtEventRepository mgmtEventRepository;
-    @Autowired MgmtSourceUpgradeService mgmtSourceUpgradeService;
 
     public static final String CONTROL_UPGRADE_URL =
         "/v3/products/{productId}/template-upgrade/control-plane";
@@ -565,7 +563,6 @@ class TemplateUpgradeControllerTest {
                   null)
               .getData()
               .get(0);
-      mgmtSourceUpgradeService.reportResult(templateUpgrade.getId(), deployment.getId());
       mgmtEventRepository.findAll().stream()
           .filter(item -> MgmtEventType.TEMPLATE_UPGRADE_RESULT.equals(item.getEventType()))
           .filter(ent -> ent.getStatus().equals(EventStatusType.WAIT_TO_SEND.name()))
