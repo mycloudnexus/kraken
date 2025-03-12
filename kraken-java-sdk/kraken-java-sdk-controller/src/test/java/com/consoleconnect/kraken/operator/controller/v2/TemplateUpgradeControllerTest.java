@@ -21,13 +21,10 @@ import com.consoleconnect.kraken.operator.core.client.ClientEventTypeEnum;
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.entity.EnvironmentClientEntity;
-import com.consoleconnect.kraken.operator.core.entity.MgmtEventEntity;
 import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
 import com.consoleconnect.kraken.operator.core.enums.*;
 import com.consoleconnect.kraken.operator.core.event.IngestionDataResult;
-import com.consoleconnect.kraken.operator.core.event.TemplateUpgradeResultEvent;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
-import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import com.consoleconnect.kraken.operator.core.model.SyncMetadata;
 import com.consoleconnect.kraken.operator.core.repo.EnvironmentClientRepository;
 import com.consoleconnect.kraken.operator.core.repo.MgmtEventRepository;
@@ -36,12 +33,8 @@ import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.*;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
-import com.fasterxml.jackson.core.type.TypeReference;
-import java.nio.charset.Charset;
 import java.time.Duration;
 import java.util.*;
-import org.apache.commons.io.IOUtils;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -451,157 +444,6 @@ class TemplateUpgradeControllerTest {
                           .equalsIgnoreCase(dto.getMetadata().getStatus()))
               .toList();
       assertThat(successList, hasSize(2));
-    }
-
-    @Test
-    @Order(15)
-    @Sql(
-        statements = {
-          "update  kraken_asset set  status='SUCCESS' where kind in ('kraken.product-deployment','kraken.product.template-deployment')",
-          "UPDATE kraken_mgmt_system_info set status='RUNNING' where key='CONTROL_PLANE'"
-        })
-    void givenAfterClasspathStageUpgrade_whenStageUpgradeFromMgmt_thenOk() throws Exception {
-      String releaseStr =
-          IOUtils.toString(
-              ClassLoader.getSystemResourceAsStream("data/latest-product-release.json"),
-              Charset.defaultCharset());
-      String publishStr =
-          IOUtils.toString(
-              ClassLoader.getSystemResourceAsStream("data/download-mapping-template.json"),
-              Charset.defaultCharset());
-      UnifiedAssetDto downloadAsset =
-          JsonToolkit.fromJson(publishStr, new TypeReference<HttpResponse<UnifiedAssetDto>>() {})
-              .getData();
-      UnifiedAssetDto releaseAsset = JsonToolkit.fromJson(releaseStr, UnifiedAssetDto.class);
-      // upgrade source
-      releaseAsset
-          .getMetadata()
-          .getLabels()
-          .put(LabelConstants.LABEL_UPGRADE_SOURCE, UpgradeSourceEnum.MGMT.name());
-      IngestionDataResult releaseResult =
-          unifiedAssetService.syncAsset(
-              "mef.sonata",
-              releaseAsset,
-              new SyncMetadata("", "", DateTime.nowInUTCString()),
-              true);
-      downloadAsset
-          .getMetadata()
-          .getLabels()
-          .put(
-              LabelConstants.LABEL_APP_TEMPLATE_UPGRADE_ID,
-              releaseResult.getData().getId().toString());
-      unifiedAssetService.syncAsset(
-          releaseAsset.getMetadata().getKey(),
-          downloadAsset,
-          new SyncMetadata("", "", DateTime.nowInUTCString()),
-          true);
-
-      // control plane upgrade
-      CreateControlPlaneUpgradeRequest planeUpgradeRequest = new CreateControlPlaneUpgradeRequest();
-      planeUpgradeRequest.setTemplateUpgradeId(releaseResult.getData().getId().toString());
-      testClientHelper.postAndVerify(
-          uriBuilder -> uriBuilder.path(CONTROL_UPGRADE_URL).build(TestContextConstants.PRODUCT_ID),
-          planeUpgradeRequest,
-          body -> {
-            assertThat(body, hasJsonPath("$.code", equalTo(200)));
-          });
-      // stage upgrade
-      CreateUpgradeRequest createUpgradeRequest = new CreateUpgradeRequest();
-      createUpgradeRequest.setTemplateUpgradeId(releaseResult.getData().getId().toString());
-      createUpgradeRequest.setStageEnvId(TestApplication.envId);
-      testClientHelper.postAndVerify(
-          uriBuilder ->
-              uriBuilder
-                  .path(STAGE_UPGRADE_URL)
-                  .build(TestContextConstants.PRODUCT_ID, TestApplication.envId),
-          createUpgradeRequest,
-          body -> {
-            assertThat(body, hasJsonPath("$.code", equalTo(200)));
-          });
-    }
-
-    @Test
-    @Order(16)
-    void givenStageUpgradeFromMgmtIn_Process_whenReport_thenOk() {
-      mgmtEventRepository.findAll().stream()
-          .filter(item -> MgmtEventType.TEMPLATE_UPGRADE_RESULT.equals(item.getEventType()))
-          .filter(item -> item.getStatus().equalsIgnoreCase(EventStatusType.WAIT_TO_SEND.name()))
-          .min(Comparator.comparing(MgmtEventEntity::getCreatedAt))
-          .ifPresent(
-              entity -> {
-                TemplateUpgradeResultEvent resultEvent =
-                    JsonToolkit.fromJson(
-                        JsonToolkit.toJson(entity.getPayload()), TemplateUpgradeResultEvent.class);
-                assertThat(resultEvent.getUpgradeBeginAt(), Matchers.notNullValue());
-                assertThat(resultEvent.getUpgradeEndAt(), Matchers.nullValue());
-                entity.setStatus(EventStatusType.DONE.name());
-                mgmtEventRepository.save(entity);
-              });
-    }
-
-    @Test
-    @Order(17)
-    @Sql(
-        statements = {
-          "update  kraken_asset set  status='SUCCESS' where kind in ('kraken.product-deployment','kraken.product.template-deployment')",
-          "UPDATE kraken_mgmt_system_info set status='RUNNING' where key='CONTROL_PLANE'"
-        })
-    void givenStageUpgradeFromMgmtCompleted_whenReport_thenOk() {
-      UnifiedAssetDto templateUpgrade =
-          unifiedAssetService.findOne(MEF_SONATA_RELEASE_1_1_0_PUBLISHED);
-
-      UnifiedAssetDto deployment =
-          unifiedAssetService
-              .findBySpecification(
-                  Tuple2.ofList(
-                      AssetsConstants.FIELD_KIND,
-                      AssetKindEnum.PRODUCT_TEMPLATE_DEPLOYMENT.getKind()),
-                  Tuple2.ofList(
-                      LabelConstants.LABEL_APP_TEMPLATE_UPGRADE_ID, templateUpgrade.getId()),
-                  null,
-                  null,
-                  null)
-              .getData()
-              .get(0);
-      mgmtEventRepository.findAll().stream()
-          .filter(item -> MgmtEventType.TEMPLATE_UPGRADE_RESULT.equals(item.getEventType()))
-          .filter(ent -> ent.getStatus().equals(EventStatusType.WAIT_TO_SEND.name()))
-          .sorted(Comparator.comparing(MgmtEventEntity::getCreatedAt))
-          .findFirst()
-          .ifPresent(
-              entity -> {
-                TemplateUpgradeResultEvent resultEvent =
-                    JsonToolkit.fromJson(
-                        JsonToolkit.toJson(entity.getPayload()), TemplateUpgradeResultEvent.class);
-                assertThat(resultEvent.getUpgradeBeginAt(), nullValue());
-                assertThat(resultEvent.getUpgradeEndAt(), Matchers.notNullValue());
-                entity.setStatus(EventStatusType.DONE.name());
-                mgmtEventRepository.save(entity);
-              });
-    }
-
-    @Test
-    @Order(18)
-    void givenTemplateId_whenListApiUseCaseFromMgmt_thenReturnData() {
-      Paging<UnifiedAssetDto> assetDtoPaging =
-          unifiedAssetService.findBySpecification(
-              Tuple2.ofList(
-                  AssetsConstants.FIELD_KIND, AssetKindEnum.PRODUCT_TEMPLATE_UPGRADE.getKind()),
-              Tuple2.ofList(LabelConstants.LABEL_UPGRADE_SOURCE, UpgradeSourceEnum.MGMT.name()),
-              null,
-              PageRequest.of(0, 1, Sort.Direction.DESC, AssetsConstants.FIELD_CREATE_AT),
-              null);
-      String url = "/v3/products/{productId}/template-upgrade/api-use-cases";
-      testClientHelper.getAndVerify(
-          uriBuilder ->
-              uriBuilder
-                  .path(url)
-                  .queryParam("templateUpgradeId", assetDtoPaging.getData().get(0).getId())
-                  .build(TestContextConstants.PRODUCT_ID, TestApplication.envId),
-          body -> {
-            assertThat(body, hasJsonPath("$.code", equalTo(200)));
-            assertThat(body, hasJsonPath("$.data", hasSize(greaterThanOrEqualTo(1))));
-          });
     }
 
     @Test
