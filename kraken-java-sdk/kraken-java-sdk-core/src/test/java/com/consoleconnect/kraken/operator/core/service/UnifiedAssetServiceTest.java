@@ -267,13 +267,13 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
 
     /*
      * mapper.testcase06.deleteDeprecatedMappingNotConfigured
-     * | property                 | old                          | new                         | merged                       |
-     * | request.customizedField  | false                        | N/A                         | false                        |
-     * | request.allowValueLimit  | true                         | N/A                         | false                        |
-     * | request.target           | NULL                         | N/A                         | @{{speed-old}}               |
-     * | response.customizedField | false                        | N/A                         | true                         |
-     * | response.allowValueLimit | true                         | N/A                         | false                        |
-     * | response.source          | NULL                         | N/A                         | @{{responseBody.status-old}} |
+     * | property                 | old                          | new                         | merged    |
+     * | request.customizedField  | false                        | N/A                         | N/A       |
+     * | request.allowValueLimit  | true                         | N/A                         | N/A       |
+     * | request.target           | NULL                         | N/A                         | N/A       |
+     * | response.customizedField | false                        | N/A                         | N/A       |
+     * | response.allowValueLimit | true                         | N/A                         | N/A       |
+     * | response.source          | NULL                         | N/A                         | N/A       |
      */
     verifyDeletedMapper("mapper.testcase06.deleteDeprecatedMappingNotConfigured", newMapperMap);
 
