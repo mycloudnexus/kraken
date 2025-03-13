@@ -13,8 +13,12 @@ spec:
   supportedProductTypesAndActions:
     - path: /mefApi/sonata/geographicAddressManagement/v7/geographicAddressValidation
       method: post
+      productTypes:
+        - SHARE
     - path: /mefApi/sonata/geographicAddressManagement/v7/geographicAddress/{id}
       method: get
+      productTypes:
+        - SHARE
   mappings:
     - uri: ${env.target.url}
       trigger:
