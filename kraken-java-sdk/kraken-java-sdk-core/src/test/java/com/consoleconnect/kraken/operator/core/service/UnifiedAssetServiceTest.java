@@ -224,7 +224,7 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
     verifyMergedMapper("mapper.testcase02.addNewSystemMapping", newMapperMap, expectedResults);
 
     /*
-     * mapper.testcase04.changeSystemMappingToDeleteToCustomized
+     * mapper.testcase03.changeSystemMappingToDeleteToCustomized
      * | property                 | old                          | new | merged                       |
      * | request.customizedField  | false                        | N/A | true                         |
      * | request.allowValueLimit  | true                         | N/A | false                        |
