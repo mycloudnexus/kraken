@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -38,7 +38,11 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration(classes = CustomConfig.class)
 class UnifiedAssetServiceTest extends AbstractIntegrationTest {
 
-  @SpyBean private UnifiedAssetService unifiedAssetService;
+  @Autowired private UnifiedAssetService unifiedAssetService;
+
+  private static final String MAPPER_REQUEST = "request";
+
+  private static final String MAPPER_RESPONSE = "response";
 
   @Order(10)
   @Test
@@ -156,7 +160,7 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
   @SneakyThrows
   @Test
   void givenTwoMappers_whenMerge_thenRemoveDuplicated() {
-    String s = readFileToString("data/mapper_1.json");
+    String s = readFileToString("data/mapper_old.json");
     Map<String, Map<String, ComponentAPITargetFacets.Mapper>> existMapperMap =
         JsonToolkit.fromJson(
             s, new TypeReference<Map<String, Map<String, ComponentAPITargetFacets.Mapper>>>() {});
@@ -176,12 +180,17 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
   @SneakyThrows
   @Test
   void givenSourceValues_whenMerge_thenReturnOK() {
-    String s1 = readFileToString("data/mapper_1.json");
+    String s1 = readFileToString("data/mapper_old.json");
     Map<String, Map<String, ComponentAPITargetFacets.Mapper>> existMapperMap =
         JsonToolkit.fromJson(s1, new TypeReference<>() {});
-    String s2 = readFileToString("data/mapper_2.json");
+    String s2 = readFileToString("data/mapper_new.json");
     Map<String, Map<String, ComponentAPITargetFacets.Mapper>> newMapperMap =
         JsonToolkit.fromJson(s2, new TypeReference<>() {});
+    String s3 = readFileToString("data/mapper_merged.json");
+
+    Map<String, Map<String, ComponentAPITargetFacets.Mapper>> expectedResults =
+        JsonToolkit.fromJson(s3, new TypeReference<>() {});
+
     UnifiedAssetService.mergeMappers(existMapperMap, newMapperMap);
     String existMapperStr = JsonToolkit.toJson(existMapperMap);
     log.info(existMapperStr);
@@ -189,6 +198,169 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
     String newMapperStr = JsonToolkit.toJson(newMapperMap);
     log.info(newMapperStr);
     Assertions.assertNotNull(newMapperStr);
+
+    /*
+     * mapper.testcase01.updateSystemMapping
+     * | property                 | old                          | new                          | merged                       |
+     * | request.customizedField  | false                        | false                        | false                        |
+     * | request.allowValueLimit  | true                         | false                        | false                        |
+     * | request.target           | @{{speed-old}}               | @{{speed-new}}               | @{{speed-old}}               |
+     * | response.customizedField | false                        | false                        | false                        |
+     * | response.allowValueLimit | true                         | false                        | false                        |
+     * | response.source          | @{{responseBody.status-old}} | @{{responseBody.status-new}} | @{{responseBody.status-old}} |
+     */
+    verifyMergedMapper("mapper.testcase01.updateSystemMapping", newMapperMap, expectedResults);
+
+    /*
+     * mapper.testcase02.updateCustomizedMapping
+     * | property                 | old                          | new                          | merged                       |
+     * | request.customizedField  | true                         | true                         | true                         |
+     * | request.allowValueLimit  | true                         | false                        | true                         |
+     * | request.target           | @{{speed-old}}               | @{{speed-new}}               | @{{speed-old}}               |
+     * | response.customizedField | true                         | true                         | true                         |
+     * | response.allowValueLimit | true                         | false                        | true                         |
+     * | response.source          | @{{responseBody.status-old}} | @{{responseBody.status-new}} | @{{responseBody.status-old}} |
+     */
+    verifyMergedMapper("mapper.testcase02.updateCustomizedMapping", newMapperMap, expectedResults);
+
+    /*
+     * mapper.testcase03.addNewSystemMapping
+     * | property                 | old                          | new                          | merged                       |
+     * | request.customizedField  | N/A                          | false                        | false                        |
+     * | request.allowValueLimit  | N/A                          | false                        | false                        |
+     * | request.target           | N/A                          | @{{speed-new}}               | @{{speed-old}}               |
+     * | response.customizedField | N/A                          | false                        | false                        |
+     * | response.allowValueLimit | N/A                          | false                        | false                        |
+     * | response.source          | N/A                          | @{{responseBody.status-new}} | @{{responseBody.status-new}} |
+     */
+    verifyMergedMapper("mapper.testcase03.addNewSystemMapping", newMapperMap, expectedResults);
+
+    /*
+     * mapper.testcase04.changeDeprecatedSystemMappingToCustomized
+     * | property                 | old                          | new | merged                       |
+     * | request.customizedField  | false                        | N/A | false                        |
+     * | request.allowValueLimit  | true                         | N/A | false                        |
+     * | request.target           | @{{speed-old}}               | N/A | @{{speed-old}}               |
+     * | response.customizedField | false                        | N/A | true                         |
+     * | response.allowValueLimit | true                         | N/A | false                        |
+     * | response.source          | @{{responseBody.status-old}} | N/A | @{{responseBody.status-old}} |
+     */
+    verifyMergedMapper(
+        "mapper.testcase04.changeDeprecatedSystemMappingToCustomized",
+        newMapperMap,
+        expectedResults);
+
+    /*
+     * mapper.testcase05.keepDeprecatedCustomizedMappingNoConflict
+     * | property                 | old                          | new                        | merged                       |
+     * | request.customizedField  | false                        | N/A                        | false                        |
+     * | request.allowValueLimit  | true                         | N/A                        | false                        |
+     * | request.target           | @{{speed-old}}               | N/A                        | @{{speed-old}}               |
+     * | response.customizedField | false                        | N/A                        | true                         |
+     * | response.allowValueLimit | true                         | N/A                        | false                        |
+     * | response.source          | @{{responseBody.status-old}} | N/A                        | @{{responseBody.status-old}} |
+     */
+    verifyMergedMapper(
+        "mapper.testcase05.keepDeprecatedCustomizedMappingNoConflict",
+        newMapperMap,
+        expectedResults);
+
+    /*
+     * mapper.testcase06.deleteDeprecatedMappingNotConfigured
+     * | property                 | old                          | new                         | merged                       |
+     * | request.customizedField  | false                        | N/A                         | false                        |
+     * | request.allowValueLimit  | true                         | N/A                         | false                        |
+     * | request.target           | NULL                         | N/A                         | @{{speed-old}}               |
+     * | response.customizedField | false                        | N/A                         | true                         |
+     * | response.allowValueLimit | true                         | N/A                         | false                        |
+     * | response.source          | NULL                         | N/A                         | @{{responseBody.status-old}} |
+     */
+    verifyDeletedMapper("mapper.testcase06.deleteDeprecatedMappingNotConfigured", newMapperMap);
+
+    /*
+     * mapper.testcase07.mergeSystemToCustomizedMapping
+     * | property                 | old                          | new                          | merged                       |
+     * | request.customizedField  | true                         | false                        | false                        |
+     * | request.allowValueLimit  | true                         | false                        | false                        |
+     * | request.target           | @{{speed-old}}               | @{{speed-new}}               | @{{speed-old}}               |
+     * | response.customizedField | true                         | false                        | false                        |
+     * | response.allowValueLimit | true                         | false                        | false                        |
+     * | response.source          | @{{responseBody.status-old}} | @{{responseBody.status-new}} | @{{responseBody.status-old}} |
+     */
+    verifyMergedMapper(
+        "mapper.testcase07.mergeSystemToCustomizedMapping", newMapperMap, expectedResults);
+
+    /*
+     * mapper.testcase08.mergeCustomizedToSystemMapping
+     * | property                 | old                          | new                          | merged                       |
+     * | request.customizedField  | false                        | true                         | true                         |
+     * | request.allowValueLimit  | true                         | false                        | false                        |
+     * | request.target           | @{{speed-old}}               | @{{speed-new}}               | @{{speed-old}}               |
+     * | response.customizedField | false                        | true                         | true                         |
+     * | response.allowValueLimit | true                         | false                        | false                        |
+     * | response.source          | @{{responseBody.status-old}} | @{{responseBody.status-new}} | @{{responseBody.status-old}} |
+     */
+    verifyMergedMapper(
+        "mapper.testcase08.mergeCustomizedToSystemMapping", newMapperMap, expectedResults);
+  }
+
+  private void verifyDeletedMapper(
+      String testcase, Map<String, Map<String, ComponentAPITargetFacets.Mapper>> mergedMapperMap) {
+    verifyDeletedMapper(mergedMapperMap, testcase, MAPPER_REQUEST);
+    verifyDeletedMapper(mergedMapperMap, testcase, MAPPER_RESPONSE);
+  }
+
+  private void verifyDeletedMapper(
+      Map<String, Map<String, ComponentAPITargetFacets.Mapper>> mergedMapperMap,
+      String name,
+      String mapperSection) {
+    String fullName = name + "." + mapperSection;
+    Assertions.assertFalse(mergedMapperMap.containsKey(fullName));
+  }
+
+  private void verifyMergedMapper(
+      String testcase,
+      Map<String, Map<String, ComponentAPITargetFacets.Mapper>> mergedMapperMap,
+      Map<String, Map<String, ComponentAPITargetFacets.Mapper>> expectedMapperMap) {
+    verifyMergedMapper(mergedMapperMap, expectedMapperMap, testcase, MAPPER_REQUEST);
+    verifyMergedMapper(mergedMapperMap, expectedMapperMap, testcase, MAPPER_RESPONSE);
+  }
+
+  private void verifyMergedMapper(
+      Map<String, Map<String, ComponentAPITargetFacets.Mapper>> mergedMapperMap,
+      Map<String, Map<String, ComponentAPITargetFacets.Mapper>> expectedMapperMap,
+      String name,
+      String mapperSection) {
+    String fullName = name + "." + mapperSection;
+    ComponentAPITargetFacets.Mapper mergedMapper = mergedMapperMap.get(fullName).get(mapperSection);
+    ComponentAPITargetFacets.Mapper expectedMapper =
+        expectedMapperMap.get(fullName).get(mapperSection);
+    Assertions.assertEquals(expectedMapper.getTitle(), mergedMapper.getTitle());
+    Assertions.assertEquals(expectedMapper.getName(), mergedMapper.getName());
+    Assertions.assertEquals(expectedMapper.getDescription(), mergedMapper.getDescription());
+    Assertions.assertEquals(expectedMapper.getSource(), mergedMapper.getSource());
+    Assertions.assertEquals(expectedMapper.getSourceType(), mergedMapper.getSourceType());
+    Assertions.assertEquals(expectedMapper.getSourceLocation(), mergedMapper.getSourceLocation());
+    Assertions.assertEquals(
+        expectedMapper.getSourceConditionExpression(), mergedMapper.getSourceConditionExpression());
+    Assertions.assertEquals(
+        expectedMapper.getSourceConditions(), mergedMapper.getSourceConditions());
+    Assertions.assertEquals(expectedMapper.getAllowValueLimit(), mergedMapper.getAllowValueLimit());
+    Assertions.assertEquals(expectedMapper.getDiscrete(), mergedMapper.getDiscrete());
+    Assertions.assertEquals(expectedMapper.getSourceValues(), mergedMapper.getSourceValues());
+    Assertions.assertEquals(expectedMapper.getTarget(), mergedMapper.getTarget());
+    Assertions.assertEquals(expectedMapper.getTargetType(), mergedMapper.getTargetType());
+    Assertions.assertEquals(expectedMapper.getTargetLocation(), mergedMapper.getTargetLocation());
+    Assertions.assertEquals(expectedMapper.getRequiredMapping(), mergedMapper.getRequiredMapping());
+    Assertions.assertEquals(expectedMapper.getReplaceStar(), mergedMapper.getReplaceStar());
+    Assertions.assertEquals(expectedMapper.getDefaultValue(), mergedMapper.getDefaultValue());
+    Assertions.assertEquals(expectedMapper.getTargetValues(), mergedMapper.getTargetValues());
+    Assertions.assertEquals(expectedMapper.getValueMapping(), mergedMapper.getValueMapping());
+    Assertions.assertEquals(expectedMapper.getFunction(), mergedMapper.getFunction());
+    Assertions.assertEquals(expectedMapper.getCheckPath(), mergedMapper.getCheckPath());
+    Assertions.assertEquals(expectedMapper.getDeletePath(), mergedMapper.getDeletePath());
+    Assertions.assertEquals(expectedMapper.getCustomizedField(), mergedMapper.getCustomizedField());
+    Assertions.assertEquals(expectedMapper.getConvertValue(), mergedMapper.getConvertValue());
   }
 
   @SneakyThrows
