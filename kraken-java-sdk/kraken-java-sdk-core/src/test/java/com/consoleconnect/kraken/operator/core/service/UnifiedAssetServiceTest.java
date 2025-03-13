@@ -212,19 +212,7 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
     verifyMergedMapper("mapper.testcase01.updateSystemMapping", newMapperMap, expectedResults);
 
     /*
-     * mapper.testcase02.updateCustomizedMapping
-     * | property                 | old                          | new                          | merged                       |
-     * | request.customizedField  | true                         | true                         | true                         |
-     * | request.allowValueLimit  | true                         | false                        | true                         |
-     * | request.target           | @{{speed-old}}               | @{{speed-new}}               | @{{speed-old}}               |
-     * | response.customizedField | true                         | true                         | true                         |
-     * | response.allowValueLimit | true                         | false                        | true                         |
-     * | response.source          | @{{responseBody.status-old}} | @{{responseBody.status-new}} | @{{responseBody.status-old}} |
-     */
-    verifyMergedMapper("mapper.testcase02.updateCustomizedMapping", newMapperMap, expectedResults);
-
-    /*
-     * mapper.testcase03.addNewSystemMapping
+     * mapper.testcase02.addNewSystemMapping
      * | property                 | old                          | new                          | merged                       |
      * | request.customizedField  | N/A                          | false                        | false                        |
      * | request.allowValueLimit  | N/A                          | false                        | false                        |
@@ -233,10 +221,10 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
      * | response.allowValueLimit | N/A                          | false                        | false                        |
      * | response.source          | N/A                          | @{{responseBody.status-new}} | @{{responseBody.status-new}} |
      */
-    verifyMergedMapper("mapper.testcase03.addNewSystemMapping", newMapperMap, expectedResults);
+    verifyMergedMapper("mapper.testcase02.addNewSystemMapping", newMapperMap, expectedResults);
 
     /*
-     * mapper.testcase04.changeDeprecatedSystemMappingToCustomized
+     * mapper.testcase04.changeSystemMappingToCustomized
      * | property                 | old                          | new | merged                       |
      * | request.customizedField  | false                        | N/A | true                         |
      * | request.allowValueLimit  | true                         | N/A | false                        |
@@ -246,12 +234,10 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
      * | response.source          | @{{responseBody.status-old}} | N/A | @{{responseBody.status-old}} |
      */
     verifyMergedMapper(
-        "mapper.testcase04.changeDeprecatedSystemMappingToCustomized",
-        newMapperMap,
-        expectedResults);
+        "mapper.testcase03.changeSystemMappingToDeleteToCustomized", newMapperMap, expectedResults);
 
     /*
-     * mapper.testcase05.keepDeprecatedCustomizedMappingNoConflict
+     * mapper.testcase04.keepCustomizedMappingToDeleteConfiguredAndNoConflict
      * | property                 | old                          | new                        | merged                       |
      * | request.customizedField  | true                         | N/A                        | true                         |
      * | request.allowValueLimit  | true                         | N/A                        | false                        |
@@ -261,12 +247,12 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
      * | response.source          | @{{responseBody.status-old}} | N/A                        | @{{responseBody.status-old}} |
      */
     verifyMergedMapper(
-        "mapper.testcase05.keepDeprecatedCustomizedMappingNoConflict",
+        "mapper.testcase04.keepCustomizedMappingToDeleteConfiguredAndNoConflict",
         newMapperMap,
         expectedResults);
 
     /*
-     * mapper.testcase06.deleteDeprecatedMappingNotConfigured
+     * mapper.testcase05.deleteOldMappingNotConfigured
      * | property                 | old                          | new                         | merged    |
      * | request.customizedField  | false                        | N/A                         | N/A       |
      * | request.allowValueLimit  | true                         | N/A                         | N/A       |
@@ -275,10 +261,10 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
      * | response.allowValueLimit | true                         | N/A                         | N/A       |
      * | response.source          | NULL                         | N/A                         | N/A       |
      */
-    verifyDeletedMapper("mapper.testcase06.deleteDeprecatedMappingNotConfigured", newMapperMap);
+    verifyDeletedMapper("mapper.testcase05.deleteOldMappingNotConfigured", newMapperMap);
 
     /*
-     * mapper.testcase07.mergeSystemToCustomizedMapping
+     * mapper.testcase06.mergeSystemToCustomizedMapping
      * | property                 | old                          | new                          | merged                       |
      * | request.customizedField  | true                         | false                        | false                        |
      * | request.allowValueLimit  | true                         | false                        | false                        |
@@ -288,20 +274,7 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
      * | response.source          | @{{responseBody.status-old}} | @{{responseBody.status-new}} | @{{responseBody.status-old}} |
      */
     verifyMergedMapper(
-        "mapper.testcase07.mergeSystemToCustomizedMapping", newMapperMap, expectedResults);
-
-    /*
-     * mapper.testcase08.mergeCustomizedToSystemMapping
-     * | property                 | old                          | new                          | merged                       |
-     * | request.customizedField  | false                        | true                         | true                         |
-     * | request.allowValueLimit  | true                         | false                        | false                        |
-     * | request.target           | @{{speed-old}}               | @{{speed-new}}               | @{{speed-old}}               |
-     * | response.customizedField | false                        | true                         | true                         |
-     * | response.allowValueLimit | true                         | false                        | false                        |
-     * | response.source          | @{{responseBody.status-old}} | @{{responseBody.status-new}} | @{{responseBody.status-old}} |
-     */
-    verifyMergedMapper(
-        "mapper.testcase08.mergeCustomizedToSystemMapping", newMapperMap, expectedResults);
+        "mapper.testcase06.mergeSystemToCustomizedMapping", newMapperMap, expectedResults);
   }
 
   private void verifyDeletedMapper(

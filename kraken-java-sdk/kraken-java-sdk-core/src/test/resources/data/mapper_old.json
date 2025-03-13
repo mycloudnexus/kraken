@@ -54,61 +54,7 @@
       }
     }
   },
-  "mapper.testcase02.updateCustomizedMapping.request": {
-    "request": {
-      "customizedField": true,
-      "allowValueLimit": true,
-      "source": "@{{productOrderItem[0].product.productConfiguration.bandwidth}}",
-      "sourceLocation": "BODY",
-      "target": "@{{speed-old}}",
-      "requiredMapping": true,
-      "title": "updateCustomizedMapping",
-      "discrete": false,
-      "sourceType": "integer",
-      "replaceStar": true,
-      "sourceValues": [
-        1,
-        10000
-      ]
-    }
-  },
-  "mapper.testcase02.updateCustomizedMapping.response": {
-    "response": {
-      "customizedField": true,
-      "allowValueLimit": true,
-      "target": "@{{state}}",
-      "targetLocation": "BODY",
-      "source": "@{{responseBody.status-old}}",
-      "requiredMapping": true,
-      "title": "Order State Mapping",
-      "name": "mapper.order.eline.add.state",
-      "description": "order state mapping",
-      "sourceLocation": "BODY",
-      "targetType": "enum",
-      "replaceStar": true,
-      "targetValues": [
-        "acknowledged",
-        "assessingCancellation",
-        "held.assessingCharge",
-        "pending.assessingModification",
-        "cancelled",
-        "pendingCancellation",
-        "completed",
-        "failed",
-        "inProgress",
-        "partial",
-        "rejected"
-      ],
-      "valueMapping": {
-        "PENDING": "pending,",
-        "CREATING": "acknowledged,",
-        "DISABLED": "disabled,",
-        "CANCELLED": "disabled,",
-        "ACTIVATING": "inProgress,"
-      }
-    }
-  },
-  "mapper.testcase04.changeDeprecatedSystemMappingToCustomized.request": {
+  "mapper.testcase03.changeSystemMappingToDeleteToCustomized.request": {
     "request": {
       "customizedField": false,
       "allowValueLimit": true,
@@ -127,7 +73,7 @@
       "targetLocation": "BODY"
     }
   },
-  "mapper.testcase04.changeDeprecatedSystemMappingToCustomized.response": {
+  "mapper.testcase03.changeSystemMappingToDeleteToCustomized.response": {
     "response": {
       "customizedField": false,
       "allowValueLimit": true,
@@ -163,7 +109,7 @@
       }
     }
   },
-  "mapper.testcase05.keepDeprecatedCustomizedMappingNoConflict.request": {
+  "mapper.testcase04.keepCustomizedMappingToDeleteConfiguredAndNoConflict.request": {
     "request": {
       "customizedField": true,
       "allowValueLimit": true,
@@ -182,7 +128,7 @@
       "targetLocation": "BODY"
     }
   },
-  "mapper.testcase05.keepDeprecatedCustomizedMappingNoConflict.response": {
+  "mapper.testcase04.keepCustomizedMappingToDeleteConfiguredAndNoConflict.response": {
     "response": {
       "customizedField": true,
       "allowValueLimit": true,
@@ -218,7 +164,7 @@
       }
     }
   },
-  "mapper.testcase06.deleteDeprecatedMappingNotConfigured.request": {
+  "mapper.testcase05.deleteOldMappingNotConfigured.request": {
     "request": {
       "customizedField": false,
       "allowValueLimit": true,
@@ -236,7 +182,7 @@
       "targetLocation": "BODY"
     }
   },
-  "mapper.testcase06.deleteDeprecatedMappingNotConfigured.response": {
+  "mapper.testcase05.deleteOldMappingNotConfigured.response": {
     "response": {
       "customizedField": true,
       "allowValueLimit": true,
@@ -271,7 +217,7 @@
       }
     }
   },
-  "mapper.testcase07.mergeSystemToCustomizedMapping.request": {
+  "mapper.testcase06.mergeSystemToCustomizedMapping.request": {
     "request": {
       "customizedField": true,
       "allowValueLimit": true,
@@ -290,64 +236,9 @@
       "targetLocation": "BODY"
     }
   },
-  "mapper.testcase07.mergeSystemToCustomizedMapping.response": {
+  "mapper.testcase06.mergeSystemToCustomizedMapping.response": {
     "response": {
       "customizedField": true,
-      "allowValueLimit": true,
-      "target": "@{{state}}",
-      "targetLocation": "BODY",
-      "source": "@{{responseBody.status-old}}",
-      "requiredMapping": true,
-      "title": "Order State Mapping",
-      "name": "mapper.order.eline.add.state",
-      "description": "order state mapping",
-      "sourceLocation": "BODY",
-      "targetType": "enum",
-      "replaceStar": true,
-      "targetValues": [
-        "acknowledged",
-        "assessingCancellation",
-        "held.assessingCharge",
-        "pending.assessingModification",
-        "cancelled",
-        "pendingCancellation",
-        "completed",
-        "failed",
-        "inProgress",
-        "partial",
-        "rejected"
-      ],
-      "valueMapping": {
-        "PENDING": "pending,",
-        "CREATING": "acknowledged,",
-        "DISABLED": "disabled,",
-        "CANCELLED": "disabled,",
-        "ACTIVATING": "inProgress,"
-      }
-    }
-  },
-  "mapper.testcase08.mergeCustomizedToSystemMapping.request": {
-    "request": {
-      "customizedField": false,
-      "allowValueLimit": true,
-      "source": "@{{productOrderItem[0].product.productConfiguration.bandwidth}}",
-      "sourceLocation": "BODY",
-      "target": "@{{speed-old}}",
-      "requiredMapping": true,
-      "title": "updateSystemMapping",
-      "discrete": false,
-      "sourceType": "integer",
-      "replaceStar": true,
-      "sourceValues": [
-        1,
-        10000
-      ],
-      "targetLocation": "BODY"
-    }
-  },
-  "mapper.testcase08.mergeCustomizedToSystemMapping.response": {
-    "response": {
-      "customizedField": false,
       "allowValueLimit": true,
       "target": "@{{state}}",
       "targetLocation": "BODY",

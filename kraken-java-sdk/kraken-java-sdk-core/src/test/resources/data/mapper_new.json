@@ -54,62 +54,7 @@
       }
     }
   },
-  "mapper.testcase02.updateCustomizedProperty.request": {
-    "request": {
-      "customizedField": true,
-      "allowValueLimit": false,
-      "source": "@{{productOrderItem[0].product.productConfiguration.bandwidth}}",
-      "sourceLocation": "BODY",
-      "target": "@{{speed-new}}",
-      "requiredMapping": false,
-      "title": "updateCustomizedProperty",
-      "discrete": false,
-      "sourceType": "integer",
-      "replaceStar": true,
-      "sourceValues": [
-        1,
-        10000
-      ],
-      "targetLocation": "BODY"
-    }
-  },
-  "mapper.testcase02.updateCustomizedProperty.response": {
-    "response": {
-      "customizedField": true,
-      "allowValueLimit": false,
-      "target": "@{{state}}",
-      "targetLocation": "BODY",
-      "source": "@{{responseBody.status-new}}",
-      "requiredMapping": false,
-      "title": "Order State Mapping",
-      "name": "mapper.order.eline.add.state",
-      "description": "order state mapping",
-      "sourceLocation": "BODY",
-      "targetType": "enum",
-      "replaceStar": true,
-      "targetValues": [
-        "acknowledged",
-        "assessingCancellation",
-        "held.assessingCharge",
-        "pending.assessingModification",
-        "cancelled",
-        "pendingCancellation",
-        "completed",
-        "failed",
-        "inProgress",
-        "partial",
-        "rejected"
-      ],
-      "valueMapping": {
-        "PENDING": "pending,",
-        "CREATING": "acknowledged,",
-        "DISABLED": "disabled,",
-        "CANCELLED": "disabled,",
-        "ACTIVATING": "inProgress,"
-      }
-    }
-  },
-  "mapper.testcase03.addNewSystemMapping.request": {
+  "mapper.testcase02.addNewSystemMapping.request": {
     "request": {
       "customizedField": false,
       "allowValueLimit": false,
@@ -128,7 +73,7 @@
       "targetLocation": "BODY"
     }
   },
-  "mapper.testcase03.addNewSystemMapping.response": {
+  "mapper.testcase02.addNewSystemMapping.response": {
     "response": {
       "customizedField": false,
       "allowValueLimit": false,
@@ -164,7 +109,7 @@
       }
     }
   },
-  "mapper.testcase07.mergeSystemToCustomizedMapping.request": {
+  "mapper.testcase06.mergeSystemToCustomizedMapping.request": {
     "request": {
       "customizedField": false,
       "allowValueLimit": true,
@@ -183,64 +128,9 @@
       "targetLocation": "BODY"
     }
   },
-  "mapper.testcase07.mergeSystemToCustomizedMapping.response": {
+  "mapper.testcase06.mergeSystemToCustomizedMapping.response": {
     "response": {
       "customizedField": false,
-      "allowValueLimit": true,
-      "target": "@{{state}}",
-      "targetLocation": "BODY",
-      "source": "@{{responseBody.status-new}}",
-      "requiredMapping": true,
-      "title": "Order State Mapping",
-      "name": "mapper.order.eline.add.state",
-      "description": "order state mapping",
-      "sourceLocation": "BODY",
-      "targetType": "enum",
-      "replaceStar": true,
-      "targetValues": [
-        "acknowledged",
-        "assessingCancellation",
-        "held.assessingCharge",
-        "pending.assessingModification",
-        "cancelled",
-        "pendingCancellation",
-        "completed",
-        "failed",
-        "inProgress",
-        "partial",
-        "rejected"
-      ],
-      "valueMapping": {
-        "PENDING": "pending,",
-        "CREATING": "acknowledged,",
-        "DISABLED": "disabled,",
-        "CANCELLED": "disabled,",
-        "ACTIVATING": "inProgress,"
-      }
-    }
-  },
-  "mapper.testcase08.mergeCustomizedToSystemMapping.request": {
-    "request": {
-      "customizedField": true,
-      "allowValueLimit": true,
-      "source": "@{{productOrderItem[0].product.productConfiguration.bandwidth}}",
-      "sourceLocation": "BODY",
-      "target": "@{{speed-new}}",
-      "requiredMapping": true,
-      "title": "updateSystemMapping",
-      "discrete": false,
-      "sourceType": "integer",
-      "replaceStar": true,
-      "sourceValues": [
-        1,
-        10000
-      ],
-      "targetLocation": "BODY"
-    }
-  },
-  "mapper.testcase08.mergeCustomizedToSystemMapping.response": {
-    "response": {
-      "customizedField": true,
       "allowValueLimit": true,
       "target": "@{{state}}",
       "targetLocation": "BODY",
