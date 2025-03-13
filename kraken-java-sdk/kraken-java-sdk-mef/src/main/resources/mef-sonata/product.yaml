@@ -68,7 +68,7 @@ spec:
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.order.uni.read.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.order.uni.delete.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.order.uni.read.delete.yaml
-    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.order.eline.add.yam
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.order.eline.add.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.order.eline.read.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.order.eline.delete.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.order.eline.read.delete.yaml

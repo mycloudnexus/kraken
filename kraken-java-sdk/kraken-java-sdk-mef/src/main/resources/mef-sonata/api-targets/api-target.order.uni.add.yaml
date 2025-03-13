@@ -45,6 +45,12 @@ spec:
               "href": "${mefRequestBody.productOrderItem[0].product.href}",
               "id": "${mefRequestBody.productOrderItem[0].product.id}"
             },
+            "itemTerm": {
+              "duration": {
+                "amount": "${mefRequestBody.productOrderItem[0].requestedItemTerm.duration.amount}",
+                "units": "${mefRequestBody.productOrderItem[0].requestedItemTerm.duration.units}"
+              }
+            },
             "productOfferingQualificationItem": "${mefRequestBody.productOrderItem[0].productOfferingQualificationItem}",
             "productOrderItemRelationship": "${mefRequestBody.productOrderItem[0].productOrderItemRelationship}",
             "quoteItem": "${mefRequestBody.productOrderItem[0].quoteItem}",
