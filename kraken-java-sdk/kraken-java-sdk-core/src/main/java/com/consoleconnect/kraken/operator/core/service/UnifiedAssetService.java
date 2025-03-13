@@ -400,7 +400,7 @@ public class UnifiedAssetService implements UUIDWrapper {
     }
 
     Map<String, Map<String, ComponentAPITargetFacets.Mapper>> mapperMap = new LinkedHashMap<>();
-    Map<ComponentAPITargetFacets.Mapper, Boolean> seenMappers = new HashMap<>();
+    Set<ComponentAPITargetFacets.Mapper> seenMappers = new HashSet<>();
     removeDuplicatedNodes(
         endpoint.getMappers().getRequest(), mapperMap, seenMappers, MAPPER_REQUEST);
     removeDuplicatedNodes(
@@ -412,16 +412,16 @@ public class UnifiedAssetService implements UUIDWrapper {
   public static void removeDuplicatedNodes(
       List<ComponentAPITargetFacets.Mapper> mappers,
       Map<String, Map<String, ComponentAPITargetFacets.Mapper>> mapperMap,
-      Map<ComponentAPITargetFacets.Mapper, Boolean> seenMappers,
+      Set<ComponentAPITargetFacets.Mapper> seenMappers,
       String mapperSection) {
     if (CollectionUtils.isNotEmpty(mappers)) {
       for (ComponentAPITargetFacets.Mapper mapper : mappers) {
-        if (seenMappers.containsKey(mapper)) {
+        if (seenMappers.contains(mapper)) {
           continue;
         }
         String key = mapper.getKey(mapperSection);
         mapperMap.computeIfAbsent(key, k -> new LinkedHashMap<>()).put(mapperSection, mapper);
-        seenMappers.put(mapper, true);
+        seenMappers.add(mapper);
       }
     }
   }
