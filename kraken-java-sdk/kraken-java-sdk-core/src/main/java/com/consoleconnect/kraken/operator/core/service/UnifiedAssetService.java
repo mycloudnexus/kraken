@@ -447,11 +447,7 @@ public class UnifiedAssetService implements UUIDWrapper {
       Map<String, Map<String, ComponentAPITargetFacets.Mapper>> mapperMapNew,
       ComponentAPITargetFacets.Mapper copyTo) {
     String mapperSection = copyFrom.getKey();
-    if (isCustomizedAndConfigured(copyFrom)) {
-      copyFrom.getValue().setCustomizedField(copyTo.getCustomizedField());
-      copyFrom.getValue().setName(copyTo.getName());
-      mapperMapNew.put(name, new HashMap<>(Map.of(mapperSection, copyFrom.getValue())));
-    } else if (isSystemAndConfigured(copyFrom)) {
+    if (isConfigured(copyFrom)) {
       shallowCopyMapper(copyFrom.getValue(), copyTo, mapperSection);
     }
   }
@@ -493,11 +489,7 @@ public class UnifiedAssetService implements UUIDWrapper {
     if (!isCustomizedMapping(mapper)) {
       return false;
     }
-    if (Objects.equals(MAPPER_REQUEST, mapper.getKey())) {
-      return Strings.isNotBlank(mapper.getValue().getTarget());
-    } else {
-      return Strings.isNotBlank(mapper.getValue().getSource());
-    }
+    return isConfigured(mapper);
   }
 
   private static boolean isSystemAndConfigured(
@@ -505,6 +497,10 @@ public class UnifiedAssetService implements UUIDWrapper {
     if (!isSystemMapping(mapper)) {
       return false;
     }
+    return isConfigured(mapper);
+  }
+
+  private static boolean isConfigured(Map.Entry<String, ComponentAPITargetFacets.Mapper> mapper) {
     if (Objects.equals(MAPPER_REQUEST, mapper.getKey())) {
       return Strings.isNotBlank(mapper.getValue().getTarget());
     } else {

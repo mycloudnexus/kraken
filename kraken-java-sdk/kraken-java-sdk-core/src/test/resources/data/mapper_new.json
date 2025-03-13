@@ -112,7 +112,7 @@
   "mapper.testcase06.mergeSystemToCustomizedMapping.request": {
     "request": {
       "customizedField": false,
-      "allowValueLimit": true,
+      "allowValueLimit": false,
       "source": "@{{productOrderItem[0].product.productConfiguration.bandwidth}}",
       "sourceLocation": "BODY",
       "target": "@{{speed-new}}",
@@ -131,7 +131,7 @@
   "mapper.testcase06.mergeSystemToCustomizedMapping.response": {
     "response": {
       "customizedField": false,
-      "allowValueLimit": true,
+      "allowValueLimit": false,
       "target": "@{{state}}",
       "targetLocation": "BODY",
       "source": "@{{responseBody.status-new}}",
