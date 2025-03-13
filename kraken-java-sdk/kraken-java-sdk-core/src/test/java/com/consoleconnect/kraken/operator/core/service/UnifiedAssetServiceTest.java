@@ -238,7 +238,7 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
     /*
      * mapper.testcase04.changeDeprecatedSystemMappingToCustomized
      * | property                 | old                          | new | merged                       |
-     * | request.customizedField  | false                        | N/A | false                        |
+     * | request.customizedField  | false                        | N/A | true                         |
      * | request.allowValueLimit  | true                         | N/A | false                        |
      * | request.target           | @{{speed-old}}               | N/A | @{{speed-old}}               |
      * | response.customizedField | false                        | N/A | true                         |
