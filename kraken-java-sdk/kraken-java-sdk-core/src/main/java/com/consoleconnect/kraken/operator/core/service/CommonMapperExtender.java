@@ -131,6 +131,7 @@ public interface CommonMapperExtender extends AssetReader {
 
       updateValue.accept(mapper.getName(), mapper::setName);
       updateValue.accept(mapper.getConvertValue(), mapper::setConvertValue);
+      updateValue.accept(mapper.getTitle(), mapper::setTitle);
 
       // Ensure unique entries in `specificMappers`
       specificMappers.removeIf(item -> item.getName().equals(mapper.getName()));
