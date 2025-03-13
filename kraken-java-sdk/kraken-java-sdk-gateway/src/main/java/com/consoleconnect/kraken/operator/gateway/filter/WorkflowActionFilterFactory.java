@@ -141,7 +141,6 @@ public class WorkflowActionFilterFactory
     payload.setId((String) inputs.get(VAR_ENTITY_ID));
     payload.setRequestId((String) inputs.get(VAR_REQUEST_ID));
     payload.setHeaders(exchange.getRequest().getHeaders().toSingleValueMap());
-    payload.setHeaders(new HashMap<>());
     workflowFacets.getValidationStage().stream()
         .forEach(task -> constructHttpPayload(task, payload, inputs));
     workflowFacets.getPreparationStage().stream()
