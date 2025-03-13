@@ -172,6 +172,20 @@ const StandardAPIMapping = () => {
     setSellerApi(defaultSellerApi);
   };
 
+  const requestValueMapping = (item: IMapping) => {
+    return [{ [item.from as string]: item.to?.[0] }];
+  };
+
+  const responseValueMapping = (item: IMapping) => {
+    return item?.to?.map((to) => ({ [to]: item.from }));
+  };
+
+  const getValueMapping = (item: IMapping, type: "request" | "response") => {
+    return type === "request"
+      ? requestValueMapping(item)
+      : responseValueMapping(item);
+  };
+
   const transformListMappingItem = (
     item: IMapping[],
     type: "request" | "response"
@@ -180,13 +194,33 @@ const StandardAPIMapping = () => {
       .groupBy("name")
       .map((items, name) => ({
         name,
-        valueMapping: flatMap(items, (item) =>
-          type === "request"
-            ? [{ [item.from as string]: item.to?.[0] }]
-            : item?.to?.map((to) => ({ [to]: item.from }))
-        ),
+        valueMapping: flatMap(items, (item) => getValueMapping(item, type)),
       }))
       .value();
+  };
+
+  const getNewResponse = (
+    newResponse: typeof responseMapping,
+    it: {
+      name: string;
+      valueMapping: (
+        | {
+            [x: string]: string | undefined;
+          }
+        | undefined
+      )[];
+    }
+  ) => {
+    return newResponse.map((rm) => {
+      if (rm.name === it.name) {
+        rm.valueMapping = reduce(
+          it.valueMapping,
+          (acc, obj) => ({ ...acc, ...obj }),
+          {}
+        );
+      }
+      return rm;
+    });
   };
 
   const handleSave = async (callback?: () => void) => {
@@ -203,31 +237,13 @@ const StandardAPIMapping = () => {
       let newResponse = cloneDeep(responseMapping);
       if (!isEmpty(newDataResponse)) {
         newDataResponse.forEach((it) => {
-          newResponse = newResponse.map((rm) => {
-            if (rm.name === it.name) {
-              rm.valueMapping = reduce(
-                it.valueMapping,
-                (acc, obj) => ({ ...acc, ...obj }),
-                {}
-              );
-            }
-            return rm;
-          });
+          newResponse = getNewResponse(newResponse, it);
         });
       }
       let newRequest = cloneDeep(requestMapping);
       if (!isEmpty(newDataRequest)) {
         newDataRequest.forEach((it) => {
-          newRequest = newRequest.map((rm) => {
-            if (rm.name === it.name) {
-              rm.valueMapping = reduce(
-                it.valueMapping,
-                (acc, obj) => ({ ...acc, ...obj }),
-                {}
-              );
-            }
-            return rm;
-          });
+          newResponse = getNewResponse(newResponse, it);
         });
       }
 
