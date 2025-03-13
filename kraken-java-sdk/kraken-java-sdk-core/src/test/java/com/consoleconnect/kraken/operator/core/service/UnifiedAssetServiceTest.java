@@ -216,7 +216,7 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
      * | property                 | old                          | new                          | merged                       |
      * | request.customizedField  | N/A                          | false                        | false                        |
      * | request.allowValueLimit  | N/A                          | false                        | false                        |
-     * | request.target           | N/A                          | @{{speed-new}}               | @{{speed-old}}               |
+     * | request.target           | N/A                          | @{{speed-new}}               | @{{speed-new}}               |
      * | response.customizedField | N/A                          | false                        | false                        |
      * | response.allowValueLimit | N/A                          | false                        | false                        |
      * | response.source          | N/A                          | @{{responseBody.status-new}} | @{{responseBody.status-new}} |
@@ -224,7 +224,7 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
     verifyMergedMapper("mapper.testcase02.addNewSystemMapping", newMapperMap, expectedResults);
 
     /*
-     * mapper.testcase04.changeSystemMappingToCustomized
+     * mapper.testcase04.changeSystemMappingToDeleteToCustomized
      * | property                 | old                          | new | merged                       |
      * | request.customizedField  | false                        | N/A | true                         |
      * | request.allowValueLimit  | true                         | N/A | false                        |
