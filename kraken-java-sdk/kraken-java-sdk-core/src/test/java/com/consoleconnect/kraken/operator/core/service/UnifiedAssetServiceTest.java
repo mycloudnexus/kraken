@@ -253,10 +253,10 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
     /*
      * mapper.testcase05.keepDeprecatedCustomizedMappingNoConflict
      * | property                 | old                          | new                        | merged                       |
-     * | request.customizedField  | false                        | N/A                        | false                        |
+     * | request.customizedField  | true                         | N/A                        | true                         |
      * | request.allowValueLimit  | true                         | N/A                        | false                        |
      * | request.target           | @{{speed-old}}               | N/A                        | @{{speed-old}}               |
-     * | response.customizedField | false                        | N/A                        | true                         |
+     * | response.customizedField | true                         | N/A                        | true                         |
      * | response.allowValueLimit | true                         | N/A                        | false                        |
      * | response.source          | @{{responseBody.status-old}} | N/A                        | @{{responseBody.status-old}} |
      */
