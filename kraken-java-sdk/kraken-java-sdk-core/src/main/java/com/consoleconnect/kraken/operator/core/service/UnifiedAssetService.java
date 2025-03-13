@@ -375,7 +375,7 @@ public class UnifiedAssetService implements UUIDWrapper {
           Optional<ComponentAPITargetFacets.Mapper> copyTo =
               findMapper(mapperMapNew, name, existMapperEntry.getKey());
           if (copyTo.isPresent()) {
-            mergeMapper(name, existMapperEntry, mapperMapNew, copyTo.get());
+            mergeMapper(existMapperEntry, mapperMapNew, copyTo.get());
           } else {
             deepCopyMapper(name, existMapperEntry, mapperMapNew);
           }
@@ -442,7 +442,6 @@ public class UnifiedAssetService implements UUIDWrapper {
   }
 
   private static void mergeMapper(
-      String name,
       Map.Entry<String, ComponentAPITargetFacets.Mapper> copyFrom,
       Map<String, Map<String, ComponentAPITargetFacets.Mapper>> mapperMapNew,
       ComponentAPITargetFacets.Mapper copyTo) {
