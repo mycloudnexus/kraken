@@ -378,6 +378,9 @@ links:
   - targetAssetKey: mef.sonata.api-target.quote.eline.add.sync
     relationship: implementation.target
     group:  mef.sonata.api-target.quote.eline.add.sync
+  - targetAssetKey: mef.sonata.api-target.quote.eline.modify.sync
+    relationship: implementation.target
+    group: mef.sonata.api-target.quote.eline.modify.sync
   - targetAssetKey: mef.sonata.api-target.quote.eline.read.sync
     relationship: implementation.target
     group: mef.sonata.api-target.quote.eline.read.sync
