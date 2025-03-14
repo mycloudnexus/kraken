@@ -49,12 +49,21 @@ spec:
                 let forwardDownstream = true;
                 let typeArr = ['UNI', 'ACCESS_E_LINE'];
                 let syncQuote = input.instantSyncQuote;
+                let action = input.quoteItem?.action;
                 let productConfiguration = input.quoteItem?.product?.productConfiguration;
                 let typeVal = productConfiguration?.['@type'];
                 if(typeVal === 'UNI') {
                   if(syncQuote === true) {
-                    targetAPIConfigKey = 'mef.sonata.api-target.quote.uni.add.sync';
-                    matrixConfigKey = 'mef.sonata.api.matrix.quote.uni.add.sync'
+                    if (action === 'add') {
+                      targetAPIConfigKey = 'mef.sonata.api-target.quote.uni.add.sync';
+                      matrixConfigKey = 'mef.sonata.api.matrix.quote.uni.add.sync'
+                    } else if (action === 'modify') {
+                      errorArr = ['api use case is not supported : uni modify : @{{quoteItem[0].action}}==modify'];
+                      errorCode = '422';
+                    } else {
+                      errorArr = ['api use case is not supported : missing property : quoteItem[0].action'];
+                      errorCode = '400';
+                    }
                   } else if (syncQuote === false) {
                     targetAPIConfigKey = 'mef.sonata.api-target.quote.uni.add';
                     matrixConfigKey = 'mef.sonata.api.matrix.quote.uni.add';
@@ -66,8 +75,16 @@ spec:
                   }
                 } else if(typeVal === 'ACCESS_E_LINE') {
                   if(syncQuote === true) {
-                    targetAPIConfigKey = 'mef.sonata.api-target.quote.eline.add.sync';
-                    matrixConfigKey = 'mef.sonata.api.matrix.quote.eline.add.sync';
+                    if (action === 'add') {
+                      targetAPIConfigKey = 'mef.sonata.api-target.quote.eline.add.sync';
+                      matrixConfigKey = 'mef.sonata.api.matrix.quote.eline.add.sync';
+                    } else if (action === 'modify') {
+                      targetAPIConfigKey = 'mef.sonata.api-target.quote.eline.modify.sync';
+                      matrixConfigKey = 'mef.sonata.api.matrix.quote.eline.modify.sync';
+                    } else {
+                      errorArr = ['api use case is not supported : missing property : quoteItem[0].action'];
+                      errorCode = '422';
+                    }
                   } else if (syncQuote === false) {
                     targetAPIConfigKey = 'mef.sonata.api-target.quote.eline.add';
                     matrixConfigKey = 'mef.sonata.api.matrix.quote.eline.add';
@@ -396,6 +413,12 @@ links:
   - targetAssetKey: mef.sonata.api.matrix.quote.eline.add.sync
     relationship: implementation.matrix
     group: mef.sonata.api-target.quote.eline.add.sync
+  - targetAssetKey: mef.sonata.api-target-mapper.quote.eline.modify.sync
+    relationship: implementation.target-mapper
+    group: mef.sonata.api-target.quote.eline.modify.sync
+  - targetAssetKey: mef.sonata.api.matrix.quote.eline.modify.sync
+    relationship: implementation.matrix
+    group: mef.sonata.api-target.quote.eline.modify.sync
   - targetAssetKey: mef.sonata.api-target-mapper.quote.uni.add.sync
     relationship: implementation.target-mapper
     group: mef.sonata.api-target.quote.uni.add.sync
