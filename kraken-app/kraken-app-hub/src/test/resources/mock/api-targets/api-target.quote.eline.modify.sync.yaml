@@ -59,6 +59,7 @@ spec:
           }],
           "quoteDate": "${T(com.consoleconnect.kraken.operator.core.toolkit.DateTime).nowInUTCFormatted()}",
           "externalId":"${mefRequestBody[externalId]?:''}",
+          "projectId":"${mefRequestBody[projectId]?:''}",
           "instantSyncQuote":"${mefRequestBody[instantSyncQuote]?:''}",
           "requestedQuoteCompletionDate": "${mefRequestBody[requestedQuoteCompletionDate]?:''}",
           "effectiveQuoteCompletionDate": "${T(com.consoleconnect.kraken.operator.core.toolkit.DateTime).nowInUTCFormatted()}",
