@@ -38,8 +38,8 @@ export interface IPushHistory {
   startTime: string;
   endTime: string;
   pushedBy: string;
-  status: string
-};
+  status: string;
+}
 
 export interface IActivityDetail {
   main: IActivityLog;
@@ -128,6 +128,7 @@ export interface IMapperDetails {
   requiredMapping: boolean;
   orderBy: string;
   order?: number;
+  rowSpan?: number;
 }
 
 export interface ILogActivity {
@@ -153,8 +154,8 @@ export interface ILogActivity {
 }
 
 export type DataPlaneUpgradeCheck = {
-  errorMessages: string[]
-  mapperCompleted: boolean
-  newerTemplate: boolean
-  compatible: boolean
-}
+  errorMessages: string[];
+  mapperCompleted: boolean;
+  newerTemplate: boolean;
+  compatible: boolean;
+};

@@ -8,7 +8,7 @@ type Props = {
   mainUrl: string;
   lastItem: React.ReactElement | string;
   items?: {
-    title: string;
+    title: React.ReactElement | string;
     url: string;
   }[];
   mainTitle?: string;
@@ -41,7 +41,10 @@ const BreadCrumb = ({
           gap={8}
           align="center"
           style={{ cursor: "pointer" }}
-          onClick={() => navigate(i.url)}
+          onClick={() => {
+            if (i.url === "") return;
+            navigate(i.url);
+          }}
           className={styles.canClick}
         >
           <Text.LightLarge>/</Text.LightLarge>

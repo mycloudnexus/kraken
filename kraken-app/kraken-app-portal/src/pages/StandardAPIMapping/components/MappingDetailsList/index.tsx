@@ -5,6 +5,7 @@ import { GroupedByPath } from "@/utils/helpers/groupByPath";
 import { IMapperDetails } from "@/utils/types/env.type";
 import { Select, Spin } from "antd";
 import { useMemo, useEffect, useCallback } from "react";
+import { useParams } from "react-router-dom";
 import DropdownOption from "./components/DropdownOption";
 
 type MappingDetailsListProps = {
@@ -24,6 +25,7 @@ const MappingDetailsList = ({
 }: MappingDetailsListProps) => {
   // Grab targetMapperKey in url's query, select the corresponding mapping
   const query = usePathQuery();
+  const { componentId, targetKey } = useParams();
 
   const { activePath, setSelectedKey, setActivePath, setActiveTab } =
     useMappingUiStore();
@@ -67,11 +69,11 @@ const MappingDetailsList = ({
         const optionProps = {
           ...item,
           size: groupedPaths[path].length,
-          value: `${path} ${item.targetKey}`,
+          value: item.targetKey,
         };
         list.push({
           label: <DropdownOption {...optionProps} />,
-          value: `${path} ${item.targetKey}`,
+          value: item.targetKey,
           item,
         });
       }
@@ -82,13 +84,18 @@ const MappingDetailsList = ({
   const handleChange = (_: string, option: Option | Option[]) => {
     if (Array.isArray(option)) return;
     handleSelection(option.item);
+    window.history.pushState(
+      null,
+      "",
+      `/api-mapping/${componentId}/${option.value}`
+    );
   };
 
   return (
     <Spin spinning={!groupedPaths}>
       <Select
         options={optionsList}
-        defaultValue={optionsList[0].value}
+        defaultValue={targetKey}
         variant="borderless"
         onChange={handleChange}
       />
