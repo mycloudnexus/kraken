@@ -19,59 +19,10 @@ spec:
       path: ""
       method: ""
       mappers:
+        schemaRef:
+          ref: "classpath:/mef-sonata/api-common-mappers/api-target-mapper.inventory.common.list.yaml"
+          params:
+            - key: productType
+              val: eline
         request:
-          - name: mapper.inventory.eline.list.buyerId
-            title: "The unique identifier of the organization that is acting as the a Buyer. MUST be specified in the request only when the requester represents more than one Buyer."
-            source: "@{{buyerId}}"
-            sourceLocation: "QUERY"
-            target: ""
-            targetType: string
-            targetLocation: ""
-            requiredMapping: false
-          - name: mapper.inventory.eline.list.orderId
-            title: "associated order Id."
-            source: "@{{productOrderId}}"
-            sourceLocation: "QUERY"
-            target: ""
-            targetType: string
-            targetLocation: ""
-            convertValue: "mef.sonata.api-target-mapper.order.eline.add#mapper.order.eline.add.orderId"
-            requiredMapping: true
         response:
-          - name: mapper.inventory.eline.list.id
-            title: "Unique identifier of the product"
-            source: ""
-            sourceLocation: ""
-            target: "@{{id}}"
-            targetType: string
-            targetLocation: BODY
-            requiredMapping: true
-            checkPath: "$[0].id"
-            deletePath: "$[*]"
-          - name:  mapper.inventory.eline.list.startDate
-            title: "The date from which the product starts"
-            description: ""
-            source: ""
-            sourceLocation: ""
-            target: "@{{startDate}}"
-            targetType: string
-            targetLocation: BODY
-            requiredMapping: true
-          - name: mapper.inventory.eline.list.status
-            title: "Possible values for the status of a MEF product"
-            source: ""
-            sourceLocation: ""
-            target: "@{{[*].status}}"
-            targetType: enum
-            targetLocation: BODY
-            requiredMapping: true
-            targetValues:
-              - active
-              - active.pendingChange
-              - cancelled
-              - pendingActive
-              - pendingTerminate
-              - suspended
-              - suspendedPendingTerminate
-              - terminated
-            valueMapping: {}

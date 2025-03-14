@@ -329,8 +329,8 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
   }
 
   @Transactional(readOnly = true)
-  public List<UnifiedAssetDto> queryDeployedAssets(String tagId) {
-    UnifiedAssetEntity unifiedAssetEntity = unifiedAssetService.findOneByIdOrKey(tagId);
+  public List<UnifiedAssetDto> queryDeployedAssets(String assetId) {
+    UnifiedAssetEntity unifiedAssetEntity = unifiedAssetService.findOneByIdOrKey(assetId);
     UnifiedAssetDto assetDto = UnifiedAssetService.toAsset(unifiedAssetEntity, true);
     DeploymentFacet facets = UnifiedAsset.getFacets(assetDto, new TypeReference<>() {});
     List<String> tagIds = facets.getComponentTags().stream().map(ComponentTag::getTagId).toList();

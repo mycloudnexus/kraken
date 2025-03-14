@@ -1,0 +1,99 @@
+---
+kind: kraken.component.api-target-mapper
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target-mapper.poq.common.add
+  name: Product Offering Qualification (POQ) API
+  description: |
+    A request initiated by the Buyer to determine whether the Seller is
+    able to deliver a product or set of products from among their product
+    offerings, at the Buyer's location(s); or modify a previously purchased
+    product. The Seller also provides estimated time intervals to complete
+    these deliveries. Reference: MEF 79 (Sn 8.4).
+spec:
+  endpoints:
+    - id: create a product offering qualification
+      mappers:
+        request:
+          - name: mapper.poq.@{{productType}}.add.place.id
+            source: "@{{productOfferingQualificationItem[0].product.place[0].id}}"
+            sourceLocation: BODY
+            sourceType: string
+            target: ""
+            targetLocation: ""
+            requiredMapping: true
+          - name: mapper.poq.@{{productType}}.add.productConfiguration.bandwidth
+            source: "@{{productOfferingQualificationItem[0].product.productConfiguration.bandwidth}}"
+            sourceLocation: BODY
+            allowValueLimit: false
+            sourceType: integer
+            discrete: true
+            sourceValues:
+            target: ""
+            targetLocation: ""
+            requiredMapping: true
+          - name: mapper.poq.@{{productType}}.add.productConfiguration.bandwidthUnit
+            source: "@{{productOfferingQualificationItem[0].product.productConfiguration.bandwidthUnit}}"
+            sourceLocation: BODY
+            sourceType: enum
+            sourceValues:
+              - GBPS
+              - MBPS
+            valueMapping: {}
+            target: ""
+            targetLocation: ""
+            requiredMapping: true
+          - name: mapper.poq.@{{productType}}.add.productOffering.id
+            source: "@{{productOfferingQualificationItem[0].product.productOffering.id}}"
+            sourceLocation: BODY
+            sourceType: string
+            target: ""
+            targetLocation: ""
+            requiredMapping: false
+        response:
+          - name: mapper.poq.@{{productType}}.add.serviceabilityConfidence
+            title: POQ Item State Mapping
+            description: >-
+              A color that indicates confidence to service the request.
+              When the item state is done the Seller MUST provide a value. 
+              It MUST NOT be populated for other states.
+            source: ""
+            sourceLocation: ""
+            target: "@{{productOfferingQualificationItem[0].serviceabilityConfidence}}"
+            targetType: enum
+            targetLocation: BODY
+            targetValues:
+              - green
+              - yellow
+              - red
+            valueMapping: {}
+            defaultValue: "green"
+            requiredMapping: true
+          - name: mapper.poq.@{{productType}}.add.installationInterval.amount
+            title: POQ installationInterval amount Mapping
+            description: Duration amount of Installation
+            source: ""
+            sourceLocation: ""
+            target: "@{{productOfferingQualificationItem[0].installationInterval.amount}}"
+            targetLocation: BODY
+            defaultValue: "0"
+            requiredMapping: true
+          - name: mapper.poq.@{{productType}}.add.installationInterval.units
+            title: POQ installationInterval units Mapping
+            description: Duration unit of Installation
+            source: ""
+            sourceLocation: ""
+            target: "@{{productOfferingQualificationItem[0].installationInterval.units}}"
+            targetType: enum
+            targetLocation: BODY
+            targetValues:
+              - calendarMonths
+              - calendarDays
+              - calendarHours
+              - calendarMinutes
+              - businessDays
+              - businessHours
+              - businessMinutes
+            valueMapping: {}
+            defaultValue: "calendarMonths"
+            requiredMapping: true

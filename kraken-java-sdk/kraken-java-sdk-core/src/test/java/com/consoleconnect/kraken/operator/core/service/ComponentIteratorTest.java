@@ -70,6 +70,8 @@ class ComponentIteratorTest extends AbstractIntegrationTest implements ApiUseCas
     Optional<ApiUseCaseDto> result =
         findRelatedApiUse("mef.sonata.api-target.order.eline.add", map);
     Assertions.assertTrue(result.isPresent());
+    List<String> list = result.map(ApiUseCaseDto::membersExcludeApiKey).orElse(List.of());
+    Assertions.assertEquals(3, list.size());
     ApiUseCaseDto apiUseCaseDto = result.get();
     Assertions.assertNotNull(apiUseCaseDto);
     log.info(JsonToolkit.toJson(apiUseCaseDto));

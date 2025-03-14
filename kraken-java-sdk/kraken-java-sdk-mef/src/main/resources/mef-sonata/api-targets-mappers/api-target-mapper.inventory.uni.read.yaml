@@ -17,50 +17,10 @@ spec:
       method: ""
       serverKey: ""
       mappers:
+        schemaRef:
+          ref: "classpath:/mef-sonata/api-common-mappers/api-target-mapper.inventory.common.read.yaml"
+          params:
+            - key: productType
+              val: uni
         request:
-          - name: mapper.product.inventory.id
-            title: Identifier of the Product
-            description: ""
-            source: "@{{id}}"
-            sourceLocation: "PATH"
-            target: ""
-            targetLocation: ""
-            requiredMapping: true
-          - name: mapper.inventory.uni.read.buyerId
-            title: "The unique identifier of the organization that is acting as the a Buyer"
-            source: "@{{buyerId}}"
-            sourceLocation: "QUERY"
-            target: ""
-            targetType: string
-            targetLocation: ""
-            requiredMapping: false
         response:
-          - name: mapper.product.inventory.read.status
-            title:  the status of a MEF product
-            description: ""
-            target: "@{{status}}"
-            targetType: enum
-            targetLocation: BODY
-            requiredMapping: true
-            targetValues:
-              - active
-              - active.pendingChange
-              - cancelled
-              - pendingActive
-              - pendingTerminate
-              - suspended
-              - suspendedPendingTerminate
-              - terminated
-            valueMapping: {}
-            source: ""
-            sourceLocation: ""
-          - name: mapper.inventory.read.startDate
-            title: The date from which the product starts
-            description: ""
-            target: "@{{startDate}}"
-            targetLocation: BODY
-            requiredMapping: true
-            source: ""
-            sourceLocation: ""
-
-
