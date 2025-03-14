@@ -10,6 +10,7 @@ import lombok.Data;
 public class ComponentAPIFacets {
   private APISpec apiSpec;
   private List<RouteMapping> mappings;
+  private List<SupportedProductAndAction> supportedProductTypesAndActions;
   private ApiTargetMapping apiTargetMapping;
 
   @Data
@@ -111,5 +112,13 @@ public class ComponentAPIFacets {
   @Data
   public static class ApiTargetMapping {
     List<String> keys;
+  }
+
+  @Data
+  public static class SupportedProductAndAction {
+    private List<String> actionTypes;
+    private String path;
+    private String method;
+    private List<String> productTypes;
   }
 }
