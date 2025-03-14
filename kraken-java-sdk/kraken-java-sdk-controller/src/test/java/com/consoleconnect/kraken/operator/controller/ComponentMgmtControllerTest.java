@@ -54,6 +54,8 @@ public class ComponentMgmtControllerTest extends AbstractIntegrationTest
   @Getter private final WebTestClientHelper testClientHelper;
   public static final String GET_DETAIL_MAPPING_URL =
       "products/mef.sonata.api.order/components/mef.sonata.api.order/mapper-details";
+  public static final String GET_PRODUCT_TYPES = "/products/%s/productTypes";
+  public static final String GET_STANDARD_COMPONENTS = "/products/%s/standardApiComponents";
   public static final String LIST_VERSIONS_URL = "products/mef.sonata/component-versions";
   public static final String UPDATE_COMPONENT =
       "/products/kraken.component.api-target-mapper/components/{id}/targetMapper";
@@ -424,6 +426,32 @@ public class ComponentMgmtControllerTest extends AbstractIntegrationTest
               log.info(bodyStr);
               assertThat(bodyStr, hasJsonPath("$.data.componentProducts", notNullValue()));
               assertThat(bodyStr, hasJsonPath("$.data.productCategories", notNullValue()));
+            });
+  }
+
+  @Test
+  @Order(12)
+  void givenNothing_whenQueryProductTypes_thenReturnOK() {
+    String path = String.format(GET_PRODUCT_TYPES, PRODUCT_ID);
+    getTestClientHelper()
+        .getAndVerify(
+            (uriBuilder -> uriBuilder.path(path).build()),
+            bodyStr -> {
+              log.info(bodyStr);
+              assertThat(bodyStr, hasJsonPath("$.data", notNullValue()));
+            });
+  }
+
+  @Test
+  @Order(12)
+  void givenProductType_whenQueryStandardComponent_thenReturnOK() {
+    String path = String.format(GET_STANDARD_COMPONENTS, PRODUCT_ID);
+    getTestClientHelper()
+        .getAndVerify(
+            (uriBuilder -> uriBuilder.path(path).queryParam("productType", "UNI").build()),
+            bodyStr -> {
+              log.info(bodyStr);
+              assertThat(bodyStr, hasJsonPath("$.data", notNullValue()));
             });
   }
 }

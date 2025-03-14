@@ -12,6 +12,7 @@ spec:
     method: post
     provideAlternative: false
     addressType: FieldedAddress
+    productType: share
   endpoints:
     - id: validate address
       path: ""

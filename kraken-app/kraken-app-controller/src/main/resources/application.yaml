@@ -235,8 +235,8 @@ app:
     - mef.sonata.api-target-mapper.quote.uni.read.sync
   api-spec-order-by:
     mef.sonata.api-spec.serviceability.address: 1
-    mef.sonata.api-spec.quote: 2
-    mef.sonata.api-spec.product.offering.qualification: 3
+    mef.sonata.api-spec.product.offering.qualification: 2
+    mef.sonata.api-spec.quote: 3
     mef.sonata.api-spec.order: 4
     mef.sonata.api-spec.inventory: 5
   api-order-by:
@@ -272,3 +272,8 @@ app:
     mef.sonata.api-target-mapper.inventory.eline.list: <1,2>
     mef.sonata.api-target-mapper.inventory.uni.read: <2,1>
     mef.sonata.api-target-mapper.inventory.eline.read: <2,2>
+  product-types:
+    - UNI
+    - ACCESS_E_LINE
+    - INTERNET_ACCESS
+    - SHARE
