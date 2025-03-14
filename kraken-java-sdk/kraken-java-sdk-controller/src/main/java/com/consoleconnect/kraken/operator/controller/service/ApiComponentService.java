@@ -301,7 +301,8 @@ public class ApiComponentService
     info.setComponentKey(asset.getMetadata().getKey());
     info.setName(asset.getMetadata().getName());
     info.setLabels(asset.getMetadata().getLabels());
-    info.setSupportedProductTypes(list.get(0).getProductTypes());
+    info.setSupportedProductTypes(
+        CollectionUtils.isEmpty(list) ? null : list.get(0).getProductTypes());
     info.setLogo(specAsset.getMetadata() == null ? null : specAsset.getMetadata().getLogo());
     if (MapUtils.isEmpty(specAsset.getFacets())) {
       return info;
