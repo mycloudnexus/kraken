@@ -3,14 +3,19 @@ import { useMappingUiStore } from "@/stores/mappingUi.store";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { GroupedByPath } from "@/utils/helpers/groupByPath";
 import { IMapperDetails } from "@/utils/types/env.type";
-import { Collapse, Spin } from "antd";
-import { useMemo, useEffect, useState, useCallback } from "react";
-import { CollapseItem, CollapseLabel } from "./components";
-import styles from "./index.module.scss";
+import { Select, Spin } from "antd";
+import { useMemo, useEffect, useCallback } from "react";
+import DropdownOption from "./components/DropdownOption";
 
 type MappingDetailsListProps = {
   groupedPaths: GroupedByPath;
   setActiveSelected: (mapItem: IMapperDetails) => void;
+};
+
+type Option = {
+  label: JSX.Element;
+  value: string;
+  item: IMapperDetails;
 };
 
 const MappingDetailsList = ({
@@ -20,22 +25,9 @@ const MappingDetailsList = ({
   // Grab targetMapperKey in url's query, select the corresponding mapping
   const query = usePathQuery();
 
-  const [activeLabel, setActiveLabel] = useState<string[]>(
-    Object.keys(groupedPaths)
-  );
-
-  const {
-    activePath,
-    selectedKey,
-    setSelectedKey,
-    setActivePath,
-    setActiveTab,
-  } = useMappingUiStore();
+  const { activePath, setSelectedKey, setActivePath, setActiveTab } =
+    useMappingUiStore();
   const { setRightSideInfo } = useNewApiMappingStore();
-
-  useEffect(() => {
-    setActiveLabel(Object.keys(groupedPaths));
-  }, [groupedPaths]);
 
   const initList = useCallback(() => {
     const apis = Object.values(groupedPaths).flatMap((subPath) => subPath);
@@ -45,8 +37,8 @@ const MappingDetailsList = ({
       // Auto select the corresponding api
       const initialMapItem = targetMapperKey
         ? (apis.find(
-          (mapping) => mapping.targetMapperKey === targetMapperKey
-        ) ?? apis[0])
+            (mapping) => mapping.targetMapperKey === targetMapperKey
+          ) ?? apis[0])
         : apis[0];
 
       setSelectedKey(initialMapItem.path);
@@ -68,53 +60,37 @@ const MappingDetailsList = ({
     [setActiveSelected, setSelectedKey]
   );
 
-  const listMapping = useMemo(() => {
-    return Object.keys(groupedPaths).map((path) => {
-      const labelProps = groupedPaths[path][0];
-      const isActiveLabel = activeLabel.includes(path);
-      const isOneChild = groupedPaths[path].length <= 1;
-      const highlighted = groupedPaths[path].some(
-        (item) => item.path === activePath
-      );
+  const optionsList = useMemo(() => {
+    const list = [];
+    for (const path in groupedPaths) {
+      for (const item of groupedPaths[path]) {
+        const optionProps = {
+          ...item,
+          size: groupedPaths[path].length,
+          value: `${path} ${item.targetKey}`,
+        };
+        list.push({
+          label: <DropdownOption {...optionProps} />,
+          value: `${path} ${item.targetKey}`,
+          item,
+        });
+      }
+    }
+    return list;
+  }, [groupedPaths]);
 
-      return {
-        key: path,
-        showArrow: !isOneChild,
-        label: (
-          <CollapseLabel
-            labelProps={labelProps}
-            handleSelection={handleSelection}
-            size={groupedPaths[path].length}
-            isActive={isActiveLabel}
-            isOneChild={isOneChild}
-            highlighted={highlighted}
-          />
-        ),
-        children: isOneChild ? null : (
-          <CollapseItem
-            data={groupedPaths[path]}
-            setActiveSelected={handleSelection}
-            selectedKey={selectedKey}
-          />
-        ),
-      };
-    });
-  }, [activeLabel, activePath, groupedPaths, handleSelection, selectedKey]);
-
-  const handleChange = useCallback((e: string[] | string) => {
-    setActiveLabel(Array.isArray(e) ? e : [e]);
-  }, []);
+  const handleChange = (_: string, option: Option | Option[]) => {
+    if (Array.isArray(option)) return;
+    handleSelection(option.item);
+  };
 
   return (
     <Spin spinning={!groupedPaths}>
-      <Collapse
-        activeKey={activeLabel}
+      <Select
+        options={optionsList}
+        defaultValue={optionsList[0].value}
+        variant="borderless"
         onChange={handleChange}
-        className={styles.collapseBox}
-        bordered
-        ghost
-        expandIconPosition="end"
-        items={listMapping}
       />
     </Spin>
   );
