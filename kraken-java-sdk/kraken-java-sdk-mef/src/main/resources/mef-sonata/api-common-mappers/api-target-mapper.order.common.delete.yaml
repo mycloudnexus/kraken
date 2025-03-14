@@ -1,32 +1,31 @@
-
 ---
 kind: kraken.component.api-target-mapper
 apiVersion: v1
 metadata:
-  key: mef.sonata.api-target-mapper.order.eline.delete
-  name:  Mapper Of Deleting Order Connection
+  key: mef.sonata.api-target-mapper.order.uni.delete
+  name: Mapper Of Deleting Order Port
   description: This operation deletes a ProductOrder entity
   version: 3
 spec:
   trigger:
     path: /mefApi/sonata/productOrderingManagement/v10/productOrder
     method: post
-    productType: access_e_line
+    productType: uni
     actionType: delete
   supportedCase:
     type: ONE_TO_ONE_AND_ONE_TO_MANY
   workflow:
     enabled: false
     synchronous: false
-    key: mef.sonata.api-workflow.order.eline.delete
+    key: mef.sonata.api-workflow.order.uni.delete
   endpoints:
-    - id: delete connection by id
+    - id: delete port
       path: ""
       method: ""
       serverKey: ""
       mappers:
         request:
-          - name: mapper.order.eline.delete.buyerId
+          - name: mapper.order.uni.delete.buyerId
             title: "The unique identifier of the organization that is acting as the a Buyer."
             description: ""
             source: "@{{buyerId}}"
@@ -34,7 +33,7 @@ spec:
             target: ""
             targetLocation: ""
             requiredMapping: false
-          - name: mapper.order.eline.delete.productId
+          - name: mapper.order.uni.delete.productId
             title: "The unique identifier of an in-service Product that is the ordering subject"
             description: ""
             source: "@{{productOrderItem[*].product.id}}"
@@ -44,7 +43,7 @@ spec:
             targetLocation: ""
             requiredMapping: true
         response:
-          - name: mapper.order.eline.delete.state
+          - name: mapper.order.uni.delete.state
             title: "Order State"
             description: ""
             target: "@{{state}}"
@@ -66,7 +65,7 @@ spec:
             valueMapping: {}
             source: ""
             sourceLocation: ""
-          - name: mapper.order.eline.delete.orderId
+          - name: mapper.order.uni.delete.orderId
             title: order Id from seller
             source: ""
             target: '@{{orderId}}'

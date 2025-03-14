@@ -2,40 +2,41 @@
 kind: kraken.component.api-target-mapper
 apiVersion: v1
 metadata:
-  key: mef.sonata.api-target-mapper.order.eline.read.delete
-  name:  Mapper Of Reading Order Connection with Delete Action
+  key: mef.sonata.api-target-mapper.order.uni.read.delete
+  name: Mapper Of Reading Order Port with Delete Action
   description: This operation retrieves a ProductOrder entity
 spec:
   trigger:
     path: /mefApi/sonata/productOrderingManagement/v10/productOrder/{id}
     method: get
-    productType: access_e_line
+    productType: uni
     actionType: delete
   endpoints:
-    - path: ""
+    - id: retrieve connection detail by id
+      path: ""
       method: ""
       serverKey: ""
       mappers:
         request:
-          - name: mapper.order.eline.read.delete.buyerId
+          - name: mapper.order.uni.read.delete.buyerId
             title: "The unique identifier of the organization that is acting as the a Buyer."
             description: ""
             source: "@{{buyerId}}"
             sourceLocation: "QUERY"
             target: ""
-            targetLocation: "PATH"
+            targetLocation: ""
             requiredMapping: false
-          - name: mapper.order.eline.read.delete.orderId
+          - name: mapper.order.uni.read.delete.orderId
             title: "Order Unique Identifier."
             description: ""
             source: "@{{id}}"
             sourceLocation: "PATH"
             target: ""
-            convertValue: "mef.sonata.api-target-mapper.order.eline.add#mapper.order.eline.add.orderId"
+            convertValue: "mef.sonata.api-target-mapper.order.uni.add#mapper.order.uni.add.orderId"
             targetLocation: ""
             requiredMapping: true
         response:
-          - name: mapper.order.eline.read.delete.state
+          - name: mapper.order.uni.read.delete.state
             title: "ProductOrderState"
             description: ""
             target: "@{{state}}"
@@ -57,7 +58,7 @@ spec:
             valueMapping: {}
             source: ""
             sourceLocation: "BODY"
-          - name: mapper.order.eline.read.delete.completionDate
+          - name: mapper.order.uni.read.delete.completionDate
             title: "order complete date"
             description: ""
             source: ""
@@ -67,7 +68,7 @@ spec:
             deletePath: "$.completionDate"
             targetLocation: "BODY"
             requiredMapping: false
-          - name: mapper.order.eline.read.delete.instanceId
+          - name: mapper.order.uni.read.delete.instanceId
             title: "instance id from seller"
             description: ""
             source: ""
@@ -75,17 +76,17 @@ spec:
             target: "@{{productOrderItem[0].product.id}}"
             targetLocation: "BODY"
             requiredMapping: false
-          - name: mapper.order.eline.read.delete.productOrderItem.completionDate
+          - name: mapper.order.uni.read.delete.productOrderItem.completionDate
             title: "order item complete date"
             description: ""
             source: ""
             sourceLocation: "BODY"
             target: "@{{productOrderItem[0].completionDate}}"
-            targetLocation: "BODY"
             checkPath: "$.productOrderItem[?(@.state == 'completed')]"
             deletePath: "$.productOrderItem[?(@.state != 'completed')].completionDate"
+            targetLocation: "BODY"
             requiredMapping: false
-          - name: mapper.order.eline.read.delete.productOrderItem.expectedCompleteDate
+          - name: mapper.order.uni.read.delete.productOrderItem.expectedCompleteDate
             title: "order item expected complete date"
             description: ""
             source: ""
