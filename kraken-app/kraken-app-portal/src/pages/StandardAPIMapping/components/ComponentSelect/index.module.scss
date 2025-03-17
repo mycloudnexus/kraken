@@ -19,25 +19,7 @@
   }
 }
 
-.componentSelectMiddle {
-  &:hover {
-    background: #e3e6eb;
-    border-radius: 2px;
-  }
-  :global {
-    .ant-select-selection-item {
-      padding-inline-end: 0 !important;
-    }
-    .ant-select-selector {
-      padding: 0 11px 0 0 !important;
-    }
-    .ant-select-arrow {
-      color: #00000073;
-    }
-  }
-}
-
-.componentSelectLast {
+.componentSelect {
   &:hover {
     background: #e3e6eb;
     border-radius: 2px;

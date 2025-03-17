@@ -1,5 +1,4 @@
 import EmptyIcon from "@/assets/icon/empty.svg";
-import { ApiCard } from "@/components/ApiMapping";
 import {
   PRODUCT_CACHE_KEYS,
   useGetAPIDeployments,
@@ -13,7 +12,6 @@ import { queryClient } from "@/utils/helpers/reactQuery";
 import { IPagination } from "@/utils/types/common.type";
 import { IEnv } from "@/utils/types/env.type";
 import { IDeploymentHistory } from "@/utils/types/product.type";
-import { InfoCircleOutlined } from "@ant-design/icons";
 import {
   Flex,
   Result,
@@ -29,6 +27,8 @@ import { useEffect, useMemo, useState } from "react";
 import { ContentTime } from "./ContentTime";
 import { DeploymentBtn } from "./DeployBtn";
 import styles from "./index.module.scss";
+import { ApiCard } from "@/components/ApiMapping";
+import { InfoCircleOutlined } from "@ant-design/icons";
 
 const DeployHistory = ({
   scrollHeight,
@@ -101,7 +101,9 @@ const DeployHistory = ({
         title: "API mapping",
         width: 400,
         fixed: "left",
-        render: (item: any) => <ApiCard apiInstance={item} />,
+        render: (item: any) => (
+          <ApiCard apiInstance={item} />
+        ),
       });
 
     columns.push(
@@ -109,7 +111,7 @@ const DeployHistory = ({
         title: "Version",
         dataIndex: "version",
         fixed: !selectedEnv && "left",
-        width: 80,
+        width: 90,
         render: (text: string) => (
           <Flex align="center" gap={8}>
             {text}
@@ -119,7 +121,7 @@ const DeployHistory = ({
       {
         title: "Environment",
         key: "environment",
-        width: 120,
+        width: 200,
         render: (record: IDeploymentHistory) => (
           <div className={styles.capitalize}>{record?.envName}</div>
         ),
@@ -129,7 +131,7 @@ const DeployHistory = ({
       },
       {
         title: "Deployed by",
-        width: 120,
+        width: 200,
         render: (record: IDeploymentHistory) => (
           <ContentTime content={record?.createBy} time={record?.createAt} />
         ),
@@ -137,7 +139,7 @@ const DeployHistory = ({
       {
         title: "Deploy status",
         dataIndex: "status",
-        width: 100,
+        width: 200,
         render: (status: string) => <DeploymentStatus status={status} />,
       }
     );
@@ -145,14 +147,10 @@ const DeployHistory = ({
     if (isStage)
       columns.push(
         {
-          title: (
-            <>
-              Verified for Production{" "}
-              <Tooltip title="Toggle this button means you have verified this deployment version in stage environment">
-                <InfoCircleOutlined />
-              </Tooltip>
-            </>
-          ),
+          title: <>
+            Verified for Production{' '}
+            <Tooltip title="Toggle this button means you have verified this deployment version in stage environment"><InfoCircleOutlined /></Tooltip>
+          </>,
           dataIndex: "verifiedStatus",
           width: 160,
           render: (verifiedStatus: boolean, record: IDeploymentHistory) =>
@@ -169,7 +167,7 @@ const DeployHistory = ({
         },
         {
           title: "Verified by",
-          width: 120,
+          width: 200,
           render: (record: IDeploymentHistory) =>
             record?.envName?.toLowerCase?.() === "stage" && (
               <ContentTime
@@ -182,7 +180,7 @@ const DeployHistory = ({
 
     columns.push({
       title: "Actions",
-      width: 80,
+      width: 120,
       fixed: "right",
       render: (record: IDeploymentHistory) => (
         <>

@@ -13,7 +13,6 @@ import styles from "./index.module.scss";
 type ComponentSelectProps = {
   componentList: any;
   componentName: string;
-  middle?: boolean;
 };
 
 type LabelProps = {
@@ -62,7 +61,6 @@ const Label = ({ value }: LabelProps) => (
 const ComponentSelect = ({
   componentList,
   componentName,
-  middle,
 }: ComponentSelectProps) => {
   const navigate = useNavigate();
   const { resetUiStore } = useMappingUiStore();
@@ -96,9 +94,7 @@ const ComponentSelect = ({
   return (
     <div className={styles.selectStyle}>
       <Select
-        className={
-          middle ? styles.componentSelectMiddle : styles.componentSelectLast
-        }
+        className={styles.componentSelect}
         onSelect={handleSelect}
         dropdownStyle={{ width: "fit-content" }}
         size="small"

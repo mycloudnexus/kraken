@@ -18,13 +18,11 @@ spec:
       productTypes:
         - UNI
         - ACCESS_E_LINE
-        - INTERNET_ACCESS
     - path: /mefApi/sonata/productOfferingQualification/v7/productOfferingQualification/{id}
       method: get
       productTypes:
         - UNI
         - ACCESS_E_LINE
-        - INTERNET_ACCESS
   mappings:
     - uri: ${env.target.url}
       trigger:

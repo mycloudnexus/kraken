@@ -9,7 +9,6 @@ import HomePage from "@/pages/HomePage";
 import ApiComponents from "@/pages/HomePage/components/ApiComponents";
 import NewAPIServer from "@/pages/NewAPIServer";
 import StandardAPIMapping from "@/pages/StandardAPIMapping";
-import StandardAPIMappingTable from "@/pages/StandardAPIMappingTable";
 import UserManagement from "@/pages/UserManagement";
 import { lazy } from "react";
 import { createBrowserRouter } from "react-router-dom";
@@ -53,7 +52,9 @@ const router = createBrowserRouter([
               },
               {
                 path: "edit/:componentId",
-                children: [{ path: "", element: <NewAPIServer /> }],
+                children: [
+                  { path: "", element: <NewAPIServer /> },
+                ],
               },
             ],
           },
@@ -78,15 +79,6 @@ const router = createBrowserRouter([
       },
       {
         path: "api-mapping/:componentId",
-        children: [
-          {
-            path: "",
-            element: <StandardAPIMappingTable />,
-          },
-        ],
-      },
-      {
-        path: "api-mapping/:componentId/:targetKey",
         children: [
           {
             path: "",

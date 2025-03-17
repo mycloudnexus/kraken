@@ -28,7 +28,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.util.Strings;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -52,6 +52,7 @@ public class UnifiedAssetService implements UUIDWrapper {
   private final AssetFacetRepository assetFacetRepository;
   private final AssetLinkRepository assetLinkRepository;
   private final AppProperty appProperty;
+  private final ApplicationContext applicationContext;
   private final MergeService mergeService;
 
   public static PageRequest getSearchPageRequest() {
@@ -372,12 +373,19 @@ public class UnifiedAssetService implements UUIDWrapper {
         (name, value) -> {
           Map.Entry<String, ComponentAPITargetFacets.Mapper> existMapperEntry =
               value.entrySet().iterator().next();
-          Optional<ComponentAPITargetFacets.Mapper> copyTo =
-              findMapper(mapperMapNew, name, existMapperEntry.getKey());
-          if (copyTo.isPresent()) {
-            mergeMapper(existMapperEntry, copyTo.get());
-          } else {
-            deepCopyMapper(name, existMapperEntry, mapperMapNew);
+          if (Objects.equals(Boolean.TRUE, existMapperEntry.getValue().getCustomizedField())) {
+            String mapperHashCode = String.valueOf(existMapperEntry.getValue().hashCode());
+            mapperMapNew.putIfAbsent(
+                mapperHashCode,
+                new HashMap<>(Map.of(existMapperEntry.getKey(), existMapperEntry.getValue())));
+          } else if (mapperMapNew.containsKey(name)) {
+            ComponentAPITargetFacets.Mapper mapper =
+                mapperMapNew.get(name).get(existMapperEntry.getKey());
+            if (Objects.equals(MAPPER_REQUEST, existMapperEntry.getKey())) {
+              FacetsMapper.INSTANCE.toRequestMapper(existMapperEntry.getValue(), mapper);
+            } else {
+              FacetsMapper.INSTANCE.toResponseMapper(existMapperEntry.getValue(), mapper);
+            }
           }
         });
   }
@@ -400,7 +408,7 @@ public class UnifiedAssetService implements UUIDWrapper {
     }
 
     Map<String, Map<String, ComponentAPITargetFacets.Mapper>> mapperMap = new LinkedHashMap<>();
-    Set<ComponentAPITargetFacets.Mapper> seenMappers = new HashSet<>();
+    Map<ComponentAPITargetFacets.Mapper, Boolean> seenMappers = new HashMap<>();
     removeDuplicatedNodes(
         endpoint.getMappers().getRequest(), mapperMap, seenMappers, MAPPER_REQUEST);
     removeDuplicatedNodes(
@@ -412,16 +420,19 @@ public class UnifiedAssetService implements UUIDWrapper {
   public static void removeDuplicatedNodes(
       List<ComponentAPITargetFacets.Mapper> mappers,
       Map<String, Map<String, ComponentAPITargetFacets.Mapper>> mapperMap,
-      Set<ComponentAPITargetFacets.Mapper> seenMappers,
+      Map<ComponentAPITargetFacets.Mapper, Boolean> seenMappers,
       String mapperSection) {
     if (CollectionUtils.isNotEmpty(mappers)) {
       for (ComponentAPITargetFacets.Mapper mapper : mappers) {
-        if (seenMappers.contains(mapper)) {
+        if (seenMappers.containsKey(mapper)) {
           continue;
         }
-        String key = mapper.getKey(mapperSection);
+        String key =
+            StringUtils.isBlank(mapper.getName())
+                ? String.valueOf(mapper.hashCode())
+                : mapper.getName();
         mapperMap.computeIfAbsent(key, k -> new LinkedHashMap<>()).put(mapperSection, mapper);
-        seenMappers.add(mapper);
+        seenMappers.put(mapper, true);
       }
     }
   }
@@ -439,81 +450,6 @@ public class UnifiedAssetService implements UUIDWrapper {
                 log.info("Child asset {} is still valid", child.getKey());
               }
             });
-  }
-
-  private static void mergeMapper(
-      Map.Entry<String, ComponentAPITargetFacets.Mapper> copyFrom,
-      ComponentAPITargetFacets.Mapper copyTo) {
-    String mapperSection = copyFrom.getKey();
-    if (isConfigured(copyFrom)) {
-      shallowCopyMapper(copyFrom.getValue(), copyTo, mapperSection);
-    }
-  }
-
-  private static void shallowCopyMapper(
-      ComponentAPITargetFacets.Mapper copyFrom,
-      ComponentAPITargetFacets.Mapper copyTo,
-      String mapperSection) {
-    if (Objects.equals(MAPPER_REQUEST, mapperSection)) {
-      FacetsMapper.INSTANCE.toRequestMapper(copyFrom, copyTo);
-    } else {
-      FacetsMapper.INSTANCE.toResponseMapper(copyFrom, copyTo);
-    }
-  }
-
-  private static void deepCopyMapper(
-      String name,
-      Map.Entry<String, ComponentAPITargetFacets.Mapper> copyFrom,
-      Map<String, Map<String, ComponentAPITargetFacets.Mapper>> mapperMapNew) {
-    String mapperSection = copyFrom.getKey();
-    if (isCustomizedAndConfigured(copyFrom)) {
-      mapperMapNew.put(name, new HashMap<>(Map.of(mapperSection, copyFrom.getValue())));
-    } else if (isSystemAndConfigured(copyFrom)) {
-      copyFrom.getValue().setCustomizedField(Boolean.TRUE);
-      mapperMapNew.put(name, new HashMap<>(Map.of(mapperSection, copyFrom.getValue())));
-    }
-  }
-
-  private static Optional<ComponentAPITargetFacets.Mapper> findMapper(
-      Map<String, Map<String, ComponentAPITargetFacets.Mapper>> mapperMap,
-      String name,
-      String mapperSection) {
-    return Optional.ofNullable(mapperMap.getOrDefault(name, null))
-        .map(x -> x.getOrDefault(mapperSection, null));
-  }
-
-  private static boolean isCustomizedAndConfigured(
-      Map.Entry<String, ComponentAPITargetFacets.Mapper> mapper) {
-    if (!isCustomizedMapping(mapper)) {
-      return false;
-    }
-    return isConfigured(mapper);
-  }
-
-  private static boolean isSystemAndConfigured(
-      Map.Entry<String, ComponentAPITargetFacets.Mapper> mapper) {
-    if (!isSystemMapping(mapper)) {
-      return false;
-    }
-    return isConfigured(mapper);
-  }
-
-  private static boolean isConfigured(Map.Entry<String, ComponentAPITargetFacets.Mapper> mapper) {
-    if (Objects.equals(MAPPER_REQUEST, mapper.getKey())) {
-      return Strings.isNotBlank(mapper.getValue().getTarget());
-    } else {
-      return Strings.isNotBlank(mapper.getValue().getSource());
-    }
-  }
-
-  private static boolean isSystemMapping(
-      Map.Entry<String, ComponentAPITargetFacets.Mapper> mapper) {
-    return !isCustomizedMapping(mapper);
-  }
-
-  private static boolean isCustomizedMapping(
-      Map.Entry<String, ComponentAPITargetFacets.Mapper> mapper) {
-    return Objects.equals(Boolean.TRUE, mapper.getValue().getCustomizedField());
   }
 
   private UnifiedAssetEntity createAssetEntity(
