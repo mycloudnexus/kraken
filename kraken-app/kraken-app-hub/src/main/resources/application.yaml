@@ -115,6 +115,7 @@ app:
   cron-job:
     push-heartbeat: 0/5 * * * * *
     check-release: 0/20 * * * * *
+  modify-use-case: "classpath:/config/component-config.yaml"
   security:
     resource-server:
       enabled: false
