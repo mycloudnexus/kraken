@@ -160,7 +160,8 @@ public class WorkflowActionFilterFactory
 
   private static Map<String, String> cleanHeaders(ServerWebExchange exchange) {
     Map<String, String> singleValueMap = exchange.getRequest().getHeaders().toSingleValueMap();
-    for (String key : singleValueMap.keySet()) {
+    Map<String, String> map = new HashMap<>(singleValueMap);
+    for (String key : map.keySet()) {
       if (key.equalsIgnoreCase(HOST) || key.equalsIgnoreCase(CONTENT_LENGTH)) {
         singleValueMap.remove(key);
       }
