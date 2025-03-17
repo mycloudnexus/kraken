@@ -45,6 +45,8 @@ public class WorkflowActionFilterFactory
   public static final String VAR_ENTITY_ID = "entity-id";
   public static final String VAR_REQUEST_ID = "log-request-id";
   public static final String VAR_BASE_URL = "url";
+  public static final String HOST = "Host";
+  public static final String CONTENT_LENGTH = "Content-Length";
 
   public WorkflowActionFilterFactory(WorkflowInstanceRepository workflowInstanceRepository) {
     super(Config.class);
@@ -140,7 +142,7 @@ public class WorkflowActionFilterFactory
     WorkflowPayload payload = new WorkflowPayload();
     payload.setId((String) inputs.get(VAR_ENTITY_ID));
     payload.setRequestId((String) inputs.get(VAR_REQUEST_ID));
-    payload.setHeaders(exchange.getRequest().getHeaders().toSingleValueMap());
+    payload.setHeaders(cleanHeaders(exchange));
     workflowFacets.getValidationStage().stream()
         .forEach(task -> constructHttpPayload(task, payload, inputs));
     workflowFacets.getPreparationStage().stream()
@@ -154,6 +156,16 @@ public class WorkflowActionFilterFactory
     request.setName(workflowFacets.getMetaData().getWorkflowName());
     request.setVersion(getLatestVersion(config.getMetadataClient(), request.getName()));
     return request;
+  }
+
+  private static Map<String, String> cleanHeaders(ServerWebExchange exchange) {
+    Map<String, String> singleValueMap = exchange.getRequest().getHeaders().toSingleValueMap();
+    for (String key : singleValueMap.keySet()) {
+      if (key.equalsIgnoreCase(HOST) || key.equalsIgnoreCase(CONTENT_LENGTH)) {
+        singleValueMap.remove(key);
+      }
+    }
+    return singleValueMap;
   }
 
   private static void constructHttpPayload(
