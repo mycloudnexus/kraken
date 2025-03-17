@@ -111,7 +111,7 @@ spec:
             requiredMapping: false
           - name: mapper.quote.uni.add.sync.place.id
             title: "the id of the place where the products' quotation must be done"
-            source: "@{{quoteItem[0].product.place[0].id}}"
+            source: "@{{quoteItem[0].product.place[0].idtest}}"
             sourceLocation: BODY
             sourceType: string
             target: ""
