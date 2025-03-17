@@ -145,6 +145,8 @@ spec:
           env:
             mappingMatrixKey: ${quote.matrixConfigKey}
             targetKey: ${quote.targetAPIConfigKey}
+            productInstanceId: ${requestBody.quoteItem[0].product.id?:''}
+
         - id: persist_http_request
           actionType: buildin@db
           env:

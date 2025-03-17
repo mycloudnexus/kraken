@@ -149,7 +149,6 @@ spec:
           with:
             action: read
             actionField: productInstanceId
-
           preRequest: true
         - id: calculate_type_for_via_javascript
           actionType: engine@javascript

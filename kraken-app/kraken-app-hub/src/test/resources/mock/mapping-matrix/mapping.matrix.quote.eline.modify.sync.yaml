@@ -8,8 +8,7 @@ metadata:
     mef-api-release: grace
   version: 14
 spec:
-  expect-http-status-422-if-missing:
-    - $.body.quoteItem[0].product.productConfiguration
+  convert-field: $.body.quoteItem[0].product.id
   matrix:
     mef.sonata.api-target.quote.eline.modify.sync:
       - name: action_add

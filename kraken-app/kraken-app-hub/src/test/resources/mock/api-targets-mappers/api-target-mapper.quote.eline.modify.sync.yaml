@@ -27,7 +27,17 @@ spec:
               - key: "$.quoteItem[0].terminationError.value"
                 val: "the quoted item is not available"
         request:
-          - name: mapper.quote.uni.modify.sync.duration.amount
+          - name: mapper.quote.eline.modify.sync.buyerId
+            title: The unique identifier of the organization that is acting as the a Buyer.
+            description:
+            source: "@{{buyerId}}"
+            replaceStar: true
+            sourceLocation: QUERY
+            target: ""
+            targetLocation: PATH
+            customizedField: false
+            requiredMapping: false
+          - name: mapper.quote.eline.modify.sync.duration.amount
             source: "@{{quoteItem[0].requestedQuoteItemTerm.duration.amount}}"
             sourceLocation: BODY
             sourceType: integer
@@ -35,7 +45,7 @@ spec:
             target: "@{{connections[*].duration.value}}"
             targetLocation: BODY
             requiredMapping: false
-          - name: mapper.quote.uni.modify.sync.duration.units
+          - name: mapper.quote.eline.modify.sync.duration.units
             source: "@{{quoteItem[0].requestedQuoteItemTerm.duration.units}}"
             sourceLocation: BODY
             sourceType: enum
@@ -52,7 +62,7 @@ spec:
             target: "@{{connections[*].duration.unit}}"
             targetLocation: BODY
             requiredMapping: false
-          - name: mapper.quote.uni.modify.sync.endOfTermAction
+          - name: mapper.quote.eline.modify.sync.endOfTermAction
             source: "@{{quoteItem[0].requestedQuoteItemTerm.endOfTermAction}}"
             sourceLocation: BODY
             sourceType: enum
@@ -64,7 +74,7 @@ spec:
             target: "roll"
             targetLocation: BODY
             requiredMapping: false
-          - name: mapper.quote.uni.modify.sync.rollInterval.amount
+          - name: mapper.quote.eline.modify.sync.rollInterval.amount
             source: "@{{quoteItem[0].requestedQuoteItemTerm.rollInterval.amount}}"
             sourceLocation: BODY
             sourceType: integer
@@ -78,7 +88,7 @@ spec:
             target: "1"
             targetLocation: BODY
             requiredMapping: false
-          - name: mapper.quote.uni.modify.sync.rollInterval.units
+          - name: mapper.quote.eline.modify.sync.rollInterval.units
             source: "@{{quoteItem[0].requestedQuoteItemTerm.rollInterval.units}}"
             sourceLocation: BODY
             sourceType: enum
@@ -100,7 +110,7 @@ spec:
             target: "calendarMonths"
             targetLocation: BODY
             requiredMapping: false
-          - name: mapper.quote.uni.modify.sync.productConfiguration.bandwidth
+          - name: mapper.quote.eline.modify.sync.productConfiguration.bandwidth
             source: "@{{quoteItem[0].product.productConfiguration.bandwidth}}"
             sourceLocation: BODY
             allowValueLimit: true
@@ -112,7 +122,7 @@ spec:
             target: "@{{connections[*].bandwidth}}"
             targetLocation: BODY
             requiredMapping: false
-          - name: mapper.quote.uni.modify.sync.productConfiguration.bandwidthUnit
+          - name: mapper.quote.eline.modify.sync.productConfiguration.bandwidthUnit
             source: "@{{quoteItem[0].product.productConfiguration.bandwidthUnit}}"
             sourceLocation: BODY
             sourceType: enum
@@ -123,31 +133,32 @@ spec:
             target: "MBPS"
             targetLocation: BODY
             requiredMapping: false
-          - name: mapper.quote.uni.modify.sync.productConfiguration.classOfService
+          - name: mapper.quote.eline.modify.sync.productConfiguration.classOfService
             source: "@{{quoteItem[0].product.productConfiguration.classOfService}}"
             sourceLocation: BODY
             sourceType: string
             target: "@{{connections[*].classOfService}}"
             targetLocation: BODY
             requiredMapping: false
-          - name: mapper.quote.uni.modify.sync.productConfiguration.paymentType
+          - name: mapper.quote.eline.modify.sync.productConfiguration.paymentType
             source: "@{{quoteItem[0].product.productConfiguration.paymentType}}"
             sourceLocation: BODY
             sourceType: string
             target: "@{{connections[*].paymentMethod}}"
             targetLocation: BODY
             requiredMapping: false
-          - name: mapper.quote.uni.modify.sync.productOffering.id
+          - name: mapper.quote.eline.modify.sync.productOffering.id
             source: "@{{quoteItem[0].product.productOffering.id}}"
             sourceLocation: BODY
             sourceType: string
             target: "ACCESS_E_LINE"
             targetLocation: BODY
             requiredMapping: false
-          - name: mapper.quote.uni.modify.sync.product.id
+          - name: mapper.quote.eline.modify.sync.product.id
             source: "@{{quoteItem[0].product.id}}"
             sourceLocation: BODY
             sourceType: string
+            convertValue: 'mef.sonata.api-target-mapper.order.eline.add#mapper.order.eline.add.instanceId'
             target: ""
             targetLocation:
             requiredMapping: true
