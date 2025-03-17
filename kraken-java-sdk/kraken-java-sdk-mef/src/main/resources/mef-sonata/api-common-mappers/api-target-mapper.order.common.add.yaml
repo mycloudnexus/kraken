@@ -1,0 +1,231 @@
+---
+kind: kraken.component.api-target-mapper
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target-mapper.order.common.add
+  name: Mapper Of Creating Order Port
+  description: This operation creates a ProductOrder entity
+  version: 1
+  endpoints:
+    - id: create order
+      mappers:
+        request:
+          - name: mapper.order.@{{productType}}.add.buyerId
+            title: The unique identifier of the organization that is acting as the a Buyer.
+            description: ""
+            source: '@{{buyerId}}'
+            sourceLocation: QUERY
+            target: ""
+            targetLocation: ""
+            requiredMapping: false
+            customizedField: false
+          - name: mapper.order.@{{productType}}.add.duration
+            title: "order item Term duration"
+            source: "@{{productOrderItem[0].requestedItemTerm.duration.amount}}"
+            sourceLocation: BODY
+            sourceType: integer
+            discrete: true
+            target: ""
+            targetLocation: ""
+            requiredMapping: true
+          - name: mapper.order.@{{productType}}.add.duration.units
+            title: "order item Term unit"
+            source: "@{{productOrderItem[0].requestedItemTerm.duration.units}}"
+            sourceType: enum
+            sourceValues:
+              - calendarYears
+              - calendarMonths
+              - calendarDays
+              - calendarHours
+              - calendarMinutes
+              - businessDays
+              - businessHours
+              - businessMinutes
+            sourceLocation: BODY
+            target: ""
+            targetLocation: BODY
+            valueMapping: {}
+            requiredMapping: true
+          - name: mapper.order.@{{productType}}.add.endOfTermAction
+            title: "MEFEndOfTermAction"
+            source: "@{{productOrderItem[0].requestedItemTerm.endOfTermAction}}"
+            sourceLocation: BODY
+            sourceType: enum
+            sourceValues:
+              - roll
+              - autoDisconnect
+              - autoRenew
+            target: ""
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.order.@{{productType}}.add.rollInterval.amount
+            title: " quote item Term roll duration"
+            source: "@{{productOrderItem[0].requestedItemTerm.rollInterval.amount}}"
+            sourceLocation: BODY
+            sourceType: integer
+            discrete: true
+            sourceConditionExpression:
+            sourceConditions:
+              - name: endOfTermAction
+                key: "@{{productOrderItem[0].requestedItemTerm.endOfTermAction}}"
+                val: roll
+                operator: eq
+            target: ""
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.order.@{{productType}}.add.rollInterval.units
+            title: " quote item Term roll unit"
+            source: "@{{productOrderItem[0].requestedItemTerm.rollInterval.units}}"
+            sourceLocation: BODY
+            sourceType: enum
+            sourceValues:
+              - calendarYears
+              - calendarMonths
+              - calendarDays
+              - calendarHours
+              - calendarMinutes
+              - businessDays
+              - businessHours
+              - businessMinutes
+            sourceConditionExpression:
+            sourceConditions:
+              - name: endOfTermAction
+                key: "@{{productOrderItem[0].requestedItemTerm.endOfTermAction}}"
+                val: roll
+                operator: eq
+            target: ""
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.order.@{{productType}}.add.bandwidthUnit
+            title: "The unit of bandwidth"
+            source: "@{{productOrderItem[0].product.productConfiguration.bandwidthUnit}}"
+            sourceType: enum
+            sourceLocation: BODY
+            sourceValues:
+              - MBPS
+              - GBPS
+            valueMapping: {}
+            target: ""
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.order.@{{productType}}.add.bandwidth
+            title: "Bandwidth of the UNI"
+            source: "@{{productOrderItem[0].product.productConfiguration.bandwidth}}"
+            sourceLocation: BODY
+            allowValueLimit: true
+            sourceType: integer
+            discrete: true
+            sourceValues:
+            target: ""
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.order.@{{productType}}.add.name
+            title: "The name of the @{{productType}}"
+            source: "@{{productOrderItem[0].product.productConfiguration.name}}"
+            sourceLocation: BODY
+            sourceType: string
+            target: ""
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.order.@{{productType}}.add.paymentType
+            title: "The payment type of the @{{productType}}"
+            source: "@{{productOrderItem[0].product.productConfiguration.paymentType}}"
+            sourceLocation: BODY
+            sourceType: string
+            target: ""
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.order.@{{productType}}.add.productOffering.id
+            title: "id of a Product Offering"
+            source: "@{{productOrderItem[0].product.productOffering.id}}"
+            sourceLocation: BODY
+            target: ""
+            targetLocation: BODY
+            requiredMapping: true
+            sourceType: string
+        response:
+          - name: mapper.order.@{{productType}}.add.state
+            title: Order State
+            source: ""
+            target: '@{{state}}'
+            targetType: enum
+            description: ''
+            targetValues:
+              - acknowledged
+              - assessingCancellation
+              - held.assessingCharge
+              - pending.assessingModification
+              - cancelled
+              - pendingCancellation
+              - completed
+              - failed
+              - inProgress
+              - partial
+              - rejected
+            valueMapping: {}
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: true
+            customizedField: false
+          - name: mapper.order.@{{productType}}.add.orderId
+            title: order Id from seller
+            source: ""
+            target: '@{{orderId}}'
+            description: orderId mapping
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.order.@{{productType}}.add.instanceId
+            title: instance id from seller
+            source: ""
+            target: '@{{instanceId}}'
+            description: order instanceId mapping
+            sourceLocation: BODY
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.order.uni.add.product.id
+            title: product instance id
+            description: ""
+            source: ""
+            sourceLocation: BODY
+            target: "@{{productOrderItem[0].product.id}}"
+            targetLocation: BODY
+            customizedField: false
+            requiredMapping: false
+          - name: mapper.order.uni.add.term.endOfTermAction
+            title: MEFEndOfTermAction
+            description: ""
+            source: ""
+            sourceLocation: ""
+            target: "@{{productOrderItem[0].itemTerm.endOfTermAction}}"
+            targetLocation: BODY
+            customizedField: false
+            requiredMapping: true
+          - name: mapper.order.@{{productType}}.add.term.rollInterval.amount
+            title: order item Term roll duration
+            description: ""
+            source: ""
+            sourceLocation: ""
+            target: "@{{productOrderItem[0].itemTerm.rollInterval.amount}}"
+            targetLocation: BODY
+            customizedField: false
+            requiredMapping: false
+          - name: mapper.order.@{{productType}}.add.term.rollInterval.unit
+            title: order item Term roll unit
+            description: ""
+            source: ""
+            sourceLocation: ""
+            target: "@{{productOrderItem[0].itemTerm.rollInterval.units}}"
+            targetLocation: BODY
+            customizedField: false
+            requiredMapping: false
+          - name: mapper.order.@{{productType}}.add.term.name
+            title: order item Term name
+            description: ""
+            source: ""
+            sourceLocation: ""
+            target: "@{{productOrderItem[0].itemTerm.name}}"
+            targetLocation: BODY
+            customizedField: false
+            requiredMapping: true
+
