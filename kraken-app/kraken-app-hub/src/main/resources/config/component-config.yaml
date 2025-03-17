@@ -1,0 +1,36 @@
+component:
+  modify-use-case:
+    - useCase: mef.sonata.api-target-mapper.order.eline.modify
+      comparedMapper: mef.sonata.api-target-mapper.order.eline.add
+      allowToModify:
+        - mapperItem: @{{productOrderItem[0].product.productConfiguration.bandwidth}}
+          comparedItem: @{{productOrderItem[0].product.productConfiguration.bandwidth}}
+      notAllowToModify:
+        - mapperItem: @{{productOrderItem[0].requestedItemTerm.duration.amount}}
+          comparedItem: @{{productOrderItem[0].requestedItemTerm.duration.amount}}
+        - mapperItem: @{{productOrderItem[0].requestedItemTerm.duration.units}}
+          comparedItem: @{{productOrderItem[0].requestedItemTerm.duration.units}}
+        - mapperItem: @{{productOrderItem[0].requestedItemTerm.endOfTermAction}}
+          comparedItem: @{{productOrderItem[0].requestedItemTerm.endOfTermAction}}
+        - mapperItem: @{{productOrderItem[0].requestedItemTerm.rollInterval.amount}}
+          comparedItem: @{{productOrderItem[0].requestedItemTerm.rollInterval.amount}}
+        - mapperItem: @{{productOrderItem[0].requestedItemTerm.rollInterval.units}}
+          comparedItem: @{{productOrderItem[0].requestedItemTerm.rollInterval.units}}
+        - mapperItem: @{{productOrderItem[0].product.productConfiguration.bandwidthUnit}}
+          comparedItem: @{{productOrderItem[0].product.productConfiguration.bandwidthUnit}}
+        - mapperItem: @{{productOrderItem[0].product.productConfiguration.name}}
+          comparedItem: @{{productOrderItem[0].product.productConfiguration.name}}
+        - mapperItem: @{{productOrderItem[0].product.productConfiguration.paymentType}}
+          comparedItem: @{{productOrderItem[0].product.productConfiguration.paymentType}}
+        - mapperItem: @{{productOrderItem[0].product.productConfiguration.classOfService}}
+          comparedItem: @{{productOrderItem[0].product.productConfiguration.classOfService}}
+        - mapperItem: @{{productOrderItem[0].product.productConfiguration.buyerCompanyId}}
+          comparedItem: @{{productOrderItem[0].product.productConfiguration.buyerCompanyId}}
+        - mapperItem: @{{productOrderItem[0].product.productConfiguration.destUNIMetroId}}
+          comparedItem: @{{productOrderItem[0].product.productConfiguration.destUNIMetroId}}
+        - mapperItem: @{{productOrderItem[0].product.productConfiguration.type}}
+          comparedItem: @{{productOrderItem[0].product.productConfiguration.type}}
+        - mapperItem: @{{productOrderItem[0].product.productRelationship[0].id}}
+          comparedItem: @{{productOrderItem[0].product.productRelationship[0].id}}
+        - mapperItem: @{{productOrderItem[0].product.productRelationship[1].id}}
+          comparedItem: @{{productOrderItem[0].product.productRelationship[1].id}}
