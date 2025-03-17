@@ -8,10 +8,7 @@ import com.consoleconnect.kraken.operator.controller.dto.ComponentExpandDTO;
 import com.consoleconnect.kraken.operator.controller.dto.ComponentProductCategoryDTO;
 import com.consoleconnect.kraken.operator.controller.dto.EndPointUsageDTO;
 import com.consoleconnect.kraken.operator.controller.dto.SaveWorkflowTemplateRequest;
-import com.consoleconnect.kraken.operator.controller.model.ComponentTag;
-import com.consoleconnect.kraken.operator.controller.model.ComponentTagFacet;
-import com.consoleconnect.kraken.operator.controller.model.DeploymentFacet;
-import com.consoleconnect.kraken.operator.controller.model.Environment;
+import com.consoleconnect.kraken.operator.controller.model.*;
 import com.consoleconnect.kraken.operator.controller.tools.VersionHelper;
 import com.consoleconnect.kraken.operator.core.dto.ApiUseCaseDto;
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
@@ -27,6 +24,8 @@ import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.core.model.AssetLink;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
+import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPIFacets;
+import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPISpecFacets;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
 import com.consoleconnect.kraken.operator.core.repo.AssetFacetRepository;
 import com.consoleconnect.kraken.operator.core.repo.EnvironmentClientRepository;
@@ -43,6 +42,7 @@ import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -61,6 +61,7 @@ public class ApiComponentService
     implements TargetMappingChecker, EndPointUsageCalculator, ApiUseCaseSelector {
   private static final Logger log = LoggerFactory.getLogger(ApiComponentService.class);
   public static final KrakenException ASSET_NOT_FOUND = KrakenException.notFound("asset not found");
+  public static final String NOT_FOUND_SPEC = "not found spec";
   @Getter private final UnifiedAssetService unifiedAssetService;
   @Getter private final EnvironmentClientRepository environmentClientRepository;
   @Getter private final EnvironmentService environmentService;
@@ -257,9 +258,89 @@ public class ApiComponentService
     return Pair.of(requestMap, responseMap);
   }
 
+  public List<StandardComponentInfo> queryForStandardMappingInfo(String productType) {
+    List<StandardComponentInfo> result = new ArrayList<>();
+    Paging<UnifiedAssetDto> apiAssetsPage =
+        unifiedAssetService.search(
+            null, "kraken.component.api", true, null, PageRequest.of(0, Integer.MAX_VALUE));
+    if (apiAssetsPage == null || CollectionUtils.isEmpty(apiAssetsPage.getData())) {
+      return result;
+    }
+    Paging<UnifiedAssetDto> specAssetsPage =
+        unifiedAssetService.search(
+            null, "kraken.component.api-spec", true, null, PageRequest.of(0, Integer.MAX_VALUE));
+    if (specAssetsPage == null || CollectionUtils.isEmpty(apiAssetsPage.getData())) {
+      return result;
+    }
+
+    for (UnifiedAsset asset : apiAssetsPage.getData()) {
+      ComponentAPIFacets facets = UnifiedAsset.getFacets(asset, ComponentAPIFacets.class);
+      if (facets.getSupportedProductTypesAndActions() == null) {
+        continue;
+      }
+      List<ComponentAPIFacets.SupportedProductAndAction> list =
+          facets.getSupportedProductTypesAndActions().stream()
+              .filter(
+                  v ->
+                      v.getProductTypes() != null
+                          && v.getProductTypes().contains(productType.toUpperCase()))
+              .toList();
+
+      UnifiedAssetDto specAsset = findSpec(asset, specAssetsPage);
+      result.add(constructStandardComponent(asset, list, specAsset, facets));
+    }
+    return result;
+  }
+
+  private static StandardComponentInfo constructStandardComponent(
+      UnifiedAsset asset,
+      List<ComponentAPIFacets.SupportedProductAndAction> list,
+      UnifiedAssetDto specAsset,
+      ComponentAPIFacets facets) {
+    StandardComponentInfo info = new StandardComponentInfo();
+    info.setComponentKey(asset.getMetadata().getKey());
+    info.setName(asset.getMetadata().getName());
+    info.setLabels(asset.getMetadata().getLabels());
+    info.setSupportedProductTypes(
+        CollectionUtils.isEmpty(list) ? null : list.get(0).getProductTypes());
+    info.setLogo(specAsset.getMetadata() == null ? null : specAsset.getMetadata().getLogo());
+    if (MapUtils.isEmpty(specAsset.getFacets())) {
+      return info;
+    }
+    ComponentAPISpecFacets specFacet =
+        UnifiedAsset.getFacets(specAsset, ComponentAPISpecFacets.class);
+    info.setBaseSpec(specFacet.getBaseSpec());
+    info.setCustomizedSpec(specFacet.getCustomizedSpec());
+    info.setApiCount(facets.getMappings().size());
+    return info;
+  }
+
+  private static UnifiedAssetDto findSpec(
+      UnifiedAsset asset, Paging<UnifiedAssetDto> specAssetsPage) {
+    AssetLink specLink =
+        asset.getLinks().stream()
+            .filter(
+                assetLink ->
+                    Objects.equals(
+                        assetLink.getRelationship(),
+                        AssetLinkKindEnum.IMPLEMENTATION_STANDARD_API_SPEC.getKind()))
+            .findFirst()
+            .orElse(null);
+    return specAssetsPage.getData().stream()
+        .filter(
+            assetDto ->
+                Objects.equals(assetDto.getMetadata().getKey(), specLink.getTargetAssetKey()))
+        .findFirst()
+        .orElse(new UnifiedAssetDto());
+  }
+
+  public List<String> listProductType() {
+    return appProperty.getProductTypes();
+  }
+
   @Transactional
   public ComponentExpandDTO queryComponentExpandInfo(
-      String productId, String componentId, String envId) {
+      String productId, String componentId, String envId, String productType) {
     unifiedAssetService.findOne(productId);
     UnifiedAssetDto unifiedAssetDto = unifiedAssetService.findOne(componentId);
     List<AssetLink> links = unifiedAssetDto.getLinks();
@@ -291,6 +372,10 @@ public class ApiComponentService
         (k, assetDto) -> {
           ComponentExpandDTO.TargetMappingDetail detail =
               getTargetMappingDetail(k, assetDto, noRequiredMappingKeys);
+          if (StringUtils.isNotBlank(productType)
+              && !detail.getProductType().equalsIgnoreCase(productType)) {
+            return;
+          }
           detail.setOrderBy(
               appProperty.getApiTargetMapperOrderBy().getOrDefault(k, "<1000, 1000>"));
           mergeLastDeployment(detail, assetDto, envId);

@@ -689,7 +689,7 @@ class ProductDeploymentControllerTest extends AbstractIntegrationTest {
   void givenEnv_whenSearchMapperDetails_thenReturnOK() {
     testClientHelper.getAndVerify(
         (uriBuilder -> {
-          uriBuilder.queryParam("envId", TestApplication.envId);
+          uriBuilder.queryParam("envId", TestApplication.envId).queryParam("productType", "uni");
           return uriBuilder.path(GET_DETAIL_MAPPING_URL).build();
         }),
         bodyStr -> {
