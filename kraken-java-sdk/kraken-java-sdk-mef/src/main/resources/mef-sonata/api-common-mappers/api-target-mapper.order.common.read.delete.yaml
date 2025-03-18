@@ -8,7 +8,7 @@ metadata:
   version: 1
 spec:
   endpoints:
-    - id: retrieve connection detail by id
+    - id: retrieve delete order by id
       mappers:
         request:
           - name: mapper.order.@{{productType}}.read.delete.buyerId

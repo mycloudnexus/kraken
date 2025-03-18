@@ -8,7 +8,7 @@ metadata:
   version: 1
 spec:
   endpoints:
-    - id: retrieve eline product inventory detail by id
+    - id: retrieve product inventory detail by id
       mappers:
         request:
           - name: mapper.product.inventory.id

@@ -8,7 +8,7 @@ metadata:
   version: 1
 spec:
   endpoints:
-    - id: delete port
+    - id: delete order
       mappers:
         request:
           - name: mapper.order.@{{productType}}.delete.buyerId
