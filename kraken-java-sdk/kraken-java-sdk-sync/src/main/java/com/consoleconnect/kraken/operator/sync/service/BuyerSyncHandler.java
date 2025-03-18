@@ -25,6 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -41,6 +42,7 @@ public class BuyerSyncHandler implements ClientSyncHandler, ParentIdSelector {
   }
 
   @Override
+  @Transactional
   public void handleAssets(List<UnifiedAssetDto> assets) {
     handleBuyers(assets);
   }

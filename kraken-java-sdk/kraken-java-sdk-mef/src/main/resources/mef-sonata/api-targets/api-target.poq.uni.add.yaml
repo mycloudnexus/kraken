@@ -19,16 +19,22 @@ spec:
     - id: create a product offering qualification for port
       path: ""
       method: ""
-      requestBody: ${mefRequestBody.productOfferingQualificationItem[0].product.productConfiguration.uni}
+      requestBody: |
+        {}
       responseBody: |
         {
           "id":  "${entity.id}",
+          "projectId": "${mefRequestBody[projectId]?:''}",
+          "externalId":"${mefRequestBody[externalId]?:''}",
+          "instantSyncQualification": "${mefRequestBody[instantSyncQualification]?:''}",
+          "provideAlternative": "${mefRequestBody[provideAlternative]?:''}",
+          "requestedPOQCompletionDate": "${mefRequestBody[requestedPOQCompletionDate]?:''}",
+          "relatedContactInformation": "${T(com.consoleconnect.kraken.operator.gateway.func.SpelFunc).appendSellerInformation(env.seller.role, env.seller.name, env.seller.emailAddress, env.seller.number, mefRequestBody.relatedContactInformation)}",
           "productOfferingQualificationItem": [{
               "product": "${mefRequestBody.productOfferingQualificationItem[0].product}",
               "action": "${mefRequestBody.productOfferingQualificationItem[0].action}",
               "id":"${mefRequestBody.productOfferingQualificationItem[0].id}",
-              "state":"@{{itemState}}"
+              "state":"done.ready"
            }],
-          "relatedContactInformation": "${T(com.consoleconnect.kraken.operator.gateway.func.SpelFunc).appendSellerInformation(env.seller.role, env.seller.name, env.seller.emailAddress, env.seller.number, mefRequestBody.relatedContactInformation)}",
-          "state": "@{{state}}"
+          "state": "done.ready"
         }

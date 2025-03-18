@@ -6,6 +6,7 @@ metadata:
   name: Product Inventory Management
   labels:
     mef-api-release: grace
+    parentProductType: access.eline
     inventory-api-version: v7
   version: 4
 spec:
@@ -15,11 +16,13 @@ spec:
       productTypes:
         - UNI
         - ACCESS_E_LINE
+        - INTERNET_ACCESS
     - path: /mefApi/sonata/productInventory/v7/product/{id}
       method: get
       productTypes:
         - UNI
         - ACCESS_E_LINE
+        - INTERNET_ACCESS
   mappings:
     - uri: ${env.target.url}
       trigger:

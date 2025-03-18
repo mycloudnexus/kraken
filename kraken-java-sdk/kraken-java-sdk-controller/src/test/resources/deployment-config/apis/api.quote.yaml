@@ -6,6 +6,7 @@ metadata:
   name: Quote Management
   labels:
     mef-api-release: grace
+    parentProductType: access.eline
     quote-api-version: v8
   version: 8
 spec:

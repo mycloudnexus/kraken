@@ -1,6 +1,7 @@
 package com.consoleconnect.kraken.operator.core.model.facet;
 
 import com.consoleconnect.kraken.operator.core.enums.SupportedCaseEnum;
+import com.consoleconnect.kraken.operator.core.model.PathRule;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -50,6 +51,7 @@ public class ComponentAPITargetFacets {
 
   @Data
   public static class Mappers {
+    private List<PathRule> pathRules;
     private List<Mapper> request;
     private List<Mapper> response;
   }
@@ -82,6 +84,19 @@ public class ComponentAPITargetFacets {
     private String convertValue;
     private String sourceTaskName;
     private String targetTaskName;
+
+    private static final String MAPPER_REQUEST = "request";
+    private static final String MAPPER_RESPONSE = "response";
+
+    public String getKey(String mapperSection) {
+      final int hashcode;
+      if (Objects.equals(MAPPER_REQUEST, mapperSection)) {
+        hashcode = Objects.hash(mapperSection, source, sourceLocation);
+      } else {
+        hashcode = Objects.hash(mapperSection, target, targetLocation);
+      }
+      return String.valueOf(hashcode);
+    }
 
     @Override
     public int hashCode() {

@@ -1,0 +1,167 @@
+{
+  "mapper.testcase01.updateSystemMapping.request": {
+    "request": {
+      "customizedField": false,
+      "allowValueLimit": false,
+      "source": "@{{productOrderItem[0].product.productConfiguration.bandwidth}}",
+      "sourceLocation": "BODY",
+      "target": "@{{speed-new}}",
+      "requiredMapping": false,
+      "title": "updateSystemMapping",
+      "discrete": false,
+      "sourceType": "integer",
+      "replaceStar": true,
+      "sourceValues": [
+        1,
+        10000
+      ],
+      "targetLocation": "BODY"
+    }
+  },
+  "mapper.testcase01.updateSystemMapping.response": {
+    "response": {
+      "customizedField": false,
+      "allowValueLimit": false,
+      "target": "@{{state}}",
+      "targetLocation": "BODY",
+      "source": "@{{responseBody.status-new}}",
+      "requiredMapping": false,
+      "title": "Order State Mapping",
+      "name": "mapper.order.eline.add.state",
+      "description": "order state mapping",
+      "sourceLocation": "BODY",
+      "targetType": "enum",
+      "replaceStar": true,
+      "targetValues": [
+        "acknowledged",
+        "assessingCancellation",
+        "held.assessingCharge",
+        "pending.assessingModification",
+        "cancelled",
+        "pendingCancellation",
+        "completed",
+        "failed",
+        "inProgress",
+        "partial",
+        "rejected"
+      ],
+      "valueMapping": {
+        "PENDING": "pending,",
+        "CREATING": "acknowledged,",
+        "DISABLED": "disabled,",
+        "CANCELLED": "disabled,",
+        "ACTIVATING": "inProgress,"
+      }
+    }
+  },
+  "mapper.testcase02.addNewSystemMapping.request": {
+    "request": {
+      "customizedField": false,
+      "allowValueLimit": false,
+      "source": "@{{productOrderItem[0].product.productConfiguration.bandwidth}}",
+      "sourceLocation": "BODY",
+      "target": "@{{speed-new}}",
+      "requiredMapping": false,
+      "title": "addNewSystemMapping",
+      "discrete": false,
+      "sourceType": "integer",
+      "replaceStar": true,
+      "sourceValues": [
+        1,
+        10000
+      ],
+      "targetLocation": "BODY"
+    }
+  },
+  "mapper.testcase02.addNewSystemMapping.response": {
+    "response": {
+      "customizedField": false,
+      "allowValueLimit": false,
+      "target": "@{{state}}",
+      "targetLocation": "BODY",
+      "source": "@{{responseBody.status-new}}",
+      "requiredMapping": false,
+      "title": "Order State Mapping",
+      "name": "mapper.order.eline.add.state",
+      "description": "order state mapping",
+      "sourceLocation": "BODY",
+      "targetType": "enum",
+      "replaceStar": true,
+      "targetValues": [
+        "acknowledged",
+        "assessingCancellation",
+        "held.assessingCharge",
+        "pending.assessingModification",
+        "cancelled",
+        "pendingCancellation",
+        "completed",
+        "failed",
+        "inProgress",
+        "partial",
+        "rejected"
+      ],
+      "valueMapping": {
+        "PENDING": "pending,",
+        "CREATING": "acknowledged,",
+        "DISABLED": "disabled,",
+        "CANCELLED": "disabled,",
+        "ACTIVATING": "inProgress,"
+      }
+    }
+  },
+  "mapper.testcase06.mergeSystemToCustomizedMapping.request": {
+    "request": {
+      "customizedField": false,
+      "allowValueLimit": false,
+      "source": "@{{productOrderItem[0].product.productConfiguration.bandwidth}}",
+      "sourceLocation": "BODY",
+      "target": "@{{speed-new}}",
+      "requiredMapping": true,
+      "title": "updateSystemMapping",
+      "discrete": false,
+      "sourceType": "integer",
+      "replaceStar": true,
+      "sourceValues": [
+        1,
+        10000
+      ],
+      "targetLocation": "BODY"
+    }
+  },
+  "mapper.testcase06.mergeSystemToCustomizedMapping.response": {
+    "response": {
+      "customizedField": false,
+      "allowValueLimit": false,
+      "target": "@{{state}}",
+      "targetLocation": "BODY",
+      "source": "@{{responseBody.status-new}}",
+      "requiredMapping": true,
+      "title": "Order State Mapping",
+      "name": "mapper.order.eline.add.state",
+      "description": "order state mapping",
+      "sourceLocation": "BODY",
+      "targetType": "enum",
+      "replaceStar": true,
+      "targetValues": [
+        "acknowledged",
+        "assessingCancellation",
+        "held.assessingCharge",
+        "pending.assessingModification",
+        "cancelled",
+        "pendingCancellation",
+        "completed",
+        "failed",
+        "inProgress",
+        "partial",
+        "rejected"
+      ],
+      "valueMapping": {
+        "PENDING": "pending,",
+        "CREATING": "acknowledged,",
+        "DISABLED": "disabled,",
+        "CANCELLED": "disabled,",
+        "ACTIVATING": "inProgress,"
+      }
+    }
+  }
+}

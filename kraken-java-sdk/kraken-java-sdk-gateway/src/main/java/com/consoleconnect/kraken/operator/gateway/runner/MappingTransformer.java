@@ -5,12 +5,15 @@ import static com.consoleconnect.kraken.operator.core.toolkit.ConstructExpressio
 
 import com.consoleconnect.kraken.operator.core.dto.StateValueMappingDto;
 import com.consoleconnect.kraken.operator.core.enums.MappingTypeEnum;
+import com.consoleconnect.kraken.operator.core.model.KVPair;
+import com.consoleconnect.kraken.operator.core.model.PathRule;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPIFacets;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.gateway.template.SpELEngine;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.PathNotFoundException;
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
@@ -18,7 +21,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
-public interface MappingTransformer {
+public interface MappingTransformer extends PathOperator {
   String REPLACEMENT_KEY_PREFIX = "@{{";
   String REPLACEMENT_KEY_SUFFIX = "}}";
   String ARRAY_WILD_MASK = "[*]";
@@ -32,6 +35,7 @@ public interface MappingTransformer {
   String REQUEST_BODY = "requestBody.";
   String RESPONSE_BODY = "responseBody";
   String WORKFLOW_PREFIX = "workflow.";
+  String ARRAY_PATTERN = ".*\\[\\d+\\]$";
 
   @Slf4j
   final class LogHolder {}
@@ -124,44 +128,136 @@ public interface MappingTransformer {
     return responseBody;
   }
 
-  default String deleteNodeByPath(Map<String, String> checkPathMap, String json) {
+  default String deleteAndInsertNodeByPath(StateValueMappingDto stateValueMappingDto, String json) {
+    if (CollectionUtils.isEmpty(stateValueMappingDto.getPathRules())
+        && MapUtils.isEmpty(stateValueMappingDto.getTargetCheckPathMapper())) {
+      return json;
+    }
     DocumentContext doc = JsonPath.parse(json);
+    // Delete and insert operations based on path rules
+    stateValueMappingDto.getPathRules().stream()
+        .filter(pathRuleDto -> StringUtils.isNotBlank(pathRuleDto.getCheckPath()))
+        .forEach(
+            pathRuleDto -> {
+              Optional.ofNullable(pathRuleDto.getDeletePath())
+                  .filter(StringUtils::isNotBlank)
+                  .ifPresent(
+                      deletePath ->
+                          deleteNodeByPath(Map.of(pathRuleDto.getCheckPath(), deletePath), doc));
+
+              Optional.ofNullable(pathRuleDto.getInsertPath())
+                  .filter(CollectionUtils::isNotEmpty)
+                  .ifPresent(
+                      insertPath ->
+                          insertPath.forEach(
+                              kvPair ->
+                                  insertNodeIfMatched(
+                                      doc,
+                                      pathRuleDto.getCheckPath(),
+                                      kvPair.getKey(),
+                                      kvPair.getVal())));
+            });
+    // Perform final deletion based on target check path mapping
+    Optional.ofNullable(stateValueMappingDto.getTargetCheckPathMapper())
+        .filter(MapUtils::isNotEmpty)
+        .ifPresent(checkPathMap -> deleteNodeByPath(checkPathMap, doc));
+
+    return doc.jsonString();
+  }
+
+  default void insertNodeIfMatched(
+      DocumentContext doc, String checkPath, String insertKey, String insertVal) {
+    if (canInsert(doc, checkPath)) {
+      insertNodeByPath(doc, insertKey, insertVal);
+    }
+  }
+
+  default boolean canInsert(DocumentContext doc, String key) {
+    try {
+      return Optional.ofNullable(doc.read(key)).map(this::matchCondition).orElse(false);
+    } catch (Exception e) {
+      String err = String.format("Json Path read key error, key:%s", key);
+      LogHolder.log.error(err, e);
+    }
+    return false;
+  }
+
+  default void insertNodeByPath(DocumentContext doc, String key, String val) {
+    ensurePathExists(doc, key);
+    doc.set(key, val);
+  }
+
+  default void ensurePathExists(DocumentContext doc, String path) {
+    String[] segments = path.replace("$.", "").split("\\.");
+    String currentPath = "$";
+    for (String segment : segments) {
+      if (segment.matches(ARRAY_PATTERN)) {
+        currentPath = ensureArrayPath(doc, currentPath, segment);
+      } else {
+        currentPath = ensureObjectPath(doc, currentPath, segment);
+      }
+    }
+  }
+
+  private String ensureArrayPath(DocumentContext doc, String parentPath, String segment) {
+    String arrayName = segment.substring(0, segment.indexOf("["));
+    int index = Integer.parseInt(segment.substring(segment.indexOf("[") + 1, segment.indexOf("]")));
+    String arrayPath = parentPath + "." + arrayName;
+
+    List<Object> array;
+    try {
+      array = doc.read(arrayPath);
+    } catch (PathNotFoundException e) {
+      array = new ArrayList<>();
+      doc.put(parentPath, arrayName, array);
+    }
+    while (array.size() <= index) {
+      array.add(new HashMap<>());
+    }
+    doc.set(arrayPath, array);
+
+    return arrayPath + "[" + index + "]";
+  }
+
+  private String ensureObjectPath(DocumentContext doc, String parentPath, String segment) {
+    String objPath = parentPath + "." + segment;
+    try {
+      if (doc.read(objPath) == null) {
+        doc.put(parentPath, segment, new HashMap<>());
+      }
+    } catch (PathNotFoundException e) {
+      doc.put(parentPath, segment, new HashMap<>());
+    }
+    return objPath;
+  }
+
+  default void deleteNodeByPath(Map<String, String> checkPathMap, DocumentContext doc) {
     checkPathMap.forEach(
         (key, value) -> {
           Object obj = null;
           try {
             obj = doc.read(key);
+            if (matchCondition(obj)) {
+              deleteByPath(value, doc);
+            } else {
+              LogHolder.log.warn("Reserved key:{}, value:{}", key, value);
+            }
           } catch (Exception e) {
             String err =
                 String.format(
                     "Json Path read key error, key:%s, value:%s will be deleted", key, value);
             LogHolder.log.error(err, e);
             deleteByPath(value, doc);
-            return;
-          }
-          if (null == obj || (obj instanceof String str && (StringUtils.isBlank(str)))) {
-            deleteByPath(value, doc);
-          } else if (obj instanceof Integer i && i < 0) {
-            deleteByPath(value, doc);
-          } else if (obj instanceof Double i && i < 0) {
-            deleteByPath(value, doc);
-          } else if (obj instanceof Boolean b && !b) {
-            deleteByPath(value, doc);
-          } else if (obj instanceof JSONArray array && array.isEmpty()) {
-            deleteByPath(value, doc);
-          } else {
-            LogHolder.log.warn("Reserved key:{}, value:{}", key, value);
           }
         });
-    return doc.jsonString();
   }
 
-  default void deleteByPath(String path, DocumentContext doc) {
-    try {
-      doc.delete(path);
-    } catch (Exception e) {
-      LogHolder.log.warn("Delete path {} error: {}", path, e.getMessage());
-    }
+  default boolean matchCondition(Object obj) {
+    return obj == null
+        || (obj instanceof String str && StringUtils.isBlank(str))
+        || (obj instanceof Number num && num.doubleValue() < 0)
+        || (obj instanceof Boolean b && !b)
+        || (obj instanceof JSONArray array && array.isEmpty());
   }
 
   default String calculateBasedOnResponseBody(String responseBody, Map<String, Object> context) {
@@ -281,5 +377,35 @@ public interface MappingTransformer {
       return forward;
     }
     return Boolean.TRUE;
+  }
+
+  default void fillPathRulesIfExist(
+      List<PathRule> pathRuleList, StateValueMappingDto stateValueMappingDto) {
+    if (CollectionUtils.isEmpty(pathRuleList)) {
+      return;
+    }
+    List<PathRule> pathRules = new ArrayList<>();
+    pathRuleList.forEach(
+        item -> {
+          PathRule dto = new PathRule();
+          dto.setName(item.getName());
+          dto.setCheckPath(item.getCheckPath());
+          dto.setDeletePath(item.getDeletePath());
+          if (CollectionUtils.isNotEmpty(item.getInsertPath())) {
+            List<KVPair> insertPath =
+                item.getInsertPath().stream()
+                    .map(
+                        p -> {
+                          KVPair pair = new KVPair();
+                          pair.setKey(p.getKey());
+                          pair.setVal(p.getVal());
+                          return pair;
+                        })
+                    .toList();
+            dto.setInsertPath(insertPath);
+          }
+          pathRules.add(dto);
+        });
+    stateValueMappingDto.setPathRules(pathRules);
   }
 }

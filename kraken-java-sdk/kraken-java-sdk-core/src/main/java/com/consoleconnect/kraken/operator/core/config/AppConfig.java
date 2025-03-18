@@ -7,6 +7,7 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,6 +20,12 @@ public class AppConfig {
   @ConfigurationProperties(prefix = "app")
   public AppProperty appProperty() {
     return new AppProperty();
+  }
+
+  @Bean
+  @ConditionalOnProperty(value = "app.dual-version-config.enabled", havingValue = "true")
+  AppProperty.DualVersionConfig dualVersionConfig(AppProperty appProperty) {
+    return appProperty.getDualVersionConfig();
   }
 
   @Data

@@ -100,15 +100,24 @@ const RequestItem = ({ item, index }: Props) => {
   const [limitRangeType, setLimitRangeType] = useState(
     item?.discrete ? "discrete" : "continuous"
   );
-  const [continuousInput, setContinuousInput] = useState({
-    from: 0,
-    to: 0,
-  });
+  const [continuousInput, setContinuousInput] = useState(
+    item.allowValueLimit && !item.discrete
+      ? {
+          from: item.sourceValues?.[0] ?? 0,
+          to: item.sourceValues?.[1] ?? 0,
+        }
+      : {
+          from: 0,
+          to: 0,
+        }
+  );
+
   const {
     value: isEditTitle,
     setTrue: enableEditTitle,
     setFalse: disableEditTitle,
   } = useBoolean(false);
+
   const {
     value: isEditDescription,
     setTrue: enableEditDescription,
@@ -213,9 +222,16 @@ const RequestItem = ({ item, index }: Props) => {
   };
 
   useEffect(() => {
-    const newRequest = cloneDeep(requestMapping);
-    set(newRequest, `[${index}].sourceValues`, Object.values(continuousInput));
-    setRequestMapping(newRequest);
+    const continuousInputValues = Object.values(continuousInput);
+    if (continuousInputValues[1] > continuousInputValues[0]) {
+      const newRequest = cloneDeep(requestMapping);
+      set(
+        newRequest,
+        `[${index}].sourceValues`,
+        Object.values(continuousInput)
+      );
+      setRequestMapping(newRequest);
+    }
   }, [continuousInput]);
 
   return (
@@ -359,13 +375,15 @@ const RequestItem = ({ item, index }: Props) => {
                   </Button>
                 </Flex>
                 <MappingIcon />
-                <Input
+                <Select
+                  popupClassName={styles.selectPopup}
+                  mode="tags"
+                  key={`enum-${key}`}
                   placeholder="Input seller order state"
-                  // key={`enum-${key}`}
                   value={to?.[0]}
                   style={{ flex: 1 }}
-                  onChange={(value) => handleChangeInput([value], key)}
                   className={styles.stateSelect}
+                  onChange={(value) => handleChangeInput([value], key)}
                 />
               </Flex>
             ))}

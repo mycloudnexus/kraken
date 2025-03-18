@@ -18,6 +18,8 @@ public interface FacetsMapper {
   @Mapping(target = "target", source = "target")
   @Mapping(target = "targetLocation", source = "targetLocation")
   @Mapping(target = "targetType", source = "targetType")
+  @Mapping(target = "discrete", source = "discrete")
+  @Mapping(target = "sourceValues", source = "sourceValues")
   @Mapping(target = "targetValues", source = "targetValues")
   @Mapping(target = "valueMapping", source = "valueMapping")
   void toRequestMapper(
@@ -27,8 +29,10 @@ public interface FacetsMapper {
   @BeanMapping(
       ignoreByDefault = true,
       ignoreUnmappedSourceProperties = {})
+  @Mapping(target = "discrete", source = "discrete")
   @Mapping(target = "source", source = "source")
   @Mapping(target = "sourceLocation", source = "sourceLocation")
+  @Mapping(target = "sourceValues", source = "sourceValues")
   @Mapping(target = "valueMapping", source = "valueMapping")
   void toResponseMapper(
       ComponentAPITargetFacets.Mapper mapper,

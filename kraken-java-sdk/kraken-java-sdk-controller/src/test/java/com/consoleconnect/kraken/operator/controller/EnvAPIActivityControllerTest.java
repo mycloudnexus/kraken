@@ -19,7 +19,6 @@ import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import java.time.ZonedDateTime;
-import java.util.*;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
@@ -40,6 +39,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @ActiveProfiles("test-rs256")
 class EnvAPIActivityControllerTest extends AbstractIntegrationTest
     implements ApiActivityLogCreator, EnvCreator, BuyerCreator {
+  private static final String ACTIVITY_BASE_URL = "/products/%s/envs/%s/api-activities";
   WebTestClientHelper webTestClient;
   @Autowired ApiActivityLogRepository apiActivityLogRepository;
   @Autowired EnvironmentService environmentService;
@@ -55,8 +55,7 @@ class EnvAPIActivityControllerTest extends AbstractIntegrationTest
   @Order(1)
   void givenFakedActivityId_whenSearchActivityDetail_thenReturnEmpty() {
     Environment envStage = createStage(PRODUCT_ID);
-    String activityBaseUrl =
-        String.format("/products/%s/envs/%s/api-activities", PRODUCT_ID, envStage.getId());
+    String activityBaseUrl = String.format(ACTIVITY_BASE_URL, PRODUCT_ID, envStage.getId());
     webTestClient.requestAndVerify(
         HttpMethod.GET,
         uriBuilder -> uriBuilder.path(activityBaseUrl + "/{activityId}").build("11"),
@@ -73,8 +72,7 @@ class EnvAPIActivityControllerTest extends AbstractIntegrationTest
   @Order(2)
   void givenExistedActivityId_whenSearchDetail_thenReturnOK() {
     Environment envStage = createStage(PRODUCT_ID);
-    String activityBaseUrl =
-        String.format("/products/%s/envs/%s/api-activities", PRODUCT_ID, envStage.getId());
+    String activityBaseUrl = String.format(ACTIVITY_BASE_URL, PRODUCT_ID, envStage.getId());
     BuyerAssetDto buyerAssetDto =
         createBuyer(BUYER_ID + "-" + System.currentTimeMillis(), envStage.getId(), COMPANY_NAME);
     BuyerOnboardFacets buyerFacets =
@@ -113,6 +111,7 @@ class EnvAPIActivityControllerTest extends AbstractIntegrationTest
                 .queryParam("envId", envStage.getId())
                 .queryParam("path", "/123")
                 .queryParam("method", "GET")
+                .queryParam("statusCode", "200")
                 .queryParam(
                     "requestStartTime", ZonedDateTime.now().minusDays(1).toInstant().toEpochMilli())
                 .queryParam(
@@ -142,5 +141,47 @@ class EnvAPIActivityControllerTest extends AbstractIntegrationTest
             .build();
     String ip = IpUtils.getIP(serverHttpRequest);
     assertThat(ip, notNullValue());
+  }
+
+  @Test
+  @Order(5)
+  void givenTimeRange_whenSearchWithMethodAndStatusCode_thenReturnOK() {
+    Environment envStage = createStage(PRODUCT_ID);
+    for (int i = 0; i < 4; i++) {
+      if (i < 2) {
+        createApiActivityLog(
+            BUYER_ID, envStage.getId(), "UNI", "/xyz" + i, "localhost", "POST", 200);
+      } else {
+        createApiActivityLog(
+            BUYER_ID, envStage.getId(), "UNI", "/xyz" + i, "localhost", "POST", 201);
+      }
+    }
+    String activityBaseUrl = String.format(ACTIVITY_BASE_URL, PRODUCT_ID, envStage.getId());
+    webTestClient.requestAndVerify(
+        HttpMethod.GET,
+        uriBuilder ->
+            uriBuilder
+                .path(activityBaseUrl)
+                .queryParam("envId", envStage.getId())
+                .queryParam("buyer", BUYER_ID)
+                .queryParam("method", String.join(",", "GET", "POST"))
+                .queryParam("statusCode", String.join(",", "200", "201"))
+                .queryParam(
+                    "requestStartTime", ZonedDateTime.now().minusDays(1).toInstant().toEpochMilli())
+                .queryParam(
+                    "requestEndTime", ZonedDateTime.now().plusDays(10).toInstant().toEpochMilli())
+                .queryParam("productType", "UNI")
+                .build(),
+        HttpStatus.OK.value(),
+        null,
+        bodyStr -> {
+          log.info(bodyStr);
+          assertThat(bodyStr, hasJsonPath("$.data", notNullValue()));
+          assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(4)));
+          assertThat(bodyStr, hasJsonPath("$.data.data[0].buyer", notNullValue()));
+          assertThat(bodyStr, hasJsonPath("$.data.data[0].method", notNullValue()));
+          assertThat(bodyStr, hasJsonPath("$.data.data[0].httpStatusCode", notNullValue()));
+          assertThat(bodyStr, hasJsonPath("$.data.data[0].productType", equalTo("UNI")));
+        });
   }
 }

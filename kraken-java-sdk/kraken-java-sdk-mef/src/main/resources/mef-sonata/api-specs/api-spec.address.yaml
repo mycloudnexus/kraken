@@ -7,8 +7,9 @@ metadata:
   icon: https://storage.googleapis.com/console-connect-static-assets/krakenUI/address-validation-202409.png
   labels:
     mef-api-release: grace
+    parentProductType: access.eline
     address-api-version: v7
-  version: 2
+  version: 3
 spec:
   baseSpec:
     path: classpath:/mef-sonata/openapi/geographicAddressManagement.api.yaml

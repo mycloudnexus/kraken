@@ -1,10 +1,13 @@
 package com.consoleconnect.kraken.operator.gateway.filter;
 
+import com.consoleconnect.kraken.operator.core.entity.WorkflowInstanceEntity;
+import com.consoleconnect.kraken.operator.core.enums.WorkflowStatusEnum;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.core.model.HttpTask;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPIFacets;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentWorkflowFacets;
+import com.consoleconnect.kraken.operator.core.repo.WorkflowInstanceRepository;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.gateway.model.WorkflowPayload;
 import com.consoleconnect.kraken.operator.gateway.runner.AbstractActionRunner;
@@ -34,15 +37,20 @@ import reactor.core.publisher.Mono;
 public class WorkflowActionFilterFactory
     extends AbstractGatewayFilterFactory<WorkflowActionFilterFactory.Config> {
 
+  private final WorkflowInstanceRepository workflowInstanceRepository;
+
   public static final String VAR_SYNCHRONOUS = "synchronous";
   public static final String VAR_WORKFLOW_ENABLED = "enabled";
   public static final String VAR_WORKFLOW_CONFIG = "workflow-config";
   public static final String VAR_ENTITY_ID = "entity-id";
   public static final String VAR_REQUEST_ID = "log-request-id";
   public static final String VAR_BASE_URL = "url";
+  public static final String HOST = "Host";
+  public static final String CONTENT_LENGTH = "Content-Length";
 
-  public WorkflowActionFilterFactory() {
+  public WorkflowActionFilterFactory(WorkflowInstanceRepository workflowInstanceRepository) {
     super(Config.class);
+    this.workflowInstanceRepository = workflowInstanceRepository;
   }
 
   @Override
@@ -64,6 +72,8 @@ public class WorkflowActionFilterFactory
         // start workflow
         log.info("start workflow: {}", JsonToolkit.toJson(request));
         String workflowId = config.getWorkflowClient().startWorkflow(request);
+        // record workflow instance
+        recordWorkflowInstance(request, inputs, workflowId);
         // if async process, then return empty response
         if (!synchronousProcess) {
           return wrapperResponse(exchange, Map.of(), config);
@@ -78,6 +88,17 @@ public class WorkflowActionFilterFactory
         throw KrakenException.internalError("workflow execute error: " + e);
       }
     };
+  }
+
+  private void recordWorkflowInstance(
+      StartWorkflowRequest request, Map<String, Object> inputs, String workflowId) {
+    WorkflowInstanceEntity entity = new WorkflowInstanceEntity();
+    entity.setStatus(WorkflowStatusEnum.IN_PROGRESS.name());
+    entity.setPayload(request);
+    entity.setRequestId((String) inputs.get(VAR_REQUEST_ID));
+    entity.setWorkflowInstanceId(workflowId);
+    entity.setSynced(false);
+    workflowInstanceRepository.save(entity);
   }
 
   public static boolean getBool(Map<String, Object> inputs, String param) {
@@ -121,8 +142,7 @@ public class WorkflowActionFilterFactory
     WorkflowPayload payload = new WorkflowPayload();
     payload.setId((String) inputs.get(VAR_ENTITY_ID));
     payload.setRequestId((String) inputs.get(VAR_REQUEST_ID));
-    payload.setHeaders(exchange.getRequest().getHeaders().toSingleValueMap());
-    payload.setHeaders(new HashMap<>());
+    payload.setHeaders(cleanHeaders(exchange));
     workflowFacets.getValidationStage().stream()
         .forEach(task -> constructHttpPayload(task, payload, inputs));
     workflowFacets.getPreparationStage().stream()
@@ -136,6 +156,17 @@ public class WorkflowActionFilterFactory
     request.setName(workflowFacets.getMetaData().getWorkflowName());
     request.setVersion(getLatestVersion(config.getMetadataClient(), request.getName()));
     return request;
+  }
+
+  private static Map<String, String> cleanHeaders(ServerWebExchange exchange) {
+    Map<String, String> singleValueMap = exchange.getRequest().getHeaders().toSingleValueMap();
+    Map<String, String> map = new HashMap<>(singleValueMap);
+    for (String key : map.keySet()) {
+      if (key.equalsIgnoreCase(HOST) || key.equalsIgnoreCase(CONTENT_LENGTH)) {
+        singleValueMap.remove(key);
+      }
+    }
+    return singleValueMap;
   }
 
   private static void constructHttpPayload(
