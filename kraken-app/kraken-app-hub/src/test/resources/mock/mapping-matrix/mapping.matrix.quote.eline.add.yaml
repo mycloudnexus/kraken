@@ -11,6 +11,7 @@ spec:
   matrix:
     mef.sonata.api-target.quote.eline.add:
       - name: enabled
+        path:
         expectType: EXPECTED
         value: false
         errorMsg: "api use case is not supported : disabled : instantSyncQuote==false"

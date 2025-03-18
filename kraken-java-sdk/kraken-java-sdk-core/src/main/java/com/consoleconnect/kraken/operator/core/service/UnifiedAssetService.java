@@ -562,7 +562,11 @@ public class UnifiedAssetService implements UUIDWrapper {
     assetEntity.setFacets(newFacets);
     Set<UUID> toDeletedIds =
         existingFacets.stream().map(AssetFacetEntity::getId).collect(Collectors.toSet());
-    log.info("delete asset facets ids:{}", JsonToolkit.toJson(toDeletedIds));
+    log.info(
+        "delete asset facets ids:{}, facets:{}",
+        JsonToolkit.toJson(toDeletedIds),
+        JsonToolkit.toJson(facets));
+    log.info("delete existingFacets:{}", JsonToolkit.toJson(existingFacets));
     this.assetFacetRepository.deleteAll(existingFacets);
     this.assetFacetRepository.flush();
     facets.forEach(
