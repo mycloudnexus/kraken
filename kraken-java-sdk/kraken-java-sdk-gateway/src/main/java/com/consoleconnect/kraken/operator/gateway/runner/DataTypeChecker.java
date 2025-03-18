@@ -43,7 +43,6 @@ public interface DataTypeChecker {
       "invalidValue, can not process @{{%s}} = %s, value should be in closed interval[%s, %s]";
   String JSON_PATH_READ_ERR = "read json path error!";
   String ARRAY_PARAM_PATTERN = "\\$\\{param\\.([^}]+)\\}";
-  ObjectMapper objectMapper = new ObjectMapper();
 
   @Slf4j
   final class LogHolder {}
@@ -131,6 +130,7 @@ public interface DataTypeChecker {
     JsonNode sourceJson = null;
     JsonNode targetJson = null;
     try {
+      ObjectMapper objectMapper = new ObjectMapper();
       sourceJson = objectMapper.readTree(source);
       targetJson = objectMapper.readTree(target);
     } catch (Exception e) {
