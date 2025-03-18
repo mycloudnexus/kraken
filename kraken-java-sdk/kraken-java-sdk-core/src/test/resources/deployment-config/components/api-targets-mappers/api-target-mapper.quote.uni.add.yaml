@@ -14,6 +14,10 @@ spec:
       method: post
       serverKey: mef.sonata.api-target-spec.con1718940696857
       mappers:
+        pathRules:
+          - name: mapper.quite.uni.add.sync.pathRule.state
+            checkPath: "$[?(@.state != 'unableToProvide')]"
+            deletePath: "$.validFor,  $.quoteLevel"
         request:
           - name: mapper.order.quote.uni.add.buyerId
             title: The unique identifier of the organization that is acting as the a Buyer.

@@ -211,7 +211,6 @@ app:
       enabled: false
 
   initialize-exclude-assets:
-    - classpath:/mef-sonata/apis/api.product.offering.yaml
     - classpath:/mef-sonata/api-targets/api-target.quote.eline.add.yaml
     - classpath:/mef-sonata/api-targets/api-target.quote.eline.read.yaml
     - classpath:/mef-sonata/api-targets/api-target.quote.uni.add.yaml
@@ -225,22 +224,25 @@ app:
     - kraken.component.api
     - kraken.component.api-spec
   query-exclude-asset-keys:
-    - mef.sonata.api.poq
-    - mef.sonata.api-spec.product.offering.qualification
     - mef.sonata.api-target-mapper.quote.eline.add
     - mef.sonata.api-target-mapper.quote.uni.add
     - mef.sonata.api-target-mapper.quote.uni.read
     - mef.sonata.api-target-mapper.quote.eline.read
+  no-required-mapping-keys:
+    - mef.sonata.api-target-mapper.poq.eline.read
+    - mef.sonata.api-target-mapper.poq.uni.read
+    - mef.sonata.api-target-mapper.quote.eline.read.sync
+    - mef.sonata.api-target-mapper.quote.uni.read.sync
   api-spec-order-by:
     mef.sonata.api-spec.serviceability.address: 1
-    mef.sonata.api-spec.quote: 2
-    mef.sonata.api-spec.product.offering.qualification: 3
+    mef.sonata.api-spec.product.offering.qualification: 2
+    mef.sonata.api-spec.quote: 3
     mef.sonata.api-spec.order: 4
     mef.sonata.api-spec.inventory: 5
   api-order-by:
     mef.sonata.api.serviceability.address: 1
-    mef.sonata.api.quote: 2
-    mef.sonata.api.poq: 3
+    mef.sonata.api.poq: 2
+    mef.sonata.api.quote: 3
     mef.sonata.api.order: 4
     mef.sonata.api.inventory: 5
   api-target-mapper-order-by:
@@ -270,3 +272,8 @@ app:
     mef.sonata.api-target-mapper.inventory.eline.list: <1,2>
     mef.sonata.api-target-mapper.inventory.uni.read: <2,1>
     mef.sonata.api-target-mapper.inventory.eline.read: <2,2>
+  product-types:
+    - UNI
+    - ACCESS_E_LINE
+    - INTERNET_ACCESS
+    - SHARE

@@ -1,0 +1,90 @@
+{
+  "response":
+  {
+    "headers":
+    {
+      "Date":
+      [
+        "Tue, 14 Jan 2025 08:36:34 GMT"
+      ],
+      "Content-Type":
+      [
+        "text/html; charset=utf-8"
+      ],
+      "Content-Length":
+      [
+        "601"
+      ],
+      "Connection":
+      [
+        "keep-alive"
+      ],
+      "x-srv-trace":
+      [
+        "v=1;t=ef8fd8c8ff27cf1a"
+      ],
+      "x-srv-span":
+      [
+        "v=1;s=bd16dcf4d8e1f5f6"
+      ],
+      "Access-Control-Allow-Origin":
+      [
+        "*"
+      ],
+      "X-RateLimit-Limit":
+      [
+        "120"
+      ],
+      "X-RateLimit-Remaining":
+      [
+        "119"
+      ],
+      "X-RateLimit-Reset":
+      [
+        "1736843854"
+      ],
+      "ETag":
+      [
+        "W/\"259-Ur4u/EhFNALYkv9MktI8XwfEtwk\""
+      ],
+      "Vary":
+      [
+        "Accept-Encoding"
+      ]
+    },
+    "reasonPhrase": "OK",
+    "body":
+    {
+      "id": "507f1f77bcf86cd799439011",
+      "name": "Mock company name",
+      "username": "mock-user-name",
+      "company":
+      {
+        "addresses":
+        [
+          {
+            "street": "Mock street",
+            "city": "Hong Kong",
+            "country": "CN"
+          }
+        ]
+      },
+      "dataCenterFacility":
+      {
+        "metroId": "507f1f77bcf86cd799439011",
+        "ready": true,
+        "nniReady": true,
+        "speeds":
+        [
+          {
+            "name": "10000 Mbps",
+            "value": 10000
+          }
+        ],
+        "canBundleCrossConnect": true
+      },
+      "bundleCrossConnectChargeId": "65eff1e96d38598ce3cf6247"
+    },
+    "statusCode": 200
+  }
+}

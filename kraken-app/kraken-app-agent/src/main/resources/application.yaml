@@ -117,6 +117,7 @@ app:
     push-heartbeat: 0/20 * * * * *
     push-log: 0/20 * * * * *
     push-log-external-system: 0 0/1 * * * *
+    push-workflow-status: 0 0/1 * * * *
     lock:
       at-most-for: 2m
       at-least-for: 10s
@@ -125,6 +126,7 @@ app:
     - kraken.component.api-target
     - kraken.component.api-target-mapper
     - kraken.component.api-workflow
+    - kraken.product.mapping.matrix
     - kraken.component.api-server
   unified-asset:
     endpoints:

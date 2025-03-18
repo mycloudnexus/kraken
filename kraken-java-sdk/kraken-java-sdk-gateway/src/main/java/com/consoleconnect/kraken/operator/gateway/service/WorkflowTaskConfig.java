@@ -2,11 +2,20 @@ package com.consoleconnect.kraken.operator.gateway.service;
 
 import static com.consoleconnect.kraken.operator.core.toolkit.Constants.*;
 
+import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
+import com.consoleconnect.kraken.operator.core.entity.WorkflowInstanceEntity;
+import com.consoleconnect.kraken.operator.core.enums.WorkflowStatusEnum;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
+import com.consoleconnect.kraken.operator.core.model.ApiActivityRequestLog;
+import com.consoleconnect.kraken.operator.core.model.ApiActivityResponseLog;
+import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
+import com.consoleconnect.kraken.operator.core.repo.WorkflowInstanceRepository;
+import com.consoleconnect.kraken.operator.core.toolkit.ConstructExpressionUtil;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.gateway.entity.HttpRequestEntity;
 import com.consoleconnect.kraken.operator.gateway.repo.HttpRequestRepository;
 import com.consoleconnect.kraken.operator.gateway.template.SpELEngine;
+import com.consoleconnect.kraken.operator.gateway.toolkit.ApiActivityLogHelper;
 import com.consoleconnect.kraken.operator.workflow.model.EvaluateResult;
 import com.consoleconnect.kraken.operator.workflow.model.LogTaskRequest;
 import com.consoleconnect.kraken.operator.workflow.service.WorkflowTaskRegister;
@@ -27,6 +36,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Getter
 public class WorkflowTaskConfig implements WorkflowTaskRegister {
   private final HttpRequestRepository repository;
+
+  private final BackendApiActivityLogService backendApiActivityLogService;
+  private final WorkflowInstanceRepository workflowInstanceRepository;
+  private final ApiActivityLogRepository apiActivityLogRepository;
 
   @WorkerTask(NOTIFY_TASK)
   public void notify(
@@ -70,9 +83,40 @@ public class WorkflowTaskConfig implements WorkflowTaskRegister {
     return result;
   }
 
+  @WorkerTask(value = EVALUATE_EXPRESSION_TASK, pollingInterval = 10)
+  public EvaluateResult evaluateExpressionTask(
+      @InputParam("value") Map<String, Object> value, @InputParam("expression") String expression) {
+    EvaluateResult result = new EvaluateResult();
+    String evaluate =
+        SpELEngine.evaluate(ConstructExpressionUtil.constructParam(expression), value);
+
+    result.setSingleResult(StringUtils.isBlank(evaluate) ? Boolean.FALSE.toString() : evaluate);
+    return result;
+  }
+
   @WorkerTask(LOG_PAYLOAD_TASK)
   public void logRequestPayload(@InputParam("payload") LogTaskRequest payload) {
     log.info("log payload: {}", JsonToolkit.toJson(payload));
+
+    try {
+      ApiActivityRequestLog activityRequestLog = ApiActivityLogHelper.extractRequestLog(payload);
+      if (activityRequestLog == null) {
+        log.error("Invalid activity log, empty request");
+        return;
+      }
+      ApiActivityLogEntity entity =
+          backendApiActivityLogService.logApiActivityRequest(activityRequestLog);
+
+      ApiActivityResponseLog activityResponseLog = ApiActivityLogHelper.extractResponseLog(payload);
+      if (activityResponseLog == null) {
+        log.error("Invalid activity log, empty response");
+        return;
+      }
+      activityResponseLog.setApiActivityLog(entity);
+      backendApiActivityLogService.logApiActivityResponse(activityResponseLog);
+    } catch (Exception e) {
+      log.error("Failed to log api activity log", e);
+    }
   }
 
   @WorkerTask(EMPTY_TASK)
@@ -102,6 +146,44 @@ public class WorkflowTaskConfig implements WorkflowTaskRegister {
               httpRequestEntity -> {
                 httpRequestEntity.setResponse(payload);
                 repository.save(httpRequestEntity);
+              });
+    }
+  }
+
+  @WorkerTask(WORKFLOW_SUCCESS_TASK)
+  public void workflowSuccessTask(@InputParam("id") String id) {
+    workflowStateChange(id, WorkflowStatusEnum.SUCCESS.name(), null);
+  }
+
+  @WorkerTask(WORKFLOW_FAILED_TASK)
+  public void workflowFailedTask(
+      @InputParam("id") String id, @InputParam("errorMsg") String errorMsg) {
+    workflowStateChange(id, WorkflowStatusEnum.FAILED.name(), errorMsg);
+  }
+
+  private void workflowStateChange(
+      @InputParam("id") String id,
+      @InputParam("status") String status,
+      @InputParam("errorMsg") String errorMsg) {
+    log.info("workflow {} terminate with: status = {}, errorMsg = {}", id, status, errorMsg);
+    if (StringUtils.isBlank(id)) {
+      log.warn("id is null");
+      return;
+    }
+    WorkflowInstanceEntity entity = workflowInstanceRepository.findByRequestId(id);
+    if (entity != null) {
+      entity.setStatus(status);
+      entity.setErrorMsg(errorMsg);
+      workflowInstanceRepository.save(entity);
+
+      apiActivityLogRepository
+          .findByRequestIdAndCallSeq(id, 0)
+          .ifPresent(
+              apiActivityLogEntity -> {
+                apiActivityLogEntity.setWorkflowStatus(status);
+                apiActivityLogEntity.setWorkflowInstanceId(entity.getWorkflowInstanceId());
+                apiActivityLogEntity.setErrorMsg(errorMsg);
+                apiActivityLogRepository.save(apiActivityLogEntity);
               });
     }
   }

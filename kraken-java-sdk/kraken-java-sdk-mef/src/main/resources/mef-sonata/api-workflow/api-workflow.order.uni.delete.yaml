@@ -2,7 +2,7 @@
 kind: kraken.component.api-workflow
 apiVersion: v1
 metadata:
-  key: mef.sonata.api-workflow.order.eline.delete
+  key: mef.sonata.api-workflow.order.uni.delete
   name: Order Management
   version: 1
 spec:

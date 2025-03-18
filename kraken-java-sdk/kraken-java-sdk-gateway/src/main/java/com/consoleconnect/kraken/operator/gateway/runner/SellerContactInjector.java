@@ -8,14 +8,14 @@ import com.consoleconnect.kraken.operator.core.enums.ParentProductTypeEnum;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.SellerContactFacets;
 import com.consoleconnect.kraken.operator.core.service.ApiUseCaseSelector;
+import com.consoleconnect.kraken.operator.core.service.AssetKeyGenerator;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
-import com.consoleconnect.kraken.operator.core.toolkit.Constants;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.*;
 import org.apache.commons.collections4.CollectionUtils;
 
-public interface SellerContactInjector extends ApiUseCaseSelector {
+public interface SellerContactInjector extends ApiUseCaseSelector, AssetKeyGenerator {
   String SELLER_KEY_WORD = "seller";
 
   UnifiedAssetService getUnifiedAssetService();
@@ -56,9 +56,5 @@ public interface SellerContactInjector extends ApiUseCaseSelector {
     currentSeller.setRole(sellerInfo.getRole());
     envMap.put(SELLER_KEY_WORD, currentSeller);
     inputs.put(ENV, envMap);
-  }
-
-  default String generateSellerContactKey(String componentKey, String productCategoryKind) {
-    return componentKey + Constants.DOT + productCategoryKind;
   }
 }

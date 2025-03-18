@@ -6,6 +6,7 @@ metadata:
   name: Product Ordering Management
   labels:
     mef-api-release: grace
+    parentProductType: access.eline
     order-api-version: v10
   version: 6
 spec:
@@ -18,6 +19,7 @@ spec:
       productTypes:
         - UNI
         - ACCESS_E_LINE
+        - INTERNET_ACCESS
     - path: /mefApi/sonata/productOrderingManagement/v10/productOrder/{id}
       method: get
       actionTypes:
@@ -26,6 +28,7 @@ spec:
       productTypes:
         - UNI
         - ACCESS_E_LINE
+        - INTERNET_ACCESS
   mappings:
     - uri: ${env.target.url}
       trigger:

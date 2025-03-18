@@ -57,8 +57,18 @@ public class GeneralSyncServiceTest extends AbstractIntegrationTest {
 
   @Test
   @Order(1)
+  void givenAssetKind_whenSyncTrue_thenOK() {
+    startSync(false);
+  }
+
+  @Test
+  @Order(2)
+  void givenAssetKind_whenSyncFalse_thenOK() {
+    startSync(true);
+  }
+
   @SneakyThrows
-  void givenAssetKind_whenSync_thenOK() {
+  private void startSync(boolean isEmpty) {
     WebClient webClient = WebClient.builder().baseUrl(url).build();
     GeneralSyncService generalSyncService1 = get(webClient);
     final Dispatcher dispatcher =
@@ -73,7 +83,7 @@ public class GeneralSyncServiceTest extends AbstractIntegrationTest {
             }
             return switch (assetKindEnum) {
               case PRODUCT_BUYER -> mockerBuyer();
-              case COMPONENT_SELLER_CONTACT -> mockerSellerContact();
+              case COMPONENT_SELLER_CONTACT -> mockerSellerContact(isEmpty);
               default -> new MockResponse().setResponseCode(404);
             };
           }
@@ -100,11 +110,17 @@ public class GeneralSyncServiceTest extends AbstractIntegrationTest {
   }
 
   @SneakyThrows
-  private MockResponse mockerSellerContact() {
+  private MockResponse mockerSellerContact(boolean isEmpty) {
+    List<UnifiedAssetDto> assets;
+    if (isEmpty) {
+      assets = Collections.emptyList();
+    } else {
+      String mockData = readFileToString("data/seller-contact-01.json");
+      UnifiedAssetDto mockAsset = JsonToolkit.fromJson(mockData, new TypeReference<>() {});
+      assets = Collections.singletonList(mockAsset);
+    }
     MockResponse mockResponse = new MockResponse();
-    String mockData = readFileToString("data/seller-contact-01.json");
-    UnifiedAssetDto mockAsset = JsonToolkit.fromJson(mockData, new TypeReference<>() {});
-    mockResponse.setBody(JsonToolkit.toJson(HttpResponse.ok(Collections.singletonList(mockAsset))));
+    mockResponse.setBody(JsonToolkit.toJson(HttpResponse.ok(assets)));
     mockResponse.addHeader("Content-Type", "application/json");
     return mockResponse;
   }

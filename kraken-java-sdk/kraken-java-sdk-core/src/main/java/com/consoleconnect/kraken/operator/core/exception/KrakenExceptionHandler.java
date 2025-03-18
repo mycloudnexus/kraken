@@ -84,7 +84,7 @@ public class KrakenExceptionHandler extends AbstractErrorWebExceptionHandler {
     String rawMsg =
         (Objects.isNull(throwable.getCause()) ? message : throwable.getCause().getMessage());
     List<String> propertyPathList = ConstructExpressionUtil.extractMapperParam(rawMsg);
-    errorResponse.setMessage(rawMsg == null ? "" : rawMsg.replace("@{{", "").replace("}}", ""));
+    StringUtils.processRawMessage(errorResponse, rawMsg);
     errorResponse.setReferenceError(reason);
     if (httpStatus.value() != HttpStatus.UNPROCESSABLE_ENTITY.value()) {
       return errorResponse;

@@ -5,7 +5,7 @@
     "id": "049c3d53-1569-4788-9527-3b1cb603984c",
     "name": "mef.sonata.seller.contact",
     "version": 0,
-    "key": "mef.sonata.api.quote.access.eline.internet.access",
+    "key": "mef.sonata.api.quote.access.eline.seller.contact",
     "description": "seller contact information",
     "status": "activated",
     "labels": {
