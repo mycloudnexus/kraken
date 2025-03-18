@@ -11,6 +11,7 @@ spec:
     path: /mefApi/sonata/geographicAddressManagement/v7/geographicAddress/{id}
     method: get
     addressType: FieldedAddress
+    productType: share
   endpoints:
     - id: retrieve address
       path: ""
