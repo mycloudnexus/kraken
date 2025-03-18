@@ -3,7 +3,7 @@ kind: kraken.component.api-target-mapper
 apiVersion: v1
 metadata:
   key: mef.sonata.api-target-mapper.order.common.add
-  name: Mapper Of Creating Order Port
+  name: Mapper Of Creating Order
   description: This operation creates a ProductOrder entity
   version: 1
   endpoints:
@@ -109,7 +109,7 @@ metadata:
             targetLocation: BODY
             requiredMapping: true
           - name: mapper.order.@{{productType}}.add.bandwidth
-            title: "Bandwidth of the UNI"
+            title: "Bandwidth of the @{{productType}}"
             source: "@{{productOrderItem[0].product.productConfiguration.bandwidth}}"
             sourceLocation: BODY
             allowValueLimit: true
@@ -183,7 +183,7 @@ metadata:
             sourceLocation: BODY
             targetLocation: BODY
             requiredMapping: false
-          - name: mapper.order.uni.add.product.id
+          - name: mapper.order.@{{productType}}.add.product.id
             title: product instance id
             description: ""
             source: ""
@@ -192,7 +192,7 @@ metadata:
             targetLocation: BODY
             customizedField: false
             requiredMapping: false
-          - name: mapper.order.uni.add.term.endOfTermAction
+          - name: mapper.order.@{{productType}}.add.term.endOfTermAction
             title: MEFEndOfTermAction
             description: ""
             source: ""

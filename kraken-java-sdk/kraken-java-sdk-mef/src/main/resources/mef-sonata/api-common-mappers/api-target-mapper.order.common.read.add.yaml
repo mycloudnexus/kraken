@@ -3,7 +3,7 @@ kind: kraken.component.api-target-mapper
 apiVersion: v1
 metadata:
   key: mef.sonata.api-target-mapper.order.common.read.add
-  name:  Mapper Of Reading Order entity
+  name:  Mapper Of Reading Created Order entity
   description: This operation retrieves a ProductOrder entity
   version: 1
   endpoints:
