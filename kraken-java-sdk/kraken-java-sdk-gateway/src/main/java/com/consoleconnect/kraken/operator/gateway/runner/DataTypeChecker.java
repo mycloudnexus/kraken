@@ -1,5 +1,8 @@
 package com.consoleconnect.kraken.operator.gateway.runner;
 
+import static com.jayway.jsonpath.Criteria.where;
+import static com.jayway.jsonpath.Filter.filter;
+
 import com.consoleconnect.kraken.operator.core.enums.MappingTypeEnum;
 import com.consoleconnect.kraken.operator.core.exception.ErrorResponse;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
@@ -8,6 +11,7 @@ import com.consoleconnect.kraken.operator.core.toolkit.Constants;
 import com.consoleconnect.kraken.operator.core.toolkit.ConstructExpressionUtil;
 import com.consoleconnect.kraken.operator.gateway.dto.PathCheck;
 import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -110,6 +114,12 @@ public interface DataTypeChecker {
       throwException(code, errorMsg, String.format(defaultMsg, extractCheckingPath(checkPath)));
     }
     return realValue;
+  }
+
+  default boolean filterRequest(String request) {
+    com.jayway.jsonpath.Predicate actionFilter = filter(where("action").eq("add"));
+    List<Object> list = JsonPath.read(request, "$.productOrderItem[?]", actionFilter);
+    return CollectionUtils.isNotEmpty(list);
   }
 
   default String getDefaultMessage(Integer code) {

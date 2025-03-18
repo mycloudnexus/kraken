@@ -1,0 +1,35 @@
+---
+kind: kraken.component.validation
+apiVersion: v1
+metadata:
+  key: mef.sonata.validation.mapping.modify
+  name: Validation Mapping for Modification
+  description: Defines validation rules for modifying quote or order mappings in MEF Sonata.
+  version: 1.0
+  lastUpdated: 2025-03-18
+spec:
+  modificationRules:
+    - useCase:  mef.sonata.api-target-mapper.quote.eline.modify.sync
+      referenceMapper: mef.sonata.api-target-mapper.order.eline.add
+      allowedChanges:
+        - sourceItem: $.quoteItem[0].product.productConfiguration.bandwidth
+          targetItem: $.productOrderItem[0].product.productConfiguration.bandwidth
+      restrictedChanges:
+        - sourceItem: $.quoteItem[0].requestedItemTerm.duration.amount
+          targetItem: $.productOrderItem[0].requestedItemTerm.duration.amount
+        - sourceItem: $.quoteItem[0].requestedItemTerm.duration.units
+          targetItem: $.productOrderItem[0].requestedItemTerm.duration.units
+        - sourceItem: $.quoteItem[0].requestedItemTerm.endOfTermAction
+          targetItem: $.productOrderItem[0].requestedItemTerm.endOfTermAction
+        - sourceItem: $.quoteItem[0].requestedItemTerm.rollInterval.amount
+          targetItem: $.productOrderItem[0].requestedItemTerm.rollInterval.amount
+        - sourceItem: $.quoteItem[0].requestedItemTerm.rollInterval.units
+          targetItem: $.productOrderItem[0].requestedItemTerm.rollInterval.units
+        - sourceItem: $.quoteItem[0].product.productConfiguration.bandwidthUnit
+          targetItem: $.productOrderItem[0].product.productConfiguration.bandwidthUnit
+        - sourceItem: $.quoteItem[0].product.productConfiguration.classOfService
+          targetItem: $.productOrderItem[0].product.productConfiguration.classOfService
+        - sourceItem: $.quoteItem[0].product.productConfiguration.paymentType
+          targetItem: $.productOrderItem[0].product.productConfiguration.paymentType
+        - sourceItem: $.quoteItem[0].product.productOffering.id
+          targetItem: $.productOrderItem[0].product.productOffering.id
