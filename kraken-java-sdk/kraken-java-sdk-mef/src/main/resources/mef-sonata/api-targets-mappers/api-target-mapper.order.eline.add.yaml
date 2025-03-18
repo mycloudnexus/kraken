@@ -217,7 +217,7 @@ spec:
             replaceStar: true
             targetValues:
               - acknowledged
-              - assessingCancellationacknowledged
+              - assessingCancellation
               - held.assessingCharge
               - pending.assessingModification
               - cancelled

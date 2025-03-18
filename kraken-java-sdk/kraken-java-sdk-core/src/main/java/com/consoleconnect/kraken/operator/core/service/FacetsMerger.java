@@ -8,7 +8,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.logging.log4j.util.Strings;
+import org.apache.commons.lang3.StringUtils;
 
 public interface FacetsMerger extends CommonMapperExtender {
 
@@ -134,6 +134,7 @@ public interface FacetsMerger extends CommonMapperExtender {
       mapperMapNew.put(name, new HashMap<>(Map.of(mapperSection, copyFrom.getValue())));
     } else if (isSystemAndConfigured(copyFrom)) {
       copyFrom.getValue().setCustomizedField(Boolean.TRUE);
+      copyFrom.getValue().setRequiredMapping(Boolean.FALSE);
       mapperMapNew.put(name, new HashMap<>(Map.of(mapperSection, copyFrom.getValue())));
     }
   }
@@ -164,9 +165,9 @@ public interface FacetsMerger extends CommonMapperExtender {
 
   private static boolean isConfigured(Map.Entry<String, ComponentAPITargetFacets.Mapper> mapper) {
     if (Objects.equals(MAPPER_REQUEST, mapper.getKey())) {
-      return Strings.isNotBlank(mapper.getValue().getTarget());
+      return StringUtils.isNotBlank(mapper.getValue().getTarget());
     } else {
-      return Strings.isNotBlank(mapper.getValue().getSource());
+      return StringUtils.isNotBlank(mapper.getValue().getSource());
     }
   }
 

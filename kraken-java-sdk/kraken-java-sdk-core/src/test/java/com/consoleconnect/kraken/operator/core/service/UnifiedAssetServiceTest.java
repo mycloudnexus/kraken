@@ -225,16 +225,37 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
 
     /*
      * mapper.testcase03.changeSystemMappingToDeleteToCustomized
-     * | property                 | old                          | new | merged                       |
-     * | request.customizedField  | false                        | N/A | true                         |
-     * | request.allowValueLimit  | true                         | N/A | false                        |
-     * | request.target           | @{{speed-old}}               | N/A | @{{speed-old}}               |
-     * | response.customizedField | false                        | N/A | true                         |
-     * | response.allowValueLimit | true                         | N/A | false                        |
-     * | response.source          | @{{responseBody.status-old}} | N/A | @{{responseBody.status-old}} |
+     * requiredMapping(false) --merge --> requiredMapping(false)
+     * | property                 | old                          | new   | merged                       |
+     * | request.customizedField  | false                        | N/A   | true                         |
+     * | request.requiredMapping  | false                        | N/A   | false                        |
+     * | request.allowValueLimit  | true                         | N/A   | false                        |
+     * | request.target           | @{{speed-old}}               | N/A   | @{{speed-old}}               |
+     * | response.customizedField | false                        | N/A   | true                         |
+     * | response.requiredMapping | false                        | N/A   | false                       |
+     * | response.allowValueLimit | true                         | N/A   | false                        |
+     * | response.source          | @{{responseBody.status-old}} | N/A   | @{{responseBody.status-old}} |
      */
     verifyMergedMapper(
         "mapper.testcase03.changeSystemMappingToDeleteToCustomized", newMapperMap, expectedResults);
+
+    /*
+     * mapper.testcase03.changeSystemMappingToDeleteToCustomized2
+     * requiredMapping(true) --merge --> requiredMapping(false)
+     * | property                 | old                          | new   | merged                       |
+     * | request.customizedField  | false                        | N/A   | true                         |
+     * | request.requiredMapping  | true                         | N/A   | false                        |
+     * | request.allowValueLimit  | true                         | N/A   | false                        |
+     * | request.target           | @{{speed-old}}               | N/A   | @{{speed-old}}               |
+     * | response.customizedField | false                        | N/A   | true                         |
+     * | response.requiredMapping | true                         | N/A   | false                        |
+     * | response.allowValueLimit | true                         | N/A   | false                        |
+     * | response.source          | @{{responseBody.status-old}} | N/A   | @{{responseBody.status-old}} |
+     */
+    verifyMergedMapper(
+        "mapper.testcase03.changeSystemMappingToDeleteToCustomized2",
+        newMapperMap,
+        expectedResults);
 
     /*
      * mapper.testcase04.keepCustomizedMappingToDeleteConfiguredAndNoConflict

@@ -116,7 +116,26 @@
       "source": "@{{productOrderItem[0].product.productConfiguration.bandwidth}}",
       "sourceLocation": "BODY",
       "target": "@{{speed-old}}",
-      "requiredMapping": true,
+      "requiredMapping": false,
+      "title": "changeDeprecatedSystemMappingToCustomized(delete system property)",
+      "discrete": false,
+      "sourceType": "integer",
+      "replaceStar": true,
+      "sourceValues": [
+        1,
+        10000
+      ],
+      "targetLocation": "BODY"
+    }
+  },
+  "mapper.testcase03.changeSystemMappingToDeleteToCustomized2.request": {
+    "request": {
+      "customizedField": true,
+      "allowValueLimit": true,
+      "source": "@{{productOrderItem[0].product.productConfiguration.bandwidth}}",
+      "sourceLocation": "BODY",
+      "target": "@{{speed-old}}",
+      "requiredMapping": false,
       "title": "changeDeprecatedSystemMappingToCustomized(delete system property)",
       "discrete": false,
       "sourceType": "integer",
@@ -135,7 +154,43 @@
       "target": "@{{state}}",
       "targetLocation": "BODY",
       "source": "@{{responseBody.status-old}}",
-      "requiredMapping": true,
+      "requiredMapping": false,
+      "title": "Order State Mapping",
+      "name": "mapper.order.eline.add.state",
+      "description": "order state mapping",
+      "sourceLocation": "BODY",
+      "targetType": "enum",
+      "replaceStar": true,
+      "targetValues": [
+        "acknowledged",
+        "assessingCancellation",
+        "held.assessingCharge",
+        "pending.assessingModification",
+        "cancelled",
+        "pendingCancellation",
+        "completed",
+        "failed",
+        "inProgress",
+        "partial",
+        "rejected"
+      ],
+      "valueMapping": {
+        "PENDING": "pending,",
+        "CREATING": "acknowledged,",
+        "DISABLED": "disabled,",
+        "CANCELLED": "disabled,",
+        "ACTIVATING": "inProgress,"
+      }
+    }
+  },
+  "mapper.testcase03.changeSystemMappingToDeleteToCustomized2.response": {
+    "response": {
+      "customizedField": true,
+      "allowValueLimit": true,
+      "target": "@{{state}}",
+      "targetLocation": "BODY",
+      "source": "@{{responseBody.status-old}}",
+      "requiredMapping": false,
       "title": "Order State Mapping",
       "name": "mapper.order.eline.add.state",
       "description": "order state mapping",
