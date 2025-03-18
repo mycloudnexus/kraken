@@ -6,6 +6,7 @@ metadata:
   name:  Mapper Of Reading Created Order entity
   description: This operation retrieves a ProductOrder entity
   version: 1
+spec:
   endpoints:
     - id: retrieve add order by id
       mappers:

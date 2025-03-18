@@ -17,11 +17,10 @@ spec:
       method: ""
       serverKey: ""
       mappers:
-        mappers:
-          schemaRef:
-            ref: "classpath:/mef-sonata/api-common-mappers/api-target-mapper.order.common.read.delete.yaml"
-            params:
-              - key: productType
-                val: uni
-          request:
-          response:
+        schemaRef:
+          ref: "classpath:/mef-sonata/api-common-mappers/api-target-mapper.order.common.read.delete.yaml"
+          params:
+            - key: productType
+              val: uni
+        request:
+        response:

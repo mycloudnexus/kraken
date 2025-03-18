@@ -3,7 +3,7 @@ kind: kraken.component.api-target-mapper
 apiVersion: v1
 metadata:
   key: mef.sonata.api-target-mapper.inventory.uni.read
-  name: Mapper Of reading product inventory  UNI
+  name: Inventory Port API Detail
   description: This operation retrieves a product entity
   version: 13
 spec:
