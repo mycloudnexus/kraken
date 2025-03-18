@@ -67,7 +67,7 @@ spec:
             }
           ],
           "orderDate":"${entity.renderedResponse.orderDate}",
-          "state": "",
+          "state": "${entity.renderedResponse.state}",
           "orderId": "${entity.renderedResponse.orderId}",
           "instanceId": ""
         }
