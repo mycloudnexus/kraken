@@ -10,7 +10,7 @@ import lombok.Data;
 public class AppProperty {
   private Tenant tenant = new Tenant();
   private Map<String, Object> env;
-
+  private String modifyUseCase;
   private List<String> filterHeaders;
   private List<String> filterPaths;
   private List<String> deletePaths;

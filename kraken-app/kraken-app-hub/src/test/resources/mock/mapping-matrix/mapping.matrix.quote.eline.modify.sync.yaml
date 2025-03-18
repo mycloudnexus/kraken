@@ -8,7 +8,7 @@ metadata:
     mef-api-release: grace
   version: 14
 spec:
-  convert-field: $.body.quoteItem[0].product.id
+  convertField: "$.body.quoteItem[0].product.id"
   matrix:
     mef.sonata.api-target.quote.eline.modify.sync:
       - name: action_add

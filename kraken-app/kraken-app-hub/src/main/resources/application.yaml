@@ -115,10 +115,10 @@ app:
   cron-job:
     push-heartbeat: 0/5 * * * * *
     check-release: 0/20 * * * * *
-  modify-use-case: "classpath:/config/component-config.yaml"
+  modify-use-case: "classpath:/config/component-modify-validation.yaml"
   security:
     resource-server:
-      enabled: false
+      enabled: true
       jwt:
         - issuer: https://kraken.consoleconnect.com/issuer
           key-id: kraken

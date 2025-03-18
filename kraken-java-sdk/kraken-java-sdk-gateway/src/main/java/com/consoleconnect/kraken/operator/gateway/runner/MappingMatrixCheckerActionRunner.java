@@ -12,13 +12,16 @@ import com.consoleconnect.kraken.operator.core.enums.ActionTypeEnum;
 import com.consoleconnect.kraken.operator.core.enums.MappingTypeEnum;
 import com.consoleconnect.kraken.operator.core.enums.ParamLocationEnum;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
+import com.consoleconnect.kraken.operator.core.ingestion.ResourceLoaderFactory;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.core.model.HttpTask;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPIFacets;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
+import com.consoleconnect.kraken.operator.core.model.facet.ComponentValidationFacets;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentWorkflowFacets;
 import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
+import com.consoleconnect.kraken.operator.core.service.AssetReader;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
@@ -31,7 +34,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
 import org.apache.commons.collections4.CollectionUtils;
@@ -45,7 +50,7 @@ import org.springframework.web.server.ServerWebExchange;
 @Service
 @Slf4j
 public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
-    implements DataTypeChecker {
+    implements DataTypeChecker, AssetReader {
   public static final String MAPPING_MATRIX_KEY = "mappingMatrixKey";
   public static final String TARGET_KEY = "targetKey";
   public static final String MATRIX = "matrix";
@@ -55,20 +60,23 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
   public static final String COLON = ":";
   public static final String WORKFLOW_PREFIX = "workflow.";
   public static final String EXPECTED422_PATH_KEY = "expect-http-status-422-if-missing";
-  public static final String CONVERT_FIELD_KEY = "convert-field";
+  public static final String CONVERT_FIELD_KEY = "convertField";
   private final UnifiedAssetService unifiedAssetService;
   private final UnifiedAssetRepository unifiedAssetRepository;
   private final HttpRequestRepository httpRequestRepository;
+  @Getter private final ResourceLoaderFactory resourceLoaderFactory;
 
   public MappingMatrixCheckerActionRunner(
       AppProperty appProperty,
       UnifiedAssetService unifiedAssetService,
       UnifiedAssetRepository unifiedAssetRepository,
-      HttpRequestRepository httpRequestRepository) {
+      HttpRequestRepository httpRequestRepository,
+      ResourceLoaderFactory resourceLoaderFactory) {
     super(appProperty);
     this.unifiedAssetService = unifiedAssetService;
     this.unifiedAssetRepository = unifiedAssetRepository;
     this.httpRequestRepository = httpRequestRepository;
+    this.resourceLoaderFactory = resourceLoaderFactory;
   }
 
   @Override
@@ -296,7 +304,21 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
       return;
     }
     // Reading the configurable items to compare
-
+    Optional<UnifiedAsset> modifyAssetOpt = readFromPath(getAppProperty().getModifyUseCase());
+    if (modifyAssetOpt.isEmpty()) {
+      return;
+    }
+    UnifiedAsset modifyAsset = modifyAssetOpt.get();
+    ComponentValidationFacets modifyFacets =
+        UnifiedAsset.getFacets(modifyAsset, ComponentValidationFacets.class);
+    Set<String> supportedUseCases =
+        modifyFacets.getModificationRules().stream()
+            .map(ComponentValidationFacets.ModificationRule::getUseCase)
+            .collect(Collectors.toSet());
+    UnifiedAssetDto targetAsset = unifiedAssetService.findOne(targetKey);
+    if (!supportedUseCases.contains(targetAsset.getMetadata().getMapperKey())) {
+      return;
+    }
     // Read instance id
     DocumentContext documentContext = JsonPath.parse(inputs);
     // 400 if no parameter
@@ -328,7 +350,6 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     HttpRequestEntity orderRequest = opt.get();
     String payload = JsonToolkit.toJson(orderRequest.getRequest());
     // Check mapping items with the order payload
-
   }
 
   public void checkMapperConstraints(

@@ -10,7 +10,6 @@ public enum ResourceLoaderTypeEnum {
   FILE("file:"),
   GITHUB("github:"),
   RAW("raw:"),
-  MEMORY("memory:"),
   UNDEFINED("undefined:");
   private final String kind;
 
