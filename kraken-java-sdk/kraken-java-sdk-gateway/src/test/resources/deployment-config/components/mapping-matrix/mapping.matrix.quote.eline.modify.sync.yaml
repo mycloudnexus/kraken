@@ -8,9 +8,7 @@ metadata:
     mef-api-release: grace
   version: 14
 spec:
-  convertField:
-    - $.body.quoteItem[0].product.id
-  modificationRules:
+  modificationFilterRule:
     - queryPath: $.body.quoteItem[0].product.id
       filterKey: action
       filterVal: add

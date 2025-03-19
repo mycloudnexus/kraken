@@ -61,7 +61,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
   public static final String COLON = ":";
   public static final String WORKFLOW_PREFIX = "workflow.";
   public static final String CONVERT_FIELD_KEY = "convertField";
-  public static final String MODIFICATION_RULE_KEY = "modificationRules";
+  public static final String MODIFICATION_RULE_KEY = "modificationFilterRule";
   public static final String EXPECTED422_PATH_KEY = "expect-http-status-422-if-missing";
   private final UnifiedAssetService unifiedAssetService;
   private final UnifiedAssetRepository unifiedAssetRepository;
@@ -354,7 +354,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     // 400 if no parameter
     FilterRule filterRule = filterRules.get(0);
     Object instanceObj =
-        readByPathWithException(documentContext, filterRule.getQueryPath(), List.of(), "");
+        readByPathWithException(documentContext, filterRule.getQueryPath().trim(), List.of(), "");
     // Query Order payload by instance id
     if (Objects.isNull(instanceObj)) {
       return;

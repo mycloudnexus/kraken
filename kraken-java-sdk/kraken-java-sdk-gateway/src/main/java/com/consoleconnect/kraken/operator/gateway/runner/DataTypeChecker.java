@@ -122,8 +122,8 @@ public interface DataTypeChecker {
 
   default boolean filterRequest(String request, FilterRule filterRule) {
     com.jayway.jsonpath.Predicate actionFilter =
-        filter(where(filterRule.getFilterKey()).eq(filterRule.getFilterVal()));
-    List<Object> list = JsonPath.read(request, filterRule.getFilterPath(), actionFilter);
+        filter(where(filterRule.getFilterKey().trim()).eq(filterRule.getFilterVal().trim()));
+    List<Object> list = JsonPath.read(request, filterRule.getFilterPath().trim(), actionFilter);
     return CollectionUtils.isNotEmpty(list);
   }
 

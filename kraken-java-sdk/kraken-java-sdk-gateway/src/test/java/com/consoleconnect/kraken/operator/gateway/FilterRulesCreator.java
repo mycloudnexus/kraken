@@ -12,7 +12,8 @@ public interface FilterRulesCreator {
     filterRule.setQueryPath("$.body.quoteItem[0].product.id");
     filterRule.setFilterKey("action");
     filterRule.setFilterVal("add");
-    filterRule.setFilterPath(" $.productOrderItem[?]");
+    filterRule.setFilterPath("$.productOrderItem[?]");
+    filterRules.add(filterRule);
     return filterRules;
   }
 }

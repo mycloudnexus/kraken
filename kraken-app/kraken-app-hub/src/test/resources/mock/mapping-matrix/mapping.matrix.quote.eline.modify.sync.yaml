@@ -10,7 +10,7 @@ metadata:
 spec:
   expect-http-status-422-if-missing:
     - $.body.quoteItem[0].product.productConfiguration
-  modificationRules:
+  modificationFilterRule:
     - queryPath: $.body.quoteItem[0].product.id
       filterKey: action
       filterVal: add
