@@ -10,16 +10,18 @@ metadata:
 spec:
   expect-http-status-422-if-missing:
     - $.body.productOrderItem[0].product.productConfiguration
+  convertField:
+    - $.body.productOrderItem[0].product.id
   matrix:
     mef.sonata.api-target.order.eline.modify:
       - name: product_type_eline_type
         path: "$.body.productOrderItem[*].product.productConfiguration.['@type']"
         expectType: EXPECTED
         value: ACCESS_E_LINE
-      - name: action_add
+      - name: action_modify
         path: "$.body.productOrderItem[*].['action']"
         expectType: EXPECTED
-        value: add
+        value: modify
       - name: relatedContactInformation_emailAddress
         path: "$.body.relatedContactInformation[*]"
         expectType: EXPECTED_TRUE
