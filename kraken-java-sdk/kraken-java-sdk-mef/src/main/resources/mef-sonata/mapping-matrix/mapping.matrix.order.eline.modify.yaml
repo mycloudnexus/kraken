@@ -10,8 +10,11 @@ metadata:
 spec:
   expect-http-status-422-if-missing:
     - $.body.productOrderItem[0].product.productConfiguration
-  convertField:
-    - $.body.productOrderItem[0].product.id
+  modificationFilterRule:
+    - queryPath: $.body.productOrderItem[0].product.id
+      filterKey: action
+      filterVal: add
+      filterPath: $.productOrderItem[?]
   matrix:
     mef.sonata.api-target.order.eline.modify:
       - name: product_type_eline_type
