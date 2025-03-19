@@ -144,6 +144,24 @@ class ClientPubSubControllerTest extends AbstractIntegrationTest implements APIT
         HttpStatus.OK.value(),
         event,
         Assertions::assertNotNull);
+
+    deployment.setStatus(DeployStatusEnum.SUCCESS.name());
+    webTestClientHelper.requestAndVerify(
+        HttpMethod.POST,
+        uriBuilder -> uriBuilder.path(CLIENT_EVENT_ENDPOINT).build(),
+        headers,
+        HttpStatus.OK.value(),
+        event,
+        Assertions::assertNotNull);
+
+    event.setEventPayload(null);
+    webTestClientHelper.requestAndVerify(
+        HttpMethod.POST,
+        uriBuilder -> uriBuilder.path(CLIENT_EVENT_ENDPOINT).build(),
+        headers,
+        HttpStatus.OK.value(),
+        event,
+        Assertions::assertNotNull);
   }
 
   @Test
