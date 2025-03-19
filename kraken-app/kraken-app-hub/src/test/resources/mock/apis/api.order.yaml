@@ -98,6 +98,31 @@ spec:
                     errorMsg = errorArr.join(' ');
                     targetAPIConfigKey = 'targetKey:notFound';
                   }
+                } else if (action === 'modify') {
+                  productConfiguration = input.productOrderItem?.product?.productConfiguration;
+                  type = productConfiguration?.['@type'];
+                  if (type === 'UNI') {
+                    let errorArr = ['api use case is not supported :'];
+                    errorCode = '422';
+                    errorArr.push(`expect modify @{{productOrderItem.product.productConfiguration.@type}} is 'ACCESS_E_LINE'], but ${type}.`);
+                    errorMsg = errorArr.join(' ');
+                    targetAPIConfigKey = 'targetKey:notFound';
+                  } else if (type === 'ACCESS_E_LINE') {
+                    targetAPIConfigKey = 'mef.sonata.api-target.order.eline.modify';
+                    matrixConfigKey = 'mef.sonata.api.matrix.order.eline.modify'
+                  } else if (type === undefined) {
+                    let errorArr = ['api use case is not supported :'];
+                    errorCode = '400';
+                    errorArr.push(`expect productOrderItem.product.productConfiguration.@type in [ ${typeArr.join(' or ')} ], but missing property.`);
+                    errorMsg = errorArr.join(' ');
+                    targetAPIConfigKey = 'targetKey:notFound';
+                  } else {
+                    let errorArr = ['api use case is not supported :'];
+                    errorCode = '422';
+                    errorArr.push(`expect @{{productOrderItem.product.productConfiguration.@type}} in [ ${typeArr.join(' or ')} ], but ${type}.`);
+                    errorMsg = errorArr.join(' ');
+                    targetAPIConfigKey = 'targetKey:notFound';
+                  }
                 } else if (action === undefined) {
                   let errorArr = ['api use case is not supported :'];
                   errorCode = '400';
@@ -331,6 +356,9 @@ links:
   - targetAssetKey: mef.sonata.api-target.order.eline.add
     relationship: implementation.target
     group: mef.sonata.api-target.order.eline.add
+  - targetAssetKey: mef.sonata.api-target.order.eline.modify
+    relationship: implementation.target
+    group: mef.sonata.api-target.order.eline.modify
   - targetAssetKey: mef.sonata.api-target.order.eline.delete
     relationship: implementation.target
     group: mef.sonata.api-target.order.eline.delete
@@ -363,9 +391,15 @@ links:
   - targetAssetKey: mef.sonata.api-target-mapper.order.eline.add
     relationship: implementation.target-mapper
     group: mef.sonata.api-target.order.eline.add
+  - targetAssetKey: mef.sonata.api-target-mapper.order.eline.modify
+    relationship: implementation.target-mapper
+    group: mef.sonata.api-target.order.eline.modify
   - targetAssetKey: mef.sonata.api.matrix.order.eline.add
     relationship: implementation.matrix
     group: mef.sonata.api-target.order.eline.add
+  - targetAssetKey: mef.sonata.api.matrix.order.eline.modify
+    relationship: implementation.matrix
+    group: mef.sonata.api-target.order.eline.modify
   - targetAssetKey: mef.sonata.api.matrix.order.uni.delete
     relationship: implementation.matrix
     group: mef.sonata.api-target.order.uni.delete

@@ -14,6 +14,7 @@ import com.consoleconnect.kraken.operator.core.enums.ParamLocationEnum;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.ingestion.ResourceLoaderFactory;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
+import com.consoleconnect.kraken.operator.core.model.FilterRule;
 import com.consoleconnect.kraken.operator.core.model.HttpTask;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPIFacets;
@@ -60,6 +61,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
   public static final String COLON = ":";
   public static final String WORKFLOW_PREFIX = "workflow.";
   public static final String CONVERT_FIELD_KEY = "convertField";
+  public static final String MODIFICATION_RULE_KEY = "modificationFilterRule";
   public static final String EXPECTED422_PATH_KEY = "expect-http-status-422-if-missing";
   private final UnifiedAssetService unifiedAssetService;
   private final UnifiedAssetRepository unifiedAssetRepository;
@@ -132,7 +134,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     // 'expect-http-status-422-if-missing' always return 422
     checkMatrixConstraints(facets, targetKey, inputs, pathsExpected422);
     // check modification conditions
-    checkModifyConstraints(readConvertField(matrixAssets), targetKey, inputs);
+    checkModifyConstraints(readModificationRules(matrixAssets), targetKey, inputs);
     // mapper checking, if-missing-return-400, wrong-value-return-422, paths under
     // 'expect-http-status-422-if-missing' always return 422
     checkMapperConstraints(targetKey, inputs, pathsExpected422);
@@ -146,18 +148,31 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
   }
 
   public List<String> readExpected422Paths(Paging<UnifiedAssetDto> assetDtoPaging) {
-    Object obj =
-        assetDtoPaging.getData().get(0).getFacets().getOrDefault(EXPECTED422_PATH_KEY, null);
-    return Objects.isNull(obj)
-        ? List.of()
-        : JsonToolkit.fromJson(JsonToolkit.toJson(obj), new TypeReference<>() {});
+    return readFacetList(
+        assetDtoPaging, EXPECTED422_PATH_KEY, new TypeReference<List<String>>() {});
   }
 
-  public List<String> readConvertField(Paging<UnifiedAssetDto> assetDtoPaging) {
-    Object obj = assetDtoPaging.getData().get(0).getFacets().getOrDefault(CONVERT_FIELD_KEY, null);
-    return Objects.isNull(obj)
-        ? List.of()
-        : JsonToolkit.fromJson(JsonToolkit.toJson(obj), new TypeReference<>() {});
+  public List<FilterRule> readModificationRules(Paging<UnifiedAssetDto> assetDtoPaging) {
+    return readFacetList(
+        assetDtoPaging, MODIFICATION_RULE_KEY, new TypeReference<List<FilterRule>>() {});
+  }
+
+  private <T> List<T> readFacetList(
+      Paging<UnifiedAssetDto> assetDtoPaging, String key, TypeReference<List<T>> typeReference) {
+    if (assetDtoPaging == null || assetDtoPaging.getData().isEmpty()) {
+      return Collections.emptyList();
+    }
+
+    UnifiedAssetDto firstAsset = assetDtoPaging.getData().get(0);
+    Map<String, Object> facets = firstAsset.getFacets();
+    if (facets == null || !facets.containsKey(key)) {
+      return Collections.emptyList();
+    }
+
+    Object obj = facets.get(key);
+    return (obj == null)
+        ? Collections.emptyList()
+        : JsonToolkit.fromJson(JsonToolkit.toJson(obj), typeReference);
   }
 
   public Paging<UnifiedAssetDto> queryMatrixAssets(String matrixKey) {
@@ -301,8 +316,8 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
   }
 
   public void checkModifyConstraints(
-      List<String> convertFields, String targetKey, Map<String, Object> inputs) {
-    if (CollectionUtils.isEmpty(convertFields)) {
+      List<FilterRule> filterRules, String targetKey, Map<String, Object> inputs) {
+    if (CollectionUtils.isEmpty(filterRules)) {
       return;
     }
     // Reading the configurable items to compare
@@ -333,8 +348,9 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     // Read instance id
     DocumentContext documentContext = JsonPath.parse(inputs);
     // 400 if no parameter
+    FilterRule filterRule = filterRules.get(0);
     Object instanceObj =
-        readByPathWithException(documentContext, convertFields.get(0), List.of(), "");
+        readByPathWithException(documentContext, filterRule.getQueryPath().trim(), List.of(), "");
     // Query Order payload by instance id
     if (Objects.isNull(instanceObj)) {
       return;
@@ -346,20 +362,20 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
       throw KrakenException.notFound(
           "instanceId not exist", new IllegalArgumentException("instanceId not exist"));
     }
-    // Filter the add order
-    Optional<HttpRequestEntity> opt =
+    // Filter the add order and reading the order payload
+    HttpRequestEntity orderRequest =
         httpRequestEntities.stream()
             .filter(
                 item -> {
                   String request = JsonToolkit.toJson(item.getRequest());
-                  return filterRequest(request);
+                  return filterRequest(request, filterRule);
                 })
-            .findFirst();
-    if (opt.isEmpty()) {
-      throw KrakenException.unProcessableEntityInvalidValue("The instanceId has no matched order");
-    }
-    // Reading the payload
-    HttpRequestEntity orderRequest = opt.get();
+            .findFirst()
+            .orElseThrow(
+                () ->
+                    KrakenException.unProcessableEntityInvalidValue(
+                        "The instanceId has no matched order"));
+
     String existPayload = JsonToolkit.toJson(orderRequest.getRequest());
     // Check mapping items with the order payload
     Object bodyObj = inputs.getOrDefault("body", null);
