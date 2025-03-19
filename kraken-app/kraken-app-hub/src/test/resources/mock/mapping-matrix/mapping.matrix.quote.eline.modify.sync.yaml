@@ -10,11 +10,14 @@ metadata:
 spec:
   expect-http-status-422-if-missing:
     - $.body.quoteItem[0].product.productConfiguration
-  convertField:
-    - $.body.quoteItem[0].product.id
+  modificationRules:
+    - queryPath: $.body.quoteItem[0].product.id
+      filterKey: action
+      filterVal: add
+      filterPath: $.productOrderItem[?]
   matrix:
     mef.sonata.api-target.quote.eline.modify.sync:
-      - name: action_add
+      - name: action_modify
         path: "$.body.quoteItem[*].['action']"
         expectType: EXPECTED
         value: modify

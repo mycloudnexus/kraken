@@ -6,6 +6,7 @@ import static com.jayway.jsonpath.Filter.filter;
 import com.consoleconnect.kraken.operator.core.enums.MappingTypeEnum;
 import com.consoleconnect.kraken.operator.core.exception.ErrorResponse;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
+import com.consoleconnect.kraken.operator.core.model.FilterRule;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentValidationFacets;
 import com.consoleconnect.kraken.operator.core.toolkit.Constants;
@@ -119,9 +120,10 @@ public interface DataTypeChecker {
     return realValue;
   }
 
-  default boolean filterRequest(String request) {
-    com.jayway.jsonpath.Predicate actionFilter = filter(where("action").eq("add"));
-    List<Object> list = JsonPath.read(request, "$.productOrderItem[?]", actionFilter);
+  default boolean filterRequest(String request, FilterRule filterRule) {
+    com.jayway.jsonpath.Predicate actionFilter =
+        filter(where(filterRule.getFilterKey()).eq(filterRule.getFilterVal()));
+    List<Object> list = JsonPath.read(request, filterRule.getFilterPath(), actionFilter);
     return CollectionUtils.isNotEmpty(list);
   }
 
