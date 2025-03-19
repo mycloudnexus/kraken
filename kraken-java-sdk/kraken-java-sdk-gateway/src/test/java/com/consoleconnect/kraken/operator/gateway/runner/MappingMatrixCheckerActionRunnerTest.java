@@ -663,7 +663,21 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest
 
   @Test
   @SneakyThrows
-  void givenEmptyFields_whenCheckModification_thenNoException() {
+  void givenMatrixKey_whenChecking_thenReturnOK() {
+    Map<String, Object> inputs = new HashMap<>();
+    inputs.put("targetKey", "mef.sonata.api-target.quote.eline.modify.sync");
+    inputs.put("mappingMatrixKey", "mef.sonata.api.matrix.quote.eline.modify.sync");
+    inputs.put(
+        "body",
+        JsonToolkit.fromJson(
+            readFileToString("mockData/quote.eline.modify.request.json"), Object.class));
+    addValidHttpRequest();
+    Assertions.assertDoesNotThrow(() -> mappingMatrixCheckerActionRunner.onCheck(inputs));
+  }
+
+  @Test
+  @SneakyThrows
+  void givenEmptyRules_whenCheckModification_thenNoException() {
     Map<String, Object> inputs = new HashMap<>();
     inputs.put(
         "body",
@@ -706,7 +720,7 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest
             readFileToString("mockData/quote.eline.modify.request.json"), Object.class));
     List<FilterRule> filterRules = buildValidFilterRules();
     String targetKey = "mef.sonata.api-target.quote.eline.modify.sync";
-    buildValidHttpRequest();
+    addValidHttpRequest();
     Assertions.assertDoesNotThrow(
         () ->
             mappingMatrixCheckerActionRunner.checkModifyConstraints(
@@ -714,7 +728,7 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest
   }
 
   @SneakyThrows
-  private void buildValidHttpRequest() {
+  private void addValidHttpRequest() {
     HttpRequestEntity entity = new HttpRequestEntity();
     entity.setId(UUID.randomUUID());
     String s = readFileToString("mockData/productOrderRequest.json");
@@ -738,7 +752,7 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest
             readFileToString("mockData/quote.eline.modify.invalid.request.json"), Object.class));
     List<FilterRule> filterRules = buildValidFilterRules();
     String targetKey = "mef.sonata.api-target.quote.eline.modify.sync";
-    buildValidHttpRequest();
+    addValidHttpRequest();
     Assertions.assertThrows(
         KrakenException.class,
         () ->

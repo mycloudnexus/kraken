@@ -152,10 +152,6 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
         assetDtoPaging, EXPECTED422_PATH_KEY, new TypeReference<List<String>>() {});
   }
 
-  public List<String> readConvertField(Paging<UnifiedAssetDto> assetDtoPaging) {
-    return readFacetList(assetDtoPaging, CONVERT_FIELD_KEY, new TypeReference<List<String>>() {});
-  }
-
   public List<FilterRule> readModificationRules(Paging<UnifiedAssetDto> assetDtoPaging) {
     return readFacetList(
         assetDtoPaging, MODIFICATION_RULE_KEY, new TypeReference<List<FilterRule>>() {});
