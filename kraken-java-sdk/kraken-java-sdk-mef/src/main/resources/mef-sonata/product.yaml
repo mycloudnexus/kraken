@@ -106,7 +106,7 @@ spec:
     - classpath:/mef-sonata/api-workflow/api-workflow.order.uni.delete.yaml
     - classpath:/mef-sonata/api-workflow/api-workflow.order.uni.add.yaml
     - classpath:/mef-sonata/api-workflow/api-workflow.order.eline.add.yaml
-    - classpath:/mef-sonata/template-upgrade/release.1.7.24.yaml
+    - classpath:/mef-sonata/template-upgrade/release.1.7.25.yaml
 
   templateUpgradePaths:
     - classpath:/mef-sonata/apis/api.address.yaml
