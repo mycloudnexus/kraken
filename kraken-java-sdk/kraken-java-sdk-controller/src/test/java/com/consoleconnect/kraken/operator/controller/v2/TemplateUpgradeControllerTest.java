@@ -434,7 +434,8 @@ class TemplateUpgradeControllerTest {
               PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, AssetsConstants.FIELD_CREATE_AT)),
               null);
       for (UnifiedAssetDto assetDto : assetDtoPaging2.getData()) {
-        productDeploymentService.reportConfigurationReloadingResult(assetDto.getId());
+        productDeploymentService.reportConfigurationReloadingResult(
+            assetDto.getId(), DeployStatusEnum.SUCCESS.name());
       }
       Paging<UnifiedAssetDto> assetDtoPaging3 =
           unifiedAssetService.findBySpecification(

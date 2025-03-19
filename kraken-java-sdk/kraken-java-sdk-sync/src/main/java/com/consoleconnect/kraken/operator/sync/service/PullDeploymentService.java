@@ -142,13 +142,22 @@ public class PullDeploymentService extends KrakenServerConnector {
           curl(HttpMethod.GET, releaseDetailEndpoint, null, new ParameterizedTypeReference<>() {});
       if (releaseDetailsRes.getCode() == 200) {
         // step3: install deployment
-        installDeployment(deploymentEvent, releaseDetailsRes);
+        try {
+          installDeployment(deploymentEvent, releaseDetailsRes);
 
-        // step4: push deployment status
-        // notify deployment status
-        pushDeploymentStatus(
-            new ReportConfigReloadEvent(
-                deploymentEvent.getProductReleaseId(), DeployStatusEnum.SUCCESS.name(), ""));
+          // step4: push deployment status
+          // notify deployment status
+          pushDeploymentStatus(
+              new ReportConfigReloadEvent(
+                  deploymentEvent.getProductReleaseId(), DeployStatusEnum.SUCCESS.name(), ""));
+        } catch (Exception e) {
+          log.error("Failed to install deployment", e);
+          pushDeploymentStatus(
+              new ReportConfigReloadEvent(
+                  deploymentEvent.getProductReleaseId(),
+                  DeployStatusEnum.FAILED.name(),
+                  e.getMessage()));
+        }
       } else {
         log.error("failed to retrieve product release detail");
       }

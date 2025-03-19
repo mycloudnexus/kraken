@@ -350,13 +350,16 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
   }
 
   @Transactional
-  public void reportConfigurationReloadingResult(String assetId) {
+  public void reportConfigurationReloadingResult(String assetId, String status) {
     unifiedAssetRepository
         .findById(UUID.fromString(assetId))
         .ifPresent(
             unifiedAssetEntity -> {
-              log.info("report asset {} configuration  reloading result success", assetId);
-              unifiedAssetEntity.setStatus(DeployStatusEnum.SUCCESS.name());
+              log.info(
+                  "report asset {} configuration  reloading result success, status: {}",
+                  assetId,
+                  status);
+              unifiedAssetEntity.setStatus(status);
               unifiedAssetRepository.save(unifiedAssetEntity);
               if (unifiedAssetEntity
                   .getLabels()

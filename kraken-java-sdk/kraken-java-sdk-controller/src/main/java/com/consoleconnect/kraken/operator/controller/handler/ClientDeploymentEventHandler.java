@@ -28,6 +28,8 @@ public class ClientDeploymentEventHandler extends ClientEventHandler {
   private final UnifiedAssetRepository unifiedAssetRepository;
   private final ProductDeploymentService productDeploymentService;
 
+  private static final String DEPLOY_STATUS_FAILED = "FAILED";
+
   @Override
   public ClientEventTypeEnum getEventType() {
     return ClientEventTypeEnum.CLIENT_DEPLOYMENT;
@@ -68,13 +70,20 @@ public class ClientDeploymentEventHandler extends ClientEventHandler {
 
     if (deploymentOptional.isPresent()) {
       log.info(
-          "report asset {} configuration  reloading result success",
-          deployment.getProductReleaseId());
-      deploymentOptional.get().setStatus(DeployStatusEnum.SUCCESS.name());
+          "report asset {} configuration  reloading result success, status: {}, reason: {}",
+          deployment.getProductReleaseId(),
+          deployment.getStatus(),
+          deployment.getReason());
+      if (DEPLOY_STATUS_FAILED.equals(deployment.getStatus())) {
+        deploymentOptional.get().setStatus(DeployStatusEnum.FAILED.name());
+      } else {
+        deploymentOptional.get().setStatus(DeployStatusEnum.SUCCESS.name());
+      }
+
       unifiedAssetRepository.save(deploymentOptional.get());
       try {
         productDeploymentService.reportConfigurationReloadingResult(
-            deployment.getProductReleaseId());
+            deployment.getProductReleaseId(), deploymentOptional.get().getStatus());
       } catch (Exception e) {
         log.error("Failed to reportConfigurationReloadingResult", e);
       }
