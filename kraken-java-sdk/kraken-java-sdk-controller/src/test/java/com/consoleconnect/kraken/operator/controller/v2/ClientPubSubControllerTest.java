@@ -9,8 +9,12 @@ import com.consoleconnect.kraken.operator.controller.service.APITokenService;
 import com.consoleconnect.kraken.operator.core.client.*;
 import com.consoleconnect.kraken.operator.core.dto.ApiActivityLog;
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
+import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
+import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
+import com.consoleconnect.kraken.operator.core.enums.DeployStatusEnum;
 import com.consoleconnect.kraken.operator.core.enums.WorkflowStatusEnum;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
+import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
 import com.consoleconnect.kraken.operator.core.request.LogSearchRequest;
 import com.consoleconnect.kraken.operator.core.service.ApiActivityLogService;
 import com.consoleconnect.kraken.operator.core.toolkit.DateTime;
@@ -40,6 +44,7 @@ class ClientPubSubControllerTest extends AbstractIntegrationTest implements APIT
   @Getter @Autowired APITokenService apiTokenService;
   @Autowired ApiActivityLogService apiActivityLogService;
   @SpyBean ApiActivityLogRepository apiActivityLogRepository;
+  @SpyBean UnifiedAssetRepository unifiedAssetRepository;
 
   public static final String PRODUCT_ID = "mef.sonata";
   public static final String CLIENT_EVENT_ENDPOINT = "/client/events";
@@ -122,6 +127,13 @@ class ClientPubSubControllerTest extends AbstractIntegrationTest implements APIT
     clientInstanceDeployment.setStatus("success");
     clientInstanceDeployment.setReason("");
     event.setEventPayload(JsonToolkit.toJson(clientInstanceDeployment));
+
+    UnifiedAssetEntity deployment = new UnifiedAssetEntity();
+    deployment.setKind(AssetKindEnum.PRODUCT_DEPLOYMENT.getKind());
+    deployment.setApiVersion("1");
+    deployment.setKey("test");
+    deployment.setStatus(DeployStatusEnum.FAILED.name());
+    Mockito.doReturn(Optional.of(deployment)).when(unifiedAssetRepository).findById(Mockito.any());
 
     Map<String, String> headers = new HashMap<>();
     headers.put("Authorization", accessToken);

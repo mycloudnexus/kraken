@@ -904,20 +904,19 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
     UnifiedAssetDto assetDto = UnifiedAssetService.toAsset(mapperDeployment, true);
     DeploymentFacet deploymentFacet = UnifiedAsset.getFacets(assetDto, DeploymentFacet.class);
     String envId = mapperDeployment.getLabels().get(LABEL_ENV_ID);
-    deploymentFacet
-        .getComponentTags()
-        .forEach(
-            componentTag -> {
-              UnifiedAssetEntity tag =
-                  unifiedAssetService.findOneByIdOrKey(componentTag.getTagId());
-              String version = tag.getLabels().get(LABEL_VERSION_NAME);
-              String subVersion = tag.getLabels().get(LABEL_SUB_VERSION_NAME);
-              log.info(
-                  "handlerMapperVersionReport, version:{}, subVersion:{}", version, subVersion);
-              applicationEventPublisher.publishEvent(
-                  new SingleMapperReportEvent(
-                      envId, componentTag.getParentComponentKey(), version, subVersion));
-            });
+    List<ComponentTag> componentTags = deploymentFacet.getComponentTags();
+    if (CollectionUtils.isNotEmpty(componentTags)) {
+      componentTags.forEach(
+          componentTag -> {
+            UnifiedAssetEntity tag = unifiedAssetService.findOneByIdOrKey(componentTag.getTagId());
+            String version = tag.getLabels().get(LABEL_VERSION_NAME);
+            String subVersion = tag.getLabels().get(LABEL_SUB_VERSION_NAME);
+            log.info("handlerMapperVersionReport, version:{}, subVersion:{}", version, subVersion);
+            applicationEventPublisher.publishEvent(
+                new SingleMapperReportEvent(
+                    envId, componentTag.getParentComponentKey(), version, subVersion));
+          });
+    }
   }
 
   @Transactional(readOnly = true)
