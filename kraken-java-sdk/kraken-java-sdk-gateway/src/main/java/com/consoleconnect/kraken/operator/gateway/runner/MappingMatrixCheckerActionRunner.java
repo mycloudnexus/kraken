@@ -366,20 +366,20 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
       throw KrakenException.notFound(
           "instanceId not exist", new IllegalArgumentException("instanceId not exist"));
     }
-    // Filter the add order
-    Optional<HttpRequestEntity> opt =
+    // Filter the add order and reading the order payload
+    HttpRequestEntity orderRequest =
         httpRequestEntities.stream()
             .filter(
                 item -> {
                   String request = JsonToolkit.toJson(item.getRequest());
                   return filterRequest(request, filterRule);
                 })
-            .findFirst();
-    if (opt.isEmpty()) {
-      throw KrakenException.unProcessableEntityInvalidValue("The instanceId has no matched order");
-    }
-    // Reading the payload
-    HttpRequestEntity orderRequest = opt.get();
+            .findFirst()
+            .orElseThrow(
+                () ->
+                    KrakenException.unProcessableEntityInvalidValue(
+                        "The instanceId has no matched order"));
+
     String existPayload = JsonToolkit.toJson(orderRequest.getRequest());
     // Check mapping items with the order payload
     Object bodyObj = inputs.getOrDefault("body", null);
