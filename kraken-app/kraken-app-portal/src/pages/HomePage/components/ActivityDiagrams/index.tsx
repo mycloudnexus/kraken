@@ -1,8 +1,5 @@
 import { Text } from "@/components/Text";
-import {
-  parseDateStartOrEnd,
-  recentXDays,
-} from "@/utils/constants/format";
+import { parseDateStartOrEnd, recentXDays } from "@/utils/constants/format";
 import { IEnv } from "@/utils/types/env.type";
 import {
   Col,
@@ -15,12 +12,12 @@ import {
   Select,
 } from "antd";
 import dayjs from "dayjs";
+import { capitalize } from "lodash";
 import { useEffect, useMemo, useState } from "react";
 import ApiActivityDiagram from "./ApiActivityDiagram";
 import ErrorBrakedownDiagram from "./ErrorDiagram";
 import MostPopularEndpoints from "./MostPopularEndpoints";
 import styles from "./index.module.scss";
-import { capitalize } from 'lodash';
 
 export type DiagramProps = {
   envId: string;
@@ -38,9 +35,12 @@ const { RangePicker } = DatePicker;
 
 const ActivityDiagrams = ({ envs }: Props) => {
   const stageEnvId =
-    envs?.find((env: IEnv) => env.name?.toLowerCase() === "stage")?.id ?? "";
+    envs?.find((env: IEnv) => env.name?.toLowerCase() === "production")?.id ??
+    "";
   const [form] = Form.useForm();
-  const [selectedRecentDate, setSelectedRecentDate] = useState<number | undefined>(7);
+  const [selectedRecentDate, setSelectedRecentDate] = useState<
+    number | undefined
+  >(7);
   const { requestStartTime, requestEndTime } = recentXDays(selectedRecentDate);
 
   const [params, setParams] = useState<DiagramProps>({
@@ -52,14 +52,17 @@ const ActivityDiagrams = ({ envs }: Props) => {
 
   const handleFormValues = (_: unknown, values: DiagramProps) => {
     const { requestTime = [] } = values ?? {};
-    if(requestTime?.[0]) setSelectedRecentDate(undefined);
+    if (requestTime?.[0]) setSelectedRecentDate(undefined);
     setParams({
       envId: values.envId || params.envId,
-      buyer: values.buyer || params.buyer,
-      requestStartTime: parseDateStartOrEnd(requestTime?.[0], "start") || params.requestStartTime,
-      requestEndTime: parseDateStartOrEnd(requestTime?.[1], "end") || params.requestEndTime
+      buyer: values.buyer ?? params.buyer,
+      requestStartTime:
+        parseDateStartOrEnd(requestTime?.[0], "start") ??
+        params.requestStartTime,
+      requestEndTime:
+        parseDateStartOrEnd(requestTime?.[1], "end") ?? params.requestEndTime,
     });
-  }
+  };
 
   const envOptions = useMemo(() => {
     return (
@@ -84,13 +87,13 @@ const ActivityDiagrams = ({ envs }: Props) => {
 
   useEffect(() => {
     // default filter values to first option each select box
-    if (!form.getFieldValue('envId')) {
-      form.setFieldValue('envId', envOptions[0]?.value)
+    if (!form.getFieldValue("envId")) {
+      form.setFieldValue("envId", envOptions[0]?.value);
     }
-    if (!form.getFieldValue('buyer')) {
-      form.setFieldValue('buyer', 'ALL_BUYERS')
+    if (!form.getFieldValue("buyer")) {
+      form.setFieldValue("buyer", "ALL_BUYERS");
     }
-  }, [])
+  }, []);
 
   return (
     <Flex vertical className={styles.wrapper} justify="center">
@@ -121,7 +124,7 @@ const ActivityDiagrams = ({ envs }: Props) => {
             <Form.Item name="buyer">
               <Select
                 className={styles.customSelectBox}
-                options={[{ value: 'ALL_BUYERS', label: "All buyers" }]}
+                options={[{ value: "ALL_BUYERS", label: "All buyers" }]}
                 popupMatchSelectWidth={false}
                 size="middle"
                 style={{ minWidth: 100 }}
@@ -131,14 +134,23 @@ const ActivityDiagrams = ({ envs }: Props) => {
           </Flex>
           <Flex align="center">
             <Form.Item>
-              <Radio.Group onChange={setRecentDate} value={selectedRecentDate} size="middle" >
+              <Radio.Group
+                onChange={setRecentDate}
+                value={selectedRecentDate}
+                size="middle"
+              >
                 <Radio.Button value={7}>Recent 7 days</Radio.Button>
-                <Radio.Button value={90} data-testid="recent-90-days">Recent 3 months</Radio.Button>
+                <Radio.Button value={90} data-testid="recent-90-days">
+                  Recent 3 months
+                </Radio.Button>
               </Radio.Group>
             </Form.Item>
             <Form.Item name="requestTime">
               <RangePicker
-                value={[dayjs(params.requestStartTime), dayjs(params.requestEndTime)]}
+                value={[
+                  dayjs(params.requestStartTime),
+                  dayjs(params.requestEndTime),
+                ]}
                 size="middle"
                 placeholder={["Select time", "Select time"]}
               />
