@@ -50,6 +50,11 @@ spec:
         expectType: EXPECTED_STR
         value: true
         code: 422
+      - name: productOrderItem[0].product.id
+        path: "$.body.productOrderItem[0].product['id']"
+        expectType: EXPECTED_STR
+        value: true
+        code: 422
       - name: productOrderItem_requestedItemTerm_name
         path: "$.body.productOrderItem[0].requestedItemTerm.name"
         expectType: EXPECTED_STR
