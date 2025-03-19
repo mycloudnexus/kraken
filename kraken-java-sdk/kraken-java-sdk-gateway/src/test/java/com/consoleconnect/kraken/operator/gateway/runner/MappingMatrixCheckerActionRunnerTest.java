@@ -682,7 +682,7 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
         JsonToolkit.fromJson(
             readFileToString("mockData/quote.eline.modify.request.json"), Object.class));
     List<String> convertFields = new ArrayList<>();
-    convertFields.add("$.body.quoteItem[0].product.id");
+    convertFields.add("$.body.quoteItem[0].product.place[0].id");
     String targetKey = "mef.sonata.api-target.quote.eline.modify.sync";
     Assertions.assertThrows(
         KrakenException.class,
