@@ -135,7 +135,9 @@ spec:
     - classpath:/mef-sonata/api-targets/api-target.order.eline.add.yaml
     - classpath:/mef-sonata/api-targets/api-target.order.eline.read.yaml
     - classpath:/mef-sonata/api-targets/api-target.order.eline.delete.yaml
+    - classpath:/mef-sonata/api-targets/api-target.order.eline.modify.yaml
     - classpath:/mef-sonata/api-targets/api-target.order.eline.read.delete.yaml
+    - classpath:/mef-sonata/api-targets/api-target.order.eline.read.modify.yaml
     - classpath:/mef-sonata/api-targets/api-target.inventory.uni.list.yaml
     - classpath:/mef-sonata/api-targets/api-target.inventory.uni.read.yaml
     - classpath:/mef-sonata/api-targets/api-target.inventory.eline.list.yaml
