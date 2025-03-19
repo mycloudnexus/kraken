@@ -1,0 +1,13 @@
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.1.7.24
+  name: V1.7.24
+  labels:
+    productSpec: grace
+    productVersion: V1.7.24
+    publishDate: 2025-03-18
+  description: |
+    Set state when using workflow
+  version: 1
