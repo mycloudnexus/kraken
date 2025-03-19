@@ -28,4 +28,11 @@ class AssetReaderTest extends AbstractIntegrationTest implements AssetReader {
     Optional<UnifiedAsset> resultOpt = readFromPath(fullPath);
     Assertions.assertTrue(resultOpt.isPresent());
   }
+
+  @Test
+  void givenNonExistedPath_whenReading_thenReturnEmpty() {
+    String fullPath = "classpath:/deployment-config/kraken-1.yaml";
+    Optional<UnifiedAsset> resultOpt = readFromPath(fullPath);
+    Assertions.assertTrue(resultOpt.isEmpty());
+  }
 }
