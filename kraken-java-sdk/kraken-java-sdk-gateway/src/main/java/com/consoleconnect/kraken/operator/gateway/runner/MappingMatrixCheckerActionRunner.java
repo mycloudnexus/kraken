@@ -12,24 +12,31 @@ import com.consoleconnect.kraken.operator.core.enums.ActionTypeEnum;
 import com.consoleconnect.kraken.operator.core.enums.MappingTypeEnum;
 import com.consoleconnect.kraken.operator.core.enums.ParamLocationEnum;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
+import com.consoleconnect.kraken.operator.core.ingestion.ResourceLoaderFactory;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.core.model.HttpTask;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPIFacets;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
+import com.consoleconnect.kraken.operator.core.model.facet.ComponentValidationFacets;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentWorkflowFacets;
 import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
+import com.consoleconnect.kraken.operator.core.service.AssetReader;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.core.toolkit.Paging;
 import com.consoleconnect.kraken.operator.gateway.dto.PathCheck;
+import com.consoleconnect.kraken.operator.gateway.entity.HttpRequestEntity;
+import com.consoleconnect.kraken.operator.gateway.repo.HttpRequestRepository;
 import com.consoleconnect.kraken.operator.gateway.template.SpELEngine;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
 import org.apache.commons.collections4.CollectionUtils;
@@ -43,7 +50,7 @@ import org.springframework.web.server.ServerWebExchange;
 @Service
 @Slf4j
 public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
-    implements DataTypeChecker {
+    implements DataTypeChecker, AssetReader {
   public static final String MAPPING_MATRIX_KEY = "mappingMatrixKey";
   public static final String TARGET_KEY = "targetKey";
   public static final String MATRIX = "matrix";
@@ -52,17 +59,24 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
   public static final String NOT_FOUND = "notFound";
   public static final String COLON = ":";
   public static final String WORKFLOW_PREFIX = "workflow.";
+  public static final String CONVERT_FIELD_KEY = "convertField";
   public static final String EXPECTED422_PATH_KEY = "expect-http-status-422-if-missing";
   private final UnifiedAssetService unifiedAssetService;
   private final UnifiedAssetRepository unifiedAssetRepository;
+  private final HttpRequestRepository httpRequestRepository;
+  @Getter private final ResourceLoaderFactory resourceLoaderFactory;
 
   public MappingMatrixCheckerActionRunner(
       AppProperty appProperty,
       UnifiedAssetService unifiedAssetService,
-      UnifiedAssetRepository unifiedAssetRepository) {
+      UnifiedAssetRepository unifiedAssetRepository,
+      HttpRequestRepository httpRequestRepository,
+      ResourceLoaderFactory resourceLoaderFactory) {
     super(appProperty);
     this.unifiedAssetService = unifiedAssetService;
     this.unifiedAssetRepository = unifiedAssetRepository;
+    this.httpRequestRepository = httpRequestRepository;
+    this.resourceLoaderFactory = resourceLoaderFactory;
   }
 
   @Override
@@ -117,6 +131,8 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     // matrix checking, if-missing-return-400, wrong-value-return-422, paths under
     // 'expect-http-status-422-if-missing' always return 422
     checkMatrixConstraints(facets, targetKey, inputs, pathsExpected422);
+    // check modification conditions
+    checkModifyConstraints(readConvertField(matrixAssets), targetKey, inputs);
     // mapper checking, if-missing-return-400, wrong-value-return-422, paths under
     // 'expect-http-status-422-if-missing' always return 422
     checkMapperConstraints(targetKey, inputs, pathsExpected422);
@@ -132,6 +148,13 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
   public List<String> readExpected422Paths(Paging<UnifiedAssetDto> assetDtoPaging) {
     Object obj =
         assetDtoPaging.getData().get(0).getFacets().getOrDefault(EXPECTED422_PATH_KEY, null);
+    return Objects.isNull(obj)
+        ? List.of()
+        : JsonToolkit.fromJson(JsonToolkit.toJson(obj), new TypeReference<>() {});
+  }
+
+  public List<String> readConvertField(Paging<UnifiedAssetDto> assetDtoPaging) {
+    Object obj = assetDtoPaging.getData().get(0).getFacets().getOrDefault(CONVERT_FIELD_KEY, null);
     return Objects.isNull(obj)
         ? List.of()
         : JsonToolkit.fromJson(JsonToolkit.toJson(obj), new TypeReference<>() {});
@@ -275,6 +298,73 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
       }
     }
     return false;
+  }
+
+  public void checkModifyConstraints(
+      List<String> convertFields, String targetKey, Map<String, Object> inputs) {
+    if (CollectionUtils.isEmpty(convertFields)) {
+      return;
+    }
+    // Reading the configurable items to compare
+    Optional<UnifiedAsset> modifyAssetOpt = readFromPath(getAppProperty().getModifyUseCase());
+    if (modifyAssetOpt.isEmpty()) {
+      return;
+    }
+    UnifiedAsset modifyAsset = modifyAssetOpt.get();
+    ComponentValidationFacets modifyFacets =
+        UnifiedAsset.getFacets(modifyAsset, ComponentValidationFacets.class);
+    Set<String> supportedUseCases =
+        modifyFacets.getModificationRules().stream()
+            .map(ComponentValidationFacets.ModificationRule::getUseCase)
+            .collect(Collectors.toSet());
+    UnifiedAssetDto targetAsset = unifiedAssetService.findOne(targetKey);
+    String mapperKey = targetAsset.getMetadata().getMapperKey();
+    if (!supportedUseCases.contains(mapperKey)) {
+      return;
+    }
+    Optional<ComponentValidationFacets.ModificationRule> modificationRuleOpt =
+        modifyFacets.getModificationRules().stream()
+            .filter(item -> item.getUseCase().equals(mapperKey))
+            .findFirst();
+    if (modificationRuleOpt.isEmpty()) {
+      return;
+    }
+    ComponentValidationFacets.ModificationRule modificationRule = modificationRuleOpt.get();
+    // Read instance id
+    DocumentContext documentContext = JsonPath.parse(inputs);
+    // 400 if no parameter
+    Object instanceObj =
+        readByPathWithException(documentContext, convertFields.get(0), List.of(), "");
+    // Query Order payload by instance id
+    if (Objects.isNull(instanceObj)) {
+      return;
+    }
+    List<HttpRequestEntity> httpRequestEntities =
+        httpRequestRepository.findByProductInstanceId((String) instanceObj);
+    // 404 if not found
+    if (CollectionUtils.isEmpty(httpRequestEntities)) {
+      throw KrakenException.notFound(
+          "instanceId not exist", new IllegalArgumentException("instanceId not exist"));
+    }
+    // Filter the add order
+    Optional<HttpRequestEntity> opt =
+        httpRequestEntities.stream()
+            .filter(
+                item -> {
+                  String request = JsonToolkit.toJson(item.getRequest());
+                  return filterRequest(request);
+                })
+            .findFirst();
+    if (opt.isEmpty()) {
+      throw KrakenException.unProcessableEntityInvalidValue("The instanceId has no matched order");
+    }
+    // Reading the payload
+    HttpRequestEntity orderRequest = opt.get();
+    String existPayload = JsonToolkit.toJson(orderRequest.getRequest());
+    // Check mapping items with the order payload
+    Object bodyObj = inputs.getOrDefault("body", null);
+    String requestBody = JsonToolkit.toJson(bodyObj);
+    checkModificationItems(requestBody, existPayload, modificationRule);
   }
 
   public void checkMapperConstraints(

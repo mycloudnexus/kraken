@@ -11,6 +11,7 @@ public class AppProperty {
   private Tenant tenant = new Tenant();
   private Map<String, Object> env;
 
+  private String modifyUseCase;
   private List<String> filterHeaders;
   private List<String> filterPaths;
   private List<String> deletePaths;
@@ -24,6 +25,7 @@ public class AppProperty {
   private Features features;
   private WorkflowConfig workflow = new WorkflowConfig();
   private DualVersionConfig dualVersionConfig = new DualVersionConfig();
+  private List<String> productTypes = new ArrayList<>();
 
   @Data
   public static class Features {
