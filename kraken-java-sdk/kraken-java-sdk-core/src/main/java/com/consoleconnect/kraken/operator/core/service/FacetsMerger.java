@@ -1,6 +1,7 @@
 package com.consoleconnect.kraken.operator.core.service;
 
 import com.consoleconnect.kraken.operator.core.mapper.FacetsMapper;
+import com.consoleconnect.kraken.operator.core.model.CommonMapperRef;
 import com.consoleconnect.kraken.operator.core.model.PathRule;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
@@ -23,7 +24,10 @@ public interface FacetsMerger extends CommonMapperExtender {
         (Objects.isNull(endpointNew) || Objects.isNull(endpointNew.getMappers()))
             ? new ArrayList<>()
             : endpointNew.getMappers().getPathRules();
-
+    CommonMapperRef schemaRef =
+        (Objects.isNull(endpointNew) || Objects.isNull(endpointNew.getMappers()))
+            ? null
+            : endpointNew.getMappers().getSchemaRef();
     extendCommonMapper(endpointNew);
     FacetsMapper.INSTANCE.toEndpoint(endpointOld, endpointNew);
 
@@ -35,6 +39,7 @@ public interface FacetsMerger extends CommonMapperExtender {
 
     Map<String, List<ComponentAPITargetFacets.Mapper>> finalMap = toFinalMapper(mapperNewMap);
     ComponentAPITargetFacets.Mappers mappers = new ComponentAPITargetFacets.Mappers();
+    mappers.setSchemaRef(schemaRef);
     mappers.setResponse(finalMap.getOrDefault(MAPPER_RESPONSE, Collections.emptyList()));
     mappers.setRequest(finalMap.getOrDefault(MAPPER_REQUEST, Collections.emptyList()));
     mappers.setPathRules(pathRules);
