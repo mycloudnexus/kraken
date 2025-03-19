@@ -34,7 +34,7 @@ type Props = {
 const { RangePicker } = DatePicker;
 
 const ActivityDiagrams = ({ envs }: Props) => {
-  const stageEnvId =
+  const productionEnvId =
     envs?.find((env: IEnv) => env.name?.toLowerCase() === "production")?.id ??
     "";
   const [form] = Form.useForm();
@@ -44,7 +44,7 @@ const ActivityDiagrams = ({ envs }: Props) => {
   const { requestStartTime, requestEndTime } = recentXDays(selectedRecentDate);
 
   const [params, setParams] = useState<DiagramProps>({
-    envId: stageEnvId,
+    envId: productionEnvId,
     requestStartTime,
     requestEndTime,
     buyer: undefined,
@@ -98,7 +98,7 @@ const ActivityDiagrams = ({ envs }: Props) => {
   return (
     <Flex vertical className={styles.wrapper} justify="center">
       <Form
-        initialValues={{ stageEnvId }}
+        initialValues={{ productionEnvId }}
         form={form}
         layout="inline"
         colon={false}
