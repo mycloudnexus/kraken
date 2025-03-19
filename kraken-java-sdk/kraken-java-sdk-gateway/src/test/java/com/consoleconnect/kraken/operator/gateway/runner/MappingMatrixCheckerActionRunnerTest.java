@@ -5,6 +5,7 @@ import static com.consoleconnect.kraken.operator.gateway.runner.ResponseCodeTran
 import com.consoleconnect.kraken.operator.core.enums.ExpectTypeEnum;
 import com.consoleconnect.kraken.operator.core.enums.MappingTypeEnum;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
+import com.consoleconnect.kraken.operator.core.model.FilterRule;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
@@ -12,7 +13,10 @@ import com.consoleconnect.kraken.operator.core.toolkit.Constants;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.core.toolkit.YamlToolkit;
 import com.consoleconnect.kraken.operator.gateway.CustomConfig;
+import com.consoleconnect.kraken.operator.gateway.FilterRulesCreator;
 import com.consoleconnect.kraken.operator.gateway.dto.PathCheck;
+import com.consoleconnect.kraken.operator.gateway.entity.HttpRequestEntity;
+import com.consoleconnect.kraken.operator.gateway.repo.HttpRequestRepository;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -34,8 +38,10 @@ import org.springframework.test.context.ContextConfiguration;
 @MockIntegrationTest
 @ContextConfiguration(classes = CustomConfig.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
+class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest
+    implements FilterRulesCreator {
   @Autowired MappingMatrixCheckerActionRunner mappingMatrixCheckerActionRunner;
+  @Autowired HttpRequestRepository httpRequestRepository;
   @Autowired UnifiedAssetService unifiedAssetService;
 
   @Test
@@ -653,5 +659,125 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
     sourceCondition3.setVal("roll3");
 
     return List.of(sourceCondition1, sourceCondition2, sourceCondition3);
+  }
+
+  @Test
+  @SneakyThrows
+  void givenMatrixKey_whenChecking_thenReturnOK() {
+    Map<String, Object> inputs = new HashMap<>();
+    inputs.put("targetKey", "mef.sonata.api-target.quote.eline.modify.sync");
+    inputs.put("mappingMatrixKey", "mef.sonata.api.matrix.quote.eline.modify.sync");
+    inputs.put(
+        "body",
+        JsonToolkit.fromJson(
+            readFileToString("mockData/quote.eline.modify.request.json"), Object.class));
+    addValidHttpRequest();
+    Assertions.assertDoesNotThrow(() -> mappingMatrixCheckerActionRunner.onCheck(inputs));
+  }
+
+  @Test
+  @SneakyThrows
+  void givenEmptyRules_whenCheckModification_thenNoException() {
+    Map<String, Object> inputs = new HashMap<>();
+    inputs.put(
+        "body",
+        JsonToolkit.fromJson(readFileToString("mockData/productOrderRequest.json"), Object.class));
+    List<FilterRule> filterRules = new ArrayList<>();
+    String targetKey = "mef.sonata.api-target.quote.eline.modify.sync";
+    Assertions.assertDoesNotThrow(
+        () ->
+            mappingMatrixCheckerActionRunner.checkModifyConstraints(
+                filterRules, targetKey, inputs));
+  }
+
+  @Test
+  @SneakyThrows
+  void givenEmptyInstanceId_whenCheckModification_thenThrowsException() {
+    Map<String, Object> inputs = new HashMap<>();
+    inputs.put(
+        "body",
+        JsonToolkit.fromJson(
+            readFileToString("mockData/quote.eline.modify.request.no.instance.id.json"),
+            Object.class));
+    List<FilterRule> filterRules = new ArrayList<>();
+    FilterRule filterRule = new FilterRule();
+    filterRule.setQueryPath("$.body.quoteItem[0].product.id");
+    filterRules.add(filterRule);
+    String targetKey = "mef.sonata.api-target.quote.eline.modify.sync";
+    Assertions.assertThrows(
+        KrakenException.class,
+        () ->
+            mappingMatrixCheckerActionRunner.checkModifyConstraints(
+                filterRules, targetKey, inputs));
+  }
+
+  @Test
+  @SneakyThrows
+  void givenNotExistedInstanceId_whenCheckModification_thenThrowsException() {
+    Map<String, Object> inputs = new HashMap<>();
+    inputs.put(
+        "body",
+        JsonToolkit.fromJson(
+            readFileToString("mockData/quote.eline.modify.request.json"), Object.class));
+    List<FilterRule> filterRules = new ArrayList<>();
+    FilterRule filterRule = new FilterRule();
+    filterRule.setQueryPath("$.body.quoteItem[0].product.place[0].id");
+    filterRules.add(filterRule);
+    String targetKey = "mef.sonata.api-target.quote.eline.modify.sync";
+    Assertions.assertThrows(
+        KrakenException.class,
+        () ->
+            mappingMatrixCheckerActionRunner.checkModifyConstraints(
+                filterRules, targetKey, inputs));
+  }
+
+  @Test
+  @SneakyThrows
+  void givenValidBody_whenCheckModification_thenNoException() {
+    Map<String, Object> inputs = new HashMap<>();
+    inputs.put(
+        "body",
+        JsonToolkit.fromJson(
+            readFileToString("mockData/quote.eline.modify.request.json"), Object.class));
+    List<FilterRule> filterRules = buildValidFilterRules();
+    String targetKey = "mef.sonata.api-target.quote.eline.modify.sync";
+    addValidHttpRequest();
+    Assertions.assertDoesNotThrow(
+        () ->
+            mappingMatrixCheckerActionRunner.checkModifyConstraints(
+                filterRules, targetKey, inputs));
+  }
+
+  @SneakyThrows
+  private void addValidHttpRequest() {
+    HttpRequestEntity entity = new HttpRequestEntity();
+    entity.setId(UUID.randomUUID());
+    String s = readFileToString("mockData/productOrderRequest.json");
+    entity.setRequest(s);
+    entity.setMethod("POST");
+    entity.setRequestId(UUID.randomUUID().toString());
+    entity.setPath("/mefApi/sonata/productOrderingManagement/v10/productOrder");
+    entity.setUri("localhost");
+    entity.setBizType("ACCESS_E_LINE");
+    entity.setProductInstanceId("67aeadfa8a05cce9385c1497");
+    httpRequestRepository.save(entity);
+  }
+
+  @Test
+  @SneakyThrows
+  void givenInvalidBody_whenCheckModification_thenThrowsException() {
+    Map<String, Object> inputs = new HashMap<>();
+    inputs.put(
+        "body",
+        JsonToolkit.fromJson(
+            readFileToString("mockData/quote.eline.modify.invalid.request.json"), Object.class));
+    List<FilterRule> filterRules = buildValidFilterRules();
+    String targetKey = "mef.sonata.api-target.quote.eline.modify.sync";
+    addValidHttpRequest();
+    Assertions.assertThrows(
+        KrakenException.class,
+        () ->
+            mappingMatrixCheckerActionRunner.checkModifyConstraints(
+                filterRules, targetKey, inputs));
   }
 }
