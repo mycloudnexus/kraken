@@ -169,6 +169,7 @@ spec:
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.quote.uni.add.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.quote.eline.add.sync.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.quote.eline.modify.sync.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.quote.eline.add.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.uni.add.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.uni.read.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.uni.delete.yaml
