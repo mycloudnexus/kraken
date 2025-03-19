@@ -723,4 +723,23 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest {
     entity.setProductInstanceId("67aeadfa8a05cce9385c1497");
     httpRequestRepository.save(entity);
   }
+
+  @Test
+  @SneakyThrows
+  void givenInvalidBody_whenCheckModification_thenThrowsException() {
+    Map<String, Object> inputs = new HashMap<>();
+    inputs.put(
+        "body",
+        JsonToolkit.fromJson(
+            readFileToString("mockData/quote.eline.modify.invalid.request.json"), Object.class));
+    List<String> convertFields = new ArrayList<>();
+    convertFields.add("$.body.quoteItem[0].product.id");
+    String targetKey = "mef.sonata.api-target.quote.eline.modify.sync";
+    buildValidHttpRequest();
+    Assertions.assertThrows(
+        KrakenException.class,
+        () ->
+            mappingMatrixCheckerActionRunner.checkModifyConstraints(
+                convertFields, targetKey, inputs));
+  }
 }
