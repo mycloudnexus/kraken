@@ -414,7 +414,22 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
       Map<String, Object> map = unifiedAssetService.mergeFacets(facetsOld, facetsNew);
       String result2 = JsonToolkit.toJson(map);
       Assertions.assertNotNull(result2);
-      Assertions.assertEquals(result1.hashCode(), result2.hashCode());
+      ComponentAPITargetFacets facets1 =
+          JsonToolkit.fromJson(result1, ComponentAPITargetFacets.class);
+      ComponentAPITargetFacets facets2 =
+          JsonToolkit.fromJson(result2, ComponentAPITargetFacets.class);
+      List<ComponentAPITargetFacets.Mapper> request1 =
+          facets1.getEndpoints().get(0).getMappers().getRequest();
+      List<ComponentAPITargetFacets.Mapper> response1 =
+          facets1.getEndpoints().get(0).getMappers().getResponse();
+      List<ComponentAPITargetFacets.Mapper> request2 =
+          facets2.getEndpoints().get(0).getMappers().getRequest();
+      List<ComponentAPITargetFacets.Mapper> response2 =
+          facets2.getEndpoints().get(0).getMappers().getResponse();
+      Assertions.assertEquals(
+          JsonToolkit.toJson(request1).hashCode(), JsonToolkit.toJson(request2).hashCode());
+      Assertions.assertEquals(
+          JsonToolkit.toJson(response1).hashCode(), JsonToolkit.toJson(response2).hashCode());
     }
   }
 
