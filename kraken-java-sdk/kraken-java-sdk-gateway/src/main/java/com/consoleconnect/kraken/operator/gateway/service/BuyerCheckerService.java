@@ -36,6 +36,8 @@ import reactor.core.publisher.SynchronousSink;
 public class BuyerCheckerService implements SecurityChecker {
 
   public static final int INTERVAL = 60;
+  private static final String INVALID_ENV_TOKEN =
+      "The provided token belongs to the %s environment and cannot be used in the %s environment. Please use a valid token.";
   private UnifiedAssetService unifiedAssetService;
   private AuthDataProperty.ResourceServer resourceServer;
 
@@ -82,9 +84,9 @@ public class BuyerCheckerService implements SecurityChecker {
               .map(Object::toString)
               .orElse("");
       if (!StringUtils.equalsIgnoreCase(resourceServer.getVerifier().getEnv(), signEnv)) {
-        sink.error(
-            KrakenException.badRequest(
-                "Invalid buyer: invalid environment identity env:" + signEnv));
+        String error =
+            String.format(INVALID_ENV_TOKEN, signEnv, resourceServer.getVerifier().getEnv());
+        sink.error(KrakenException.unauthorizedInvalidCredentials(error));
         return;
       }
       Instant issuedAt = principal.getIssuedAt();
