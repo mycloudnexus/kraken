@@ -178,7 +178,7 @@ spec:
             title: "Tax included price value"
             description: ""
             source: ""
-            sourceLocation: BODY
+            sourceLocation: ""
             target: "@{{quoteItem[0].quoteItemPrice[*].price.taxIncludedAmount.value}}"
             targetLocation: BODY
             requiredMapping: false
@@ -186,7 +186,7 @@ spec:
             title: "Name of the quote item price"
             description: ""
             source: ""
-            sourceLocation: BODY
+            sourceLocation: ""
             target: "@{{quoteItem[0].quoteItemPrice[*].name}}"
             targetLocation: BODY
             requiredMapping: false
