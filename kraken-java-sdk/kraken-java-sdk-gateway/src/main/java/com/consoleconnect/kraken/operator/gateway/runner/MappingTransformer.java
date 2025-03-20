@@ -375,7 +375,10 @@ public interface MappingTransformer extends PathOperator {
     return str.replace(ARRAY_WILD_MASK, ARRAY_FIRST_ELE);
   }
 
-  default Boolean forwardDownstream(ComponentAPIFacets.Action config) {
+  default Boolean forwardDownstream(Map<String, Object> context, ComponentAPIFacets.Action config) {
+    if (context.containsKey(FORWARD_DOWNSTREAM)) {
+      return (Boolean) context.get(FORWARD_DOWNSTREAM);
+    }
     if (MapUtils.isNotEmpty(config.getEnv()) && config.getEnv().get(FORWARD_DOWNSTREAM) != null) {
       return Boolean.valueOf(config.getEnv().get(FORWARD_DOWNSTREAM));
     }
