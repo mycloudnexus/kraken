@@ -129,6 +129,8 @@ spec:
                   let errorArr = ['api use case is not supported :'];
                   errorCode = '400';
                   errorArr.push(`expect productOrderItem.action in [ ${actionArr} ], but missing property`);
+                  errorMsg = errorArr.join(' ');
+                  targetAPIConfigKey = 'targetKey:notFound';
                 } else {
                   let errorArr = ['api use case is not supported :'];
                   errorCode = '422';
