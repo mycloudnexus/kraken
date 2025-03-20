@@ -37,6 +37,7 @@ public interface MappingTransformer extends PathOperator {
   String RESPONSE_BODY = "responseBody";
   String WORKFLOW_PREFIX = "workflow.";
   String ARRAY_PATTERN = ".*\\[\\d+\\]$";
+  String RESPONSE_UNIQUE_ID = "$.entity.renderedResponse.uniqueId";
 
   @Slf4j
   final class LogHolder {}
@@ -60,11 +61,9 @@ public interface MappingTransformer extends PathOperator {
     List<ComponentAPITargetFacets.Mapper> response = mappers.getResponse();
     for (ComponentAPITargetFacets.Mapper mapper : response) {
       Map<String, Object> inputs = responseTargetMapperDto.getInputs();
-      if (inputs.containsKey("entity")) {
-        String id = (String) readWithJsonPath(inputs, "$.entity.renderedResponse.uniqueId");
-        if (StringUtils.isBlank(id)) {
-          continue;
-        }
+      String id = (String) readWithJsonPath(inputs, RESPONSE_UNIQUE_ID);
+      if (StringUtils.isBlank(id)) {
+        continue;
       }
       // Preparing check and delete path for final result
       if (StringUtils.isNotBlank(mapper.getCheckPath())

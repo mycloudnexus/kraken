@@ -6,6 +6,8 @@ import com.consoleconnect.kraken.operator.core.enums.WorkflowStageEnum;
 import com.consoleconnect.kraken.operator.core.enums.WorkflowStatusEnum;
 import com.consoleconnect.kraken.operator.core.exception.ErrorResponse;
 import com.consoleconnect.kraken.operator.core.toolkit.StringUtils;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -75,5 +77,12 @@ class StringUtilsTest {
     StringUtils.processRawMessage(errorResponse, raw);
     String result = errorResponse.getMessage();
     Assertions.assertFalse(result.contains("@{{"));
+  }
+
+  @Test
+  void givenPath_whenParse_thenReturnOK() {
+    Map<String, String> map = new HashMap<>();
+    map.put("id", "123");
+    Assertions.assertNotNull(StringUtils.readWithJsonPath(map, "$.id"));
   }
 }
