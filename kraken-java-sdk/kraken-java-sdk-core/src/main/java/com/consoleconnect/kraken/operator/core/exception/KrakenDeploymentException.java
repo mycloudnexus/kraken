@@ -22,6 +22,18 @@ public class KrakenDeploymentException extends KrakenException {
     return new KrakenDeploymentException(ErrorSeverityEnum.FATAL, 500, message);
   }
 
+  public static KrakenDeploymentException internalWarningError(String message) {
+    return new KrakenDeploymentException(ErrorSeverityEnum.WARNING, 500, message);
+  }
+
+  public static KrakenDeploymentException internalNoticeError(String message) {
+    return new KrakenDeploymentException(ErrorSeverityEnum.WARNING, 500, message);
+  }
+
+  public static KrakenDeploymentException internalNoticeError() {
+    return new KrakenDeploymentException(ErrorSeverityEnum.WARNING, 500);
+  }
+
   private void buildError(ErrorSeverityEnum severity) {
     this.error = DeployComponentError.builder().severity(severity).reason(getMessage()).build();
   }

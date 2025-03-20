@@ -30,7 +30,7 @@ public class DeployComponentError {
 
   public static DeployComponentError of(UnifiedAssetDto assetDto, Exception e) {
     return DeployComponentError.builder()
-        .severity(ErrorSeverityEnum.ERROR)
+        .severity(ErrorSeverityEnum.WARNING)
         .assetKind(assetDto.getKind())
         .assetId(assetDto.getId())
         .reason(e.getMessage())
