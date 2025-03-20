@@ -148,6 +148,7 @@ public class RenderRequestService implements MappingTransformer {
         UnifiedAsset.getFacets(asset, ComponentAPITargetFacets.class);
     Optional<ComponentAPITargetFacets.Mapper> uniqueMapper;
     if (createFacets.getWorkflow() != null && createFacets.getWorkflow().isEnabled()) {
+      log.info("render from workflow mapper");
       UnifiedAssetDto workflowAsset =
           unifiedAssetService.findOne(createFacets.getWorkflow().getKey());
       ComponentWorkflowFacets workflowFacets =
