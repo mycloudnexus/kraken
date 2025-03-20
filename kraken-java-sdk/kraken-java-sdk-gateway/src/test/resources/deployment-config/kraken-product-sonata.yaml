@@ -25,9 +25,11 @@ spec:
     - classpath:deployment-config/components/api-targets/api-target.order.eline.delete.yaml
     - classpath:deployment-config/components/api-targets/api-target.hub.add.yaml
     - classpath:deployment-config/components/api-targets/api-target.quote.uni.add.yaml
+    - classpath:deployment-config/components/api-targets/api-target.quote.eline.modify.sync.yaml
     - classpath:deployment-config/components/api-targets/api-target.order.notification.state.change.yaml
     - classpath:deployment-config/components/api-targets-mappers/api-target-mapper.hub.add.yaml
     - classpath:deployment-config/components/api-targets-mappers/api-target-mapper.quote.uni.add.yaml
+    - classpath:deployment-config/components/api-targets-mappers/api-target-mapper.quote.eline.modify.sync.yaml
     - classpath:deployment-config/components/api-targets-mappers/api-target-mapper.order.uni.add.yaml
     - classpath:deployment-config/components/api-targets-mappers/api-target-mapper.order.eline.add.yaml
     - classpath:deployment-config/components/api-targets-mappers/api-target-mapper.order.eline.delete.yaml
@@ -36,6 +38,7 @@ spec:
     - classpath:deployment-config/components/mapping-matrix/mapping.matrix.address.validation.yaml
     - classpath:deployment-config/components/mapping-matrix/mapping.matrix.address.validation.enable.yaml
     - classpath:deployment-config/components/mapping-matrix/mapping.matrix.quote.uni.add.yaml
+    - classpath:deployment-config/components/mapping-matrix/mapping.matrix.quote.eline.modify.sync.yaml
     - classpath:deployment-config/components/mapping-matrix/mapping.matrix.order.eline.delete.yaml
 
 
