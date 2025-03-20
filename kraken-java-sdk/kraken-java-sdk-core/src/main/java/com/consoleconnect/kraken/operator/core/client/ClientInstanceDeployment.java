@@ -8,6 +8,6 @@ import lombok.Data;
 public class ClientInstanceDeployment {
   String instanceId;
   String status;
-  private List<DeployComponentError> errors;
+  List<DeployComponentError> errors;
   String productReleaseId;
 }

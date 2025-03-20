@@ -426,7 +426,7 @@ class TemplateUpgradeControllerTest {
               null);
       for (UnifiedAssetDto assetDto : assetDtoPaging2.getData()) {
         productDeploymentService.reportConfigurationReloadingResult(
-            assetDto.getId(), DeployStatusEnum.SUCCESS.name());
+            assetDto.getId(), DeployStatusEnum.SUCCESS.name(), List.of());
       }
       Paging<UnifiedAssetDto> assetDtoPaging3 =
           unifiedAssetService.findBySpecification(

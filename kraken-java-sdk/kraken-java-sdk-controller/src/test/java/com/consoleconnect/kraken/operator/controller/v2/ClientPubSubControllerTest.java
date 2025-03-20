@@ -188,6 +188,7 @@ class ClientPubSubControllerTest extends AbstractIntegrationTest implements APIT
             .component(AssetKindEnum.COMPONENT_API_WORK_FLOW.getKind())
             .reason("Failed to deploy workflow")
             .build();
+    clientInstanceDeployment.setStatus(DeployStatusEnum.FAILED.name());
     clientInstanceDeployment.setErrors(List.of(error));
     event.setEventPayload(JsonToolkit.toJson(clientInstanceDeployment));
     webTestClientHelper.requestAndVerify(
@@ -207,7 +208,7 @@ class ClientPubSubControllerTest extends AbstractIntegrationTest implements APIT
         event,
         Assertions::assertNotNull);
 
-    unifiedAssetRepository.delete(deployment);
+    unifiedAssetRepository.delete(unifiedAssetRepository.findById(deployment.getId()).get());
   }
 
   @Test

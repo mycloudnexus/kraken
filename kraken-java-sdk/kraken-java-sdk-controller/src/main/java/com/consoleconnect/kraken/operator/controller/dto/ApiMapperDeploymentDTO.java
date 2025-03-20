@@ -1,5 +1,7 @@
 package com.consoleconnect.kraken.operator.controller.dto;
 
+import com.consoleconnect.kraken.operator.core.dto.DeployComponentError;
+import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -19,6 +21,8 @@ public class ApiMapperDeploymentDTO extends ComponentExpandDTO.TargetMappingDeta
   private String version;
   private String subVersion;
   private String status;
+  private DeployComponentError failureReason;
+  private List<DeployComponentError> errors;
   private String verifiedBy;
   private String verifiedAt;
   private boolean verifiedStatus;

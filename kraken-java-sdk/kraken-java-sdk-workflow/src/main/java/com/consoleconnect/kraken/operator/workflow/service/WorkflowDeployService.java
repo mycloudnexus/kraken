@@ -58,7 +58,7 @@ public class WorkflowDeployService {
       log.error("Failed to register workflow", e);
       throw KrakenDeploymentException.internalFatalError(
           AssetKindEnum.COMPONENT_API_WORK_FLOW.getKind(),
-          String.format("Failed to deploy workflow: %s", e.getMessage()));
+          String.format("Failed to deploy workflow"));
     }
     log.info("Deploying workflow completed");
   }
