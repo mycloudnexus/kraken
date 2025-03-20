@@ -17,7 +17,7 @@ spec:
     productType: access_e_line
     actionType: modify
   endpoints:
-    - id: create connection order
+    - id: modify connection order
       path: ""
       method: ""
       requestBody: |
@@ -25,6 +25,7 @@ spec:
       responseBody: |
         {
           "relatedContactInformation": "${T(com.consoleconnect.kraken.operator.gateway.func.SpelFunc).appendSellerInformation(env.seller.role, env.seller.name, env.seller.emailAddress, env.seller.number, mefRequestBody.relatedContactInformation)}",
+          "projectId": "${mefRequestBody.projectId}",
           "id": "${entity.id}",
           "orderDate":"${T(com.consoleconnect.kraken.operator.core.toolkit.DateTime).nowInUTCFormatted()}",
           "productOrderItem": [{
