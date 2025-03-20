@@ -36,6 +36,7 @@ spec:
     - taskName: create_order_task
       description: ""
       taskType: http
+      uniqueIdPath:
       endpoint:
           path: ""
           method: ''

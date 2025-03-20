@@ -2,6 +2,7 @@ package com.consoleconnect.kraken.operator.gateway.runner;
 
 import static com.consoleconnect.kraken.operator.core.toolkit.Constants.DOT;
 import static com.consoleconnect.kraken.operator.core.toolkit.ConstructExpressionUtil.*;
+import static com.consoleconnect.kraken.operator.core.toolkit.StringUtils.readWithJsonPath;
 
 import com.consoleconnect.kraken.operator.core.dto.StateValueMappingDto;
 import com.consoleconnect.kraken.operator.core.enums.MappingTypeEnum;
@@ -58,6 +59,13 @@ public interface MappingTransformer extends PathOperator {
     LogHolder.log.info("compactedResponseBody:{}", compactedResponseBody);
     List<ComponentAPITargetFacets.Mapper> response = mappers.getResponse();
     for (ComponentAPITargetFacets.Mapper mapper : response) {
+      Map<String, Object> inputs = responseTargetMapperDto.getInputs();
+      if (inputs.containsKey("entity")) {
+        String id = (String) readWithJsonPath(inputs, "$.entity.renderedResponse.uniqueId");
+        if (StringUtils.isBlank(id)) {
+          continue;
+        }
+      }
       // Preparing check and delete path for final result
       if (StringUtils.isNotBlank(mapper.getCheckPath())
           && StringUtils.isNotBlank(mapper.getDeletePath())) {

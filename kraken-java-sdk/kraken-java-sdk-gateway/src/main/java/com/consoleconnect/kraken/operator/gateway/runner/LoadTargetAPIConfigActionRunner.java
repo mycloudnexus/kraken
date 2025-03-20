@@ -128,6 +128,7 @@ public class LoadTargetAPIConfigActionRunner extends AbstractActionRunner
               endpoint.setRequestBody(renderedRequest);
             }
             if (Objects.nonNull(endpoint.getResponseBody())) {
+              stateValueMappingDto.setInputs(inputs);
               String transformedResp = transform(endpoint, stateValueMappingDto);
               endpoint.setResponseBody(SpELEngine.evaluate(transformedResp, inputs));
             }
@@ -141,6 +142,9 @@ public class LoadTargetAPIConfigActionRunner extends AbstractActionRunner
   }
 
   public static String encodeUrlParam(String path) {
+    if (StringUtils.isBlank(path)) {
+      return StringUtils.EMPTY;
+    }
     String[] split = path.split("\\?");
     StringBuilder pathBuilder = new StringBuilder().append(split[0]);
     if (split.length > 1) {

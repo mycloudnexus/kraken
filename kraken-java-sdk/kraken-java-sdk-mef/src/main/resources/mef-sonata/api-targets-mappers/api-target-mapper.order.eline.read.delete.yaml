@@ -31,7 +31,7 @@ spec:
             source: "@{{id}}"
             sourceLocation: "PATH"
             target: ""
-            convertValue: "mef.sonata.api-target-mapper.order.eline.add#mapper.order.eline.add.orderId"
+            convertValue: "mef.sonata.api-target-mapper.order.eline.delete#mapper.order.eline.delete.orderId"
             targetLocation: ""
             requiredMapping: true
         response:

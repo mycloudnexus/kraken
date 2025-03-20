@@ -137,7 +137,10 @@ public class WorkflowTaskConfig implements WorkflowTaskRegister {
   }
 
   @WorkerTask(PERSIST_RESPONSE_TASK)
-  public void persistResponse(@InputParam("id") String id, @InputParam("payload") Object payload) {
+  public void persistResponse(
+      @InputParam("id") String id,
+      @InputParam("payload") Object payload,
+      @InputParam("uniqueIdPath") String uniqueIdPath) {
     log.info("persist response: {}", id);
     if (StringUtils.isNotBlank(id)) {
       repository
@@ -145,8 +148,24 @@ public class WorkflowTaskConfig implements WorkflowTaskRegister {
           .ifPresent(
               httpRequestEntity -> {
                 httpRequestEntity.setResponse(payload);
+                // set unique id to trace order
+                setUniqueId(payload, uniqueIdPath, httpRequestEntity);
                 repository.save(httpRequestEntity);
               });
+    }
+  }
+
+  private static void setUniqueId(
+      Object payload, String uniqueIdPath, HttpRequestEntity httpRequestEntity) {
+    if (uniqueIdPath != null) {
+      String expression = ConstructExpressionUtil.constructParam(uniqueIdPath);
+      String uniqueId = SpELEngine.evaluate(expression, JsonToolkit.fromJson(payload, Map.class));
+      if (StringUtils.isNotBlank(uniqueId)) {
+        Object renderedResponse = httpRequestEntity.getRenderedResponse();
+        Map<String, Object> map = JsonToolkit.fromJson(renderedResponse, Map.class);
+        map.put("uniqueId", uniqueId);
+        httpRequestEntity.setRenderedResponse(map);
+      }
     }
   }
 

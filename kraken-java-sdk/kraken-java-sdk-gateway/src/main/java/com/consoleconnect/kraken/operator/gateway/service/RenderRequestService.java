@@ -4,9 +4,11 @@ import static com.consoleconnect.kraken.operator.core.enums.ParamLocationEnum.*;
 import static com.consoleconnect.kraken.operator.core.toolkit.ConstructExpressionUtil.*;
 
 import com.consoleconnect.kraken.operator.core.dto.StateValueMappingDto;
+import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.enums.MappingTypeEnum;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
+import com.consoleconnect.kraken.operator.core.model.facet.ComponentWorkflowFacets;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.gateway.runner.MappingTransformer;
@@ -144,6 +146,15 @@ public class RenderRequestService implements MappingTransformer {
     UnifiedAsset asset = unifiedAssetService.findOne(pathReferIds[0]);
     ComponentAPITargetFacets createFacets =
         UnifiedAsset.getFacets(asset, ComponentAPITargetFacets.class);
+    if (createFacets.getWorkflow() != null && createFacets.getWorkflow().isEnabled()) {
+      UnifiedAssetDto workflowAsset =
+          unifiedAssetService.findOne(createFacets.getWorkflow().getKey());
+      ComponentWorkflowFacets workflowFacets =
+          UnifiedAsset.getFacets(workflowAsset, ComponentWorkflowFacets.class);
+      String uniqueIdPath = workflowFacets.getExecutionStage().get(0).getUniqueIdPath();
+      mapper.setSource(constructOriginalDBParam(uniqueIdPath));
+      return;
+    }
     List<ComponentAPITargetFacets.Mapper> response =
         createFacets.getEndpoints().get(0).getMappers().getResponse();
     Optional<ComponentAPITargetFacets.Mapper> instanceOpt =
