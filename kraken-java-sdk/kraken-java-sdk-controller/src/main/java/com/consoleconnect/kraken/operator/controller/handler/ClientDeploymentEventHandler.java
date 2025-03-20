@@ -4,10 +4,12 @@ import com.consoleconnect.kraken.operator.controller.service.ProductDeploymentSe
 import com.consoleconnect.kraken.operator.core.client.ClientEvent;
 import com.consoleconnect.kraken.operator.core.client.ClientEventTypeEnum;
 import com.consoleconnect.kraken.operator.core.client.ClientInstanceDeployment;
+import com.consoleconnect.kraken.operator.core.dto.DeployComponentError;
 import com.consoleconnect.kraken.operator.core.entity.EnvironmentClientEntity;
 import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
 import com.consoleconnect.kraken.operator.core.enums.ClientReportTypeEnum;
 import com.consoleconnect.kraken.operator.core.enums.DeployStatusEnum;
+import com.consoleconnect.kraken.operator.core.enums.ErrorSeverityEnum;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import com.consoleconnect.kraken.operator.core.repo.EnvironmentClientRepository;
 import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
@@ -17,6 +19,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,9 +63,9 @@ public class ClientDeploymentEventHandler extends ClientEventHandler {
                   return entity;
                 });
     environmentClientEntity.setStatus(deployment.getStatus());
-    environmentClientEntity.setReason(deployment.getReason());
     environmentClientEntity.setUpdatedAt(ZonedDateTime.now());
     environmentClientEntity.setUpdatedBy(userId);
+    processDeployError(environmentClientEntity, deployment);
     environmentClientRepository.save(environmentClientEntity);
 
     Optional<UnifiedAssetEntity> deploymentOptional =
@@ -70,10 +73,9 @@ public class ClientDeploymentEventHandler extends ClientEventHandler {
 
     if (deploymentOptional.isPresent()) {
       log.info(
-          "report asset {} configuration  reloading result success, status: {}, reason: {}",
+          "report asset {} configuration  reloading result success, status: {}",
           deployment.getProductReleaseId(),
-          deployment.getStatus(),
-          deployment.getReason());
+          deployment.getStatus());
       if (DEPLOY_STATUS_FAILED.equals(deployment.getStatus())) {
         deploymentOptional.get().setStatus(DeployStatusEnum.FAILED.name());
       } else {
@@ -94,5 +96,24 @@ public class ClientDeploymentEventHandler extends ClientEventHandler {
     }
 
     return HttpResponse.ok(null);
+  }
+
+  private static final int MAX_REASON_MSG = 120;
+
+  private void processDeployError(
+      EnvironmentClientEntity environmentClient, ClientInstanceDeployment deployment) {
+    environmentClient.setErrors(deployment.getErrors());
+    if (CollectionUtils.isNotEmpty(deployment.getErrors())) {
+      Optional<DeployComponentError> fatal =
+          deployment.getErrors().stream()
+              .filter(e -> e.getSeverity() == ErrorSeverityEnum.FATAL)
+              .findFirst();
+      if (fatal.isPresent()) {
+        if (fatal.get().getReason().length() > MAX_REASON_MSG) {
+          fatal.get().setReason(fatal.get().getReason().substring(0, MAX_REASON_MSG) + "...");
+        }
+        environmentClient.setReason(JsonToolkit.toJson(fatal.get()));
+      }
+    }
   }
 }

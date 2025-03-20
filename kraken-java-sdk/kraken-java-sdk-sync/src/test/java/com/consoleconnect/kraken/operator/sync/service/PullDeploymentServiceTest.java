@@ -2,7 +2,7 @@ package com.consoleconnect.kraken.operator.sync.service;
 
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
-import com.consoleconnect.kraken.operator.core.exception.KrakenException;
+import com.consoleconnect.kraken.operator.core.exception.KrakenDeploymentException;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import com.consoleconnect.kraken.operator.core.model.Metadata;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
@@ -152,7 +152,9 @@ class PullDeploymentServiceTest extends AbstractIntegrationTest {
     Mockito.doReturn(HttpResponse.ok(null)).when(pullDeploymentService).pushEvent(Mockito.any());
 
     // Mock deploy failure
-    Mockito.doThrow(KrakenException.internalError(""))
+    Mockito.doThrow(
+            KrakenDeploymentException.internalFatalError(
+                AssetKindEnum.COMPONENT_API_WORK_FLOW.getKind(), "Failed to deploy workflow"))
         .when(unifiedAssetService)
         .syncAsset(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyBoolean());
 
