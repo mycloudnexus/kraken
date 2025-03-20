@@ -152,9 +152,7 @@ class PullDeploymentServiceTest extends AbstractIntegrationTest {
     Mockito.doReturn(HttpResponse.ok(null)).when(pullDeploymentService).pushEvent(Mockito.any());
 
     // Mock deploy failure
-    Mockito.doThrow(
-            KrakenDeploymentException.internalFatalError(
-                AssetKindEnum.COMPONENT_API_WORK_FLOW.getKind(), "Failed to deploy workflow"))
+    Mockito.doThrow(KrakenDeploymentException.internalFatalError("Failed to deploy workflow"))
         .when(unifiedAssetService)
         .syncAsset(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyBoolean());
 

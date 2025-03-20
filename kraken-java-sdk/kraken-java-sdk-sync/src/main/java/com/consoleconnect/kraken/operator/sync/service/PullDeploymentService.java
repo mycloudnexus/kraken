@@ -113,10 +113,10 @@ public class PullDeploymentService extends KrakenServerConnector {
       return null;
     } catch (KrakenDeploymentException e) {
       log.error("Failed to install deployment", e);
-      return e.getError();
+      return DeployComponentError.of(dto, e);
     } catch (Exception e) {
       log.error("Failed to install deployment", e);
-      return DeployComponentError.of(e);
+      return DeployComponentError.of(dto, e);
     }
   }
 
