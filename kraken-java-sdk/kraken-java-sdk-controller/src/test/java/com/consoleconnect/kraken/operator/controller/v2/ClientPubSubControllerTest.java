@@ -22,7 +22,6 @@ import com.consoleconnect.kraken.operator.core.enums.DeployStatusEnum;
 import com.consoleconnect.kraken.operator.core.enums.ErrorSeverityEnum;
 import com.consoleconnect.kraken.operator.core.enums.WorkflowStatusEnum;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
-import com.consoleconnect.kraken.operator.core.repo.AssetFacetRepository;
 import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
 import com.consoleconnect.kraken.operator.core.request.LogSearchRequest;
 import com.consoleconnect.kraken.operator.core.service.ApiActivityLogService;
@@ -54,7 +53,6 @@ class ClientPubSubControllerTest extends AbstractIntegrationTest implements APIT
   @Autowired ApiActivityLogService apiActivityLogService;
   @SpyBean ApiActivityLogRepository apiActivityLogRepository;
   @SpyBean UnifiedAssetRepository unifiedAssetRepository;
-  @SpyBean AssetFacetRepository assetFacetRepository;
   @SpyBean EvnClientMapperInfoService evnClientMapperInfoService;
 
   public static final String PRODUCT_ID = "mef.sonata";
@@ -185,7 +183,6 @@ class ClientPubSubControllerTest extends AbstractIntegrationTest implements APIT
     DeployComponentError error =
         DeployComponentError.builder()
             .severity(ErrorSeverityEnum.FATAL)
-            .component(AssetKindEnum.COMPONENT_API_WORK_FLOW.getKind())
             .reason("Failed to deploy workflow")
             .build();
     clientInstanceDeployment.setStatus(DeployStatusEnum.FAILED.name());
