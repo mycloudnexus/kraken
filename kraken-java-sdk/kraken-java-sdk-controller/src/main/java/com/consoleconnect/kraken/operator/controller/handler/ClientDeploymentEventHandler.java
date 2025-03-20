@@ -5,6 +5,7 @@ import com.consoleconnect.kraken.operator.controller.tools.DeploymentHelper;
 import com.consoleconnect.kraken.operator.core.client.ClientEvent;
 import com.consoleconnect.kraken.operator.core.client.ClientEventTypeEnum;
 import com.consoleconnect.kraken.operator.core.client.ClientInstanceDeployment;
+import com.consoleconnect.kraken.operator.core.dto.DeployComponentError;
 import com.consoleconnect.kraken.operator.core.entity.EnvironmentClientEntity;
 import com.consoleconnect.kraken.operator.core.enums.ClientReportTypeEnum;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
@@ -59,8 +60,8 @@ public class ClientDeploymentEventHandler extends ClientEventHandler {
     environmentClientEntity.setStatus(deployment.getStatus());
     environmentClientEntity.setUpdatedAt(ZonedDateTime.now());
     environmentClientEntity.setUpdatedBy(userId);
-    environmentClientEntity.setReason(
-        DeploymentHelper.extractFailReason(deployment.getErrors()).getReason());
+    DeployComponentError error = DeploymentHelper.extractFailReason(deployment.getErrors());
+    environmentClientEntity.setReason(error != null ? error.getReason() : "");
     environmentClientRepository.save(environmentClientEntity);
 
     try {
