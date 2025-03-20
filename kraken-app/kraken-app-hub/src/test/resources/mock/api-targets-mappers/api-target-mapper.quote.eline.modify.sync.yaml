@@ -1,0 +1,262 @@
+---
+kind: kraken.component.api-target-mapper
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target-mapper.quote.eline.modify.sync
+  name: Mapper Of Creating Quote Eline
+  description: This operation creates a Quote entity
+spec:
+  trigger:
+    path: /mefApi/sonata/quoteManagement/v8/quote
+    method: post
+    productType: access_e_line
+    actionType: modify
+  endpoints:
+    - id: create quote for connection
+      path: /api/company/{username}/pricing/calculate/flex
+      method: post
+      serverKey: mef.sonata.api-target-spec.con1718940696857
+      mappers:
+        pathRules:
+          - name: mapper.quite.eline.modify.sync.pathRule.state
+            checkPath: "$[?(@.state != 'unableToProvide')]"
+            deletePath: "$.validFor"
+            insertPath:
+              - key: "$.quoteItem[0].terminationError.code"
+                val: "otherIssue"
+              - key: "$.quoteItem[0].terminationError.value"
+                val: "the quoted item is not available"
+        request:
+          - name: mapper.quote.eline.modify.sync.buyerId
+            title: The unique identifier of the organization that is acting as the a Buyer.
+            description:
+            source: "@{{buyerId}}"
+            replaceStar: true
+            sourceLocation: QUERY
+            target: "@{{username}}"
+            targetLocation: PATH
+            customizedField: false
+            requiredMapping: false
+          - name: mapper.quote.eline.modify.sync.duration.amount
+            source: "@{{quoteItem[0].requestedQuoteItemTerm.duration.amount}}"
+            sourceLocation: BODY
+            sourceType: integer
+            discrete: true
+            target: ""
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.quote.eline.modify.sync.duration.units
+            source: "@{{quoteItem[0].requestedQuoteItemTerm.duration.units}}"
+            sourceLocation: BODY
+            sourceType: enum
+            sourceValues:
+              - calendarMonths
+              - calendarDays
+              - calendarHours
+              - calendarMinutes
+              - businessDays
+              - businessHours
+              - businessMinutes
+            valueMapping:
+              calendarMonths: m
+            target: ""
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.quote.eline.modify.sync.endOfTermAction
+            source: "@{{quoteItem[0].requestedQuoteItemTerm.endOfTermAction}}"
+            sourceLocation: BODY
+            sourceType: enum
+            sourceValues:
+              - roll
+              - autoDisconnect
+              - autoRenew
+            valueMapping: {}
+            target: "roll"
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.quote.eline.modify.sync.rollInterval.amount
+            source: "@{{quoteItem[0].requestedQuoteItemTerm.rollInterval.amount}}"
+            sourceLocation: BODY
+            sourceType: integer
+            discrete: true
+            sourceConditionExpression:
+            sourceConditions:
+              - name: endOfTermAction
+                key: "@{{quoteItem[0].requestedQuoteItemTerm.endOfTermAction}}"
+                val: roll
+                operator: eq
+            target: "1"
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.quote.eline.modify.sync.rollInterval.units
+            source: "@{{quoteItem[0].requestedQuoteItemTerm.rollInterval.units}}"
+            sourceLocation: BODY
+            sourceType: enum
+            sourceValues:
+              - calendarMonths
+              - calendarDays
+              - calendarHours
+              - calendarMinutes
+              - businessDays
+              - businessHours
+              - businessMinutes
+            valueMapping: {}
+            sourceConditionExpression:
+            sourceConditions:
+              - name: endOfTermAction
+                key: "@{{quoteItem[0].requestedQuoteItemTerm.endOfTermAction}}"
+                val: roll
+                operator: eq
+            target: "calendarMonths"
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.quote.eline.modify.sync.productConfiguration.bandwidth
+            source: "@{{quoteItem[0].product.productConfiguration.bandwidth}}"
+            sourceLocation: BODY
+            allowValueLimit: true
+            sourceType: integer
+            discrete: true
+            sourceValues:
+              - 1000
+              - 10000
+            target: "@{{flexBandwidth}}"
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.quote.eline.modify.sync.productConfiguration.bandwidthUnit
+            source: "@{{quoteItem[0].product.productConfiguration.bandwidthUnit}}"
+            sourceLocation: BODY
+            sourceType: enum
+            sourceValues:
+              - GBPS
+              - MBPS
+            valueMapping: {}
+            target: "MBPS"
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.quote.eline.modify.sync.productConfiguration.classOfService
+            source: "@{{quoteItem[0].product.productConfiguration.classOfService}}"
+            sourceLocation: BODY
+            sourceType: string
+            target: ""
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.quote.eline.modify.sync.productConfiguration.paymentType
+            source: "@{{quoteItem[0].product.productConfiguration.paymentType}}"
+            sourceLocation: BODY
+            sourceType: string
+            target: ""
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.quote.eline.modify.sync.productOffering.id
+            source: "@{{quoteItem[0].product.productOffering.id}}"
+            sourceLocation: BODY
+            sourceType: string
+            target: "ACCESS_E_LINE"
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.quote.eline.modify.sync.product.id
+            source: "@{{quoteItem[0].product.id}}"
+            sourceLocation: BODY
+            sourceType: string
+            target: "@{{connectionId}}"
+            targetLocation: BODY
+            requiredMapping: true
+        response:
+          - name: mapper.quote.eline.modify.sync.unitOfMeasure
+            title: Quote unitOfMeasure Mapping
+            description: quote unitOfMeasure mapping
+            source: "Gb"
+            sourceLocation: BODY
+            target: "@{{quoteItem[0].quoteItemPrice[*].unitOfMeasure}}"
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.quote.eline.modify.price.unit
+            title: Quote Price Unit Mapping
+            description: quote price unit mapping
+            source: "USD"
+            sourceLocation: BODY
+            target: "@{{quoteItem[0].quoteItemPrice[*].price.dutyFreeAmount.unit}}"
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.quote.eline.modify.price.value
+            title: Quote Price Value Mapping
+            description: quote price value mapping
+            source: "@{{responseBody.flexCharge}}"
+            sourceLocation: ""
+            target: "@{{quoteItem[0].quoteItemPrice[*].price.dutyFreeAmount.value}}"
+            checkPath: "$['quoteItem'][0]['quoteItemPrice'][0]['price']['dutyFreeAmount']['value']"
+            deletePath: "$.quoteItem[0].quoteItemPrice"
+            requiredMapping: true
+            replaceStar: true
+          - name: mapper.quote.eline.modify.sync.taxRate
+            title: Quote taxRate Mapping
+            description: quote taxRate mapping
+            source: "16"
+            sourceLocation: BODY
+            target: "@{{quoteItem[0].quoteItemPrice[*].price.taxRate}}"
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.quote.eline.modify.sync.taxIncludedAmount.unit
+            title: Quote taxIncludedAmount unit Mapping
+            description: quote taxIncludedAmount unit mapping
+            source: "USD"
+            sourceLocation: BODY
+            target: "@{{quoteItem[0].quoteItemPrice[*].price.taxIncludedAmount.unit}}"
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.quote.eline.modify.sync.taxIncludedAmount.value
+            title: Quote taxIncludedAmount value Mapping
+            description: quote taxIncludedAmount value mapping
+            source: "100"
+            sourceLocation: BODY
+            target: "@{{quoteItem[0].quoteItemPrice[*].price.taxIncludedAmount.value}}"
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.quote.eline.modify.sync.quoteItemPrice.name
+            title: Quote quoteItemPrice name Mapping
+            description: quote quoteItemPrice name mapping
+            source: "name-here"
+            sourceLocation: BODY
+            target: "@{{quoteItem[0].quoteItemPrice[*].name}}"
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.quote.eline.modify.sync.quoteItemPrice.priceType
+            title: Quote quoteItemPrice priceType Mapping
+            description: quote quoteItemPrice priceType mapping
+            source: "recurring"
+            sourceLocation: BODY
+            target: "@{{quoteItem[0].quoteItemPrice[*].priceType}}"
+            targetType: enum
+            targetLocation: BODY
+            requiredMapping: false
+            targetValues:
+              - recurring
+              - nonRecurring
+              - usageBased
+            valueMapping: {}
+          - name: mapper.quote.eline.modify.sync.quoteItemPrice.description
+            title: Quote quoteItemPrice description Mapping
+            description: quote quoteItemPrice description mapping
+            source: ""
+            sourceLocation: BODY
+            target: "@{{quoteItem[0].quoteItemPrice[*].description}}"
+            targetLocation: BODY
+            requiredMapping: false
+          - name: mapper.quote.eline.modify.sync.quoteItemPrice.recurringChargePeriod
+            title: Quote quoteItemPrice recurringChargePeriod Mapping
+            description: quote quoteItemPrice recurringChargePeriod mapping
+            source: "@{{results[*].entity.duration.unit}}"
+            sourceLocation: BODY
+            target: "@{{quoteItem[0].quoteItemPrice[*].recurringChargePeriod}}"
+            targetType: enum
+            targetLocation: BODY
+            requiredMapping: false
+            replaceStar: true
+            targetValues:
+              - hour
+              - day
+              - week
+              - month
+              - year
+            valueMapping:
+              m: month
