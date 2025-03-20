@@ -692,7 +692,28 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest
 
   @Test
   @SneakyThrows
-  void givenNoInstanceId_whenCheckModification_thenThrowsException() {
+  void givenEmptyInstanceId_whenCheckModification_thenThrowsException() {
+    Map<String, Object> inputs = new HashMap<>();
+    inputs.put(
+        "body",
+        JsonToolkit.fromJson(
+            readFileToString("mockData/quote.eline.modify.request.no.instance.id.json"),
+            Object.class));
+    List<FilterRule> filterRules = new ArrayList<>();
+    FilterRule filterRule = new FilterRule();
+    filterRule.setQueryPath("$.body.quoteItem[0].product.id");
+    filterRules.add(filterRule);
+    String targetKey = "mef.sonata.api-target.quote.eline.modify.sync";
+    Assertions.assertThrows(
+        KrakenException.class,
+        () ->
+            mappingMatrixCheckerActionRunner.checkModifyConstraints(
+                filterRules, targetKey, inputs));
+  }
+
+  @Test
+  @SneakyThrows
+  void givenNotExistedInstanceId_whenCheckModification_thenThrowsException() {
     Map<String, Object> inputs = new HashMap<>();
     inputs.put(
         "body",

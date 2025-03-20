@@ -42,7 +42,7 @@ spec:
             sourceLocation: BODY
             sourceType: integer
             discrete: true
-            target: "@{{connections[*].duration.value}}"
+            target: ""
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.quote.eline.modify.sync.duration.units
@@ -59,7 +59,7 @@ spec:
               - businessMinutes
             valueMapping:
               calendarMonths: m
-            target: "@{{connections[*].duration.unit}}"
+            target: ""
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.quote.eline.modify.sync.endOfTermAction
@@ -119,7 +119,7 @@ spec:
             sourceValues:
               - 1000
               - 10000
-            target: "@{{connections[*].bandwidth}}"
+            target: "@{{flexBandwidth}}"
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.quote.eline.modify.sync.productConfiguration.bandwidthUnit
@@ -137,14 +137,14 @@ spec:
             source: "@{{quoteItem[0].product.productConfiguration.classOfService}}"
             sourceLocation: BODY
             sourceType: string
-            target: "@{{connections[*].classOfService}}"
+            target: ""
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.quote.eline.modify.sync.productConfiguration.paymentType
             source: "@{{quoteItem[0].product.productConfiguration.paymentType}}"
             sourceLocation: BODY
             sourceType: string
-            target: "@{{connections[*].paymentMethod}}"
+            target: ""
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.quote.eline.modify.sync.productOffering.id
@@ -158,8 +158,8 @@ spec:
             source: "@{{quoteItem[0].product.id}}"
             sourceLocation: BODY
             sourceType: string
-            target: ""
-            targetLocation:
+            target: "@{{connectionId}}"
+            targetLocation: BODY
             requiredMapping: true
         response:
           - name: mapper.quote.eline.modify.sync.unitOfMeasure
@@ -181,7 +181,7 @@ spec:
           - name: mapper.quote.eline.modify.price.value
             title: Quote Price Value Mapping
             description: quote price value mapping
-            source: "@{{responseBody.results[*].price}}"
+            source: "@{{responseBody.flexCharge}}"
             sourceLocation: ""
             target: "@{{quoteItem[0].quoteItemPrice[*].price.dutyFreeAmount.value}}"
             checkPath: "$['quoteItem'][0]['quoteItemPrice'][0]['price']['dutyFreeAmount']['value']"
