@@ -84,5 +84,6 @@ class StringUtilsTest {
     Map<String, String> map = new HashMap<>();
     map.put("id", "123");
     Assertions.assertNotNull(StringUtils.readWithJsonPath(map, "$.id"));
+    Assertions.assertNotNull(StringUtils.readWithJsonPath(map, "$.name"));
   }
 }
