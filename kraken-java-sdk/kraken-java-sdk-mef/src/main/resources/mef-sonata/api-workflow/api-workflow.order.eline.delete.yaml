@@ -36,12 +36,20 @@ spec:
     - taskName: create_order_task
       description: ""
       taskType: http
-      uniqueIdPath:
       endpoint:
           path: ""
           method: ''
           serverKey: ''
           mappers:
             request:
+            response:
+              - name: mapper.order.eline.delete.orderId
+                title: order Id from seller
+                source: ""
+                target: '@{{orderId}}'
+                description: ""
+                sourceLocation: BODY
+                targetLocation: BODY
+                requiredMapping: true
       notificationUrl:
 

@@ -43,4 +43,13 @@ spec:
         serverKey: ""
         mappers:
           request:
+          response:
+            - name: mapper.order.uni.add.orderId
+              title: order Id from seller
+              source: ""
+              target: '@{{orderId}}'
+              description: ""
+              sourceLocation: BODY
+              targetLocation: BODY
+              requiredMapping: true
       notificationUrl:

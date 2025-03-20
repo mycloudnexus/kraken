@@ -146,21 +146,29 @@ public class RenderRequestService implements MappingTransformer {
     UnifiedAsset asset = unifiedAssetService.findOne(pathReferIds[0]);
     ComponentAPITargetFacets createFacets =
         UnifiedAsset.getFacets(asset, ComponentAPITargetFacets.class);
+    Optional<ComponentAPITargetFacets.Mapper> uniqueMapper;
     if (createFacets.getWorkflow() != null && createFacets.getWorkflow().isEnabled()) {
       UnifiedAssetDto workflowAsset =
           unifiedAssetService.findOne(createFacets.getWorkflow().getKey());
       ComponentWorkflowFacets workflowFacets =
           UnifiedAsset.getFacets(workflowAsset, ComponentWorkflowFacets.class);
-      String uniqueIdPath = workflowFacets.getExecutionStage().get(0).getUniqueIdPath();
-      mapper.setSource(constructOriginalDBParam(uniqueIdPath));
-      return;
+      ComponentAPITargetFacets.Mappers mappers =
+          workflowFacets.getExecutionStage().get(0).getEndpoint().getMappers();
+      Optional<ComponentAPITargetFacets.Mapper> uniqueOpt =
+          mappers.getResponse().stream()
+              .filter(respMapper -> Objects.equals(respMapper.getName(), pathReferIds[1]))
+              .findFirst();
+      uniqueMapper = uniqueOpt;
+    } else {
+      List<ComponentAPITargetFacets.Mapper> response =
+          createFacets.getEndpoints().get(0).getMappers().getResponse();
+      Optional<ComponentAPITargetFacets.Mapper> instanceOpt =
+          response.stream().filter(v -> Objects.equals(pathReferIds[1], v.getName())).findFirst();
+      uniqueMapper = instanceOpt;
     }
-    List<ComponentAPITargetFacets.Mapper> response =
-        createFacets.getEndpoints().get(0).getMappers().getResponse();
-    Optional<ComponentAPITargetFacets.Mapper> instanceOpt =
-        response.stream().filter(v -> Objects.equals(pathReferIds[1], v.getName())).findFirst();
-    if (instanceOpt.isPresent()) {
-      ComponentAPITargetFacets.Mapper referMapper = instanceOpt.get();
+
+    if (uniqueMapper.isPresent()) {
+      ComponentAPITargetFacets.Mapper referMapper = uniqueMapper.get();
       String source = referMapper.getSource();
       List<String> paramLocations = extractMapperParam(source);
       mapper.setSource(constructOriginalDBParam(paramLocations.get(0)));
