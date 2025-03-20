@@ -62,7 +62,7 @@ public interface MappingTransformer extends PathOperator {
     for (ComponentAPITargetFacets.Mapper mapper : response) {
       Map<String, Object> inputs = responseTargetMapperDto.getInputs();
       String id = (String) readWithJsonPath(inputs, RESPONSE_UNIQUE_ID);
-      if (StringUtils.isBlank(id)) {
+      if (mapper.isRenderCheck() && StringUtils.isBlank(id)) {
         continue;
       }
       // Preparing check and delete path for final result

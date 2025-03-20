@@ -57,6 +57,7 @@ spec:
             valueMapping: {}
             source: ""
             sourceLocation: "BODY"
+            renderCheck: true
           - name: mapper.order.eline.read.delete.completionDate
             title: "order complete date"
             description: ""
