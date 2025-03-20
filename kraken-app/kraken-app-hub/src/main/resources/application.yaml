@@ -125,3 +125,8 @@ app:
           secret: ${ACCESS_TOKEN_JWT_SECRET}
       bearer-token-header-name: x-sonata-buyer-key
       user-id: x-kraken-buyer-id
+
+  workflow:
+    base-url: https://external-kraken-conductor.dev.consolecore.io/api
+    enabled: true
+    enable-register-worker: true

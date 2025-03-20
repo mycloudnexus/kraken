@@ -1,0 +1,73 @@
+
+---
+kind: kraken.component.api-target
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target.order.eline.modify
+  name: Order Connection API
+  mapperKey: mef.sonata.api-target-mapper.order.eline.modify
+  version: 7
+spec:
+  inputs:
+    - mefQuery
+    - mefRequestBody
+  trigger:
+    path: /mefApi/sonata/productOrderingManagement/v10/productOrder
+    method: post
+    productType: access_e_line
+    actionType: modify
+  endpoints:
+    - id: modify connection order
+      path: ""
+      method: ""
+      requestBody: |
+        {}
+      responseBody: |
+        {
+          "relatedContactInformation": "${T(com.consoleconnect.kraken.operator.gateway.func.SpelFunc).appendSellerInformation(env.seller.role, env.seller.name, env.seller.emailAddress, env.seller.number, mefRequestBody.relatedContactInformation)}",
+          "projectId": "${mefRequestBody.projectId}",
+          "id": "${entity.id}",
+          "orderDate":"${T(com.consoleconnect.kraken.operator.core.toolkit.DateTime).nowInUTCFormatted()}",
+          "productOrderItem": [{
+            "action": "${mefRequestBody.productOrderItem[0].action}",
+            "agreementName": "${mefRequestBody.productOrderItem[0].agreementName}",
+            "billingAccount": "${mefRequestBody.productOrderItem[0].billingAccount}",
+            "coordinatedAction": "${mefRequestBody.productOrderItem[0].coordinatedAction}",
+            "endCustomerName": "${mefRequestBody.productOrderItem[0].endCustomerName}",
+            "expediteIndicator": "${mefRequestBody.productOrderItem[0].expediteIndicator}",
+            "id": "${mefRequestBody.productOrderItem[0].id}",
+            "expectedCompletionDate": "${mefRequestBody.productOrderItem[0].expectedCompletionDate}",
+            "note": "${mefRequestBody.productOrderItem[0].note}",
+            "product": {
+              "productOffering": "${mefRequestBody.productOrderItem[0].product.productOffering}",
+              "productConfiguration": "${mefRequestBody.productOrderItem[0].product.productConfiguration}",
+              "productRelationship": "${mefRequestBody.productOrderItem[0].product.productRelationship}",
+              "place": "${mefRequestBody.productOrderItem[0].product.place}",
+              "href": "${mefRequestBody.productOrderItem[0].product.href}",
+              "id": "${mefRequestBody.productOrderItem[0].product.id}"
+            },
+            "itemTerm": {
+              "duration": {
+                "amount": "${mefRequestBody.productOrderItem[0].requestedItemTerm.duration.amount}",
+                "units": "${mefRequestBody.productOrderItem[0].requestedItemTerm.duration.units}"
+              }
+            },
+            "productOfferingQualificationItem": "${mefRequestBody.productOrderItem[0].productOfferingQualificationItem}",
+            "productOrderItemRelationship": "${mefRequestBody.productOrderItem[0].productOrderItemRelationship}",
+            "quoteItem": "${mefRequestBody.productOrderItem[0].quoteItem}",
+            "relatedBuyerPON": "${mefRequestBody.productOrderItem[0].relatedBuyerPON}",
+            "relatedContactInformation": "${mefRequestBody.productOrderItem[0].relatedContactInformation}",
+            "requestedCompletionDate": "${mefRequestBody.productOrderItem[0].requestedCompletionDate}",
+            "requestedItemTerm": "${mefRequestBody.productOrderItem[0].requestedItemTerm}",
+            "tspRestorationPriority": "${mefRequestBody.productOrderItem[0].tspRestorationPriority}",
+            "charge": "${mefRequestBody.productOrderItem[0].charge}",
+            "completionDate": "((mefResponseBody.state=='completed'?mefResponseBody.completionDate:null))",
+            "expectedCompletionDate": "${mefRequestBody.productOrderItem[0].requestedCompletionDate}",
+            "expediteAcceptedIndicator": "${mefRequestBody.productOrderItem[0].expediteIndicator}",
+            "milestone": "${mefRequestBody.productOrderItem[0].milestone}",
+            "state": "((mefResponseBody.state))",
+            "terminationError": "${mefRequestBody.productOrderItem[0].terminationError}"
+          }],
+          "state": "",
+          "orderId": ""
+        }
