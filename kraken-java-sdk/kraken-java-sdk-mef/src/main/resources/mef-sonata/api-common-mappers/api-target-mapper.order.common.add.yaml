@@ -140,10 +140,10 @@ spec:
             title: "id of a Product Offering"
             source: "@{{productOrderItem[0].product.productOffering.id}}"
             sourceLocation: BODY
+            sourceType: string
             target: ""
             targetLocation: BODY
             requiredMapping: true
-            sourceType: string
         response:
           - name: mapper.order.@{{productType}}.add.state
             title: Order State
@@ -193,6 +193,33 @@ spec:
             targetLocation: BODY
             customizedField: false
             requiredMapping: false
+          - name: mapper.order.@{{productType}}.add.term.duration
+            title: order item Term duration
+            description: ""
+            source: ""
+            sourceLocation: ""
+            target: "@{{productOrderItem[0].itemTerm.duration.amount}}"
+            targetLocation: BODY
+            customizedField: false
+            requiredMapping: true
+          - name: mapper.order.@{{productType}}.add.term.units
+            title: order item Term unit
+            description: ""
+            source: ""
+            sourceLocation: ""
+            target: "@{{productOrderItem[0].itemTerm.duration.units}}"
+            targetLocation: BODY
+            targetValues:
+              - calendarYears
+              - calendarMonths
+              - calendarDays
+              - calendarHours
+              - calendarMinutes
+              - businessDays
+              - businessHours
+              - businessMinutes
+            customizedField: false
+            requiredMapping: true
           - name: mapper.order.@{{productType}}.add.term.endOfTermAction
             title: MEFEndOfTermAction
             description: ""
