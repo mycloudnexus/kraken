@@ -160,6 +160,7 @@ public class WorkflowTaskConfig implements WorkflowTaskRegister {
     if (uniqueIdPath != null) {
       String expression = ConstructExpressionUtil.constructParam(uniqueIdPath);
       String uniqueId = SpELEngine.evaluate(expression, JsonToolkit.fromJson(payload, Map.class));
+      log.info("set uniqueId: {}", uniqueId);
       if (StringUtils.isNotBlank(uniqueId)) {
         Object renderedResponse = httpRequestEntity.getRenderedResponse();
         Map<String, Object> map = JsonToolkit.fromJson(renderedResponse, Map.class);
