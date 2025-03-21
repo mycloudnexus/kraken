@@ -3,6 +3,7 @@ package com.consoleconnect.kraken.operator.workflow.service;
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
 import com.consoleconnect.kraken.operator.core.enums.DeployStatusEnum;
 import com.consoleconnect.kraken.operator.core.event.IngestionDataResult;
+import com.consoleconnect.kraken.operator.core.exception.KrakenDeploymentException;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.model.SyncMetadata;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
@@ -55,7 +56,8 @@ public class WorkflowDeployService {
       createWorkflowDeployment(asset, workflowDef);
     } catch (Exception e) {
       log.error("Failed to register workflow", e);
-      throw KrakenException.internalError("Failed to deploy conductor");
+      throw KrakenDeploymentException.internalFatalError(
+          String.format("Failed to deploy workflow"));
     }
     log.info("Deploying workflow completed");
   }
