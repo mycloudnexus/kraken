@@ -5,6 +5,7 @@ import static org.apache.commons.lang3.StringUtils.*;
 
 import com.consoleconnect.kraken.operator.core.exception.ErrorResponse;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
+import com.jayway.jsonpath.JsonPath;
 
 public class StringUtils {
 
@@ -70,5 +71,13 @@ public class StringUtils {
     }
     // fetch the first 8 characters of the UUID, which is enough to uniquely identify it
     return uuidString.substring(0, 8);
+  }
+
+  public static Object readWithJsonPath(Object json, String path) {
+    try {
+      return JsonPath.read(json, path);
+    } catch (Exception e) {
+      return EMPTY;
+    }
   }
 }

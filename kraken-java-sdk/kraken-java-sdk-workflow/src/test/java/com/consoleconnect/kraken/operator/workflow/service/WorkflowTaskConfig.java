@@ -65,7 +65,10 @@ public class WorkflowTaskConfig implements WorkflowTaskRegister {
   }
 
   @WorkerTask(PERSIST_RESPONSE_TASK)
-  public void persistResponse(@InputParam("id") String id, @InputParam("payload") Object payload) {
+  public void persistResponse(
+      @InputParam("id") String id,
+      @InputParam("payload") Object payload,
+      @InputParam("uniqueIdPath") String uniqueIdPath) {
     log.info("persist response: {}", id);
   }
 

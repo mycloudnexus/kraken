@@ -352,6 +352,26 @@ public class UnifiedAssetService implements UUIDWrapper, FacetsMerger {
             });
   }
 
+  public void syncFacets(UnifiedAssetEntity assetEntity, Map<String, Object> facets) {
+    Set<AssetFacetEntity> existingFacets = assetEntity.getFacets();
+    Set<AssetFacetEntity> newFacets = new HashSet<>();
+    assetEntity.setFacets(newFacets);
+    Set<UUID> toDeletedIds =
+        existingFacets.stream().map(AssetFacetEntity::getId).collect(Collectors.toSet());
+    log.info("delete asset facets ids:{}", JsonToolkit.toJson(toDeletedIds));
+    this.assetFacetRepository.deleteAll(existingFacets);
+    this.assetFacetRepository.flush();
+    facets.forEach(
+        (key, value) -> {
+          AssetFacetEntity facetEntity = new AssetFacetEntity();
+          facetEntity.setAsset(assetEntity);
+          facetEntity.setKey(key);
+          facetEntity.setPayload(value);
+          newFacets.add(facetEntity);
+        });
+    this.assetFacetRepository.saveAll(newFacets);
+  }
+
   private UnifiedAssetEntity createAssetEntity(
       String parentId, UnifiedAsset data, SyncMetadata syncMetadata) {
     UnifiedAssetEntity entity = new UnifiedAssetEntity();
@@ -389,26 +409,6 @@ public class UnifiedAssetService implements UUIDWrapper, FacetsMerger {
     } else {
       entity.setUpdatedBy(syncMetadata.getSyncedBy());
     }
-  }
-
-  private void syncFacets(UnifiedAssetEntity assetEntity, Map<String, Object> facets) {
-    Set<AssetFacetEntity> existingFacets = assetEntity.getFacets();
-    Set<AssetFacetEntity> newFacets = new HashSet<>();
-    assetEntity.setFacets(newFacets);
-    Set<UUID> toDeletedIds =
-        existingFacets.stream().map(AssetFacetEntity::getId).collect(Collectors.toSet());
-    log.info("delete asset facets ids:{}", JsonToolkit.toJson(toDeletedIds));
-    this.assetFacetRepository.deleteAll(existingFacets);
-    this.assetFacetRepository.flush();
-    facets.forEach(
-        (key, value) -> {
-          AssetFacetEntity facetEntity = new AssetFacetEntity();
-          facetEntity.setAsset(assetEntity);
-          facetEntity.setKey(key);
-          facetEntity.setPayload(value);
-          newFacets.add(facetEntity);
-        });
-    this.assetFacetRepository.saveAll(newFacets);
   }
 
   private void syncAssetLinks(UnifiedAssetEntity assetEntity, List<AssetLink> links) {

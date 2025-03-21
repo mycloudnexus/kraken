@@ -86,6 +86,7 @@ class ProductDeploymentControllerTest extends AbstractIntegrationTest {
   @Test
   @Order(1)
   void givenApiMapper_whenDeploy_thenReturnOk() {
+
     String path = String.format("%s/%s/api-mapper-deployments", PRODUCT_BASE_PATH, PRODUCT_ID);
 
     // create a component tag

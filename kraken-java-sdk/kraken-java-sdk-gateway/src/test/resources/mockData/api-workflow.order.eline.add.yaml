@@ -2,12 +2,12 @@
 kind: kraken.component.api-workflow
 apiVersion: v1
 metadata:
-  key: mef.sonata.api-workflow.order.uni.add
+  key: mef.sonata.api-workflow.order.eline.add
   name: Order Management
   version: 1
 spec:
   metaData:
-    workflowName: "order.uni.add"
+    workflowName: "order.eline.add"
     externalId: ""
   validationMapper:
   validationStage:
@@ -35,7 +35,7 @@ spec:
           request:
   executionStage:
     - taskName: create_order_task
-      description: "create uni order task"
+      description: "create eline order task"
       taskType: http
       endpoint:
         path: ""
@@ -44,9 +44,9 @@ spec:
         mappers:
           request:
           response:
-            - name: mapper.order.uni.add.orderId
+            - name: mapper.order.eline.add.orderId
               title: order Id from seller
-              source: ""
+              source: "@{{id}}"
               target: '@{{orderId}}'
               description: ""
               sourceLocation: BODY

@@ -21,7 +21,7 @@ public class MockResponseGatewayFilterFactory
       log.info("Running mock response action: {}", config.getActionType());
       Optional<Map<String, Object>> contextOptional =
           AbstractActionRunner.generateActionContext(exchange, config);
-      Boolean forwardDownstream = forwardDownstream(config);
+      Boolean forwardDownstream = forwardDownstream(contextOptional.get(), config);
       if (contextOptional.isPresent() && !Boolean.TRUE.equals(forwardDownstream)) {
         ServerHttpResponse httpResponse = exchange.getResponse();
         Map<String, Object> context = contextOptional.get();

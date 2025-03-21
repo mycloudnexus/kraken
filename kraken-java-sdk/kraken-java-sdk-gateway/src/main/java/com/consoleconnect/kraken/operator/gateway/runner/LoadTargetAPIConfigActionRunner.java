@@ -1,6 +1,7 @@
 package com.consoleconnect.kraken.operator.gateway.runner;
 
 import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.COMPONENT_API_SERVER;
+import static com.consoleconnect.kraken.operator.core.toolkit.StringUtils.readWithJsonPath;
 import static com.consoleconnect.kraken.operator.gateway.filter.KrakenFilterConstants.X_KRAKEN_WORKFLOW_CONFIG;
 
 import com.consoleconnect.kraken.operator.core.dto.SimpleApiServerDto;
@@ -128,6 +129,8 @@ public class LoadTargetAPIConfigActionRunner extends AbstractActionRunner
               endpoint.setRequestBody(renderedRequest);
             }
             if (Objects.nonNull(endpoint.getResponseBody())) {
+              stateValueMappingDto.setUniqueId(
+                  (String) readWithJsonPath(inputs, RESPONSE_UNIQUE_ID));
               String transformedResp = transform(endpoint, stateValueMappingDto);
               endpoint.setResponseBody(SpELEngine.evaluate(transformedResp, inputs));
             }
@@ -141,6 +144,9 @@ public class LoadTargetAPIConfigActionRunner extends AbstractActionRunner
   }
 
   public static String encodeUrlParam(String path) {
+    if (StringUtils.isBlank(path)) {
+      return StringUtils.EMPTY;
+    }
     String[] split = path.split("\\?");
     StringBuilder pathBuilder = new StringBuilder().append(split[0]);
     if (split.length > 1) {
