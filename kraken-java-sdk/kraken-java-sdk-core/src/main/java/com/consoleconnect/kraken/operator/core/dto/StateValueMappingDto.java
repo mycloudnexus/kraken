@@ -18,5 +18,5 @@ public class StateValueMappingDto {
 
   private List<PathRule> pathRules = new ArrayList<>();
 
-  private Map<String, Object> inputs = new HashMap<>();
+  private String uniqueId;
 }
