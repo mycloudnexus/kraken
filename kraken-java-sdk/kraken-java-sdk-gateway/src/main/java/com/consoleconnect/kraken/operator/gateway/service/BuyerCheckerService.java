@@ -37,7 +37,7 @@ public class BuyerCheckerService implements SecurityChecker {
 
   public static final int INTERVAL = 60;
   private static final String INVALID_ENV_TOKEN =
-      "The provided token belongs to the %s environment and cannot be used in the %s environment. Please use a valid token.";
+      "The provided token belongs to the %s cannot be used in the %s environment. Please use a valid token.";
   private UnifiedAssetService unifiedAssetService;
   private AuthDataProperty.ResourceServer resourceServer;
 

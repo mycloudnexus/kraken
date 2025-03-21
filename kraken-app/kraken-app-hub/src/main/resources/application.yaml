@@ -106,6 +106,7 @@ app:
   filter-headers:
     - token
     - Authorization
+    - authorization
     - x-sonata-buyer-key
   filter-paths:
     - /mefApi
