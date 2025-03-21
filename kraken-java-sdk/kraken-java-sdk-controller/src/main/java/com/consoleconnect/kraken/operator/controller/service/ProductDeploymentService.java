@@ -15,7 +15,6 @@ import com.consoleconnect.kraken.operator.controller.event.SingleMapperReportEve
 import com.consoleconnect.kraken.operator.controller.model.*;
 import com.consoleconnect.kraken.operator.controller.repo.EnvironmentRepository;
 import com.consoleconnect.kraken.operator.controller.service.upgrade.UpgradeSourceServiceFactory;
-import com.consoleconnect.kraken.operator.controller.tools.DeploymentErrorHelper;
 import com.consoleconnect.kraken.operator.core.dto.DeployComponentError;
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;

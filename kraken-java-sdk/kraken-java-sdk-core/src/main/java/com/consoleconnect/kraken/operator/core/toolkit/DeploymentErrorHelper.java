@@ -1,4 +1,4 @@
-package com.consoleconnect.kraken.operator.controller.tools;
+package com.consoleconnect.kraken.operator.core.toolkit;
 
 import com.consoleconnect.kraken.operator.core.dto.DeployComponentError;
 import com.consoleconnect.kraken.operator.core.enums.ErrorSeverityEnum;

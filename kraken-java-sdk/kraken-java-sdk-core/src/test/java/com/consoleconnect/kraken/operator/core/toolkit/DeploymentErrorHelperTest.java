@@ -1,6 +1,5 @@
-package com.consoleconnect.kraken.operator.toolkit;
+package com.consoleconnect.kraken.operator.core.toolkit;
 
-import com.consoleconnect.kraken.operator.controller.tools.DeploymentErrorHelper;
 import com.consoleconnect.kraken.operator.core.dto.DeployComponentError;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.exception.KrakenDeploymentException;
@@ -9,7 +8,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class DeploymentHelperTest {
+public class DeploymentErrorHelperTest {
 
   @Test
   void testDeploymentHelper() {
