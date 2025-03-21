@@ -738,32 +738,29 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
               .getComponentTags()
               .forEach(
                   dto -> {
-                    if (!mapperAssetMap.containsKey(dto.getParentComponentKey())) {
-                      log.error(
-                          "Failed to process component tag, parentComponentKey {} not found",
-                          dto.getParentComponentKey());
-                      return;
-                    }
-                    UnifiedAssetDto mapperAsset = mapperAssetMap.get(dto.getParentComponentKey());
-                    ComponentAPITargetFacets componentAPITargetFacets =
-                        UnifiedAsset.getFacets(mapperAsset, ComponentAPITargetFacets.class);
-                    ComponentAPITargetFacets.Trigger trigger =
-                        componentAPITargetFacets.getTrigger();
                     ApiMapperDeploymentDTO deploymentDTO = new ApiMapperDeploymentDTO();
-                    if (trigger != null) {
-                      BeanUtils.copyProperties(trigger, deploymentDTO);
-                      ComponentExpandDTO.MappingMatrix mappingMatrix =
-                          new ComponentExpandDTO.MappingMatrix();
-                      BeanUtils.copyProperties(trigger, mappingMatrix);
-                      deploymentDTO.setMappingMatrix(mappingMatrix);
+                    if (mapperAssetMap.containsKey(dto.getParentComponentKey())) {
+                      UnifiedAssetDto mapperAsset = mapperAssetMap.get(dto.getParentComponentKey());
+                      ComponentAPITargetFacets componentAPITargetFacets =
+                          UnifiedAsset.getFacets(mapperAsset, ComponentAPITargetFacets.class);
+                      ComponentAPITargetFacets.Trigger trigger =
+                          componentAPITargetFacets.getTrigger();
+                      if (trigger != null) {
+                        BeanUtils.copyProperties(trigger, deploymentDTO);
+                        ComponentExpandDTO.MappingMatrix mappingMatrix =
+                            new ComponentExpandDTO.MappingMatrix();
+                        BeanUtils.copyProperties(trigger, mappingMatrix);
+                        deploymentDTO.setMappingMatrix(mappingMatrix);
+                      }
+                      deploymentDTO.setTargetMapperKey(mapperAsset.getMetadata().getKey());
                     }
+
                     deploymentDTO.setCreateAt(assetDto.getCreatedAt());
                     deploymentDTO.setCreateBy(assetDto.getCreatedBy());
                     setUserName(deploymentDTO);
                     deploymentDTO.setStatus(assetDto.getMetadata().getStatus());
                     deploymentDTO.setFailureReason(facets.getFailureReason());
                     deploymentDTO.setErrors(facets.getErrors());
-                    deploymentDTO.setTargetMapperKey(mapperAsset.getMetadata().getKey());
                     deploymentDTO.setVersion(dto.getVersion());
                     deploymentDTO.setReleaseKey(assetDto.getMetadata().getKey());
                     deploymentDTO.setReleaseId(assetDto.getId());
