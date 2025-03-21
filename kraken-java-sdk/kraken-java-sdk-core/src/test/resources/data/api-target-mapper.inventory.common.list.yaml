@@ -1,70 +1,55 @@
 ---
-kind: kraken.component.api-target-mapper
+kind: kraken.component.api-common-mapper
 apiVersion: v1
 metadata:
-  key: mef.sonata.api-target-mapper.inventory.uni.list
-  name: Inventory Connection API
-  version: 2
+  key: mef.sonata.api-target-mapper.inventory.common.list
+  name: Inventory Connection API Common Mappers
+  version: 1
 spec:
-  inputs:
-    - mefQuery
-    - mefRequestBody
-    - entity
-  trigger:
-    path: /mefApi/sonata/productInventory/v7/product
-    method: get
-    productType: uni
   endpoints:
-    - id: list uni product
-      path: /api/company/{companyName}/ports/orders/{orderId}
-      method: get
+    - id: list product inventory
       mappers:
-        schemaRef:
-          ref: "classpath:/mef-sonata/api-common-mappers/api-target-mapper.inventory.common.list.yaml"
-          params:
-            - key: productType
-              val: uni
         request:
-          - name: mapper.inventory.uni.list.buyerId
+          - name: mapper.inventory.@{{productType}}.list.buyerId
             title: "The unique identifier of the organization that is acting as the a Buyer. MUST be specified in the request only when the requester represents more than one Buyer."
             source: "@{{buyerId}}"
             sourceLocation: QUERY
-            target: "@{{companyName}}"
+            target: ""
             targetLocation: PATH
             requiredMapping: false
-          - name: mapper.inventory.uni.list.orderId
+          - name: mapper.inventory.@{{productType}}.list.orderId
             title: "associated order Id."
             source: "@{{productOrderId}}"
             sourceLocation: "QUERY"
-            target: "@{{orderId}}"
+            target: ""
             targetType: string
             targetLocation: "PATH"
-            convertValue: "mef.sonata.api-target-mapper.order.uni.add#mapper.order.uni.add.orderId"
+            convertValue: "mef.sonata.api-target-mapper.order.@{{productType}}.add#mapper.order.@{{productType}}.add.orderId"
             requiredMapping: true
         response:
-          - name: mapper.inventory.uni.list.id
+          - name: mapper.inventory.@{{productType}}.list.id
             title: "Unique identifier of the product"
-            source: "@{{responseBody.createdPortId}}"
-            sourceLocation: BODY
+            source: ""
+            sourceLocation:
             target: "@{{id}}"
             targetType: string
             targetLocation: BODY
             requiredMapping: true
             checkPath: "$[0]['id']"
             deletePath: "$[*]"
-          - name:  mapper.inventory.uni.list.startDate
+          - name: mapper.inventory.@{{productType}}.list.startDate
             title: "The date from which the product starts"
             description: "BODY"
-            source: "@{{responseBody.createdAt}}"
-            sourceLocation: BODY
+            source: ""
+            sourceLocation:
             target: "@{{startDate}}"
             targetType: string
             targetLocation: BODY
             requiredMapping: true
-          - name: mapper.inventory.uni.list.status
+          - name: mapper.inventory.@{{productType}}.list.status
             title: "Possible values for the status of a MEF product"
-            source: "@{{responseBody.port.status}}"
-            sourceLocation: BODY
+            source: ""
+            sourceLocation:
             target: "@{{[*].status}}"
             targetType: enum
             targetLocation: BODY
@@ -78,10 +63,3 @@ spec:
               - suspended
               - suspendedPendingTerminate
               - terminated
-            valueMapping:
-              ACTIVE: active,
-              ACTIVATING: pendingActive
-              DELETING: pendingTerminate
-              DISABLED: suspended
-              DELETED: terminated
-              CANCELED: cancelled

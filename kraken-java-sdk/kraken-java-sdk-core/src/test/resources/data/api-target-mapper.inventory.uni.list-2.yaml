@@ -3,8 +3,7 @@ kind: kraken.component.api-target-mapper
 apiVersion: v1
 metadata:
   key: mef.sonata.api-target-mapper.inventory.uni.list
-  name: Inventory Port API List
-  description: This operation retrieves a list of product inventory
+  name: Inventory Connection API
   version: 2
 spec:
   inputs:
@@ -17,11 +16,11 @@ spec:
     productType: uni
   endpoints:
     - id: list uni product
-      path: ""
-      method: ""
+      path: /api/company/{companyName}/ports/orders/{orderId}
+      method: get
       mappers:
         schemaRef:
-          ref: "classpath:/mef-sonata/api-common-mappers/api-target-mapper.inventory.common.list.yaml"
+          ref: "classpath:/data/api-target-mapper.inventory.common.list.yaml"
           params:
             - key: productType
               val: uni

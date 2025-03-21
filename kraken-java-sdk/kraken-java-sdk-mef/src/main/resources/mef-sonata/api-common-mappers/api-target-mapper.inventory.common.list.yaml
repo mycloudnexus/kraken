@@ -1,0 +1,67 @@
+---
+kind: kraken.component.api-target-mapper
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target-mapper.inventory.common.list
+  name: Inventory Connection API Common Mappers
+  version: 1
+spec:
+  endpoints:
+    - id: list product inventory
+      mappers:
+        request:
+          - name: mapper.inventory.@{{productType}}.list.buyerId
+            title: "The unique identifier of the organization that is acting as the a Buyer. MUST be specified in the request only when the requester represents more than one Buyer."
+            source: "@{{buyerId}}"
+            sourceLocation: "QUERY"
+            target: ""
+            targetType: string
+            targetLocation: ""
+            requiredMapping: false
+          - name: mapper.inventory.@{{productType}}.list.orderId
+            title: "associated order Id."
+            source: "@{{productOrderId}}"
+            sourceLocation: "QUERY"
+            target: ""
+            targetType: string
+            targetLocation: ""
+            convertValue: "mef.sonata.api-target-mapper.order.@{{productType}}.add#mapper.order.@{{productType}}.add.orderId"
+            requiredMapping: true
+        response:
+          - name: mapper.inventory.@{{productType}}.list.id
+            title: "Unique identifier of the product"
+            source: ""
+            sourceLocation: ""
+            target: "@{{id}}"
+            targetType: string
+            targetLocation: BODY
+            requiredMapping: true
+            checkPath: "$[0].id"
+            deletePath: "$[*]"
+          - name: mapper.inventory.@{{productType}}.list.startDate
+            title: "The date from which the product starts"
+            description: ""
+            source: ""
+            sourceLocation: ""
+            target: "@{{startDate}}"
+            targetType: string
+            targetLocation: BODY
+            requiredMapping: true
+          - name: mapper.inventory.@{{productType}}.list.status
+            title: "Possible values for the status of a MEF product"
+            source: ""
+            sourceLocation: ""
+            target: "@{{[*].status}}"
+            targetType: enum
+            targetLocation: BODY
+            requiredMapping: true
+            targetValues:
+              - active
+              - active.pendingChange
+              - cancelled
+              - pendingActive
+              - pendingTerminate
+              - suspended
+              - suspendedPendingTerminate
+              - terminated
+            valueMapping: {}
