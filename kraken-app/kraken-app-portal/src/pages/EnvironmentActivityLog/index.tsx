@@ -9,8 +9,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useBoolean } from "usehooks-ts";
 import ActivityDetailModal from "./components/ActivityDetailModal";
 import EnvironmentActivityTable from "./components/EnvironmentActivityTable";
+import PushHistoryDrawer from "./components/PushHistoryDrawer";
 import PushHistoryList from "./components/PushHistoryList";
-import PushHistoryModal from "./components/PushHistoryModal";
 import styles from "./index.module.scss";
 
 const { Search } = Input;
@@ -100,7 +100,7 @@ const EnvironmentActivityLog = () => {
     >
       <div className={styles.contentWrapper} ref={refWrapper}>
         {isOpen && (
-          <PushHistoryModal
+          <PushHistoryDrawer
             isOpen={isOpen}
             envOptions={envOptions}
             onClose={close}
