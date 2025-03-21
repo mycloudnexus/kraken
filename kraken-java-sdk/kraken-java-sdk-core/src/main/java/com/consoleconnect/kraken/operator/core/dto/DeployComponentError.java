@@ -21,7 +21,7 @@ public class DeployComponentError {
 
   public static DeployComponentError of(UnifiedAssetDto assetDto, KrakenDeploymentException e) {
     return DeployComponentError.builder()
-        .severity(e.getError().getSeverity())
+        .severity(e.getSeverity())
         .assetKind(assetDto.getKind())
         .assetId(assetDto.getId())
         .reason(e.getMessage())

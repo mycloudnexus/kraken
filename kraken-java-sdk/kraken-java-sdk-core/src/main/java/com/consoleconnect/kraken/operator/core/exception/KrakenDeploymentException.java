@@ -1,12 +1,11 @@
 package com.consoleconnect.kraken.operator.core.exception;
 
-import com.consoleconnect.kraken.operator.core.dto.DeployComponentError;
 import com.consoleconnect.kraken.operator.core.enums.ErrorSeverityEnum;
 import lombok.Getter;
 
 public class KrakenDeploymentException extends KrakenException {
 
-  @Getter private DeployComponentError error;
+  @Getter private ErrorSeverityEnum severity;
 
   public KrakenDeploymentException(ErrorSeverityEnum severity, int code) {
     super(code);
@@ -35,6 +34,6 @@ public class KrakenDeploymentException extends KrakenException {
   }
 
   private void buildError(ErrorSeverityEnum severity) {
-    this.error = DeployComponentError.builder().severity(severity).reason(getMessage()).build();
+    this.severity = severity;
   }
 }
