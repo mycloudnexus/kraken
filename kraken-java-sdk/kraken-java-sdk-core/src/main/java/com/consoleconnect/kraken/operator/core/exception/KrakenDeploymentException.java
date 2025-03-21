@@ -5,16 +5,16 @@ import lombok.Getter;
 
 public class KrakenDeploymentException extends KrakenException {
 
-  @Getter private ErrorSeverityEnum severity;
+  @Getter private final ErrorSeverityEnum severity;
 
   public KrakenDeploymentException(ErrorSeverityEnum severity, int code) {
     super(code);
-    buildError(severity);
+    this.severity = severity;
   }
 
   public KrakenDeploymentException(ErrorSeverityEnum severity, int code, String message) {
     super(code, message);
-    buildError(severity);
+    this.severity = severity;
   }
 
   public static KrakenDeploymentException internalFatalError(String message) {
@@ -31,9 +31,5 @@ public class KrakenDeploymentException extends KrakenException {
 
   public static KrakenDeploymentException internalNoticeError() {
     return new KrakenDeploymentException(ErrorSeverityEnum.WARNING, 500);
-  }
-
-  private void buildError(ErrorSeverityEnum severity) {
-    this.severity = severity;
   }
 }

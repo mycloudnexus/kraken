@@ -12,6 +12,8 @@ public class DeploymentErrorHelper {
 
   private static final int MAX_REASON_MSG = 120;
 
+  private static final String STRING_TRUNCATE_MARK = "...";
+
   public static DeployComponentError extractFailReason(List<DeployComponentError> errors) {
     if (CollectionUtils.isEmpty(errors)) {
       return null;
@@ -22,7 +24,9 @@ public class DeploymentErrorHelper {
       return null;
     }
     if (fatal.get().getReason().length() > MAX_REASON_MSG) {
-      fatal.get().setReason(fatal.get().getReason().substring(0, MAX_REASON_MSG) + "...");
+      fatal
+          .get()
+          .setReason(fatal.get().getReason().substring(0, MAX_REASON_MSG) + STRING_TRUNCATE_MARK);
     }
     return fatal.get();
   }
