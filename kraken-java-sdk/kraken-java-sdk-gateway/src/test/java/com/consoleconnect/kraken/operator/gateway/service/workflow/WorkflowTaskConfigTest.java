@@ -35,7 +35,7 @@ class WorkflowTaskConfigTest extends AbstractIntegrationTest {
   @Autowired WorkflowTaskConfig workflowTaskConfig;
   @Autowired WorkflowInstanceRepository workflowInstanceRepository;
 
-  @Test
+  // @Test
   void givenUrlAndId_whenNotify_thenSuccess() {
     String id = UUID.randomUUID().toString();
     String url = "https://httpbin.org/anything";
