@@ -1,11 +1,10 @@
-import { usePathQuery } from "@/hooks/usePathQuery";
 import { useMappingUiStore } from "@/stores/mappingUi.store";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { GroupedByPath } from "@/utils/helpers/groupByPath";
 import { IMapperDetails } from "@/utils/types/env.type";
 import { Select, Spin } from "antd";
 import { useMemo, useEffect, useCallback } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import DropdownOption from "./components/DropdownOption";
 
 type MappingDetailsListProps = {
@@ -24,7 +23,7 @@ const MappingDetailsList = ({
   setActiveSelected,
 }: MappingDetailsListProps) => {
   // Grab targetMapperKey in url's query, select the corresponding mapping
-  const query = usePathQuery();
+  const navigate = useNavigate();
   const { componentId, targetKey } = useParams();
 
   const { activePath, setSelectedKey, setActivePath, setActiveTab } =
@@ -34,13 +33,9 @@ const MappingDetailsList = ({
   const initList = useCallback(() => {
     const apis = Object.values(groupedPaths).flatMap((subPath) => subPath);
     if (apis.length > 0) {
-      const targetMapperKey = query.get("targetMapperKey");
-
       // Auto select the corresponding api
-      const initialMapItem = targetMapperKey
-        ? (apis.find(
-            (mapping) => mapping.targetMapperKey === targetMapperKey
-          ) ?? apis[0])
+      const initialMapItem = targetKey
+        ? (apis.find((mapping) => mapping.targetKey === targetKey) ?? apis[0])
         : apis[0];
 
       setSelectedKey(initialMapItem.path);
@@ -84,11 +79,7 @@ const MappingDetailsList = ({
   const handleChange = (_: string, option: Option | Option[]) => {
     if (Array.isArray(option)) return;
     handleSelection(option.item);
-    window.history.pushState(
-      null,
-      "",
-      `/api-mapping/${componentId}/${option.value}`
-    );
+    navigate(`/api-mapping/${componentId}/${option.value}`);
   };
 
   return (
