@@ -117,6 +117,7 @@ app:
       enabled: false
     resource-server:
       enabled: false
+  modify-use-case: "classpath:/config/component-modify-validation.yaml"
   initialize-exclude-assets:
 #    - classpath:/mef-sonata/apis/api.product.offering.yaml
     - classpath:/mef-sonata/api-targets/api-target.quote.eline.add.yaml
