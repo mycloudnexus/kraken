@@ -2,6 +2,7 @@ package com.consoleconnect.kraken.operator.gateway;
 
 import static com.consoleconnect.kraken.operator.gateway.CustomConfig.X_KRAKEN_KEY_TOKEN;
 import static com.consoleconnect.kraken.operator.gateway.filter.KrakenFilterConstants.X_KRAKEN_AUTH_KEY;
+import static com.consoleconnect.kraken.operator.gateway.runner.LoadTargetAPIConfigActionRunner.encodeUrlParam;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -26,6 +27,7 @@ import java.util.Map;
 import java.util.Objects;
 import lombok.SneakyThrows;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -271,5 +273,10 @@ class GatewayTest extends AbstractIntegrationTest {
               String bodyStr = new String(Objects.requireNonNull(response.getResponseBody()));
               System.out.println(bodyStr);
             });
+  }
+
+  @Test
+  void givenEmptyPath_whenEncode_thenReturnNull() {
+    Assertions.assertEquals(StringUtils.EMPTY, encodeUrlParam(""));
   }
 }

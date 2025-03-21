@@ -84,6 +84,7 @@ public class ComponentAPITargetFacets {
     private String convertValue;
     private String sourceTaskName;
     private String targetTaskName;
+    private boolean renderCheck = false;
 
     private static final String MAPPER_REQUEST = "request";
     private static final String MAPPER_RESPONSE = "response";

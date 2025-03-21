@@ -313,6 +313,11 @@ spec:
           with:
             method: get
 
+        - id: mock-response
+          actionType: buildin@mock-response
+          env:
+            forwardDownstream: ${entity.renderedResponse.uniqueId!=null}
+
         - id: modify-response-body
           actionType: buildin@modify-response-body
           with:

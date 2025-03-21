@@ -13,6 +13,7 @@ import lombok.Setter;
 public class HttpTask extends AbstractTask {
   private ComponentAPITargetFacets.Endpoint endpoint;
   private ConditionCheck conditionCheck = new ConditionCheck();
+  private String uniqueIdPath;
   private String notificationUrl;
 
   @Data
