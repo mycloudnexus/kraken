@@ -738,6 +738,12 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
               .getComponentTags()
               .forEach(
                   dto -> {
+                    if (!mapperAssetMap.containsKey(dto.getParentComponentKey())) {
+                      log.error(
+                          "Failed to process component tag, parentComponentKey {} not found",
+                          dto.getParentComponentKey());
+                      return;
+                    }
                     UnifiedAssetDto mapperAsset = mapperAssetMap.get(dto.getParentComponentKey());
                     ComponentAPITargetFacets componentAPITargetFacets =
                         UnifiedAsset.getFacets(mapperAsset, ComponentAPITargetFacets.class);
