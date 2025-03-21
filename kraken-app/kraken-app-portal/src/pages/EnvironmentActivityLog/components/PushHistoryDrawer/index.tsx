@@ -198,7 +198,7 @@ const PushHistoryDrawer = ({ isOpen, onClose, envOptions }: Props) => {
           required
           className={styles.rangePicker}
         >
-          <DatePicker maxDate={dayjs().endOf("day")} />
+          <DatePicker maxDate={dayjs().endOf("day")} data-testId="datePicker" />
         </Form.Item>
 
         <Flex justify="center" style={{ width: "100%" }}>

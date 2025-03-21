@@ -3,7 +3,8 @@ import * as pushApiHooks from "@/hooks/pushApiEvent";
 import PushHistoryDrawer from "@/pages/EnvironmentActivityLog/components/PushHistoryDrawer";
 import { queryClient } from "@/utils/helpers/reactQuery";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { render, waitFor, fireEvent } from "@testing-library/react";
+import { render, waitFor, fireEvent, screen } from "@testing-library/react";
+import dayjs from "dayjs";
 import { BrowserRouter } from "react-router-dom";
 
 test("PushHistoryDrawer", () => {
@@ -28,7 +29,7 @@ test("PushHistoryDrawer", () => {
           envOptions={[
             {
               value: "testEnv",
-              label: "Test Env",
+              label: "stage",
             },
           ]}
         />
@@ -40,6 +41,14 @@ test("PushHistoryDrawer", () => {
   waitFor(() => {
     expect(envSelect).toBeInTheDocument();
   });
+
+  const datepicker = getByTestId("datePicker");
+  fireEvent.click(datepicker);
+
+  const dateToSelect = dayjs().get("date");
+  const dateElement = screen.getByText(dateToSelect);
+  fireEvent.click(dateElement);
+
   const okButton = getByTestId("pushLog-btn");
   fireEvent.click(okButton);
 });
