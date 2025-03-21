@@ -1,8 +1,10 @@
 package com.consoleconnect.kraken.operator.controller.model;
 
+import com.consoleconnect.kraken.operator.core.dto.DeployComponentError;
 import com.consoleconnect.kraken.operator.core.entity.EnvironmentClientEntity;
 import com.consoleconnect.kraken.operator.core.model.AbstractModel;
 import jakarta.validation.constraints.Size;
+import java.util.List;
 import lombok.Data;
 
 /** DTO for {@link EnvironmentClientEntity} */
@@ -16,4 +18,6 @@ public class EnvironmentClient extends AbstractModel {
   private String status;
 
   private String reason;
+
+  private List<DeployComponentError> errors;
 }

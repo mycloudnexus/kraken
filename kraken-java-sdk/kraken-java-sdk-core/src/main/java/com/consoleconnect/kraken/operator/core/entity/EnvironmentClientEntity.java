@@ -1,8 +1,10 @@
 package com.consoleconnect.kraken.operator.core.entity;
 
+import com.consoleconnect.kraken.operator.core.dto.DeployComponentError;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
@@ -33,6 +35,10 @@ public class EnvironmentClientEntity extends AbstractEntity {
 
   @Column(name = "reason")
   private String reason;
+
+  @Type(JsonType.class)
+  @Column(columnDefinition = "json", name = "errors", nullable = true)
+  private List<DeployComponentError> errors;
 
   @Column(name = "env_name")
   private String envName;
