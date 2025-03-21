@@ -487,6 +487,7 @@ public class UnifiedAssetService implements UUIDWrapper {
       Map<String, Map<String, ComponentAPITargetFacets.Mapper>> mapperMapNew) {
     String mapperSection = copyFrom.getKey();
     if (isCustomizedAndConfigured(copyFrom)) {
+      copyFrom.getValue().setRequiredMapping(Boolean.FALSE);
       mapperMapNew.put(name, new HashMap<>(Map.of(mapperSection, copyFrom.getValue())));
     } else if (isSystemAndConfigured(copyFrom)) {
       copyFrom.getValue().setCustomizedField(Boolean.TRUE);
