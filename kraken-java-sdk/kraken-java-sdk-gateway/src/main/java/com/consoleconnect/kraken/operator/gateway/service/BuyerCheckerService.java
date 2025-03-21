@@ -83,7 +83,9 @@ public class BuyerCheckerService implements SecurityChecker {
               .map(map -> map.get(Constants.ENV))
               .map(Object::toString)
               .orElse("");
-      if (!StringUtils.equalsIgnoreCase(resourceServer.getVerifier().getEnv(), signEnv)) {
+      // To compatible with the old token which has no environment salt.
+      if (StringUtils.isNotBlank(signEnv)
+          && !StringUtils.equalsIgnoreCase(resourceServer.getVerifier().getEnv(), signEnv)) {
         String error =
             String.format(INVALID_ENV_TOKEN, signEnv, resourceServer.getVerifier().getEnv());
         sink.error(KrakenException.unauthorizedInvalidCredentials(error));
