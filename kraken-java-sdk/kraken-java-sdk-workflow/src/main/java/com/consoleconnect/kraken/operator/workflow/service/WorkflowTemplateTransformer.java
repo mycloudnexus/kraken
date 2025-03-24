@@ -59,6 +59,7 @@ public class WorkflowTemplateTransformer {
   private static final int RETRY_COUNT = 3;
   private static final String SWITCH_HTTP_CHECK_NAME_PREFIX = "switch_http_check_%s";
   private static final String SWITCH_CUSTOMIZED_CHECK_PREFIX = "switch_%s";
+  private static final String UNIQUE_ID_PATH = "uniqueIdPath";
 
   public WorkflowTemplateTransformer(
       WorkflowConfig.BuildInTask buildInTask, AppProperty appProperty) {
@@ -225,6 +226,9 @@ public class WorkflowTemplateTransformer {
         simpleTask
             .getInput()
             .putAll(Map.of(PAYLOAD, String.format(SUB_HTTP_TASK_RESPONSE, httpTask.getTaskName())));
+        if (StringUtils.isNotBlank(httpTask.getUniqueIdPath())) {
+          simpleTask.getInput().put(UNIQUE_ID_PATH, httpTask.getUniqueIdPath());
+        }
       }
       case EVALUATE_EXPRESSION_TASK -> {
         simpleTask.getInput().putAll(input);

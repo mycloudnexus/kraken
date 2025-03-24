@@ -115,6 +115,7 @@ app:
   cron-job:
     push-heartbeat: 0/5 * * * * *
     check-release: 0/20 * * * * *
+  modify-use-case: "classpath:/config/component-modify-validation.yaml"
   security:
     resource-server:
       enabled: true
@@ -124,3 +125,8 @@ app:
           secret: ${ACCESS_TOKEN_JWT_SECRET}
       bearer-token-header-name: x-sonata-buyer-key
       user-id: x-kraken-buyer-id
+
+  workflow:
+    base-url: https://external-kraken-conductor.dev.consolecore.io/api
+    enabled: true
+    enable-register-worker: true

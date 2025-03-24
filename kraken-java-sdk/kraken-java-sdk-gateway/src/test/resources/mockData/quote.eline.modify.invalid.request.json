@@ -1,0 +1,116 @@
+{
+  "note": [],
+  "requestedQuoteCompletionDate": "2027-12-31T23:00:00Z",
+  "relatedContactInformation": [
+    {
+      "number": "111 222 333",
+      "emailAddress": "buyerContact@mef.com",
+      "role": "buyerContactInformation",
+      "postalAddress": null,
+      "organization": "MEF",
+      "name": "Joe Buyer",
+      "numberExtension": null
+    }
+  ],
+  "externalId": "ORDERABLE_ALTERNATE [8203] Sync Quote FIRM - Modify",
+  "buyerRequestedQuoteLevel": "firm",
+  "projectId": "MEF OIT",
+  "instantSyncQuote": true,
+  "quoteItem": [
+    {
+      "requestedQuoteItemTerm": {
+        "name": "ELine Item Term",
+        "duration": {
+          "amount": 2,
+          "units": "calendarMonths"
+        },
+        "endOfTermAction": "roll",
+        "description": "no description",
+        "rollInterval": {
+          "amount": 1,
+          "units": "calendarMonths"
+        }
+      },
+      "note": [],
+      "product": {
+        "id": "67aeadfa8a05cce9385c1497",
+        "href": null,
+        "place": [
+          {
+            "role": "INSTALL_LOCATION",
+            "href": null,
+            "id": "6360d0915064cc00157f7984",
+            "@type": "GeographicAddressRef",
+            "@schemaLocation": null
+          },
+          {
+            "role": "INSTALL_LOCATION",
+            "href": null,
+            "id": "6356792a4806220015488631",
+            "@type": "GeographicAddressRef",
+            "@schemaLocation": null
+          }
+        ],
+        "productConfiguration": {
+          "@type": "ACCESS_E_LINE",
+          "bandwidth": 1000,
+          "bandwidthUnit": "MBPS",
+          "classOfService": "SILVER",
+          "paymentType": "invoice",
+          "name": "Qe 1 Company Connection 0904",
+          "buyerCompanyId": "qe1company",
+          "destUNIMetroId": "5db65dcf5d545c000bc6884b",
+          "type": "LAYER2"
+        },
+        "productOffering": {
+          "id": "ACCESS_E_LINE",
+          "href": null
+        },
+        "productRelationship": [
+          {
+            "relationshipType": "CONNECTS_TO_ENNI",
+            "id": "6371e5fa2fb2fa00155a3535",
+            "href": null
+          },
+          {
+            "relationshipType": "CONNECTS_TO_UNI",
+            "id": "63634cbf11ffdd00151fc6fb",
+            "href": null
+          }
+        ]
+      },
+      "productOfferingQualificationItem": {
+        "productOfferingQualificationId": "",
+        "alternateProductProposalId": null,
+        "productOfferingQualificationHref": null,
+        "id": "ELINE"
+      },
+      "relatedContactInformation": [
+        {
+          "number": "111 222 333",
+          "emailAddress": "quoteItemTechnicalContact@mef.com",
+          "role": "quoteItemTechnicalContact",
+          "postalAddress": null,
+          "organization": "MEF",
+          "name": "David Item",
+          "numberExtension": null
+        }
+      ],
+      "agreementName": null,
+      "action": "modify",
+      "dealReference": null,
+      "id": "ELINE",
+      "requestedQuoteItemInstallationInterval": {
+        "amount": 1,
+        "units": "calendarMonths"
+      },
+      "quoteItemRelationship": [
+        {
+          "relationshipType": "CONNECTS_TO_UNI",
+          "id": "ELINE"
+        }
+      ],
+      "quoteItemTerm": ""
+    }
+  ]
+}
