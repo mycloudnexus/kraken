@@ -297,7 +297,9 @@ public class UnifiedAssetService implements UUIDWrapper, FacetsMerger {
     log.info("syncing asset facets, assetId: {}", assetEntity.getKey());
 
     if (Objects.equals(assetEntity.getKind(), COMPONENT_API_TARGET_MAPPER.getKind())) {
-      tryExtendCommonMappers(data);
+      if (syncMetadata.isExtendCommon()) {
+        tryExtendCommonMappers(data);
+      }
       entityOptional
           .map(entity -> mergeFacetsInternal(entity, data.getFacets()))
           .ifPresent(data::setFacets);

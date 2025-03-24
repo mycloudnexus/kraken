@@ -268,7 +268,8 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
 
     productReleaseAsset.setLinks(links);
 
-    SyncMetadata syncMetadata = new SyncMetadata("", "", DateTime.nowInUTCString(), createdBy);
+    SyncMetadata syncMetadata =
+        new SyncMetadata("", "", DateTime.nowInUTCString(), createdBy, true);
     IngestionDataResult result =
         unifiedAssetService.syncAsset(
             productEntity.getId(), productReleaseAsset, syncMetadata, true);
@@ -968,8 +969,8 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
         .map(
             entry -> {
               String mapperKey = entry.getKey();
-              ClientMapperVersionPayloadDto paylaod = entry.getValue();
-              UnifiedAssetEntity tagEntity = tagEntityMap.get(paylaod.getTagId());
+              ClientMapperVersionPayloadDto payload = entry.getValue();
+              UnifiedAssetEntity tagEntity = tagEntityMap.get(payload.getTagId());
               UnifiedAssetDto tagAsset = UnifiedAssetService.toAsset(tagEntity, false);
               Map<String, String> labels = tagAsset.getMetadata().getLabels();
               UnifiedAssetDto mapperAsset = mapperAssetMap.get(mapperKey);
@@ -991,7 +992,7 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
               deploymentDTO.setTargetMapperKey(mapperKey);
               deploymentDTO.setVersion(labels.get(LABEL_VERSION_NAME));
               deploymentDTO.setSubVersion(labels.get(LABEL_SUB_VERSION_NAME));
-              deploymentDTO.setTagId(paylaod.getTagId());
+              deploymentDTO.setTagId(payload.getTagId());
               deploymentDTO.setEnvId(environment.getId());
               deploymentDTO.setEnvName(environment.getName());
               fillVerifiedInfo(tagAsset.getId(), deploymentDTO, envId);

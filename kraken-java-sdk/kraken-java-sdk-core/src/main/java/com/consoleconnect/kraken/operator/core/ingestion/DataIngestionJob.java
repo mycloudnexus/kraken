@@ -115,7 +115,8 @@ public class DataIngestionJob {
                 fullPath,
                 yamlContentOptional.get().getSha(),
                 DateTime.nowInUTCString(),
-                event.getUserId()),
+                event.getUserId(),
+                event.isCommonExtend()),
             event.isEnforceSync());
     asset.getMetadata().setId(syncAssetResult.getData().getId().toString());
     onPostPersist(parentId, new FileDescriptor(fullPath), asset);

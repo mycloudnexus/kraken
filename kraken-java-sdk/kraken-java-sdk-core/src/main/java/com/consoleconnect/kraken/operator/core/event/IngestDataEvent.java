@@ -12,6 +12,7 @@ public class IngestDataEvent {
   private String parentId; // parentId can be parsed from asset
   @NotNull private String fullPath;
   private boolean enforceSync = false;
+  private boolean commonExtend = false;
   private AssetKindEnum kind;
   private UnifiedAsset asset;
 
