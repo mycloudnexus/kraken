@@ -1,0 +1,57 @@
+---
+kind: kraken.product.mapping.matrix
+apiVersion: v1
+metadata:
+  key: mef.sonata.api.matrix.quote.eline.modify.sync
+  name: MEF Sonata API
+  labels:
+    mef-api-release: grace
+  version: 14
+spec:
+  expect-http-status-422-if-missing:
+    - $.body.quoteItem[0].product.productConfiguration
+  modificationFilterRule:
+    - queryPath: $.body.quoteItem[0].product.id
+      filterKey: action
+      filterVal: add
+      filterPath: $.productOrderItem[?]
+  matrix:
+    mef.sonata.api-target.quote.eline.modify.sync:
+      - name: action_modify
+        path: "$.body.quoteItem[*].['action']"
+        expectType: EXPECTED
+        value: modify
+        code: 400
+      - name: syn_mode_true
+        path: "$.body.instantSyncQuote"
+        expectType: EXPECTED
+        value: true
+      - name: buyer.requested.quote.level.firm
+        path: "$.body.buyerRequestedQuoteLevel"
+        expectType: EXPECTED
+        value: firm
+      - name: quoteItem[0].product.id
+        path: "$.body.quoteItem[0].product.['id']"
+        expectType: EXPECTED_STR
+        value: true
+        code: 422
+      - name: relatedContactInformation_emailAddress
+        path: "$.body.relatedContactInformation[*]"
+        expectType: EXPECTED_TRUE
+        value: ${param.emailAddress}
+        expectedValueType: String
+      - name: relatedContactInformation_name
+        path: "$.body.relatedContactInformation[*]"
+        expectType: EXPECTED_TRUE
+        value: ${param.name}
+        expectedValueType: String
+      - name: relatedContactInformation_number
+        path: "$.body.relatedContactInformation[*]"
+        expectType: EXPECTED_TRUE
+        value: ${param.number}
+        expectedValueType: String
+      - name: relatedContactInformation_role
+        path: "$.body.relatedContactInformation[*]"
+        expectType: EXPECTED_TRUE
+        value: ${param.role}
+        expectedValueType: String

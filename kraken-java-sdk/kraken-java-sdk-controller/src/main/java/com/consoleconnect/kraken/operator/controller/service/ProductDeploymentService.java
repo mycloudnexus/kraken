@@ -1,6 +1,6 @@
 package com.consoleconnect.kraken.operator.controller.service;
 
-import static com.consoleconnect.kraken.operator.controller.model.DeploymentFacet.KEY_COMPONENT_TAGS;
+import static com.consoleconnect.kraken.operator.controller.model.DeploymentFacet.*;
 import static com.consoleconnect.kraken.operator.core.enums.AssetLinkKindEnum.DEPLOYMENT_API_TAG;
 import static com.consoleconnect.kraken.operator.core.enums.AssetLinkKindEnum.DEPLOYMENT_COMPONENT_API;
 import static com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants.*;
@@ -15,6 +15,7 @@ import com.consoleconnect.kraken.operator.controller.event.SingleMapperReportEve
 import com.consoleconnect.kraken.operator.controller.model.*;
 import com.consoleconnect.kraken.operator.controller.repo.EnvironmentRepository;
 import com.consoleconnect.kraken.operator.controller.service.upgrade.UpgradeSourceServiceFactory;
+import com.consoleconnect.kraken.operator.core.dto.DeployComponentError;
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.entity.EnvironmentClientEntity;
@@ -350,22 +351,40 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
   }
 
   @Transactional
-  public void reportConfigurationReloadingResult(String assetId) {
-    unifiedAssetRepository
-        .findById(UUID.fromString(assetId))
-        .ifPresent(
-            unifiedAssetEntity -> {
-              log.info("report asset {} configuration  reloading result success", assetId);
-              unifiedAssetEntity.setStatus(DeployStatusEnum.SUCCESS.name());
-              unifiedAssetRepository.save(unifiedAssetEntity);
-              if (unifiedAssetEntity
-                  .getLabels()
-                  .getOrDefault(LabelConstants.LABEL_ENV_NAME, "")
-                  .equalsIgnoreCase(mgmtProperty.getDefaultEnv())) {
-                updateDeployedMapperStatus(assetId);
-              }
-              handleDeploymentCallback(unifiedAssetEntity);
-            });
+  public void reportConfigurationReloadingResult(
+      String assetId, String status, List<DeployComponentError> errors) {
+    log.info("report asset {} configuration reloading result, status: {}", assetId, status);
+
+    UnifiedAssetEntity unifiedAssetEntity =
+        unifiedAssetRepository
+            .findById(UUID.fromString(assetId))
+            .orElseThrow(
+                () -> KrakenException.notFound(String.format("Asset %s not found", assetId)));
+    if (DeployStatusEnum.FAILED.name().equals(status)) {
+      unifiedAssetEntity.setStatus(DeployStatusEnum.FAILED.name());
+      updateErrors(unifiedAssetEntity, errors);
+    } else {
+      unifiedAssetEntity.setStatus(DeployStatusEnum.SUCCESS.name());
+    }
+    log.info("report asset {} configuration reloading result, status: {}", assetId, status);
+    unifiedAssetRepository.save(unifiedAssetEntity);
+    if (unifiedAssetEntity
+        .getLabels()
+        .getOrDefault(LabelConstants.LABEL_ENV_NAME, "")
+        .equalsIgnoreCase(mgmtProperty.getDefaultEnv())) {
+      updateDeployedMapperStatus(assetId);
+    }
+    handleDeploymentCallback(unifiedAssetEntity);
+  }
+
+  private void updateErrors(UnifiedAssetEntity assetEntity, List<DeployComponentError> errors) {
+    UnifiedAssetDto assetDto = UnifiedAssetService.toAsset(assetEntity, true);
+    DeploymentFacet deploymentFacet = UnifiedAsset.getFacets(assetDto, new TypeReference<>() {});
+    Map<String, Object> facets = new HashMap<>();
+    facets.put(KEY_COMPONENT_TAGS, deploymentFacet.getComponentTags());
+    facets.put(KEY_FAILURE_REASON, DeploymentErrorHelper.extractFailReason(errors));
+    facets.put(KEY_ERRORS, errors);
+    unifiedAssetService.syncFacets(assetEntity, facets);
   }
 
   private void handleDeploymentCallback(UnifiedAssetEntity mapperDeployment) {
@@ -719,24 +738,29 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
               .getComponentTags()
               .forEach(
                   dto -> {
-                    UnifiedAssetDto mapperAsset = mapperAssetMap.get(dto.getParentComponentKey());
-                    ComponentAPITargetFacets componentAPITargetFacets =
-                        UnifiedAsset.getFacets(mapperAsset, ComponentAPITargetFacets.class);
-                    ComponentAPITargetFacets.Trigger trigger =
-                        componentAPITargetFacets.getTrigger();
                     ApiMapperDeploymentDTO deploymentDTO = new ApiMapperDeploymentDTO();
-                    if (trigger != null) {
-                      BeanUtils.copyProperties(trigger, deploymentDTO);
-                      ComponentExpandDTO.MappingMatrix mappingMatrix =
-                          new ComponentExpandDTO.MappingMatrix();
-                      BeanUtils.copyProperties(trigger, mappingMatrix);
-                      deploymentDTO.setMappingMatrix(mappingMatrix);
+                    if (mapperAssetMap.containsKey(dto.getParentComponentKey())) {
+                      UnifiedAssetDto mapperAsset = mapperAssetMap.get(dto.getParentComponentKey());
+                      ComponentAPITargetFacets componentAPITargetFacets =
+                          UnifiedAsset.getFacets(mapperAsset, ComponentAPITargetFacets.class);
+                      ComponentAPITargetFacets.Trigger trigger =
+                          componentAPITargetFacets.getTrigger();
+                      if (trigger != null) {
+                        BeanUtils.copyProperties(trigger, deploymentDTO);
+                        ComponentExpandDTO.MappingMatrix mappingMatrix =
+                            new ComponentExpandDTO.MappingMatrix();
+                        BeanUtils.copyProperties(trigger, mappingMatrix);
+                        deploymentDTO.setMappingMatrix(mappingMatrix);
+                      }
+                      deploymentDTO.setTargetMapperKey(mapperAsset.getMetadata().getKey());
                     }
+
                     deploymentDTO.setCreateAt(assetDto.getCreatedAt());
                     deploymentDTO.setCreateBy(assetDto.getCreatedBy());
                     setUserName(deploymentDTO);
                     deploymentDTO.setStatus(assetDto.getMetadata().getStatus());
-                    deploymentDTO.setTargetMapperKey(mapperAsset.getMetadata().getKey());
+                    deploymentDTO.setFailureReason(facets.getFailureReason());
+                    deploymentDTO.setErrors(facets.getErrors());
                     deploymentDTO.setVersion(dto.getVersion());
                     deploymentDTO.setReleaseKey(assetDto.getMetadata().getKey());
                     deploymentDTO.setReleaseId(assetDto.getId());
@@ -901,20 +925,19 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
     UnifiedAssetDto assetDto = UnifiedAssetService.toAsset(mapperDeployment, true);
     DeploymentFacet deploymentFacet = UnifiedAsset.getFacets(assetDto, DeploymentFacet.class);
     String envId = mapperDeployment.getLabels().get(LABEL_ENV_ID);
-    deploymentFacet
-        .getComponentTags()
-        .forEach(
-            componentTag -> {
-              UnifiedAssetEntity tag =
-                  unifiedAssetService.findOneByIdOrKey(componentTag.getTagId());
-              String version = tag.getLabels().get(LABEL_VERSION_NAME);
-              String subVersion = tag.getLabels().get(LABEL_SUB_VERSION_NAME);
-              log.info(
-                  "handlerMapperVersionReport, version:{}, subVersion:{}", version, subVersion);
-              applicationEventPublisher.publishEvent(
-                  new SingleMapperReportEvent(
-                      envId, componentTag.getParentComponentKey(), version, subVersion));
-            });
+    List<ComponentTag> componentTags = deploymentFacet.getComponentTags();
+    if (CollectionUtils.isNotEmpty(componentTags)) {
+      componentTags.forEach(
+          componentTag -> {
+            UnifiedAssetEntity tag = unifiedAssetService.findOneByIdOrKey(componentTag.getTagId());
+            String version = tag.getLabels().get(LABEL_VERSION_NAME);
+            String subVersion = tag.getLabels().get(LABEL_SUB_VERSION_NAME);
+            log.info("handlerMapperVersionReport, version:{}, subVersion:{}", version, subVersion);
+            applicationEventPublisher.publishEvent(
+                new SingleMapperReportEvent(
+                    envId, componentTag.getParentComponentKey(), version, subVersion));
+          });
+    }
   }
 
   @Transactional(readOnly = true)

@@ -32,6 +32,7 @@ spec:
     - classpath:/mef-sonata/api-targets/api-target.quote.uni.read.sync.yaml
     - classpath:/mef-sonata/api-targets/api-target.quote.eline.add.yaml
     - classpath:/mef-sonata/api-targets/api-target.quote.eline.add.sync.yaml
+    - classpath:/mef-sonata/api-targets/api-target.quote.eline.modify.sync.yaml
     - classpath:/mef-sonata/api-targets/api-target.quote.eline.read.yaml
     - classpath:/mef-sonata/api-targets/api-target.quote.eline.read.sync.yaml
     - classpath:/mef-sonata/api-targets/api-target.order.uni.add.yaml
@@ -63,6 +64,7 @@ spec:
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.eline.add.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.eline.read.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.eline.add.sync.yaml
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.eline.modify.sync.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.eline.read.sync.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.order.uni.add.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.order.uni.read.yaml
@@ -71,7 +73,9 @@ spec:
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.order.eline.add.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.order.eline.read.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.order.eline.delete.yaml
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.order.eline.modify.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.order.eline.read.delete.yaml
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.order.eline.read.modify.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.inventory.uni.list.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.inventory.uni.read.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.inventory.eline.list.yaml
@@ -88,6 +92,7 @@ spec:
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.quote.uni.add.sync.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.quote.eline.add.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.quote.eline.add.sync.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.quote.eline.modify.sync.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.uni.add.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.uni.read.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.uni.delete.yaml
@@ -104,7 +109,7 @@ spec:
     - classpath:/mef-sonata/api-workflow/api-workflow.order.uni.delete.yaml
     - classpath:/mef-sonata/api-workflow/api-workflow.order.uni.add.yaml
     - classpath:/mef-sonata/api-workflow/api-workflow.order.eline.add.yaml
-    - classpath:/mef-sonata/template-upgrade/release.1.7.24.yaml
+    - classpath:/mef-sonata/template-upgrade/release.1.7.29.yaml
 
   templateUpgradePaths:
     - classpath:/mef-sonata/apis/api.address.yaml
@@ -122,6 +127,7 @@ spec:
     - classpath:/mef-sonata/api-targets/api-target.quote.uni.add.sync.yaml
     - classpath:/mef-sonata/api-targets/api-target.quote.uni.read.sync.yaml
     - classpath:/mef-sonata/api-targets/api-target.quote.eline.add.sync.yaml
+    - classpath:/mef-sonata/api-targets/api-target.quote.eline.modify.sync.yaml
     - classpath:/mef-sonata/api-targets/api-target.quote.eline.read.sync.yaml
     - classpath:/mef-sonata/api-targets/api-target.order.uni.add.yaml
     - classpath:/mef-sonata/api-targets/api-target.order.uni.read.yaml
@@ -130,7 +136,9 @@ spec:
     - classpath:/mef-sonata/api-targets/api-target.order.eline.add.yaml
     - classpath:/mef-sonata/api-targets/api-target.order.eline.read.yaml
     - classpath:/mef-sonata/api-targets/api-target.order.eline.delete.yaml
+    - classpath:/mef-sonata/api-targets/api-target.order.eline.modify.yaml
     - classpath:/mef-sonata/api-targets/api-target.order.eline.read.delete.yaml
+    - classpath:/mef-sonata/api-targets/api-target.order.eline.read.modify.yaml
     - classpath:/mef-sonata/api-targets/api-target.inventory.uni.list.yaml
     - classpath:/mef-sonata/api-targets/api-target.inventory.uni.read.yaml
     - classpath:/mef-sonata/api-targets/api-target.inventory.eline.list.yaml
@@ -144,6 +152,7 @@ spec:
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.uni.add.sync.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.uni.read.sync.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.eline.add.sync.yaml
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.eline.modify.sync.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.quote.eline.read.sync.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.order.uni.add.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.order.uni.read.yaml
@@ -151,7 +160,9 @@ spec:
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.order.uni.read.delete.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.order.eline.add.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.order.eline.read.yaml
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.order.eline.read.modify.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.order.eline.delete.yaml
+    - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.order.eline.modify.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.order.eline.read.delete.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.inventory.uni.list.yaml
     - classpath:/mef-sonata/api-targets-mappers/api-target-mapper.inventory.uni.read.yaml
@@ -164,6 +175,7 @@ spec:
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.quote.uni.add.sync.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.quote.uni.add.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.quote.eline.add.sync.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.quote.eline.modify.sync.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.quote.eline.add.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.uni.add.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.uni.read.yaml
@@ -171,7 +183,9 @@ spec:
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.uni.read.delete.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.eline.add.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.eline.read.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.eline.read.modify.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.eline.delete.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.eline.modify.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.eline.read.delete.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.inventory.uni.list.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.inventory.uni.read.yaml

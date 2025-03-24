@@ -4,9 +4,11 @@ import static com.consoleconnect.kraken.operator.core.enums.ParamLocationEnum.*;
 import static com.consoleconnect.kraken.operator.core.toolkit.ConstructExpressionUtil.*;
 
 import com.consoleconnect.kraken.operator.core.dto.StateValueMappingDto;
+import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.enums.MappingTypeEnum;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
+import com.consoleconnect.kraken.operator.core.model.facet.ComponentWorkflowFacets;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.gateway.runner.MappingTransformer;
@@ -144,12 +146,30 @@ public class RenderRequestService implements MappingTransformer {
     UnifiedAsset asset = unifiedAssetService.findOne(pathReferIds[0]);
     ComponentAPITargetFacets createFacets =
         UnifiedAsset.getFacets(asset, ComponentAPITargetFacets.class);
-    List<ComponentAPITargetFacets.Mapper> response =
-        createFacets.getEndpoints().get(0).getMappers().getResponse();
-    Optional<ComponentAPITargetFacets.Mapper> instanceOpt =
-        response.stream().filter(v -> Objects.equals(pathReferIds[1], v.getName())).findFirst();
-    if (instanceOpt.isPresent()) {
-      ComponentAPITargetFacets.Mapper referMapper = instanceOpt.get();
+    Optional<ComponentAPITargetFacets.Mapper> uniqueMapper;
+    if (createFacets.getWorkflow() != null && createFacets.getWorkflow().isEnabled()) {
+      log.info("render from workflow mapper");
+      UnifiedAssetDto workflowAsset =
+          unifiedAssetService.findOne(createFacets.getWorkflow().getKey());
+      ComponentWorkflowFacets workflowFacets =
+          UnifiedAsset.getFacets(workflowAsset, ComponentWorkflowFacets.class);
+      ComponentAPITargetFacets.Mappers mappers =
+          workflowFacets.getExecutionStage().get(0).getEndpoint().getMappers();
+      Optional<ComponentAPITargetFacets.Mapper> uniqueOpt =
+          mappers.getResponse().stream()
+              .filter(respMapper -> Objects.equals(respMapper.getName(), pathReferIds[1]))
+              .findFirst();
+      uniqueMapper = uniqueOpt;
+    } else {
+      List<ComponentAPITargetFacets.Mapper> response =
+          createFacets.getEndpoints().get(0).getMappers().getResponse();
+      Optional<ComponentAPITargetFacets.Mapper> instanceOpt =
+          response.stream().filter(v -> Objects.equals(pathReferIds[1], v.getName())).findFirst();
+      uniqueMapper = instanceOpt;
+    }
+
+    if (uniqueMapper.isPresent()) {
+      ComponentAPITargetFacets.Mapper referMapper = uniqueMapper.get();
       String source = referMapper.getSource();
       List<String> paramLocations = extractMapperParam(source);
       mapper.setSource(constructOriginalDBParam(paramLocations.get(0)));
