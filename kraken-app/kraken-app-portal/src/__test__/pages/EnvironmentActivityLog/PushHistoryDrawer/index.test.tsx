@@ -3,7 +3,7 @@ import * as pushApiHooks from "@/hooks/pushApiEvent";
 import PushHistoryDrawer from "@/pages/EnvironmentActivityLog/components/PushHistoryDrawer";
 import { queryClient } from "@/utils/helpers/reactQuery";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { render, waitFor, fireEvent, screen } from "@testing-library/react";
+import { render, waitFor, fireEvent } from "@testing-library/react";
 import dayjs from "dayjs";
 import { BrowserRouter } from "react-router-dom";
 
@@ -20,7 +20,7 @@ test("PushHistoryDrawer", () => {
   vi.spyOn(pushApiHooks, "usePostPushActivityLog").mockReturnValue({
     mutateAsync: vi.fn(),
   } as any);
-  const { container, findAllByText, getByTestId } = render(
+  const { container, findAllByText, getByTestId, getAllByText } = render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <PushHistoryDrawer
@@ -46,8 +46,8 @@ test("PushHistoryDrawer", () => {
   fireEvent.click(datepicker);
 
   const dateToSelect = dayjs().get("date");
-  const dateElement = screen.getByText(dateToSelect);
-  fireEvent.click(dateElement);
+  const dateElement = getAllByText(dateToSelect);
+  fireEvent.click(dateElement[0]);
 
   const okButton = getByTestId("pushLog-btn");
   fireEvent.click(okButton);
