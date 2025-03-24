@@ -32,6 +32,7 @@ spec:
     #- classpath:/mock/api-targets/api-target.quote.eline.add.sync.yaml
     #- classpath:/mock/api-targets/api-target.quote.eline.read.sync.yaml
     #- classpath:/mock/api-targets/api-target.quote.uni.add.sync.yaml
+    #- classpath:/mock/api-targets/api-target.quote.eline.modify.sync.yaml
     #- classpath:/mock/api-targets/api-target.quote.uni.read.sync.yaml
     #- classpath:/mock/api-targets/api-target.address.validate.yaml
     #- classpath:/mock/api-targets/api-target.address.retrieve.yaml
@@ -57,6 +58,7 @@ spec:
     #- classpath:/mock/api-targets-mappers/api-target-mapper.quote.uni.read.yaml
     #- classpath:/mock/api-targets-mappers/api-target-mapper.quote.eline.add.sync.yaml
     #- classpath:/mock/api-targets-mappers/api-target-mapper.quote.eline.read.sync.yaml
+    #- classpath:/mock/api-targets-mappers/api-target-mapper.quote.eline.modify.sync.yaml
     #- classpath:/mock/api-targets-mappers/api-target-mapper.quote.uni.add.sync.yaml
     #- classpath:/mock/api-targets-mappers/api-target-mapper.quote.uni.read.sync.yaml
     #- classpath:/mock/api-targets-mappers/api-target-mapper.address.validate.yaml
@@ -83,6 +85,7 @@ spec:
     #- classpath:/mock/mapping-matrix/mapping.matrix.quote.uni.add.yaml
     #- classpath:/mock/mapping-matrix/mapping.matrix.quote.eline.add.sync.yaml
     #- classpath:/mock/mapping-matrix/mapping.matrix.quote.eline.add.yaml
+    #- classpath:/mock/mapping-matrix/mapping.matrix.quote.eline.modify.sync.yaml
     #- classpath:/mock/mapping-matrix/mapping.matrix.poq.uni.add.yaml
     #- classpath:/mock/mapping-matrix/mapping.matrix.poq.eline.add.yaml
     #- classpath:/mock/mapping-matrix/mapping.matrix.inventory.uni.read.yaml

@@ -441,6 +441,26 @@ public class UnifiedAssetService implements UUIDWrapper {
             });
   }
 
+  public void syncFacets(UnifiedAssetEntity assetEntity, Map<String, Object> facets) {
+    Set<AssetFacetEntity> existingFacets = assetEntity.getFacets();
+    Set<AssetFacetEntity> newFacets = new HashSet<>();
+    assetEntity.setFacets(newFacets);
+    Set<UUID> toDeletedIds =
+        existingFacets.stream().map(AssetFacetEntity::getId).collect(Collectors.toSet());
+    log.info("delete asset facets ids:{}", JsonToolkit.toJson(toDeletedIds));
+    this.assetFacetRepository.deleteAll(existingFacets);
+    this.assetFacetRepository.flush();
+    facets.forEach(
+        (key, value) -> {
+          AssetFacetEntity facetEntity = new AssetFacetEntity();
+          facetEntity.setAsset(assetEntity);
+          facetEntity.setKey(key);
+          facetEntity.setPayload(value);
+          newFacets.add(facetEntity);
+        });
+    this.assetFacetRepository.saveAll(newFacets);
+  }
+
   private static void mergeMapper(
       Map.Entry<String, ComponentAPITargetFacets.Mapper> copyFrom,
       ComponentAPITargetFacets.Mapper copyTo) {
@@ -467,6 +487,7 @@ public class UnifiedAssetService implements UUIDWrapper {
       Map<String, Map<String, ComponentAPITargetFacets.Mapper>> mapperMapNew) {
     String mapperSection = copyFrom.getKey();
     if (isCustomizedAndConfigured(copyFrom)) {
+      copyFrom.getValue().setRequiredMapping(Boolean.FALSE);
       mapperMapNew.put(name, new HashMap<>(Map.of(mapperSection, copyFrom.getValue())));
     } else if (isSystemAndConfigured(copyFrom)) {
       copyFrom.getValue().setCustomizedField(Boolean.TRUE);
@@ -554,26 +575,6 @@ public class UnifiedAssetService implements UUIDWrapper {
     } else {
       entity.setUpdatedBy(syncMetadata.getSyncedBy());
     }
-  }
-
-  private void syncFacets(UnifiedAssetEntity assetEntity, Map<String, Object> facets) {
-    Set<AssetFacetEntity> existingFacets = assetEntity.getFacets();
-    Set<AssetFacetEntity> newFacets = new HashSet<>();
-    assetEntity.setFacets(newFacets);
-    Set<UUID> toDeletedIds =
-        existingFacets.stream().map(AssetFacetEntity::getId).collect(Collectors.toSet());
-    log.info("delete asset facets ids:{}", JsonToolkit.toJson(toDeletedIds));
-    this.assetFacetRepository.deleteAll(existingFacets);
-    this.assetFacetRepository.flush();
-    facets.forEach(
-        (key, value) -> {
-          AssetFacetEntity facetEntity = new AssetFacetEntity();
-          facetEntity.setAsset(assetEntity);
-          facetEntity.setKey(key);
-          facetEntity.setPayload(value);
-          newFacets.add(facetEntity);
-        });
-    this.assetFacetRepository.saveAll(newFacets);
   }
 
   private void syncAssetLinks(UnifiedAssetEntity assetEntity, List<AssetLink> links) {

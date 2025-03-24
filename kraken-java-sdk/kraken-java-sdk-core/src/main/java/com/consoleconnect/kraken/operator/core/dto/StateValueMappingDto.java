@@ -17,4 +17,6 @@ public class StateValueMappingDto {
   private Map<String, String> targetCheckPathMapper = new HashMap<>();
 
   private List<PathRule> pathRules = new ArrayList<>();
+
+  private String uniqueId;
 }

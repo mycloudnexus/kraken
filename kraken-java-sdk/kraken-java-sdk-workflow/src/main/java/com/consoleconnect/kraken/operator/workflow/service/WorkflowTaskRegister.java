@@ -35,7 +35,10 @@ public interface WorkflowTaskRegister {
   void logRequestPayload(LogTaskRequest payload);
 
   @WorkerTask(PERSIST_RESPONSE_TASK)
-  void persistResponse(@InputParam("id") String id, @InputParam("payload") Object payload);
+  void persistResponse(
+      @InputParam("id") String id,
+      @InputParam("payload") Object payload,
+      @InputParam("uniqueIdPath") String uniqueIdPath);
 
   @WorkerTask(value = EVALUATE_EXPRESSION_TASK, pollingInterval = 10)
   EvaluateResult evaluateExpressionTask(

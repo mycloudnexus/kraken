@@ -4,17 +4,15 @@ import com.consoleconnect.kraken.operator.controller.service.ProductDeploymentSe
 import com.consoleconnect.kraken.operator.core.client.ClientEvent;
 import com.consoleconnect.kraken.operator.core.client.ClientEventTypeEnum;
 import com.consoleconnect.kraken.operator.core.client.ClientInstanceDeployment;
+import com.consoleconnect.kraken.operator.core.dto.DeployComponentError;
 import com.consoleconnect.kraken.operator.core.entity.EnvironmentClientEntity;
-import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
 import com.consoleconnect.kraken.operator.core.enums.ClientReportTypeEnum;
-import com.consoleconnect.kraken.operator.core.enums.DeployStatusEnum;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import com.consoleconnect.kraken.operator.core.repo.EnvironmentClientRepository;
 import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
+import com.consoleconnect.kraken.operator.core.toolkit.DeploymentErrorHelper;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import java.time.ZonedDateTime;
-import java.util.Optional;
-import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,6 +25,8 @@ public class ClientDeploymentEventHandler extends ClientEventHandler {
   private final EnvironmentClientRepository environmentClientRepository;
   private final UnifiedAssetRepository unifiedAssetRepository;
   private final ProductDeploymentService productDeploymentService;
+
+  private static final String DEPLOY_STATUS_FAILED = "FAILED";
 
   @Override
   public ClientEventTypeEnum getEventType() {
@@ -58,30 +58,17 @@ public class ClientDeploymentEventHandler extends ClientEventHandler {
                   return entity;
                 });
     environmentClientEntity.setStatus(deployment.getStatus());
-    environmentClientEntity.setReason(deployment.getReason());
     environmentClientEntity.setUpdatedAt(ZonedDateTime.now());
     environmentClientEntity.setUpdatedBy(userId);
+    DeployComponentError error = DeploymentErrorHelper.extractFailReason(deployment.getErrors());
+    environmentClientEntity.setReason(error != null ? error.getReason() : "");
     environmentClientRepository.save(environmentClientEntity);
 
-    Optional<UnifiedAssetEntity> deploymentOptional =
-        unifiedAssetRepository.findById(UUID.fromString(deployment.getProductReleaseId()));
-
-    if (deploymentOptional.isPresent()) {
-      log.info(
-          "report asset {} configuration  reloading result success",
-          deployment.getProductReleaseId());
-      deploymentOptional.get().setStatus(DeployStatusEnum.SUCCESS.name());
-      unifiedAssetRepository.save(deploymentOptional.get());
-      try {
-        productDeploymentService.reportConfigurationReloadingResult(
-            deployment.getProductReleaseId());
-      } catch (Exception e) {
-        log.error("Failed to reportConfigurationReloadingResult", e);
-      }
-    } else {
-      log.info(
-          "report asset {} configuration  reloading result failed",
-          deployment.getProductReleaseId());
+    try {
+      productDeploymentService.reportConfigurationReloadingResult(
+          deployment.getProductReleaseId(), deployment.getStatus(), deployment.getErrors());
+    } catch (Exception e) {
+      log.error("Failed to reportConfigurationReloadingResult", e);
     }
 
     return HttpResponse.ok(null);
