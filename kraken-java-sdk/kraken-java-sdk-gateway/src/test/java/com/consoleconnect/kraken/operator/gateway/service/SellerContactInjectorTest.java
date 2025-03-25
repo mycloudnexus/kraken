@@ -27,8 +27,10 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.*;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.web.server.ServerWebExchange;
 
 @Slf4j
 @MockIntegrationTest
@@ -46,7 +48,7 @@ class SellerContactInjectorTest extends AbstractIntegrationTest implements Selle
   @Order(1)
   void givenNotExistedTargetKey_whenInjection_thenReturnDirectly() {
     Map<String, Object> inputs = buildInputs();
-    inject(inputs, "mef.sonata.api-target.order.eline.add1");
+    inject(Mockito.mock(ServerWebExchange.class), inputs, "mef.sonata.api-target.order.eline.add1");
     String bodyStr = JsonToolkit.toJson(inputs);
     log.info(bodyStr);
     assertThat(bodyStr, hasJsonPath("$.env.seller", notNullValue()));
@@ -60,7 +62,7 @@ class SellerContactInjectorTest extends AbstractIntegrationTest implements Selle
   @Order(2)
   void givenNotExistSellerContactKey_whenInjection_thenReturnOK() {
     Map<String, Object> inputs = buildInputs();
-    inject(inputs, "mef.sonata.api-target.order.eline.add");
+    inject(Mockito.mock(ServerWebExchange.class), inputs, "mef.sonata.api-target.order.eline.add");
     String bodyStr = JsonToolkit.toJson(inputs);
     log.info(bodyStr);
     assertThat(bodyStr, hasJsonPath("$.env.seller", notNullValue()));
@@ -86,7 +88,7 @@ class SellerContactInjectorTest extends AbstractIntegrationTest implements Selle
     Assertions.assertNotNull(ingestionDataResult);
     Map<String, Object> inputs = buildInputs();
 
-    inject(inputs, "mef.sonata.api-target.order.eline.add");
+    inject(Mockito.mock(ServerWebExchange.class), inputs, "mef.sonata.api-target.order.eline.add");
     String bodyStr = JsonToolkit.toJson(inputs);
     log.info(bodyStr);
     assertThat(bodyStr, hasJsonPath("$.env.seller", notNullValue()));
