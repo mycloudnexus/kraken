@@ -96,8 +96,6 @@ public class WorkflowTaskConfig implements WorkflowTaskRegister {
 
   @WorkerTask(LOG_PAYLOAD_TASK)
   public void logRequestPayload(@InputParam("payload") LogTaskRequest payload) {
-    log.info("log payload: {}", JsonToolkit.toJson(payload));
-
     try {
       ApiActivityRequestLog activityRequestLog = ApiActivityLogHelper.extractRequestLog(payload);
       if (activityRequestLog == null) {

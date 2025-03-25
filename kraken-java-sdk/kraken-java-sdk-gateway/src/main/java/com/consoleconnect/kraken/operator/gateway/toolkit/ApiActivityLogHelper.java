@@ -7,6 +7,7 @@ import com.consoleconnect.kraken.operator.core.model.ApiActivityResponseLog;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.workflow.model.LogTaskRequest;
 import com.fasterxml.jackson.core.type.TypeReference;
+import io.jsonwebtoken.lang.Strings;
 import io.netty.util.internal.StringUtil;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -14,7 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.CollectionUtils;
 
 @Slf4j
 public class ApiActivityLogHelper {
@@ -129,7 +129,18 @@ public class ApiActivityLogHelper {
     if (!map.containsKey(key)) {
       return Map.of();
     }
-    Map<String, List<String>> convertedMap = (Map<String, List<String>>) map.get(key);
-    return CollectionUtils.toMultiValueMap(convertedMap).toSingleValueMap();
+    Map<String, Object> convertedMap = (Map<String, Object>) map.get(key);
+    Map<String, String> result = new HashMap<>(convertedMap.size());
+    convertedMap.forEach(
+        (k, v) -> {
+          if (v instanceof String strVal) {
+            result.put(k, strVal);
+          } else if (v instanceof List list) {
+            result.put(k, String.join(", ", list));
+          } else {
+            result.put(k, Strings.EMPTY + v);
+          }
+        });
+    return result;
   }
 }
