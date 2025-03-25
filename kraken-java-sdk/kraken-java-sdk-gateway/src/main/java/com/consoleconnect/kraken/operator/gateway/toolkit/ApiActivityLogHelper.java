@@ -136,7 +136,7 @@ public class ApiActivityLogHelper {
           if (v instanceof String strVal) {
             result.put(k, strVal);
           } else if (v instanceof List list) {
-            result.put(k, String.join(", ", list));
+            result.put(k, String.join(",", list));
           } else {
             result.put(k, Strings.EMPTY + v);
           }

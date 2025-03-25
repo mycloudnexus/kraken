@@ -25,7 +25,7 @@ class ApiActivityLogHelperTest {
     Assertions.assertEquals("/qe1company/ports/order", requestLog.getPath());
     Assertions.assertEquals("PUT", requestLog.getMethod());
     Assertions.assertEquals("v", requestLog.getQueryParameters().get("q"));
-    Assertions.assertEquals("HEADER_VAL1, HEADER_VAL2", requestLog.getHeaders().get("TEST_HEADER"));
+    Assertions.assertEquals("HEADER_VAL1,HEADER_VAL2", requestLog.getHeaders().get("TEST_HEADER"));
 
     Map<String, Object> body =
         (Map<String, Object>) JsonToolkit.fromJson((String) requestLog.getRequest(), Map.class);
