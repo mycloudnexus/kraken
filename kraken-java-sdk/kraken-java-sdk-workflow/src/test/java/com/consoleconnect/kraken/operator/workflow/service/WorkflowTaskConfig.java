@@ -2,7 +2,6 @@ package com.consoleconnect.kraken.operator.workflow.service;
 
 import static com.consoleconnect.kraken.operator.core.toolkit.Constants.*;
 
-import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.workflow.model.EvaluateResult;
 import com.consoleconnect.kraken.operator.workflow.model.LogTaskRequest;
 import com.netflix.conductor.sdk.workflow.task.InputParam;
@@ -45,9 +44,7 @@ public class WorkflowTaskConfig implements WorkflowTaskRegister {
   }
 
   @WorkerTask(LOG_PAYLOAD_TASK)
-  public void logRequestPayload(@InputParam("payload") LogTaskRequest payload) {
-    log.info("log payload: {}", JsonToolkit.toJson(payload));
-  }
+  public void logRequestPayload(@InputParam("payload") LogTaskRequest payload) {}
 
   @WorkerTask(EMPTY_TASK)
   public void doNothing() {

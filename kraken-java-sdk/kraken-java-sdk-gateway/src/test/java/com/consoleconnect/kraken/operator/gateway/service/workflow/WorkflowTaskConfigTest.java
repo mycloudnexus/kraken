@@ -97,7 +97,7 @@ class WorkflowTaskConfigTest extends AbstractIntegrationTest {
     Assertions.assertEquals("/qe1company/ports/order", activityLog.getPath());
     Assertions.assertEquals("PUT", activityLog.getMethod());
     Assertions.assertEquals("v", activityLog.getQueryParameters().get("q"));
-    Assertions.assertEquals("HEADER_VAL1", activityLog.getHeaders().get("TEST_HEADER"));
+    Assertions.assertEquals("HEADER_VAL1,HEADER_VAL2", activityLog.getHeaders().get("TEST_HEADER"));
 
     Map<String, String> request =
         (Map<String, String>) activityLog.getApiLogBodyEntity().getRequest();

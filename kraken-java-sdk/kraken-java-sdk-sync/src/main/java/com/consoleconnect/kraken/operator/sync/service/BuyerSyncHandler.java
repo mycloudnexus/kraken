@@ -8,14 +8,10 @@ import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
 import com.consoleconnect.kraken.operator.core.enums.ResourceLoaderTypeEnum;
 import com.consoleconnect.kraken.operator.core.event.IngestDataEvent;
 import com.consoleconnect.kraken.operator.core.ingestion.DataIngestionJob;
-import com.consoleconnect.kraken.operator.core.model.facet.BuyerOnboardFacets;
 import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
-import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.sync.model.SyncProperty;
-import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -69,20 +65,7 @@ public class BuyerSyncHandler implements ClientSyncHandler, ParentIdSelector {
   }
 
   private boolean hasChanges(UnifiedAssetDto dto, UnifiedAssetEntity existingBuyer) {
-    UnifiedAssetDto existingBuyerDto = UnifiedAssetService.toAsset(existingBuyer, true);
-    BuyerOnboardFacets existingFacets =
-        JsonToolkit.fromJson(
-            JsonToolkit.toJson(existingBuyerDto.getFacets()),
-            new TypeReference<BuyerOnboardFacets>() {});
-    BuyerOnboardFacets currentFacets =
-        JsonToolkit.fromJson(
-            JsonToolkit.toJson(dto.getFacets()), new TypeReference<BuyerOnboardFacets>() {});
-    return !existingBuyerDto.getMetadata().getStatus().equals(dto.getMetadata().getStatus())
-        || !(Objects.nonNull(existingFacets.getBuyerInfo().getCompanyName())
-            && existingFacets
-                .getBuyerInfo()
-                .getCompanyName()
-                .equals(currentFacets.getBuyerInfo().getCompanyName()));
+    return existingBuyer.getVersion().compareTo(dto.getMetadata().getVersion()) < 0;
   }
 
   private Optional<UnifiedAssetEntity> findExistingBuyer(String envId, String buyerId) {
