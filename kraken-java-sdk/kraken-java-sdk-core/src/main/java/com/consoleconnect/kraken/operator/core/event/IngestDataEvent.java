@@ -4,15 +4,17 @@ import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
+@Getter
 public class IngestDataEvent {
   private String parentId; // parentId can be parsed from asset
   @NotNull private String fullPath;
   private boolean enforceSync = false;
-  private boolean commonExtend = false;
+  private boolean extendCommon = false;
   private AssetKindEnum kind;
   private UnifiedAsset asset;
 

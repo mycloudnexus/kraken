@@ -5,17 +5,17 @@ import static com.consoleconnect.kraken.operator.core.toolkit.ConstructExpressio
 
 import com.consoleconnect.kraken.operator.core.model.CommonMapperRef;
 import com.consoleconnect.kraken.operator.core.model.KVPair;
+import com.consoleconnect.kraken.operator.core.model.Metadata;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.consoleconnect.kraken.operator.core.toolkit.LabelConstants;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
 public interface CommonMapperExtender extends AssetReader {
@@ -23,31 +23,15 @@ public interface CommonMapperExtender extends AssetReader {
   @Slf4j
   final class LogHolder {}
 
-  default void tryExtendCommonMappers(UnifiedAsset data) {
-    Map<String, Object> facetsUpdated = data.getFacets();
-    if (MapUtils.isEmpty(facetsUpdated)) {
-      LogHolder.log.info("skip facetsUpdated");
-      return;
-    }
-    ComponentAPITargetFacets facetsNew = null;
-    try {
-      facetsNew =
-          JsonToolkit.fromJson(JsonToolkit.toJson(facetsUpdated), ComponentAPITargetFacets.class);
-    } catch (Exception e) {
-      LogHolder.log.error("Reading facets updated failed", e);
-    }
-    if (Objects.isNull(facetsNew) || CollectionUtils.isEmpty(facetsNew.getEndpoints())) {
-      LogHolder.log.info("skip facetsNew");
-      return;
-    }
-    ComponentAPITargetFacets.Endpoint endpointNew = facetsNew.getEndpoints().get(0);
-    extendCommonMapper(endpointNew);
-    facetsNew.getEndpoints().set(0, endpointNew);
-
-    Map<String, Object> resultUpdated =
-        JsonToolkit.fromJson(JsonToolkit.toJson(facetsNew), new TypeReference<>() {});
-    LogHolder.log.info("facets updated result:{}", JsonToolkit.toJson(resultUpdated));
-    data.setFacets(resultUpdated);
+  default boolean checkExtendCommon(UnifiedAsset data) {
+    return Optional.ofNullable(data)
+        .map(UnifiedAsset::getMetadata)
+        .map(Metadata::getLabels)
+        .map(
+            labels ->
+                labels.getOrDefault(LabelConstants.EXTEND_COMMON, String.valueOf(Boolean.FALSE)))
+        .map(Boolean::valueOf)
+        .orElse(false);
   }
 
   default void extendCommonMapper(ComponentAPITargetFacets.Endpoint endpointNew) {

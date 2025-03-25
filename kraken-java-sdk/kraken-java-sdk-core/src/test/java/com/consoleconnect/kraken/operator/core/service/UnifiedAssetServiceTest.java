@@ -1,5 +1,6 @@
 package com.consoleconnect.kraken.operator.core.service;
 
+import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.COMPONENT_API_TARGET_MAPPER;
 import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.COMPONENT_API_TARGET_SPEC;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -299,9 +300,9 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
   }
 
   private void verifyDeletedMapper(
-      String testcase, Map<String, Map<String, ComponentAPITargetFacets.Mapper>> mergedMapperMap) {
-    verifyDeletedMapper(mergedMapperMap, testcase, MAPPER_REQUEST);
-    verifyDeletedMapper(mergedMapperMap, testcase, MAPPER_RESPONSE);
+      String testCase, Map<String, Map<String, ComponentAPITargetFacets.Mapper>> mergedMapperMap) {
+    verifyDeletedMapper(mergedMapperMap, testCase, MAPPER_REQUEST);
+    verifyDeletedMapper(mergedMapperMap, testCase, MAPPER_RESPONSE);
   }
 
   private void verifyDeletedMapper(
@@ -377,7 +378,7 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
 
       String result1 = JsonToolkit.toJson(facetsOld);
       Assertions.assertNotNull(result1);
-      Map<String, Object> map = unifiedAssetService.mergeFacets(facetsOld, facetsNew);
+      Map<String, Object> map = unifiedAssetService.mergeFacets(facetsOld, facetsNew, true);
       String result2 = JsonToolkit.toJson(map);
       Assertions.assertNotNull(result2);
       assertThat(result2, hasJsonPath("$.endpoints[0].mappers.request", hasSize(9)));
@@ -411,7 +412,7 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
 
       String result1 = JsonToolkit.toJson(facetsOld);
       Assertions.assertNotNull(result1);
-      Map<String, Object> map = unifiedAssetService.mergeFacets(facetsOld, facetsNew);
+      Map<String, Object> map = unifiedAssetService.mergeFacets(facetsOld, facetsNew, true);
       String result2 = JsonToolkit.toJson(map);
       Assertions.assertNotNull(result2);
       ComponentAPITargetFacets facets1 =
@@ -439,5 +440,17 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
     String path = "classpath:/data/api-target-mapper.inventory.common.list-1.yaml";
     Optional<UnifiedAsset> opt = unifiedAssetService.readFromPath(path);
     Assertions.assertTrue(opt.isEmpty());
+  }
+
+  @Test
+  void givenExtendCommon_whenExtract_thenReturnOK() {
+    UnifiedAsset data =
+        UnifiedAsset.of(
+            COMPONENT_API_TARGET_MAPPER.getKind(),
+            "mef.sonata.api-target-mapper.inventory.eline.list",
+            "Inventory Connection API List");
+    data.getMetadata().getLabels().put(LabelConstants.EXTEND_COMMON, String.valueOf(Boolean.TRUE));
+    boolean result = unifiedAssetService.checkExtendCommon(data);
+    Assertions.assertTrue(result);
   }
 }

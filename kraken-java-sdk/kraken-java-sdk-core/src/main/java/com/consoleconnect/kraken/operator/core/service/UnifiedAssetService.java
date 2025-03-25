@@ -297,11 +297,8 @@ public class UnifiedAssetService implements UUIDWrapper, FacetsMerger {
     log.info("syncing asset facets, assetId: {}", assetEntity.getKey());
 
     if (Objects.equals(assetEntity.getKind(), COMPONENT_API_TARGET_MAPPER.getKind())) {
-      if (syncMetadata.isExtendCommon()) {
-        tryExtendCommonMappers(data);
-      }
       entityOptional
-          .map(entity -> mergeFacetsInternal(entity, data.getFacets()))
+          .map(entity -> mergeFacetsInternal(entity, data.getFacets(), checkExtendCommon(data)))
           .ifPresent(data::setFacets);
     }
     if (data.getFacets() != null) {
@@ -330,13 +327,15 @@ public class UnifiedAssetService implements UUIDWrapper, FacetsMerger {
   }
 
   public Map<String, Object> mergeFacetsInternal(
-      UnifiedAssetEntity unifiedAssetEntity, Map<String, Object> facetsUpdated) {
+      UnifiedAssetEntity unifiedAssetEntity,
+      Map<String, Object> facetsUpdated,
+      boolean extendCommon) {
     UnifiedAssetDto assetDto = UnifiedAssetService.toAsset(unifiedAssetEntity, true);
     ComponentAPITargetFacets existFacets =
         UnifiedAsset.getFacets(assetDto, ComponentAPITargetFacets.class);
     ComponentAPITargetFacets newFacets =
         JsonToolkit.fromJson(JsonToolkit.toJson(facetsUpdated), ComponentAPITargetFacets.class);
-    return mergeFacets(existFacets, newFacets);
+    return mergeFacets(existFacets, newFacets, extendCommon);
   }
 
   public void removeNotExistingChildren(String assetId) {

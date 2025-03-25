@@ -268,8 +268,7 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
 
     productReleaseAsset.setLinks(links);
 
-    SyncMetadata syncMetadata =
-        new SyncMetadata("", "", DateTime.nowInUTCString(), createdBy, true);
+    SyncMetadata syncMetadata = new SyncMetadata("", "", DateTime.nowInUTCString(), createdBy);
     IngestionDataResult result =
         unifiedAssetService.syncAsset(
             productEntity.getId(), productReleaseAsset, syncMetadata, true);

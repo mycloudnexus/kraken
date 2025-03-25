@@ -117,7 +117,7 @@ public class TemplateUpgradeService implements ApiUseCaseSelector {
         unifiedAssetService.syncAsset(
             templateUpgradeId,
             templateUpgradeDeployment,
-            new SyncMetadata("", "", DateTime.nowInUTCString(), userId, true),
+            new SyncMetadata("", "", DateTime.nowInUTCString(), userId),
             true);
     if (DeployStatusEnum.IN_PROCESS
         .name()
@@ -759,7 +759,7 @@ public class TemplateUpgradeService implements ApiUseCaseSelector {
         new IngestDataEvent(
             parentKey, upgradeRecord.fullPath(), mergeLabels, this.getSystemUpgradeUser());
     event.setEnforceSync(enforce);
-    event.setCommonExtend(true);
+    event.setExtendCommon(true);
     dataIngestionJob.ingestData(event);
   }
 
@@ -1027,7 +1027,7 @@ public class TemplateUpgradeService implements ApiUseCaseSelector {
         unifiedAssetService.syncAsset(
             assetDto.getId(),
             templateUpgradeDeployment,
-            new SyncMetadata("", "", DateTime.nowInUTCString(), event.getUserId(), true),
+            new SyncMetadata("", "", DateTime.nowInUTCString(), event.getUserId()),
             true);
     UUID id = ingestionDataResult.getData().getId();
     this.addLabels(envDeployment, id.toString());

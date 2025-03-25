@@ -17,7 +17,9 @@ public interface FacetsMerger extends CommonMapperExtender {
   String MAPPER_RESPONSE = "response";
 
   default Map<String, Object> mergeFacets(
-      ComponentAPITargetFacets facetsOld, ComponentAPITargetFacets facetsNew) {
+      ComponentAPITargetFacets facetsOld,
+      ComponentAPITargetFacets facetsNew,
+      boolean extendCommon) {
     ComponentAPITargetFacets.Endpoint endpointOld = facetsOld.getEndpoints().get(0);
     ComponentAPITargetFacets.Endpoint endpointNew = facetsNew.getEndpoints().get(0);
     List<PathRule> pathRules =
@@ -28,7 +30,9 @@ public interface FacetsMerger extends CommonMapperExtender {
         (Objects.isNull(endpointNew) || Objects.isNull(endpointNew.getMappers()))
             ? null
             : endpointNew.getMappers().getSchemaRef();
-    extendCommonMapper(endpointNew);
+    if (extendCommon) {
+      extendCommonMapper(endpointNew);
+    }
     FacetsMapper.INSTANCE.toEndpoint(endpointOld, endpointNew);
 
     Map<String, Map<String, ComponentAPITargetFacets.Mapper>> mapperOldMap =

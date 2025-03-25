@@ -1,5 +1,7 @@
 package com.consoleconnect.kraken.operator.core.ingestion;
 
+import static com.consoleconnect.kraken.operator.core.toolkit.LabelConstants.EXTEND_COMMON;
+
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.event.IngestDataEvent;
 import com.consoleconnect.kraken.operator.core.event.IngestionDataResult;
@@ -94,6 +96,7 @@ public class DataIngestionJob {
     if (event.isMergeLabels() && assetService.existed(asset.getMetadata().getKey())) {
       UnifiedAssetDto db = assetService.findOne(asset.getMetadata().getKey());
       Map<String, String> labels = new HashMap<>();
+      labels.put(EXTEND_COMMON, String.valueOf(event.isExtendCommon()));
       Optional.ofNullable(db)
           .map(UnifiedAssetDto::getMetadata)
           .map(Metadata::getLabels)
@@ -115,8 +118,7 @@ public class DataIngestionJob {
                 fullPath,
                 yamlContentOptional.get().getSha(),
                 DateTime.nowInUTCString(),
-                event.getUserId(),
-                event.isCommonExtend()),
+                event.getUserId()),
             event.isEnforceSync());
     asset.getMetadata().setId(syncAssetResult.getData().getId().toString());
     onPostPersist(parentId, new FileDescriptor(fullPath), asset);
