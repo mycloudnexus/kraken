@@ -66,7 +66,11 @@ public class ComponentAPITargetFacets {
     private String sourceLocation;
     private String sourceConditionExpression;
     private List<SourceCondition> sourceConditions;
+    // Used in the front side to control the bandwidth and show the input box with range
     private Boolean allowValueLimit = Boolean.FALSE;
+    // Used in the back end to control the validation of enum, string which source values are not
+    // empty
+    private Boolean systemValueLimit = Boolean.FALSE;
     private Boolean discrete;
     private List<String> sourceValues;
     private String target;

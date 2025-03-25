@@ -29,16 +29,16 @@ spec:
         request:
           - name: mapper.quote.uni.add.sync.duration.amount
             source: "@{{quoteItem[0].requestedQuoteItemTerm.duration.amount}}"
-            sourceLocation: BODY
             sourceType: integer
+            sourceLocation: BODY
             discrete: true
             target: "@{{connections[*].duration.value}}"
             targetLocation: BODY
             requiredMapping: true
           - name: mapper.quote.uni.add.sync.duration.units
             source: "@{{quoteItem[0].requestedQuoteItemTerm.duration.units}}"
-            sourceLocation: BODY
             sourceType: enum
+            sourceLocation: BODY
             sourceValues:
               - calendarMonths
               - calendarDays
@@ -47,6 +47,7 @@ spec:
               - businessDays
               - businessHours
               - businessMinutes
+            systemValueLimit: true
             valueMapping:
               calendarMonths: m
             target: "@{{connections[*].duration.unit}}"
@@ -54,20 +55,21 @@ spec:
             requiredMapping: true
           - name: mapper.quote.uni.add.sync.endOfTermAction
             source: "@{{quoteItem[0].requestedQuoteItemTerm.endOfTermAction}}"
-            sourceLocation: BODY
             sourceType: enum
+            sourceLocation: BODY
             sourceValues:
               - roll
               - autoDisconnect
               - autoRenew
+            systemValueLimit: true
             valueMapping: {}
             target: "roll"
             targetLocation: BODY
             requiredMapping: true
           - name: mapper.quote.uni.add.sync.rollInterval.amount
             source: "@{{quoteItem[0].requestedQuoteItemTerm.rollInterval.amount}}"
-            sourceLocation: BODY
             sourceType: integer
+            sourceLocation: BODY
             discrete: true
             sourceConditionExpression:
             sourceConditions:
@@ -80,8 +82,8 @@ spec:
             requiredMapping: false
           - name: mapper.quote.uni.add.sync.rollInterval.units
             source: "@{{quoteItem[0].requestedQuoteItemTerm.rollInterval.units}}"
-            sourceLocation: BODY
             sourceType: enum
+            sourceLocation: BODY
             sourceValues:
               - calendarMonths
               - calendarDays
@@ -90,6 +92,7 @@ spec:
               - businessDays
               - businessHours
               - businessMinutes
+            systemValueLimit: true
             valueMapping: {}
             sourceConditionExpression:
             sourceConditions:
@@ -102,59 +105,61 @@ spec:
             requiredMapping: false
           - name: mapper.quote.uni.add.sync.place0.id
             source: "@{{quoteItem[0].product.place[0].id}}"
-            sourceLocation: BODY
             sourceType: string
+            sourceLocation: BODY
             target: "@{{connections[*].srcDcf}}"
             targetLocation: BODY
             requiredMapping: true
           - name: mapper.quote.uni.add.sync.place1.id
             source: "@{{quoteItem[0].product.place[1].id}}"
-            sourceLocation: BODY
             sourceType: string
+            sourceLocation: BODY
             target: "@{{connections[*].destDcf}}"
             targetLocation: BODY
             requiredMapping: true
           - name: mapper.quote.uni.add.sync.productConfiguration.bandwidth
             source: "@{{quoteItem[0].product.productConfiguration.bandwidth}}"
-            sourceLocation: BODY
-            allowValueLimit: true
             sourceType: integer
-            discrete: true
+            sourceLocation: BODY
             sourceValues:
               - 1000
               - 10000
+            allowValueLimit: true
+            discrete: true
+            systemValueLimit: true
             target: "@{{connections[*].bandwidth}}"
             targetLocation: BODY
             requiredMapping: true
           - name: mapper.quote.uni.add.sync.productConfiguration.bandwidthUnit
             source: "@{{quoteItem[0].product.productConfiguration.bandwidthUnit}}"
-            sourceLocation: BODY
             sourceType: enum
+            sourceLocation: BODY
             sourceValues:
               - GBPS
               - MBPS
+            systemValueLimit: true
             valueMapping: {}
             target: "MBPS"
             targetLocation: BODY
             requiredMapping: true
           - name: mapper.quote.uni.add.sync.productConfiguration.classOfService
             source: "@{{quoteItem[0].product.productConfiguration.classOfService}}"
-            sourceLocation: BODY
             sourceType: string
+            sourceLocation: BODY
             target: "@{{connections[*].classOfService}}"
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.quote.uni.add.sync.productConfiguration.paymentType
             source: "@{{quoteItem[0].product.productConfiguration.paymentType}}"
-            sourceLocation: BODY
             sourceType: string
+            sourceLocation: BODY
             target: "@{{connections[*].paymentMethod}}"
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.quote.uni.add.sync.productOffering.id
             source: "@{{quoteItem[0].product.productOffering.id}}"
-            sourceLocation: BODY
             sourceType: string
+            sourceLocation: BODY
             target: "ACCESS_E_LINE"
             targetLocation: BODY
             requiredMapping: false

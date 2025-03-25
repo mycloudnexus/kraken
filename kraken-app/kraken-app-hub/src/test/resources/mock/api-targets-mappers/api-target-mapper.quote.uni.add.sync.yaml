@@ -29,15 +29,15 @@ spec:
         request:
           - name: mapper.quote.uni.add.sync.duration.amount
             source: "@{{quoteItem[0].requestedQuoteItemTerm.duration.amount}}"
-            sourceLocation: BODY
             sourceType: integer
+            sourceLocation: BODY
             target: "1"
             targetLocation: BODY
             requiredMapping: true
           - name: mapper.quote.uni.add.sync.duration.units
             source: "@{{quoteItem[0].requestedQuoteItemTerm.duration.units}}"
-            sourceLocation: BODY
             sourceType: enum
+            sourceLocation: BODY
             sourceValues:
               - calendarMonths
               - calendarDays
@@ -46,6 +46,7 @@ spec:
               - businessDays
               - businessHours
               - businessMinutes
+            systemValueLimit: true
             valueMapping:
               calendarMonths: m
             target: "@{{ports[*].durationUnit}}"
@@ -53,20 +54,21 @@ spec:
             requiredMapping: true
           - name: mapper.quote.uni.add.sync.endOfTermAction
             source: "@{{quoteItem[0].requestedQuoteItemTerm.endOfTermAction}}"
-            sourceLocation: BODY
             sourceType: enum
+            sourceLocation: BODY
             sourceValues:
               - roll
               - autoDisconnect
               - autoRenew
+            systemValueLimit: true
             valueMapping: {}
             target: "roll"
             targetLocation: BODY
             requiredMapping: true
           - name: mapper.quote.uni.add.sync.rollInterval.amount
             source: "@{{quoteItem[0].requestedQuoteItemTerm.rollInterval.amount}}"
-            sourceLocation: BODY
             sourceType: integer
+            sourceLocation: BODY
             sourceConditionExpression:
             sourceConditions:
               - name: endOfTermAction
@@ -78,8 +80,8 @@ spec:
             requiredMapping: false
           - name: mapper.quote.uni.add.sync.rollInterval.units
             source: "@{{quoteItem[0].requestedQuoteItemTerm.rollInterval.units}}"
-            sourceLocation: BODY
             sourceType: enum
+            sourceLocation: BODY
             sourceValues:
               - calendarMonths
               - calendarDays
@@ -88,6 +90,7 @@ spec:
               - businessDays
               - businessHours
               - businessMinutes
+            systemValueLimit: true
             valueMapping: {}
             sourceConditionExpression:
             sourceConditions:
@@ -100,38 +103,40 @@ spec:
             requiredMapping: false
           - name: mapper.quote.uni.add.sync.place.id
             source: "@{{quoteItem[0].product.place[0].id}}"
-            sourceLocation: BODY
             sourceType: string
+            sourceLocation: BODY
             target: "@{{ports[*].dcf}}"
             targetLocation: BODY
             requiredMapping: true
           - name: mapper.quote.uni.add.sync.productConfiguration.bandwidth
             source: "@{{quoteItem[0].product.productConfiguration.bandwidth}}"
-            sourceLocation: BODY
-            allowValueLimit: true
             sourceType: integer
-            discrete: true
+            sourceLocation: BODY
             sourceValues:
               - 1000
               - 10000
+            allowValueLimit: true
+            discrete: true
+            systemValueLimit: true
             target: "@{{ports[*].speed}}"
             targetLocation: BODY
             requiredMapping: true
           - name: mapper.quote.uni.add.sync.productConfiguration.bandwidthUnit
             source: "@{{quoteItem[0].product.productConfiguration.bandwidthUnit}}"
-            sourceLocation: BODY
             sourceType: enum
+            sourceLocation: BODY
             sourceValues:
               - GBPS
               - MBPS
+            systemValueLimit: true
             valueMapping: {}
             target: "MBPS"
             targetLocation: BODY
             requiredMapping: true
           - name: mapper.quote.uni.add.sync.productOffering.id
             source: "@{{quoteItem[0].product.productOffering.id}}"
-            sourceLocation: BODY
             sourceType: string
+            sourceLocation: BODY
             target: "UNI"
             targetLocation: BODY
             requiredMapping: false

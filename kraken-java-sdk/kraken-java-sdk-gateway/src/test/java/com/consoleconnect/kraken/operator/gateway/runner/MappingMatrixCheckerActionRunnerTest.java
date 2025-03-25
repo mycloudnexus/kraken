@@ -2,6 +2,7 @@ package com.consoleconnect.kraken.operator.gateway.runner;
 
 import static com.consoleconnect.kraken.operator.gateway.runner.ResponseCodeTransform.TARGET_KEY_NOT_FOUND;
 
+import com.consoleconnect.kraken.operator.core.dto.SourceCheckItem;
 import com.consoleconnect.kraken.operator.core.enums.ExpectTypeEnum;
 import com.consoleconnect.kraken.operator.core.enums.MappingTypeEnum;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
@@ -359,87 +360,135 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest
   void givenStringValueList_whenValueNotInDiscreteStr_thenThrowsException() {
     Assertions.assertThrowsExactly(
         KrakenException.class,
-        () ->
-            mappingMatrixCheckerActionRunner.validateEnumOrDiscreteString(
-                "4", "x", List.of("1", "2", "3"), MappingTypeEnum.STRING.getKind()));
+        () -> {
+          SourceCheckItem sourceCheckItem = new SourceCheckItem();
+          sourceCheckItem.setEvaluateValue("4");
+          sourceCheckItem.setParamName("x");
+          sourceCheckItem.setValueList(List.of("1", "2", "3"));
+          sourceCheckItem.setSourceType(MappingTypeEnum.STRING.getKind());
+          sourceCheckItem.setAllowValueLimit(true);
+          mappingMatrixCheckerActionRunner.validateEnumOrDiscreteString(sourceCheckItem);
+        });
   }
 
   @Test
   void givenNotInteger_whenValidatingDiscreteInt_thenThrowsException() {
     Assertions.assertThrowsExactly(
         KrakenException.class,
-        () ->
-            mappingMatrixCheckerActionRunner.validateDiscreteInteger(
-                "4", "x", List.of(), MappingTypeEnum.DISCRETE_INT.getKind(), true));
+        () -> {
+          SourceCheckItem sourceCheckItem = new SourceCheckItem();
+          sourceCheckItem.setEvaluateValue("4");
+          sourceCheckItem.setParamName("x");
+          sourceCheckItem.setValueList(List.of());
+          sourceCheckItem.setSourceType(MappingTypeEnum.DISCRETE_INT.getKind());
+          sourceCheckItem.setDiscrete(true);
+          sourceCheckItem.setAllowValueLimit(true);
+          mappingMatrixCheckerActionRunner.validateDiscreteInteger(sourceCheckItem);
+        });
   }
 
   @Test
   void givenIntegerNotIn_whenValidatingDiscreteInt_thenThrowsException() {
     Assertions.assertThrowsExactly(
         KrakenException.class,
-        () ->
-            mappingMatrixCheckerActionRunner.validateDiscreteInteger(
-                4, "x", List.of("1", "2", "3"), MappingTypeEnum.DISCRETE_INT.getKind(), true));
+        () -> {
+          SourceCheckItem sourceCheckItem = new SourceCheckItem();
+          sourceCheckItem.setEvaluateValue("4");
+          sourceCheckItem.setParamName("x");
+          sourceCheckItem.setValueList(List.of("1", "2", "3"));
+          sourceCheckItem.setSourceType(MappingTypeEnum.DISCRETE_INT.getKind());
+          sourceCheckItem.setDiscrete(true);
+          sourceCheckItem.setAllowValueLimit(true);
+          mappingMatrixCheckerActionRunner.validateDiscreteInteger(sourceCheckItem);
+        });
   }
 
   @Test
   void givenNotInteger_whenValidatingContinuousInt_thenThrowsException() {
     Assertions.assertThrowsExactly(
         KrakenException.class,
-        () ->
-            mappingMatrixCheckerActionRunner.validateContinuousNumber(
-                "4", "x", List.of(), MappingTypeEnum.CONTINUOUS_INT.getKind(), false));
+        () -> {
+          SourceCheckItem sourceCheckItem = new SourceCheckItem();
+          sourceCheckItem.setEvaluateValue("4");
+          sourceCheckItem.setParamName("x");
+          sourceCheckItem.setValueList(List.of());
+          sourceCheckItem.setSourceType(MappingTypeEnum.CONTINUOUS_INT.getKind());
+          sourceCheckItem.setDiscrete(false);
+          mappingMatrixCheckerActionRunner.validateContinuousNumber(sourceCheckItem);
+        });
   }
 
   @Test
   void givenIntegerNotIn_whenValidatingContinuousInt_thenThrowsException() {
     Assertions.assertThrowsExactly(
         KrakenException.class,
-        () ->
-            mappingMatrixCheckerActionRunner.validateContinuousNumber(
-                4, "x", List.of("1", "3"), MappingTypeEnum.CONTINUOUS_INT.getKind(), false));
+        () -> {
+          SourceCheckItem sourceCheckItem = new SourceCheckItem();
+          sourceCheckItem.setEvaluateValue("4");
+          sourceCheckItem.setParamName("x");
+          sourceCheckItem.setValueList(List.of("1", "3"));
+          sourceCheckItem.setSourceType(MappingTypeEnum.CONTINUOUS_INT.getKind());
+          sourceCheckItem.setDiscrete(false);
+          mappingMatrixCheckerActionRunner.validateContinuousNumber(sourceCheckItem);
+        });
   }
 
   @Test
   void givenNotDouble_whenValidatingContinuousDouble_thenThrowsException() {
     Assertions.assertThrowsExactly(
         KrakenException.class,
-        () ->
-            mappingMatrixCheckerActionRunner.validateContinuousNumber(
-                "4", "x", List.of(), MappingTypeEnum.CONTINUOUS_DOUBLE.getKind(), false));
+        () -> {
+          SourceCheckItem sourceCheckItem = new SourceCheckItem();
+          sourceCheckItem.setEvaluateValue("4");
+          sourceCheckItem.setParamName("x");
+          sourceCheckItem.setValueList(List.of());
+          sourceCheckItem.setSourceType(MappingTypeEnum.CONTINUOUS_DOUBLE.getKind());
+          sourceCheckItem.setDiscrete(false);
+          mappingMatrixCheckerActionRunner.validateContinuousNumber(sourceCheckItem);
+        });
   }
 
   @Test
   void givenDoubleNotIn_whenValidatingContinuousDouble_thenThrowsException() {
     Assertions.assertThrowsExactly(
         KrakenException.class,
-        () ->
-            mappingMatrixCheckerActionRunner.validateContinuousNumber(
-                4.0,
-                "x",
-                List.of("1.0", "3.9"),
-                MappingTypeEnum.CONTINUOUS_DOUBLE.getKind(),
-                false));
+        () -> {
+          SourceCheckItem sourceCheckItem = new SourceCheckItem();
+          sourceCheckItem.setEvaluateValue("4");
+          sourceCheckItem.setParamName("x");
+          sourceCheckItem.setValueList(List.of("1.0", "3.9"));
+          sourceCheckItem.setSourceType(MappingTypeEnum.CONTINUOUS_DOUBLE.getKind());
+          sourceCheckItem.setDiscrete(false);
+          mappingMatrixCheckerActionRunner.validateContinuousNumber(sourceCheckItem);
+        });
   }
 
   @Test
   void givenDoubleInRange_whenValidatingContinuousDouble_thenNoException() {
     Assertions.assertDoesNotThrow(
-        () ->
-            mappingMatrixCheckerActionRunner.validateContinuousNumber(
-                3.2,
-                "x",
-                List.of("1.0", "3.9"),
-                MappingTypeEnum.CONTINUOUS_DOUBLE.getKind(),
-                false));
+        () -> {
+          SourceCheckItem sourceCheckItem = new SourceCheckItem();
+          sourceCheckItem.setEvaluateValue(3.2);
+          sourceCheckItem.setParamName("x");
+          sourceCheckItem.setValueList(List.of("1.0", "3.9"));
+          sourceCheckItem.setSourceType(MappingTypeEnum.CONTINUOUS_DOUBLE.getKind());
+          sourceCheckItem.setDiscrete(false);
+          mappingMatrixCheckerActionRunner.validateContinuousNumber(sourceCheckItem);
+        });
   }
 
   @Test
   void givenIntegerInRange_whenValidatingContinuousInteger_thenNoException() {
     Assertions.assertDoesNotThrow(
-        () ->
-            mappingMatrixCheckerActionRunner.validateContinuousNumber(
-                3, "x", List.of("1", "4"), MappingTypeEnum.CONTINUOUS_INT.getKind(), false));
+        () -> {
+          SourceCheckItem sourceCheckItem = new SourceCheckItem();
+          sourceCheckItem.setEvaluateValue(3);
+          sourceCheckItem.setParamName("x");
+          sourceCheckItem.setValueList(List.of("1", "4"));
+          sourceCheckItem.setSourceType(MappingTypeEnum.CONTINUOUS_INT.getKind());
+          sourceCheckItem.setDiscrete(false);
+          mappingMatrixCheckerActionRunner.validateContinuousNumber(sourceCheckItem);
+        });
   }
 
   @Test

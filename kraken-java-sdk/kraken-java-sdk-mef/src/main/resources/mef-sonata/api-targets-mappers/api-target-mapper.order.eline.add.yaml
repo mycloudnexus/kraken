@@ -38,8 +38,8 @@ spec:
           - name: mapper.order.eline.add.duration
             title: "order item Term duration"
             source: "@{{productOrderItem[0].requestedItemTerm.duration.amount}}"
-            sourceLocation: BODY
             sourceType: integer
+            sourceLocation: BODY
             discrete: true
             target: ""
             targetLocation: ""
@@ -48,6 +48,7 @@ spec:
             title: "order item Term unit"
             source: "@{{productOrderItem[0].requestedItemTerm.duration.units}}"
             sourceType: enum
+            sourceLocation: BODY
             sourceValues:
               - calendarYears
               - calendarMonths
@@ -57,28 +58,29 @@ spec:
               - businessDays
               - businessHours
               - businessMinutes
-            sourceLocation: BODY
+            systemValueLimit: true
+            valueMapping: {}
             target: ""
             targetLocation: ""
-            valueMapping: {}
             requiredMapping: true
           - name: mapper.order.eline.add.endOfTermAction
             title: "MEFEndOfTermAction"
             source: "@{{productOrderItem[0].requestedItemTerm.endOfTermAction}}"
-            sourceLocation: BODY
             sourceType: enum
+            sourceLocation: BODY
             sourceValues:
               - roll
               - autoDisconnect
               - autoRenew
+            systemValueLimit: true
             target: ""
             targetLocation: BODY
             requiredMapping: true
           - name: mapper.order.eline.add.rollInterval.amount
             title: " quote item Term roll duration"
             source: "@{{productOrderItem[0].requestedItemTerm.rollInterval.amount}}"
-            sourceLocation: BODY
             sourceType: integer
+            sourceLocation: BODY
             discrete: true
             sourceConditionExpression:
             sourceConditions:
@@ -92,8 +94,8 @@ spec:
           - name: mapper.order.eline.add.rollInterval.units
             title: " quote item Term roll unit"
             source: "@{{productOrderItem[0].requestedItemTerm.rollInterval.units}}"
-            sourceLocation: BODY
             sourceType: enum
+            sourceLocation: BODY
             sourceValues:
               - calendarYears
               - calendarMonths
@@ -103,6 +105,7 @@ spec:
               - businessDays
               - businessHours
               - businessMinutes
+            systemValueLimit: true
             sourceConditionExpression:
             sourceConditions:
               - name: endOfTermAction
@@ -116,10 +119,11 @@ spec:
             title: "The unit of bandwidth"
             source: "@{{productOrderItem[0].product.productConfiguration.bandwidthUnit}}"
             sourceType: enum
+            sourceLocation: BODY
             sourceValues:
               - MBPS
               - GBPS
-            sourceLocation: BODY
+            systemValueLimit: true
             target: ""
             targetLocation: BODY
             valueMapping: {}
@@ -127,19 +131,19 @@ spec:
           - name: mapper.order.eline.add.bandwidth
             title: "Bandwidth of the ELINE"
             source: "@{{productOrderItem[0].product.productConfiguration.bandwidth}}"
-            sourceLocation: BODY
-            allowValueLimit: true
             sourceType: integer
-            discrete: true
+            sourceLocation: BODY
             sourceValues:
+            allowValueLimit: true
+            discrete: true
             target: ""
             targetLocation: BODY
             requiredMapping: true
           - name: mapper.order.eline.add.name
             title: "The name of the ELINE"
             source: "@{{productOrderItem[0].product.productConfiguration.name}}"
-            sourceLocation: BODY
             sourceType: string
+            sourceLocation: BODY
             target: ""
             targetLocation: BODY
             requiredMapping: false
@@ -154,56 +158,56 @@ spec:
           - name: mapper.order.eline.add.classOfService
             title: "The class of Service of the Eline"
             source: "@{{productOrderItem[0].product.productConfiguration.classOfService}}"
-            sourceLocation: BODY
             sourceType: string
+            sourceLocation: BODY
             target: ""
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.order.eline.add.product.productConfiguration.buyerCompanyId
             title: "The Id of buyer Company"
             source: "@{{productOrderItem[0].product.productConfiguration.buyerCompanyId}}"
-            sourceLocation: BODY
             sourceType: string
+            sourceLocation: BODY
             target: ""
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.order.eline.add.product.productConfiguration.destUNIMetroId
             title: "The metro id of the destination UNI"
             source: "@{{productOrderItem[0].product.productConfiguration.destUNIMetroId}}"
-            sourceLocation: BODY
             sourceType: string
+            sourceLocation: BODY
             target: ""
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.order.eline.add.product.productConfiguration.type
             title: "customized product type"
             source: "@{{productOrderItem[0].product.productConfiguration.type}}"
-            sourceLocation: BODY
             sourceType: string
+            sourceLocation: BODY
             target: ""
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.order.eline.add.srcUNI
             title: "source UNI or ENNI id"
             source: "@{{productOrderItem[0].product.productRelationship[0].id}}"
-            sourceLocation: BODY
             sourceType: string
+            sourceLocation: BODY
             target: ""
             targetLocation: BODY
             requiredMapping: true
           - name: mapper.order.eline.add.destUNI
             title: "destination UNI id"
             source: "@{{productOrderItem[0].product.productRelationship[1].id}}"
-            sourceLocation: BODY
             sourceType: string
+            sourceLocation: BODY
             target: ""
             targetLocation: BODY
             requiredMapping: true
           - name: mapper.order.eline.add.productOffering.id
             title: "id of a Product Offering"
             source: "@{{productOrderItem[0].product.productOffering.id}}"
-            sourceLocation: BODY
             sourceType: string
+            sourceLocation: BODY
             target: ""
             targetLocation: BODY
             requiredMapping: true

@@ -33,8 +33,8 @@ spec:
           - name: mapper.quote.uni.add.sync.duration.amount
             title: "quote item Term duration"
             source: "@{{quoteItem[0].requestedQuoteItemTerm.duration.amount}}"
-            sourceLocation: BODY
             sourceType: integer
+            sourceLocation: BODY
             discrete: true
             target: ""
             targetLocation: BODY
@@ -42,8 +42,8 @@ spec:
           - name: mapper.quote.uni.add.sync.duration.units
             title: "quote item Term unit"
             source: "@{{quoteItem[0].requestedQuoteItemTerm.duration.units}}"
-            sourceLocation: BODY
             sourceType: enum
+            sourceLocation: BODY
             sourceValues:
               - calendarYears
               - calendarMonths
@@ -53,6 +53,7 @@ spec:
               - businessDays
               - businessHours
               - businessMinutes
+            systemValueLimit: true
             valueMapping: {}
             target: ""
             targetLocation: BODY
@@ -60,12 +61,13 @@ spec:
           - name: mapper.quote.uni.add.sync.endOfTermAction
             title: "MEFEndOfTermAction"
             source: "@{{quoteItem[0].requestedQuoteItemTerm.endOfTermAction}}"
-            sourceLocation: BODY
             sourceType: enum
+            sourceLocation: BODY
             sourceValues:
               - roll
               - autoDisconnect
               - autoRenew
+            systemValueLimit: true
             valueMapping: {}
             target: ""
             targetLocation: BODY
@@ -73,8 +75,8 @@ spec:
           - name: mapper.quote.uni.add.sync.rollInterval.amount
             title: "quote item Term roll duration"
             source: "@{{quoteItem[0].requestedQuoteItemTerm.rollInterval.amount}}"
-            sourceLocation: BODY
             sourceType: integer
+            sourceLocation: BODY
             discrete: true
             sourceConditionExpression:
             sourceConditions:
@@ -88,8 +90,8 @@ spec:
           - name: mapper.quote.uni.add.sync.rollInterval.units
             title: "quote item Term roll unit"
             source: "@{{quoteItem[0].requestedQuoteItemTerm.rollInterval.units}}"
-            sourceLocation: BODY
             sourceType: enum
+            sourceLocation: BODY
             sourceValues:
               - calendarYears
               - calendarMonths
@@ -99,6 +101,7 @@ spec:
               - businessDays
               - businessHours
               - businessMinutes
+            systemValueLimit: true
             valueMapping: {}
             sourceConditionExpression:
             sourceConditions:
@@ -112,30 +115,32 @@ spec:
           - name: mapper.quote.uni.add.sync.place.id
             title: "the id of the place where the products' quotation must be done"
             source: "@{{quoteItem[0].product.place[0].id}}"
-            sourceLocation: BODY
             sourceType: string
+            sourceLocation: BODY
             target: ""
             targetLocation: BODY
             requiredMapping: true
           - name: mapper.quote.uni.add.sync.productConfiguration.bandwidth
             title: "Bandwidth of the UNI"
             source: "@{{quoteItem[0].product.productConfiguration.bandwidth}}"
-            sourceLocation: BODY
-            allowValueLimit: true
             sourceType: integer
-            discrete: true
+            sourceLocation: BODY
             sourceValues:
+            allowValueLimit: true
+            discrete: true
+            systemValueLimit: true
             target: ""
             targetLocation: BODY
             requiredMapping: true
           - name: mapper.quote.uni.add.sync.productConfiguration.bandwidthUnit
             title: "The unit of bandwidth"
             source: "@{{quoteItem[0].product.productConfiguration.bandwidthUnit}}"
-            sourceLocation: BODY
             sourceType: enum
+            sourceLocation: BODY
             sourceValues:
               - GBPS
               - MBPS
+            systemValueLimit: true
             valueMapping: {}
             target: ""
             targetLocation: BODY
@@ -143,8 +148,8 @@ spec:
           - name: mapper.quote.uni.add.sync.productOffering.id
             title: "The id of the quoted product offering"
             source: "@{{quoteItem[0].product.productOffering.id}}"
-            sourceLocation: BODY
             sourceType: string
+            sourceLocation: BODY
             target: ""
             targetLocation: BODY
             requiredMapping: false

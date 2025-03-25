@@ -39,8 +39,8 @@ spec:
           - name: mapper.order.uni.add.duration
             title: "order item Term duration"
             source: "@{{productOrderItem[0].requestedItemTerm.duration.amount}}"
-            sourceLocation: BODY
             sourceType: integer
+            sourceLocation: BODY
             discrete: true
             target: ""
             targetLocation: ""
@@ -49,6 +49,7 @@ spec:
             title: "order item Term unit"
             source: "@{{productOrderItem[0].requestedItemTerm.duration.units}}"
             sourceType: enum
+            sourceLocation: BODY
             sourceValues:
               - calendarYears
               - calendarMonths
@@ -58,7 +59,7 @@ spec:
               - businessDays
               - businessHours
               - businessMinutes
-            sourceLocation: BODY
+            systemValueLimit: true
             target: ""
             targetLocation: BODY
             valueMapping: {}
@@ -66,16 +67,16 @@ spec:
           - name: mapper.order.eline.add.endOfTermAction
             title: "MEFEndOfTermAction"
             source: "@{{productOrderItem[0].requestedItemTerm.endOfTermAction}}"
-            sourceLocation: BODY
             sourceType: string
+            sourceLocation: BODY
             target: ""
             targetLocation: BODY
             requiredMapping: true
           - name: mapper.order.uni.add.rollInterval.amount
             title: " quote item Term roll duration"
             source: "@{{productOrderItem[0].requestedItemTerm.rollInterval.amount}}"
-            sourceLocation: BODY
             sourceType: integer
+            sourceLocation: BODY
             discrete: true
             sourceConditionExpression:
             sourceConditions:
@@ -89,8 +90,8 @@ spec:
           - name: mapper.order.uni.add.rollInterval.units
             title: " quote item Term roll unit"
             source: "@{{productOrderItem[0].requestedItemTerm.rollInterval.units}}"
-            sourceLocation: BODY
             sourceType: enum
+            sourceLocation: BODY
             sourceValues:
               - calendarYears
               - calendarMonths
@@ -100,6 +101,7 @@ spec:
               - businessDays
               - businessHours
               - businessMinutes
+            systemValueLimit: true
             sourceConditionExpression:
             sourceConditions:
               - name: endOfTermAction
@@ -112,10 +114,10 @@ spec:
           - name: mapper.order.uni.add.place.id
             title: >-
               the id of the place where the products' installation must be done.
-            source: '@{{productOrderItem[0].product.place[0].id}}'
             description: ''
-            sourceLocation: BODY
+            source: '@{{productOrderItem[0].product.place[0].id}}'
             sourceType: string
+            sourceLocation: BODY
             target: ''
             targetLocation: BODY
             requiredMapping: false
@@ -127,33 +129,35 @@ spec:
             sourceValues:
               - MBPS
               - GBPS
+            systemValueLimit: true
             target: ""
             targetLocation: BODY
             requiredMapping: true
           - name: mapper.order.uni.add.bandwidth
             title: "Bandwidth of the UNI"
             source: "@{{productOrderItem[0].product.productConfiguration.bandwidth}}"
-            sourceLocation: BODY
-            allowValueLimit: true
             sourceType: integer
-            discrete: true
+            sourceLocation: BODY
             sourceValues:
+            allowValueLimit: true
+            discrete: true
+            systemValueLimit: true
             target: ""
             targetLocation: BODY
             requiredMapping: true
           - name: mapper.order.uni.add.name
             title: "The name of the UNI"
             source: "@{{productOrderItem[0].product.productConfiguration.name}}"
-            sourceLocation: BODY
             sourceType: string
+            sourceLocation: BODY
             target: ""
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.order.uni.add.paymentType
             title: "The payment type of the UNI"
             source: "@{{productOrderItem[0].product.productConfiguration.paymentType}}"
-            sourceLocation: BODY
             sourceType: string
+            sourceLocation: BODY
             target: ""
             targetLocation: BODY
             requiredMapping: false

@@ -6,6 +6,7 @@ import static com.consoleconnect.kraken.operator.core.toolkit.Constants.COMMA;
 import static com.consoleconnect.kraken.operator.core.toolkit.Constants.COMMA_SPACE_EXPRESSION;
 import static com.consoleconnect.kraken.operator.core.toolkit.ConstructExpressionUtil.*;
 
+import com.consoleconnect.kraken.operator.core.dto.SourceCheckItem;
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.enums.ActionTypeEnum;
@@ -13,6 +14,7 @@ import com.consoleconnect.kraken.operator.core.enums.MappingTypeEnum;
 import com.consoleconnect.kraken.operator.core.enums.ParamLocationEnum;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.ingestion.ResourceLoaderFactory;
+import com.consoleconnect.kraken.operator.core.mapper.SourceCheckItemMapper;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.core.model.FilterRule;
 import com.consoleconnect.kraken.operator.core.model.HttpTask;
@@ -485,33 +487,31 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     // if path in the excluded400Path, then throws 422, otherwise throws 400
     Object realValue =
         readByPathWithException(documentContext, constructedBody, pathsExpected422, null);
-    validateSourceValue(
-        mapper.getSourceType(),
-        mapper.getDiscrete(),
-        realValue,
-        params.get(0),
-        mapper.getSourceValues(),
-        mapper.getTarget());
+    SourceCheckItem sourceCheckItem = buildWith(mapper, params.get(0), realValue);
+    validateSourceValue(sourceCheckItem);
   }
 
-  private void validateSourceValue(
-      String sourceType,
-      Boolean discrete,
-      Object evaluateValue,
-      String paramName,
-      List<String> valueList,
-      String target) {
+  private void validateSourceValue(SourceCheckItem sourceCheckItem) {
     // Constants checking
-    validateConstantValue(target, evaluateValue, paramName, sourceType);
+    validateConstantValue(sourceCheckItem);
 
     // Enumeration and discrete string variables checking
-    validateEnumOrDiscreteString(evaluateValue, paramName, valueList, sourceType);
+    validateEnumOrDiscreteString(sourceCheckItem);
 
     // Discrete integer checking
-    validateDiscreteInteger(evaluateValue, paramName, valueList, sourceType, discrete);
+    validateDiscreteInteger(sourceCheckItem);
 
     // Continuous number variables checking, include integer and double
-    validateContinuousNumber(evaluateValue, paramName, valueList, sourceType, discrete);
+    validateContinuousNumber(sourceCheckItem);
+  }
+
+  private SourceCheckItem buildWith(
+      ComponentAPITargetFacets.Mapper mapper, String paramName, Object realValue) {
+    SourceCheckItem sourceCheckItem = new SourceCheckItem();
+    SourceCheckItemMapper.INSTANCE.toSourceCheckItem(mapper, sourceCheckItem);
+    sourceCheckItem.setParamName(paramName);
+    sourceCheckItem.setEvaluateValue(realValue);
+    return sourceCheckItem;
   }
 
   public void checkMappingValue(
@@ -547,13 +547,8 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
       // if path in the excluded400Path, then throws 422, otherwise throws 400
       Object realValue =
           readByPathWithException(documentContext, jsonPathExpression, pathsExpected422, null);
-      validateSourceValue(
-          mapper.getSourceType(),
-          mapper.getDiscrete(),
-          realValue,
-          params.get(0),
-          mapper.getSourceValues(),
-          mapper.getTarget());
+      SourceCheckItem sourceCheckItem = buildWith(mapper, params.get(0), realValue);
+      validateSourceValue(sourceCheckItem);
     }
     if (QUERY.equals(location) || BODY.equals(location)) {
       try {

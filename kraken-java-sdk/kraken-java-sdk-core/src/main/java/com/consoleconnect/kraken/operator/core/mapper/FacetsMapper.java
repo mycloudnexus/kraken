@@ -22,6 +22,7 @@ public interface FacetsMapper {
   @Mapping(target = "sourceValues", source = "sourceValues")
   @Mapping(target = "targetValues", source = "targetValues")
   @Mapping(target = "valueMapping", source = "valueMapping")
+  @Mapping(target = "systemValueLimit", source = "systemValueLimit")
   void toRequestMapper(
       ComponentAPITargetFacets.Mapper mapper,
       @MappingTarget ComponentAPITargetFacets.Mapper mapperTarget);
@@ -34,6 +35,7 @@ public interface FacetsMapper {
   @Mapping(target = "sourceLocation", source = "sourceLocation")
   @Mapping(target = "sourceValues", source = "sourceValues")
   @Mapping(target = "valueMapping", source = "valueMapping")
+  @Mapping(target = "systemValueLimit", source = "systemValueLimit")
   void toResponseMapper(
       ComponentAPITargetFacets.Mapper mapper,
       @MappingTarget ComponentAPITargetFacets.Mapper mapperTarget);

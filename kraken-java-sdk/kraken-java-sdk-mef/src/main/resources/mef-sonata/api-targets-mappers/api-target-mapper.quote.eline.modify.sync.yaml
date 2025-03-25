@@ -42,8 +42,8 @@ spec:
           - name: mapper.quote.eline.modify.sync.duration.amount
             title: "quote item Term duration"
             source: "@{{quoteItem[0].requestedQuoteItemTerm.duration.amount}}"
-            sourceLocation: BODY
             sourceType: integer
+            sourceLocation: BODY
             discrete: true
             target: ""
             targetLocation: BODY
@@ -51,8 +51,8 @@ spec:
           - name: mapper.quote.eline.modify.sync.duration.units
             title: "quote item Term unit"
             source: "@{{quoteItem[0].requestedQuoteItemTerm.duration.units}}"
-            sourceLocation: BODY
             sourceType: enum
+            sourceLocation: BODY
             sourceValues:
               - calendarYears
               - calendarMonths
@@ -62,6 +62,7 @@ spec:
               - businessDays
               - businessHours
               - businessMinutes
+            systemValueLimit: true
             valueMapping: {}
             target: ""
             targetLocation: BODY
@@ -69,12 +70,13 @@ spec:
           - name: mapper.quote.eline.modify.sync.endOfTermAction
             title: "MEFEndOfTermAction"
             source: "@{{quoteItem[0].requestedQuoteItemTerm.endOfTermAction}}"
-            sourceLocation: BODY
             sourceType: enum
+            sourceLocation: BODY
             sourceValues:
               - roll
               - autoDisconnect
               - autoRenew
+            systemValueLimit: true
             valueMapping: {}
             target: ""
             targetLocation: BODY
@@ -82,8 +84,8 @@ spec:
           - name: mapper.quote.eline.modify.sync.rollInterval.amount
             title: "quote item Term roll duration"
             source: "@{{quoteItem[0].requestedQuoteItemTerm.rollInterval.amount}}"
-            sourceLocation: BODY
             sourceType: integer
+            sourceLocation: BODY
             discrete: true
             sourceConditionExpression:
             sourceConditions:
@@ -97,8 +99,8 @@ spec:
           - name: mapper.quote.eline.modify.sync.rollInterval.units
             title: "quote item Term roll unit"
             source: "@{{quoteItem[0].requestedQuoteItemTerm.rollInterval.units}}"
-            sourceLocation: BODY
             sourceType: enum
+            sourceLocation: BODY
             sourceValues:
               - calendarYears
               - calendarMonths
@@ -108,6 +110,7 @@ spec:
               - businessDays
               - businessHours
               - businessMinutes
+            systemValueLimit: true
             valueMapping: {}
             sourceConditionExpression:
             sourceConditions:
@@ -121,22 +124,24 @@ spec:
           - name: mapper.quote.eline.modify.sync.productConfiguration.bandwidth
             title: "Bandwidth of the Eline"
             source: "@{{quoteItem[0].product.productConfiguration.bandwidth}}"
-            sourceLocation: BODY
-            allowValueLimit: true
             sourceType: integer
-            discrete: true
+            sourceLocation: BODY
             sourceValues:
+            allowValueLimit: true
+            discrete: true
+            systemValueLimit: true
             target: ""
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.quote.eline.modify.sync.productConfiguration.bandwidthUnit
             title: "The unit of bandwidth"
             source: "@{{quoteItem[0].product.productConfiguration.bandwidthUnit}}"
-            sourceLocation: BODY
             sourceType: enum
+            sourceLocation: BODY
             sourceValues:
               - GBPS
               - MBPS
+            systemValueLimit: true
             valueMapping: {}
             target: ""
             targetLocation: BODY
@@ -144,31 +149,31 @@ spec:
           - name: mapper.quote.eline.modify.sync.productConfiguration.classOfService
             title: "The class of Service of the Eline"
             source: "@{{quoteItem[0].product.productConfiguration.classOfService}}"
-            sourceLocation: BODY
             sourceType: string
+            sourceLocation: BODY
             target: ""
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.quote.eline.modify.sync.productConfiguration.paymentType
             title: "The payment type of the Eline"
             source: "@{{quoteItem[0].product.productConfiguration.paymentType}}"
-            sourceLocation: BODY
             sourceType: string
+            sourceLocation: BODY
             target: ""
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.quote.eline.modify.sync.productOffering.id
             title: "The id of the quoted product offering"
             source: "@{{quoteItem[0].product.productOffering.id}}"
-            sourceLocation: BODY
             sourceType: string
+            sourceLocation: BODY
             target: ""
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.quote.eline.modify.sync.product.id
             source: "@{{quoteItem[0].product.id}}"
-            sourceLocation: BODY
             sourceType: string
+            sourceLocation: BODY
             target: ""
             targetLocation:
             requiredMapping: true

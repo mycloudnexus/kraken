@@ -26,36 +26,38 @@ spec:
         request:
           - name: mapper.poq.uni.add.place.id
             source: "@{{productOfferingQualificationItem[0].product.place[0].id}}"
-            sourceLocation: BODY
             sourceType: string
+            sourceLocation: BODY
             target: ""
             targetLocation: ""
             requiredMapping: true
           - name: mapper.poq.uni.add.productConfiguration.bandwidth
             source: "@{{productOfferingQualificationItem[0].product.productConfiguration.bandwidth}}"
-            sourceLocation: BODY
-            allowValueLimit: false
             sourceType: integer
-            discrete: true
+            sourceLocation: BODY
             sourceValues:
+            allowValueLimit: false
+            discrete: true
+            systemValueLimit: true
             target: ""
             targetLocation: ""
             requiredMapping: true
           - name: mapper.poq.uni.add.productConfiguration.bandwidthUnit
             source: "@{{productOfferingQualificationItem[0].product.productConfiguration.bandwidthUnit}}"
-            sourceLocation: BODY
             sourceType: enum
+            sourceLocation: BODY
             sourceValues:
               - GBPS
               - MBPS
             valueMapping: {}
+            systemValueLimit: true
             target: ""
             targetLocation: ""
             requiredMapping: true
           - name: mapper.poq.uni.add.productOffering.id
             source: "@{{productOfferingQualificationItem[0].product.productOffering.id}}"
-            sourceLocation: BODY
             sourceType: string
+            sourceLocation: BODY
             target: ""
             targetLocation: ""
             requiredMapping: false

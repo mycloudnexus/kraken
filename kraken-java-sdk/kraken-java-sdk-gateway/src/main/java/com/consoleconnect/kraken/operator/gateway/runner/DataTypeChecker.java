@@ -3,6 +3,7 @@ package com.consoleconnect.kraken.operator.gateway.runner;
 import static com.jayway.jsonpath.Criteria.where;
 import static com.jayway.jsonpath.Filter.filter;
 
+import com.consoleconnect.kraken.operator.core.dto.SourceCheckItem;
 import com.consoleconnect.kraken.operator.core.enums.MappingTypeEnum;
 import com.consoleconnect.kraken.operator.core.exception.ErrorResponse;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
@@ -220,8 +221,11 @@ public interface DataTypeChecker {
     return StringUtils.isNotBlank(target) && !target.contains("@{{");
   }
 
-  default void validateConstantValue(
-      String target, Object evaluateValue, String paramName, String sourceType) {
+  default void validateConstantValue(SourceCheckItem sourceCheckItem) {
+    String target = sourceCheckItem.getTarget();
+    Object evaluateValue = sourceCheckItem.getEvaluateValue();
+    String paramName = sourceCheckItem.getParamName();
+    String sourceType = sourceCheckItem.getSourceType();
     if (isConstantType(target)) {
       validateDiscreteString(evaluateValue, paramName, sourceType);
       Object targetObj = convertBySourceType(target, sourceType);
@@ -287,17 +291,28 @@ public interface DataTypeChecker {
     return true;
   }
 
-  default void validateEnumOrDiscreteString(
-      Object evaluateValue, String paramName, List<String> valueList, String sourceType) {
+  default void validateEnumOrDiscreteString(SourceCheckItem sourceCheckItem) {
+    Object evaluateValue = sourceCheckItem.getEvaluateValue();
+    String paramName = sourceCheckItem.getParamName();
+    List<String> valueList = sourceCheckItem.getValueList();
+    String sourceType = sourceCheckItem.getSourceType();
     validateDiscreteString(evaluateValue, paramName, sourceType);
     if ((MappingTypeEnum.STRING.getKind().equalsIgnoreCase(sourceType)
             || (MappingTypeEnum.ENUM.getKind().equalsIgnoreCase(sourceType)))
         && Objects.nonNull(evaluateValue)
-        && CollectionUtils.isNotEmpty(valueList)
-        && !valueList.contains(evaluateValue.toString())) {
-      throw KrakenException.unProcessableEntityInvalidValue(
-          String.format(SHOULD_BE_IN_MSG, paramName, evaluateValue, valueList));
+        && CollectionUtils.isNotEmpty(valueList)) {
+      boolean isValueLimitEnabled =
+          enableValueLimit(
+              sourceCheckItem.getAllowValueLimit(), sourceCheckItem.getSystemValueLimit());
+      if (isValueLimitEnabled && !valueList.contains(evaluateValue.toString())) {
+        throw KrakenException.unProcessableEntityInvalidValue(
+            String.format(SHOULD_BE_IN_MSG, paramName, evaluateValue, valueList));
+      }
     }
+  }
+
+  default boolean enableValueLimit(Boolean allowValueLimit, Boolean systemValueLimit) {
+    return Boolean.TRUE.equals(allowValueLimit) || Boolean.TRUE.equals(systemValueLimit);
   }
 
   default String whichDataType(Object evaluateValue) {
@@ -308,12 +323,12 @@ public interface DataTypeChecker {
     return (evaluateValue == null ? null : evaluateValue.getClass());
   }
 
-  default void validateDiscreteInteger(
-      Object evaluateValue,
-      String paramName,
-      List<String> valueList,
-      String sourceType,
-      Boolean discrete) {
+  default void validateDiscreteInteger(SourceCheckItem sourceCheckItem) {
+    Object evaluateValue = sourceCheckItem.getEvaluateValue();
+    String paramName = sourceCheckItem.getParamName();
+    List<String> valueList = sourceCheckItem.getValueList();
+    String sourceType = sourceCheckItem.getSourceType();
+    Boolean discrete = sourceCheckItem.getDiscrete();
     if (MappingTypeEnum.DISCRETE_INT.getKind().equalsIgnoreCase(sourceType)
         && MappingTypeEnum.DISCRETE_INT.getDiscrete().equals(discrete)) {
       if (Objects.isNull(evaluateValue) || isNotInteger(evaluateValue)) {
@@ -321,7 +336,11 @@ public interface DataTypeChecker {
             String.format(
                 EXPECT_INT_MSG, paramName, evaluateValue, whichDataType(evaluateValue), "Integer"));
       }
-      if (CollectionUtils.isNotEmpty(valueList)
+      boolean isValueLimitEnabled =
+          enableValueLimit(
+              sourceCheckItem.getAllowValueLimit(), sourceCheckItem.getSystemValueLimit());
+      if (isValueLimitEnabled
+          && CollectionUtils.isNotEmpty(valueList)
           && evaluateValue instanceof Integer evaluateIntVal) {
         Set<Integer> sets = valueList.stream().map(Integer::valueOf).collect(Collectors.toSet());
         if (!sets.contains(evaluateIntVal)) {
@@ -332,12 +351,18 @@ public interface DataTypeChecker {
     }
   }
 
-  default void validateContinuousNumber(
-      Object evaluateValue,
-      String paramName,
-      List<String> valueList,
-      String sourceType,
-      Boolean discrete) {
+  default void validateContinuousNumber(SourceCheckItem sourceCheckItem) {
+    boolean isValueLimitEnabled =
+        enableValueLimit(
+            sourceCheckItem.getAllowValueLimit(), sourceCheckItem.getSystemValueLimit());
+    if (!isValueLimitEnabled) {
+      return;
+    }
+    Object evaluateValue = sourceCheckItem.getEvaluateValue();
+    String paramName = sourceCheckItem.getParamName();
+    List<String> valueList = sourceCheckItem.getValueList();
+    String sourceType = sourceCheckItem.getSourceType();
+    Boolean discrete = sourceCheckItem.getDiscrete();
     if (isContinuousInt(sourceType, discrete)) {
       validateNumber(
           evaluateValue, paramName, valueList, Integer::parseInt, "Integer", this::isNotInteger);

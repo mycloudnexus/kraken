@@ -42,6 +42,7 @@ spec:
             title: "order item Term unit"
             source: "@{{productOrderItem[0].requestedItemTerm.duration.units}}"
             sourceType: enum
+            sourceLocation: BODY
             sourceValues:
               - calendarMonths
               - calendarDays
@@ -49,7 +50,7 @@ spec:
               - calendarMinutes
               - businessDays
               - businessHours
-            sourceLocation: BODY
+            systemValueLimit: true
             target: "@{{durationUnit}}"
             targetLocation: BODY
             valueMapping:
@@ -65,14 +66,15 @@ spec:
               - roll
               - autoDisconnect
               - autoRenew
+            systemValueLimit: true
             target: "roll"
             targetLocation: BODY
             requiredMapping: true
           - name: mapper.order.eline.add.rollInterval.amount
             title: " quote item Term roll duration"
             source: "@{{productOrderItem[0].requestedItemTerm.rollInterval.amount}}"
-            sourceLocation: BODY
             sourceType: integer
+            sourceLocation: BODY
             discrete: true
             sourceConditionExpression:
             sourceConditions:
@@ -86,8 +88,8 @@ spec:
           - name: mapper.order.eline.add.rollInterval.units
             title: " quote item Term roll unit"
             source: "@{{productOrderItem[0].requestedItemTerm.rollInterval.units}}"
-            sourceLocation: BODY
             sourceType: enum
+            sourceLocation: BODY
             sourceValues:
               - calendarYears
               - calendarMonths
@@ -97,6 +99,7 @@ spec:
               - businessDays
               - businessHours
               - businessMinutes
+            systemValueLimit: true
             sourceConditionExpression:
             sourceConditions:
               - name: endOfTermAction
@@ -110,10 +113,11 @@ spec:
             title: "The unit of bandwidth"
             source: "@{{productOrderItem[0].product.productConfiguration.bandwidthUnit}}"
             sourceType: enum
+            sourceLocation: BODY
             sourceValues:
               - MBPS
               - GBPS
-            sourceLocation: BODY
+            systemValueLimit: true
             target: "MBPS"
             targetLocation: BODY
             valueMapping: {}
@@ -121,13 +125,14 @@ spec:
           - name: mapper.order.eline.add.bandwidth
             title: "Bandwidth of the ELINE"
             source: "@{{productOrderItem[0].product.productConfiguration.bandwidth}}"
-            sourceLocation: BODY
-            allowValueLimit: true
             sourceType: integer
-            discrete: true
+            sourceLocation: BODY
             sourceValues:
               - 1
               - 10000
+            allowValueLimit: true
+            discrete: true
+            systemValueLimit: true
             target: "@{{speed}}"
             targetLocation: BODY
             requiredMapping: true
