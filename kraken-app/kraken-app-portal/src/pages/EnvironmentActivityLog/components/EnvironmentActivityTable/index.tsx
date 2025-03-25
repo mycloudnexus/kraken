@@ -5,6 +5,7 @@ import { useCommonListProps } from "@/hooks/useCommonListProps";
 import { toDateTime } from "@/libs/dayjs";
 import { useAppStore } from "@/stores/app.store";
 import { DEFAULT_PAGING } from "@/utils/constants/common";
+import { getProductName } from "@/utils/helpers/name";
 import { IActivityLog } from "@/utils/types/env.type";
 import {
   CheckCircleFilled,
@@ -240,6 +241,25 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
     },
   ];
 
+  const productOptions = [
+    {
+      value: "ACCESS_E_LINE",
+      text: getProductName("ACCESS_E_LINE"),
+    },
+    {
+      value: "UNI",
+      text: getProductName("UNI"),
+    },
+    {
+      value: "INTERNET_ACCESS",
+      text: getProductName("INTERNET_ACCESS"),
+    },
+    {
+      value: "SHARE",
+      text: getProductName("SHARE"),
+    },
+  ];
+
   const handleTimeFilter = () => {
     setQueryParams({
       ...queryParams,
@@ -249,6 +269,14 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
   };
 
   const columns: ColumnsType<IActivityLog> = [
+    {
+      key: "productType",
+      title: "Product",
+      render: (log: IActivityLog) => getProductName(log.productType),
+      width: 200,
+      filters: productOptions,
+      filterMultiple: false,
+    },
     {
       key: "name",
       title: "Method",
@@ -348,6 +376,7 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
       size: pagination.pageSize,
       method: filters.name,
       statusCode: filters.status,
+      productType: filters.productType,
     });
   };
 
