@@ -1,6 +1,6 @@
 import { Text } from "@/components/Text";
 import { IUnifiedAsset } from "@/utils/types/common.type";
-import { Col, Tooltip, Divider, Flex, Typography, Button } from "antd";
+import { Col, Tooltip, Flex, Typography, Button } from "antd";
 import { ReactNode, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { DrawerDetails } from "./ApiComponents";
@@ -64,7 +64,9 @@ const ApiComponent = ({
     <Flex
       className={styles.apiContainer}
       onClick={() => {
-        navigate(`/api-mapping/${item.metadata.key}`);
+        navigate(`/api-mapping/${item.metadata.key}`, {
+          state: { productType: supportInfo as string },
+        });
       }}
     >
       <div>
@@ -113,23 +115,6 @@ const ApiComponent = ({
           <p className={styles.desc}>{formattedTargetYaml.description}</p>,
           targetYaml.info?.description?.length > 310
         )}
-      </div>
-      <div>
-        <Divider />
-        <Flex className={styles.typeInfo} align="center" gap={4}>
-          <span style={{ color: "#717788" }}>Product type</span>
-          {supportInfo ? (
-            supportInfo?.[0].map((s: any) => {
-              return (
-                <Col key={s} className={styles.tagInfo}>
-                  {s}
-                </Col>
-              );
-            })
-          ) : (
-            <Col>NA</Col>
-          )}
-        </Flex>
       </div>
     </Flex>
   );
