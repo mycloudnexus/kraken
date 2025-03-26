@@ -29,6 +29,8 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
+import org.springframework.mock.web.server.MockServerWebExchange;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.web.server.ServerWebExchange;
 
@@ -48,7 +50,8 @@ class SellerContactInjectorTest extends AbstractIntegrationTest implements Selle
   @Order(1)
   void givenNotExistedTargetKey_whenInjection_thenReturnDirectly() {
     Map<String, Object> inputs = buildInputs();
-    inject(Mockito.mock(ServerWebExchange.class), inputs, "mef.sonata.api-target.order.eline.add1");
+    ServerWebExchange exchange = Mockito.mock(ServerWebExchange.class);
+    inject(exchange, inputs, "mef.sonata.api-target.order.eline.add1");
     String bodyStr = JsonToolkit.toJson(inputs);
     log.info(bodyStr);
     assertThat(bodyStr, hasJsonPath("$.env.seller", notNullValue()));
@@ -87,8 +90,10 @@ class SellerContactInjectorTest extends AbstractIntegrationTest implements Selle
         unifiedAssetService.syncAsset(productId, sellerContactAsset, syncMetadata, true);
     Assertions.assertNotNull(ingestionDataResult);
     Map<String, Object> inputs = buildInputs();
-
-    inject(Mockito.mock(ServerWebExchange.class), inputs, "mef.sonata.api-target.order.eline.add");
+    ServerWebExchange exchange =
+        MockServerWebExchange.from(MockServerHttpRequest.get("/test").build());
+    exchange.getAttributes().put("env", new HashMap<>());
+    inject(exchange, inputs, "mef.sonata.api-target.order.eline.add");
     String bodyStr = JsonToolkit.toJson(inputs);
     log.info(bodyStr);
     assertThat(bodyStr, hasJsonPath("$.env.seller", notNullValue()));
@@ -96,6 +101,9 @@ class SellerContactInjectorTest extends AbstractIntegrationTest implements Selle
     assertThat(bodyStr, hasJsonPath("$.env.seller.role", notNullValue()));
     assertThat(bodyStr, hasJsonPath("$.env.seller.emailAddress", notNullValue()));
     assertThat(bodyStr, hasJsonPath("$.env.seller.name", equalTo("test-new-seller-contact")));
+    assertThat(
+        JsonToolkit.toJson(exchange.getAttributes().get("env")),
+        hasJsonPath("$.seller.name", equalTo("test-new-seller-contact")));
   }
 
   private UnifiedAsset createSellerContact(
