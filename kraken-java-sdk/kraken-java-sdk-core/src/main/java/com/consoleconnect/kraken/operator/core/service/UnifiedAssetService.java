@@ -365,7 +365,14 @@ public class UnifiedAssetService implements UUIDWrapper {
       return;
     }
 
-    stageTasksNew.get(0).setConditionCheck(stageTasksOld.get(0).getConditionCheck());
+    HttpTask.ConditionCheck oldConditionCheck = stageTasksOld.get(0).getConditionCheck();
+    HttpTask.ConditionCheck newConditionCheck = stageTasksNew.get(0).getConditionCheck();
+    if (oldConditionCheck != null
+        && newConditionCheck != null
+        && newConditionCheck.getBuildInTask() != null) {
+      oldConditionCheck.setBuildInTask(newConditionCheck.getBuildInTask());
+    }
+    stageTasksNew.get(0).setConditionCheck(oldConditionCheck);
 
     ComponentAPITargetFacets.Endpoint endpointOld = stageTasksOld.get(0).getEndpoint();
     ComponentAPITargetFacets.Endpoint endpointNew = stageTasksNew.get(0).getEndpoint();

@@ -344,6 +344,9 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
 
     Assertions.assertEquals(
         expectedTask.getConditionCheck().getJoin(), actualTask.getConditionCheck().getJoin());
+    Assertions.assertEquals(
+        expectedTask.getConditionCheck().getBuildInTask(),
+        actualTask.getConditionCheck().getBuildInTask());
     if (!CollectionUtils.isEmpty(expectedTask.getConditionCheck().getConditionItems())) {
       Assertions.assertEquals(
           expectedTask.getConditionCheck().getConditionItems().get(0).getExpression(),

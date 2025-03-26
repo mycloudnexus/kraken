@@ -41,7 +41,7 @@ spec:
           - operator: EQUAL
             value: "DELETED"
             expression: "status_checking_task.status-old"
-        buildInTask: reject_order_task
+        buildInTask: reject_order_task_old
   preparationStage:
     - taskName: disable_order_task
       taskType: http
