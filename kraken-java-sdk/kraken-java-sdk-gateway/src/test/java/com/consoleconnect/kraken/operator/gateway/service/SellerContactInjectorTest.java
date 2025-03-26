@@ -1,8 +1,7 @@
 package com.consoleconnect.kraken.operator.gateway.service;
 
 import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.COMPONENT_SELLER_CONTACT;
-import static com.consoleconnect.kraken.operator.core.toolkit.Constants.ORDER_KEY_WORD;
-import static com.consoleconnect.kraken.operator.core.toolkit.Constants.QUOTE_KEY_WORD;
+import static com.consoleconnect.kraken.operator.core.toolkit.Constants.*;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -92,6 +91,7 @@ class SellerContactInjectorTest extends AbstractIntegrationTest implements Selle
     Map<String, Object> inputs = buildInputs();
     ServerWebExchange exchange =
         MockServerWebExchange.from(MockServerHttpRequest.get("/test").build());
+    exchange.getAttributes().put(ENV, new HashMap<>());
     inject(exchange, inputs, "mef.sonata.api-target.order.eline.add");
     String bodyStr = JsonToolkit.toJson(inputs);
     log.info(bodyStr);
