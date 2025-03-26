@@ -26,6 +26,7 @@ public class AppProperty {
   private WorkflowConfig workflow = new WorkflowConfig();
   private DualVersionConfig dualVersionConfig = new DualVersionConfig();
   private List<String> productTypes = new ArrayList<>();
+  private SupportedProductTypes supportedProductTypes = new SupportedProductTypes();
 
   @Data
   public static class Features {
@@ -68,5 +69,14 @@ public class AppProperty {
       tableMaps.put("kraken_asset_link", "kraken_asset_link_v2");
       tableMaps.put("kraken_asset_facet", "kraken_asset_facet_v2");
     }
+  }
+
+  @Data
+  public static class SupportedProductTypes {
+    private List<String> address;
+    private List<String> quote;
+    private List<String> poq;
+    private List<String> order;
+    private List<String> inventory;
   }
 }

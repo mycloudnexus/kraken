@@ -277,3 +277,18 @@ app:
     - ACCESS_E_LINE
     - INTERNET_ACCESS
     - SHARE
+  supported-product-types:
+    address:
+      - SHARE
+    order:
+      - UNI
+      - ACCESS_E_LINE
+    quote:
+      - UNI
+      - ACCESS_E_LINE
+    poq:
+      - UNI
+      - ACCESS_E_LINE
+    inventory:
+      - UNI
+      - ACCESS_E_LINE
