@@ -142,7 +142,7 @@ public class UnifiedAssetService implements UUIDWrapper {
 
   public void fillSupportedProductType(List<UnifiedAssetDto> content) {
     content.stream()
-        .filter(v -> v.getKind().equalsIgnoreCase(COMPONENT_API.getKind()))
+        .filter(v -> v.getKind().equalsIgnoreCase(COMPONENT_API.getKind()) && v.getFacets() != null)
         .forEach(
             asset -> {
               ComponentAPIFacets facets = UnifiedAsset.getFacets(asset, ComponentAPIFacets.class);
