@@ -16,6 +16,7 @@ import com.consoleconnect.kraken.operator.core.ingestion.ResourceLoaderFactory;
 import com.consoleconnect.kraken.operator.core.mapper.AssetMapper;
 import com.consoleconnect.kraken.operator.core.model.*;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
+import com.consoleconnect.kraken.operator.core.model.facet.ComponentWorkflowFacets;
 import com.consoleconnect.kraken.operator.core.repo.AssetFacetRepository;
 import com.consoleconnect.kraken.operator.core.repo.AssetLinkRepository;
 import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
@@ -294,12 +295,18 @@ public class UnifiedAssetService implements UUIDWrapper, FacetsMerger {
             .map(entity -> updateAssetEntity(parentId, entity, data, syncMetadata))
             .orElseGet(() -> createAssetEntity(parentId, data, syncMetadata));
 
-    log.info("syncing asset facets, assetId: {}", assetEntity.getKey());
-
-    if (Objects.equals(assetEntity.getKind(), COMPONENT_API_TARGET_MAPPER.getKind())) {
-      entityOptional
-          .map(entity -> mergeFacetsInternal(entity, data.getFacets(), checkExtendCommon(data)))
-          .ifPresent(data::setFacets);
+    boolean extendCommon = checkExtendCommon(data);
+    log.info(
+        "syncing asset facets, assetId: {}, extendCommon:{}", assetEntity.getKey(), extendCommon);
+    if (enableMerge(assetEntity)) {
+      if (extendCommon) {}
+      if (entityOptional.isPresent()) {
+        Map<String, Object> facets =
+            mergeFacetsInternal(entityOptional.get(), data.getFacets(), extendCommon);
+        data.setFacets(facets);
+      } else {
+        log.info("Database has no key:{}", assetEntity.getKey());
+      }
     }
     if (data.getFacets() != null) {
       syncFacets(assetEntity, data.getFacets());
@@ -331,11 +338,19 @@ public class UnifiedAssetService implements UUIDWrapper, FacetsMerger {
       Map<String, Object> facetsUpdated,
       boolean extendCommon) {
     UnifiedAssetDto assetDto = UnifiedAssetService.toAsset(unifiedAssetEntity, true);
-    ComponentAPITargetFacets existFacets =
-        UnifiedAsset.getFacets(assetDto, ComponentAPITargetFacets.class);
-    ComponentAPITargetFacets newFacets =
-        JsonToolkit.fromJson(JsonToolkit.toJson(facetsUpdated), ComponentAPITargetFacets.class);
-    return mergeFacets(existFacets, newFacets, extendCommon);
+    if (Objects.equals(unifiedAssetEntity.getKind(), COMPONENT_API_TARGET_MAPPER.getKind())) {
+      ComponentAPITargetFacets existFacets =
+          UnifiedAsset.getFacets(assetDto, ComponentAPITargetFacets.class);
+      ComponentAPITargetFacets newFacets =
+          JsonToolkit.fromJson(JsonToolkit.toJson(facetsUpdated), ComponentAPITargetFacets.class);
+      return mergeFacets(existFacets, newFacets, extendCommon);
+    } else {
+      ComponentWorkflowFacets existFacets =
+          UnifiedAsset.getFacets(assetDto, ComponentWorkflowFacets.class);
+      ComponentWorkflowFacets newFacets =
+          JsonToolkit.fromJson(JsonToolkit.toJson(facetsUpdated), ComponentWorkflowFacets.class);
+      return mergeFacets(existFacets, newFacets);
+    }
   }
 
   public void removeNotExistingChildren(String assetId) {

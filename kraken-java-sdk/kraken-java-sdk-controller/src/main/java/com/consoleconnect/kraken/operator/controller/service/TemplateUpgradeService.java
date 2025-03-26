@@ -759,7 +759,9 @@ public class TemplateUpgradeService implements ApiUseCaseSelector {
         new IngestDataEvent(
             parentKey, upgradeRecord.fullPath(), mergeLabels, this.getSystemUpgradeUser());
     event.setEnforceSync(enforce);
-    event.setExtendCommon(true);
+    if (mergeLabels) {
+      event.setExtendCommon(true);
+    }
     dataIngestionJob.ingestData(event);
   }
 

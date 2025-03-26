@@ -35,7 +35,8 @@ public class WorkspaceEventListener extends AbstractAssetEventListener {
     // reload products
     if (facets.getProductPaths() != null) {
       for (String productPath : facets.getProductPaths()) {
-        job.ingestData(new IngestDataEvent(asset.getMetadata().getId(), productPath));
+        IngestDataEvent event = new IngestDataEvent(asset.getMetadata().getId(), productPath);
+        job.ingestData(event);
       }
     }
     log.info("onPostPersist,assetKey:{} completed", asset.getMetadata().getKey());

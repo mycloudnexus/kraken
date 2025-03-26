@@ -1,13 +1,20 @@
 package com.consoleconnect.kraken.operator.core.service;
 
+import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.COMPONENT_API_TARGET_MAPPER;
+import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.COMPONENT_API_WORK_FLOW;
+
+import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
 import com.consoleconnect.kraken.operator.core.mapper.FacetsMapper;
 import com.consoleconnect.kraken.operator.core.model.CommonMapperRef;
+import com.consoleconnect.kraken.operator.core.model.HttpTask;
 import com.consoleconnect.kraken.operator.core.model.PathRule;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
+import com.consoleconnect.kraken.operator.core.model.facet.ComponentWorkflowFacets;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.*;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -16,12 +23,13 @@ public interface FacetsMerger extends CommonMapperExtender {
   String MAPPER_REQUEST = "request";
   String MAPPER_RESPONSE = "response";
 
-  default Map<String, Object> mergeFacets(
-      ComponentAPITargetFacets facetsOld,
-      ComponentAPITargetFacets facetsNew,
+  @Slf4j
+  final class LogHolder {}
+
+  default Map<String, Object> mergeEndpoint(
+      ComponentAPITargetFacets.Endpoint endpointOld,
+      ComponentAPITargetFacets.Endpoint endpointNew,
       boolean extendCommon) {
-    ComponentAPITargetFacets.Endpoint endpointOld = facetsOld.getEndpoints().get(0);
-    ComponentAPITargetFacets.Endpoint endpointNew = facetsNew.getEndpoints().get(0);
     List<PathRule> pathRules =
         (Objects.isNull(endpointNew) || Objects.isNull(endpointNew.getMappers()))
             ? new ArrayList<>()
@@ -31,6 +39,7 @@ public interface FacetsMerger extends CommonMapperExtender {
             ? null
             : endpointNew.getMappers().getSchemaRef();
     if (extendCommon) {
+      LogHolder.log.info("Start to extend common mapper");
       extendCommonMapper(endpointNew);
     }
     FacetsMapper.INSTANCE.toEndpoint(endpointOld, endpointNew);
@@ -50,7 +59,7 @@ public interface FacetsMerger extends CommonMapperExtender {
     if (Objects.nonNull(endpointNew)) {
       endpointNew.setMappers(mappers);
     }
-    return JsonToolkit.fromJson(JsonToolkit.toJson(facetsNew), new TypeReference<>() {});
+    return JsonToolkit.fromJson(JsonToolkit.toJson(endpointNew), new TypeReference<>() {});
   }
 
   default void mergeMappers(
@@ -189,5 +198,47 @@ public interface FacetsMerger extends CommonMapperExtender {
   private static boolean isCustomizedMapping(
       Map.Entry<String, ComponentAPITargetFacets.Mapper> mapper) {
     return Objects.equals(Boolean.TRUE, mapper.getValue().getCustomizedField());
+  }
+
+  default boolean enableMerge(UnifiedAssetEntity assetEntity) {
+    return Objects.equals(assetEntity.getKind(), COMPONENT_API_TARGET_MAPPER.getKind())
+        || Objects.equals(assetEntity.getKind(), COMPONENT_API_WORK_FLOW.getKind());
+  }
+
+  default Map<String, Object> mergeFacets(
+      ComponentWorkflowFacets facetsOld, ComponentWorkflowFacets facetsNew) {
+    mergeFacets(facetsOld.getValidationStage(), facetsNew.getValidationStage());
+    mergeFacets(facetsOld.getPreparationStage(), facetsNew.getPreparationStage());
+    mergeFacets(facetsOld.getExecutionStage(), facetsNew.getExecutionStage());
+    return JsonToolkit.fromJson(JsonToolkit.toJson(facetsNew), new TypeReference<>() {});
+  }
+
+  default void mergeFacets(List<HttpTask> stageTasksOld, List<HttpTask> stageTasksNew) {
+    if (CollectionUtils.isEmpty(stageTasksOld) || CollectionUtils.isEmpty(stageTasksNew)) {
+      return;
+    }
+
+    HttpTask.ConditionCheck oldConditionCheck = stageTasksOld.get(0).getConditionCheck();
+    HttpTask.ConditionCheck newConditionCheck = stageTasksNew.get(0).getConditionCheck();
+    if (oldConditionCheck != null
+        && newConditionCheck != null
+        && newConditionCheck.getBuildInTask() != null) {
+      oldConditionCheck.setBuildInTask(newConditionCheck.getBuildInTask());
+    }
+    stageTasksNew.get(0).setConditionCheck(oldConditionCheck);
+
+    ComponentAPITargetFacets.Endpoint endpointOld = stageTasksOld.get(0).getEndpoint();
+    ComponentAPITargetFacets.Endpoint endpointNew = stageTasksNew.get(0).getEndpoint();
+    mergeEndpoint(endpointOld, endpointNew, false);
+  }
+
+  default Map<String, Object> mergeFacets(
+      ComponentAPITargetFacets facetsOld,
+      ComponentAPITargetFacets facetsNew,
+      boolean extendCommon) {
+    ComponentAPITargetFacets.Endpoint endpointOld = facetsOld.getEndpoints().get(0);
+    ComponentAPITargetFacets.Endpoint endpointNew = facetsNew.getEndpoints().get(0);
+    mergeEndpoint(endpointOld, endpointNew, extendCommon);
+    return JsonToolkit.fromJson(JsonToolkit.toJson(facetsNew), new TypeReference<>() {});
   }
 }

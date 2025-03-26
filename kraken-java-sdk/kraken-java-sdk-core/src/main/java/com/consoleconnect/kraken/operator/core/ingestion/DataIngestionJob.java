@@ -3,6 +3,7 @@ package com.consoleconnect.kraken.operator.core.ingestion;
 import static com.consoleconnect.kraken.operator.core.toolkit.LabelConstants.EXTEND_COMMON;
 
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
+import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
 import com.consoleconnect.kraken.operator.core.event.IngestDataEvent;
 import com.consoleconnect.kraken.operator.core.event.IngestionDataResult;
 import com.consoleconnect.kraken.operator.core.model.*;
@@ -55,6 +56,9 @@ public class DataIngestionJob {
     UnifiedAsset asset = assetOptional.get();
 
     onPrePersist(new FileDescriptor(fullPath), asset);
+    if (isMapperKind(asset)) {
+      asset.getMetadata().getLabels().put(EXTEND_COMMON, String.valueOf(Boolean.TRUE));
+    }
     final IngestionDataResult syncAssetResult =
         assetService.syncAsset(
             null,
@@ -93,10 +97,18 @@ public class DataIngestionJob {
     if (parentId == null && asset.getMetadata().getProductKey() != null) {
       parentId = asset.getMetadata().getProductKey();
     }
+    boolean mapperKind = isMapperKind(asset);
+    log.info(
+        "asset key:{}, mapper kind:{}, event extend common:{}",
+        asset.getMetadata().getKey(),
+        mapperKind,
+        event.isExtendCommon());
+    if (mapperKind) {
+      asset.getMetadata().getLabels().put(EXTEND_COMMON, String.valueOf(event.isExtendCommon()));
+    }
     if (event.isMergeLabels() && assetService.existed(asset.getMetadata().getKey())) {
       UnifiedAssetDto db = assetService.findOne(asset.getMetadata().getKey());
       Map<String, String> labels = new HashMap<>();
-      labels.put(EXTEND_COMMON, String.valueOf(event.isExtendCommon()));
       Optional.ofNullable(db)
           .map(UnifiedAssetDto::getMetadata)
           .map(Metadata::getLabels)
@@ -142,5 +154,10 @@ public class DataIngestionJob {
 
   public Optional<FileContentDescriptor> readFile(String fullPath) {
     return resourceLoaderFactory.readFile(fullPath);
+  }
+
+  public boolean isMapperKind(UnifiedAsset asset) {
+    return asset != null
+        && AssetKindEnum.COMPONENT_API_TARGET_MAPPER.getKind().equals(asset.getKind());
   }
 }
