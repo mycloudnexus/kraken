@@ -212,6 +212,7 @@ const RequestItem = ({ item, index }: Props) => {
         sourceType === "integer" ? Number(item.trim()) : item.trim()
       );
     set(newRequest, `[${index}].sourceValues`, discreteArray);
+    set(newRequest, `[${index}].discrete`, true);
     setRequestMapping(newRequest);
   };
 
@@ -230,6 +231,7 @@ const RequestItem = ({ item, index }: Props) => {
         `[${index}].sourceValues`,
         Object.values(continuousInput)
       );
+      set(newRequest, `[${index}].discrete`, false);
       setRequestMapping(newRequest);
     }
   }, [continuousInput]);
