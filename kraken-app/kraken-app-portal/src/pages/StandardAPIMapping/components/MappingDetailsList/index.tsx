@@ -42,20 +42,11 @@ const MappingDetailsList = ({
       setActivePath(initialMapItem.path);
       setActiveSelected(initialMapItem);
     }
-  }, [activePath]);
+  }, [activePath, targetKey]);
 
   useEffect(() => {
     initList();
   }, [window.location.pathname]);
-
-  const handleSelection = useCallback(
-    (mapItem: IMapperDetails) => {
-      setRightSideInfo(undefined);
-      setActiveSelected(mapItem);
-      setActiveTab("request");
-    },
-    [setActiveSelected, setSelectedKey]
-  );
 
   const optionsList = useMemo(() => {
     const list = [];
@@ -78,7 +69,8 @@ const MappingDetailsList = ({
 
   const handleChange = (_: string, option: Option | Option[]) => {
     if (Array.isArray(option)) return;
-    handleSelection(option.item);
+    setRightSideInfo(undefined);
+    setActiveTab("request");
     navigate(`/api-mapping/${componentId}/${option.value}`);
   };
 
