@@ -1,8 +1,7 @@
 package com.consoleconnect.kraken.operator.gateway.service;
 
 import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.COMPONENT_SELLER_CONTACT;
-import static com.consoleconnect.kraken.operator.core.toolkit.Constants.ORDER_KEY_WORD;
-import static com.consoleconnect.kraken.operator.core.toolkit.Constants.QUOTE_KEY_WORD;
+import static com.consoleconnect.kraken.operator.core.toolkit.Constants.*;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -27,8 +26,12 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.*;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
+import org.springframework.mock.web.server.MockServerWebExchange;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.web.server.ServerWebExchange;
 
 @Slf4j
 @MockIntegrationTest
@@ -46,7 +49,8 @@ class SellerContactInjectorTest extends AbstractIntegrationTest implements Selle
   @Order(1)
   void givenNotExistedTargetKey_whenInjection_thenReturnDirectly() {
     Map<String, Object> inputs = buildInputs();
-    inject(inputs, "mef.sonata.api-target.order.eline.add1");
+    ServerWebExchange exchange = Mockito.mock(ServerWebExchange.class);
+    inject(exchange, inputs, "mef.sonata.api-target.order.eline.add1");
     String bodyStr = JsonToolkit.toJson(inputs);
     log.info(bodyStr);
     assertThat(bodyStr, hasJsonPath("$.env.seller", notNullValue()));
@@ -60,7 +64,7 @@ class SellerContactInjectorTest extends AbstractIntegrationTest implements Selle
   @Order(2)
   void givenNotExistSellerContactKey_whenInjection_thenReturnOK() {
     Map<String, Object> inputs = buildInputs();
-    inject(inputs, "mef.sonata.api-target.order.eline.add");
+    inject(Mockito.mock(ServerWebExchange.class), inputs, "mef.sonata.api-target.order.eline.add");
     String bodyStr = JsonToolkit.toJson(inputs);
     log.info(bodyStr);
     assertThat(bodyStr, hasJsonPath("$.env.seller", notNullValue()));
@@ -85,8 +89,10 @@ class SellerContactInjectorTest extends AbstractIntegrationTest implements Selle
         unifiedAssetService.syncAsset(productId, sellerContactAsset, syncMetadata, true);
     Assertions.assertNotNull(ingestionDataResult);
     Map<String, Object> inputs = buildInputs();
-
-    inject(inputs, "mef.sonata.api-target.order.eline.add");
+    ServerWebExchange exchange =
+        MockServerWebExchange.from(MockServerHttpRequest.get("/test").build());
+    exchange.getAttributes().put(ENV, new HashMap<>());
+    inject(exchange, inputs, "mef.sonata.api-target.order.eline.add");
     String bodyStr = JsonToolkit.toJson(inputs);
     log.info(bodyStr);
     assertThat(bodyStr, hasJsonPath("$.env.seller", notNullValue()));
@@ -94,6 +100,12 @@ class SellerContactInjectorTest extends AbstractIntegrationTest implements Selle
     assertThat(bodyStr, hasJsonPath("$.env.seller.role", notNullValue()));
     assertThat(bodyStr, hasJsonPath("$.env.seller.emailAddress", notNullValue()));
     assertThat(bodyStr, hasJsonPath("$.env.seller.name", equalTo("test-new-seller-contact")));
+    ServerWebExchange exchange1 =
+        MockServerWebExchange.from(MockServerHttpRequest.get("/test").build());
+    inject(exchange1, inputs, "mef.sonata.api-target.order.eline.add");
+    assertThat(
+        JsonToolkit.toJson(exchange.getAttributes().get("env")),
+        hasJsonPath("$.seller.name", equalTo("test-new-seller-contact")));
   }
 
   private UnifiedAsset createSellerContact(
