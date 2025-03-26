@@ -92,7 +92,6 @@ class SellerContactInjectorTest extends AbstractIntegrationTest implements Selle
     Map<String, Object> inputs = buildInputs();
     ServerWebExchange exchange =
         MockServerWebExchange.from(MockServerHttpRequest.get("/test").build());
-    exchange.getAttributes().put("env", new HashMap<>());
     inject(exchange, inputs, "mef.sonata.api-target.order.eline.add");
     String bodyStr = JsonToolkit.toJson(inputs);
     log.info(bodyStr);
@@ -101,6 +100,9 @@ class SellerContactInjectorTest extends AbstractIntegrationTest implements Selle
     assertThat(bodyStr, hasJsonPath("$.env.seller.role", notNullValue()));
     assertThat(bodyStr, hasJsonPath("$.env.seller.emailAddress", notNullValue()));
     assertThat(bodyStr, hasJsonPath("$.env.seller.name", equalTo("test-new-seller-contact")));
+    ServerWebExchange exchange1 =
+        MockServerWebExchange.from(MockServerHttpRequest.get("/test").build());
+    inject(exchange1, inputs, "mef.sonata.api-target.order.eline.add");
     assertThat(
         JsonToolkit.toJson(exchange.getAttributes().get("env")),
         hasJsonPath("$.seller.name", equalTo("test-new-seller-contact")));
