@@ -17,7 +17,7 @@ import org.springframework.core.io.ResourceLoader;
 class ApiActivityLogHelperTest {
 
   @Test
-  void testExtractRequestPayload() {
+  void testExtractRequestPayloadWithMultiHeaderValues() {
     LogTaskRequest logTaskRequest = new LogTaskRequest();
     logTaskRequest.setRequestPayload(readFileToString("mockData/workflowRequest.json"));
     ApiActivityRequestLog requestLog = ApiActivityLogHelper.extractRequestLog(logTaskRequest);
@@ -25,11 +25,25 @@ class ApiActivityLogHelperTest {
     Assertions.assertEquals("/qe1company/ports/order", requestLog.getPath());
     Assertions.assertEquals("PUT", requestLog.getMethod());
     Assertions.assertEquals("v", requestLog.getQueryParameters().get("q"));
-    Assertions.assertEquals("HEADER_VAL1", requestLog.getHeaders().get("TEST_HEADER"));
+    Assertions.assertEquals("HEADER_VAL1,HEADER_VAL2", requestLog.getHeaders().get("TEST_HEADER"));
 
     Map<String, Object> body =
         (Map<String, Object>) JsonToolkit.fromJson((String) requestLog.getRequest(), Map.class);
     Assertions.assertEquals("test-qc01", body.get("portName"));
+  }
+
+  @Test
+  void testExtractRequestPayloadWithSingleHeaderValue() {
+    LogTaskRequest logTaskRequest = new LogTaskRequest();
+    logTaskRequest.setRequestPayload(
+        readFileToString("mockData/workflowRequestSingleHeaderValue.json"));
+    ApiActivityRequestLog requestLog = ApiActivityLogHelper.extractRequestLog(logTaskRequest);
+    Assertions.assertEquals("https://localhost/qe1company/ports/order?q=v", requestLog.getUri());
+    Assertions.assertEquals("/qe1company/ports/order", requestLog.getPath());
+    Assertions.assertEquals("PUT", requestLog.getMethod());
+    Assertions.assertEquals("v", requestLog.getQueryParameters().get("q"));
+    Assertions.assertEquals(
+        "8ebaea07-a755-4671-8a36-2ef0571ce464", requestLog.getHeaders().get("x-request-id"));
   }
 
   @Test
