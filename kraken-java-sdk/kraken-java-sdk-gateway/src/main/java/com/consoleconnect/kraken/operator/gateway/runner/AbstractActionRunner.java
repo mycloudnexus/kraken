@@ -12,6 +12,7 @@ import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.MapUtils;
 import org.springframework.web.server.ServerWebExchange;
 
 @Getter
@@ -20,6 +21,7 @@ import org.springframework.web.server.ServerWebExchange;
 public abstract class AbstractActionRunner implements ResponseCodeTransform, MappingTransformer {
 
   public static final String ATTRIBUTE_KEY_PREFIX = "x-kraken-";
+  public static final String ENV = "env";
 
   private final AppProperty appProperty;
 
@@ -69,7 +71,11 @@ public abstract class AbstractActionRunner implements ResponseCodeTransform, Map
       ServerWebExchange exchange, ComponentAPIFacets.Action action, Map<String, Object> env) {
 
     Map<String, Object> context = new HashMap<>();
-    if (env != null) context.put("env", env);
+    if (MapUtils.isNotEmpty(env)) {
+      context.put(ENV, env);
+    } else if (exchange.getAttributes().containsKey(ENV)) {
+      context.put(ENV, exchange.getAttributes().get(ENV));
+    }
 
     flowToContext(exchange, context, KrakenFilterConstants.X_ORIGINAL_REQUEST_BODY, "body");
 
