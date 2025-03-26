@@ -57,6 +57,12 @@ public interface SellerContactInjector extends ApiUseCaseSelector, AssetKeyGener
     currentSeller.setRole(sellerInfo.getRole());
     envMap.put(SELLER_KEY_WORD, currentSeller);
     inputs.put(ENV, envMap);
-    exchange.getAttributes().put(ENV, envMap);
+    if (exchange.getAttributes().containsKey(ENV)) {
+      Map<String, Object> env = (Map<String, Object>) exchange.getAttributes().get(ENV);
+      env.put(SELLER_KEY_WORD, currentSeller);
+      exchange.getAttributes().put(ENV, env);
+    } else {
+      exchange.getAttributes().put(ENV, envMap);
+    }
   }
 }
