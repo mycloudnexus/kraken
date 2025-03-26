@@ -1,6 +1,7 @@
 import LogMethodTag from "@/components/LogMethodTag";
 import TrimmedPath from "@/components/TrimmedPath";
 import { useGetProductEnvActivities } from "@/hooks/product";
+import { useGetProductTypes } from "@/hooks/product";
 import { useCommonListProps } from "@/hooks/useCommonListProps";
 import { toDateTime } from "@/libs/dayjs";
 import { useAppStore } from "@/stores/app.store";
@@ -163,6 +164,8 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
     envActivityParams.params
   );
 
+  const { data: productTypes } = useGetProductTypes(currentProduct);
+
   const methodOptions = [
     {
       text: "POST",
@@ -241,24 +244,10 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
     },
   ];
 
-  const productOptions = [
-    {
-      value: "ACCESS_E_LINE",
-      text: getProductName("ACCESS_E_LINE"),
-    },
-    {
-      value: "UNI",
-      text: getProductName("UNI"),
-    },
-    {
-      value: "INTERNET_ACCESS",
-      text: getProductName("INTERNET_ACCESS"),
-    },
-    {
-      value: "SHARE",
-      text: getProductName("SHARE"),
-    },
-  ];
+  const productOptions =
+    productTypes?.map((type: string) => {
+      return { value: type, text: getProductName(type) };
+    }) ?? [];
 
   const handleTimeFilter = () => {
     setQueryParams({
