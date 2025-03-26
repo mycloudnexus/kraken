@@ -156,6 +156,7 @@ const PushHistoryDrawer = ({ isOpen, onClose, envOptions }: Props) => {
       open={isOpen}
       onClose={onClose}
       className={styles.modal}
+      maskClosable={false}
       title={
         <Flex justify="space-between">
           <span>Push log</span>
