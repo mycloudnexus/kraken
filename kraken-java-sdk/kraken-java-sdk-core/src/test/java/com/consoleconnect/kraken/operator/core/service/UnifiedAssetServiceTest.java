@@ -14,9 +14,11 @@ import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
 import com.consoleconnect.kraken.operator.core.enums.AssetStatusEnum;
 import com.consoleconnect.kraken.operator.core.event.IngestionDataResult;
+import com.consoleconnect.kraken.operator.core.model.HttpTask;
 import com.consoleconnect.kraken.operator.core.model.SyncMetadata;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
+import com.consoleconnect.kraken.operator.core.model.facet.ComponentWorkflowFacets;
 import com.consoleconnect.kraken.operator.core.toolkit.*;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
@@ -32,6 +34,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.util.CollectionUtils;
 
 @Slf4j
 @MockIntegrationTest
@@ -39,6 +42,8 @@ import org.springframework.test.context.ContextConfiguration;
 class UnifiedAssetServiceTest extends AbstractIntegrationTest {
 
   @Autowired private UnifiedAssetService unifiedAssetService;
+
+  @Autowired private MergeService mergeService;
 
   private static final String MAPPER_REQUEST = "request";
 
@@ -179,7 +184,7 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
 
   @SneakyThrows
   @Test
-  void givenSourceValues_whenMerge_thenReturnOK() {
+  void givenSourceValues_whenMergeApiMappers_thenReturnOK() {
     String s1 = readFileToString("data/mapper_old.json");
     Map<String, Map<String, ComponentAPITargetFacets.Mapper>> existMapperMap =
         JsonToolkit.fromJson(s1, new TypeReference<>() {});
@@ -298,6 +303,59 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
         "mapper.testcase06.mergeSystemToCustomizedMapping", newMapperMap, expectedResults);
   }
 
+  @Test
+  void givenSourceValues_whenMergeApiWorkflows_thenReturnOK() {
+    UnifiedAsset assetOld = loadAsset("data/workflow_old.yaml");
+    UnifiedAsset assetNew = loadAsset("data/workflow_new.yaml");
+    UnifiedAsset expectedMerged = loadAsset("data/workflow_merged.yaml");
+
+    IngestionDataResult ingestionDataResult =
+        unifiedAssetService.syncAsset(
+            "product.mef.sonata.api",
+            assetOld,
+            new SyncMetadata("", "", DateTime.nowInUTCString(), ""),
+            true);
+    UnifiedAssetEntity assetEntity = ingestionDataResult.getData();
+    Map<String, Object> result = UnifiedAssetService.mergeFacets(assetEntity, assetNew.getFacets());
+    verifyWorkflow(result, expectedMerged.getFacets());
+  }
+
+  private void verifyWorkflow(Map<String, Object> actual, Map<String, Object> expected) {
+    ComponentWorkflowFacets actualFacets =
+        JsonToolkit.fromJson(JsonToolkit.toJson(actual), ComponentWorkflowFacets.class);
+    ComponentWorkflowFacets expectedFacets =
+        JsonToolkit.fromJson(JsonToolkit.toJson(expected), ComponentWorkflowFacets.class);
+    verifyMergedTask(
+        actualFacets.getValidationStage().get(0), expectedFacets.getValidationStage().get(0));
+    verifyMergedTask(
+        actualFacets.getPreparationStage().get(0), expectedFacets.getPreparationStage().get(0));
+    verifyMergedTask(
+        actualFacets.getExecutionStage().get(0), expectedFacets.getExecutionStage().get(0));
+  }
+
+  private void verifyMergedTask(HttpTask actualTask, HttpTask expectedTask) {
+    Assertions.assertEquals(expectedTask.getTaskName(), actualTask.getTaskName());
+    Assertions.assertEquals(expectedTask.getTaskType(), actualTask.getTaskType());
+    Assertions.assertEquals(expectedTask.getNotificationUrl(), actualTask.getNotificationUrl());
+
+    verifyMergedMapper(
+        actualTask.getEndpoint().getMappers().getRequest().get(0),
+        expectedTask.getEndpoint().getMappers().getRequest().get(0));
+
+    Assertions.assertEquals(
+        expectedTask.getConditionCheck().getJoin(), actualTask.getConditionCheck().getJoin());
+    if (!CollectionUtils.isEmpty(expectedTask.getConditionCheck().getConditionItems())) {
+      Assertions.assertEquals(
+          expectedTask.getConditionCheck().getConditionItems().get(0).getExpression(),
+          actualTask.getConditionCheck().getConditionItems().get(0).getExpression());
+    }
+  }
+
+  @SneakyThrows
+  private UnifiedAsset loadAsset(String path) {
+    return YamlToolkit.parseYaml(readFileToString(path), UnifiedAsset.class).get();
+  }
+
   private void verifyDeletedMapper(
       String testcase, Map<String, Map<String, ComponentAPITargetFacets.Mapper>> mergedMapperMap) {
     verifyDeletedMapper(mergedMapperMap, testcase, MAPPER_REQUEST);
@@ -329,6 +387,12 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
     ComponentAPITargetFacets.Mapper mergedMapper = mergedMapperMap.get(fullName).get(mapperSection);
     ComponentAPITargetFacets.Mapper expectedMapper =
         expectedMapperMap.get(fullName).get(mapperSection);
+    verifyMergedMapper(mergedMapper, expectedMapper);
+  }
+
+  private void verifyMergedMapper(
+      ComponentAPITargetFacets.Mapper mergedMapper,
+      ComponentAPITargetFacets.Mapper expectedMapper) {
     Assertions.assertEquals(expectedMapper.getTitle(), mergedMapper.getTitle());
     Assertions.assertEquals(expectedMapper.getName(), mergedMapper.getName());
     Assertions.assertEquals(expectedMapper.getDescription(), mergedMapper.getDescription());
@@ -377,8 +441,10 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
 
       String result1 = JsonToolkit.toJson(facetsOld);
       Assertions.assertNotNull(result1);
-      Map<String, Object> map = UnifiedAssetService.mergeFacets(facetsOld, facetsNew);
-      String result2 = JsonToolkit.toJson(map);
+      ComponentAPITargetFacets.Endpoint endpointOld = facetsOld.getEndpoints().get(0);
+      ComponentAPITargetFacets.Endpoint endpointNew = facetsNew.getEndpoints().get(0);
+      UnifiedAssetService.mergeEndpoint(endpointOld, endpointNew);
+      String result2 = JsonToolkit.toJson(facetsNew);
       Assertions.assertNotNull(result2);
       assertThat(result2, hasJsonPath("$.endpoints[0].mappers.request", hasSize(9)));
       assertThat(result2, hasJsonPath("$.endpoints[0].mappers.response", hasSize(10)));
