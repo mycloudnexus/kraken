@@ -14,25 +14,30 @@ import { useBuyerStore } from "@/stores/buyer.store";
 import { IBuyer } from "@/utils/types/component.type";
 import { Button, Flex, Popconfirm, Table, notification } from "antd";
 import { get } from "lodash";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useBoolean } from "usehooks-ts";
 import { ContentTime } from "../NewAPIMapping/components/DeployHistory/ContentTime";
 import NewBuyerModal from "./components/NewBuyerModal";
 import RegenToken from "./components/RegenToken";
+import TokenModal from "./components/TokenModal";
 import styles from "./index.module.scss";
 
 const Buyer = () => {
   const { currentProduct } = useAppStore();
   const { params, setParams, resetParams } = useBuyerStore();
-  const { data: dataList, isLoading } = useGetBuyerList(
-    currentProduct,
-    params
-  );
+  const { data: dataList, isLoading } = useGetBuyerList(currentProduct, params);
   const {
     value: isModalVisible,
     setFalse: hideModal,
     setTrue: showModal,
   } = useBoolean(false);
+
+  const {
+    value: isReactivateModalVisible,
+    setFalse: hideReactivateModal,
+    setTrue: showReactivateModal,
+  } = useBoolean(false);
+  const [responseItem, setResponseItem] = useState<IBuyer>();
   const { mutateAsync: runActive } = useActiveBuyer();
   const { mutateAsync: runDeactive } = useDeactiveBuyer();
   const ref = useRef<any>();
@@ -45,9 +50,8 @@ const Buyer = () => {
         id,
       } as any);
       if (res) {
-        notification.success({
-          message: get(res, "message", "Success!"),
-        });
+        setResponseItem(get(res, "data"));
+        showReactivateModal();
       }
     } catch (error) {
       notification.error({
@@ -201,6 +205,14 @@ const Buyer = () => {
         onClose={hideModal}
         currentEnv={params.envId ?? ""}
       />
+
+      {responseItem && (
+        <TokenModal
+          open={isReactivateModalVisible}
+          onClose={hideReactivateModal}
+          item={responseItem}
+        />
+      )}
     </PageLayout>
   );
 };
