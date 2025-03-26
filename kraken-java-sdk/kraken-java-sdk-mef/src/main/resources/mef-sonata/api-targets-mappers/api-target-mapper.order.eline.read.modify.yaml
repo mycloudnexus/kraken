@@ -2,8 +2,8 @@
 kind: kraken.component.api-target-mapper
 apiVersion: v1
 metadata:
-  key: mef.sonata.api-target-mapper.order.eline.read.delete
-  name:  Mapper Of Reading Order Connection with Delete Action
+  key: mef.sonata.api-target-mapper.order.eline.read.modify
+  name:  Mapper Of Reading Order Connection with Modify Action
   description: This operation retrieves a ProductOrder entity
 spec:
   trigger:
