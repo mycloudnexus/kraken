@@ -1,0 +1,13 @@
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.1.7.32
+  name: V1.7.32
+  labels:
+    productSpec: grace
+    productVersion: V1.7.32
+    publishDate: 2025-03-26
+  description: |
+    Add mock response action in inventory list to apply workflow case
+  version: 1
