@@ -120,5 +120,6 @@ public class ComponentAPIFacets {
     private String path;
     private String method;
     private List<String> productTypes;
+    private String supportedConfig;
   }
 }

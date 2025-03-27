@@ -12,8 +12,10 @@ spec:
   supportedProductTypesAndActions:
     - path: /mefApi/sonata/geographicAddressManagement/v7/geographicAddressValidation
       method: post
+      supportedConfig: $.address
     - path: /mefApi/sonata/geographicAddressManagement/v7/geographicAddress/{id}
       method: get
+      supportedConfig: $.address
   mappings:
     - uri: ${env.target.url}
       trigger:

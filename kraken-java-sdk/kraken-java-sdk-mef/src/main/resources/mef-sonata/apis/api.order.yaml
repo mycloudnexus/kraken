@@ -17,20 +17,14 @@ spec:
         - add
         - modify
         - delete
-      productTypes:
-        - UNI
-        - ACCESS_E_LINE
-        - INTERNET_ACCESS
+      supportedConfig: $.order
     - path: /mefApi/sonata/productOrderingManagement/v10/productOrder/{id}
       method: get
       actionTypes:
         - add
         - modify
         - delete
-      productTypes:
-        - UNI
-        - ACCESS_E_LINE
-        - INTERNET_ACCESS
+      supportedConfig: $.order
   mappings:
     - uri: ${env.target.url}
       trigger:

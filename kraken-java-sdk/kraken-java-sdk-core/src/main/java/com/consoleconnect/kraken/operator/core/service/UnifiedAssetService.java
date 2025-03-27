@@ -1,7 +1,9 @@
 package com.consoleconnect.kraken.operator.core.service;
 
+import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.COMPONENT_API;
 import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.COMPONENT_API_TARGET_MAPPER;
 import static com.consoleconnect.kraken.operator.core.toolkit.LabelConstants.FUNCTION_JSON_EXTRACT_PATH_TEXT;
+import static com.consoleconnect.kraken.operator.core.toolkit.StringUtils.readWithJsonPath;
 
 import com.consoleconnect.kraken.operator.core.dto.AssetLinkDto;
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
@@ -15,6 +17,7 @@ import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.ingestion.ResourceLoaderFactory;
 import com.consoleconnect.kraken.operator.core.mapper.AssetMapper;
 import com.consoleconnect.kraken.operator.core.model.*;
+import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPIFacets;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentWorkflowFacets;
 import com.consoleconnect.kraken.operator.core.repo.AssetFacetRepository;
@@ -123,11 +126,47 @@ public class UnifiedAssetService implements UUIDWrapper, FacetsMerger {
       if (facetIncluded && StringUtils.isNotBlank(parentProductType)) {
         List<UnifiedAssetDto> assetDtoList = filterByParentProductType(data, parentProductType);
         Page<UnifiedAssetDto> pagedData = PagingHelper.paginateList(assetDtoList, pageRequest);
+        // set supported product type from config
+        fillSupportedProductType(pagedData.getContent());
         return PagingHelper.toPaging(pagedData, x -> x);
       }
     }
     Page<UnifiedAssetEntity> pagedData = PagingHelper.paginateList(data, pageRequest);
-    return PagingHelper.toPaging(pagedData, entity -> toAsset(entity, facetIncluded));
+    Paging<UnifiedAssetDto> paging =
+        PagingHelper.toPaging(pagedData, entity -> toAsset(entity, facetIncluded));
+    fillSupportedProductType(paging.getData());
+    return paging;
+  }
+
+  public void fillSupportedProductType(List<UnifiedAssetDto> content) {
+    content.stream()
+        .filter(v -> v.getKind().equalsIgnoreCase(COMPONENT_API.getKind()) && v.getFacets() != null)
+        .forEach(
+            asset -> {
+              ComponentAPIFacets facets = UnifiedAsset.getFacets(asset, ComponentAPIFacets.class);
+              List<ComponentAPIFacets.SupportedProductAndAction> supportedTypesAndActions =
+                  facets.getSupportedProductTypesAndActions();
+              if (supportedTypesAndActions == null) {
+                return;
+              }
+              supportedTypesAndActions.stream()
+                  .forEach(
+                      typeAndAction -> {
+                        try {
+                          typeAndAction.setProductTypes(
+                              (List<String>)
+                                  readWithJsonPath(
+                                      JsonToolkit.fromJson(
+                                          JsonToolkit.toJson(
+                                              appProperty.getSupportedProductTypes()),
+                                          Map.class),
+                                      typeAndAction.getSupportedConfig()));
+                        } catch (Exception e) {
+                          log.warn("no supported type configuration");
+                        }
+                      });
+              asset.setFacets(JsonToolkit.fromJson(JsonToolkit.toJson(facets), Map.class));
+            });
   }
 
   private List<UnifiedAssetEntity> filterExcludedAssets(List<UnifiedAssetEntity> data) {
