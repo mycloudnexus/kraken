@@ -231,4 +231,19 @@ class ComponentControllerTest extends AbstractIntegrationTest {
           assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(0)));
         });
   }
+
+  @Test
+  void givenSupportedProductTypeConfig_whenSearch_thenReturnOK() {
+    String path = String.format("%s/%s/components", PRODUCT_BASE_PATH, PRODUCT_ID);
+    testClientHelper.getAndVerify(
+        (uriBuilder ->
+            uriBuilder
+                .path(path)
+                .queryParam("kind", AssetKindEnum.COMPONENT_API.getKind())
+                .build()),
+        bodyStr -> {
+          System.out.println(bodyStr);
+          assertThat(bodyStr, hasJsonPath("$.data", notNullValue()));
+        });
+  }
 }
