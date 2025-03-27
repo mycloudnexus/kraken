@@ -42,7 +42,9 @@ spec:
     - classpath:/mef-sonata/api-targets/api-target.order.eline.add.yaml
     - classpath:/mef-sonata/api-targets/api-target.order.eline.read.yaml
     - classpath:/mef-sonata/api-targets/api-target.order.eline.delete.yaml
+    - classpath:/mef-sonata/api-targets/api-target.order.eline.modify.yaml
     - classpath:/mef-sonata/api-targets/api-target.order.eline.read.delete.yaml
+    - classpath:/mef-sonata/api-targets/api-target.order.eline.read.modify.yaml
     - classpath:/mef-sonata/api-targets/api-target.inventory.uni.list.yaml
     - classpath:/mef-sonata/api-targets/api-target.inventory.uni.read.yaml
     - classpath:/mef-sonata/api-targets/api-target.inventory.eline.list.yaml
@@ -101,6 +103,8 @@ spec:
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.eline.read.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.eline.delete.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.eline.read.delete.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.eline.modify.yaml
+    - classpath:/mef-sonata/mapping-matrix/mapping.matrix.order.eline.read.modify.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.inventory.uni.list.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.inventory.uni.read.yaml
     - classpath:/mef-sonata/mapping-matrix/mapping.matrix.inventory.eline.list.yaml
@@ -109,7 +113,7 @@ spec:
     - classpath:/mef-sonata/api-workflow/api-workflow.order.uni.delete.yaml
     - classpath:/mef-sonata/api-workflow/api-workflow.order.uni.add.yaml
     - classpath:/mef-sonata/api-workflow/api-workflow.order.eline.add.yaml
-    - classpath:/mef-sonata/template-upgrade/release.1.7.32.yaml
+    - classpath:/mef-sonata/template-upgrade/release.1.7.33.yaml
 
   templateUpgradePaths:
     - classpath:/mef-sonata/apis/api.address.yaml

@@ -1,0 +1,13 @@
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.1.7.33
+  name: V1.7.33
+  labels:
+    productSpec: grace
+    productVersion: V1.7.33
+    publishDate: 2025-03-27
+  description: |
+    Add modify related files
+  version: 1
