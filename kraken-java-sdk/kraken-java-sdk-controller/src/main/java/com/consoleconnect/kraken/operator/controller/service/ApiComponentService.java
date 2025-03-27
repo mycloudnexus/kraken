@@ -603,4 +603,18 @@ public class ApiComponentService
             .toList());
     return componentProductCategoryDTO;
   }
+
+  @Transactional(readOnly = true)
+  public List<String> findRelatedAssetKeys(String key, ApiUseCaseDto usecase) {
+    UnifiedAssetEntity mapperEntity = unifiedAssetService.findOneByIdOrKey(key);
+    boolean workflowEnabled = isWorkflowEnabled(mapperEntity);
+    return usecase.membersDeployable(workflowEnabled);
+  }
+
+  private boolean isWorkflowEnabled(UnifiedAssetEntity mapperEntity) {
+    UnifiedAssetDto mapperAsset = UnifiedAssetService.toAsset(mapperEntity, true);
+    ComponentAPITargetFacets mapperFacets =
+        UnifiedAsset.getFacets(mapperAsset, ComponentAPITargetFacets.class);
+    return mapperFacets.getWorkflow() != null && mapperFacets.getWorkflow().isEnabled();
+  }
 }
