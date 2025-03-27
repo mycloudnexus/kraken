@@ -16,6 +16,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
 public interface FacetsMerger extends CommonMapperExtender {
@@ -239,6 +240,18 @@ public interface FacetsMerger extends CommonMapperExtender {
     ComponentAPITargetFacets.Endpoint endpointOld = facetsOld.getEndpoints().get(0);
     ComponentAPITargetFacets.Endpoint endpointNew = facetsNew.getEndpoints().get(0);
     mergeEndpoint(endpointOld, endpointNew, extendCommon);
+    return JsonToolkit.fromJson(JsonToolkit.toJson(facetsNew), new TypeReference<>() {});
+  }
+
+  default Map<String, Object> extendCommonNodesInFacets(
+      boolean extendCommon, Map<String, Object> facetsUpdated) {
+    if (!extendCommon || MapUtils.isEmpty(facetsUpdated)) {
+      return facetsUpdated;
+    }
+    ComponentAPITargetFacets facetsNew =
+        JsonToolkit.fromJson(JsonToolkit.toJson(facetsUpdated), ComponentAPITargetFacets.class);
+    ComponentAPITargetFacets.Endpoint endpointNew = facetsNew.getEndpoints().get(0);
+    extendCommonMapper(endpointNew);
     return JsonToolkit.fromJson(JsonToolkit.toJson(facetsNew), new TypeReference<>() {});
   }
 }

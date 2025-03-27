@@ -27,6 +27,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.*;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.MapUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -522,5 +523,26 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
     data.getMetadata().getLabels().put(LabelConstants.EXTEND_COMMON, String.valueOf(Boolean.TRUE));
     boolean result = unifiedAssetService.checkExtendCommon(data);
     Assertions.assertTrue(result);
+  }
+
+  @Test
+  void givenEmptyUpdatedFacets_whenExtendCommon_thenReturnEmpty() {
+    Map<String, Object> facetsUpdated = new HashMap<>();
+    Map<String, Object> result = unifiedAssetService.extendCommonNodesInFacets(true, facetsUpdated);
+    Assertions.assertTrue(MapUtils.isEmpty(result));
+  }
+
+  @SneakyThrows
+  @Test
+  void givenExistedUpdateFacets_whenExtendCommon_thenReturnOK() {
+    String targetApiPath2 = "data/api-target-mapper.inventory.uni.list-2.yaml";
+    Optional<UnifiedAsset> unifiedAssetOptNew =
+        YamlToolkit.parseYaml(readFileToString(targetApiPath2), UnifiedAsset.class);
+    if (unifiedAssetOptNew.isPresent()) {
+      UnifiedAsset assetNew = unifiedAssetOptNew.get();
+      Map<String, Object> result =
+          unifiedAssetService.extendCommonNodesInFacets(true, assetNew.getFacets());
+      Assertions.assertTrue(MapUtils.isNotEmpty(result));
+    }
   }
 }
