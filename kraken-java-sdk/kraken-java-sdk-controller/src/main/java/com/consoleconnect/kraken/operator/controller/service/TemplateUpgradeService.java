@@ -918,6 +918,9 @@ public class TemplateUpgradeService implements ApiUseCaseSelector {
     checkIsLatestUpgrade(event.getTemplateUpgradeId(), true);
     List<ApiMapperDeploymentDTO> stageRunningMappers =
         productDeploymentService.listRunningApiMapperDeploymentV3(event.getEnvId());
+    if (stageRunningMappers.isEmpty()) {
+      throw KrakenException.notFound("No running mapper found for upgrading template");
+    }
     List<String> runningMapperKeys =
         stageRunningMappers.stream().map(ApiMapperDeploymentDTO::getTargetMapperKey).toList();
     boolean existedInCompleted =
