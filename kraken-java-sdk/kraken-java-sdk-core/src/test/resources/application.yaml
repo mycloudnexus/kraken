@@ -143,3 +143,18 @@ app:
     mef.sonata.api-target-mapper.inventory.eline.list: <1,2>
     mef.sonata.api-target-mapper.inventory.uni.read: <2,1>
     mef.sonata.api-target-mapper.inventory.eline.read: <2,2>
+  supported-product-types:
+    address:
+      - SHARE
+    order:
+      - UNI
+      - ACCESS_E_LINE
+    quote:
+      - UNI
+      - ACCESS_E_LINE
+    poq:
+      - UNI
+      - ACCESS_E_LINE
+    inventory:
+      - UNI
+      - ACCESS_E_LINE
