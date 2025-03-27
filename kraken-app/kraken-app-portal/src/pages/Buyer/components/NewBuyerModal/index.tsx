@@ -1,13 +1,13 @@
-import { Flex, Form, Input, Modal, Tooltip, notification } from "antd";
-import styles from "./index.module.scss";
-import { useAppStore } from "@/stores/app.store";
 import { useCreateBuyer } from "@/hooks/product";
-import { get } from "lodash";
-import { useEffect, useState } from "react";
-import TokenModal from "../TokenModal";
-import { useBoolean } from "usehooks-ts";
+import { useAppStore } from "@/stores/app.store";
 import { IBuyer } from "@/utils/types/component.type";
 import { InfoCircleOutlined } from "@ant-design/icons";
+import { Flex, Form, Input, Modal, Tooltip, notification } from "antd";
+import { get } from "lodash";
+import { useEffect, useState } from "react";
+import { useBoolean } from "usehooks-ts";
+import TokenModal from "../TokenModal";
+import styles from "./index.module.scss";
 
 type Props = {
   open: boolean;
@@ -77,6 +77,7 @@ const NewBuyerModal = ({ open, onClose, currentEnv }: Props) => {
         onCancel={onClose}
         title="Add new buyer"
         onOk={form.submit}
+        maskClosable={false}
       >
         <Form form={form} layout="vertical" onFinish={handleOk}>
           <Form.Item
