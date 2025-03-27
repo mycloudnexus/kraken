@@ -272,7 +272,7 @@ public class ApiComponentService
     if (specAssetsPage == null || CollectionUtils.isEmpty(apiAssetsPage.getData())) {
       return result;
     }
-
+    unifiedAssetService.fillSupportedProductType(apiAssetsPage.getData());
     for (UnifiedAsset asset : apiAssetsPage.getData()) {
       ComponentAPIFacets facets = UnifiedAsset.getFacets(asset, ComponentAPIFacets.class);
       if (facets.getSupportedProductTypesAndActions() == null) {
@@ -285,7 +285,9 @@ public class ApiComponentService
                       v.getProductTypes() != null
                           && v.getProductTypes().contains(productType.toUpperCase()))
               .toList();
-
+      if (CollectionUtils.isEmpty(list)) {
+        continue;
+      }
       UnifiedAssetDto specAsset = findSpec(asset, specAssetsPage);
       result.add(constructStandardComponent(asset, list, specAsset, facets));
     }
