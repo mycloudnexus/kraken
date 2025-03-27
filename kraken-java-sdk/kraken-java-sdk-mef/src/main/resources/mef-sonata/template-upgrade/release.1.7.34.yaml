@@ -1,0 +1,13 @@
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.1.7.34
+  name: V1.7.34
+  labels:
+    productSpec: grace
+    productVersion: V1.7.34
+    publishDate: 2025-03-27
+  description: |
+    Introduced a switch to ensure facet merging only occurs in the control plane, and not in the data plane.
+  version: 1
