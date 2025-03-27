@@ -136,7 +136,11 @@ const Buyer = () => {
                   danger: true,
                 }}
               >
-                <Button className={styles.btn} type="link">
+                <Button
+                  className={styles.btn}
+                  type="link"
+                  data-testid={`${record.id}-deactivate`}
+                >
                   Deactivate buyer
                 </Button>
               </Popconfirm>
@@ -146,6 +150,7 @@ const Buyer = () => {
                 className={styles.btn}
                 type="link"
                 onClick={() => handleActive(record.id)}
+                data-testid={`${record.id}-activate`}
               >
                 Activate buyer
               </Button>
