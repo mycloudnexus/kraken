@@ -1,0 +1,14 @@
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.1.7.35
+  name: V1.7.35
+  labels:
+    productSpec: grace
+    productVersion: V1.7.35
+    publishDate: 2025-03-27
+  description: |
+    Introduced a switch to ensure facet merging only occurs in the control plane, and not in the data plane.
+    Fixed the wrong action value for quote eline add and quote eline modify.
+  version: 1
