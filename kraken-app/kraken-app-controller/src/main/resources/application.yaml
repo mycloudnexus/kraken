@@ -254,6 +254,7 @@ app:
     mef.sonata.api-target-mapper.poq.eline.read: <2,2>
     mef.sonata.api-target-mapper.quote.uni.add.sync: <1,1>
     mef.sonata.api-target-mapper.quote.eline.add.sync: <1,2>
+    mef.sonata.api-target-mapper.quote.eline.modify.sync: <1,3>
     mef.sonata.api-target-mapper.quote.uni.read.sync: <2,1>
     mef.sonata.api-target-mapper.quote.eline.read.sync: <2,2>
     mef.sonata.api-target-mapper.quote.uni.add: <1,1>
@@ -264,16 +265,33 @@ app:
     mef.sonata.api-target-mapper.order.eline.add: <1,2>
     mef.sonata.api-target-mapper.order.uni.delete: <1,3>
     mef.sonata.api-target-mapper.order.eline.delete: <1,4>
+    mef.sonata.api-target-mapper.order.eline.modify: <1,5>
     mef.sonata.api-target-mapper.order.uni.read: <2,1>
     mef.sonata.api-target-mapper.order.eline.read: <2,2>
     mef.sonata.api-target-mapper.order.uni.read.delete: <3,1>
     mef.sonata.api-target-mapper.order.eline.read.delete: <3,2>
+    mef.sonata.api-target-mapper.order.eline.read.modify: <3,3>
     mef.sonata.api-target-mapper.inventory.uni.list: <1,1>
     mef.sonata.api-target-mapper.inventory.eline.list: <1,2>
     mef.sonata.api-target-mapper.inventory.uni.read: <2,1>
     mef.sonata.api-target-mapper.inventory.eline.read: <2,2>
   product-types:
-    - UNI
-    - ACCESS_E_LINE
-    - INTERNET_ACCESS
-    - SHARE
+    - "UNI:Uni"
+    - "ACCESS_E_LINE:Access Eline "
+    - "INTERNET_ACCESS:Internet Access"
+    - "SHARE:Shared"
+  supported-product-types:
+    address:
+      - SHARE
+    order:
+      - UNI
+      - ACCESS_E_LINE
+    quote:
+      - UNI
+      - ACCESS_E_LINE
+    poq:
+      - UNI
+      - ACCESS_E_LINE
+    inventory:
+      - UNI
+      - ACCESS_E_LINE

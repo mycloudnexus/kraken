@@ -1,10 +1,11 @@
-import { Input, Modal, Tag } from "antd";
-import Flex from "../Flex";
-import styles from "./index.module.scss";
-import { Text } from "../Text";
-import { useEffect, useState } from "react";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
+import { Input, Modal, Tag } from "antd";
 import { get } from "lodash";
+import { useEffect, useState } from "react";
+import Flex from "../Flex";
+import { Text } from "../Text";
+import styles from "./index.module.scss";
+
 const { TextArea } = Input;
 type Props = {
   attribute: string;
@@ -45,6 +46,7 @@ const ExampleValueModal = ({
       title="Add example value with variable"
       className={styles.modal}
       okButtonProps={{ "data-testid": "example-btn" }}
+      maskClosable={false}
     >
       <Flex justifyContent="flex-start" style={{ marginBottom: 4 }}>
         <Tag color="blue">JSON</Tag>

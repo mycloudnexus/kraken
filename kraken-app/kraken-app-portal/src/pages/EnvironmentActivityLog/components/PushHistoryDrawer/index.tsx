@@ -6,6 +6,7 @@ import { usePostPushActivityLog } from "@/hooks/pushApiEvent";
 import { toDateTime } from "@/libs/dayjs";
 import { useAppStore } from "@/stores/app.store";
 import { TIME_ZONE_FORMAT } from "@/utils/constants/format";
+import { getProductName } from "@/utils/helpers/name";
 import { ICreateActivityHistoryLogRequest } from "@/utils/types/common.type";
 import { CloseOutlined } from "@ant-design/icons";
 import {
@@ -105,17 +106,6 @@ const PushHistoryDrawer = ({ isOpen, onClose, envOptions }: Props) => {
     );
   }, [responseData, form]);
 
-  const getProductName = (product: string) => {
-    switch (product) {
-      case "ACCESS_E_LINE":
-        return "Access Eline";
-      case "UNI":
-        return "UNI";
-      default:
-        return "Internet access";
-    }
-  };
-
   const columns: ColumnsType = [
     {
       title: "Product",
@@ -156,6 +146,7 @@ const PushHistoryDrawer = ({ isOpen, onClose, envOptions }: Props) => {
       open={isOpen}
       onClose={onClose}
       className={styles.modal}
+      maskClosable={false}
       title={
         <Flex justify="space-between">
           <span>Push log</span>
