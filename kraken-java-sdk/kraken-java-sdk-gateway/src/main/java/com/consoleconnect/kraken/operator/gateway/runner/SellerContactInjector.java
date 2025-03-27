@@ -14,13 +14,14 @@ import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.*;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.web.server.ServerWebExchange;
 
 public interface SellerContactInjector extends ApiUseCaseSelector, AssetKeyGenerator {
   String SELLER_KEY_WORD = "seller";
 
   UnifiedAssetService getUnifiedAssetService();
 
-  default void inject(Map<String, Object> inputs, String targetKey) {
+  default void inject(ServerWebExchange exchange, Map<String, Object> inputs, String targetKey) {
     Optional<ApiUseCaseDto> apiUseCaseDtoOptional = findRelatedApiUse(targetKey, findApiUseCase());
     if (apiUseCaseDtoOptional.isEmpty()) {
       return;
@@ -56,5 +57,12 @@ public interface SellerContactInjector extends ApiUseCaseSelector, AssetKeyGener
     currentSeller.setRole(sellerInfo.getRole());
     envMap.put(SELLER_KEY_WORD, currentSeller);
     inputs.put(ENV, envMap);
+    if (exchange.getAttributes().containsKey(ENV)) {
+      Map<String, Object> env = (Map<String, Object>) exchange.getAttributes().get(ENV);
+      env.put(SELLER_KEY_WORD, currentSeller);
+      exchange.getAttributes().put(ENV, env);
+    } else {
+      exchange.getAttributes().put(ENV, envMap);
+    }
   }
 }

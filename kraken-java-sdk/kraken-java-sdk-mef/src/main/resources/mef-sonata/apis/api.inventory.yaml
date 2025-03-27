@@ -13,16 +13,10 @@ spec:
   supportedProductTypesAndActions:
     - path: /mefApi/sonata/productInventory/v7/product
       method: get
-      productTypes:
-        - UNI
-        - ACCESS_E_LINE
-        - INTERNET_ACCESS
+      supportedConfig: $.inventory
     - path: /mefApi/sonata/productInventory/v7/product/{id}
       method: get
-      productTypes:
-        - UNI
-        - ACCESS_E_LINE
-        - INTERNET_ACCESS
+      supportedConfig: $.inventory
   mappings:
     - uri: ${env.target.url}
       trigger:
@@ -105,6 +99,11 @@ spec:
           env:
             path: ${targetApiConfig.endpoints[0].path}
             method: ${targetApiConfig.endpoints[0].method}
+
+        - id: mock-response
+          actionType: buildin@mock-response
+          env:
+            forwardDownstream: ${entity.renderedResponse.uniqueId!=null}
 
         - id: modify-response-body
           actionType: buildin@modify-response-body

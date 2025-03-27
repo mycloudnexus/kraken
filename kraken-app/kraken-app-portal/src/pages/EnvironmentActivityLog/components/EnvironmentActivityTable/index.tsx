@@ -274,7 +274,6 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
       render: (log: IActivityLog) => <LogMethodTag method={log.method} />,
       width: 100,
       filters: methodOptions,
-      filterMultiple: false,
     },
     {
       key: "name",
@@ -298,7 +297,6 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
       width: 140,
       render: (log: IActivityLog) => getStatusCodeWithIcon(log.httpStatusCode),
       filters: statusCodeOptions,
-      filterMultiple: false,
     },
     {
       key: "date",
