@@ -18,4 +18,12 @@ public class ApiUseCaseDto {
         .filter(Objects::nonNull)
         .toList();
   }
+
+  public List<String> membersDeployable(boolean workflowEnabled) {
+    return workflowEnabled
+        ? Stream.of(targetKey, mapperKey, workflowKey, mappingMatrixKey)
+            .filter(Objects::nonNull)
+            .toList()
+        : Stream.of(targetKey, mapperKey, mappingMatrixKey).filter(Objects::nonNull).toList();
+  }
 }
