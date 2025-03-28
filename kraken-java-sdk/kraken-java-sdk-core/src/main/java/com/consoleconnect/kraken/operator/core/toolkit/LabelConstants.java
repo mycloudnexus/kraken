@@ -25,7 +25,11 @@ public class LabelConstants {
   public static final String LABEL_PRODUCT_VERSION = "productVersion";
   public static final String LABEL_PRODUCT_SPEC = "productSpec";
   public static final String LABEL_PUBLISH_DATE = "publishDate";
+  // Used in manage plane
+  public static final String LABEL_PUBLISH_BY = "publishBy";
   public static final String LABEL_RELEASE_ID = "releaseId";
+  // Used in manage plane
+  public static final String LABEL_RELEASE_KEY = "releaseKey";
   public static final String LABEL_UPGRADE_SOURCE = "upgradeSource";
   public static final String LABEL_PRODUCT_KEY = "productKey";
   public static final String LABEL_EXPIRED_AT = "expiredAt";
