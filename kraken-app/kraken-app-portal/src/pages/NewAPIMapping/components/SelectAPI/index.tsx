@@ -68,7 +68,7 @@ export const APIItem = ({
     } catch (error) {
       return "";
     }
-  }, [item]);
+  }, [item, componentDetail]);
 
   const [resolvedSpec, setResolvedSpec] = useState<any>();
 
