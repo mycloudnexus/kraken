@@ -116,9 +116,6 @@ app:
     push-heartbeat: 0/5 * * * * *
     check-release: 0/20 * * * * *
   modify-use-case: "classpath:/config/component-modify-validation.yaml"
-  features:
-    extendCommonConfig:
-      enabled: false
   security:
     resource-server:
       enabled: true
