@@ -25,9 +25,7 @@ public class LabelConstants {
   public static final String LABEL_PRODUCT_VERSION = "productVersion";
   public static final String LABEL_PRODUCT_SPEC = "productSpec";
   public static final String LABEL_PUBLISH_DATE = "publishDate";
-  public static final String LABEL_PUBLISH_BY = "publishBy";
   public static final String LABEL_RELEASE_ID = "releaseId";
-  public static final String LABEL_RELEASE_KEY = "releaseKey";
   public static final String LABEL_UPGRADE_SOURCE = "upgradeSource";
   public static final String LABEL_PRODUCT_KEY = "productKey";
   public static final String LABEL_EXPIRED_AT = "expiredAt";
@@ -37,5 +35,4 @@ public class LabelConstants {
   public static final String LABEL_FIRST_UPGRADE = "firstUpgraded";
   public static final String CONDITION_NULL = "NULL";
   public static final String FUNCTION_JSON_EXTRACT_PATH_TEXT = "json_extract_path_text";
-  public static final String EXTEND_COMMON = "extendCommon";
 }
