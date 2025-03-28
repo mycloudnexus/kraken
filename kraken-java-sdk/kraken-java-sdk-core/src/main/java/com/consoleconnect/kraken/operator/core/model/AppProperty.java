@@ -26,6 +26,7 @@ public class AppProperty {
   private WorkflowConfig workflow = new WorkflowConfig();
   private DualVersionConfig dualVersionConfig = new DualVersionConfig();
   private List<String> productTypes = new ArrayList<>();
+  private Map<String, List<String>> supportedProductTypes = new HashMap<>();
 
   @Data
   public static class Features {

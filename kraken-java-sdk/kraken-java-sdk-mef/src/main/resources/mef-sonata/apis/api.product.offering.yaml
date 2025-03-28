@@ -15,16 +15,10 @@ spec:
       method: post
       actionTypes:
         - add
-      productTypes:
-        - UNI
-        - ACCESS_E_LINE
-        - INTERNET_ACCESS
+      supportedConfig: $.poq
     - path: /mefApi/sonata/productOfferingQualification/v7/productOfferingQualification/{id}
       method: get
-      productTypes:
-        - UNI
-        - ACCESS_E_LINE
-        - INTERNET_ACCESS
+      supportedConfig: $.poq
   mappings:
     - uri: ${env.target.url}
       trigger:

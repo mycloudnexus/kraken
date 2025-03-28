@@ -272,7 +272,7 @@ public class ApiComponentService
     if (specAssetsPage == null || CollectionUtils.isEmpty(apiAssetsPage.getData())) {
       return result;
     }
-
+    unifiedAssetService.fillSupportedProductType(apiAssetsPage.getData());
     for (UnifiedAsset asset : apiAssetsPage.getData()) {
       ComponentAPIFacets facets = UnifiedAsset.getFacets(asset, ComponentAPIFacets.class);
       if (facets.getSupportedProductTypesAndActions() == null) {
@@ -285,7 +285,9 @@ public class ApiComponentService
                       v.getProductTypes() != null
                           && v.getProductTypes().contains(productType.toUpperCase()))
               .toList();
-
+      if (CollectionUtils.isEmpty(list)) {
+        continue;
+      }
       UnifiedAssetDto specAsset = findSpec(asset, specAssetsPage);
       result.add(constructStandardComponent(asset, list, specAsset, facets));
     }
@@ -602,5 +604,19 @@ public class ApiComponentService
                 })
             .toList());
     return componentProductCategoryDTO;
+  }
+
+  @Transactional(readOnly = true)
+  public List<String> findRelatedAssetKeys(String key, ApiUseCaseDto usecase) {
+    UnifiedAssetEntity mapperEntity = unifiedAssetService.findOneByIdOrKey(key);
+    boolean workflowEnabled = isWorkflowEnabled(mapperEntity);
+    return usecase.membersDeployable(workflowEnabled);
+  }
+
+  private boolean isWorkflowEnabled(UnifiedAssetEntity mapperEntity) {
+    UnifiedAssetDto mapperAsset = UnifiedAssetService.toAsset(mapperEntity, true);
+    ComponentAPITargetFacets mapperFacets =
+        UnifiedAsset.getFacets(mapperAsset, ComponentAPITargetFacets.class);
+    return mapperFacets.getWorkflow() != null && mapperFacets.getWorkflow().isEnabled();
   }
 }
