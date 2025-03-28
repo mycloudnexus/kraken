@@ -1,8 +1,8 @@
+import { useResetPassword } from "@/hooks/user";
 import { IUser } from "@/utils/types/user.type";
 import { Form, Input, Modal, notification } from "antd";
-import styles from "./index.module.scss";
 import { get } from "lodash";
-import { useResetPassword } from "@/hooks/user";
+import styles from "./index.module.scss";
 
 type Props = {
   user: IUser;
@@ -41,6 +41,7 @@ const ResetPwdModal = ({ user, open, onClose }: Props) => {
       }}
       onOk={form.submit}
       onCancel={onClose}
+      maskClosable={false}
     >
       <Form
         form={form}

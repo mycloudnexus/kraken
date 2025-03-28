@@ -16,16 +16,10 @@ spec:
       actionTypes:
         - add
         - modify
-      productTypes:
-        - UNI
-        - ACCESS_E_LINE
-        - INTERNET_ACCESS
+      supportedConfig: $.quote
     - path: /mefApi/sonata/quoteManagement/v8/quote/{id}
       method: get
-      productTypes:
-        - UNI
-        - ACCESS_E_LINE
-        - INTERNET_ACCESS
+      supportedConfig: $.quote
   mappings:
     - uri: ${env.target.url}
       trigger:
