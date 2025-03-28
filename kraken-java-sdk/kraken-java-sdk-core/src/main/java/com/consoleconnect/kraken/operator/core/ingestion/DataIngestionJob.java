@@ -1,6 +1,5 @@
 package com.consoleconnect.kraken.operator.core.ingestion;
 
-
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.event.IngestDataEvent;
 import com.consoleconnect.kraken.operator.core.event.IngestionDataResult;
