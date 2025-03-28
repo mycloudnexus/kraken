@@ -240,7 +240,7 @@ export const useGetComponentListV2 = (
       targetMapperKey,
     ],
     queryFn: () => getListComponentsV2(productId, targetMapperKey),
-    enabled: Boolean(productId),
+    enabled: Boolean(productId && targetMapperKey),
     select: (data) => data?.data,
   });
 };
