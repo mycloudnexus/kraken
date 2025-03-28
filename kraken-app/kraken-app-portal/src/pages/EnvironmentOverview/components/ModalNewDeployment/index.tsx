@@ -121,6 +121,7 @@ const ModalNewDeployment = ({
         disabled: deploying,
       }}
       cancelButtonProps={{ disabled: deploying }}
+      maskClosable={false}
     >
       <Text.BoldLarge className={styles.title}>
         Select API components to deploy

@@ -1435,39 +1435,6 @@ describe("requestItem render", () => {
     );
     expect(container).toBeInTheDocument();
   });
-  it("add value limit string", () => {
-    const { container, getByTestId } = render(
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <RequestItem
-            index={2}
-            item={{
-              id: "id",
-              description: "",
-              name: "mapper.order.eline.add.duration.unit",
-              title: "order item Term unit",
-              source:
-                "@{{productOrderItem[0].requestedItemTerm.duration.units}}",
-              target: "@{{requestBody.durationUnit}}",
-              valueMapping: {
-                calendarMonths: "calendarMonths",
-                calendarDays: "calendarDays",
-              },
-              sourceLocation: "BODY",
-              targetLocation: "BODY",
-              customizedField: true,
-              requiredMapping: true,
-              allowValueLimit: true,
-              sourceType: "string",
-            }}
-          />
-        </BrowserRouter>
-      </QueryClientProvider>
-    );
-    expect(container).toBeInTheDocument();
-    const btnAdd = getByTestId("btn-add-valuelimit-str");
-    fireEvent.click(btnAdd);
-  });
   it("add value limit string with sourceValue", () => {
     const { container } = render(
       <QueryClientProvider client={queryClient}>

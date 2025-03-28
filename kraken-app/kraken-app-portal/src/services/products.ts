@@ -401,3 +401,9 @@ export const editContactInformation = (
     }
   );
 };
+
+export const getProductTypes = (productId: string) => {
+  return request(`${PRODUCT}/${productId}/productTypes`, {
+    method: "GET",
+  });
+};
