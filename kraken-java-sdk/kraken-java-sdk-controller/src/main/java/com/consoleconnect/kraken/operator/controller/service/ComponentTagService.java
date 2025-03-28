@@ -9,7 +9,6 @@ import com.consoleconnect.kraken.operator.controller.model.ComponentTag;
 import com.consoleconnect.kraken.operator.controller.model.ComponentTagFacet;
 import com.consoleconnect.kraken.operator.controller.model.DeploymentFacet;
 import com.consoleconnect.kraken.operator.controller.tools.VersionHelper;
-import com.consoleconnect.kraken.operator.core.dto.ApiUseCaseDto;
 import com.consoleconnect.kraken.operator.core.dto.AssetLinkDto;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
@@ -121,7 +120,7 @@ public class ComponentTagService implements TargetMappingChecker, LatestDeployme
     List<String> memberKeys =
         apiComponentService
             .findRelatedApiUse(mapperKey)
-            .map(ApiUseCaseDto::membersExcludeApiKey)
+            .map(usecase -> apiComponentService.findRelatedAssetKeys(mapperKey, usecase))
             .orElse(List.of());
     List<UnifiedAssetDto> childAssets = unifiedAssetService.findByAllKeysIn(memberKeys, true);
     changeParentId(childAssets, componentAsset);
