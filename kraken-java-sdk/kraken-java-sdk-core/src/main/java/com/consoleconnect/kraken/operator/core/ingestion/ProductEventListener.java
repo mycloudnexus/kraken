@@ -37,9 +37,7 @@ public class ProductEventListener extends AbstractAssetEventListener {
           log.info("onPostPersist,bypass componentPath:{}", componentPath);
           continue;
         }
-        IngestDataEvent event = new IngestDataEvent(asset.getMetadata().getId(), componentPath);
-        event.setExtendCommon(true);
-        job.ingestData(event);
+        job.ingestData(new IngestDataEvent(asset.getMetadata().getId(), componentPath));
       }
     }
   }

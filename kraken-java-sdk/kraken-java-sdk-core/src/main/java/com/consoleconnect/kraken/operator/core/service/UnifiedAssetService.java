@@ -334,7 +334,7 @@ public class UnifiedAssetService implements UUIDWrapper, FacetsMerger {
             .map(entity -> updateAssetEntity(parentId, entity, data, syncMetadata))
             .orElseGet(() -> createAssetEntity(parentId, data, syncMetadata));
 
-    boolean extendCommon = checkExtendCommon(data);
+    boolean extendCommon = appProperty.getFeatures().getExtendCommonConfig().isEnabled();
     log.info(
         "syncing asset facets, assetId: {}, extendCommon:{}", assetEntity.getKey(), extendCommon);
     if (enableMerge(assetEntity) && extendCommon) {

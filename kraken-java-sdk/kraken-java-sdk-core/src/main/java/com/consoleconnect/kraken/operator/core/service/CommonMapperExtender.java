@@ -5,11 +5,9 @@ import static com.consoleconnect.kraken.operator.core.toolkit.ConstructExpressio
 
 import com.consoleconnect.kraken.operator.core.model.CommonMapperRef;
 import com.consoleconnect.kraken.operator.core.model.KVPair;
-import com.consoleconnect.kraken.operator.core.model.Metadata;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
-import com.consoleconnect.kraken.operator.core.toolkit.LabelConstants;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -22,17 +20,6 @@ public interface CommonMapperExtender extends AssetReader {
 
   @Slf4j
   final class LogHolder {}
-
-  default boolean checkExtendCommon(UnifiedAsset data) {
-    return Optional.ofNullable(data)
-        .map(UnifiedAsset::getMetadata)
-        .map(Metadata::getLabels)
-        .map(
-            labels ->
-                labels.getOrDefault(LabelConstants.EXTEND_COMMON, String.valueOf(Boolean.FALSE)))
-        .map(Boolean::valueOf)
-        .orElse(false);
-  }
 
   default void extendCommonMapper(ComponentAPITargetFacets.Endpoint endpointNew) {
     if (Objects.isNull(endpointNew) || Objects.isNull(endpointNew.getMappers())) {

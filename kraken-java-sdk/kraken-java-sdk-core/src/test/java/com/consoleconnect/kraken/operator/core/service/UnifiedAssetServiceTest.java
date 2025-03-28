@@ -1,6 +1,5 @@
 package com.consoleconnect.kraken.operator.core.service;
 
-import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.COMPONENT_API_TARGET_MAPPER;
 import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.COMPONENT_API_TARGET_SPEC;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -510,18 +509,6 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
     String path = "classpath:/data/api-target-mapper.inventory.common.list-1.yaml";
     Optional<UnifiedAsset> opt = unifiedAssetService.readFromPath(path);
     Assertions.assertTrue(opt.isEmpty());
-  }
-
-  @Test
-  void givenExtendCommon_whenExtract_thenReturnOK() {
-    UnifiedAsset data =
-        UnifiedAsset.of(
-            COMPONENT_API_TARGET_MAPPER.getKind(),
-            "mef.sonata.api-target-mapper.inventory.eline.list",
-            "Inventory Connection API List");
-    data.getMetadata().getLabels().put(LabelConstants.EXTEND_COMMON, String.valueOf(Boolean.TRUE));
-    boolean result = unifiedAssetService.checkExtendCommon(data);
-    Assertions.assertTrue(result);
   }
 
   @Test
