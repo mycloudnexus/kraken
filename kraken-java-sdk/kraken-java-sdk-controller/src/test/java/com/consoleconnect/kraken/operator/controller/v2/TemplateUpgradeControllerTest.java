@@ -1,5 +1,6 @@
 package com.consoleconnect.kraken.operator.controller.v2;
 
+import static com.consoleconnect.kraken.operator.toolkit.TestConstant.COMPONENT_ORDER_ELINE_DELETE_MAPPER;
 import static com.consoleconnect.kraken.operator.toolkit.TestConstant.MEF_SONATA_API_TARGET_MAPPER_ADDRESS_RETRIEVE;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -27,7 +28,6 @@ import com.consoleconnect.kraken.operator.core.event.IngestionDataResult;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.core.model.SyncMetadata;
 import com.consoleconnect.kraken.operator.core.repo.EnvironmentClientRepository;
-import com.consoleconnect.kraken.operator.core.repo.MgmtEventRepository;
 import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.*;
@@ -62,7 +62,6 @@ class TemplateUpgradeControllerTest {
     @Autowired SystemInfoService systemInfoService;
     @Autowired ClientMapperVersionCreator clientMapperVersionCreator;
     @Autowired ProductDeploymentService productDeploymentService;
-    @Autowired MgmtEventRepository mgmtEventRepository;
 
     public static final String CONTROL_UPGRADE_URL =
         "/v3/products/{productId}/template-upgrade/control-plane";
@@ -119,7 +118,39 @@ class TemplateUpgradeControllerTest {
 
     @Test
     @Order(2)
-    void givenControlPlaneUpgraded_whenStageUpgrade_thenSuccess() {
+    void givenWorkflowEnabled_whenStageUpgrade_thenSuccess() {
+      IngestionDataResult mappingTag =
+          componentTagService.createMappingTag(
+              "mef.sonata.api.order", COMPONENT_ORDER_ELINE_DELETE_MAPPER, null);
+      clientMapperVersionCreator.newClientMapperVersion(
+          mappingTag.getData().getId().toString(), TestApplication.envId);
+      clientMapperVersionCreator.newClientMapperVersion(
+          mappingTag.getData().getId().toString(), TestApplication.productionEnvId);
+      Paging<UnifiedAssetDto> assetDtoPaging =
+          unifiedAssetService.findBySpecification(
+              List.of(
+                  Tuple2.of(
+                      AssetsConstants.FIELD_KIND,
+                      AssetKindEnum.PRODUCT_TEMPLATE_UPGRADE.getKind())),
+              null,
+              null,
+              null,
+              null);
+      String templateId = assetDtoPaging.getData().get(0).getId();
+      CreateUpgradeRequest createUpgradeRequest = new CreateUpgradeRequest();
+      createUpgradeRequest.setTemplateUpgradeId(templateId);
+      createUpgradeRequest.setStageEnvId(TestApplication.envId);
+      testClientHelper.postAndVerify(
+          uriBuilder -> uriBuilder.path(STAGE_UPGRADE_URL).build(TestContextConstants.PRODUCT_ID),
+          createUpgradeRequest,
+          body -> {
+            assertThat(body, hasJsonPath("$.code", equalTo(HttpStatus.OK.value())));
+          });
+    }
+
+    @Test
+    @Order(3)
+    void givenControlPlaneUpgraded_whenStageUpgradeAgain_thenFail() {
       IngestionDataResult mappingTag =
           componentTagService.createMappingTag(
               "mef.sonata.api.serviceability.address",
@@ -145,14 +176,15 @@ class TemplateUpgradeControllerTest {
       createUpgradeRequest.setStageEnvId(TestApplication.envId);
       testClientHelper.postAndVerify(
           uriBuilder -> uriBuilder.path(STAGE_UPGRADE_URL).build(TestContextConstants.PRODUCT_ID),
+          HttpStatus.BAD_REQUEST,
           createUpgradeRequest,
           body -> {
-            assertThat(body, hasJsonPath("$.code", equalTo(200)));
+            assertThat(body, hasJsonPath("$.code", equalTo("invalidBody")));
           });
     }
 
     @Test
-    @Order(3)
+    @Order(5)
     void givenStageUpgraded_WhenReportClientMapperVersion_thenReturnOk() {
       ClientMapperVersionPayloadDto clientMapperVersionPayloadDto =
           new ClientMapperVersionPayloadDto();
@@ -172,7 +204,7 @@ class TemplateUpgradeControllerTest {
     }
 
     @Test
-    @Order(4)
+    @Order(6)
     void givenUpgradeCompleted_whenQueryControlDeploymentDetails_thenReturnData() {
       String url = "/v2/products/{productId}/template-upgrade/template-deployments/{deploymentId}";
       UnifiedAssetDto assetDto =
@@ -189,7 +221,7 @@ class TemplateUpgradeControllerTest {
     }
 
     @Test
-    @Order(5)
+    @Order(7)
     void givenStageUpgraded_whenListTemplateDeployment_thenReturnData() {
       String url = "/v2/products/{productId}/template-upgrade/template-deployments";
       testClientHelper.getAndVerify(
@@ -202,7 +234,7 @@ class TemplateUpgradeControllerTest {
     }
 
     @Test
-    @Order(6)
+    @Order(8)
     void givenStageUpgraded_whenGetDetail_thenReturnData() {
       Paging<UnifiedAssetDto> assetDtoPaging =
           unifiedAssetService.findBySpecification(
@@ -230,7 +262,7 @@ class TemplateUpgradeControllerTest {
     }
 
     @Test
-    @Order(7)
+    @Order(9)
     @Sql(
         statements = {
           "update kraken_mgmt_system_info set status='STAGE_UPGRADE_DONE'",
@@ -276,7 +308,7 @@ class TemplateUpgradeControllerTest {
     }
 
     @Test
-    @Order(8)
+    @Order(10)
     void givenStageUpgraded_whenCheckStageUpgrade_thenReturnData() {
       String url = "/v3/products/{productId}/template-upgrade/stage-upgrade-check";
       UnifiedAssetDto assetDto =
@@ -295,7 +327,7 @@ class TemplateUpgradeControllerTest {
     }
 
     @Test
-    @Order(9)
+    @Order(11)
     void givenStageUpgradedAndErrorEnv_whenCheckStageUpgrade_thenReturnCode400() {
       String url = "/v3/products/{productId}/template-upgrade/stage-upgrade-check";
       UnifiedAssetDto assetDto =
@@ -314,7 +346,7 @@ class TemplateUpgradeControllerTest {
     }
 
     @Test
-    @Order(10)
+    @Order(12)
     void givenProductionUpgraded_whenCheckProductionUpgrade_thenReturnData() {
       String url = "/v3/products/{productId}/template-upgrade/production-upgrade-check";
       UnifiedAssetDto assetDto =
@@ -333,7 +365,7 @@ class TemplateUpgradeControllerTest {
     }
 
     @Test
-    @Order(11)
+    @Order(13)
     void givenProductionUpgradedAndErrorEnv_whenCheckProductionUpgrade_thenReturnCode400() {
       String url = "/v3/products/{productId}/template-upgrade/production-upgrade-check";
       UnifiedAssetDto assetDto =
@@ -352,7 +384,7 @@ class TemplateUpgradeControllerTest {
     }
 
     @Test
-    @Order(12)
+    @Order(14)
     void givenTemplateId_whenListApiUseCaseFromClasspath_thenReturnData() {
       Paging<UnifiedAssetDto> assetDtoPaging =
           unifiedAssetService.findBySpecification(
@@ -376,7 +408,7 @@ class TemplateUpgradeControllerTest {
     }
 
     @Test
-    @Order(13)
+    @Order(15)
     void givenStageDeployed_whenCurrentVersion_thenReturnData() {
       Paging<UnifiedAssetDto> assetDtoPaging =
           unifiedAssetService.findBySpecification(
@@ -405,7 +437,7 @@ class TemplateUpgradeControllerTest {
     }
 
     @Test
-    @Order(14)
+    @Order(16)
     void givenProductDeployInProcess_whenReportDeploymentStatus_thenOk() {
       Paging<UnifiedAssetDto> assetDtoPaging =
           unifiedAssetService.findBySpecification(
