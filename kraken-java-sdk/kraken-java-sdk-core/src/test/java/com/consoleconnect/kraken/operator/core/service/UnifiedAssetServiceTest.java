@@ -26,6 +26,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.*;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.MapUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -42,8 +43,6 @@ import org.springframework.util.CollectionUtils;
 class UnifiedAssetServiceTest extends AbstractIntegrationTest {
 
   @Autowired private UnifiedAssetService unifiedAssetService;
-
-  @Autowired private MergeService mergeService;
 
   private static final String MAPPER_REQUEST = "request";
 
@@ -170,7 +169,7 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
         JsonToolkit.fromJson(
             s, new TypeReference<Map<String, Map<String, ComponentAPITargetFacets.Mapper>>>() {});
     int beforeSize = existMapperMap.size();
-    UnifiedAssetService.mergeMappers(existMapperMap, existMapperMap);
+    unifiedAssetService.mergeMappers(existMapperMap, existMapperMap);
     int afterSize = existMapperMap.size();
     Assertions.assertEquals(beforeSize, afterSize);
   }
@@ -196,7 +195,7 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
     Map<String, Map<String, ComponentAPITargetFacets.Mapper>> expectedResults =
         JsonToolkit.fromJson(s3, new TypeReference<>() {});
 
-    UnifiedAssetService.mergeMappers(existMapperMap, newMapperMap);
+    unifiedAssetService.mergeMappers(existMapperMap, newMapperMap);
     String existMapperStr = JsonToolkit.toJson(existMapperMap);
     log.info(existMapperStr);
     Assertions.assertNotNull(existMapperStr);
@@ -316,7 +315,8 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
             new SyncMetadata("", "", DateTime.nowInUTCString(), ""),
             true);
     UnifiedAssetEntity assetEntity = ingestionDataResult.getData();
-    Map<String, Object> result = UnifiedAssetService.mergeFacets(assetEntity, assetNew.getFacets());
+    Map<String, Object> result =
+        unifiedAssetService.mergeFacetsInternal(assetEntity, assetNew.getFacets(), false);
     verifyWorkflow(result, expectedMerged.getFacets());
   }
 
@@ -446,7 +446,8 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
       Assertions.assertNotNull(result1);
       ComponentAPITargetFacets.Endpoint endpointOld = facetsOld.getEndpoints().get(0);
       ComponentAPITargetFacets.Endpoint endpointNew = facetsNew.getEndpoints().get(0);
-      UnifiedAssetService.mergeEndpoint(endpointOld, endpointNew);
+
+      unifiedAssetService.mergeEndpoint(endpointOld, endpointNew, true);
       String result2 = JsonToolkit.toJson(facetsNew);
       Assertions.assertNotNull(result2);
       assertThat(result2, hasJsonPath("$.endpoints[0].mappers.request", hasSize(9)));
@@ -457,6 +458,77 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
       assertThat(result2, hasJsonPath("$.endpoints[0].mappers.response[0].target", notNullValue()));
       assertThat(
           result2, hasJsonPath("$.endpoints[0].mappers.pathRules[0].checkPath", notNullValue()));
+    }
+  }
+
+  @SneakyThrows
+  @Test
+  void givenCommonSchema_whenMergeMappers_thenReturnOK() {
+    String targetApiPath1 = "data/api-target-mapper.inventory.uni.list-1.yaml";
+    Optional<UnifiedAsset> unifiedAssetOptOld =
+        YamlToolkit.parseYaml(readFileToString(targetApiPath1), UnifiedAsset.class);
+    String targetApiPath2 = "data/api-target-mapper.inventory.uni.list-2.yaml";
+    Optional<UnifiedAsset> unifiedAssetOptNew =
+        YamlToolkit.parseYaml(readFileToString(targetApiPath2), UnifiedAsset.class);
+    if (unifiedAssetOptOld.isPresent() && unifiedAssetOptNew.isPresent()) {
+      UnifiedAsset assetOld = unifiedAssetOptOld.get();
+      UnifiedAsset assetNew = unifiedAssetOptNew.get();
+
+      ComponentAPITargetFacets facetsOld =
+          UnifiedAsset.getFacets(assetOld, ComponentAPITargetFacets.class);
+      ComponentAPITargetFacets facetsNew =
+          UnifiedAsset.getFacets(assetNew, ComponentAPITargetFacets.class);
+
+      String result1 = JsonToolkit.toJson(facetsOld);
+      Assertions.assertNotNull(result1);
+      Map<String, Object> map = unifiedAssetService.mergeFacets(facetsOld, facetsNew, true);
+      String result2 = JsonToolkit.toJson(map);
+      Assertions.assertNotNull(result2);
+      ComponentAPITargetFacets facets1 =
+          JsonToolkit.fromJson(result1, ComponentAPITargetFacets.class);
+      ComponentAPITargetFacets facets2 =
+          JsonToolkit.fromJson(result2, ComponentAPITargetFacets.class);
+      List<ComponentAPITargetFacets.Mapper> request1 =
+          facets1.getEndpoints().get(0).getMappers().getRequest();
+      List<ComponentAPITargetFacets.Mapper> response1 =
+          facets1.getEndpoints().get(0).getMappers().getResponse();
+      List<ComponentAPITargetFacets.Mapper> request2 =
+          facets2.getEndpoints().get(0).getMappers().getRequest();
+      List<ComponentAPITargetFacets.Mapper> response2 =
+          facets2.getEndpoints().get(0).getMappers().getResponse();
+      Assertions.assertEquals(
+          JsonToolkit.toJson(request1).hashCode(), JsonToolkit.toJson(request2).hashCode());
+      Assertions.assertEquals(
+          JsonToolkit.toJson(response1).hashCode(), JsonToolkit.toJson(response2).hashCode());
+    }
+  }
+
+  @SneakyThrows
+  @Test
+  void givenBlankClassPath_whenReading_thenReturnEmpty() {
+    String path = "classpath:/data/api-target-mapper.inventory.common.list-1.yaml";
+    Optional<UnifiedAsset> opt = unifiedAssetService.readFromPath(path);
+    Assertions.assertTrue(opt.isEmpty());
+  }
+
+  @Test
+  void givenEmptyUpdatedFacets_whenExtendCommon_thenReturnEmpty() {
+    Map<String, Object> facetsUpdated = new HashMap<>();
+    Map<String, Object> result = unifiedAssetService.extendCommonNodesInFacets(true, facetsUpdated);
+    Assertions.assertTrue(MapUtils.isEmpty(result));
+  }
+
+  @SneakyThrows
+  @Test
+  void givenExistedUpdateFacets_whenExtendCommon_thenReturnOK() {
+    String targetApiPath2 = "data/api-target-mapper.inventory.uni.list-2.yaml";
+    Optional<UnifiedAsset> unifiedAssetOptNew =
+        YamlToolkit.parseYaml(readFileToString(targetApiPath2), UnifiedAsset.class);
+    if (unifiedAssetOptNew.isPresent()) {
+      UnifiedAsset assetNew = unifiedAssetOptNew.get();
+      Map<String, Object> result =
+          unifiedAssetService.extendCommonNodesInFacets(true, assetNew.getFacets());
+      Assertions.assertTrue(MapUtils.isNotEmpty(result));
     }
   }
 }

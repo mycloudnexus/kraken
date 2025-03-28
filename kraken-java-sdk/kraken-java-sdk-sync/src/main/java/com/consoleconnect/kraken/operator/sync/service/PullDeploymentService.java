@@ -20,6 +20,7 @@ import com.consoleconnect.kraken.operator.data.repo.AssetReleaseRepository;
 import com.consoleconnect.kraken.operator.sync.model.SyncProperty;
 import com.consoleconnect.kraken.operator.sync.service.security.ExternalSystemTokenProvider;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
@@ -65,7 +66,7 @@ public class PullDeploymentService extends KrakenServerConnector {
                   return asset;
                 })
             .map(this::ingestData)
-            .filter(e -> e != null)
+            .filter(Objects::nonNull)
             .toList();
 
     AssetReleaseEntity assetReleaseEntity = new AssetReleaseEntity();
@@ -107,7 +108,6 @@ public class PullDeploymentService extends KrakenServerConnector {
     event.setAsset(dto);
     event.setFullPath("raw:" + JsonToolkit.toJson(dto));
     event.setEnforceSync(getAppProperty().isAssetConfigOverwriteFlag());
-
     try {
       dataIngestionJob.ingestData(event);
       return null;

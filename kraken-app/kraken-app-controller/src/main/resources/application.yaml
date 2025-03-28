@@ -209,6 +209,8 @@ app:
   features:
     push-activity-log-external:
       enabled: false
+    extendCommonConfig:
+      enabled: true
 
   initialize-exclude-assets:
     - classpath:/mef-sonata/api-targets/api-target.quote.eline.add.yaml

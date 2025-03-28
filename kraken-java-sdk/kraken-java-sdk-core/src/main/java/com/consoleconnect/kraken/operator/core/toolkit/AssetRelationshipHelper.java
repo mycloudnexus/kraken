@@ -22,13 +22,12 @@ public class AssetRelationshipHelper {
 
   public static ApiUseCaseDto createReferences(List<Tuple2> tuple2s) {
     final ApiUseCaseDto apiUseCaseDto = new ApiUseCaseDto();
-    tuple2s.stream()
-        .forEach(
-            link -> {
-              if (referenceHandlers.containsKey(link.value())) {
-                referenceHandlers.get(link.value()).accept(link.field(), apiUseCaseDto);
-              }
-            });
+    tuple2s.forEach(
+        link -> {
+          if (referenceHandlers.containsKey(link.value())) {
+            referenceHandlers.get(link.value()).accept(link.field(), apiUseCaseDto);
+          }
+        });
     return apiUseCaseDto;
   }
 

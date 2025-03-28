@@ -1,5 +1,7 @@
 package com.consoleconnect.kraken.operator.gateway.service.workflow;
 
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doReturn;
@@ -9,6 +11,8 @@ import com.consoleconnect.kraken.operator.core.entity.WorkflowInstanceEntity;
 import com.consoleconnect.kraken.operator.core.enums.WorkflowStatusEnum;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
 import com.consoleconnect.kraken.operator.core.repo.WorkflowInstanceRepository;
+import com.consoleconnect.kraken.operator.core.toolkit.DateTime;
+import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.gateway.CustomConfig;
 import com.consoleconnect.kraken.operator.gateway.entity.HttpRequestEntity;
 import com.consoleconnect.kraken.operator.gateway.repo.HttpRequestRepository;
@@ -17,10 +21,10 @@ import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import com.consoleconnect.kraken.operator.workflow.model.LogTaskRequest;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.time.ZonedDateTime;
+import java.util.*;
+import lombok.SneakyThrows;
+import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +63,8 @@ class WorkflowTaskConfigTest extends AbstractIntegrationTest {
     doReturn(new ApiActivityLogEntity()).when(apiActivityLogRepository).save(any());
 
     HttpRequestEntity entity = new HttpRequestEntity();
-    entity.setRenderedResponse(Map.of("state", "active"));
+    entity.setRenderedResponse(Map.of("state", "active", "productOrderItem", new ArrayList<>()));
+    entity.setCreatedAt(ZonedDateTime.now());
     doReturn(Optional.of(entity)).when(httpRequestRepository).findById(any());
     doReturn(entity).when(httpRequestRepository).save(any());
     assertDoesNotThrow(
@@ -107,5 +112,22 @@ class WorkflowTaskConfigTest extends AbstractIntegrationTest {
         (Map<String, String>) activityLog.getApiLogBodyEntity().getResponse();
     Assertions.assertEquals("Mock company name", response.get("name"));
     Assertions.assertEquals(200, activityLog.getHttpStatusCode());
+  }
+
+  @Test
+  @SneakyThrows
+  void givenRenderedResponse_whenSetStateChange_thenReturnOK() {
+    Map map =
+        JsonToolkit.fromJson(readFileToString("/mockData/productOrderResponse.json"), Map.class);
+    WorkflowTaskConfig.setStateChangeRecord(map, "acknowledged", DateTime.nowInUTCFormatted());
+    WorkflowTaskConfig.setStateChangeRecord(map, "acknowledged", "");
+    WorkflowTaskConfig.setStateChangeRecord(map, "failed", "");
+    System.out.println(JsonToolkit.toJson(map));
+    MatcherAssert.assertThat(
+        JsonToolkit.toJson(map),
+        hasJsonPath("$.productOrderItem[0].stateChange[0].state", equalTo("acknowledged")));
+    MatcherAssert.assertThat(
+        JsonToolkit.toJson(map),
+        hasJsonPath("$.productOrderItem[0].stateChange[1].state", equalTo("failed")));
   }
 }
