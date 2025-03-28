@@ -7,7 +7,7 @@ metadata:
   labels:
     productSpec: grace
     productVersion: V1.7.36
-    publishDate: 2025-03-26
+    publishDate: 2025-03-28
   description: |
     Introduced a switch to ensure facet merging only occurs in the control plane, and not in the data plane.
     Added modify related files
