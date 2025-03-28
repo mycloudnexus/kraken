@@ -21,6 +21,7 @@ import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import com.consoleconnect.kraken.operator.workflow.model.LogTaskRequest;
 import java.io.IOException;
+import java.time.ZonedDateTime;
 import java.util.*;
 import lombok.SneakyThrows;
 import org.hamcrest.MatcherAssert;
@@ -62,7 +63,8 @@ class WorkflowTaskConfigTest extends AbstractIntegrationTest {
     doReturn(new ApiActivityLogEntity()).when(apiActivityLogRepository).save(any());
 
     HttpRequestEntity entity = new HttpRequestEntity();
-    entity.setRenderedResponse(Map.of("state", "active"));
+    entity.setRenderedResponse(Map.of("state", "active", "productOrderItem", new ArrayList<>()));
+    entity.setCreatedAt(ZonedDateTime.now());
     doReturn(Optional.of(entity)).when(httpRequestRepository).findById(any());
     doReturn(entity).when(httpRequestRepository).save(any());
     assertDoesNotThrow(
