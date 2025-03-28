@@ -88,7 +88,6 @@ public class StringUtils {
     try {
       DocumentContext doc = JsonPath.parse(json);
       doc.put(path, node, value);
-      doc.json();
     } catch (Exception e) {
       log.error(String.format("failed to set json path %s, error: %s", path, e.getMessage()));
     }
