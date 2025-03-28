@@ -27,7 +27,7 @@ public interface FacetsMerger extends CommonMapperExtender {
   @Slf4j
   final class LogHolder {}
 
-  default Map<String, Object> mergeEndpoint(
+  default void mergeEndpoint(
       ComponentAPITargetFacets.Endpoint endpointOld,
       ComponentAPITargetFacets.Endpoint endpointNew,
       boolean extendCommon) {
@@ -60,7 +60,6 @@ public interface FacetsMerger extends CommonMapperExtender {
     if (Objects.nonNull(endpointNew)) {
       endpointNew.setMappers(mappers);
     }
-    return JsonToolkit.fromJson(JsonToolkit.toJson(endpointNew), new TypeReference<>() {});
   }
 
   default void mergeMappers(
