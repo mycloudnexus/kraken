@@ -800,7 +800,7 @@ public class TemplateUpgradeService implements ApiUseCaseSelector {
                     relatedApiUse -> {
                       changedMappers.add(relatedApiUse.getMapperKey());
                       dealSet.add(relatedApiUse.getComponentApiKey());
-                      dealSet.addAll(relatedApiUse.membersExcludeApiKey());
+                      dealSet.addAll(apiComponentService.findRelatedAssetKeys(key, relatedApiUse));
                     });
 
           } else {
@@ -808,7 +808,7 @@ public class TemplateUpgradeService implements ApiUseCaseSelector {
                 .ifPresent(
                     relatedApiUse -> {
                       dealSet.add(relatedApiUse.getComponentApiKey());
-                      dealSet.addAll(relatedApiUse.membersExcludeApiKey());
+                      dealSet.addAll(apiComponentService.findRelatedAssetKeys(key, relatedApiUse));
                     });
           }
         });

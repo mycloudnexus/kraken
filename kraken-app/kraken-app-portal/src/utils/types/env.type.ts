@@ -29,6 +29,7 @@ export interface IActivityLog {
   requestIp: string;
   responseIp: string;
   callSeq: number;
+  productType: string;
 }
 
 export interface IPushHistory {
