@@ -708,11 +708,7 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
         .forEach(
             comAsset ->
                 comAsset.getLinks().stream()
-                    .filter(
-                        link ->
-                            link.getRelationship()
-                                .equalsIgnoreCase(
-                                    AssetLinkKindEnum.IMPLEMENTATION_TARGET_MAPPER.getKind()))
+                    .filter(this::isMapperOrWorkflow)
                     .forEach(
                         link ->
                             mapper2Component.put(
@@ -721,6 +717,12 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
                                     comAsset.getMetadata().getKey(),
                                     comAsset.getMetadata().getName()))));
     return mapper2Component;
+  }
+
+  private boolean isMapperOrWorkflow(AssetLink link) {
+    String relationship = link.getRelationship();
+    return relationship.equalsIgnoreCase(AssetLinkKindEnum.IMPLEMENTATION_TARGET_MAPPER.getKind())
+        || relationship.equalsIgnoreCase(AssetLinkKindEnum.IMPLEMENTATION_WORKFLOW.getKind());
   }
 
   private @NotNull List<ApiMapperDeploymentDTO> getApiMapperDeploymentDTOS(
@@ -770,10 +772,12 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
                     deploymentDTO.setEnvName(labels.getOrDefault(LABEL_ENV_NAME, ""));
                     fillVerifiedInfo(dto.getTagId(), deploymentDTO, envId);
                     calculateCanDeployToTargetEnv(deploymentDTO);
-                    deploymentDTO.setComponentKey(
-                        mapper2Component.get(dto.getParentComponentKey()).getKey());
-                    deploymentDTO.setComponentName(
-                        mapper2Component.get(dto.getParentComponentKey()).getValue());
+                    if (mapper2Component.containsKey(dto.getParentComponentKey())) {
+                      deploymentDTO.setComponentKey(
+                          mapper2Component.get(dto.getParentComponentKey()).getKey());
+                      deploymentDTO.setComponentName(
+                          mapper2Component.get(dto.getParentComponentKey()).getValue());
+                    }
                     result.add(deploymentDTO);
                   });
         });
