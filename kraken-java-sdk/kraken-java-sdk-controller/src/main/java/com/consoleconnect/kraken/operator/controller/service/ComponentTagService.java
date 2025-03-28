@@ -167,9 +167,9 @@ public class ComponentTagService implements TargetMappingChecker, LatestDeployme
     finalAssetDtos.stream()
         .filter(Objects::nonNull)
         .forEach(
-            pram ->
-                Optional.ofNullable(assetMap.get(UUID.fromString(pram.getParentId())))
-                    .ifPresent(pramEntity -> pram.setParentId(pramEntity.getKey())));
+            param ->
+                Optional.ofNullable(assetMap.get(UUID.fromString(param.getParentId())))
+                    .ifPresent(pramEntity -> param.setParentId(pramEntity.getKey())));
   }
 
   @Transactional

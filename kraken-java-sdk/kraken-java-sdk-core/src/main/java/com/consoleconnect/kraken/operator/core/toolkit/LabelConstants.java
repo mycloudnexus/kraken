@@ -37,4 +37,5 @@ public class LabelConstants {
   public static final String LABEL_FIRST_UPGRADE = "firstUpgraded";
   public static final String CONDITION_NULL = "NULL";
   public static final String FUNCTION_JSON_EXTRACT_PATH_TEXT = "json_extract_path_text";
+  public static final String EXTEND_COMMON = "extendCommon";
 }
