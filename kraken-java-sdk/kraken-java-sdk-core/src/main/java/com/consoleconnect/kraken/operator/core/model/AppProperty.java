@@ -31,6 +31,12 @@ public class AppProperty {
   @Data
   public static class Features {
     private PushActivityLogExternal pushActivityLogExternal;
+    private ExtendCommonConfig extendCommonConfig;
+  }
+
+  @Data
+  public static class ExtendCommonConfig {
+    private boolean enabled;
   }
 
   @Data
