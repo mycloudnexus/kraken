@@ -7,10 +7,10 @@ import { useAppStore } from "@/stores/app.store";
 import { SPEC_VALUE } from "@/utils/constants/product";
 import type { IUnifiedAsset } from "@/utils/types/common.type";
 import { CloseOutlined } from "@ant-design/icons";
-import { Card, Col, Drawer, Flex, Row, Spin } from "antd";
+import { Tabs, Card, Col, Drawer, Flex, Row, Spin } from "antd";
 import { decode } from "js-base64";
 import yaml from "js-yaml";
-import { get, isEmpty } from "lodash";
+import { get, isEmpty, isNull } from "lodash";
 import { useCallback, useState } from "react";
 import ApiComponent from "./ApiComponent";
 
@@ -18,6 +18,13 @@ export type DrawerDetails = {
   apiTitle: string;
   documentTitle: string;
   documentContent: string;
+};
+
+const TAB_LABELS = {
+  ACCESS_E_LINE: "Access Eline",
+  INTERNET_ACCESS: "Internet Access",
+  UNI: "Uni",
+  SHARE: "Shared",
 };
 
 const ApiComponents = () => {
@@ -84,31 +91,42 @@ const ApiComponents = () => {
     <PageLayout title={`Standard API Mapping`}>
       <Spin spinning={specLoading || isLoading}>
         <Card style={{ height: "100%", borderRadius: "4px" }}>
-          <Row gutter={[24, 24]} style={{ marginBottom: 24 }}>
-            {componentList?.data?.map((i: IUnifiedAsset) => {
-              const { targetSpec = {}, targetYaml = {} } = getTargetSpecItem(i);
-              const supportInfo = getSupportInfo(i);
-              const title = targetYaml.info?.title;
-              const apis =
-                i?.facets?.supportedProductTypesAndActions?.length ?? 0;
-              if (isEmpty(targetSpec)) {
-                return null;
-              }
-              return (
-                <Col lg={12} xl={8} sm={24} key={i.id}>
-                  <ApiComponent
-                    item={i}
-                    title={title}
-                    apis={apis}
-                    targetSpec={targetSpec}
-                    targetYaml={targetYaml}
-                    supportInfo={supportInfo}
-                    openDrawer={openDrawer}
-                  />
-                </Col>
-              );
-            })}
-          </Row>
+          <Tabs>
+            {Object.entries(TAB_LABELS).map(([key, label]) => (
+              <Tabs.TabPane tab={label} key={key}>
+                <Row gutter={[24, 24]}>
+                  {componentList?.data?.map((i: IUnifiedAsset) => {
+                    const { targetSpec = {}, targetYaml = {} } =
+                      getTargetSpecItem(i);
+                    const supportInfo = getSupportInfo(i);
+                    const title = targetYaml.info?.title;
+                    const apis =
+                      i?.facets?.supportedProductTypesAndActions?.length ?? 0;
+                    if (isEmpty(targetSpec) || isNull(supportInfo)) {
+                      return null;
+                    }
+                    return (
+                      <>
+                        {supportInfo[0].includes(key) && (
+                          <Col lg={12} xl={8} sm={24} key={i.id}>
+                            <ApiComponent
+                              item={i}
+                              title={title}
+                              apis={apis}
+                              targetSpec={targetSpec}
+                              targetYaml={targetYaml}
+                              supportInfo={key}
+                              openDrawer={openDrawer}
+                            />
+                          </Col>
+                        )}
+                      </>
+                    );
+                  })}
+                </Row>
+              </Tabs.TabPane>
+            ))}
+          </Tabs>
         </Card>
         <Drawer
           width={576}

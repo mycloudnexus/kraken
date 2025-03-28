@@ -14,6 +14,7 @@ type ComponentSelectProps = {
   componentList: any;
   componentName: string;
   middle?: boolean;
+  productType?: string;
 };
 
 type LabelProps = {
@@ -63,6 +64,7 @@ const ComponentSelect = ({
   componentList,
   componentName,
   middle,
+  productType,
 }: ComponentSelectProps) => {
   const navigate = useNavigate();
   const { resetUiStore } = useMappingUiStore();
@@ -90,7 +92,9 @@ const ComponentSelect = ({
 
   const handleSelect = (e: { value: string }) => {
     resetUiStore();
-    navigate(`/api-mapping/${e.value}`);
+    navigate(`/api-mapping/${e.value}`, {
+      state: { productType: productType },
+    });
   };
 
   return (

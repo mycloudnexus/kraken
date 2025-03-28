@@ -5,6 +5,17 @@ import { queryClient } from "@/utils/helpers/reactQuery";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { render } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
+import { vi } from "vitest";
+
+vi.mock("react-router-dom", async () => {
+  const actual = await vi.importActual("react-router-dom");
+  return {
+    ...actual,
+    useLocation: () => ({
+      state: { productType: "UNI" },
+    }),
+  };
+});
 
 test("StandardAPIMappingTable", () => {
   vi.spyOn(mappingStore, "useMappingUiStore").mockReturnValue({
@@ -52,7 +63,9 @@ test("StandardAPIMappingTable", () => {
       details: [
         {
           description: "mock_mapping",
-          mappingMatrix: {},
+          mappingMatrix: {
+            productType: "UNI",
+          },
           mappingStatus: "in progress",
           method: "GET",
           orderBy: "createdAt",
