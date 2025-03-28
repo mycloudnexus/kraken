@@ -330,8 +330,8 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
   }
 
   @Transactional(readOnly = true)
-  public List<UnifiedAssetDto> queryDeployedAssets(String tagId) {
-    UnifiedAssetEntity unifiedAssetEntity = unifiedAssetService.findOneByIdOrKey(tagId);
+  public List<UnifiedAssetDto> queryDeployedAssets(String assetId) {
+    UnifiedAssetEntity unifiedAssetEntity = unifiedAssetService.findOneByIdOrKey(assetId);
     UnifiedAssetDto assetDto = UnifiedAssetService.toAsset(unifiedAssetEntity, true);
     DeploymentFacet facets = UnifiedAsset.getFacets(assetDto, new TypeReference<>() {});
     List<String> tagIds = facets.getComponentTags().stream().map(ComponentTag::getTagId).toList();
@@ -968,8 +968,8 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
         .map(
             entry -> {
               String mapperKey = entry.getKey();
-              ClientMapperVersionPayloadDto paylaod = entry.getValue();
-              UnifiedAssetEntity tagEntity = tagEntityMap.get(paylaod.getTagId());
+              ClientMapperVersionPayloadDto payload = entry.getValue();
+              UnifiedAssetEntity tagEntity = tagEntityMap.get(payload.getTagId());
               UnifiedAssetDto tagAsset = UnifiedAssetService.toAsset(tagEntity, false);
               Map<String, String> labels = tagAsset.getMetadata().getLabels();
               UnifiedAssetDto mapperAsset = mapperAssetMap.get(mapperKey);
@@ -991,7 +991,7 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
               deploymentDTO.setTargetMapperKey(mapperKey);
               deploymentDTO.setVersion(labels.get(LABEL_VERSION_NAME));
               deploymentDTO.setSubVersion(labels.get(LABEL_SUB_VERSION_NAME));
-              deploymentDTO.setTagId(paylaod.getTagId());
+              deploymentDTO.setTagId(payload.getTagId());
               deploymentDTO.setEnvId(environment.getId());
               deploymentDTO.setEnvName(environment.getName());
               fillVerifiedInfo(tagAsset.getId(), deploymentDTO, envId);

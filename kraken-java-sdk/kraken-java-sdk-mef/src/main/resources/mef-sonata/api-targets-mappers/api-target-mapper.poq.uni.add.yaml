@@ -23,86 +23,10 @@ spec:
       path: ""
       method: ""
       mappers:
+        schemaRef:
+          ref: "classpath:/mef-sonata/api-common-mappers/api-target-mapper.poq.common.add.yaml"
+          params:
+            - key: productType
+              val: uni
         request:
-          - name: mapper.poq.uni.add.place.id
-            source: "@{{productOfferingQualificationItem[0].product.place[0].id}}"
-            sourceLocation: BODY
-            sourceType: string
-            target: ""
-            targetLocation: ""
-            requiredMapping: true
-          - name: mapper.poq.uni.add.productConfiguration.bandwidth
-            source: "@{{productOfferingQualificationItem[0].product.productConfiguration.bandwidth}}"
-            sourceLocation: BODY
-            allowValueLimit: false
-            sourceType: integer
-            discrete: true
-            sourceValues:
-            target: ""
-            targetLocation: ""
-            requiredMapping: true
-          - name: mapper.poq.uni.add.productConfiguration.bandwidthUnit
-            source: "@{{productOfferingQualificationItem[0].product.productConfiguration.bandwidthUnit}}"
-            sourceLocation: BODY
-            sourceType: enum
-            sourceValues:
-              - GBPS
-              - MBPS
-            valueMapping: {}
-            target: ""
-            targetLocation: ""
-            requiredMapping: true
-          - name: mapper.poq.uni.add.productOffering.id
-            source: "@{{productOfferingQualificationItem[0].product.productOffering.id}}"
-            sourceLocation: BODY
-            sourceType: string
-            target: ""
-            targetLocation: ""
-            requiredMapping: false
         response:
-          - name: mapper.poq.uni.add.serviceabilityConfidence
-            title: POQ Item State Mapping
-            description: >-
-              A color that indicates confidence to service the request.
-              When the item state is done the Seller MUST provide a value. 
-              It MUST NOT be populated for other states.
-            source: ""
-            sourceLocation: ""
-            target: "@{{productOfferingQualificationItem[0].serviceabilityConfidence}}"
-            targetType: enum
-            targetLocation: BODY
-            targetValues:
-              - green
-              - yellow
-              - red
-            valueMapping: {}
-            defaultValue: "green"
-            requiredMapping: true
-          - name: mapper.poq.uni.add.installationInterval.amount
-            title: POQ installationInterval amount Mapping
-            description: Duration amount of Installation
-            source: ""
-            sourceLocation: ""
-            target: "@{{productOfferingQualificationItem[0].installationInterval.amount}}"
-            targetLocation: BODY
-            defaultValue: "0"
-            requiredMapping: true
-          - name: mapper.poq.uni.add.installationInterval.units
-            title: POQ installationInterval units Mapping
-            description: Duration unit of Installation
-            source: ""
-            sourceLocation: ""
-            target: "@{{productOfferingQualificationItem[0].installationInterval.units}}"
-            targetType: enum
-            targetLocation: BODY
-            targetValues:
-              - calendarMonths
-              - calendarDays
-              - calendarHours
-              - calendarMinutes
-              - businessDays
-              - businessHours
-              - businessMinutes
-            valueMapping: {}
-            defaultValue: "calendarMonths"
-            requiredMapping: true
