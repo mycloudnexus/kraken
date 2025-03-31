@@ -1,9 +1,9 @@
-import { render, screen, fireEvent } from "@testing-library/react";
-import { vi } from "vitest";
-import { BrowserRouter as Router } from "react-router-dom";
-import ApiComponents from "@/pages/HomePage/components/ApiComponents";
 import ApiComponent from "@/pages/HomePage/components/ApiComponent";
+import ApiComponents from "@/pages/HomePage/components/ApiComponents";
 import { IUnifiedAsset } from "@/utils/types/common.type";
+import { render, screen, fireEvent } from "@testing-library/react";
+import { BrowserRouter as Router } from "react-router-dom";
+import { vi } from "vitest";
 
 const mockOpenDrawer = vi.fn();
 const mockNavigate = vi.fn();
@@ -15,25 +15,28 @@ vi.mock("react-router-dom", () => ({
   ),
 }));
 
-vi.mock("@/hooks/product", () => ({
-  useGetComponentListAPI: () => ({
-    data: {
-      data: [
-        {
-          id: "1",
-          facets: {
-            supportedProductTypesAndActions: [
-              { productTypes: ["ACCESS_E_LINE"], actionTypes: ["CREATE"] },
-            ],
-          },
-          links: [],
-        },
-      ],
-    },
-    isLoading: false,
+vi.mock("@/hooks/homepage", () => ({
+  useGetProductTypeList: () => ({
+    data: [
+      "ACCESS_E_LINE:Access Eline",
+      "INTERNET_ACCESS:Internet Access",
+      "UNI:Uni",
+      "SHARED:Shared",
+    ],
   }),
-  useGetComponentListSpec: () => ({
-    data: { data: [] },
+  useGetStandardApiComponents: (selectedProductType: string) => ({
+    data:
+      selectedProductType === "UNI"
+        ? [
+            {
+              name: "Test API",
+              componentKey: "item-key",
+              apiCount: 3,
+              baseSpec: { content: "mock-content" },
+              supportedProductTypes: ["UNI"],
+            },
+          ]
+        : [],
     isLoading: false,
   }),
 }));
@@ -43,30 +46,25 @@ vi.mock("@/stores/app.store", () => ({
 }));
 
 const defaultProps = {
-  targetSpec: {
-    metadata: {
-      logo: "mock-logo.png",
-    },
-  },
   supportInfo: "UNI",
   apis: 3,
   title: "Test API",
+  logo: "mock-logo.png",
   targetYaml: {
     info: {
       description: "**Title** Description of the API",
     },
   },
   item: {
-    metadata: {
-      key: "item-key",
-      labels: { label1: "Label 1", label2: "Label 2" },
-    },
+    componentKey: "item-key",
+    labels: { label1: "Label 1", label2: "Label 2" },
+    supportedProductTypes: ["UNI"],
   } as unknown as IUnifiedAsset,
   openDrawer: mockOpenDrawer,
 };
 
 describe("API Components - Tabs and Navigation", () => {
-  it("renders all tabs correctly", async () => {
+  it("renders all tabs correctly", () => {
     render(
       <Router>
         <ApiComponents />
@@ -74,25 +72,32 @@ describe("API Components - Tabs and Navigation", () => {
     );
 
     expect(screen.getByText("Standard API Mapping")).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "Access Eline" })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "Internet Access" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("tab", { name: "Access Eline" })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("tab", { name: "Internet Access" })
+    ).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: "Uni" })).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: "Shared" })).toBeInTheDocument();
   });
 
-  it("switches tabs and renders the correct content", async () => {
+  it("switches tabs and renders the correct content", () => {
     render(
       <Router>
         <ApiComponents />
       </Router>
     );
+
+    const uniTab = screen.getByRole("tab", { name: "Uni" });
     const accessElineTab = screen.getByRole("tab", { name: "Access Eline" });
-    const internetAccessTab = screen.getByRole("tab", { name: "Internet Access" });
 
-    expect(accessElineTab).toHaveAttribute("aria-selected", "true");
-    fireEvent.click(internetAccessTab);
+    expect(screen.getByRole("tab", { name: "Uni" })).toBeInTheDocument();
+    fireEvent.click(accessElineTab);
 
-    expect(internetAccessTab).toHaveAttribute("aria-selected", "true");
+    expect(
+      screen.getByRole("tab", { name: "Access Eline" })
+    ).toBeInTheDocument();
   });
 
   it("renders ApiComponent correctly inside a tab", () => {

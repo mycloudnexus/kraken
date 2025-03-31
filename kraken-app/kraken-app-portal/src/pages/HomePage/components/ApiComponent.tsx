@@ -1,5 +1,5 @@
 import { Text } from "@/components/Text";
-import { IUnifiedAsset } from "@/utils/types/common.type";
+import { StandardApiComponent } from "@/utils/types/product.type";
 import { Col, Tooltip, Flex, Typography, Button } from "antd";
 import { ReactNode, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
@@ -7,17 +7,15 @@ import { DrawerDetails } from "./ApiComponents";
 import styles from "./index.module.scss";
 
 type Props = {
-  targetSpec: Record<string, any>;
   targetYaml: Record<string, any>;
   supportInfo: any;
   apis: number;
   title: string;
-  item: IUnifiedAsset;
+  item: StandardApiComponent;
   openDrawer: (details: DrawerDetails) => void;
 };
 
 const ApiComponent = ({
-  targetSpec,
   supportInfo,
   apis,
   title,
@@ -64,14 +62,14 @@ const ApiComponent = ({
     <Flex
       className={styles.apiContainer}
       onClick={() => {
-        navigate(`/api-mapping/${item.metadata.key}`, {
+        navigate(`/api-mapping/${item.componentKey}`, {
           state: { productType: supportInfo as string },
         });
       }}
     >
       <div>
         <Flex justify="flex-start" gap={12} align="center">
-          <img src={targetSpec.metadata?.logo} alt={title}></img>
+          <img src={item.logo} alt={title}></img>
           <Flex style={{ flex: 1, overflow: "hidden" }} vertical>
             <Flex
               style={{ flex: 1, width: "100%" }}
@@ -101,10 +99,10 @@ const ApiComponent = ({
               </Flex>
             </Flex>
             <Flex gap={8} style={{ marginTop: 2 }}>
-              {Object.keys(item.metadata.labels).map((l) => {
+              {Object.keys(item.labels).map((l) => {
                 return (
                   <Tooltip title={l} key={l}>
-                    <Col className={styles.tags}>{item.metadata.labels[l]}</Col>
+                    <Col className={styles.tags}>{item.labels[l]}</Col>
                   </Tooltip>
                 );
               })}

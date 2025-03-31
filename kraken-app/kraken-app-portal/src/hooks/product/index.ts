@@ -358,6 +358,7 @@ export const useGetComponentSpecDetails = (
 export const useGetComponentDetailMapping = (
   productId: string,
   componentId: string,
+  productType: string,
   open = true
 ) => {
   return useQuery<any, Error, IDetailsData<IMapperDetails>>({
@@ -366,7 +367,8 @@ export const useGetComponentDetailMapping = (
       productId,
       componentId,
     ],
-    queryFn: () => getComponentDetailMapping(productId, componentId),
+    queryFn: () =>
+      getComponentDetailMapping(productId, componentId, productType),
     enabled: Boolean(productId && componentId && open),
     select: (data) => data.data,
   });

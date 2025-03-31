@@ -2,13 +2,16 @@ import {
   getApiActivityRequests,
   getErrorBrakedownRequests,
   getMostPopularEndpointsRequests,
+  getProductTypeList,
   getQuickStartGuide,
+  getStandardApiComponents,
 } from "@/services/homepage";
 import {
   IApiActivity,
   IErrorBrakedown,
   IMostPopularEndpoints,
   IQuickStartGuideObject,
+  StandardApiComponent,
 } from "@/utils/types/product.type";
 import { useQuery } from "@tanstack/react-query";
 import { USER_CACHE_KEYS } from "../user";
@@ -71,5 +74,26 @@ export const useGetMostPopularEndpoints = (
         requestEndTime,
       }),
     select: (data) => data?.data,
+  });
+};
+
+export const useGetProductTypeList = (productId: string) => {
+  return useQuery<any, Error, any>({
+    queryKey: [USER_CACHE_KEYS.get_product_types, productId],
+    queryFn: () => getProductTypeList(productId),
+    select: (data) => data?.data,
+    enabled: !!productId,
+  });
+};
+
+export const useGetStandardApiComponents = (
+  productId: string,
+  productType: string
+) => {
+  return useQuery<any, Error>({
+    queryKey: [USER_CACHE_KEYS.get_standard_components, productId, productType],
+    queryFn: () => getStandardApiComponents(productId, productType),
+    select: (data) => data?.data,
+    enabled: !!productId && !!productType,
   });
 };

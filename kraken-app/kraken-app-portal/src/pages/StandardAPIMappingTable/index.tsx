@@ -28,20 +28,24 @@ const StandardAPIMappingTable = () => {
   const navigate = useNavigate();
   const { componentId } = useParams();
   const { currentProduct } = useAppStore();
+  const { state } = useLocation();
+  const { productType } = state;
   const { data: componentList } = useGetComponentListAPI(currentProduct);
   const { data: componentDetail, isLoading } = useGetComponentDetail(
     currentProduct,
     componentId ?? ""
   );
   const { data: detailDataMapping, isLoading: isDetailMappingLoading } =
-    useGetComponentDetailMapping(currentProduct, componentId ?? "");
+    useGetComponentDetailMapping(
+      currentProduct,
+      componentId ?? "",
+      productType
+    );
 
   const componentName = useMemo(
     () => get(componentDetail, "metadata.name", ""),
     [componentDetail]
   );
-  const { state } = useLocation();
-  const { productType } = state;
 
   const mergePath = (data: IMapperDetails[]) => {
     const result = [...data];
