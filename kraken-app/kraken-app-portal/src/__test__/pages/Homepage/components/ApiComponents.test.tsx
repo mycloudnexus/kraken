@@ -1,6 +1,6 @@
 import ApiComponent from "@/pages/HomePage/components/ApiComponent";
 import ApiComponents from "@/pages/HomePage/components/ApiComponents";
-import { IUnifiedAsset } from "@/utils/types/common.type";
+import { StandardApiComponent } from "@/utils/types/product.type";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { BrowserRouter as Router } from "react-router-dom";
 import { vi } from "vitest";
@@ -56,10 +56,18 @@ const defaultProps = {
     },
   },
   item: {
+    name: "Test API",
     componentKey: "item-key",
-    labels: { label1: "Label 1", label2: "Label 2" },
     supportedProductTypes: ["UNI"],
-  } as unknown as IUnifiedAsset,
+    labels: { label1: "Label 1", label2: "Label 2" },
+    logo: "mock-logo.png",
+    baseSpec: {
+      path: "/api-path",
+      content: "mock-content",
+      format: "json",
+    },
+    apiCount: 3,
+  } as StandardApiComponent,
   openDrawer: mockOpenDrawer,
 };
 
@@ -88,8 +96,6 @@ describe("API Components - Tabs and Navigation", () => {
         <ApiComponents />
       </Router>
     );
-
-    const uniTab = screen.getByRole("tab", { name: "Uni" });
     const accessElineTab = screen.getByRole("tab", { name: "Access Eline" });
 
     expect(screen.getByRole("tab", { name: "Uni" })).toBeInTheDocument();
