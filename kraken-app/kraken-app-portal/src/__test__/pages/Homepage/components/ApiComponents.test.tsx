@@ -134,4 +134,34 @@ describe("API Components - Tabs and Navigation", () => {
       state: { productType: "UNI" },
     });
   });
+
+  it("does not render ApiComponent when key is not in supported product types", () => {
+    vi.doMock("@/hooks/homepage", () => ({
+      useGetProductTypeList: () => ({
+        data: ["INTERNET_ACCESS:Internet Access"],
+      }),
+      useGetStandardApiComponents: () => ({
+        data: [
+          {
+            name: "Test API",
+            componentKey: "item-key",
+            apiCount: 3,
+            baseSpec: { content: "mock-content" },
+            supportedProductTypes: ["UNI"], // Does not include "INTERNET_ACCESS"
+          },
+        ],
+        isLoading: false,
+      }),
+    }));
+
+    render(
+      <Router>
+        <ApiComponents />
+      </Router>
+    );
+
+    fireEvent.click(screen.getByRole("tab", { name: "Internet Access" }));
+
+    expect(screen.queryByText("Test API")).not.toBeInTheDocument();
+  });
 });

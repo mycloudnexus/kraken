@@ -32,17 +32,12 @@ const ApiComponents = () => {
   >(undefined);
 
   const { data: productTypeList } = useGetProductTypeList(currentProduct);
-
   const { data: standardApiComponents, isLoading: apiLoading } =
     useGetStandardApiComponents(currentProduct, selectedProductType || "UNI");
 
-  const getTargetSpecItem = useCallback(
-    (i: any) => {
-      const targetYaml = yaml.load(decode(i)) as any;
-      return { targetYaml };
-    },
-    [standardApiComponents]
-  );
+  const getTargetSpecItem = useCallback((content: string) => {
+    return { targetYaml: yaml.load(decode(content)) as any };
+  }, []);
 
   const openDrawer = (details: DrawerDetails) => {
     setDrawerDetails(details);
@@ -53,48 +48,44 @@ const ApiComponents = () => {
     setOpen(false);
   };
 
+  const renderTabs = () =>
+    productTypeList?.map((item: string) => {
+      const [key, label] = item.split(":");
+
+      return (
+        <Tabs.TabPane tab={label} key={key}>
+          <Row gutter={[24, 24]}>
+            {standardApiComponents
+              ?.filter((component: StandardApiComponent) =>
+                component.supportedProductTypes.includes(key)
+              )
+              .map((component: StandardApiComponent) => {
+                const { name, componentKey, apiCount, baseSpec } = component;
+                const { targetYaml = {} } = getTargetSpecItem(baseSpec.content);
+
+                return (
+                  <Col lg={12} xl={8} sm={24} key={componentKey}>
+                    <ApiComponent
+                      item={component}
+                      title={name}
+                      apis={apiCount}
+                      targetYaml={targetYaml}
+                      supportInfo={key}
+                      openDrawer={openDrawer}
+                    />
+                  </Col>
+                );
+              })}
+          </Row>
+        </Tabs.TabPane>
+      );
+    });
+
   return (
-    <PageLayout title={`Standard API Mapping`}>
+    <PageLayout title="Standard API Mapping">
       <Spin spinning={apiLoading}>
         <Card style={{ height: "100%", borderRadius: "4px" }}>
-          <Tabs onChange={(key) => setSelectedProductType(key)}>
-            {productTypeList?.map(
-              (item: { split: (arg0: string) => [any, any] }) => {
-                const [key, label] = item.split(":");
-                return (
-                  <Tabs.TabPane tab={label} key={key}>
-                    <Row gutter={[24, 24]}>
-                      {standardApiComponents?.map(
-                        (component: StandardApiComponent) => {
-                          const { name, componentKey, apiCount, baseSpec } =
-                            component;
-                          const { targetYaml = {} } = getTargetSpecItem(
-                            baseSpec.content
-                          );
-
-                          if (!component.supportedProductTypes.includes(key))
-                            return null;
-
-                          return (
-                            <Col lg={12} xl={8} sm={24} key={componentKey}>
-                              <ApiComponent
-                                item={component}
-                                title={name}
-                                apis={apiCount}
-                                targetYaml={targetYaml}
-                                supportInfo={key}
-                                openDrawer={openDrawer}
-                              />
-                            </Col>
-                          );
-                        }
-                      )}
-                    </Row>
-                  </Tabs.TabPane>
-                );
-              }
-            )}
-          </Tabs>
+          <Tabs onChange={setSelectedProductType}>{renderTabs()}</Tabs>
         </Card>
         <Drawer
           width={576}
@@ -108,7 +99,7 @@ const ApiComponents = () => {
           open={open}
         >
           <b>{drawerDetails.documentTitle}</b>
-          <p style={{ whiteSpace: "pre-wrap", margin: "0" }}>
+          <p style={{ whiteSpace: "pre-wrap", margin: 0 }}>
             {drawerDetails.documentContent}
           </p>
         </Drawer>
