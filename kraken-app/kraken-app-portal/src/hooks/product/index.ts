@@ -358,7 +358,7 @@ export const useGetComponentSpecDetails = (
 export const useGetComponentDetailMapping = (
   productId: string,
   componentId: string,
-  productType: string,
+  productType?: string,
   open = true
 ) => {
   return useQuery<any, Error, IDetailsData<IMapperDetails>>({

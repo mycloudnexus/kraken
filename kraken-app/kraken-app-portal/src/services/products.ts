@@ -60,7 +60,7 @@ export const getComponentDetailV2 = (
 export const getComponentDetailMapping = (
   productId: string,
   componentId: string,
-  productType: string
+  productType?: string
 ) => {
   return request(
     `${PRODUCT}/${productId}/components/${componentId}/mapper-details`,

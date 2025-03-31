@@ -11,7 +11,6 @@ import {
   IErrorBrakedown,
   IMostPopularEndpoints,
   IQuickStartGuideObject,
-  StandardApiComponent,
 } from "@/utils/types/product.type";
 import { useQuery } from "@tanstack/react-query";
 import { USER_CACHE_KEYS } from "../user";
