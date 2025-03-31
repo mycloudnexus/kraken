@@ -1,6 +1,8 @@
 package com.consoleconnect.kraken.operator.gateway.service;
 
 import static com.consoleconnect.kraken.operator.core.toolkit.Constants.*;
+import static com.consoleconnect.kraken.operator.core.toolkit.StringUtils.readWithJsonPath;
+import static com.consoleconnect.kraken.operator.core.toolkit.StringUtils.writeWithJsonPath;
 
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
 import com.consoleconnect.kraken.operator.core.entity.WorkflowInstanceEntity;
@@ -11,6 +13,7 @@ import com.consoleconnect.kraken.operator.core.model.ApiActivityResponseLog;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
 import com.consoleconnect.kraken.operator.core.repo.WorkflowInstanceRepository;
 import com.consoleconnect.kraken.operator.core.toolkit.ConstructExpressionUtil;
+import com.consoleconnect.kraken.operator.core.toolkit.DateTime;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.gateway.entity.HttpRequestEntity;
 import com.consoleconnect.kraken.operator.gateway.repo.HttpRequestRepository;
@@ -35,6 +38,12 @@ import org.springframework.web.reactive.function.client.WebClient;
 @AllArgsConstructor
 @Getter
 public class WorkflowTaskConfig implements WorkflowTaskRegister {
+  public static final String CHANGE_DATE = "changeDate";
+  public static final String STATE = "state";
+  public static final String ORDER_ITEM_PATH = "$.productOrderItem[0]";
+  public static final String STATE_CHANGE_PATH = "$.productOrderItem[0].stateChange";
+  public static final String STATE_CHANGE = "stateChange";
+  public static final String ACKNOWLEDGED = "acknowledged";
   private final HttpRequestRepository repository;
 
   private final BackendApiActivityLogService backendApiActivityLogService;
@@ -211,9 +220,29 @@ public class WorkflowTaskConfig implements WorkflowTaskRegister {
     optional.ifPresent(
         entity -> {
           Map<String, Object> map = JsonToolkit.fromJson(entity.getRenderedResponse(), Map.class);
-          map.put("state", state);
+          map.put(STATE, state);
+          setStateChangeRecord(map, ACKNOWLEDGED, DateTime.format(entity.getCreatedAt()));
+          setStateChangeRecord(map, state, entity.getCreatedAt().toString());
           entity.setRenderedResponse(map);
           repository.save(entity);
         });
+  }
+
+  public static void setStateChangeRecord(
+      Map<String, Object> map, String state, String changeDate) {
+    Object stateChangeListObj = readWithJsonPath(map, STATE_CHANGE_PATH);
+    LinkedList<Map<String, Object>> list = new LinkedList<>();
+    if (stateChangeListObj instanceof List) {
+      list.addAll((List<Map<String, Object>>) stateChangeListObj);
+    }
+    boolean stateExist = list.stream().anyMatch(v -> Objects.equals(v.get(STATE), state));
+    if (!stateExist) {
+      Map<String, Object> stateMap = new HashMap<>();
+      stateMap.put(STATE, state);
+      stateMap.put(
+          CHANGE_DATE, StringUtils.isBlank(changeDate) ? DateTime.nowInUTCFormatted() : changeDate);
+      list.add(stateMap);
+      writeWithJsonPath(map, ORDER_ITEM_PATH, STATE_CHANGE, list);
+    }
   }
 }

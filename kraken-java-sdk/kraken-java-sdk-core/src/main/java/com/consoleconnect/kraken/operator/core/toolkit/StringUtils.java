@@ -5,8 +5,11 @@ import static org.apache.commons.lang3.StringUtils.*;
 
 import com.consoleconnect.kraken.operator.core.exception.ErrorResponse;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
+import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class StringUtils {
 
   private StringUtils() {}
@@ -78,6 +81,15 @@ public class StringUtils {
       return JsonPath.read(json, path);
     } catch (Exception e) {
       return EMPTY;
+    }
+  }
+
+  public static void writeWithJsonPath(Object json, String path, String node, Object value) {
+    try {
+      DocumentContext doc = JsonPath.parse(json);
+      doc.put(path, node, value);
+    } catch (Exception e) {
+      log.error(String.format("failed to set json path %s, error: %s", path, e.getMessage()));
     }
   }
 }

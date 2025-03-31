@@ -85,5 +85,7 @@ class StringUtilsTest {
     map.put("id", "123");
     Assertions.assertNotNull(StringUtils.readWithJsonPath(map, "$.id"));
     Assertions.assertNotNull(StringUtils.readWithJsonPath(map, "$.name"));
+    StringUtils.writeWithJsonPath(map, "$", "name", "John");
+    Assertions.assertTrue(map.containsKey("name"));
   }
 }
