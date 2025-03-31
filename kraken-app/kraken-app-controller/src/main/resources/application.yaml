@@ -209,6 +209,8 @@ app:
   features:
     push-activity-log-external:
       enabled: false
+    extendCommonConfig:
+      enabled: true
 
   initialize-exclude-assets:
     - classpath:/mef-sonata/api-targets/api-target.quote.eline.add.yaml
@@ -276,7 +278,22 @@ app:
     mef.sonata.api-target-mapper.inventory.uni.read: <2,1>
     mef.sonata.api-target-mapper.inventory.eline.read: <2,2>
   product-types:
-    - UNI
-    - ACCESS_E_LINE
-    - INTERNET_ACCESS
-    - SHARE
+    - "UNI:Uni"
+    - "ACCESS_E_LINE:Access Eline "
+    - "INTERNET_ACCESS:Internet Access"
+    - "SHARE:Shared"
+  supported-product-types:
+    address:
+      - SHARE
+    order:
+      - UNI
+      - ACCESS_E_LINE
+    quote:
+      - UNI
+      - ACCESS_E_LINE
+    poq:
+      - UNI
+      - ACCESS_E_LINE
+    inventory:
+      - UNI
+      - ACCESS_E_LINE

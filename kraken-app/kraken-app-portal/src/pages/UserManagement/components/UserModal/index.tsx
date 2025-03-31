@@ -1,4 +1,6 @@
+import Role from "@/components/Role";
 import { Text } from "@/components/Text";
+import { useCreateUser } from "@/hooks/user";
 import { CloseOutlined } from "@ant-design/icons";
 import {
   Button,
@@ -10,11 +12,9 @@ import {
   Select,
   notification,
 } from "antd";
-import styles from "./index.module.scss";
-import { roleOptions } from "../UserRoleEdit";
-import Role from "@/components/Role";
-import { useCreateUser } from "@/hooks/user";
 import { get } from "lodash";
+import { roleOptions } from "../UserRoleEdit";
+import styles from "./index.module.scss";
 
 type Props = {
   open: boolean;
@@ -44,7 +44,7 @@ const UserModal = ({ open, onClose }: Props) => {
     <Drawer
       width="40vw"
       open={open}
-      maskClosable
+      maskClosable={false}
       onClose={onClose}
       title={
         <Flex justify="space-between" align="center">

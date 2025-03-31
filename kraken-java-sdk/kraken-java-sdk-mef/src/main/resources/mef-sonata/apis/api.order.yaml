@@ -17,20 +17,14 @@ spec:
         - add
         - modify
         - delete
-      productTypes:
-        - UNI
-        - ACCESS_E_LINE
-        - INTERNET_ACCESS
+      supportedConfig: $.order
     - path: /mefApi/sonata/productOrderingManagement/v10/productOrder/{id}
       method: get
       actionTypes:
         - add
         - modify
         - delete
-      productTypes:
-        - UNI
-        - ACCESS_E_LINE
-        - INTERNET_ACCESS
+      supportedConfig: $.order
   mappings:
     - uri: ${env.target.url}
       trigger:
@@ -316,7 +310,7 @@ spec:
         - id: mock-response
           actionType: buildin@mock-response
           env:
-            forwardDownstream: ${entity.renderedResponse.uniqueId!=null}
+            forwardDownstream: ${entity.renderedResponse.orderId!=null || entity.renderedResponse.uniqueId!=null}
 
         - id: modify-response-body
           actionType: buildin@modify-response-body

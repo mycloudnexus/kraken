@@ -201,6 +201,7 @@ const APIServerList = () => {
     componentKey: "-",
     key: "-",
   });
+  const [activeKey, setActiveKey] = useState("apiServerSetup");
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDrawerDetails({
@@ -213,18 +214,20 @@ const APIServerList = () => {
     <div style={{ width: "100%" }}>
       <Tabs
         className={styles["seller-api-tabs-container"]}
-        defaultActiveKey="1"
+        onChange={(key) => setActiveKey(key)}
         tabBarExtraContent={
-          <Button
-            type="primary"
-            onClick={() => navigate(`/component/${currentProduct}/new`)}
-          >
-            + Create API server
-          </Button>
+          activeKey === "apiServerSetup" && (
+            <Button
+              type="primary"
+              onClick={() => navigate(`/component/${currentProduct}/new`)}
+            >
+              + Create API server
+            </Button>
+          )
         }
         items={[
           {
-            key: "1",
+            key: "apiServerSetup",
             label: "API server setup",
             children: (
               <div className={styles.content}>
@@ -251,7 +254,7 @@ const APIServerList = () => {
             ),
           },
           {
-            key: "2",
+            key: "contactInformationSetup",
             label: "Contact information setup",
             children: (
               <ContactInformationSetup
@@ -271,6 +274,7 @@ const APIServerList = () => {
           </div>
         }
         open={drawerOpen}
+        maskClosable={false}
         onClose={() => setDrawerOpen(false)}
         width={578}
         destroyOnClose

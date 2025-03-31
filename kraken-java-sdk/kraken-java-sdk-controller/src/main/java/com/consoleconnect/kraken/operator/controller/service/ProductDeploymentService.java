@@ -330,8 +330,8 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
   }
 
   @Transactional(readOnly = true)
-  public List<UnifiedAssetDto> queryDeployedAssets(String tagId) {
-    UnifiedAssetEntity unifiedAssetEntity = unifiedAssetService.findOneByIdOrKey(tagId);
+  public List<UnifiedAssetDto> queryDeployedAssets(String assetId) {
+    UnifiedAssetEntity unifiedAssetEntity = unifiedAssetService.findOneByIdOrKey(assetId);
     UnifiedAssetDto assetDto = UnifiedAssetService.toAsset(unifiedAssetEntity, true);
     DeploymentFacet facets = UnifiedAsset.getFacets(assetDto, new TypeReference<>() {});
     List<String> tagIds = facets.getComponentTags().stream().map(ComponentTag::getTagId).toList();
@@ -708,11 +708,7 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
         .forEach(
             comAsset ->
                 comAsset.getLinks().stream()
-                    .filter(
-                        link ->
-                            link.getRelationship()
-                                .equalsIgnoreCase(
-                                    AssetLinkKindEnum.IMPLEMENTATION_TARGET_MAPPER.getKind()))
+                    .filter(this::isMapperOrWorkflow)
                     .forEach(
                         link ->
                             mapper2Component.put(
@@ -721,6 +717,12 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
                                     comAsset.getMetadata().getKey(),
                                     comAsset.getMetadata().getName()))));
     return mapper2Component;
+  }
+
+  private boolean isMapperOrWorkflow(AssetLink link) {
+    String relationship = link.getRelationship();
+    return relationship.equalsIgnoreCase(AssetLinkKindEnum.IMPLEMENTATION_TARGET_MAPPER.getKind())
+        || relationship.equalsIgnoreCase(AssetLinkKindEnum.IMPLEMENTATION_WORKFLOW.getKind());
   }
 
   private @NotNull List<ApiMapperDeploymentDTO> getApiMapperDeploymentDTOS(
@@ -770,10 +772,12 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
                     deploymentDTO.setEnvName(labels.getOrDefault(LABEL_ENV_NAME, ""));
                     fillVerifiedInfo(dto.getTagId(), deploymentDTO, envId);
                     calculateCanDeployToTargetEnv(deploymentDTO);
-                    deploymentDTO.setComponentKey(
-                        mapper2Component.get(dto.getParentComponentKey()).getKey());
-                    deploymentDTO.setComponentName(
-                        mapper2Component.get(dto.getParentComponentKey()).getValue());
+                    if (mapper2Component.containsKey(dto.getParentComponentKey())) {
+                      deploymentDTO.setComponentKey(
+                          mapper2Component.get(dto.getParentComponentKey()).getKey());
+                      deploymentDTO.setComponentName(
+                          mapper2Component.get(dto.getParentComponentKey()).getValue());
+                    }
                     result.add(deploymentDTO);
                   });
         });
@@ -968,8 +972,8 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
         .map(
             entry -> {
               String mapperKey = entry.getKey();
-              ClientMapperVersionPayloadDto paylaod = entry.getValue();
-              UnifiedAssetEntity tagEntity = tagEntityMap.get(paylaod.getTagId());
+              ClientMapperVersionPayloadDto payload = entry.getValue();
+              UnifiedAssetEntity tagEntity = tagEntityMap.get(payload.getTagId());
               UnifiedAssetDto tagAsset = UnifiedAssetService.toAsset(tagEntity, false);
               Map<String, String> labels = tagAsset.getMetadata().getLabels();
               UnifiedAssetDto mapperAsset = mapperAssetMap.get(mapperKey);
@@ -991,7 +995,7 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
               deploymentDTO.setTargetMapperKey(mapperKey);
               deploymentDTO.setVersion(labels.get(LABEL_VERSION_NAME));
               deploymentDTO.setSubVersion(labels.get(LABEL_SUB_VERSION_NAME));
-              deploymentDTO.setTagId(paylaod.getTagId());
+              deploymentDTO.setTagId(payload.getTagId());
               deploymentDTO.setEnvId(environment.getId());
               deploymentDTO.setEnvName(environment.getName());
               fillVerifiedInfo(tagAsset.getId(), deploymentDTO, envId);

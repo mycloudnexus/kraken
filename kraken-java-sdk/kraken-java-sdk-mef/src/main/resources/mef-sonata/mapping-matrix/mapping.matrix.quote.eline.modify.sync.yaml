@@ -20,7 +20,7 @@ spec:
       - name: action_modify
         path: "$.body.quoteItem[*].['action']"
         expectType: EXPECTED
-        value: add
+        value: modify
         code: 400
       - name: syn_mode_true
         path: "$.body.instantSyncQuote"
