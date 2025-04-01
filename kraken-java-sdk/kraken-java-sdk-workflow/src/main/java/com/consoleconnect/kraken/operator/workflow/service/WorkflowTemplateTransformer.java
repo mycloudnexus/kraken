@@ -226,8 +226,13 @@ public class WorkflowTemplateTransformer {
         simpleTask
             .getInput()
             .putAll(Map.of(PAYLOAD, String.format(SUB_HTTP_TASK_RESPONSE, httpTask.getTaskName())));
-        if (StringUtils.isNotBlank(httpTask.getUniqueIdPath())) {
-          simpleTask.getInput().put(UNIQUE_ID_PATH, httpTask.getUniqueIdPath());
+        if (httpTask.getEndpoint().getMappers() != null
+            && CollectionUtils.isNotEmpty(httpTask.getEndpoint().getMappers().getResponse())) {
+          String source = httpTask.getEndpoint().getMappers().getResponse().get(0).getSource();
+          List<String> idPaths = ConstructExpressionUtil.extractMapperParam(source);
+          if (CollectionUtils.isNotEmpty(idPaths)) {
+            simpleTask.getInput().put(UNIQUE_ID_PATH, idPaths.get(0));
+          }
         }
       }
       case EVALUATE_EXPRESSION_TASK -> {
