@@ -42,7 +42,6 @@ facets:
   executionStage:
     - taskName: delete_order_task
       taskType: http
-      uniqueIdPath: "id"
       endpoint:
         path: '/api/v2/company/{username}/connections/{connectionId}'
         method: DELETE
