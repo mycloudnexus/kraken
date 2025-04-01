@@ -1,0 +1,13 @@
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.1.7.39
+  name: V1.7.39
+  labels:
+    productSpec: grace
+    productVersion: V1.7.39
+    publishDate: 2025-04-01
+  description: |
+    fix check forward downstream issue
+  version: 1
