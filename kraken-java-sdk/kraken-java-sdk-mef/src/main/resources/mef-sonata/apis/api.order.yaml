@@ -310,7 +310,7 @@ spec:
         - id: mock-response
           actionType: buildin@mock-response
           env:
-            forwardDownstream: ${entity.renderedResponse.orderId!=null || entity.renderedResponse.uniqueId!=null}
+            forwardDownstream: ${(entity.renderedResponse.orderId!='' && entity.renderedResponse.orderId!=null) || (entity.renderedResponse.uniqueId!=null && entity.renderedResponse.uniqueId!=‘’)}
 
         - id: modify-response-body
           actionType: buildin@modify-response-body
