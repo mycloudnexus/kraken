@@ -62,6 +62,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
   public static final String WORKFLOW_PREFIX = "workflow.";
   public static final String MODIFICATION_RULE_KEY = "modificationFilterRule";
   public static final String EXPECTED422_PATH_KEY = "expect-http-status-422-if-missing";
+  public static final String ROUTE_PARAMS = "routeParams";
   private final UnifiedAssetService unifiedAssetService;
   private final UnifiedAssetRepository unifiedAssetRepository;
   private final HttpRequestRepository httpRequestRepository;
@@ -102,7 +103,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     String matrixKey = inputs.get(MAPPING_MATRIX_KEY).toString();
     String targetKey = inputs.get(TARGET_KEY).toString();
     if (unifiedAssetRepository.findOneByKey(targetKey).isEmpty()) {
-      throw KrakenException.badRequest(API_CASE_NOT_SUPPORTED.formatted("not deployed"));
+      throw KrakenException.badRequest(API_CASE_NOT_SUPPORTED.formatted(inputs.get(ROUTE_PARAMS)));
     }
     if (StringUtils.isNotBlank(matrixKey)
         && matrixKey.endsWith(NOT_FOUND)

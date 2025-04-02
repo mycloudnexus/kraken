@@ -55,8 +55,8 @@ spec:
                        targetAPIConfigKey = 'mef.sonata.api-target.quote.uni.add.sync';
                        matrixConfigKey = 'mef.sonata.api.matrix.quote.uni.add.sync';
                      } else if (action === 'modify') {
-                       errorArr = ['api use case is not supported : uni modify : @{{quoteItem[0].action}}==modify'];
-                       errorCode = '422';
+                       targetAPIConfigKey = 'mef.sonata.api-target.quote.uni.modify.sync';
+                       matrixConfigKey = 'mef.sonata.api.matrix.quote.uni.modify.sync';
                      } else {
                        errorArr = ['api use case is not supported : missing property : quoteItem[0].action'];
                        errorCode = '400';
@@ -131,7 +131,12 @@ spec:
                    targetAPIConfigKey: targetAPIConfigKey,
                    matrixConfigKey: matrixConfigKey,
                    errorMsg: errorMsg,
-                   errorCode: errorCode
+                   errorCode: errorCode,
+                   routeParams: {
+                      type: typeVal,
+                      action: action,
+                      syncQuote: syncQuote
+                   }
                  };
                  return JSON.stringify(ret);
                }
@@ -142,6 +147,7 @@ spec:
           env:
             mappingMatrixKey: ${quote.matrixConfigKey}
             targetKey: ${quote.targetAPIConfigKey}
+            routeParams: ${quote.routeParams}
         - id: persist_http_request
           actionType: buildin@db
           env:

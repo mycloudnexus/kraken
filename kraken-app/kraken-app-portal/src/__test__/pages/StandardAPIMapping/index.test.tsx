@@ -41,6 +41,27 @@ test("StandardAPIMapping btn-create-version", () => {
     isFetched: true,
   } as any);
 
+  vi.spyOn(productHooks, "useGetComponentDetail").mockReturnValue({
+    data: {
+      metadata: {
+        name: "Test API",
+        componentKey: "item-key",
+        supportedProductTypes: ["UNI"],
+        labels: { label1: "Label 1", label2: "Label 2" },
+        logo: "mock-logo.png",
+        baseSpec: {
+          path: "/api-path",
+          content: "mock-content",
+          format: "json",
+        },
+        apiCount: 3,
+      },
+    },
+    isLoading: false,
+    isFetching: false,
+    isFetched: true,
+  } as any);
+
   const { container, getByTestId } = render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
@@ -102,6 +123,27 @@ test("StandardAPIMapping btn-save", () => {
       };
     },
     isPending: false,
+  } as any);
+
+  vi.spyOn(productHooks, "useGetComponentDetail").mockReturnValue({
+    data: {
+      metadata: {
+        name: "Test API",
+        componentKey: "item-key",
+        supportedProductTypes: ["UNI"],
+        labels: { label1: "Label 1", label2: "Label 2" },
+        logo: "mock-logo.png",
+        baseSpec: {
+          path: "/api-path",
+          content: "mock-content",
+          format: "json",
+        },
+        apiCount: 3,
+      },
+    },
+    isLoading: false,
+    isFetching: false,
+    isFetched: true,
   } as any);
 
   const { container, getByTestId } = render(

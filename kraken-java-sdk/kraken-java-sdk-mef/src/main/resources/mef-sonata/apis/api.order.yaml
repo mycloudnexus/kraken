@@ -98,11 +98,8 @@ spec:
                   productConfiguration = input.productOrderItem?.product?.productConfiguration;
                   type = productConfiguration?.['@type'];
                   if (type === 'UNI') {
-                    let errorArr = ['api use case is not supported :'];
-                    errorCode = '422';
-                    errorArr.push(`expect modify @{{productOrderItem.product.productConfiguration.@type}} is 'ACCESS_E_LINE'], but ${type}.`);
-                    errorMsg = errorArr.join(' ');
-                    targetAPIConfigKey = 'targetKey:notFound';
+                    targetAPIConfigKey = 'mef.sonata.api-target.order.uni.modify';
+                    matrixConfigKey = 'mef.sonata.api.matrix.order.uni.modify'
                   } else if (type === 'ACCESS_E_LINE') {
                     targetAPIConfigKey = 'mef.sonata.api-target.order.eline.modify';
                     matrixConfigKey = 'mef.sonata.api.matrix.order.eline.modify'
@@ -138,7 +135,11 @@ spec:
                   targetAPIConfigKey: targetAPIConfigKey,
                   matrixConfigKey: matrixConfigKey,
                   errorMsg: errorMsg,
-                  errorCode: errorCode
+                  errorCode: errorCode,
+                  routeParams: {
+                      type: type,
+                      action: action
+                  }
                 };
                 return JSON.stringify(ret);
               }
@@ -148,6 +149,7 @@ spec:
           env:
             mappingMatrixKey: ${order.matrixConfigKey}
             targetKey: ${order.targetAPIConfigKey}
+            routeParams: ${order.routeParams}
         - id: persist_http_request
           actionType: buildin@db
           env:
@@ -310,7 +312,7 @@ spec:
         - id: mock-response
           actionType: buildin@mock-response
           env:
-            forwardDownstream: ${(entity.renderedResponse.orderId!='' && entity.renderedResponse.orderId!=null) || (entity.renderedResponse.uniqueId!=null && entity.renderedResponse.uniqueId!=‘’)}
+            forwardDownstream: ${(entity.renderedResponse.orderId!='' && entity.renderedResponse.orderId!=null) || (entity.renderedResponse.uniqueId!=null && entity.renderedResponse.uniqueId!='')}
 
         - id: modify-response-body
           actionType: buildin@modify-response-body
