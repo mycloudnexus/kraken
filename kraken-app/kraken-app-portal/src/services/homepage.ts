@@ -48,3 +48,19 @@ export const getMostPopularEndpointsRequests = (
     }
   );
 };
+
+export const getProductTypeList = (productId: string) => {
+  return request(`/products/${productId}/productTypes`, {
+    method: "GET",
+  });
+};
+
+export const getStandardApiComponents = (
+  productId: string,
+  productType: string
+) => {
+  return request(`/products/${productId}/standardApiComponents`, {
+    method: "GET",
+    params: { productType },
+  });
+};

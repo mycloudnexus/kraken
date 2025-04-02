@@ -39,7 +39,7 @@ export interface IDeploymentHistory {
   verifiedBy: string;
   verifiedAt: string;
   verifiedStatus: boolean;
-  mapperKey: string
+  mapperKey: string;
 }
 
 export interface IMappingMatrix {
@@ -148,4 +148,22 @@ export interface IApiUseCase {
 export interface IProductIdAndNameParams {
   productId: string;
   name: string;
+}
+export interface StandardApiComponent {
+  name: string;
+  componentKey: string;
+  supportedProductTypes: string[];
+  labels: Record<string, string>;
+  logo: string;
+  baseSpec: {
+    path: string;
+    content: string;
+    format: string;
+  };
+  customizedSpec?: {
+    path: string;
+    content: string;
+    format: string;
+  };
+  apiCount: number;
 }
