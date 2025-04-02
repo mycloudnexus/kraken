@@ -21,3 +21,27 @@ spec:
           params:
             - key: productType
               val: eline
+        response:
+          - name: mapper.order.eline.read.delete.state
+            title: "ProductOrderState"
+            description: ""
+            target: "@{{state}}"
+            targetType: enum
+            targetLocation: BODY
+            requiredMapping: true
+            targetValues:
+              - acknowledged
+              - assessingCancellation
+              - held.assessingCharge
+              - pending.assessingModification
+              - cancelled
+              - pendingCancellation
+              - completed
+              - failed
+              - inProgress
+              - partial
+              - rejected
+            valueMapping: { }
+            source: ""
+            sourceLocation: "BODY"
+            renderCheck: false
