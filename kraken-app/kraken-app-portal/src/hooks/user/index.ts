@@ -26,7 +26,9 @@ export const USER_CACHE_KEYS = {
   enable_user: "enable_user",
   disable_user: "disable_user",
   reset_password: "reset_password",
-  get_system_info: 'get_system_info',
+  get_system_info: "get_system_info",
+  get_product_types: "get_product_types",
+  get_standard_components: "get_standard_components",
 };
 export const useGetUserList = (params: Record<string, any>, options?: any) => {
   return useQuery<any, Error, IPagingData<IUser>>({

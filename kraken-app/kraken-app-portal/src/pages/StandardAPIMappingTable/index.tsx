@@ -13,7 +13,7 @@ import { IMapperDetails } from "@/utils/types/env.type";
 import { Badge, Button, Flex, Spin, Table, TableColumnsType } from "antd";
 import { get } from "lodash";
 import { useMemo } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import ComponentSelect from "../StandardAPIMapping/components/ComponentSelect";
 import styles from "./index.module.scss";
 
@@ -28,13 +28,19 @@ const StandardAPIMappingTable = () => {
   const navigate = useNavigate();
   const { componentId } = useParams();
   const { currentProduct } = useAppStore();
+  const { state } = useLocation();
+  const { productType } = state;
   const { data: componentList } = useGetComponentListAPI(currentProduct);
   const { data: componentDetail, isLoading } = useGetComponentDetail(
     currentProduct,
     componentId ?? ""
   );
   const { data: detailDataMapping, isLoading: isDetailMappingLoading } =
-    useGetComponentDetailMapping(currentProduct, componentId ?? "");
+    useGetComponentDetailMapping(
+      currentProduct,
+      componentId ?? "",
+      productType
+    );
 
   const componentName = useMemo(
     () => get(componentDetail, "metadata.name", ""),
@@ -64,11 +70,16 @@ const StandardAPIMappingTable = () => {
     return result;
   };
 
-  const mappingDetailsData = useMemo(
-    () =>
-      detailDataMapping?.details ? mergePath(detailDataMapping.details) : [],
-    [detailDataMapping]
-  );
+  const mappingDetailsData = useMemo(() => {
+    if (!detailDataMapping?.details) return [];
+
+    const filteredData = detailDataMapping.details.filter(
+      (product) =>
+        product.mappingMatrix?.productType === productType?.toLowerCase()
+    );
+
+    return mergePath(filteredData);
+  }, [detailDataMapping, productType]);
 
   const columns: TableColumnsType = [
     {
@@ -143,6 +154,7 @@ const StandardAPIMappingTable = () => {
               <ComponentSelect
                 componentList={componentList}
                 componentName={componentName}
+                productType={productType}
               />
             }
           />
