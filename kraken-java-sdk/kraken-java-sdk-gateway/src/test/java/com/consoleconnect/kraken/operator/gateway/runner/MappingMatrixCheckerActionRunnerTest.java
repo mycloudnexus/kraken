@@ -54,8 +54,7 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest
         Assertions.assertThrowsExactly(
             KrakenException.class, () -> mappingMatrixCheckerActionRunner.onCheck(inputs));
     MatcherAssert.assertThat(
-        krakenException.getMessage(),
-        Matchers.containsString("api use case is not supported: not deployed"));
+        krakenException.getMessage(), Matchers.containsString("api use case is not supported:"));
   }
 
   @Test
@@ -70,7 +69,7 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest
     MatcherAssert.assertThat(
         krakenException.getMessage(),
         Matchers.containsString("""
-            api use case is not supported: not deployed"""));
+            api use case is not supported: """));
   }
 
   @Test

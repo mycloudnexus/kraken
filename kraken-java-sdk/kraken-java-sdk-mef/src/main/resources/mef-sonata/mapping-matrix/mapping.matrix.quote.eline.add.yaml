@@ -15,11 +15,11 @@ spec:
         value: false
         errorMsg: "api use case is not supported : disabled : instantSyncQuote==false"
       - name: product_type_eline
-        path: "$.body.quoteItem[*].product.productConfiguration.['@type']"
+        path: "$.body.quoteItem[0].product.productConfiguration.['@type']"
         expectType: EXPECTED
         value: ACCESS_E_LINE
       - name: action_add
-        path: "$.body.quoteItem[*].['action']"
+        path: "$.body.quoteItem[0].['action']"
         expectType: EXPECTED
         value: add
       - name: syn_mode_false
