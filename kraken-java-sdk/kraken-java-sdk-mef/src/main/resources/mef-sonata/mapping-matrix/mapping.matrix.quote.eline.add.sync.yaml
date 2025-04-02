@@ -13,7 +13,7 @@ spec:
   matrix:
     mef.sonata.api-target.quote.eline.add.sync:
       - name: action_add
-        path: "$.body.quoteItem[*].['action']"
+        path: "$.body.quoteItem[0].['action']"
         expectType: EXPECTED
         value: add
         code: 400
@@ -44,7 +44,7 @@ spec:
         value: true
         code: 422
       - name: product_type_eline
-        path: "$.body.quoteItem[*].product.productConfiguration.['@type']"
+        path: "$.body.quoteItem[0].product.productConfiguration.['@type']"
         expectType: EXPECTED
         value: ACCESS_E_LINE
       - name: relationship_type_0

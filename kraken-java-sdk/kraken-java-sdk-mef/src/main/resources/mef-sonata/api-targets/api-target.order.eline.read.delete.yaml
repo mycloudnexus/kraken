@@ -54,7 +54,6 @@ spec:
               "tspRestorationPriority": "${entity.renderedResponse.productOrderItem[0].tspRestorationPriority}",
               "charge": "${entity.renderedResponse.productOrderItem[0].charge}",
               "expediteAcceptedIndicator": "${entity.renderedResponse.productOrderItem[0].expediteIndicator}",
-              "itemTerm": "${entity.renderedResponse.productOrderItem[0].itemTerm}",
               "milestone": "${entity.renderedResponse.productOrderItem[0].milestone}",
               "state": "((mefResponseBody.state))",
               "terminationError": "${entity.renderedResponse.productOrderItem[0].terminationError}",
