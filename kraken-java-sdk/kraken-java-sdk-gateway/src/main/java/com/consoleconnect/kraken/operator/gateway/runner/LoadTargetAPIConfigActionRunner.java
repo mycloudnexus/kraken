@@ -131,6 +131,8 @@ public class LoadTargetAPIConfigActionRunner extends AbstractActionRunner
             if (Objects.nonNull(endpoint.getResponseBody())) {
               stateValueMappingDto.setUniqueId(
                   (String) readWithJsonPath(inputs, RESPONSE_UNIQUE_ID));
+              stateValueMappingDto.setOrderId((String) readWithJsonPath(inputs, RESPONSE_ORDER_ID));
+
               String transformedResp = transform(endpoint, stateValueMappingDto);
               endpoint.setResponseBody(SpELEngine.evaluate(transformedResp, inputs));
             }
