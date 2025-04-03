@@ -19,4 +19,5 @@ public class StateValueMappingDto {
   private List<PathRule> pathRules = new ArrayList<>();
 
   private String uniqueId;
+  private String orderId;
 }
