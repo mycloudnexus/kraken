@@ -1,142 +1,61 @@
 import { PageLayout } from "@/components/Layout";
-import { useGetProductEnvs } from "@/hooks/product";
-import { useGetPushButtonEnabled } from "@/hooks/pushApiEvent";
-import { useAppStore } from "@/stores/app.store";
-import { Button, Flex, Tabs, Input } from "antd";
-import { startCase } from "lodash";
-import { useMemo, useRef, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { useBoolean } from "usehooks-ts";
-import ActivityDetailModal from "./components/ActivityDetailModal";
-import EnvironmentActivityTable from "./components/EnvironmentActivityTable";
-import PushHistoryDrawer from "./components/PushHistoryDrawer";
-import PushHistoryList from "./components/PushHistoryList";
+import { Flex, Tabs } from "antd";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import styles from "./index.module.scss";
-
-const { Search } = Input;
+import config from "@/config.json";
 
 const EnvironmentActivityLog = () => {
-  const { envId } = useParams();
-  const { currentProduct } = useAppStore();
-  const navigate = useNavigate();
-  const { data: envData } = useGetProductEnvs(currentProduct);
-  const { data: isPushButtonEnabledResponse } = useGetPushButtonEnabled();
-  const refWrapper = useRef<any>();
   const [mainTabKey, setMainTabKey] = useState<string>("activityLog");
-  const { value: isOpen, setTrue: open, setFalse: close } = useBoolean(false);
-  const [pathQuery, setPathQuery] = useState("");
 
-  const envOptions = useMemo(() => {
-    return (
-      envData?.data?.map((env) => ({
-        value: env.id,
-        label: env.name,
-      })) ?? []
-    );
-  }, [envData]);
+  const [components, setComponents] = useState<any[]> ([]);
 
-  const [modalActivityId, setModalActivityId] = useState<string | undefined>();
-  const [modalOpen, setModalOpen] = useState(false);
-  const isActivityLogActive = useMemo(
-    () => mainTabKey === "activityLog",
-    [mainTabKey]
-  );
+  const refWrapper = useRef<any>();
 
-  const openActionModal = (requestId: string) => {
-    setModalActivityId(requestId);
-    setModalOpen(true);
-  };
+  useEffect(() => {
+    async function loadTabs() {
+      const componentPromises = config.activityLogPages.map(item => {
+        const children = lazy(() => import(item.path));
+        return {
+          label: `${item.label}`,
+          key: `${item.key}`,
+          children: children,
+        };
+      });
 
-  const envTabs = useMemo(() => {
-    return (
-      envData?.data?.map((env) => ({
-        key: env.id,
-        label: `${startCase(env.name)} Environment`,
-        children: (
-          <EnvironmentActivityTable
-            openActionModal={openActionModal}
-            pathQuery={pathQuery}
-          />
-        ),
-      })) ?? []
-    );
-  }, [envData, pathQuery]);
+      Promise.all(componentPromises).then(setComponents);
+    }
 
-  const searchPathQuery = (value: string) => {
-    setPathQuery(value);
-  };
+    loadTabs();
+  }, [config.activityLogPages]);
 
   return (
     <PageLayout
-      title={
-        <Flex
+      title=""
+    >
+      <Flex
           align="center"
           justify="space-between"
           vertical={false}
           style={{ width: "100%" }}
         >
-          <Tabs
-            activeKey={mainTabKey}
-            hideAdd
-            onChange={setMainTabKey}
-            items={[
-              {
-                label: "Activity log",
-                key: "activityLog",
-              },
-              {
-                label: "Push history",
-                key: "pushHistory",
-              },
-            ]}
-          />
-          {isActivityLogActive && !!isPushButtonEnabledResponse?.enabled && (
-            <Button type="primary" onClick={open}>
-              Push log
-            </Button>
-          )}
+          <Suspense fallback={<div>Loading...Please Wait..</div>}>
+            <Tabs activeKey={mainTabKey}
+                        hideAdd
+                        onChange={setMainTabKey}>
+              {components.map((tab) => (
+                <Tabs.TabPane tab={tab.label} key={tab.key}>
+                  <div className={styles.contentWrapper} ref={refWrapper}>
+                  <div className={styles.tableWrapper}>
+
+                  <tab.children />
+
+                    </div>
+                    </div>
+                </Tabs.TabPane>
+              ))}
+            </Tabs>
+          </Suspense>
         </Flex>
-      }
-    >
-      <div className={styles.contentWrapper} ref={refWrapper}>
-        {isOpen && (
-          <PushHistoryDrawer
-            isOpen={isOpen}
-            envOptions={envOptions}
-            onClose={close}
-          />
-        )}
-
-        <div className={styles.tableWrapper}>
-          {isActivityLogActive ? (
-            <Tabs
-              type="card"
-              activeKey={envId}
-              items={envTabs}
-              onChange={(key) => {
-                navigate(`/env/${key}`);
-              }}
-              tabBarExtraContent={
-                <Search
-                  placeholder="Please copy full path here"
-                  style={{ width: "250px" }}
-                  onSearch={searchPathQuery}
-                  allowClear
-                />
-              }
-            />
-          ) : (
-            <PushHistoryList />
-          )}
-        </div>
-      </div>
-
-      <ActivityDetailModal
-        envId={String(envId)}
-        activityId={modalActivityId ?? ""}
-        open={modalOpen}
-        setOpen={(value) => setModalOpen(value)}
-      />
     </PageLayout>
   );
 };
