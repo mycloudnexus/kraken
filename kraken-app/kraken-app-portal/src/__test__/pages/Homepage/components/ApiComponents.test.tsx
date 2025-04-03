@@ -1,76 +1,167 @@
 import ApiComponent from "@/pages/HomePage/components/ApiComponent";
 import ApiComponents from "@/pages/HomePage/components/ApiComponents";
-import { queryClient } from "@/utils/helpers/reactQuery";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { render } from "@testing-library/react";
-import { BrowserRouter } from "react-router-dom";
+import { StandardApiComponent } from "@/utils/types/product.type";
+import { render, screen, fireEvent } from "@testing-library/react";
+import { BrowserRouter as Router } from "react-router-dom";
+import { vi } from "vitest";
 
-test("ApiComponents test", () => {
-  const { container } = render(
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
+const mockOpenDrawer = vi.fn();
+const mockNavigate = vi.fn();
+
+vi.mock("react-router-dom", () => ({
+  useNavigate: () => mockNavigate,
+  BrowserRouter: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
+}));
+
+vi.mock("@/hooks/homepage", () => ({
+  useGetProductTypeList: () => ({
+    data: [
+      "ACCESS_E_LINE:Access Eline",
+      "INTERNET_ACCESS:Internet Access",
+      "UNI:Uni",
+      "SHARED:Shared",
+    ],
+  }),
+  useGetStandardApiComponents: (selectedProductType: string) => ({
+    data:
+      selectedProductType === "UNI"
+        ? [
+            {
+              name: "Test API",
+              componentKey: "item-key",
+              apiCount: 3,
+              baseSpec: { content: "mock-content" },
+              supportedProductTypes: ["UNI"],
+            },
+          ]
+        : [],
+    isLoading: false,
+  }),
+}));
+
+vi.mock("@/stores/app.store", () => ({
+  useAppStore: () => ({ currentProduct: "test-product" }),
+}));
+
+const defaultProps = {
+  supportInfo: "UNI",
+  apis: 3,
+  title: "Test API",
+  logo: "mock-logo.png",
+  targetYaml: {
+    info: {
+      description: "**Title** Description of the API",
+    },
+  },
+  item: {
+    name: "Test API",
+    componentKey: "item-key",
+    supportedProductTypes: ["UNI"],
+    labels: { label1: "Label 1", label2: "Label 2" },
+    logo: "mock-logo.png",
+    baseSpec: {
+      path: "/api-path",
+      content: "mock-content",
+      format: "json",
+    },
+    apiCount: 3,
+  } as StandardApiComponent,
+  openDrawer: mockOpenDrawer,
+};
+
+describe("API Components - Tabs and Navigation", () => {
+  it("renders all tabs correctly", () => {
+    render(
+      <Router>
         <ApiComponents />
-      </BrowserRouter>
-    </QueryClientProvider>
-  );
-  expect(container).toBeInTheDocument();
-});
+      </Router>
+    );
 
-test("ApiComponent test", () => {
-  const { container } = render(
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <ApiComponent
-          targetSpec={{ metadata: { logo: "http://localhost:5176/i.img" } }}
-          targetYaml={{
-            info: {
-              description: "abc",
-            },
-          }}
-          supportInfo={[["ADD", "DELETE"]]}
-          apis={0}
-          title={"abc"}
-          item={
-            {
-              metadata: {
-                labels: ["a", "b", "c"],
-              },
-            } as any
-          }
-          openDrawer={() => {}}
-        />
-      </BrowserRouter>
-    </QueryClientProvider>
-  );
-  expect(container).toBeInTheDocument();
-});
+    expect(screen.getByText("Standard API Mapping")).toBeInTheDocument();
+    expect(
+      screen.getByRole("tab", { name: "Access Eline" })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("tab", { name: "Internet Access" })
+    ).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Uni" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Shared" })).toBeInTheDocument();
+  });
 
-test("ApiComponent test with see more", () => {
-  const { container } = render(
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <ApiComponent
-          targetSpec={{ metadata: { logo: "http://localhost:5176/i.img" } }}
-          targetYaml={{
-            info: {
-              description:
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla a ligula velit. Duis dictum vehicula finibus. Vivamus est quam, cursus ac ligula at, egestas blandit leo. Pellentesque lobortis, turpis ac feugiat tempor, massa nulla consequat justo, nec volutpat felis elit ultrices velit. Duis porttitor molestie.",
-            },
-          }}
-          supportInfo={[["ADD", "DELETE"]]}
-          apis={0}
-          title={"abc"}
-          item={
-            {
-              metadata: {
-                labels: ["a", "b", "c"],
-              },
-            } as any
-          }
-          openDrawer={() => {}}
-        />
-      </BrowserRouter>
-    </QueryClientProvider>
-  );
-  expect(container).toBeInTheDocument();
+  it("switches tabs and renders the correct content", () => {
+    render(
+      <Router>
+        <ApiComponents />
+      </Router>
+    );
+    const accessElineTab = screen.getByRole("tab", { name: "Access Eline" });
+
+    expect(screen.getByRole("tab", { name: "Uni" })).toBeInTheDocument();
+    fireEvent.click(accessElineTab);
+
+    expect(
+      screen.getByRole("tab", { name: "Access Eline" })
+    ).toBeInTheDocument();
+  });
+
+  it("renders ApiComponent correctly inside a tab", () => {
+    render(
+      <Router>
+        <ApiComponent {...defaultProps} />
+      </Router>
+    );
+
+    expect(screen.getByText("Test API")).toBeInTheDocument();
+    expect(screen.getByText("3 APIs")).toBeInTheDocument();
+    expect(screen.getByText("Label 1")).toBeInTheDocument();
+    expect(screen.getByText("Label 2")).toBeInTheDocument();
+    expect(screen.getByText("Description of the API")).toBeInTheDocument();
+  });
+
+  it("navigates to the correct URL when clicked inside a tab", () => {
+    render(
+      <Router>
+        <ApiComponent {...defaultProps} />
+      </Router>
+    );
+
+    const apiComponent = screen.getByText("Test API").closest("div");
+    fireEvent.click(apiComponent!);
+
+    expect(mockNavigate).toHaveBeenCalledWith("/api-mapping/item-key", {
+      state: { productType: "UNI" },
+    });
+  });
+
+  it("does not render ApiComponent when key is not in supported product types", () => {
+    vi.doMock("@/hooks/homepage", () => ({
+      useGetProductTypeList: () => ({
+        data: ["INTERNET_ACCESS:Internet Access"],
+      }),
+      useGetStandardApiComponents: () => ({
+        data: [
+          {
+            name: "Test API",
+            componentKey: "item-key",
+            apiCount: 3,
+            baseSpec: { content: "mock-content" },
+            supportedProductTypes: ["UNI"], // Does not include "INTERNET_ACCESS"
+          },
+        ],
+        isLoading: false,
+      }),
+    }));
+
+    render(
+      <Router>
+        <ApiComponents />
+      </Router>
+    );
+
+    fireEvent.click(screen.getByRole("tab", { name: "Internet Access" }));
+
+    expect(screen.queryByText("Test API")).not.toBeInTheDocument();
+  });
 });
