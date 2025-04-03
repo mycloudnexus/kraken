@@ -1,0 +1,13 @@
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.1.7.43
+  name: V1.7.43
+  labels:
+    productSpec: grace
+    productVersion: V1.7.43
+    publishDate: 2025-04-03
+  description: |
+    Delete route for hub api
+  version: 1
