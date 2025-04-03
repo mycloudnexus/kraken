@@ -4,11 +4,6 @@
       "label": "Activity Log",
       "key": "activityLog",
       "path": "./components/tabs/ApiActivityLogTab"
-    },
-    {
-      "label": "Push History",
-      "key": "pushHistory",
-      "path": "./components/tabs/ApiActivityLogPushHistoryTab"
     }
   ]
 }
