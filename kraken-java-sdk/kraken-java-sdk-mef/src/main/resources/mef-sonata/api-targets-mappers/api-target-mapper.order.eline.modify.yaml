@@ -24,133 +24,14 @@ spec:
       method: ""
       serverKey: ""
       mappers:
+        schemaRef:
+          ref: "classpath:/mef-sonata/api-common-mappers/api-target-mapper.order.common.add.yaml"
+          params:
+            - key: productType
+              val: eline
+            - key: action
+              val: modify
         request:
-          - name: mapper.order.eline.modify.buyerId
-            title: The unique identifier of the organization that is acting as the a Buyer.
-            description:
-            target: ""
-            source: "@{{buyerId}}"
-            sourceLocation: QUERY
-            targetLocation: ""
-            customizedField: false
-            requiredMapping: false
-            replaceStar: true
-          - name: mapper.order.eline.modify.duration
-            title: "order item Term duration"
-            source: "@{{productOrderItem[0].requestedItemTerm.duration.amount}}"
-            sourceLocation: BODY
-            sourceType: integer
-            discrete: true
-            target: ""
-            targetLocation: ""
-            requiredMapping: true
-          - name: mapper.order.eline.modify.duration.unit
-            title: "order item Term unit"
-            source: "@{{productOrderItem[0].requestedItemTerm.duration.units}}"
-            sourceType: enum
-            sourceValues:
-              - calendarYears
-              - calendarMonths
-              - calendarDays
-              - calendarHours
-              - calendarMinutes
-              - businessDays
-              - businessHours
-              - businessMinutes
-            sourceLocation: BODY
-            target: ""
-            targetLocation: ""
-            valueMapping: {}
-            requiredMapping: true
-          - name: mapper.order.eline.modify.endOfTermAction
-            title: "MEFEndOfTermAction"
-            source: "@{{productOrderItem[0].requestedItemTerm.endOfTermAction}}"
-            sourceLocation: BODY
-            sourceType: enum
-            sourceValues:
-              - roll
-              - autoDisconnect
-              - autoRenew
-            target: ""
-            targetLocation: BODY
-            requiredMapping: true
-          - name: mapper.order.eline.modify.rollInterval.amount
-            title: " quote item Term roll duration"
-            source: "@{{productOrderItem[0].requestedItemTerm.rollInterval.amount}}"
-            sourceLocation: BODY
-            sourceType: integer
-            discrete: true
-            sourceConditionExpression:
-            sourceConditions:
-              - name: endOfTermAction
-                key: "@{{productOrderItem[0].requestedItemTerm.endOfTermAction}}"
-                val: roll
-                operator: eq
-            target: ""
-            targetLocation: BODY
-            requiredMapping: false
-          - name: mapper.order.eline.modify.rollInterval.units
-            title: " quote item Term roll unit"
-            source: "@{{productOrderItem[0].requestedItemTerm.rollInterval.units}}"
-            sourceLocation: BODY
-            sourceType: enum
-            sourceValues:
-              - calendarYears
-              - calendarMonths
-              - calendarDays
-              - calendarHours
-              - calendarMinutes
-              - businessDays
-              - businessHours
-              - businessMinutes
-            sourceConditionExpression:
-            sourceConditions:
-              - name: endOfTermAction
-                key: "@{{productOrderItem[0].requestedItemTerm.endOfTermAction}}"
-                val: roll
-                operator: eq
-            target: ""
-            targetLocation: BODY
-            requiredMapping: false
-          - name: mapper.order.eline.modify.bandwidthUnit
-            title: "The unit of bandwidth"
-            source: "@{{productOrderItem[0].product.productConfiguration.bandwidthUnit}}"
-            sourceType: enum
-            sourceValues:
-              - MBPS
-              - GBPS
-            sourceLocation: BODY
-            target: ""
-            targetLocation: BODY
-            valueMapping: {}
-            requiredMapping: false
-          - name: mapper.order.eline.modify.bandwidth
-            title: "Bandwidth of the ELINE"
-            source: "@{{productOrderItem[0].product.productConfiguration.bandwidth}}"
-            sourceLocation: BODY
-            allowValueLimit: true
-            sourceType: integer
-            discrete: true
-            sourceValues:
-            target: ""
-            targetLocation: BODY
-            requiredMapping: false
-          - name: mapper.order.eline.modify.name
-            title: "The name of the ELINE"
-            source: "@{{productOrderItem[0].product.productConfiguration.name}}"
-            sourceLocation: BODY
-            sourceType: string
-            target: ""
-            targetLocation: BODY
-            requiredMapping: false
-          - name: mapper.order.eline.modify.paymentType
-            title: "The payment type of the ELINE"
-            source: "@{{productOrderItem[0].product.productConfiguration.paymentType}}"
-            sourceType: string
-            sourceLocation: BODY
-            target: ""
-            targetLocation: BODY
-            requiredMapping: false
           - name: mapper.order.eline.modify.classOfService
             title: "The class of Service of the Eline"
             source: "@{{productOrderItem[0].product.productConfiguration.classOfService}}"
@@ -190,7 +71,7 @@ spec:
             sourceType: string
             target: ""
             targetLocation: BODY
-            requiredMapping: false
+            requiredMapping: true
           - name: mapper.order.eline.modify.destUNI
             title: "destination UNI id"
             source: "@{{productOrderItem[0].product.productRelationship[1].id}}"
@@ -198,15 +79,7 @@ spec:
             sourceType: string
             target: ""
             targetLocation: BODY
-            requiredMapping: false
-          - name: mapper.order.eline.modify.productOffering.id
-            title: "id of a Product Offering"
-            source: "@{{productOrderItem[0].product.productOffering.id}}"
-            sourceLocation: BODY
-            sourceType: string
-            target: ""
-            targetLocation: BODY
-            requiredMapping: false
+            requiredMapping: true
           - name: mapper.order.eline.modify.product.id
             title: "The unique identifier of an in-service Product that is the ordering subject"
             source: "@{{productOrderItem[0].product.id}}"
@@ -216,73 +89,4 @@ spec:
             targetLocation: BODY
             requiredMapping: true
         response:
-          - name: mapper.order.eline.modify.state
-            title: Order State
-            source: ""
-            target: "@{{state}}"
-            targetType: enum
-            description:
-            replaceStar: true
-            targetValues:
-              - acknowledged
-              - assessingCancellationacknowledged
-              - held.assessingCharge
-              - pending.assessingModification
-              - cancelled
-              - pendingCancellation
-              - completed
-              - failed
-              - inProgress
-              - partial
-              - rejected
-            valueMapping: {}
-            sourceLocation: BODY
-            targetLocation: BODY
-            customizedField: false
-            requiredMapping: true
-          - name: mapper.order.eline.modify.orderId
-            title: order Id from seller
-            source: ""
-            target: "@{{orderId}}"
-            description: orderId mapping
-            sourceLocation: BODY
-            targetLocation: BODY
-            customizedField: false
-            requiredMapping: true
-          - name: mapper.order.eline.modify.term.endOfTermAction
-            title: MEFEndOfTermAction
-            description: ""
-            source: ""
-            sourceLocation: ""
-            target: "@{{productOrderItem[0].itemTerm.endOfTermAction}}"
-            targetLocation: BODY
-            customizedField: false
-            requiredMapping: true
-          - name: mapper.order.eline.modify.term.rollInterval.amount
-            title: order item Term roll duration
-            description: ""
-            source: ""
-            sourceLocation: ""
-            target: "@{{productOrderItem[0].itemTerm.rollInterval.amount}}"
-            targetLocation: BODY
-            customizedField: false
-            requiredMapping: false
-          - name: mapper.order.eline.modify.term.rollInterval.unit
-            title: order item Term roll unit
-            description: ""
-            source: ""
-            sourceLocation: ""
-            target: "@{{productOrderItem[0].itemTerm.rollInterval.units}}"
-            targetLocation: BODY
-            customizedField: false
-            requiredMapping: false
-          - name: mapper.order.eline.modify.term.name
-            title: order item Term name
-            description: ""
-            source: ""
-            sourceLocation: ""
-            target: "@{{productOrderItem[0].itemTerm.name}}"
-            targetLocation: BODY
-            customizedField: false
-            requiredMapping: true
 
