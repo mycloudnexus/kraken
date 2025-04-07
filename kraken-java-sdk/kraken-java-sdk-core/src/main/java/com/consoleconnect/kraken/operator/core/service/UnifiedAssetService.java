@@ -342,16 +342,23 @@ public class UnifiedAssetService implements UUIDWrapper, FacetsMerger {
             .orElse(false);
     log.info(
         "syncing asset facets, assetId: {}, extendCommon:{}", assetEntity.getKey(), extendCommon);
-    if (enableMerge(assetEntity) && extendCommon) {
-      Map<String, Object> facets;
-      if (entityOptional.isPresent()) {
-        log.info("Database has key:{}, extendCommon:{}", assetEntity.getKey(), extendCommon);
-        facets = mergeFacetsInternal(entityOptional.get(), data.getFacets(), extendCommon);
-      } else {
-        log.info("Database has no key:{}, extendCommon:{}", assetEntity.getKey(), extendCommon);
-        facets = extendCommonNodesInFacets(extendCommon, data.getFacets());
+    if (extendCommon) {
+      if (enableMerge(assetEntity)) {
+        Map<String, Object> facets;
+        if (entityOptional.isPresent()) {
+          log.info("Database has key:{}, extendCommon:{}", assetEntity.getKey(), extendCommon);
+          facets = mergeFacetsInternal(entityOptional.get(), data.getFacets(), extendCommon);
+          data.setFacets(facets);
+        }
       }
-      data.setFacets(facets);
+      if (Objects.equals(assetEntity.getKind(), COMPONENT_API_TARGET_MAPPER.getKind())) {
+        Map<String, Object> facets;
+        if (entityOptional.isEmpty()) {
+          log.info("Database has no key:{}, extendCommon:{}", assetEntity.getKey(), extendCommon);
+          facets = extendCommonNodesInFacets(extendCommon, data.getFacets());
+          data.setFacets(facets);
+        }
+      }
     }
     if (data.getFacets() != null) {
       syncFacets(assetEntity, data.getFacets());
