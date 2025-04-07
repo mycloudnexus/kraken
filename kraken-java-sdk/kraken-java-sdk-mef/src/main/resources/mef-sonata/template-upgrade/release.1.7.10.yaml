@@ -1,0 +1,13 @@
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.1.7.10
+  name: V1.7.10
+  labels:
+    productSpec: grace
+    productVersion: V1.7.10
+    publishDate: 2025-02-13
+  description: |
+    Added support for workflow deployment
+  version: 1

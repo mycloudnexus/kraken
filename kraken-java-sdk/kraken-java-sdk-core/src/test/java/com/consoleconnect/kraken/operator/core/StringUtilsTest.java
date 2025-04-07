@@ -1,8 +1,14 @@
 package com.consoleconnect.kraken.operator.core;
 
 import com.consoleconnect.kraken.operator.core.enums.RegisterActionTypeEnum;
+import com.consoleconnect.kraken.operator.core.enums.TaskEnum;
+import com.consoleconnect.kraken.operator.core.enums.WorkflowStageEnum;
+import com.consoleconnect.kraken.operator.core.enums.WorkflowStatusEnum;
 import com.consoleconnect.kraken.operator.core.exception.ErrorResponse;
 import com.consoleconnect.kraken.operator.core.toolkit.StringUtils;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -18,8 +24,18 @@ class StringUtilsTest {
     System.out.println(register.name());
     System.out.println(unregister.name());
     System.out.println(read.name());
+    String shortId = StringUtils.shortenUUID(UUID.randomUUID().toString());
     RegisterActionTypeEnum type = RegisterActionTypeEnum.fromString("REGISTER");
     Assertions.assertNotNull(type);
+    Assertions.assertNotNull(WorkflowStageEnum.EXECUTION_STAGE);
+    Assertions.assertNotNull(WorkflowStageEnum.PREPARATION_STAGE);
+    Assertions.assertNotNull(WorkflowStageEnum.VALIDATION_STAGE);
+    Assertions.assertNotNull(TaskEnum.HTTP);
+    Assertions.assertNotNull(TaskEnum.SWITCH);
+    Assertions.assertNotNull(WorkflowStatusEnum.FAILED);
+    Assertions.assertNotNull(WorkflowStatusEnum.IN_PROGRESS);
+    Assertions.assertNotNull(WorkflowStatusEnum.SUCCESS);
+    Assertions.assertEquals(8, shortId.length());
   }
 
   @Test
@@ -61,5 +77,15 @@ class StringUtilsTest {
     StringUtils.processRawMessage(errorResponse, raw);
     String result = errorResponse.getMessage();
     Assertions.assertFalse(result.contains("@{{"));
+  }
+
+  @Test
+  void givenPath_whenParse_thenReturnOK() {
+    Map<String, String> map = new HashMap<>();
+    map.put("id", "123");
+    Assertions.assertNotNull(StringUtils.readWithJsonPath(map, "$.id"));
+    Assertions.assertNotNull(StringUtils.readWithJsonPath(map, "$.name"));
+    StringUtils.writeWithJsonPath(map, "$", "name", "John");
+    Assertions.assertTrue(map.containsKey("name"));
   }
 }

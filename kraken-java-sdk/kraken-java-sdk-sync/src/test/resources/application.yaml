@@ -82,9 +82,26 @@ logging:
   level:
     com.consoleconnect.kraken.operator: INFO
 app:
+  achieve-log-conf:
+    month: 1
+    protocol: GET
+    achieveScope: basic
+    page: 100
   controlPlane:
     url: http://localhost:4567
-    token: 123456
+    auth:
+      authMode: internalToken
+      internalToken:
+        accessToken: ${KRAKEN_CONTROL_PLANE_AGENT_TOKEN:123456}
+      clientCredentials:
+        authServerUrl: ${app.controlPlane.url}
+        authTokenEndpoint: "/tenant/auth/token"
+        clientId: ${KRAKEN_CONTROL_PLANE_AGENT_CLIENT_ID:123456}
+        clientSecret: ${KRAKEN_CONTROL_PLANE_AGENT_CLIENT_SECRET:123456}
+        expirationBufferInSeconds: 30
+    push-activity-log-external:
+      batch-size: 30
+      enabled: true
   accept-asset-kinds:
     - kraken.component.api-target
   task:

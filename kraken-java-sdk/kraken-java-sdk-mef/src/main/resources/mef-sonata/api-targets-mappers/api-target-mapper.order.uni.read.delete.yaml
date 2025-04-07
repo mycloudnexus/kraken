@@ -17,24 +17,12 @@ spec:
       method: ""
       serverKey: ""
       mappers:
+        schemaRef:
+          ref: "classpath:/mef-sonata/api-common-mappers/api-target-mapper.order.common.read.delete.yaml"
+          params:
+            - key: productType
+              val: uni
         request:
-          - name: mapper.order.uni.read.delete.buyerId
-            title: "The unique identifier of the organization that is acting as the a Buyer."
-            description: ""
-            source: "@{{buyerId}}"
-            sourceLocation: "QUERY"
-            target: ""
-            targetLocation: ""
-            requiredMapping: false
-          - name: mapper.order.uni.read.delete.orderId
-            title: "Order Unique Identifier."
-            description: ""
-            source: "@{{id}}"
-            sourceLocation: "PATH"
-            target: ""
-            convertValue: "mef.sonata.api-target-mapper.order.uni.add#mapper.order.uni.add.orderId"
-            targetLocation: ""
-            requiredMapping: true
         response:
           - name: mapper.order.uni.read.delete.state
             title: "ProductOrderState"
@@ -55,76 +43,7 @@ spec:
               - inProgress
               - partial
               - rejected
-            valueMapping: {}
+            valueMapping: { }
             source: ""
             sourceLocation: "BODY"
-          - name: mapper.order.uni.read.delete.completionDate
-            title: "order complete date"
-            description: ""
-            source: ""
-            sourceLocation: "BODY"
-            target: "@{{completionDate}}"
-            checkPath: "$[?(@.state == 'completed'||@.state == 'failed'||@.state == 'partial'||@.state == 'rejected'||@.state == 'cancelled')]"
-            deletePath: "$.completionDate"
-            targetLocation: "BODY"
-            requiredMapping: false
-          - name: mapper.order.uni.read.delete.instanceId
-            title: "instance id from seller"
-            description: ""
-            source: ""
-            sourceLocation: "BODY"
-            target: "@{{productOrderItem[0].product.id}}"
-            targetLocation: "BODY"
-            requiredMapping: false
-          - name: mapper.order.uni.read.delete.productOrderItem.completionDate
-            title: "order item complete date"
-            description: ""
-            source: ""
-            sourceLocation: "BODY"
-            target: "@{{productOrderItem[0].completionDate}}"
-            checkPath: "$.productOrderItem[?(@.state == 'completed')]"
-            deletePath: "$.productOrderItem[?(@.state != 'completed')].completionDate"
-            targetLocation: "BODY"
-            requiredMapping: false
-          - name: mapper.order.uni.read.delete.productOrderItem.expectedCompleteDate
-            title: "order item expected complete date"
-            description: ""
-            source: ""
-            sourceLocation: "BODY"
-            target: "@{{productOrderItem[0].expectedCompletionDate}}"
-            targetLocation: "BODY"
-            requiredMapping: false
-          - name: mapper.order.uni.read.stateChange.state
-            title: state in state change history
-            description: ''
-            source: ""
-            target: '@{{productOrderItem[0].stateChange[*].state}}'
-            targetType: enum
-            targetValues:
-              - acknowledged
-              - assessingCancellation
-              - held.assessingCharge
-              - pending.assessingModification
-              - cancelled
-              - pendingCancellation
-              - completed
-              - failed
-              - inProgress
-              - partial
-              - rejected
-            valueMapping: {}
-            replaceStar: true
-            sourceLocation: BODY
-            targetLocation: BODY
-            customizedField: false
-            requiredMapping: false
-          - name: mapper.order.uni.read.stateChange.changeDate
-            title: change date in state change history
-            description: ''
-            source: ''
-            target: '@{{productOrderItem[0].stateChange[*].changeDate}}'
-            replaceStar: true
-            sourceLocation: BODY
-            targetLocation: BODY
-            customizedField: false
-            requiredMapping: false
+            renderCheck: false

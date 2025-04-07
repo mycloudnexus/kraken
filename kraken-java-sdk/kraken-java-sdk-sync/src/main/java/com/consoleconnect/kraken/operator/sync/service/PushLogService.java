@@ -1,17 +1,21 @@
 package com.consoleconnect.kraken.operator.sync.service;
 
-import static com.consoleconnect.kraken.operator.core.service.ApiActivityLogService.CREATED_AT;
+import static com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants.TRIGGERED_AT;
 
 import com.consoleconnect.kraken.operator.core.client.ClientEvent;
 import com.consoleconnect.kraken.operator.core.client.ClientEventTypeEnum;
+import com.consoleconnect.kraken.operator.core.dto.ApiActivityLog;
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
+import com.consoleconnect.kraken.operator.core.enums.LifeStatusEnum;
 import com.consoleconnect.kraken.operator.core.enums.SyncStatusEnum;
 import com.consoleconnect.kraken.operator.core.mapper.ApiActivityLogMapper;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
+import com.consoleconnect.kraken.operator.core.service.ApiActivityLogService;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.DateTime;
 import com.consoleconnect.kraken.operator.sync.model.SyncProperty;
+import com.consoleconnect.kraken.operator.sync.service.security.ExternalSystemTokenProvider;
 import java.time.ZonedDateTime;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -26,13 +30,17 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class PushLogService extends KrakenServerConnector {
 
   private final ApiActivityLogRepository apiActivityLogRepository;
+  private final ApiActivityLogService apiActivityLogService;
 
   public PushLogService(
       SyncProperty appProperty,
       WebClient webClient,
-      ApiActivityLogRepository apiActivityLogRepository) {
-    super(appProperty, webClient);
+      ExternalSystemTokenProvider externalSystemTokenProvider,
+      ApiActivityLogRepository apiActivityLogRepository,
+      ApiActivityLogService apiActivityLogService) {
+    super(appProperty, webClient, externalSystemTokenProvider);
     this.apiActivityLogRepository = apiActivityLogRepository;
+    this.apiActivityLogService = apiActivityLogService;
   }
 
   @SchedulerLock(
@@ -45,10 +53,11 @@ public class PushLogService extends KrakenServerConnector {
         ZonedDateTime.now().minusSeconds(getAppProperty().getSynDelaySeconds());
     List<ApiActivityLogEntity> logEntities =
         apiActivityLogRepository
-            .findAllBySyncStatusAndCreatedAtBefore(
+            .findAllBySyncStatusAndLifeStatusAndCreatedAtBefore(
                 SyncStatusEnum.UNDEFINED,
+                LifeStatusEnum.LIVE,
                 createdAt,
-                UnifiedAssetService.getSearchPageRequest(0, 50, Sort.Direction.ASC, CREATED_AT))
+                UnifiedAssetService.getSearchPageRequest(0, 50, Sort.Direction.ASC, TRIGGERED_AT))
             .getContent();
 
     if (logEntities.isEmpty()) {
@@ -62,17 +71,18 @@ public class PushLogService extends KrakenServerConnector {
         ClientEvent.of(
             CLIENT_ID,
             ClientEventTypeEnum.CLIENT_API_AUDIT_LOG,
-            logEntities.stream().map(ApiActivityLogMapper.INSTANCE::map).toList());
+            logEntities.stream().map(this::map).toList());
 
     HttpResponse<Void> res = pushEvent(event);
     if (res.getCode() == 200) {
       ZonedDateTime now = DateTime.nowInUTC();
-      logEntities.forEach(
-          logEntity -> {
-            logEntity.setSyncStatus(SyncStatusEnum.SYNCED);
-            logEntity.setSyncedAt(now);
-          });
-      apiActivityLogRepository.saveAll(logEntities);
+      this.apiActivityLogService.setSynced(logEntities, now);
     }
+  }
+
+  private ApiActivityLog map(ApiActivityLogEntity entity) {
+    ApiActivityLog dto = ApiActivityLogMapper.INSTANCE.map(entity);
+    dto.setTriggeredAt(entity.getCreatedAt());
+    return dto;
   }
 }

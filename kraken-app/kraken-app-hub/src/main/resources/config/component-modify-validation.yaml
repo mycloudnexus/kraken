@@ -1,0 +1,67 @@
+---
+kind: kraken.component.validation
+apiVersion: v1
+metadata:
+  key: mef.sonata.validation.mapping.modify
+  name: Validation Mapping for Modification
+  description: Defines validation rules for modifying quote or order mappings in MEF Sonata.
+  version: 1.0
+  lastUpdated: 2025-03-18
+spec:
+  modificationRules:
+    - useCase: mef.sonata.api-target-mapper.quote.eline.modify.sync
+      referenceMapper: mef.sonata.api-target-mapper.order.eline.add
+      allowedChanges:
+        - sourceItem: "$.quoteItem[0].product.productConfiguration.bandwidth"
+          targetItem: "$.productOrderItem[0].product.productConfiguration.bandwidth"
+      restrictedChanges:
+        - sourceItem: "$.quoteItem[0].requestedQuoteItemTerm.duration.amount"
+          targetItem: "$.productOrderItem[0].requestedItemTerm.duration.amount"
+        - sourceItem: "$.quoteItem[0].requestedQuoteItemTerm.duration.units"
+          targetItem: "$.productOrderItem[0].requestedItemTerm.duration.units"
+        - sourceItem: "$.quoteItem[0].requestedQuoteItemTerm.endOfTermAction"
+          targetItem: "$.productOrderItem[0].requestedItemTerm.endOfTermAction"
+        - sourceItem: "$.quoteItem[0].requestedQuoteItemTerm.rollInterval.amount"
+          targetItem: "$.productOrderItem[0].requestedItemTerm.rollInterval.amount"
+        - sourceItem: "$.quoteItem[0].requestedQuoteItemTerm.rollInterval.units"
+          targetItem: "$.productOrderItem[0].requestedItemTerm.rollInterval.units"
+        - sourceItem: "$.quoteItem[0].product.productConfiguration.bandwidthUnit"
+          targetItem: "$.productOrderItem[0].product.productConfiguration.bandwidthUnit"
+        - sourceItem: "$.quoteItem[0].product.productConfiguration.classOfService"
+          targetItem: "$.productOrderItem[0].product.productConfiguration.classOfService"
+        - sourceItem: "$.quoteItem[0].product.productConfiguration.paymentType"
+          targetItem: "$.productOrderItem[0].product.productConfiguration.paymentType"
+    - useCase: mef.sonata.api-target-mapper.order.eline.modify
+      referenceMapper: mef.sonata.api-target-mapper.order.eline.add
+      allowedChanges:
+        - sourceItem: "$.productOrderItem[0].product.productConfiguration.bandwidth"
+          targetItem: "$.productOrderItem[0].product.productConfiguration.bandwidth"
+      restrictedChanges:
+        - sourceItem: "$.productOrderItem[0].requestedItemTerm.duration.amount"
+          targetItem: "$.productOrderItem[0].requestedItemTerm.duration.amount"
+        - sourceItem: "$.productOrderItem[0].requestedItemTerm.duration.units"
+          targetItem: "$.productOrderItem[0].requestedItemTerm.duration.units"
+        - sourceItem: "$.productOrderItem[0].requestedItemTerm.endOfTermAction"
+          targetItem: "$.productOrderItem[0].requestedItemTerm.endOfTermAction"
+        - sourceItem: "$.productOrderItem[0].requestedItemTerm.rollInterval.amount"
+          targetItem: "$.productOrderItem[0].requestedItemTerm.rollInterval.amount"
+        - sourceItem: "$.productOrderItem[0].requestedItemTerm.rollInterval.units"
+          targetItem: "$.productOrderItem[0].requestedItemTerm.rollInterval.units"
+        - sourceItem: "$.productOrderItem[0].product.productConfiguration.bandwidthUnit"
+          targetItem: "$.productOrderItem[0].product.productConfiguration.bandwidthUnit"
+        - sourceItem: "$.productOrderItem[0].product.productConfiguration.name"
+          targetItem: "$.productOrderItem[0].product.productConfiguration.name"
+        - sourceItem: "$.productOrderItem[0].product.productConfiguration.paymentType"
+          targetItem: "$.productOrderItem[0].product.productConfiguration.paymentType"
+        - sourceItem: "$.productOrderItem[0].product.productConfiguration.classOfService"
+          targetItem: "$.productOrderItem[0].product.productConfiguration.classOfService"
+        - sourceItem: "$.productOrderItem[0].product.productConfiguration.buyerCompanyId"
+          targetItem: "$.productOrderItem[0].product.productConfiguration.buyerCompanyId"
+        - sourceItem: "$.productOrderItem[0].product.productConfiguration.destUNIMetroId"
+          targetItem: "$.productOrderItem[0].product.productConfiguration.destUNIMetroId"
+        - sourceItem: "$.productOrderItem[0].product.productConfiguration.type"
+          targetItem: "$.productOrderItem[0].product.productConfiguration.type"
+        - sourceItem: "$.productOrderItem[0].product.productRelationship[0].id"
+          targetItem: "$.productOrderItem[0].product.productRelationship[0].id"
+        - sourceItem: "$.productOrderItem[0].product.productRelationship[1].id"
+          targetItem: "$.productOrderItem[0].product.productRelationship[1].id"

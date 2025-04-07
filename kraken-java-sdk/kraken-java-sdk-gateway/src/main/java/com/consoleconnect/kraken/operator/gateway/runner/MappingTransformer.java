@@ -34,7 +34,10 @@ public interface MappingTransformer extends PathOperator {
   String FORWARD_DOWNSTREAM = "forwardDownstream";
   String REQUEST_BODY = "requestBody.";
   String RESPONSE_BODY = "responseBody";
+  String WORKFLOW_PREFIX = "workflow.";
   String ARRAY_PATTERN = ".*\\[\\d+\\]$";
+  String RESPONSE_UNIQUE_ID = "$.entity.renderedResponse.uniqueId";
+  String RESPONSE_ORDER_ID = "$.entity.renderedResponse.orderId";
 
   @Slf4j
   final class LogHolder {}
@@ -57,6 +60,12 @@ public interface MappingTransformer extends PathOperator {
     LogHolder.log.info("compactedResponseBody:{}", compactedResponseBody);
     List<ComponentAPITargetFacets.Mapper> response = mappers.getResponse();
     for (ComponentAPITargetFacets.Mapper mapper : response) {
+      LogHolder.log.info("unique id is : {}", responseTargetMapperDto.getUniqueId());
+      if (mapper.isRenderCheck()
+          && StringUtils.isBlank(responseTargetMapperDto.getUniqueId())
+          && StringUtils.isBlank(responseTargetMapperDto.getOrderId())) {
+        continue;
+      }
       // Preparing check and delete path for final result
       if (StringUtils.isNotBlank(mapper.getCheckPath())
           && StringUtils.isNotBlank(mapper.getDeletePath())) {
@@ -332,6 +341,9 @@ public interface MappingTransformer extends PathOperator {
       if (strippedValue.startsWith(ARRAY_FIRST_ELE) || strippedValue.startsWith(ARRAY_WILD_MASK)) {
         strippedValue = RESPONSE_BODY + strippedValue;
       } else {
+        if (strippedValue.startsWith(WORKFLOW_PREFIX)) {
+          return formatWorkflowResponseExpression(strippedValue);
+        }
         strippedValue = RESPONSE_BODY + "." + strippedValue;
       }
     }
@@ -363,7 +375,10 @@ public interface MappingTransformer extends PathOperator {
     return str.replace(ARRAY_WILD_MASK, ARRAY_FIRST_ELE);
   }
 
-  default Boolean forwardDownstream(ComponentAPIFacets.Action config) {
+  default Boolean forwardDownstream(Map<String, Object> context, ComponentAPIFacets.Action config) {
+    if (context.containsKey(FORWARD_DOWNSTREAM)) {
+      return (Boolean) context.get(FORWARD_DOWNSTREAM);
+    }
     if (MapUtils.isNotEmpty(config.getEnv()) && config.getEnv().get(FORWARD_DOWNSTREAM) != null) {
       return Boolean.valueOf(config.getEnv().get(FORWARD_DOWNSTREAM));
     }

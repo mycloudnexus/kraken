@@ -1,7 +1,9 @@
 package com.consoleconnect.kraken.operator.core.service;
 
-import static com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants.MAPPER_KIND;
+import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.COMPONENT_API;
+import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.COMPONENT_API_TARGET_MAPPER;
 import static com.consoleconnect.kraken.operator.core.toolkit.LabelConstants.FUNCTION_JSON_EXTRACT_PATH_TEXT;
+import static com.consoleconnect.kraken.operator.core.toolkit.StringUtils.readWithJsonPath;
 
 import com.consoleconnect.kraken.operator.core.dto.AssetLinkDto;
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
@@ -12,23 +14,24 @@ import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
 import com.consoleconnect.kraken.operator.core.event.IngestionDataResult;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
+import com.consoleconnect.kraken.operator.core.ingestion.ResourceLoaderFactory;
 import com.consoleconnect.kraken.operator.core.mapper.AssetMapper;
-import com.consoleconnect.kraken.operator.core.mapper.FacetsMapper;
 import com.consoleconnect.kraken.operator.core.model.*;
+import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPIFacets;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
+import com.consoleconnect.kraken.operator.core.model.facet.ComponentWorkflowFacets;
 import com.consoleconnect.kraken.operator.core.repo.AssetFacetRepository;
 import com.consoleconnect.kraken.operator.core.repo.AssetLinkRepository;
 import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
 import com.consoleconnect.kraken.operator.core.toolkit.*;
-import com.fasterxml.jackson.core.type.TypeReference;
 import jakarta.persistence.criteria.*;
 import java.util.*;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -38,11 +41,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class UnifiedAssetService implements UUIDWrapper {
+public class UnifiedAssetService implements UUIDWrapper, FacetsMerger {
 
   private static final String DEFAULT_ORDER_SEQ = "1000";
-  private static final String MAPPER_REQUEST = "request";
-  private static final String MAPPER_RESPONSE = "response";
   private static final String PARENT_PRODUCT_TYPE_KEY = "parentProductType";
 
   private static final Set<String> API_KINDS =
@@ -52,8 +53,7 @@ public class UnifiedAssetService implements UUIDWrapper {
   private final AssetFacetRepository assetFacetRepository;
   private final AssetLinkRepository assetLinkRepository;
   private final AppProperty appProperty;
-  private final ApplicationContext applicationContext;
-  private final MergeService mergeService;
+  @Getter private final ResourceLoaderFactory resourceLoaderFactory;
 
   public static PageRequest getSearchPageRequest() {
     return getSearchPageRequest(PagingHelper.DEFAULT_PAGE, PagingHelper.DEFAULT_SIZE, null, null);
@@ -126,11 +126,47 @@ public class UnifiedAssetService implements UUIDWrapper {
       if (facetIncluded && StringUtils.isNotBlank(parentProductType)) {
         List<UnifiedAssetDto> assetDtoList = filterByParentProductType(data, parentProductType);
         Page<UnifiedAssetDto> pagedData = PagingHelper.paginateList(assetDtoList, pageRequest);
+        // set supported product type from config
+        fillSupportedProductType(pagedData.getContent());
         return PagingHelper.toPaging(pagedData, x -> x);
       }
     }
     Page<UnifiedAssetEntity> pagedData = PagingHelper.paginateList(data, pageRequest);
-    return PagingHelper.toPaging(pagedData, entity -> toAsset(entity, facetIncluded));
+    Paging<UnifiedAssetDto> paging =
+        PagingHelper.toPaging(pagedData, entity -> toAsset(entity, facetIncluded));
+    fillSupportedProductType(paging.getData());
+    return paging;
+  }
+
+  public void fillSupportedProductType(List<UnifiedAssetDto> content) {
+    content.stream()
+        .filter(v -> v.getKind().equalsIgnoreCase(COMPONENT_API.getKind()) && v.getFacets() != null)
+        .forEach(
+            asset -> {
+              ComponentAPIFacets facets = UnifiedAsset.getFacets(asset, ComponentAPIFacets.class);
+              List<ComponentAPIFacets.SupportedProductAndAction> supportedTypesAndActions =
+                  facets.getSupportedProductTypesAndActions();
+              if (supportedTypesAndActions == null) {
+                return;
+              }
+              supportedTypesAndActions.stream()
+                  .forEach(
+                      typeAndAction -> {
+                        try {
+                          typeAndAction.setProductTypes(
+                              (List<String>)
+                                  readWithJsonPath(
+                                      JsonToolkit.fromJson(
+                                          JsonToolkit.toJson(
+                                              appProperty.getSupportedProductTypes()),
+                                          Map.class),
+                                      typeAndAction.getSupportedConfig()));
+                        } catch (Exception e) {
+                          log.warn("no supported type configuration");
+                        }
+                      });
+              asset.setFacets(JsonToolkit.fromJson(JsonToolkit.toJson(facets), Map.class));
+            });
   }
 
   private List<UnifiedAssetEntity> filterExcludedAssets(List<UnifiedAssetEntity> data) {
@@ -298,10 +334,24 @@ public class UnifiedAssetService implements UUIDWrapper {
             .map(entity -> updateAssetEntity(parentId, entity, data, syncMetadata))
             .orElseGet(() -> createAssetEntity(parentId, data, syncMetadata));
 
-    log.info("syncing asset facets, assetId: {}", assetEntity.getKey());
-
-    if (Objects.equals(assetEntity.getKind(), MAPPER_KIND) && entityOptional.isPresent()) {
-      data.setFacets(mergeService.mergeFacets(entityOptional.get(), data.getFacets()));
+    boolean extendCommon =
+        Optional.ofNullable(appProperty)
+            .map(AppProperty::getFeatures)
+            .map(AppProperty.Features::getExtendCommonConfig)
+            .map(AppProperty.ExtendCommonConfig::isEnabled)
+            .orElse(false);
+    log.info(
+        "syncing asset facets, assetId: {}, extendCommon:{}", assetEntity.getKey(), extendCommon);
+    if (enableMerge(assetEntity) && extendCommon) {
+      Map<String, Object> facets;
+      if (entityOptional.isPresent()) {
+        log.info("Database has key:{}, extendCommon:{}", assetEntity.getKey(), extendCommon);
+        facets = mergeFacetsInternal(entityOptional.get(), data.getFacets(), extendCommon);
+      } else {
+        log.info("Database has no key:{}, extendCommon:{}", assetEntity.getKey(), extendCommon);
+        facets = extendCommonNodesInFacets(extendCommon, data.getFacets());
+      }
+      data.setFacets(facets);
     }
     if (data.getFacets() != null) {
       syncFacets(assetEntity, data.getFacets());
@@ -328,111 +378,23 @@ public class UnifiedAssetService implements UUIDWrapper {
     return parentKey == null ? null : findOneByIdOrKey(parentKey).getId().toString();
   }
 
-  public static Map<String, Object> mergeFacets(
-      UnifiedAssetEntity unifiedAssetEntity, Map<String, Object> facetsUpdated) {
+  public Map<String, Object> mergeFacetsInternal(
+      UnifiedAssetEntity unifiedAssetEntity,
+      Map<String, Object> facetsUpdated,
+      boolean extendCommon) {
     UnifiedAssetDto assetDto = UnifiedAssetService.toAsset(unifiedAssetEntity, true);
-    ComponentAPITargetFacets existFacets =
-        UnifiedAsset.getFacets(assetDto, ComponentAPITargetFacets.class);
-    ComponentAPITargetFacets newFacets =
-        JsonToolkit.fromJson(JsonToolkit.toJson(facetsUpdated), ComponentAPITargetFacets.class);
-    return mergeFacets(existFacets, newFacets);
-  }
-
-  public static Map<String, Object> mergeFacets(
-      ComponentAPITargetFacets facetsOld, ComponentAPITargetFacets facetsNew) {
-    ComponentAPITargetFacets.Endpoint endpointOld = facetsOld.getEndpoints().get(0);
-    ComponentAPITargetFacets.Endpoint endpointNew = facetsNew.getEndpoints().get(0);
-    List<PathRule> pathRules =
-        (Objects.isNull(endpointNew) || Objects.isNull(endpointNew.getMappers()))
-            ? new ArrayList<>()
-            : endpointNew.getMappers().getPathRules();
-    FacetsMapper.INSTANCE.toEndpoint(endpointOld, endpointNew);
-
-    Map<String, Map<String, ComponentAPITargetFacets.Mapper>> mapperOldMap =
-        constructMapperMap(endpointOld);
-    Map<String, Map<String, ComponentAPITargetFacets.Mapper>> mapperNewMap =
-        constructMapperMap(endpointNew);
-    mergeMappers(mapperOldMap, mapperNewMap);
-
-    Map<String, List<ComponentAPITargetFacets.Mapper>> finalMap = toFinalMapper(mapperNewMap);
-    ComponentAPITargetFacets.Mappers mappers = new ComponentAPITargetFacets.Mappers();
-    mappers.setResponse(finalMap.getOrDefault(MAPPER_RESPONSE, Collections.emptyList()));
-    mappers.setRequest(finalMap.getOrDefault(MAPPER_REQUEST, Collections.emptyList()));
-    mappers.setPathRules(pathRules);
-    if (Objects.nonNull(endpointNew)) {
-      endpointNew.setMappers(mappers);
-    }
-    return JsonToolkit.fromJson(JsonToolkit.toJson(facetsNew), new TypeReference<>() {});
-  }
-
-  public static void mergeMappers(
-      Map<String, Map<String, ComponentAPITargetFacets.Mapper>> mapperMapOld,
-      Map<String, Map<String, ComponentAPITargetFacets.Mapper>> mapperMapNew) {
-    mapperMapOld.forEach(
-        (name, value) -> {
-          Map.Entry<String, ComponentAPITargetFacets.Mapper> existMapperEntry =
-              value.entrySet().iterator().next();
-          if (Objects.equals(Boolean.TRUE, existMapperEntry.getValue().getCustomizedField())) {
-            String mapperHashCode = String.valueOf(existMapperEntry.getValue().hashCode());
-            mapperMapNew.putIfAbsent(
-                mapperHashCode,
-                new HashMap<>(Map.of(existMapperEntry.getKey(), existMapperEntry.getValue())));
-          } else if (mapperMapNew.containsKey(name)) {
-            ComponentAPITargetFacets.Mapper mapper =
-                mapperMapNew.get(name).get(existMapperEntry.getKey());
-            if (Objects.equals(MAPPER_REQUEST, existMapperEntry.getKey())) {
-              FacetsMapper.INSTANCE.toRequestMapper(existMapperEntry.getValue(), mapper);
-            } else {
-              FacetsMapper.INSTANCE.toResponseMapper(existMapperEntry.getValue(), mapper);
-            }
-          }
-        });
-  }
-
-  public static Map<String, List<ComponentAPITargetFacets.Mapper>> toFinalMapper(
-      Map<String, Map<String, ComponentAPITargetFacets.Mapper>> newMapperMap) {
-    return newMapperMap.values().stream()
-        .collect(
-            Collectors.groupingBy(
-                map -> map.entrySet().iterator().next().getKey(),
-                Collectors.mapping(
-                    nested -> nested.entrySet().iterator().next().getValue(),
-                    Collectors.toList())));
-  }
-
-  public static Map<String, Map<String, ComponentAPITargetFacets.Mapper>> constructMapperMap(
-      ComponentAPITargetFacets.Endpoint endpoint) {
-    if (Objects.isNull(endpoint) || Objects.isNull(endpoint.getMappers())) {
-      return new LinkedHashMap<>();
-    }
-
-    Map<String, Map<String, ComponentAPITargetFacets.Mapper>> mapperMap = new LinkedHashMap<>();
-    Map<ComponentAPITargetFacets.Mapper, Boolean> seenMappers = new HashMap<>();
-    removeDuplicatedNodes(
-        endpoint.getMappers().getRequest(), mapperMap, seenMappers, MAPPER_REQUEST);
-    removeDuplicatedNodes(
-        endpoint.getMappers().getResponse(), mapperMap, seenMappers, MAPPER_RESPONSE);
-
-    return mapperMap;
-  }
-
-  public static void removeDuplicatedNodes(
-      List<ComponentAPITargetFacets.Mapper> mappers,
-      Map<String, Map<String, ComponentAPITargetFacets.Mapper>> mapperMap,
-      Map<ComponentAPITargetFacets.Mapper, Boolean> seenMappers,
-      String mapperSection) {
-    if (CollectionUtils.isNotEmpty(mappers)) {
-      for (ComponentAPITargetFacets.Mapper mapper : mappers) {
-        if (seenMappers.containsKey(mapper)) {
-          continue;
-        }
-        String key =
-            StringUtils.isBlank(mapper.getName())
-                ? String.valueOf(mapper.hashCode())
-                : mapper.getName();
-        mapperMap.computeIfAbsent(key, k -> new LinkedHashMap<>()).put(mapperSection, mapper);
-        seenMappers.put(mapper, true);
-      }
+    if (Objects.equals(unifiedAssetEntity.getKind(), COMPONENT_API_TARGET_MAPPER.getKind())) {
+      ComponentAPITargetFacets existFacets =
+          UnifiedAsset.getFacets(assetDto, ComponentAPITargetFacets.class);
+      ComponentAPITargetFacets newFacets =
+          JsonToolkit.fromJson(JsonToolkit.toJson(facetsUpdated), ComponentAPITargetFacets.class);
+      return mergeFacets(existFacets, newFacets, extendCommon);
+    } else {
+      ComponentWorkflowFacets existFacets =
+          UnifiedAsset.getFacets(assetDto, ComponentWorkflowFacets.class);
+      ComponentWorkflowFacets newFacets =
+          JsonToolkit.fromJson(JsonToolkit.toJson(facetsUpdated), ComponentWorkflowFacets.class);
+      return mergeFacets(existFacets, newFacets);
     }
   }
 
@@ -449,6 +411,26 @@ public class UnifiedAssetService implements UUIDWrapper {
                 log.info("Child asset {} is still valid", child.getKey());
               }
             });
+  }
+
+  public void syncFacets(UnifiedAssetEntity assetEntity, Map<String, Object> facets) {
+    Set<AssetFacetEntity> existingFacets = assetEntity.getFacets();
+    Set<AssetFacetEntity> newFacets = new HashSet<>();
+    assetEntity.setFacets(newFacets);
+    Set<UUID> toDeletedIds =
+        existingFacets.stream().map(AssetFacetEntity::getId).collect(Collectors.toSet());
+    log.info("delete asset facets ids:{}", JsonToolkit.toJson(toDeletedIds));
+    this.assetFacetRepository.deleteAll(existingFacets);
+    this.assetFacetRepository.flush();
+    facets.forEach(
+        (key, value) -> {
+          AssetFacetEntity facetEntity = new AssetFacetEntity();
+          facetEntity.setAsset(assetEntity);
+          facetEntity.setKey(key);
+          facetEntity.setPayload(value);
+          newFacets.add(facetEntity);
+        });
+    this.assetFacetRepository.saveAll(newFacets);
   }
 
   private UnifiedAssetEntity createAssetEntity(
@@ -488,26 +470,6 @@ public class UnifiedAssetService implements UUIDWrapper {
     } else {
       entity.setUpdatedBy(syncMetadata.getSyncedBy());
     }
-  }
-
-  private void syncFacets(UnifiedAssetEntity assetEntity, Map<String, Object> facets) {
-    Set<AssetFacetEntity> existingFacets = assetEntity.getFacets();
-    Set<AssetFacetEntity> newFacets = new HashSet<>();
-    assetEntity.setFacets(newFacets);
-    Set<UUID> toDeletedIds =
-        existingFacets.stream().map(AssetFacetEntity::getId).collect(Collectors.toSet());
-    log.info("delete asset facets ids:{}", JsonToolkit.toJson(toDeletedIds));
-    this.assetFacetRepository.deleteAll(existingFacets);
-    this.assetFacetRepository.flush();
-    facets.forEach(
-        (key, value) -> {
-          AssetFacetEntity facetEntity = new AssetFacetEntity();
-          facetEntity.setAsset(assetEntity);
-          facetEntity.setKey(key);
-          facetEntity.setPayload(value);
-          newFacets.add(facetEntity);
-        });
-    this.assetFacetRepository.saveAll(newFacets);
   }
 
   private void syncAssetLinks(UnifiedAssetEntity assetEntity, List<AssetLink> links) {

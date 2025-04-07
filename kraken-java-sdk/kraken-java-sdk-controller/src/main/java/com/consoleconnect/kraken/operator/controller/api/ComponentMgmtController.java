@@ -3,6 +3,7 @@ package com.consoleconnect.kraken.operator.controller.api;
 import com.consoleconnect.kraken.operator.auth.security.UserContext;
 import com.consoleconnect.kraken.operator.controller.dto.*;
 import com.consoleconnect.kraken.operator.controller.model.ComponentTagFacet;
+import com.consoleconnect.kraken.operator.controller.model.StandardComponentInfo;
 import com.consoleconnect.kraken.operator.controller.service.ApiComponentService;
 import com.consoleconnect.kraken.operator.controller.service.ComponentTagService;
 import com.consoleconnect.kraken.operator.controller.service.ProductDeploymentService;
@@ -119,14 +120,30 @@ public class ComponentMgmtController {
         .map(userId -> apiComponentService.updateApiTargetMapper(asset, id, userId));
   }
 
+  @Operation(summary = "update workflow template)")
+  @PatchMapping("/components/{id}/workflow")
+  @AuditAction(
+      resource = AuditConstants.API_MAPPING,
+      resourceId = "#pathVariable['id']",
+      description = "update target api workflow mapper")
+  public Mono<IngestionDataResult> updateWorkflowTemplate(
+      @PathVariable String productId,
+      @PathVariable String id,
+      @RequestBody SaveWorkflowTemplateRequest template) {
+    return UserContext.getUserId()
+        .publishOn(Schedulers.boundedElastic())
+        .map(userId -> apiComponentService.updateWorkflowTemplate(template, id, userId));
+  }
+
   @Operation(summary = "The detail of mapping for an api component")
   @GetMapping("/components/{componentId}/mapper-details")
   public HttpResponse<ComponentExpandDTO> detailMapping(
       @PathVariable String productId,
       @PathVariable String componentId,
-      @RequestParam(value = "envId", required = false) String envId) {
+      @RequestParam(value = "envId", required = false) String envId,
+      @RequestParam(value = "productType", required = false) String productType) {
     return HttpResponse.ok(
-        apiComponentService.queryComponentExpandInfo(productId, componentId, envId));
+        apiComponentService.queryComponentExpandInfo(productId, componentId, envId, productType));
   }
 
   @Operation(summary = "list all api use case in a product")
@@ -147,5 +164,18 @@ public class ComponentMgmtController {
   public HttpResponse<ComponentProductCategoryDTO> listProductCategories(
       @PathVariable String productId) {
     return HttpResponse.ok(apiComponentService.listProductCategories(productId));
+  }
+
+  @Operation(summary = "list standard api components")
+  @GetMapping("/standardApiComponents")
+  public HttpResponse<List<StandardComponentInfo>> listStandardApiComponents(
+      @RequestParam(value = "productType") String productType) {
+    return HttpResponse.ok(apiComponentService.queryForStandardMappingInfo(productType));
+  }
+
+  @Operation(summary = "list product types")
+  @GetMapping("/productTypes")
+  public HttpResponse<List<String>> listProductTypes() {
+    return HttpResponse.ok(apiComponentService.listProductType());
   }
 }

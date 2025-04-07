@@ -35,6 +35,7 @@ import com.consoleconnect.kraken.operator.core.toolkit.*;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import io.jsonwebtoken.lang.Strings;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.function.Consumer;
@@ -796,7 +797,7 @@ public class TemplateUpgradeService implements ApiUseCaseSelector {
                     relatedApiUse -> {
                       changedMappers.add(relatedApiUse.getMapperKey());
                       dealSet.add(relatedApiUse.getComponentApiKey());
-                      dealSet.addAll(relatedApiUse.membersExcludeApiKey());
+                      dealSet.addAll(apiComponentService.findRelatedAssetKeys(key, relatedApiUse));
                     });
 
           } else {
@@ -804,7 +805,7 @@ public class TemplateUpgradeService implements ApiUseCaseSelector {
                 .ifPresent(
                     relatedApiUse -> {
                       dealSet.add(relatedApiUse.getComponentApiKey());
-                      dealSet.addAll(relatedApiUse.membersExcludeApiKey());
+                      dealSet.addAll(apiComponentService.findRelatedAssetKeys(key, relatedApiUse));
                     });
           }
         });
@@ -918,6 +919,10 @@ public class TemplateUpgradeService implements ApiUseCaseSelector {
     checkIsLatestUpgrade(event.getTemplateUpgradeId(), true);
     List<ApiMapperDeploymentDTO> stageRunningMappers =
         productDeploymentService.listRunningApiMapperDeploymentV3(event.getEnvId());
+    if (stageRunningMappers.isEmpty()) {
+      systemInfoService.updateSystemStatus(SystemStateEnum.RUNNING);
+      return Strings.EMPTY;
+    }
     List<String> runningMapperKeys =
         stageRunningMappers.stream().map(ApiMapperDeploymentDTO::getTargetMapperKey).toList();
     boolean existedInCompleted =

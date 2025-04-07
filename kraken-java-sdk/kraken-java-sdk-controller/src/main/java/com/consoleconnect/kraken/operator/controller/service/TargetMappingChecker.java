@@ -8,6 +8,8 @@ import com.consoleconnect.kraken.operator.core.enums.MappingStatusEnum;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -17,7 +19,6 @@ import org.apache.commons.lang3.StringUtils;
 public interface TargetMappingChecker {
   String QUOTE_KEY = "quote";
   String ORDER_KEY = "order";
-  Set<String> keywords = Set.of(QUOTE_KEY, "read", "sync");
 
   @Slf4j
   final class LogHolder {}
@@ -78,11 +79,11 @@ public interface TargetMappingChecker {
                                         || !MapUtils.isEmpty(mapper.getValueMapping()))))));
   }
 
-  default void fillMappingStatus(UnifiedAssetDto assetDto) {
+  default void fillMappingStatus(UnifiedAssetDto assetDto, List<String> noRequiredMappingKeys) {
     if (!COMPONENT_API_TARGET_MAPPER.getKind().equals(assetDto.getKind())) {
       return;
     }
-    if (containsKeywords(assetDto.getMetadata().getKey())) {
+    if (containsKeywords(noRequiredMappingKeys, assetDto.getMetadata().getKey())) {
       assetDto.setMappingStatus(MappingStatusEnum.COMPLETE.getDesc());
       return;
     }
@@ -120,15 +121,11 @@ public interface TargetMappingChecker {
     }
   }
 
-  default boolean containsKeywords(String s) {
-    if (StringUtils.isBlank(s)) {
+  default boolean containsKeywords(List<String> noRequiredMappingKeys, String mapperKey) {
+    if (StringUtils.isBlank(mapperKey) || CollectionUtils.isEmpty(noRequiredMappingKeys)) {
       return false;
     }
-    for (String word : keywords) {
-      if (!s.contains(word)) {
-        return false;
-      }
-    }
-    return true;
+    Set<String> sets = new HashSet<>(noRequiredMappingKeys);
+    return sets.contains(mapperKey);
   }
 }

@@ -1,15 +1,20 @@
 import LogMethodTag from "@/components/LogMethodTag";
 import TrimmedPath from "@/components/TrimmedPath";
-import { useGetProductEnvActivities } from "@/hooks/product";
+import {
+  useGetProductEnvActivities,
+  useGetProductTypes,
+} from "@/hooks/product";
 import { useCommonListProps } from "@/hooks/useCommonListProps";
 import { toDateTime } from "@/libs/dayjs";
 import { useAppStore } from "@/stores/app.store";
 import { DEFAULT_PAGING } from "@/utils/constants/common";
+import { getProductName } from "@/utils/helpers/name";
 import { IActivityLog } from "@/utils/types/env.type";
 import {
   CheckCircleFilled,
   ExclamationCircleFilled,
   CloseCircleFilled,
+  FilterFilled,
 } from "@ant-design/icons";
 import { Table, Flex, Button, DatePicker, Divider } from "antd";
 import { ColumnsType, TableProps } from "antd/es/table";
@@ -37,11 +42,13 @@ const TimeFilter = ({
   setDates,
   handleTimeFilter,
   close,
+  setIsTimeFiltered,
 }: {
   dates: [Dayjs | null, Dayjs | null] | null;
   setDates: Dispatch<SetStateAction<[Dayjs | null, Dayjs | null] | null>>;
   handleTimeFilter: () => void;
   close: FilterDropdownProps["close"];
+  setIsTimeFiltered: Dispatch<SetStateAction<boolean>>;
 }) => {
   return (
     <div style={{ padding: "8px" }}>
@@ -80,6 +87,7 @@ const TimeFilter = ({
         <Button
           onClick={() => {
             handleTimeFilter();
+            setIsTimeFiltered(!!dates);
             close();
           }}
           type="primary"
@@ -134,6 +142,7 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
   const { currentProduct } = useAppStore();
   const { envId } = useParams();
   const [dates, setDates] = useState<[Dayjs | null, Dayjs | null] | null>(null);
+  const [isTimeFiltered, setIsTimeFiltered] = useState(false);
 
   const {
     tableData,
@@ -156,6 +165,8 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
     envActivityParams.envId,
     envActivityParams.params
   );
+
+  const { data: productTypes } = useGetProductTypes(currentProduct);
 
   const methodOptions = [
     {
@@ -235,6 +246,11 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
     },
   ];
 
+  const productOptions =
+    productTypes?.map((type: string) => {
+      return { value: type, text: getProductName(type) };
+    }) ?? [];
+
   const handleTimeFilter = () => {
     setQueryParams({
       ...queryParams,
@@ -245,12 +261,19 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
 
   const columns: ColumnsType<IActivityLog> = [
     {
+      key: "productType",
+      title: "Product",
+      render: (log: IActivityLog) => getProductName(log.productType),
+      width: 200,
+      filters: productOptions,
+      filterMultiple: false,
+    },
+    {
       key: "name",
       title: "Method",
       render: (log: IActivityLog) => <LogMethodTag method={log.method} />,
       width: 100,
       filters: methodOptions,
-      filterMultiple: false,
     },
     {
       key: "name",
@@ -274,7 +297,6 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
       width: 140,
       render: (log: IActivityLog) => getStatusCodeWithIcon(log.httpStatusCode),
       filters: statusCodeOptions,
-      filterMultiple: false,
     },
     {
       key: "date",
@@ -282,7 +304,18 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
       render: (log: IActivityLog) => toDateTime(log.createdAt),
       width: 200,
       filterDropdown: ({ close }) =>
-        TimeFilter({ dates, setDates, handleTimeFilter, close }),
+        TimeFilter({
+          dates,
+          setDates,
+          handleTimeFilter,
+          close,
+          setIsTimeFiltered,
+        }),
+      filterIcon: isTimeFiltered ? (
+        <FilterFilled style={{ color: "#1677ff" }} />
+      ) : (
+        <FilterFilled />
+      ),
     },
     {
       key: "action",
@@ -332,6 +365,7 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
       size: pagination.pageSize,
       method: filters.name,
       statusCode: filters.status,
+      productType: filters.productType,
     });
   };
 

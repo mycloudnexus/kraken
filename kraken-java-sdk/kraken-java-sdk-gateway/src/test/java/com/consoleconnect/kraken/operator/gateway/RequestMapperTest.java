@@ -61,7 +61,17 @@ class RequestMapperTest implements MappingTransformer {
         YamlToolkit.parseYaml(
                 readFileToString("mockData/api-target.order.eline.add.yaml"), UnifiedAssetDto.class)
             .get();
-    Mockito.doReturn(elineAsset).when(unifiedAssetService).findOne(contains("order.eline"));
+    UnifiedAssetDto workflowAsset =
+        YamlToolkit.parseYaml(
+                readFileToString("mockData/api-workflow.order.eline.add.yaml"),
+                UnifiedAssetDto.class)
+            .get();
+    Mockito.doReturn(elineAsset)
+        .when(unifiedAssetService)
+        .findOne(contains("api-target.order.eline.add"));
+    Mockito.doReturn(workflowAsset)
+        .when(unifiedAssetService)
+        .findOne(contains("api-workflow.order.eline.add"));
     ComponentAPITargetFacets orderReadFacets =
         renderFacets("mockData/api-target.order.eline.read.yaml");
     Assertions.assertNotNull(orderReadFacets);
@@ -84,7 +94,7 @@ class RequestMapperTest implements MappingTransformer {
     ComponentAPITargetFacets facets =
         UnifiedAsset.getFacets(unifiedAsset.get(), ComponentAPITargetFacets.class);
     StateValueMappingDto stateValueMappingDto = new StateValueMappingDto();
-    renderRequestService.parseRequest(facets, stateValueMappingDto);
+    renderRequestService.parseRequest(facets.getEndpoints(), stateValueMappingDto);
     return facets;
   }
 

@@ -5,12 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>kraken-app-controller</artifactId>
     <name>kraken-app-controller</name>
-    <version>1.2.0</version>
+    <version>2.0.0-snapshot.5</version>
     <packaging>jar</packaging>
     <parent>
         <groupId>com.consoleconnect.kraken</groupId>
         <artifactId>kraken-app</artifactId>
-        <version>1.2.0</version>
+        <version>2.0.0-snapshot.5</version>
     </parent>
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>

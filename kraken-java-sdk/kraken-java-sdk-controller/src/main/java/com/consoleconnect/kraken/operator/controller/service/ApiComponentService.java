@@ -4,33 +4,45 @@ import static com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants.*;
 import static com.consoleconnect.kraken.operator.core.toolkit.LabelConstants.*;
 
 import com.consoleconnect.kraken.operator.auth.security.UserContext;
-import com.consoleconnect.kraken.operator.controller.dto.*;
-import com.consoleconnect.kraken.operator.controller.model.ComponentTag;
-import com.consoleconnect.kraken.operator.controller.model.ComponentTagFacet;
-import com.consoleconnect.kraken.operator.controller.model.DeploymentFacet;
-import com.consoleconnect.kraken.operator.controller.model.Environment;
+import com.consoleconnect.kraken.operator.controller.dto.ComponentExpandDTO;
+import com.consoleconnect.kraken.operator.controller.dto.ComponentProductCategoryDTO;
+import com.consoleconnect.kraken.operator.controller.dto.EndPointUsageDTO;
+import com.consoleconnect.kraken.operator.controller.dto.SaveWorkflowTemplateRequest;
+import com.consoleconnect.kraken.operator.controller.model.*;
 import com.consoleconnect.kraken.operator.controller.tools.VersionHelper;
 import com.consoleconnect.kraken.operator.core.dto.ApiUseCaseDto;
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
-import com.consoleconnect.kraken.operator.core.entity.*;
-import com.consoleconnect.kraken.operator.core.enums.*;
+import com.consoleconnect.kraken.operator.core.entity.AssetFacetEntity;
+import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
+import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
+import com.consoleconnect.kraken.operator.core.enums.AssetLinkKindEnum;
+import com.consoleconnect.kraken.operator.core.enums.ParentProductTypeEnum;
+import com.consoleconnect.kraken.operator.core.enums.SupportedCaseEnum;
 import com.consoleconnect.kraken.operator.core.event.IngestionDataResult;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
-import com.consoleconnect.kraken.operator.core.model.*;
+import com.consoleconnect.kraken.operator.core.model.AppProperty;
+import com.consoleconnect.kraken.operator.core.model.AssetLink;
+import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
+import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPIFacets;
+import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPISpecFacets;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
 import com.consoleconnect.kraken.operator.core.repo.AssetFacetRepository;
 import com.consoleconnect.kraken.operator.core.repo.EnvironmentClientRepository;
 import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
 import com.consoleconnect.kraken.operator.core.service.ApiUseCaseSelector;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
-import com.consoleconnect.kraken.operator.core.toolkit.*;
+import com.consoleconnect.kraken.operator.core.toolkit.JsonDiffTool;
+import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
+import com.consoleconnect.kraken.operator.core.toolkit.LabelConstants;
+import com.consoleconnect.kraken.operator.core.toolkit.Paging;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -49,6 +61,7 @@ public class ApiComponentService
     implements TargetMappingChecker, EndPointUsageCalculator, ApiUseCaseSelector {
   private static final Logger log = LoggerFactory.getLogger(ApiComponentService.class);
   public static final KrakenException ASSET_NOT_FOUND = KrakenException.notFound("asset not found");
+  public static final String NOT_FOUND_SPEC = "not found spec";
   @Getter private final UnifiedAssetService unifiedAssetService;
   @Getter private final EnvironmentClientRepository environmentClientRepository;
   @Getter private final EnvironmentService environmentService;
@@ -72,18 +85,51 @@ public class ApiComponentService
     return IngestionDataResult.of(HttpStatus.OK.value(), "success", assetEntity);
   }
 
+  @Transactional
+  public IngestionDataResult updateWorkflowTemplate(
+      SaveWorkflowTemplateRequest template, String id, String updatedBy) {
+    log.info("update mapping template id: {}", id);
+    if (template.getWorkflowTemplate() == null) {
+      throw KrakenException.badRequest("workflow template can not be null");
+    }
+    if (template.getMappingTemplate() == null) {
+      throw KrakenException.badRequest("mapping template can not be null");
+    }
+    UnifiedAssetDto existingAsset = unifiedAssetService.findOne(id);
+    validateMapper(template.getMappingTemplate(), existingAsset);
+
+    ComponentAPITargetFacets facets =
+        UnifiedAsset.getFacets(existingAsset, ComponentAPITargetFacets.class);
+    if (facets.getWorkflow() == null
+        || !Objects.equals(
+            facets.getWorkflow().getKey(), template.getWorkflowTemplate().getMetadata().getKey())) {
+      throw KrakenException.badRequest("workflow template key not match");
+    }
+    updateUnifiedAssetEntity(template.getMappingTemplate(), id, updatedBy);
+    updateUnifiedAssetEntity(
+        template.getWorkflowTemplate(), facets.getWorkflow().getKey(), updatedBy);
+    return IngestionDataResult.of(HttpStatus.OK.value(), "success", null);
+  }
+
   public UnifiedAssetEntity updateUnifiedAssetEntity(
       UnifiedAsset asset, String id, String updatedBy) {
     UnifiedAssetEntity assetEntity = unifiedAssetService.findOneByIdOrKey(id);
     assetEntity.setUpdatedBy(updatedBy);
     Set<AssetFacetEntity> facets = assetEntity.getFacets();
-    Optional<AssetFacetEntity> endpointsFacets =
-        facets.stream().filter(v -> Objects.equals(END_POINTS, v.getKey())).findAny();
-    endpointsFacets.ifPresent(
-        facet -> {
-          facet.setPayload(asset.getFacets().get(END_POINTS));
-          assetFacetRepository.save(facet);
-        });
+
+    List<AssetFacetEntity> endpointsFacets =
+        facets.stream()
+            .filter(
+                v ->
+                    Objects.equals(END_POINTS, v.getKey())
+                        || Objects.equals(META_DATA, v.getKey())
+                        || Objects.equals(WORKFLOW, v.getKey())
+                        || Objects.equals(PREPARATION_STAGE, v.getKey())
+                        || Objects.equals(EXECUTION_STAGE, v.getKey())
+                        || Objects.equals(VALIDATION_STAGE, v.getKey()))
+            .toList();
+    endpointsFacets.stream()
+        .forEach(facet -> updateFacetsByKeyIfExist(facet.getKey(), asset, facet));
     if (asset.getMetadata() != null && asset.getMetadata().getLabels() != null) {
       Map<String, String> labels =
           assetEntity.getLabels() == null ? new HashMap<>() : assetEntity.getLabels();
@@ -111,6 +157,13 @@ public class ApiComponentService
     assetEntity.setVersion(assetEntity.getVersion() + 1);
     unifiedAssetRepository.save(assetEntity);
     return assetEntity;
+  }
+
+  private void updateFacetsByKeyIfExist(String key, UnifiedAsset asset, AssetFacetEntity facet) {
+    if (asset.getFacets().containsKey(key)) {
+      facet.setPayload(asset.getFacets().get(key));
+      assetFacetRepository.save(facet);
+    }
   }
 
   private void validateMapper(UnifiedAsset request, UnifiedAssetDto origin) {
@@ -205,9 +258,91 @@ public class ApiComponentService
     return Pair.of(requestMap, responseMap);
   }
 
+  public List<StandardComponentInfo> queryForStandardMappingInfo(String productType) {
+    List<StandardComponentInfo> result = new ArrayList<>();
+    Paging<UnifiedAssetDto> apiAssetsPage =
+        unifiedAssetService.search(
+            null, "kraken.component.api", true, null, PageRequest.of(0, Integer.MAX_VALUE));
+    if (apiAssetsPage == null || CollectionUtils.isEmpty(apiAssetsPage.getData())) {
+      return result;
+    }
+    Paging<UnifiedAssetDto> specAssetsPage =
+        unifiedAssetService.search(
+            null, "kraken.component.api-spec", true, null, PageRequest.of(0, Integer.MAX_VALUE));
+    if (specAssetsPage == null || CollectionUtils.isEmpty(apiAssetsPage.getData())) {
+      return result;
+    }
+    unifiedAssetService.fillSupportedProductType(apiAssetsPage.getData());
+    for (UnifiedAsset asset : apiAssetsPage.getData()) {
+      ComponentAPIFacets facets = UnifiedAsset.getFacets(asset, ComponentAPIFacets.class);
+      if (facets.getSupportedProductTypesAndActions() == null) {
+        continue;
+      }
+      List<ComponentAPIFacets.SupportedProductAndAction> list =
+          facets.getSupportedProductTypesAndActions().stream()
+              .filter(
+                  v ->
+                      v.getProductTypes() != null
+                          && v.getProductTypes().contains(productType.toUpperCase()))
+              .toList();
+      if (CollectionUtils.isEmpty(list)) {
+        continue;
+      }
+      UnifiedAssetDto specAsset = findSpec(asset, specAssetsPage);
+      result.add(constructStandardComponent(asset, list, specAsset, facets));
+    }
+    return result;
+  }
+
+  private static StandardComponentInfo constructStandardComponent(
+      UnifiedAsset asset,
+      List<ComponentAPIFacets.SupportedProductAndAction> list,
+      UnifiedAssetDto specAsset,
+      ComponentAPIFacets facets) {
+    StandardComponentInfo info = new StandardComponentInfo();
+    info.setComponentKey(asset.getMetadata().getKey());
+    info.setName(asset.getMetadata().getName());
+    info.setLabels(asset.getMetadata().getLabels());
+    info.setSupportedProductTypes(
+        CollectionUtils.isEmpty(list) ? null : list.get(0).getProductTypes());
+    info.setLogo(specAsset.getMetadata() == null ? null : specAsset.getMetadata().getLogo());
+    if (MapUtils.isEmpty(specAsset.getFacets())) {
+      return info;
+    }
+    ComponentAPISpecFacets specFacet =
+        UnifiedAsset.getFacets(specAsset, ComponentAPISpecFacets.class);
+    info.setBaseSpec(specFacet.getBaseSpec());
+    info.setCustomizedSpec(specFacet.getCustomizedSpec());
+    info.setApiCount(facets.getMappings().size());
+    return info;
+  }
+
+  private static UnifiedAssetDto findSpec(
+      UnifiedAsset asset, Paging<UnifiedAssetDto> specAssetsPage) {
+    AssetLink specLink =
+        asset.getLinks().stream()
+            .filter(
+                assetLink ->
+                    Objects.equals(
+                        assetLink.getRelationship(),
+                        AssetLinkKindEnum.IMPLEMENTATION_STANDARD_API_SPEC.getKind()))
+            .findFirst()
+            .orElse(null);
+    return specAssetsPage.getData().stream()
+        .filter(
+            assetDto ->
+                Objects.equals(assetDto.getMetadata().getKey(), specLink.getTargetAssetKey()))
+        .findFirst()
+        .orElse(new UnifiedAssetDto());
+  }
+
+  public List<String> listProductType() {
+    return appProperty.getProductTypes();
+  }
+
   @Transactional
   public ComponentExpandDTO queryComponentExpandInfo(
-      String productId, String componentId, String envId) {
+      String productId, String componentId, String envId, String productType) {
     unifiedAssetService.findOne(productId);
     UnifiedAssetDto unifiedAssetDto = unifiedAssetService.findOne(componentId);
     List<AssetLink> links = unifiedAssetDto.getLinks();
@@ -216,6 +351,7 @@ public class ApiComponentService
           "The current componentId has no links, componentId:" + componentId);
     }
     List<String> queryExcludeAssets = appProperty.getQueryExcludeAssetKeys();
+    List<String> noRequiredMappingKeys = appProperty.getNoRequiredMappingKeys();
     List<String> assetKeyList =
         links.stream()
             .filter(
@@ -236,10 +372,19 @@ public class ApiComponentService
     List<ComponentExpandDTO.TargetMappingDetail> details = new ArrayList<>();
     assetEntityMap.forEach(
         (k, assetDto) -> {
-          ComponentExpandDTO.TargetMappingDetail detail = getTargetMappingDetail(k, assetDto);
+          ComponentExpandDTO.TargetMappingDetail detail =
+              getTargetMappingDetail(k, assetDto, noRequiredMappingKeys);
+          if (StringUtils.isNotBlank(productType)
+              && !detail.getProductType().equalsIgnoreCase(productType)) {
+            return;
+          }
           detail.setOrderBy(
               appProperty.getApiTargetMapperOrderBy().getOrDefault(k, "<1000, 1000>"));
           mergeLastDeployment(detail, assetDto, envId);
+          ComponentAPITargetFacets currentFacet =
+              UnifiedAsset.getFacets(assetDto, ComponentAPITargetFacets.class);
+          detail.setSupportedCase(currentFacet.getSupportedCase().getType());
+          detail.setRunningMappingType(checkRunningMappingType(currentFacet));
           details.add(detail);
         });
 
@@ -317,6 +462,17 @@ public class ApiComponentService
             : deployAssetDto.getMetadata().getStatus());
   }
 
+  private String checkRunningMappingType(ComponentAPITargetFacets currentFacet) {
+    String type = "";
+    if (currentFacet.getWorkflow() != null && currentFacet.getWorkflow().isEnabled()) {
+      type = SupportedCaseEnum.ONE_TO_MANY.name();
+    } else if (CollectionUtils.isNotEmpty(currentFacet.getEndpoints())
+        && StringUtils.isNotBlank(currentFacet.getEndpoints().get(0).getPath())) {
+      type = SupportedCaseEnum.ONE_TO_ONE.name();
+    }
+    return type;
+  }
+
   @Transactional(readOnly = true)
   public List<ComponentExpandDTO> listAllApiUseCase() {
     List<UnifiedAssetDto> componentAssetList =
@@ -327,11 +483,16 @@ public class ApiComponentService
             .toList();
     List<UnifiedAssetDto> mapperAssetList =
         unifiedAssetService.findByKind(AssetKindEnum.COMPONENT_API_TARGET_MAPPER.getKind());
-    return convert(appProperty.getQueryExcludeAssetKeys(), componentAssetList, mapperAssetList);
+    return convert(
+        appProperty.getQueryExcludeAssetKeys(),
+        appProperty.getNoRequiredMappingKeys(),
+        componentAssetList,
+        mapperAssetList);
   }
 
   public List<ComponentExpandDTO> convert(
       List<String> queryExcludeAssets,
+      List<String> noRequiredMappingKeys,
       List<UnifiedAssetDto> componentList,
       List<UnifiedAssetDto> mapperList) {
     Map<String, UnifiedAssetDto> mapper2ComponentMap = new HashMap<>();
@@ -347,7 +508,8 @@ public class ApiComponentService
         .forEach(mapper -> mapperAssetMap.put(mapper.getMetadata().getKey(), mapper));
     mapperAssetMap.forEach(
         (k, assetDto) -> {
-          ComponentExpandDTO.TargetMappingDetail detail = getTargetMappingDetail(k, assetDto);
+          ComponentExpandDTO.TargetMappingDetail detail =
+              getTargetMappingDetail(k, assetDto, noRequiredMappingKeys);
           UnifiedAssetDto componentAsset = mapper2ComponentMap.get(detail.getTargetMapperKey());
           if (componentAsset == null) {
             return;
@@ -370,8 +532,8 @@ public class ApiComponentService
   }
 
   private ComponentExpandDTO.TargetMappingDetail getTargetMappingDetail(
-      String mapperKey, UnifiedAssetDto mapperAsset) {
-    fillMappingStatus(mapperAsset);
+      String mapperKey, UnifiedAssetDto mapperAsset, List<String> noRequiredMappingKeys) {
+    fillMappingStatus(mapperAsset, noRequiredMappingKeys);
     ComponentAPITargetFacets mapperFacets =
         UnifiedAsset.getFacets(mapperAsset, ComponentAPITargetFacets.class);
     ComponentAPITargetFacets.Trigger trigger = mapperFacets.getTrigger();
@@ -385,7 +547,7 @@ public class ApiComponentService
       BeanUtils.copyProperties(trigger, mappingMatrix);
       detail.setMappingMatrix(mappingMatrix);
     }
-    if (containsKeywords(mapperAsset.getMetadata().getKey())) {
+    if (containsKeywords(noRequiredMappingKeys, mapperAsset.getMetadata().getKey())) {
       detail.setRequiredMapping(false);
     }
     detail.setDescription(mapperAsset.getMetadata().getDescription());
@@ -442,5 +604,19 @@ public class ApiComponentService
                 })
             .toList());
     return componentProductCategoryDTO;
+  }
+
+  @Transactional(readOnly = true)
+  public List<String> findRelatedAssetKeys(String key, ApiUseCaseDto usecase) {
+    UnifiedAssetEntity mapperEntity = unifiedAssetService.findOneByIdOrKey(key);
+    boolean workflowEnabled = isWorkflowEnabled(mapperEntity);
+    return usecase.membersDeployable(workflowEnabled);
+  }
+
+  private boolean isWorkflowEnabled(UnifiedAssetEntity mapperEntity) {
+    UnifiedAssetDto mapperAsset = UnifiedAssetService.toAsset(mapperEntity, true);
+    ComponentAPITargetFacets mapperFacets =
+        UnifiedAsset.getFacets(mapperAsset, ComponentAPITargetFacets.class);
+    return mapperFacets.getWorkflow() != null && mapperFacets.getWorkflow().isEnabled();
   }
 }

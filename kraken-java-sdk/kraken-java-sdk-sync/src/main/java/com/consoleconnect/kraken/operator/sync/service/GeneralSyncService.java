@@ -11,6 +11,7 @@ import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.DateTime;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.sync.model.SyncProperty;
+import com.consoleconnect.kraken.operator.sync.service.security.ExternalSystemTokenProvider;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.net.URI;
 import java.time.ZonedDateTime;
@@ -41,9 +42,10 @@ public class GeneralSyncService extends KrakenServerConnector {
   public GeneralSyncService(
       SyncProperty syncProperty,
       WebClient webClient,
+      ExternalSystemTokenProvider externalSystemTokenProvider,
       UnifiedAssetService unifiedAssetService,
       List<ClientSyncHandler> clientSyncHandlers) {
-    super(syncProperty, webClient);
+    super(syncProperty, webClient, externalSystemTokenProvider);
     this.syncProperty = syncProperty;
     this.unifiedAssetService = unifiedAssetService;
     this.clientSyncHandlers = clientSyncHandlers;

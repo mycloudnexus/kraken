@@ -15,7 +15,8 @@ public class KrakenException extends RuntimeException {
   private static final String UNPROCESSABLE_ENTITY_INVALID_FORMAT =
       "422 UnProcessable Entity, invalidFormat";
   private static final String BAD_REQUEST_INVALID_BODY = "400 Bad Request, invalidBody";
-
+  private static final String INVALID_CREDENTIAL_BODY =
+      "invalidCredentials: Provided credentials are invalid or expired";
   private final int code;
 
   public KrakenException(int code) {
@@ -71,6 +72,10 @@ public class KrakenException extends RuntimeException {
   public static KrakenException badRequestInvalidBody(String message) {
     return new KrakenException(
         400, BAD_REQUEST_INVALID_BODY, new IllegalArgumentException(message));
+  }
+
+  public static KrakenException unauthorizedInvalidCredentials(String message) {
+    return new KrakenException(401, INVALID_CREDENTIAL_BODY, new IllegalArgumentException(message));
   }
 
   public static KrakenException unauthorized(String message) {

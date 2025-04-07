@@ -4,7 +4,9 @@ import com.consoleconnect.kraken.operator.core.client.ClientEvent;
 import com.consoleconnect.kraken.operator.core.client.ClientEventTypeEnum;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
+import com.consoleconnect.kraken.operator.sync.MockServerTest;
 import com.consoleconnect.kraken.operator.sync.model.SyncProperty;
+import com.consoleconnect.kraken.operator.sync.service.security.ExternalSystemTokenProvider;
 import java.util.UUID;
 import lombok.SneakyThrows;
 import okhttp3.mockwebserver.MockResponse;
@@ -14,9 +16,12 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.reactive.function.client.WebClient;
 
-class KrakenServiceConnectorTest {
+class KrakenServiceConnectorTest extends MockServerTest {
+
+  @Autowired ExternalSystemTokenProvider externalSystemTokenProvider;
 
   static MockWebServer mockWebServer = new MockWebServer();
 
@@ -36,14 +41,11 @@ class KrakenServiceConnectorTest {
   @Test
   void givenCorrectRequestPayload_whenPost_thenResponseOK() {
     String mockServerUrl = mockWebServer.url("").toString();
-    SyncProperty syncProperty = new SyncProperty();
-    syncProperty.getControlPlane().setUrl(mockServerUrl);
-    syncProperty.getControlPlane().setToken("Bearer token");
 
     WebClient webClient = WebClient.builder().baseUrl(mockServerUrl).build();
 
     KrakenServerConnector krakenServerConnector =
-        new KrakenServerConnector(syncProperty, webClient);
+        new KrakenServerConnector(syncProperty, webClient, externalSystemTokenProvider);
 
     MockResponse mockResponse = new MockResponse();
     mockResponse.setResponseCode(200);
@@ -57,7 +59,7 @@ class KrakenServiceConnectorTest {
     Assertions.assertEquals(
         syncProperty.getControlPlane().getPushEventEndpoint(), recordedRequest.getPath());
     Assertions.assertEquals("POST", recordedRequest.getMethod());
-    Assertions.assertEquals("Bearer token", recordedRequest.getHeader("Authorization"));
+    Assertions.assertEquals("Bearer 123456", recordedRequest.getHeader("Authorization"));
   }
 
   @SneakyThrows
@@ -66,12 +68,11 @@ class KrakenServiceConnectorTest {
     String mockServerUrl = mockWebServer.url("").toString();
     SyncProperty syncProperty = new SyncProperty();
     syncProperty.getControlPlane().setUrl(mockServerUrl);
-    syncProperty.getControlPlane().setToken("Bearer token");
 
     WebClient webClient = WebClient.builder().baseUrl(mockServerUrl).build();
 
     KrakenServerConnector krakenServerConnector =
-        new KrakenServerConnector(syncProperty, webClient);
+        new KrakenServerConnector(syncProperty, webClient, externalSystemTokenProvider);
 
     MockResponse mockResponse = new MockResponse();
     mockResponse.setResponseCode(400);
@@ -85,6 +86,6 @@ class KrakenServiceConnectorTest {
     Assertions.assertEquals(
         syncProperty.getControlPlane().getPushEventEndpoint(), recordedRequest.getPath());
     Assertions.assertEquals("POST", recordedRequest.getMethod());
-    Assertions.assertEquals("Bearer token", recordedRequest.getHeader("Authorization"));
+    Assertions.assertEquals("Bearer 123456", recordedRequest.getHeader("Authorization"));
   }
 }

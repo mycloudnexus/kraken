@@ -7,12 +7,14 @@ import static org.hamcrest.Matchers.*;
 import com.consoleconnect.kraken.operator.auth.security.UserContext;
 import com.consoleconnect.kraken.operator.config.TestApplication;
 import com.consoleconnect.kraken.operator.controller.dto.ComponentExpandDTO;
+import com.consoleconnect.kraken.operator.controller.dto.SaveWorkflowTemplateRequest;
 import com.consoleconnect.kraken.operator.controller.model.Environment;
 import com.consoleconnect.kraken.operator.controller.service.EnvironmentService;
 import com.consoleconnect.kraken.operator.core.client.ClientEvent;
 import com.consoleconnect.kraken.operator.core.client.ClientEventTypeEnum;
 import com.consoleconnect.kraken.operator.core.client.ServerAPIDto;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
+import com.consoleconnect.kraken.operator.core.enums.SupportedCaseEnum;
 import com.consoleconnect.kraken.operator.core.mapper.FacetsMapper;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import com.consoleconnect.kraken.operator.core.model.SyncMetadata;
@@ -52,9 +54,13 @@ public class ComponentMgmtControllerTest extends AbstractIntegrationTest
   @Getter private final WebTestClientHelper testClientHelper;
   public static final String GET_DETAIL_MAPPING_URL =
       "products/mef.sonata.api.order/components/mef.sonata.api.order/mapper-details";
+  public static final String GET_PRODUCT_TYPES = "/products/%s/productTypes";
+  public static final String GET_STANDARD_COMPONENTS = "/products/%s/standardApiComponents";
   public static final String LIST_VERSIONS_URL = "products/mef.sonata/component-versions";
   public static final String UPDATE_COMPONENT =
       "/products/kraken.component.api-target-mapper/components/{id}/targetMapper";
+  public static final String UPDATE_WORKFLOW =
+      "/products/kraken.component.api-target-mapper/components/{id}/workflow";
   public static final String LIST_API_USE_CASES =
       "/products/kraken.component.api-target-mapper/api-use-cases";
   @Autowired UnifiedAssetService unifiedAssetService;
@@ -81,6 +87,37 @@ public class ComponentMgmtControllerTest extends AbstractIntegrationTest
                     .path(UPDATE_COMPONENT)
                     .build("mef.sonata.api-target-mapper.order.eline.add"))
         .bodyValue(asset)
+        .exchange()
+        .expectBody()
+        .consumeWith(
+            response -> {
+              String bodyStr = new String(Objects.requireNonNull(response.getResponseBody()));
+              log.info("update result {}", bodyStr);
+              assertThat(bodyStr, Matchers.notNullValue());
+            });
+  }
+
+  @Order(10)
+  @Test
+  void givenWorkflowRequest_whenUpdateWorkflowTemplate_thenSuccess() {
+    UnifiedAssetDto asset =
+        unifiedAssetService.findOne("mef.sonata.api-target-mapper.order.eline.delete");
+    UnifiedAssetDto workflow =
+        unifiedAssetService.findOne("mef.sonata.api-workflow.order.eline.delete");
+    SaveWorkflowTemplateRequest request = new SaveWorkflowTemplateRequest();
+    request.setMappingTemplate(asset);
+    request.setWorkflowTemplate(workflow);
+    webTestClient
+        .mutate()
+        .responseTimeout(Duration.ofSeconds(600))
+        .build()
+        .patch()
+        .uri(
+            uriBuilder ->
+                uriBuilder
+                    .path(UPDATE_WORKFLOW)
+                    .build("mef.sonata.api-target-mapper.order.eline.delete"))
+        .bodyValue(request)
         .exchange()
         .expectBody()
         .consumeWith(
@@ -193,6 +230,8 @@ public class ComponentMgmtControllerTest extends AbstractIntegrationTest
                     return t1.getOrderBy().compareTo(t2.getOrderBy());
                   };
               Assertions.assertTrue(isSorted(data.getDetails(), comp));
+              Assertions.assertEquals(
+                  data.getDetails().get(0).getSupportedCase(), SupportedCaseEnum.ONE_TO_ONE.name());
             });
   }
 
@@ -387,6 +426,32 @@ public class ComponentMgmtControllerTest extends AbstractIntegrationTest
               log.info(bodyStr);
               assertThat(bodyStr, hasJsonPath("$.data.componentProducts", notNullValue()));
               assertThat(bodyStr, hasJsonPath("$.data.productCategories", notNullValue()));
+            });
+  }
+
+  @Test
+  @Order(12)
+  void givenNothing_whenQueryProductTypes_thenReturnOK() {
+    String path = String.format(GET_PRODUCT_TYPES, PRODUCT_ID);
+    getTestClientHelper()
+        .getAndVerify(
+            (uriBuilder -> uriBuilder.path(path).build()),
+            bodyStr -> {
+              log.info(bodyStr);
+              assertThat(bodyStr, hasJsonPath("$.data", notNullValue()));
+            });
+  }
+
+  @Test
+  @Order(12)
+  void givenProductType_whenQueryStandardComponent_thenReturnOK() {
+    String path = String.format(GET_STANDARD_COMPONENTS, PRODUCT_ID);
+    getTestClientHelper()
+        .getAndVerify(
+            (uriBuilder -> uriBuilder.path(path).queryParam("productType", "UNI").build()),
+            bodyStr -> {
+              log.info(bodyStr);
+              assertThat(bodyStr, hasJsonPath("$.data", notNullValue()));
             });
   }
 }

@@ -32,6 +32,12 @@ class ConstructExpressionUtilTest {
     String s5 = ConstructExpressionUtil.constructOriginalDBParam("abc");
     assertThat(s5).contains("entity");
     assertThat(s4).doesNotContain("*");
+    String s6 = ConstructExpressionUtil.constructBody("@{{workflow.param.a}}");
+    assertThat(s6).isNotNull();
+    String s7 = ConstructExpressionUtil.formatWorkflowResponseExpression("@{{workflow.param.a}}");
+    assertThat(s7).isNotNull();
+    String s8 = ConstructExpressionUtil.formatTaskExpression("${task.a.b}");
+    assertThat(s8).isNotNull();
     ExpectTypeEnum expected = ExpectTypeEnum.EXPECTED;
     ExpectTypeEnum expectedExist = ExpectTypeEnum.EXPECTED_EXIST;
     ExpectTypeEnum expectedTrue = ExpectTypeEnum.EXPECTED_TRUE;

@@ -4,9 +4,11 @@ import static com.consoleconnect.kraken.operator.core.enums.ParamLocationEnum.*;
 import static com.consoleconnect.kraken.operator.core.toolkit.ConstructExpressionUtil.*;
 
 import com.consoleconnect.kraken.operator.core.dto.StateValueMappingDto;
+import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.enums.MappingTypeEnum;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
+import com.consoleconnect.kraken.operator.core.model.facet.ComponentWorkflowFacets;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.gateway.runner.MappingTransformer;
@@ -27,8 +29,7 @@ public class RenderRequestService implements MappingTransformer {
     this.unifiedAssetService = unifiedAssetService;
   }
 
-  public void handlePath(ComponentAPITargetFacets facets) {
-    List<ComponentAPITargetFacets.Endpoint> endpoints = facets.getEndpoints();
+  public void handlePath(List<ComponentAPITargetFacets.Endpoint> endpoints) {
     ComponentAPITargetFacets.Mappers mappers = endpoints.get(0).getMappers();
     String path = endpoints.get(0).getPath();
     if (mappers != null && mappers.getRequest() != null) {
@@ -87,19 +88,19 @@ public class RenderRequestService implements MappingTransformer {
   }
 
   public void parseRequest(
-      ComponentAPITargetFacets facets, StateValueMappingDto stateValueMappingDto) {
-    handlePath(facets);
-    handleBody(facets, stateValueMappingDto);
+      List<ComponentAPITargetFacets.Endpoint> endpoints,
+      StateValueMappingDto stateValueMappingDto) {
+    handlePath(endpoints);
+    handleBody(endpoints, stateValueMappingDto);
   }
 
   private void handleBody(
-      ComponentAPITargetFacets facets, StateValueMappingDto stateValueMappingDto) {
-    String requestBody = facets.getEndpoints().get(0).getRequestBody();
-    fillPathRulesIfExist(
-        facets.getEndpoints().get(0).getMappers().getPathRules(), stateValueMappingDto);
-    List<ComponentAPITargetFacets.Mapper> request =
-        facets.getEndpoints().get(0).getMappers().getRequest();
-    if (StringUtils.isBlank(requestBody) || CollectionUtils.isEmpty(request)) {
+      List<ComponentAPITargetFacets.Endpoint> endpoints,
+      StateValueMappingDto stateValueMappingDto) {
+    String requestBody = endpoints.get(0).getRequestBody();
+    fillPathRulesIfExist(endpoints.get(0).getMappers().getPathRules(), stateValueMappingDto);
+    List<ComponentAPITargetFacets.Mapper> request = endpoints.get(0).getMappers().getRequest();
+    if (CollectionUtils.isEmpty(request)) {
       return;
     }
     for (ComponentAPITargetFacets.Mapper mapper : request) {
@@ -135,7 +136,7 @@ public class RenderRequestService implements MappingTransformer {
             mapper.getTarget());
       }
     }
-    facets.getEndpoints().get(0).setRequestBody(requestBody);
+    endpoints.get(0).setRequestBody(requestBody);
     log.info("handleBody rendered request body:{}", requestBody);
   }
 
@@ -145,12 +146,30 @@ public class RenderRequestService implements MappingTransformer {
     UnifiedAsset asset = unifiedAssetService.findOne(pathReferIds[0]);
     ComponentAPITargetFacets createFacets =
         UnifiedAsset.getFacets(asset, ComponentAPITargetFacets.class);
-    List<ComponentAPITargetFacets.Mapper> response =
-        createFacets.getEndpoints().get(0).getMappers().getResponse();
-    Optional<ComponentAPITargetFacets.Mapper> instanceOpt =
-        response.stream().filter(v -> Objects.equals(pathReferIds[1], v.getName())).findFirst();
-    if (instanceOpt.isPresent()) {
-      ComponentAPITargetFacets.Mapper referMapper = instanceOpt.get();
+    Optional<ComponentAPITargetFacets.Mapper> uniqueMapper;
+    if (createFacets.getWorkflow() != null && createFacets.getWorkflow().isEnabled()) {
+      log.info("render from workflow mapper");
+      UnifiedAssetDto workflowAsset =
+          unifiedAssetService.findOne(createFacets.getWorkflow().getKey());
+      ComponentWorkflowFacets workflowFacets =
+          UnifiedAsset.getFacets(workflowAsset, ComponentWorkflowFacets.class);
+      ComponentAPITargetFacets.Mappers mappers =
+          workflowFacets.getExecutionStage().get(0).getEndpoint().getMappers();
+      Optional<ComponentAPITargetFacets.Mapper> uniqueOpt =
+          mappers.getResponse().stream()
+              .filter(respMapper -> Objects.equals(respMapper.getName(), pathReferIds[1]))
+              .findFirst();
+      uniqueMapper = uniqueOpt;
+    } else {
+      List<ComponentAPITargetFacets.Mapper> response =
+          createFacets.getEndpoints().get(0).getMappers().getResponse();
+      Optional<ComponentAPITargetFacets.Mapper> instanceOpt =
+          response.stream().filter(v -> Objects.equals(pathReferIds[1], v.getName())).findFirst();
+      uniqueMapper = instanceOpt;
+    }
+
+    if (uniqueMapper.isPresent()) {
+      ComponentAPITargetFacets.Mapper referMapper = uniqueMapper.get();
       String source = referMapper.getSource();
       List<String> paramLocations = extractMapperParam(source);
       mapper.setSource(constructOriginalDBParam(paramLocations.get(0)));

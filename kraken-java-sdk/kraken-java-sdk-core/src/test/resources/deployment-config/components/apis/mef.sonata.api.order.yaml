@@ -19,16 +19,14 @@ spec:
         - add
         - delete
       productTypes:
-        - UNI
-        - ACCESS_E_LINE
+      supportedConfig: $.order
     - path: /mefApi/sonata/productOrderingManagement/v10/productOrder/{id}
       method: get
       actionTypes:
         - add
         - delete
       productTypes:
-        - UNI
-        - ACCESS_E_LINE
+      supportedConfig: $.order
   mappings:
     - uri: ${env.target.url}
       trigger:
@@ -349,6 +347,9 @@ links:
     group: mef.sonata.api-target.order.uni.delete
   - targetAssetKey: mef.sonata.api-target-mapper.order.eline.delete
     relationship: implementation.target-mapper
+    group: mef.sonata.api-target.order.eline.delete
+  - targetAssetKey: mef.sonata.api-workflow.order.eline.delete
+    relationship: implementation.workflow
     group: mef.sonata.api-target.order.eline.delete
   - targetAssetKey: mef.sonata.api.matrix.order.eline.delete
     relationship: implementation.matrix

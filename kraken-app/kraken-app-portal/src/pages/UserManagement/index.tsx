@@ -5,6 +5,7 @@ import { useUser } from "@/hooks/user/useUser";
 import { useUserStore } from "@/stores/user.store";
 import { IUser } from "@/utils/types/user.type";
 import { Button, Flex, Input, Switch, Table, notification } from "antd";
+import { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import { debounce, get } from "lodash";
 import { useEffect, useMemo, useState } from "react";
@@ -13,28 +14,34 @@ import ResetPwd from "./components/ResetPwd";
 import UserModal from "./components/UserModal";
 import UserRoleEdit from "./components/UserRoleEdit";
 import styles from "./index.module.scss";
-import { ColumnsType } from "antd/es/table";
 
-function parseFiltersObj(filters: Record<string, Array<any>>): Record<string, any> {
-  if (!filters) return {}
+function parseFiltersObj(
+  filters: Record<string, Array<any>>
+): Record<string, any> {
+  if (!filters) return {};
 
-  return Object.entries(filters).reduce((acc: Record<string, any>, [key, value]) => {
-    acc[key] = value ? value[0] : undefined
-    return acc
-  }, {})
+  return Object.entries(filters).reduce(
+    (acc: Record<string, any>, [key, value]) => {
+      acc[key] = value ? value[0] : undefined;
+      return acc;
+    },
+    {}
+  );
 }
 
 const UserManagement = () => {
   const { currentUser } = useUser();
   const { userParams, setUserParams, resetParams } = useUserStore();
 
-  const [filters, setFilters] = useState<{ role?: Array<string>; state?: Array<string> }>({})
+  const [filters, setFilters] = useState<{
+    role?: Array<string>;
+    state?: Array<string>;
+  }>({});
 
   const { data: dataUser, isLoading: loadingUser } = useGetUserList({
     ...userParams,
-    ...parseFiltersObj(filters)
+    ...parseFiltersObj(filters),
   });
-
   const { value: isOpen, setTrue: open, setFalse: close } = useBoolean(false);
   const { mutateAsync: runEnable, isPending: pendingEnable } = useEnableUser();
   const { mutateAsync: runDisable, isPending: pendingDisable } =
@@ -74,7 +81,7 @@ const UserManagement = () => {
       },
       {
         title: "User role",
-        key: 'role',
+        key: "role",
         dataIndex: "role",
         width: 205,
         filters: [
@@ -94,7 +101,7 @@ const UserManagement = () => {
       },
       {
         title: "Enable State",
-        key: 'state',
+        key: "state",
         dataIndex: "state",
         width: 205,
         filters: [
@@ -108,8 +115,9 @@ const UserManagement = () => {
           },
         ],
         filterMultiple: false,
-        render: (state: string, record: IUser) => (
+        render: (state: string, record: IUser, index: number) => (
           <Switch
+            data-testid={`switch-${index}`}
             loading={pendingEnable || pendingDisable}
             onChange={(e) => handleSwitch(record.id, e)}
             disabled={!isAdmin}
@@ -181,11 +189,9 @@ const UserManagement = () => {
             },
           }}
           onChange={(_, filters) => {
-            setFilters(filters)
-            setUserParams({ page: 0 })
+            setFilters(filters);
           }}
           scroll={{
-            // y: get(size, "height", 0) - 164,
             x: "auto",
           }}
         />

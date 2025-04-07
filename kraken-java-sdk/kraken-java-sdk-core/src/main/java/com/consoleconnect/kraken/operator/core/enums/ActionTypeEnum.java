@@ -12,6 +12,7 @@ public enum ActionTypeEnum {
   MODIFY_RESPONSE_BODY("buildin@modify-response-body"),
   MOCK_RESPONSE("buildin@mock-response"),
   REWRITE_PATH("buildin@rewrite-path"),
+  WORKFLOW("buildin@workflow"),
   DB("buildin@db"),
   REGISTER_EVENT("buildin@register-event"),
   PATTERN("buildin@pattern"),

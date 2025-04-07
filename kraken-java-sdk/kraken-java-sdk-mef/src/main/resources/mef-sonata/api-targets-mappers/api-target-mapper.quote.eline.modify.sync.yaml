@@ -1,0 +1,38 @@
+---
+kind: kraken.component.api-target-mapper
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target-mapper.quote.eline.modify.sync
+  name: Mapper Of Creating Quote Eline
+  description: This operation modifies a Quote entity
+  version: 4
+spec:
+  trigger:
+    path: /mefApi/sonata/quoteManagement/v8/quote
+    method: post
+    productType: access_e_line
+    actionType: modify
+    quoteLevel: firm
+    syncMode: true
+  endpoints:
+    - id: modify quote for connection
+      path:
+      method:
+      serverKey: mef.sonata.api-target-spec.con1718940696857
+      mappers:
+        schemaRef:
+          ref: "classpath:/mef-sonata/api-common-mappers/api-target-mapper.quote.common.modify.sync.yaml"
+          params:
+            - key: productType
+              val: eline
+        pathRules:
+          - name: mapper.quite.eline.modify.sync.pathRule.state
+            checkPath: "$[?(@.state != 'unableToProvide')]"
+            deletePath: "$.validFor"
+            insertPath:
+              - key: "$.quoteItem[0].terminationError.code"
+                val: "otherIssue"
+              - key: "$.quoteItem[0].terminationError.value"
+                val: "the quoted item is not available"
+        request:
+        response:

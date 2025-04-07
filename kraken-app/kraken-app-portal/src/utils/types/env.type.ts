@@ -29,6 +29,17 @@ export interface IActivityLog {
   requestIp: string;
   responseIp: string;
   callSeq: number;
+  productType: string;
+}
+
+export interface IPushHistory {
+  id: string;
+  createdAt: string;
+  envName: string;
+  startTime: string;
+  endTime: string;
+  pushedBy: string;
+  status: string;
 }
 
 export interface IActivityDetail {
@@ -118,6 +129,7 @@ export interface IMapperDetails {
   requiredMapping: boolean;
   orderBy: string;
   order?: number;
+  rowSpan?: number;
 }
 
 export interface ILogActivity {
@@ -143,8 +155,8 @@ export interface ILogActivity {
 }
 
 export type DataPlaneUpgradeCheck = {
-  errorMessages: string[]
-  mapperCompleted: boolean
-  newerTemplate: boolean
-  compatible: boolean
-}
+  errorMessages: string[];
+  mapperCompleted: boolean;
+  newerTemplate: boolean;
+  compatible: boolean;
+};

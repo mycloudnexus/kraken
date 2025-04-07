@@ -5,12 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>kraken-java-sdk-sync</artifactId>
     <name>kraken-java-sdk-sync</name>
-    <version>1.2.0</version>
+    <version>2.0.0-snapshot.5</version>
     <packaging>jar</packaging>
     <parent>
         <groupId>com.consoleconnect.kraken</groupId>
         <artifactId>kraken-java-sdk</artifactId>
-        <version>1.2.0</version>
+        <version>2.0.0-snapshot.5</version>
     </parent>
     <dependencies>
         <dependency>
@@ -26,12 +26,18 @@
         <dependency>
             <groupId>com.consoleconnect.kraken</groupId>
             <artifactId>kraken-java-sdk-data</artifactId>
-            <version>1.2.0</version>
+            <version>2.0.0-snapshot.5</version>
+        </dependency>
+        <dependency>
+            <groupId>com.consoleconnect.kraken</groupId>
+            <artifactId>kraken-java-sdk-auth</artifactId>
+            <version>2.0.0-snapshot.5</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.consoleconnect.kraken</groupId>
             <artifactId>kraken-java-sdk-test</artifactId>
-            <version>1.2.0</version>
+            <version>2.0.0-snapshot.5</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -39,6 +45,11 @@
             <artifactId>lombok</artifactId>
             <optional>true</optional>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.nimbusds</groupId>
+            <artifactId>nimbus-jose-jwt</artifactId>
+            <version>9.37.3</version>
         </dependency>
     </dependencies>
 

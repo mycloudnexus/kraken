@@ -17,7 +17,7 @@ spec:
   endpoints:
     - id: retrieve connection detail by id
       path: "/api/v2/company/{companyName}/connections/{connectionId}"
-      pathReferId: "mef.sonata.api-target.order.eline.add#order.eline.add.orderId.mapper"
+      pathReferId: "mef.sonata.api-target.order.eline.add#mapper.order.eline.add.orderId"
       method: get
       responseBody: |
         {
@@ -47,7 +47,7 @@ spec:
             source: "@{{id}}"
             sourceLocation: "PATH"
             target: "@{{connectionId}}"
-            convertValue: "mef.sonata.api-target.order.eline.add#order.eline.add.orderId.mapper"
+            convertValue: "mef.sonata.api-target.order.eline.add#mapper.order.eline.add.orderId"
             targetLocation: "PATH"
             requiredMapping: true
         response:

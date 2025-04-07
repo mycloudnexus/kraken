@@ -15,8 +15,8 @@
   }
   :global(.ant-form-item input::placeholder) {
     color: var(
-                    --character-disabled-placeholder-25,
-                    var(--text-disabled-placeholder, rgba(0, 0, 0, 0.25))
+      --character-disabled-placeholder-25,
+      var(--text-disabled-placeholder, rgba(0, 0, 0, 0.25))
     );
   }
   :global(.ant-form-item .ant-select-selection-placeholder) {

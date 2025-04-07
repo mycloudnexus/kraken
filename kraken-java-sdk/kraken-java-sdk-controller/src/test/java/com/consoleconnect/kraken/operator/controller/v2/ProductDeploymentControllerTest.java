@@ -86,6 +86,7 @@ class ProductDeploymentControllerTest extends AbstractIntegrationTest {
   @Test
   @Order(1)
   void givenApiMapper_whenDeploy_thenReturnOk() {
+
     String path = String.format("%s/%s/api-mapper-deployments", PRODUCT_BASE_PATH, PRODUCT_ID);
 
     // create a component tag
@@ -689,7 +690,7 @@ class ProductDeploymentControllerTest extends AbstractIntegrationTest {
   void givenEnv_whenSearchMapperDetails_thenReturnOK() {
     testClientHelper.getAndVerify(
         (uriBuilder -> {
-          uriBuilder.queryParam("envId", TestApplication.envId);
+          uriBuilder.queryParam("envId", TestApplication.envId).queryParam("productType", "uni");
           return uriBuilder.path(GET_DETAIL_MAPPING_URL).build();
         }),
         bodyStr -> {

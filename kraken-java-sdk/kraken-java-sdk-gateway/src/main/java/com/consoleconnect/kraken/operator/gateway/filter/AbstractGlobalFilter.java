@@ -4,6 +4,7 @@ import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
 import com.consoleconnect.kraken.operator.core.enums.SyncStatusEnum;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
+import com.consoleconnect.kraken.operator.core.service.ApiActivityLogService;
 import com.consoleconnect.kraken.operator.gateway.service.FilterHeaderService;
 import java.util.Optional;
 import java.util.UUID;
@@ -22,23 +23,16 @@ public abstract class AbstractGlobalFilter implements GlobalFilter, Ordered {
   protected final AppProperty appProperty;
   protected final ApiActivityLogRepository apiActivityLogRepository;
   protected final FilterHeaderService filterHeaderService;
+  protected final ApiActivityLogService apiActivityLogService;
 
   public ApiActivityLogEntity generateHttpRequestEntity(ServerWebExchange exchange) {
-    String seq =
-        (String)
-            exchange
-                .getAttributes()
-                .getOrDefault(KrakenFilterConstants.X_KRAKEN_LOG_CALL_SEQ, "-1");
     ApiActivityLogEntity entity = new ApiActivityLogEntity();
     entity.setRequestId((String) exchange.getAttribute(KrakenFilterConstants.X_LOG_REQUEST_ID));
     entity.setPath(exchange.getRequest().getURI().getPath());
     entity.setMethod(exchange.getRequest().getMethod().name());
     entity.setUri(exchange.getRequest().getURI().getHost());
-    entity.setCallSeq(Integer.parseInt(seq) + 1);
+    entity.setCallSeq(getAndUpdateCallSeq(exchange));
     entity.setSyncStatus(SyncStatusEnum.UNDEFINED);
-    exchange
-        .getAttributes()
-        .put(KrakenFilterConstants.X_KRAKEN_LOG_CALL_SEQ, String.valueOf(entity.getCallSeq()));
     return entity;
   }
 
@@ -67,6 +61,18 @@ public abstract class AbstractGlobalFilter implements GlobalFilter, Ordered {
     } else {
       return filterInternal(exchange, chain);
     }
+  }
+
+  protected int getAndUpdateCallSeq(ServerWebExchange exchange) {
+    String attrSeq =
+        (String)
+            exchange
+                .getAttributes()
+                .getOrDefault(KrakenFilterConstants.X_KRAKEN_LOG_CALL_SEQ, "-1");
+    int seq = Integer.parseInt(attrSeq) + 1;
+    exchange.getAttributes().put(KrakenFilterConstants.X_KRAKEN_LOG_CALL_SEQ, String.valueOf(seq));
+
+    return seq;
   }
 
   abstract Mono<Void> filterInternal(ServerWebExchange exchange, GatewayFilterChain chain);

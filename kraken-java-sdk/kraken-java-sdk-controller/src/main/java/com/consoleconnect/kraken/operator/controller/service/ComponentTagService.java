@@ -9,7 +9,6 @@ import com.consoleconnect.kraken.operator.controller.model.ComponentTag;
 import com.consoleconnect.kraken.operator.controller.model.ComponentTagFacet;
 import com.consoleconnect.kraken.operator.controller.model.DeploymentFacet;
 import com.consoleconnect.kraken.operator.controller.tools.VersionHelper;
-import com.consoleconnect.kraken.operator.core.dto.ApiUseCaseDto;
 import com.consoleconnect.kraken.operator.core.dto.AssetLinkDto;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
@@ -49,6 +48,7 @@ public class ComponentTagService implements TargetMappingChecker, LatestDeployme
   @Getter private final UnifiedAssetService unifiedAssetService;
   private final UnifiedAssetRepository unifiedAssetRepository;
   private final ApiComponentService apiComponentService;
+  private final AppProperty appProperty;
 
   @Transactional
   public IngestionDataResult createTag(
@@ -120,7 +120,7 @@ public class ComponentTagService implements TargetMappingChecker, LatestDeployme
     List<String> memberKeys =
         apiComponentService
             .findRelatedApiUse(mapperKey)
-            .map(ApiUseCaseDto::membersExcludeApiKey)
+            .map(usecase -> apiComponentService.findRelatedAssetKeys(mapperKey, usecase))
             .orElse(List.of());
     List<UnifiedAssetDto> childAssets = unifiedAssetService.findByAllKeysIn(memberKeys, true);
     changeParentId(childAssets, componentAsset);
@@ -166,9 +166,9 @@ public class ComponentTagService implements TargetMappingChecker, LatestDeployme
     finalAssetDtos.stream()
         .filter(Objects::nonNull)
         .forEach(
-            pram ->
-                Optional.ofNullable(assetMap.get(UUID.fromString(pram.getParentId())))
-                    .ifPresent(pramEntity -> pram.setParentId(pramEntity.getKey())));
+            param ->
+                Optional.ofNullable(assetMap.get(UUID.fromString(param.getParentId())))
+                    .ifPresent(pramEntity -> param.setParentId(pramEntity.getKey())));
   }
 
   @Transactional
@@ -183,7 +183,7 @@ public class ComponentTagService implements TargetMappingChecker, LatestDeployme
       throw KrakenException.badRequest("No difference with currently running version ");
     }
     UnifiedAssetDto assetDto = UnifiedAssetService.toAsset(mapperEntity, true);
-    fillMappingStatus(assetDto);
+    fillMappingStatus(assetDto, appProperty.getNoRequiredMappingKeys());
     if (MappingStatusEnum.INCOMPLETE.getDesc().equals(assetDto.getMappingStatus())) {
       throw KrakenException.badRequest(
           "deployed failed due to the mapping was incomplete:" + mapperKey);

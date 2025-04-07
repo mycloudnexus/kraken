@@ -91,8 +91,33 @@ app:
     workspacePath:
   controlPlane:
     url: http://localhost:8001
-    token: Bearer ${KRAKEN_MGMT_API_ACCESS_TOKEN:FAKE_TOKEN}
+    auth:
+      authMode: internalToken
+      internalToken:
+        accessToken: ${KRAKEN_CONTROL_PLANE_AGENT_TOKEN:123456}
+      clientCredentials:
+        authServerUrl: ${app.controlPlane.url}
+        authTokenEndpoint: "/tenant/auth/token"
+        clientId: ${KRAKEN_CONTROL_PLANE_AGENT_CLIENT_ID:123456}
+        clientSecret: ${KRAKEN_CONTROL_PLANE_AGENT_CLIENT_SECRET:123456}
+        expirationBufferInSeconds: 30
+    push-activity-log-external:
+      enabled: false
+      batch-size: ${EXTERNAL_SYSTEM_PUSH_LOG_BATCH_SIZE:200}
+  workflow:
+    baseUrl: ${CONDUCTOR_SERVICE_BASE_URL}
+    enabled: false
+    deployment:
+      enabled: false
   cron-job:
+    pull-api-server-info: 0/20 * * * * *
+    pull-server-assets: 0 0/1 * * * *
+    pull-latest-release: 0 0/1 * * * *
+    pull-reset-event: 0 0/1 * * * *
+    push-heartbeat: 0/20 * * * * *
+    push-log: 0/20 * * * * *
+    push-log-external-system: 0 0/1 * * * *
+    push-workflow-status: 0 0/1 * * * *
     lock:
       at-most-for: 2m
       at-least-for: 10s
@@ -100,6 +125,8 @@ app:
     - kraken.component.api
     - kraken.component.api-target
     - kraken.component.api-target-mapper
+    - kraken.component.api-workflow
+    - kraken.product.mapping.matrix
     - kraken.component.api-server
   unified-asset:
     endpoints:

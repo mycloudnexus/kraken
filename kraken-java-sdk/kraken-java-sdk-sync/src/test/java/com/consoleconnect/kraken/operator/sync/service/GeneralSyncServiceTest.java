@@ -9,6 +9,7 @@ import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.sync.CustomConfig;
 import com.consoleconnect.kraken.operator.sync.model.SyncProperty;
+import com.consoleconnect.kraken.operator.sync.service.security.ExternalSystemTokenProvider;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
 import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -39,6 +40,7 @@ public class GeneralSyncServiceTest extends AbstractIntegrationTest {
   @Autowired private SyncProperty syncProperty;
   @Autowired private UnifiedAssetService unifiedAssetService;
   @Autowired private List<ClientSyncHandler> clientSyncHandlers;
+  @Autowired private ExternalSystemTokenProvider externalSystemTokenProvider;
 
   @BeforeAll
   @SneakyThrows
@@ -124,6 +126,11 @@ public class GeneralSyncServiceTest extends AbstractIntegrationTest {
   }
 
   private GeneralSyncService get(WebClient webClient) {
-    return new GeneralSyncService(syncProperty, webClient, unifiedAssetService, clientSyncHandlers);
+    return new GeneralSyncService(
+        syncProperty,
+        webClient,
+        externalSystemTokenProvider,
+        unifiedAssetService,
+        clientSyncHandlers);
   }
 }

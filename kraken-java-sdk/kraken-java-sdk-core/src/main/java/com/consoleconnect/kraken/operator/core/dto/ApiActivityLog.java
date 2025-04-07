@@ -17,6 +17,8 @@ public class ApiActivityLog extends AbstractHttpModel {
   private String responseIp;
   private Integer callSeq;
 
+  private ZonedDateTime triggeredAt;
+
   private ZonedDateTime syncedAt;
   private SyncStatusEnum syncStatus;
 
@@ -25,4 +27,6 @@ public class ApiActivityLog extends AbstractHttpModel {
   private String buyerId;
   private String buyerName;
   private String productType;
+  private String workflowStatus;
+  private String errorMsg;
 }

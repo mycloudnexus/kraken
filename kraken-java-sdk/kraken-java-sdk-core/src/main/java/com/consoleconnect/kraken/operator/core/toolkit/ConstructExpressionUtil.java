@@ -2,6 +2,7 @@ package com.consoleconnect.kraken.operator.core.toolkit;
 
 import static com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants.CUSTOMIZED_PLACE_HOLDER;
 
+import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -11,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 public class ConstructExpressionUtil {
 
   public static final String ARRAY_ROOT_PREFIX = "[*].";
+  public static final String DOT = "\\.";
 
   private ConstructExpressionUtil() {}
 
@@ -54,6 +56,9 @@ public class ConstructExpressionUtil {
   }
 
   public static String constructMeRequestBody(String s) {
+    if (s.startsWith("workflow")) {
+      return formatWorkflowExpression(s);
+    }
     return String.format("${body.%s}", s);
   }
 
@@ -62,7 +67,35 @@ public class ConstructExpressionUtil {
   }
 
   public static String constructBody(String source) {
+    // handle workflow output expression
+    if (source.startsWith("@{{workflow.")) {
+      List<String> params = extractMapperParam(source);
+      return formatWorkflowExpression(params.get(0));
+    }
     return source.replace("@{{", "${body.").replace("}}", "}");
+  }
+
+  public static String formatWorkflowExpression(String param) {
+    String[] split = param.split(DOT);
+    return String.format(
+        "${%s.output.response.body.%s}",
+        split[1], param.substring(split[0].length() + split[1].length() + 2));
+  }
+
+  public static String formatTaskExpression(String param) {
+    String[] split = param.split(DOT);
+    if (split.length < 2) {
+      throw KrakenException.internalError(String.format("bad format for param: %s", param));
+    }
+    return String.format(
+        "%s.output.response.body.%s", split[0], param.substring(split[0].length() + 1));
+  }
+
+  public static String formatWorkflowResponseExpression(String param) {
+    String[] split = param.split(DOT);
+    return String.format(
+        "${responseBody.%s.response.body.%s}",
+        split[1], param.substring(split[0].length() + split[1].length() + 2));
   }
 
   public static String constructJsonPathBody(String source) {
@@ -87,6 +120,11 @@ public class ConstructExpressionUtil {
 
   public static List<String> extractOriginalPathParam(String path) {
     String patternStr = "\\{(.*?)\\}";
+    return extractParam(path, patternStr);
+  }
+
+  public static List<String> extractSpelParam(String path) {
+    String patternStr = "\\$\\{(.*?)\\}";
     return extractParam(path, patternStr);
   }
 }

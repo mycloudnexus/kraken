@@ -45,6 +45,7 @@ import {
   getComponentDetailV2,
   getValidateServerName,
   editContactInformation,
+  getProductTypes,
 } from "@/services/products";
 import { STALE_TIME } from "@/utils/constants/common";
 import {
@@ -140,6 +141,7 @@ export const PRODUCT_CACHE_KEYS = {
   get_validate_api_server_name: "get_validate_api_server_name",
   verify_product: "verify_product",
   edit_contact_information: "edit_contact_information",
+  get_product_type_list: "get_product_type_list",
 };
 
 export const useCreateNewComponent = () => {
@@ -238,7 +240,7 @@ export const useGetComponentListV2 = (
       targetMapperKey,
     ],
     queryFn: () => getListComponentsV2(productId, targetMapperKey),
-    enabled: Boolean(productId),
+    enabled: Boolean(productId && targetMapperKey),
     select: (data) => data?.data,
   });
 };
@@ -356,6 +358,7 @@ export const useGetComponentSpecDetails = (
 export const useGetComponentDetailMapping = (
   productId: string,
   componentId: string,
+  productType?: string,
   open = true
 ) => {
   return useQuery<any, Error, IDetailsData<IMapperDetails>>({
@@ -364,7 +367,8 @@ export const useGetComponentDetailMapping = (
       productId,
       componentId,
     ],
-    queryFn: () => getComponentDetailMapping(productId, componentId),
+    queryFn: () =>
+      getComponentDetailMapping(productId, componentId, productType),
     enabled: Boolean(productId && componentId && open),
     select: (data) => data.data,
   });
@@ -817,5 +821,14 @@ export const useEditContactInformation = () => {
     mutationKey: [PRODUCT_CACHE_KEYS.edit_contact_information],
     mutationFn: ({ productId, componentId, id, data }: any) =>
       editContactInformation(productId, componentId, id, data),
+  });
+};
+
+export const useGetProductTypes = (productId: string) => {
+  return useQuery<any, Error>({
+    queryKey: [PRODUCT_CACHE_KEYS.get_product_type_list, productId],
+    queryFn: () => getProductTypes(productId),
+    enabled: Boolean(productId),
+    select: (data) => data?.data,
   });
 };

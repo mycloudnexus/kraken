@@ -4,6 +4,7 @@ import com.consoleconnect.kraken.operator.core.client.ClientEvent;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import com.consoleconnect.kraken.operator.core.toolkit.IpUtils;
 import com.consoleconnect.kraken.operator.sync.model.SyncProperty;
+import com.consoleconnect.kraken.operator.sync.service.security.ExternalSystemTokenProvider;
 import java.net.URI;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -24,11 +25,17 @@ public class KrakenServerConnector {
   @Getter private final SyncProperty appProperty;
   private final WebClient webClient;
 
+  private ExternalSystemTokenProvider agentTokenProvider = null;
+
   public static final String CLIENT_ID = IpUtils.getHostAddress();
 
-  public KrakenServerConnector(SyncProperty appProperty, WebClient webClient) {
+  public KrakenServerConnector(
+      SyncProperty appProperty,
+      WebClient webClient,
+      ExternalSystemTokenProvider externalSystemTokenProvider) {
     this.appProperty = appProperty;
     this.webClient = webClient;
+    this.agentTokenProvider = externalSystemTokenProvider;
   }
 
   public HttpResponse<Void> curl(HttpMethod method, String path, Object body) {
@@ -54,7 +61,7 @@ public class KrakenServerConnector {
         blockCurl(
             method,
             uriBuilder -> uriBuilder.path(path).build(),
-            appProperty.getControlPlane().getToken(),
+            this.getToken(),
             body,
             responseBodyType);
     if (res.getCode() == 200) {
@@ -70,8 +77,7 @@ public class KrakenServerConnector {
       Function<UriBuilder, URI> uriFunction,
       Object body,
       ParameterizedTypeReference<HttpResponse<T>> responseBodyType) {
-    return blockCurl(
-        method, uriFunction, appProperty.getControlPlane().getToken(), body, responseBodyType);
+    return blockCurl(method, uriFunction, this.getToken(), body, responseBodyType);
   }
 
   public <T> HttpResponse<T> blockCurl(
@@ -113,5 +119,9 @@ public class KrakenServerConnector {
 
   public HttpResponse<Void> pushEvent(ClientEvent clientEvent) {
     return curl(HttpMethod.POST, appProperty.getControlPlane().getPushEventEndpoint(), clientEvent);
+  }
+
+  private String getToken() {
+    return agentTokenProvider.getToken();
   }
 }

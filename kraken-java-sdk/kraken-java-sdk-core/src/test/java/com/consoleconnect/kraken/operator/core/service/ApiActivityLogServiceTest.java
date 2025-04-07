@@ -49,6 +49,8 @@ class ApiActivityLogServiceTest extends AbstractIntegrationTest {
   @SpyBean private ApiActivityLogService apiActivityLogService;
 
   private static final String STAGE_ENV = "stage";
+  private static final String BUYER_PREFIX = "Alita";
+  private static final String BUYER_SUFFIX = "Battle Angel";
 
   @Test
   @Order(1)
@@ -65,15 +67,20 @@ class ApiActivityLogServiceTest extends AbstractIntegrationTest {
   @Test
   @Order(2)
   void givenTimeRange_whenSearchActivities_thenReturnOK() {
-    String buyerId = "test-log" + System.currentTimeMillis();
+    String buyerId = BUYER_PREFIX + "-" + BUYER_SUFFIX;
     createBuyer(buyerId, STAGE_ENV, "test-company-name-" + System.currentTimeMillis());
     ApiActivityLogEntity entity = createApiActivityLog(buyerId, STAGE_ENV);
     LogSearchRequest logSearchRequest =
         LogSearchRequest.builder()
             .env(STAGE_ENV)
             .requestId(entity.getRequestId())
+            .buyer(buyerId)
+            .statusCode("200, 201")
+            .method("GET, POST")
             .queryStart(ZonedDateTime.now().minusDays(1))
             .queryEnd(ZonedDateTime.now().plusDays(10))
+            .statusCode("200")
+            .productType("access.eline")
             .build();
     Paging<ApiActivityLog> pages =
         apiActivityLogService.search(logSearchRequest, PageRequest.of(0, 10));
@@ -94,6 +101,10 @@ class ApiActivityLogServiceTest extends AbstractIntegrationTest {
     apiActivityLogEntity.setHeaders(headers);
     apiActivityLogEntity.setBuyer(buyerId);
     apiActivityLogEntity.setCallSeq(0);
+    apiActivityLogEntity.setHttpStatusCode(200);
+    apiActivityLogEntity.setTriggeredAt(ZonedDateTime.now());
+    apiActivityLogEntity.setProductType("access.eline");
+    apiActivityLogEntity.setHttpStatusCode(200);
     apiActivityLogEntity = apiActivityLogRepository.save(apiActivityLogEntity);
     return apiActivityLogEntity;
   }

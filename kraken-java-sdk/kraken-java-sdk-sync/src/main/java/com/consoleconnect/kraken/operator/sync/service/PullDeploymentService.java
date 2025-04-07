@@ -3,13 +3,14 @@ package com.consoleconnect.kraken.operator.sync.service;
 import com.consoleconnect.kraken.operator.core.client.ClientEvent;
 import com.consoleconnect.kraken.operator.core.client.ClientEventTypeEnum;
 import com.consoleconnect.kraken.operator.core.client.ClientInstanceDeployment;
+import com.consoleconnect.kraken.operator.core.dto.DeployComponentError;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
-import com.consoleconnect.kraken.operator.core.enums.DeployStatusEnum;
 import com.consoleconnect.kraken.operator.core.event.DeploymentEvent;
 import com.consoleconnect.kraken.operator.core.event.IngestDataEvent;
 import com.consoleconnect.kraken.operator.core.event.ReportConfigReloadEvent;
+import com.consoleconnect.kraken.operator.core.exception.KrakenDeploymentException;
 import com.consoleconnect.kraken.operator.core.ingestion.DataIngestionJob;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
@@ -17,7 +18,9 @@ import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.data.entity.AssetReleaseEntity;
 import com.consoleconnect.kraken.operator.data.repo.AssetReleaseRepository;
 import com.consoleconnect.kraken.operator.sync.model.SyncProperty;
+import com.consoleconnect.kraken.operator.sync.service.security.ExternalSystemTokenProvider;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
@@ -38,34 +41,41 @@ public class PullDeploymentService extends KrakenServerConnector {
   public PullDeploymentService(
       SyncProperty appProperty,
       WebClient webClient,
+      ExternalSystemTokenProvider externalSystemTokenProvider,
       DataIngestionJob dataIngestionJob,
       UnifiedAssetRepository assetRepository,
       AssetReleaseRepository assetReleaseRepository,
       SyncProperty syncProperty) {
-    super(appProperty, webClient);
+    super(appProperty, webClient, externalSystemTokenProvider);
     this.dataIngestionJob = dataIngestionJob;
     this.assetRepository = assetRepository;
     this.assetReleaseRepository = assetReleaseRepository;
     this.syncProperty = syncProperty;
   }
 
-  private void installDeployment(DeploymentEvent event, HttpResponse<List<UnifiedAssetDto>> res) {
-    res.getData().stream()
-        .filter(dto -> getAppProperty().getAcceptAssetKinds().contains(dto.getKind()))
-        .map(
-            asset -> {
-              if (asset.getKind().equalsIgnoreCase(AssetKindEnum.COMPONENT_API.getKind())) {
-                this.ingestData(asset);
-              }
-              return asset;
-            })
-        .forEach(this::ingestData);
+  private List<DeployComponentError> installDeployment(
+      DeploymentEvent event, HttpResponse<List<UnifiedAssetDto>> res) {
+    List<DeployComponentError> errors =
+        res.getData().stream()
+            .filter(dto -> getAppProperty().getAcceptAssetKinds().contains(dto.getKind()))
+            .map(
+                asset -> {
+                  if (asset.getKind().equalsIgnoreCase(AssetKindEnum.COMPONENT_API.getKind())) {
+                    this.ingestData(asset);
+                  }
+                  return asset;
+                })
+            .map(this::ingestData)
+            .filter(Objects::nonNull)
+            .toList();
 
     AssetReleaseEntity assetReleaseEntity = new AssetReleaseEntity();
     assetReleaseEntity.setProductKey(event.getProductId());
     assetReleaseEntity.setVersion(event.getProductReleaseId());
     assetReleaseEntity.setPayload(res.getData());
     assetReleaseRepository.save(assetReleaseEntity);
+
+    return errors;
   }
 
   public void pushDeploymentStatus(ReportConfigReloadEvent event) {
@@ -73,7 +83,7 @@ public class PullDeploymentService extends KrakenServerConnector {
     ClientInstanceDeployment clientInstanceDeployment = new ClientInstanceDeployment();
     clientInstanceDeployment.setProductReleaseId(event.getProductReleaseId());
     clientInstanceDeployment.setStatus(event.getStatus());
-    clientInstanceDeployment.setReason(event.getReason());
+    clientInstanceDeployment.setErrors(event.getErrors());
     clientInstanceDeployment.setInstanceId(CLIENT_ID);
 
     ClientEvent clientEvent =
@@ -81,7 +91,7 @@ public class PullDeploymentService extends KrakenServerConnector {
     pushEvent(clientEvent);
   }
 
-  protected void ingestData(UnifiedAssetDto dto) {
+  protected DeployComponentError ingestData(UnifiedAssetDto dto) {
     Optional<UnifiedAssetEntity> unifiedAssetEntityOpt =
         assetRepository.findOneByKey(dto.getMetadata().getKey());
     if (unifiedAssetEntityOpt.isEmpty()) {
@@ -98,7 +108,16 @@ public class PullDeploymentService extends KrakenServerConnector {
     event.setAsset(dto);
     event.setFullPath("raw:" + JsonToolkit.toJson(dto));
     event.setEnforceSync(getAppProperty().isAssetConfigOverwriteFlag());
-    dataIngestionJob.ingestData(event);
+    try {
+      dataIngestionJob.ingestData(event);
+      return null;
+    } catch (KrakenDeploymentException e) {
+      log.error("Failed to install deployment", e);
+      return DeployComponentError.of(dto, e);
+    } catch (Exception e) {
+      log.error("Failed to install deployment", e);
+      return DeployComponentError.of(dto, e);
+    }
   }
 
   @SchedulerLock(
@@ -140,13 +159,12 @@ public class PullDeploymentService extends KrakenServerConnector {
           curl(HttpMethod.GET, releaseDetailEndpoint, null, new ParameterizedTypeReference<>() {});
       if (releaseDetailsRes.getCode() == 200) {
         // step3: install deployment
-        installDeployment(deploymentEvent, releaseDetailsRes);
+        List<DeployComponentError> errors = installDeployment(deploymentEvent, releaseDetailsRes);
 
         // step4: push deployment status
         // notify deployment status
         pushDeploymentStatus(
-            new ReportConfigReloadEvent(
-                deploymentEvent.getProductReleaseId(), DeployStatusEnum.SUCCESS.name(), ""));
+            ReportConfigReloadEvent.of(deploymentEvent.getProductReleaseId(), errors));
       } else {
         log.error("failed to retrieve product release detail");
       }

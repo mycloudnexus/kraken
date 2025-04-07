@@ -1,0 +1,117 @@
+kind: kraken.component.api-workflow
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-workflow.order.eline.delete
+  name: Order Management
+  version: 1
+facets:
+  metaData:
+    workflowName: order.eline.delete
+    externalId: ''
+  validationStage: []
+  preparationStage:
+    - taskName: disable_order_task
+      taskType: http
+      endpoint:
+        path: '/api/company/{username}/connections/{connectionId}/disable'
+        method: PUT
+        serverKey: mef.sonata.api-target-spec.cca1730430287705
+        mappers:
+          request:
+            - name: mapper.order.eline.delete.buyerId
+              title: >-
+                The unique identifier of the organization that is acting as the
+                a Buyer.
+              description: ''
+              source: '@{{buyerId}}'
+              sourceLocation: QUERY
+              target: '@{{username}}'
+              targetLocation: PATH
+              requiredMapping: false
+              sourceTaskName: status_checking_task
+            - name: mapper.order.eline.delete.productId
+              title: >-
+                The unique identifier of an in-service Product that is the
+                ordering subject
+              description: ''
+              source: '@{{productOrderItem[*].product.id}}'
+              sourceLocation: BODY
+              target: '@{{connectionId}}'
+              targetLocation: PATH
+              requiredMapping: true
+  executionStage:
+    - taskName: delete_order_task
+      taskType: http
+      endpoint:
+        path: '/api/v2/company/{username}/connections/{connectionId}'
+        method: DELETE
+        serverKey: mef.sonata.api-target-spec.cca1730430287705
+        mappers:
+          request:
+            - name: mapper.order.eline.delete.buyerId
+              title: >-
+                The unique identifier of the organization that is acting as the
+                a Buyer.
+              source: '@{{buyerId}}'
+              target: '@{{username}}'
+              description: ''
+              replaceStar: true
+              sourceLocation: QUERY
+              targetLocation: PATH
+              allowValueLimit: false
+              customizedField: false
+              requiredMapping: false
+            - name: mapper.order.eline.delete.productId
+              title: >-
+                The unique identifier of an in-service Product that is the
+                ordering subject
+              source: '@{{productOrderItem[*].product.id}}'
+              target: '@{{connectionId}}'
+              sourceType: string
+              description: ''
+              replaceStar: true
+              sourceLocation: BODY
+              targetLocation: PATH
+              allowValueLimit: false
+              customizedField: false
+              requiredMapping: true
+          response:
+            - name: mapper.order.eline.delete.state
+              title: Order State
+              source: '@{{status}}'
+              target: '@{{state}}'
+              targetType: enum
+              description: ''
+              replaceStar: true
+              targetValues:
+                - acknowledged
+                - assessingCancellation
+                - held.assessingCharge
+                - pending.assessingModification
+                - cancelled
+                - pendingCancellation
+                - completed
+                - failed
+                - inProgress
+                - partial
+                - rejected
+              valueMapping:
+                ERROR: failed
+                DELETING: acknowledged
+              sourceLocation: BODY
+              targetLocation: BODY
+              allowValueLimit: false
+              customizedField: false
+              requiredMapping: true
+            - name: mapper.order.eline.delete.orderId
+              title: order Id from seller
+              source: '@{{id}}'
+              target: '@{{orderId}}'
+              description: ''
+              replaceStar: true
+              sourceLocation: BODY
+              targetLocation: BODY
+              allowValueLimit: false
+              customizedField: false
+              requiredMapping: true
+      notificationUrl: 'http://slack.notice/api'

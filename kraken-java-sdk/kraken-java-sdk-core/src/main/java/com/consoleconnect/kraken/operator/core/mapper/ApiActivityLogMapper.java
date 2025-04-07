@@ -10,7 +10,24 @@ public interface ApiActivityLogMapper {
 
   ApiActivityLogMapper INSTANCE = Mappers.getMapper(ApiActivityLogMapper.class);
 
-  ApiActivityLogEntity map(ApiActivityLog request);
+  ApiActivityLogEntity mapOnlySelf(ApiActivityLog request);
 
-  ApiActivityLog map(ApiActivityLogEntity entity);
+  default ApiActivityLogEntity map(ApiActivityLog request) {
+    var entity = INSTANCE.mapOnlySelf(request);
+    if (request.getRequest() != null || request.getResponse() != null) {
+      entity.setApiLogBodyEntity(ApiActivityLogBodyMapper.INSTANCE.map(request));
+    }
+    return entity;
+  }
+
+  ApiActivityLog mapOnlySelf(ApiActivityLogEntity entity);
+
+  default ApiActivityLog map(ApiActivityLogEntity entity) {
+    ApiActivityLog dto = INSTANCE.mapOnlySelf(entity);
+    if (entity.getApiLogBodyEntity() != null) {
+      dto.setRequest(entity.getApiLogBodyEntity().getRequest());
+      dto.setResponse(entity.getApiLogBodyEntity().getResponse());
+    }
+    return dto;
+  }
 }

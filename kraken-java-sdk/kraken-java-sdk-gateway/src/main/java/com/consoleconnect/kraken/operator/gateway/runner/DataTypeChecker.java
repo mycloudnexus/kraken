@@ -1,13 +1,21 @@
 package com.consoleconnect.kraken.operator.gateway.runner;
 
+import static com.jayway.jsonpath.Criteria.where;
+import static com.jayway.jsonpath.Filter.filter;
+
 import com.consoleconnect.kraken.operator.core.enums.MappingTypeEnum;
 import com.consoleconnect.kraken.operator.core.exception.ErrorResponse;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
+import com.consoleconnect.kraken.operator.core.model.FilterRule;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
+import com.consoleconnect.kraken.operator.core.model.facet.ComponentValidationFacets;
 import com.consoleconnect.kraken.operator.core.toolkit.Constants;
 import com.consoleconnect.kraken.operator.core.toolkit.ConstructExpressionUtil;
 import com.consoleconnect.kraken.operator.gateway.dto.PathCheck;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -110,6 +118,41 @@ public interface DataTypeChecker {
       throwException(code, errorMsg, String.format(defaultMsg, extractCheckingPath(checkPath)));
     }
     return realValue;
+  }
+
+  default boolean filterRequest(String request, FilterRule filterRule) {
+    com.jayway.jsonpath.Predicate actionFilter =
+        filter(where(filterRule.getFilterKey().trim()).eq(filterRule.getFilterVal().trim()));
+    List<Object> list = JsonPath.read(request, filterRule.getFilterPath().trim(), actionFilter);
+    return CollectionUtils.isNotEmpty(list);
+  }
+
+  default void checkModificationItems(
+      String source, String target, ComponentValidationFacets.ModificationRule rule) {
+    JsonNode sourceJson = null;
+    JsonNode targetJson = null;
+    try {
+      ObjectMapper objectMapper = new ObjectMapper();
+      sourceJson = objectMapper.readTree(source);
+      targetJson = objectMapper.readTree(target);
+    } catch (Exception e) {
+      String error =
+          String.format("Failed to read input json, source:%s, target:%s", source, target);
+      throw KrakenException.badRequest(error);
+    }
+
+    // Check restrictedChanges (must be the same)
+    for (ComponentValidationFacets.CompareItem item : rule.getRestrictedChanges()) {
+      Object sourceValue = JsonPath.read(sourceJson.toString(), item.getSourceItem());
+      Object targetValue = JsonPath.read(targetJson.toString(), item.getTargetItem());
+      if (sourceValue == null || !sourceValue.equals(targetValue)) {
+        String error =
+            String.format(
+                "Mismatch in restrictedChanges:@{{%s}}, source: %s does not match %s target: %s",
+                item.getSourceItem(), sourceValue, item.getTargetItem(), targetValue);
+        throw KrakenException.unProcessableEntityInvalidValue(error);
+      }
+    }
   }
 
   default String getDefaultMessage(Integer code) {

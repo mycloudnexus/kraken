@@ -15,14 +15,10 @@ spec:
       method: post
       actionTypes:
         - add
-      productTypes:
-        - UNI
-        - ACCESS_E_LINE
+      supportedConfig: $.poq
     - path: /mefApi/sonata/productOfferingQualification/v7/productOfferingQualification/{id}
       method: get
-      productTypes:
-        - UNI
-        - ACCESS_E_LINE
+      supportedConfig: $.poq
   mappings:
     - uri: ${env.target.url}
       trigger:
@@ -35,28 +31,103 @@ spec:
           actionType: engine@javascript
           env:
             productOfferingQualificationItem: ${body['productOfferingQualificationItem'][0]}
+            instantSync: ${body.instantSyncQualification}
           with:
             code: |
               (jsonStr) => {
                 console.log("input: " + jsonStr);
                 let input = JSON.parse(jsonStr);
+                let errorCode = '';
+                let errorMsg = '';
+                let errorArr = [''];
                 let targetAPIConfigKey = '';
+                let matrixConfigKey = '';
+                let forwardDownstream = true;
+                let typeArr = ['UNI', 'ACCESS_E_LINE'];
+                let syncMode = input.instantSync;
                 let productConfiguration = input.productOfferingQualificationItem?.product?.productConfiguration;
-                let type = productConfiguration?.['@type'];
-                if(type === 'UNI') {
-                  targetAPIConfigKey = 'mef.sonata.api-target.poq.uni.add';
-                } else if(type === 'ACCESS_E_LINE') {
-                  targetAPIConfigKey = 'mef.sonata.api-target.poq.eline.add';
+                let typeVal = productConfiguration?.['@type'];
+                if(typeVal === 'UNI') {
+                  if(syncMode === true) {
+                    targetAPIConfigKey = 'mef.sonata.api-target.poq.uni.add';
+                    matrixConfigKey = 'mef.sonata.api.matrix.poq.uni.add';
+                  } else if (syncMode === false) {
+                    targetAPIConfigKey = 'targetKey:notFound';
+                    matrixConfigKey = 'matrixKey:notFound';
+                    errorArr = ['api use case is not supported : disabled : @{{instantSyncQualification}}==false'];
+                    errorCode = '422';
+                  } else {
+                    targetAPIConfigKey = 'targetKey:notFound';
+                    matrixConfigKey = 'matrixKey:notFound';
+                    errorArr = ['api use case is not supported : missing property : instantSyncQualification'];
+                    errorCode = '400';
+                  }
+                } else if(typeVal === 'ACCESS_E_LINE') {
+                  if(syncMode === true) {
+                    targetAPIConfigKey = 'mef.sonata.api-target.poq.eline.add';
+                    matrixConfigKey = 'mef.sonata.api.matrix.poq.eline.add';
+                  } else if (syncMode === false) {
+                    targetAPIConfigKey = 'targetKey:notFound';
+                    matrixConfigKey = 'matrixKey:notFound';
+                    errorArr = ['api use case is not supported : disabled : @{{instantSyncQualification}}==false'];
+                    errorCode = '422';
+                  } else {
+                    targetAPIConfigKey = 'targetKey:notFound';
+                    matrixConfigKey = 'matrixKey:notFound';
+                    errorArr = ['api use case is not supported : missing property : instantSyncQualification'];
+                    errorCode = '400';
+                  }
                 } else {
+                  errorArr = ['api use case is not supported :'];
+                  if (!typeArr.includes(typeVal) && syncMode === true){
+                    if (typeVal === undefined) {
+                      errorCode = '400';
+                      errorArr.push(`expect productOfferingQualificationItem[0].product.productConfiguration.@type in [ ${typeArr} ], but missing property.`);
+                    } else {
+                      errorCode = '422';
+                      errorArr.push(`expect @{{productOfferingQualificationItem[0].product.productConfiguration.@type}} in [ ${typeArr} ], but ${typeVal}.`);
+                    }
+                  } else if (!typeArr.includes(typeVal) && syncMode === false) {
+                    if (typeVal === undefined) {
+                      errorCode = '400';
+                      errorArr.push(`expect productOfferingQualificationItem[0].product.productConfiguration.@type in [ ${typeArr} ], but missing property.`);
+                      errorArr.push('disabled : instantSyncQualification==false');
+                    } else {
+                      errorCode = '422';
+                      errorArr.push(`expect @{{productOfferingQualificationItem[0].product.productConfiguration.@type}} in [ ${typeArr} ], but ${typeVal}.`);
+                      errorArr.push('disabled : @{{instantSyncQualification}}==false');
+                    }
+                  } else {
+                     if (typeVal === undefined || syncMode === undefined) {
+                      errorCode = '400';
+                      errorArr.push(`expect productOfferingQualificationItem[0].product.productConfiguration.@type in [ ${typeArr} ], instantSyncQualification, but missing property.`);
+                    } else {
+                      errorCode = '400';
+                      errorArr.push(`expect productOfferingQualificationItem[0].product.productConfiguration.@type in [ ${typeArr} ], but ${typeVal}.`);
+                      errorArr.push('missing property : instantSyncQualification');
+                    }
+                  }
                   targetAPIConfigKey = 'targetKey:notFound';
                 }
+                errorMsg = errorArr.join(' ');
                 let ret = {
-                  productType: type || 'undefined',
-                  targetAPIConfigKey: targetAPIConfigKey
+                  productType: typeVal || 'undefined',
+                  instantSyncQualification: syncMode !== undefined ? syncMode : 'undefined',
+                  forwardDownstream: forwardDownstream,
+                  targetAPIConfigKey: targetAPIConfigKey,
+                  matrixConfigKey: matrixConfigKey,
+                  errorMsg: errorMsg,
+                  errorCode: errorCode
                 };
                 return JSON.stringify(ret);
               }
           outputKey: productOfferingQualification
+
+        - id: mapping_matrix_check_poq
+          actionType: buildin@mapping-matrix-checker
+          env:
+            mappingMatrixKey: ${productOfferingQualification.matrixConfigKey}
+            targetKey: ${productOfferingQualification.targetAPIConfigKey}
 
         - id: persist_http_request
           actionType: buildin@db
@@ -108,6 +179,7 @@ spec:
             properties:
               - responseBody
               - responseStatusCode
+              - renderedResponseBody
           preRequest: false
           postRequest: true
           order: -4
@@ -129,6 +201,8 @@ spec:
           actionType: buildin@db
           env:
             id: ${segment}
+            blankIdErrMsg: "product offering id cannot be blank"
+            notExistedErrMsg: "product offering id does not exist"
           with:
             action: read
           preRequest: true
@@ -137,27 +211,52 @@ spec:
           actionType: engine@javascript
           env:
             bizType: ${entity.bizType}
+            instantSync: ${entity.request.instantSyncQualification}
           with:
             code: |
               (jsonStr) => {
                 console.log("input: " + jsonStr);
                 let input = JSON.parse(jsonStr);
+                let errorMsg = '';
+                let errorArr = [''];
                 let targetAPIConfigKey = '';
-                if(input.bizType == 'UNI') {
-                  targetAPIConfigKey = 'mef.sonata.api-target.poq.uni.read';
-                } else if(input.bizType == 'ACCESS_E_LINE') {
-                  targetAPIConfigKey = 'mef.sonata.api-target.poq.eline.read';
+                let forwardDownstream = true;
+                let typeArr = ['UNI', 'ACCESS_E_LINE'];
+                let syncMode = input.instantSync;
+                if(input.bizType === 'UNI') {
+                  if (syncMode === true) {
+                    targetAPIConfigKey = 'mef.sonata.api-target.poq.uni.read';
+                    forwardDownstream = false;
+                  } else {
+                    targetAPIConfigKey = 'targetKey:notFound';
+                    errorArr = ['api use case is not supported : disabled : @{{instantSyncQualification}}==false'];
+                  }
+                } else if(input.bizType === 'ACCESS_E_LINE') {
+                  if (syncMode === true) {
+                    targetAPIConfigKey = 'mef.sonata.api-target.poq.eline.read';
+                    forwardDownstream = false;
+                  } else {
+                    targetAPIConfigKey = 'targetKey:notFound';
+                    errorArr = ['api use case is not supported : disabled : @{{instantSyncQualification}}==false'];
+                  }
                 } else {
-                  targetAPIConfigKey = 'notImplemented';
+                  targetAPIConfigKey = 'targetKey:notFound';
+                  errorArr = ['api use case is not supported :'];
+                  if (!syncMode) {
+                    errorArr.push('disabled : @{{instantSyncQualification}}==false');
+                  }
                 }
+                errorMsg = errorArr.join(' ');
                 let ret = {
                   productType: input.bizType,
-                  targetAPIConfigKey: targetAPIConfigKey
+                  instantSync: input.instantSync,
+                  forwardDownstream: forwardDownstream,
+                  targetAPIConfigKey: targetAPIConfigKey,
+                  errorMsg: errorMsg
                 };
                 return JSON.stringify(ret);
               }
           outputKey: productOfferingQualification
-
         - id: load-downstream-api-config
           actionType: buildin@load-target-api-config
           env:
@@ -174,6 +273,11 @@ spec:
             path: ${targetApiConfig.endpoints[0].path}
             method: ${targetApiConfig.endpoints[0].method}
 
+        - id: mock-response
+          actionType: buildin@mock-response
+          env:
+            forwardDownstream: ${productOfferingQualification.forwardDownstream}
+
         - id: modify-request-body
           actionType: buildin@modify-request-body
           env:
@@ -187,59 +291,6 @@ spec:
             code: ${targetApiConfig.endpoints[0].responseBody}
             inputs: ${targetApiConfig.inputs}
 
-    - trigger:
-        path: /mefApi/sonata/productOfferingQualification/v7/productOfferingQualification/hub
-        method: post
-      metadata:
-        cacheRequestBody: true
-      actions:
-
-        - id: calculate_poq_event_types_via_javascript
-          actionType: engine@javascript
-          env:
-            query: ${body.query}
-          with:
-            code: |
-              (jsonStr) => {
-                console.log("input: " + jsonStr);
-                let input = JSON.parse(jsonStr);
-                let query = input.query;
-                let arr = query.split("=");
-                let eventArr = arr[1].split(",");
-                let ret = {
-                  "eventTypes": eventArr,
-                  "targetAPIConfigKey": "mef.sonata.api-target.hub.add"
-                };
-                return JSON.stringify(ret);
-              }
-          outputKey: event
-        - id: register-poq-event
-          actionType: buildin@register-event
-          env:
-            eventTypes: ${event.eventTypes}
-          with:
-            action: register
-
-        - id: load-downstream-api-config
-          actionType: buildin@load-target-api-config
-          env:
-            configKey: ${event.targetAPIConfigKey}
-            mefRequestBody: ${body}
-            entity: ${entity}
-          with:
-            render: true
-          outputKey: targetApiConfig
-
-        - id: mock-response
-          actionType: buildin@mock-response
-
-        - id: modify-response-body
-          actionType: buildin@modify-response-body
-          with:
-            engine: spel
-          env:
-            code: ${targetApiConfig.endpoints[0].responseBody}
-            inputs: ${targetApiConfig.inputs}
 links:
   - targetAssetKey: mef.sonata.api-target.poq.eline.add
     relationship: implementation.target
@@ -265,5 +316,11 @@ links:
   - targetAssetKey: mef.sonata.api-target-mapper.poq.uni.read
     relationship: implementation.target-mapper
     group: mef.sonata.api-target.poq.uni.read
+  - targetAssetKey: mef.sonata.api.matrix.poq.uni.add
+    relationship: implementation.matrix
+    group: mef.sonata.api-target.poq.uni.add
+  - targetAssetKey: mef.sonata.api.matrix.poq.eline.add
+    relationship: implementation.matrix
+    group: mef.sonata.api-target.poq.eline.add
   - targetAssetKey: mef.sonata.api-spec.product.offering.qualification
     relationship: implementation.standard.api-spec

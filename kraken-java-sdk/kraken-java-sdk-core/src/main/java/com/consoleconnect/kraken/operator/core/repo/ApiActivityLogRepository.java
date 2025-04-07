@@ -1,6 +1,7 @@
 package com.consoleconnect.kraken.operator.core.repo;
 
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
+import com.consoleconnect.kraken.operator.core.enums.LifeStatusEnum;
 import com.consoleconnect.kraken.operator.core.enums.SyncStatusEnum;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -25,8 +26,20 @@ public interface ApiActivityLogRepository
 
   Page<ApiActivityLogEntity> findAll(Pageable pageable);
 
-  Page<ApiActivityLogEntity> findAllBySyncStatusAndCreatedAtBefore(
-      SyncStatusEnum syncStatus, ZonedDateTime createdAt, Pageable pageable);
+  @Query(
+      "select e from #{#entityName} e "
+          + " where ( :requestId is not null and e.requestId = :requestId) "
+          + " order by e.callSeq desc limit 1")
+  Optional<ApiActivityLogEntity> findLatestSeq(String requestId);
+
+  @Query(value = "SELECT e FROM #{#entityName} e where e.lifeStatus is null ")
+  Page<ApiActivityLogEntity> findAllByMigrateStatus(Pageable pageable);
+
+  Page<ApiActivityLogEntity> findAllBySyncStatusAndLifeStatusAndCreatedAtBefore(
+      SyncStatusEnum syncStatus,
+      LifeStatusEnum lifeStatus,
+      ZonedDateTime createdAt,
+      Pageable pageable);
 
   @Query(
       "SELECT e.path, e.method , COUNT(e) FROM #{#entityName} e "
@@ -46,4 +59,11 @@ public interface ApiActivityLogRepository
       @Param("limit") int limit);
 
   List<ApiActivityLogEntity> findAllByRequestIdIn(List<String> requestIds);
+
+  @Query(
+      value =
+          "SELECT e FROM #{#entityName} e where e.createdAt < :expiredDateTime and e.lifeStatus = :lifeStatus"
+              + " and (:method is null or e.method = :method)")
+  Page<ApiActivityLogEntity> listExpiredApiLog(
+      ZonedDateTime expiredDateTime, LifeStatusEnum lifeStatus, String method, Pageable pageable);
 }

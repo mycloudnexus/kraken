@@ -2,6 +2,8 @@ package com.consoleconnect.kraken.operator.gateway.runner;
 
 import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.PRODUCT_MAPPING_MATRIX;
 import static com.consoleconnect.kraken.operator.core.enums.ParamLocationEnum.*;
+import static com.consoleconnect.kraken.operator.core.toolkit.Constants.COMMA;
+import static com.consoleconnect.kraken.operator.core.toolkit.Constants.COMMA_SPACE_EXPRESSION;
 import static com.consoleconnect.kraken.operator.core.toolkit.ConstructExpressionUtil.*;
 
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
@@ -10,22 +12,32 @@ import com.consoleconnect.kraken.operator.core.enums.ActionTypeEnum;
 import com.consoleconnect.kraken.operator.core.enums.MappingTypeEnum;
 import com.consoleconnect.kraken.operator.core.enums.ParamLocationEnum;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
+import com.consoleconnect.kraken.operator.core.ingestion.ResourceLoaderFactory;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
+import com.consoleconnect.kraken.operator.core.model.FilterRule;
+import com.consoleconnect.kraken.operator.core.model.HttpTask;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPIFacets;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
+import com.consoleconnect.kraken.operator.core.model.facet.ComponentValidationFacets;
+import com.consoleconnect.kraken.operator.core.model.facet.ComponentWorkflowFacets;
 import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
+import com.consoleconnect.kraken.operator.core.service.AssetReader;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.core.toolkit.Paging;
 import com.consoleconnect.kraken.operator.gateway.dto.PathCheck;
+import com.consoleconnect.kraken.operator.gateway.entity.HttpRequestEntity;
+import com.consoleconnect.kraken.operator.gateway.repo.HttpRequestRepository;
 import com.consoleconnect.kraken.operator.gateway.template.SpELEngine;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
 import org.apache.commons.collections4.CollectionUtils;
@@ -39,7 +51,7 @@ import org.springframework.web.server.ServerWebExchange;
 @Service
 @Slf4j
 public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
-    implements DataTypeChecker {
+    implements DataTypeChecker, AssetReader {
   public static final String MAPPING_MATRIX_KEY = "mappingMatrixKey";
   public static final String TARGET_KEY = "targetKey";
   public static final String MATRIX = "matrix";
@@ -47,17 +59,26 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
   public static final String PARAM_NAME = "param";
   public static final String NOT_FOUND = "notFound";
   public static final String COLON = ":";
+  public static final String WORKFLOW_PREFIX = "workflow.";
+  public static final String MODIFICATION_RULE_KEY = "modificationFilterRule";
   public static final String EXPECTED422_PATH_KEY = "expect-http-status-422-if-missing";
+  public static final String ROUTE_PARAMS = "routeParams";
   private final UnifiedAssetService unifiedAssetService;
   private final UnifiedAssetRepository unifiedAssetRepository;
+  private final HttpRequestRepository httpRequestRepository;
+  @Getter private final ResourceLoaderFactory resourceLoaderFactory;
 
   public MappingMatrixCheckerActionRunner(
       AppProperty appProperty,
       UnifiedAssetService unifiedAssetService,
-      UnifiedAssetRepository unifiedAssetRepository) {
+      UnifiedAssetRepository unifiedAssetRepository,
+      HttpRequestRepository httpRequestRepository,
+      ResourceLoaderFactory resourceLoaderFactory) {
     super(appProperty);
     this.unifiedAssetService = unifiedAssetService;
     this.unifiedAssetRepository = unifiedAssetRepository;
+    this.httpRequestRepository = httpRequestRepository;
+    this.resourceLoaderFactory = resourceLoaderFactory;
   }
 
   @Override
@@ -82,7 +103,8 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     String matrixKey = inputs.get(MAPPING_MATRIX_KEY).toString();
     String targetKey = inputs.get(TARGET_KEY).toString();
     if (unifiedAssetRepository.findOneByKey(targetKey).isEmpty()) {
-      throw KrakenException.badRequest(API_CASE_NOT_SUPPORTED.formatted("not deployed"));
+      throw KrakenException.unProcessableEntityInvalidValue(
+          API_CASE_NOT_SUPPORTED.formatted(inputs.get(ROUTE_PARAMS)));
     }
     if (StringUtils.isNotBlank(matrixKey)
         && matrixKey.endsWith(NOT_FOUND)
@@ -112,6 +134,8 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     // matrix checking, if-missing-return-400, wrong-value-return-422, paths under
     // 'expect-http-status-422-if-missing' always return 422
     checkMatrixConstraints(facets, targetKey, inputs, pathsExpected422);
+    // check modification conditions
+    checkModifyConstraints(readModificationRules(matrixAssets), targetKey, inputs);
     // mapper checking, if-missing-return-400, wrong-value-return-422, paths under
     // 'expect-http-status-422-if-missing' always return 422
     checkMapperConstraints(targetKey, inputs, pathsExpected422);
@@ -125,11 +149,31 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
   }
 
   public List<String> readExpected422Paths(Paging<UnifiedAssetDto> assetDtoPaging) {
-    Object obj =
-        assetDtoPaging.getData().get(0).getFacets().getOrDefault(EXPECTED422_PATH_KEY, null);
-    return Objects.isNull(obj)
-        ? List.of()
-        : JsonToolkit.fromJson(JsonToolkit.toJson(obj), new TypeReference<>() {});
+    return readFacetList(
+        assetDtoPaging, EXPECTED422_PATH_KEY, new TypeReference<List<String>>() {});
+  }
+
+  public List<FilterRule> readModificationRules(Paging<UnifiedAssetDto> assetDtoPaging) {
+    return readFacetList(
+        assetDtoPaging, MODIFICATION_RULE_KEY, new TypeReference<List<FilterRule>>() {});
+  }
+
+  private <T> List<T> readFacetList(
+      Paging<UnifiedAssetDto> assetDtoPaging, String key, TypeReference<List<T>> typeReference) {
+    if (assetDtoPaging == null || assetDtoPaging.getData().isEmpty()) {
+      return Collections.emptyList();
+    }
+
+    UnifiedAssetDto firstAsset = assetDtoPaging.getData().get(0);
+    Map<String, Object> facets = firstAsset.getFacets();
+    if (facets == null || !facets.containsKey(key)) {
+      return Collections.emptyList();
+    }
+
+    Object obj = facets.get(key);
+    return (obj == null)
+        ? Collections.emptyList()
+        : JsonToolkit.fromJson(JsonToolkit.toJson(obj), typeReference);
   }
 
   public Paging<UnifiedAssetDto> queryMatrixAssets(String matrixKey) {
@@ -222,7 +266,12 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
   public boolean checkExpect(PathCheck pathCheck, Object value) {
     switch (pathCheck.expectType()) {
       case EXPECTED -> {
-        return pathCheck.value().equalsIgnoreCase(wrapAsString(value));
+        if (pathCheck.value().contains(COMMA)) {
+          return Arrays.stream(pathCheck.value().split(COMMA_SPACE_EXPRESSION))
+              .anyMatch(item -> item.equalsIgnoreCase(wrapAsString(value)));
+        } else {
+          return pathCheck.value().equalsIgnoreCase(wrapAsString(value));
+        }
       }
       case EXPECTED_START_WITH -> {
         return wrapAsString(value).startsWith(pathCheck.value());
@@ -267,17 +316,101 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     return false;
   }
 
+  public void checkModifyConstraints(
+      List<FilterRule> filterRules, String targetKey, Map<String, Object> inputs) {
+    if (CollectionUtils.isEmpty(filterRules)) {
+      return;
+    }
+    // Reading the configurable items to compare
+    Optional<UnifiedAsset> modifyAssetOpt = readFromPath(getAppProperty().getModifyUseCase());
+    if (modifyAssetOpt.isEmpty()) {
+      return;
+    }
+    UnifiedAsset modifyAsset = modifyAssetOpt.get();
+    ComponentValidationFacets modifyFacets =
+        UnifiedAsset.getFacets(modifyAsset, ComponentValidationFacets.class);
+    Set<String> supportedUseCases =
+        modifyFacets.getModificationRules().stream()
+            .map(ComponentValidationFacets.ModificationRule::getUseCase)
+            .collect(Collectors.toSet());
+    UnifiedAssetDto targetAsset = unifiedAssetService.findOne(targetKey);
+    String mapperKey = targetAsset.getMetadata().getMapperKey();
+    if (!supportedUseCases.contains(mapperKey)) {
+      return;
+    }
+    Optional<ComponentValidationFacets.ModificationRule> modificationRuleOpt =
+        modifyFacets.getModificationRules().stream()
+            .filter(item -> item.getUseCase().equals(mapperKey))
+            .findFirst();
+    if (modificationRuleOpt.isEmpty()) {
+      return;
+    }
+    ComponentValidationFacets.ModificationRule modificationRule = modificationRuleOpt.get();
+    // Read instance id
+    DocumentContext documentContext = JsonPath.parse(inputs);
+    // 400 if no parameter
+    FilterRule filterRule = filterRules.get(0);
+    Object instanceObj =
+        readByPathWithException(documentContext, filterRule.getQueryPath().trim(), List.of(), "");
+    if (Objects.isNull(instanceObj)) {
+      throw KrakenException.badRequestInvalidBody(
+          "The value cannot be null for path:" + filterRule.getQueryPath());
+    }
+    // Query Order payload by instance id
+    List<HttpRequestEntity> httpRequestEntities =
+        httpRequestRepository.findByProductInstanceId((String) instanceObj);
+    // 404 if not found
+    if (CollectionUtils.isEmpty(httpRequestEntities)) {
+      throw KrakenException.notFound(
+          "instanceId not exist", new IllegalArgumentException("instanceId not exist"));
+    }
+    // Filter the add order and reading the order payload
+    HttpRequestEntity orderRequest =
+        httpRequestEntities.stream()
+            .filter(
+                item -> {
+                  String request = JsonToolkit.toJson(item.getRequest());
+                  return filterRequest(request, filterRule);
+                })
+            .findFirst()
+            .orElseThrow(
+                () ->
+                    KrakenException.unProcessableEntityInvalidValue(
+                        "The instanceId has no matched order"));
+
+    String existPayload = JsonToolkit.toJson(orderRequest.getRequest());
+    // Check mapping items with the order payload
+    Object bodyObj = inputs.getOrDefault("body", null);
+    String requestBody = JsonToolkit.toJson(bodyObj);
+    checkModificationItems(requestBody, existPayload, modificationRule);
+  }
+
   public void checkMapperConstraints(
       String targetKey, Map<String, Object> inputs, List<String> pathsExpected422) {
     UnifiedAssetDto assetDto = unifiedAssetService.findOne(targetKey);
     UnifiedAssetDto mapperAsset =
         unifiedAssetService.findOne(assetDto.getMetadata().getMapperKey());
-    ComponentAPITargetFacets.Mappers mappers =
-        UnifiedAsset.getFacets(mapperAsset, ComponentAPITargetFacets.class)
-            .getEndpoints()
-            .get(0)
-            .getMappers();
-    List<ComponentAPITargetFacets.Mapper> request = mappers.getRequest();
+    ComponentAPITargetFacets facets =
+        UnifiedAsset.getFacets(mapperAsset, ComponentAPITargetFacets.class);
+    List<ComponentAPITargetFacets.Mapper> request = new ArrayList<>();
+    if (facets.getWorkflow() != null && facets.getWorkflow().isEnabled()) {
+      UnifiedAssetDto workflowAsset = unifiedAssetService.findOne(facets.getWorkflow().getKey());
+      ComponentWorkflowFacets workflowFacets =
+          UnifiedAsset.getFacets(workflowAsset, ComponentWorkflowFacets.class);
+      if (workflowFacets.getValidationMapper() != null) {
+        request.addAll(workflowFacets.getValidationMapper());
+        request.addAll(fetchMapper(workflowFacets.getExecutionStage()));
+        request.addAll(fetchMapper(workflowFacets.getValidationStage()));
+        request.addAll(fetchMapper(workflowFacets.getPreparationStage()));
+      }
+    } else {
+      ComponentAPITargetFacets.Mappers mappers =
+          UnifiedAsset.getFacets(mapperAsset, ComponentAPITargetFacets.class)
+              .getEndpoints()
+              .get(0)
+              .getMappers();
+      request.addAll(mappers.getRequest());
+    }
     DocumentContext documentContext = JsonPath.parse(inputs);
     for (ComponentAPITargetFacets.Mapper mapper : request) {
       if (StringUtils.isBlank(mapper.getTarget())) {
@@ -294,6 +427,13 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
         checkMappingValue(documentContext, mapper, inputs, pathsExpected422);
       }
     }
+  }
+
+  private static List<ComponentAPITargetFacets.Mapper> fetchMapper(List<HttpTask> workflowFacets) {
+    return workflowFacets.stream()
+        .flatMap(httpTask -> httpTask.getEndpoint().getMappers().getRequest().stream())
+        .filter(mapper -> !mapper.getTarget().contains(WORKFLOW_PREFIX))
+        .toList();
   }
 
   public void checkConstantValue(

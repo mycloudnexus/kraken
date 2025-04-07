@@ -65,6 +65,7 @@ class ResponseCodeTransformTest extends AbstractIntegrationTest implements Respo
     list.forEach(
         item -> {
           deleteByPath(item, doc);
+          ;
         });
     String result = doc.jsonString();
     System.out.println(result);
