@@ -30,6 +30,8 @@ spec:
           params:
             - key: productType
               val: uni
+            - key: action
+              val: add
         request:
           - name: mapper.order.uni.add.place.id
             title: >-
