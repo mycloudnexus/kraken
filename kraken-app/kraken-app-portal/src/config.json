@@ -1,7 +1,7 @@
 {
   "activityLogPages": [
     {
-      "label": "Api Activity Log V5",
+      "label": "Api Activity Log V6",
       "key": "activityLog",
       "path": "./components/tabs/ApiActivityLogTab"
     }
