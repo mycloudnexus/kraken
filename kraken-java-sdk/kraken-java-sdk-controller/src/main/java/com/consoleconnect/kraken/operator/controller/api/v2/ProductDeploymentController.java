@@ -7,6 +7,7 @@ import com.consoleconnect.kraken.operator.controller.aspect.TemplateUpgradeBlock
 import com.consoleconnect.kraken.operator.controller.dto.*;
 import com.consoleconnect.kraken.operator.controller.service.ComponentTagService;
 import com.consoleconnect.kraken.operator.controller.service.ProductDeploymentService;
+import com.consoleconnect.kraken.operator.core.annotation.LogExecutionTime;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.enums.DeployStatusEnum;
 import com.consoleconnect.kraken.operator.core.enums.ReleaseKindEnum;
@@ -93,6 +94,7 @@ public class ProductDeploymentController {
 
   @Operation(summary = "list deployment at api mapper level")
   @GetMapping("api-mapper-deployments")
+  @LogExecutionTime
   public HttpResponse<Paging<ApiMapperDeploymentDTO>> retrieveApiMapperDeployment(
       @PathVariable String productId,
       @RequestParam(value = "envId", required = false) String envId,
