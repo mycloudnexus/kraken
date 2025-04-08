@@ -1,0 +1,14 @@
+
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.2.0.0
+  name: V2.0.0
+  labels:
+    productSpec: grace
+    productVersion: V2.0.0
+    publishDate: 2025-04-08
+  description: |
+    fix workflow template initial load failed
+  version: 1
