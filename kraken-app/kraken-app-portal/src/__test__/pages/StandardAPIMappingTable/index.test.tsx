@@ -8,12 +8,14 @@ import { render, screen } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import { vi } from "vitest";
 
+let mockedProductType = "UNI"; // default value
+
 vi.mock("react-router-dom", async () => {
   const actual = await vi.importActual("react-router-dom");
   return {
     ...actual,
     useLocation: () => ({
-      state: { productType: "UNI" },
+      state: { productType: mockedProductType },
     }),
   };
 });
@@ -149,6 +151,8 @@ test("productTypeOptions should return correct options", async () => {
 });
 
 test("filteredComponentList should exclude SHARE if productType is not SHARE", () => {
+  mockedProductType = "SHARED";
+  
   vi.spyOn(mappingStore, "useMappingUiStore").mockReturnValue({
     currentProduct: "test",
   });
