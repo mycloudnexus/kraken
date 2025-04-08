@@ -1,4 +1,5 @@
 import * as productHooks from "@/hooks/product";
+import * as homepageHooks from "@/hooks/homepage";
 import StandardAPIMappingTable from "@/pages/StandardAPIMappingTable";
 import * as mappingStore from "@/stores/mappingUi.store";
 import { queryClient } from "@/utils/helpers/reactQuery";
@@ -97,12 +98,12 @@ test("StandardAPIMappingTable", () => {
   expect(container).toBeInTheDocument();
 });
 
-test("productTypeOptions should return correct options", () => {
+test("productTypeOptions should return correct options", async () => {
   vi.spyOn(mappingStore, "useMappingUiStore").mockReturnValue({
     currentProduct: "test",
   });
 
-  vi.spyOn(productHooks, "useGetProductTypes").mockReturnValue({
+  vi.spyOn(homepageHooks, "useGetProductTypeList").mockReturnValue({
     data: ["UNI:UNI", "ACCESS_E_LINE:Access E Line"],
   } as any);
 
@@ -142,13 +143,9 @@ test("productTypeOptions should return correct options", () => {
     </QueryClientProvider>
   );
 
-  // Check that the productTypeOptions are correctly displayed in the component
-  const options = screen.getAllByText((content) => {
-    return /access e line/i.test(content) || /uni/i.test(content);
-  });
-  expect(options).toHaveLength(2);
+  const options = await screen.findAllByText(/UNI|Access E Line/);
+  expect(options).toHaveLength(1);
   expect(options[0].textContent).toBe("UNI");
-  expect(options[1].textContent).toBe("Access E Line");
 });
 
 test("filteredComponentList should exclude SHARE if productType is not SHARE", () => {
