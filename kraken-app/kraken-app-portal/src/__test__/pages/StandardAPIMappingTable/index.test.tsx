@@ -150,6 +150,39 @@ test("productTypeOptions should return correct options", async () => {
   expect(options[0].textContent).toBe("UNI");
 });
 
+test("filteredComponentList returns empty array if componentList is empty", () => {
+  mockedProductType = "UNI";
+
+  vi.spyOn(mappingStore, "useMappingUiStore").mockReturnValue({
+    currentProduct: "test",
+  });
+
+  vi.spyOn(productHooks, "useGetComponentListAPI").mockReturnValue({
+    data: [],
+  } as any);
+
+  vi.spyOn(productHooks, "useGetComponentDetail").mockReturnValue({ data: {} } as any);
+
+  vi.spyOn(productHooks, "useGetComponentDetailMapping").mockReturnValue({
+    data: { details: [] },
+    isLoading: false,
+    isFetching: false,
+    isFetched: true,
+  } as any);
+
+  const { container } = render(
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <StandardAPIMappingTable />
+      </BrowserRouter>
+    </QueryClientProvider>
+  );
+
+  // Should render with no components
+  expect(container.innerHTML).not.toContain("SHARE Component");
+  expect(container.innerHTML).not.toContain("Non-SHARE Component");
+});
+
 test("filteredComponentList should exclude SHARE if productType is not SHARE", () => {
   mockedProductType = "UNI";
 
