@@ -134,7 +134,7 @@ test("productTypeOptions should return correct options", () => {
     ],
   } as any);
 
-  const { container } = render(
+  render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <StandardAPIMappingTable />
@@ -219,7 +219,7 @@ test("filteredComponentList should exclude SHARE if productType is not SHARE", (
     isFetched: true,
   } as any);
 
-  const { container } = render(
+  render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <StandardAPIMappingTable />
