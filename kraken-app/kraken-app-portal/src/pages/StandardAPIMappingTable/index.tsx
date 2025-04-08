@@ -33,6 +33,21 @@ type ProductTypeOption = {
   label: string;
 };
 
+type ComponentItem = {
+  metadata: {
+    id: string;
+    name: string;
+    key: string;
+  };
+  facets?: {
+    supportedProductTypesAndActions?: {
+      path: string;
+      method: string;
+      productTypes: string[];
+    }[];
+  };
+};
+
 const StandardAPIMappingTable = () => {
   const navigate = useNavigate();
   const { componentId } = useParams();
@@ -105,6 +120,26 @@ const StandardAPIMappingTable = () => {
     }, []);
   }, [productTypeList]);
 
+  const filteredComponentList = useMemo(() => {
+    const components = (componentList?.data ?? []) as ComponentItem[];
+    if (!components.length) return [];
+    if (productType === "SHARE") {
+      return components.filter((item) => {
+        const supportedTypes = item.facets?.supportedProductTypesAndActions ?? [];
+        return supportedTypes?.some((entry) =>
+          entry.productTypes?.includes("SHARE")
+        );
+      });
+    } else {
+      return components.filter((item) => {
+        const supportedTypes = item.facets?.supportedProductTypesAndActions ?? [];
+        return supportedTypes?.every((entry) =>
+          !entry.productTypes?.includes("SHARE")
+        );
+      });
+    }
+  }, [componentList, productType]);
+  
   const columns: TableColumnsType = [
     {
       title: "Endpoints",
@@ -179,7 +214,7 @@ const StandardAPIMappingTable = () => {
             mainUrl="/components"
             lastItem={
               <ComponentSelect
-                componentList={componentList}
+                componentList={{data : filteredComponentList}}
                 componentName={componentName}
                 productType={productType}
               />
