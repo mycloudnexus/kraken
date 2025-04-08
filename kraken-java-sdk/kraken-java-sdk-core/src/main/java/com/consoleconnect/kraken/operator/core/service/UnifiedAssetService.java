@@ -6,6 +6,7 @@ import static com.consoleconnect.kraken.operator.core.toolkit.LabelConstants.FUN
 import static com.consoleconnect.kraken.operator.core.toolkit.StringUtils.readWithJsonPath;
 
 import com.consoleconnect.kraken.operator.core.dto.AssetLinkDto;
+import com.consoleconnect.kraken.operator.core.dto.SearchQueryParams;
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.entity.AssetFacetEntity;
@@ -24,6 +25,7 @@ import com.consoleconnect.kraken.operator.core.repo.AssetFacetRepository;
 import com.consoleconnect.kraken.operator.core.repo.AssetLinkRepository;
 import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
 import com.consoleconnect.kraken.operator.core.toolkit.*;
+import com.fasterxml.jackson.core.type.TypeReference;
 import jakarta.persistence.criteria.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -84,13 +86,14 @@ public class UnifiedAssetService implements UUIDWrapper, FacetsMerger {
 
   @Transactional(readOnly = true)
   public Paging<UnifiedAssetDto> search(
-      String parentId,
-      String kind,
-      boolean facetIncluded,
-      String q,
-      String parentProductType,
-      PageRequest pageRequest) {
-    return performSearch(parentId, kind, facetIncluded, q, parentProductType, pageRequest);
+      SearchQueryParams searchQueryParams, PageRequest pageRequest) {
+    return performSearch(
+        searchQueryParams.getParentId(),
+        searchQueryParams.getKind(),
+        searchQueryParams.isFacetIncluded(),
+        searchQueryParams.getQuery(),
+        searchQueryParams.getParentProductType(),
+        pageRequest);
   }
 
   @Transactional(readOnly = true)
@@ -139,34 +142,47 @@ public class UnifiedAssetService implements UUIDWrapper, FacetsMerger {
   }
 
   public void fillSupportedProductType(List<UnifiedAssetDto> content) {
+    if (CollectionUtils.isEmpty(content)) {
+      return;
+    }
+    Map<String, Object> supportedTypesMap = getSupportedProductTypesMap();
     content.stream()
-        .filter(v -> v.getKind().equalsIgnoreCase(COMPONENT_API.getKind()) && v.getFacets() != null)
+        .filter(
+            assetDto ->
+                assetDto.getKind().equalsIgnoreCase(COMPONENT_API.getKind())
+                    && assetDto.getFacets() != null)
         .forEach(
             asset -> {
               ComponentAPIFacets facets = UnifiedAsset.getFacets(asset, ComponentAPIFacets.class);
-              List<ComponentAPIFacets.SupportedProductAndAction> supportedTypesAndActions =
-                  facets.getSupportedProductTypesAndActions();
-              if (supportedTypesAndActions == null) {
+              if (null == facets
+                  || CollectionUtils.isEmpty(facets.getSupportedProductTypesAndActions())) {
                 return;
               }
-              supportedTypesAndActions.stream()
+              facets
+                  .getSupportedProductTypesAndActions()
                   .forEach(
                       typeAndAction -> {
                         try {
-                          typeAndAction.setProductTypes(
-                              (List<String>)
-                                  readWithJsonPath(
-                                      JsonToolkit.fromJson(
-                                          JsonToolkit.toJson(
-                                              appProperty.getSupportedProductTypes()),
-                                          Map.class),
-                                      typeAndAction.getSupportedConfig()));
+                          String configPath = typeAndAction.getSupportedConfig();
+                          if (StringUtils.isNotBlank(configPath)) {
+                            @SuppressWarnings("unchecked")
+                            List<String> productTypes =
+                                (List<String>) readWithJsonPath(supportedTypesMap, configPath);
+                            typeAndAction.setProductTypes(productTypes);
+                          }
                         } catch (Exception e) {
                           log.warn("no supported type configuration");
                         }
                       });
-              asset.setFacets(JsonToolkit.fromJson(JsonToolkit.toJson(facets), Map.class));
+              // Convert back to Map for facet update
+              asset.setFacets(JsonToolkit.convertToMap(facets));
             });
+  }
+
+  private Map<String, Object> getSupportedProductTypesMap() {
+    return JsonToolkit.fromJson(
+        JsonToolkit.toJson(appProperty.getSupportedProductTypes()),
+        new TypeReference<Map<String, Object>>() {});
   }
 
   private List<UnifiedAssetEntity> filterExcludedAssets(List<UnifiedAssetEntity> data) {

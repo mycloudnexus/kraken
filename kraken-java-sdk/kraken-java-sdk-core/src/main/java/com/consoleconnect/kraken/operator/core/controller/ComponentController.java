@@ -3,6 +3,7 @@ package com.consoleconnect.kraken.operator.core.controller;
 import static com.consoleconnect.kraken.operator.core.service.UnifiedAssetService.getSearchPageRequest;
 
 import com.consoleconnect.kraken.operator.core.dto.AssetLinkDto;
+import com.consoleconnect.kraken.operator.core.dto.SearchQueryParams;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
@@ -36,6 +37,7 @@ public class ComponentController {
           boolean facetIncluded,
       @RequestParam(value = "q", required = false) String q,
       @RequestParam(value = "parentProductType", required = false) String parentProductType,
+      @RequestParam(value = "productType", required = false) String productType,
       @RequestParam(value = "orderBy", required = false, defaultValue = "createdAt") String orderBy,
       @RequestParam(value = "direction", required = false, defaultValue = "DESC")
           Sort.Direction direction,
@@ -44,14 +46,17 @@ public class ComponentController {
       @RequestParam(value = "size", required = false, defaultValue = PagingHelper.DEFAULT_SIZE_STR)
           int size) {
     String productUuid = this.service.findOne(productId).getId();
+    SearchQueryParams searchQueryParams =
+        SearchQueryParams.builder()
+            .parentId(productUuid)
+            .kind(kind)
+            .facetIncluded(facetIncluded)
+            .query(q)
+            .parentProductType(parentProductType)
+            .build();
     return HttpResponse.ok(
         this.service.search(
-            productUuid,
-            kind,
-            facetIncluded,
-            q,
-            parentProductType,
-            getSearchPageRequest(page, size, direction, orderBy)));
+            searchQueryParams, getSearchPageRequest(page, size, direction, orderBy)));
   }
 
   @Operation(summary = "Retrieve a component by id")
