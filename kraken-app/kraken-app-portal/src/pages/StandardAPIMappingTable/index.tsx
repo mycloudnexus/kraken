@@ -9,7 +9,7 @@ import {
   useGetComponentDetailMapping,
 } from "@/hooks/product";
 import {
-  useGetProductTypeList
+  useGetProductTypeList,
 } from "@/hooks/homepage";
 import { useAppStore } from "@/stores/app.store";
 import { IMapperDetails } from "@/utils/types/env.type";
