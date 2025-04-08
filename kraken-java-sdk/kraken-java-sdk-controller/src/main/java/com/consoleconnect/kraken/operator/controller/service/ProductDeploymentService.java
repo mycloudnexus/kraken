@@ -969,8 +969,6 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
               deploymentDTO.setTagId(payload.getTagId());
               deploymentDTO.setEnvId(environment.getId());
               deploymentDTO.setEnvName(environment.getName());
-              fillVerifiedInfo(tagAsset, deploymentDTO, envId);
-              calculateCanDeployToTargetEnv(deploymentDTO);
               deploymentDTO.setComponentKey(mapper2Component.get(mapperKey).getKey());
               deploymentDTO.setComponentName(mapper2Component.get(mapperKey).getValue());
               return deploymentDTO;
