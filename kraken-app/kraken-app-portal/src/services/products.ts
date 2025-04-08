@@ -240,7 +240,7 @@ export const getRunningAPIMappingList = (
   productId: string,
   params: Record<string, any>
 ) => {
-  return request(`/v2${PRODUCT}/${productId}/running-api-mapper-deployments`, {
+  return request(`/v3${PRODUCT}/${productId}/running-api-mapper-deployments`, {
     method: "GET",
     params,
   });

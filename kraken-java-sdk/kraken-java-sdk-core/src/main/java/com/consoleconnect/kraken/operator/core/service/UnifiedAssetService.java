@@ -5,6 +5,7 @@ import static com.consoleconnect.kraken.operator.core.enums.AssetKindEnum.COMPON
 import static com.consoleconnect.kraken.operator.core.toolkit.LabelConstants.FUNCTION_JSON_EXTRACT_PATH_TEXT;
 import static com.consoleconnect.kraken.operator.core.toolkit.StringUtils.readWithJsonPath;
 
+import com.consoleconnect.kraken.operator.core.annotation.LogExecutionTime;
 import com.consoleconnect.kraken.operator.core.dto.AssetLinkDto;
 import com.consoleconnect.kraken.operator.core.dto.SearchQueryParams;
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
@@ -310,6 +311,7 @@ public class UnifiedAssetService implements UUIDWrapper, FacetsMerger {
   }
 
   @Transactional
+  @LogExecutionTime
   public IngestionDataResult syncAsset(
       String parentKey, UnifiedAsset data, SyncMetadata syncMetadata, boolean enforceSync) {
     log.info(
@@ -653,5 +655,14 @@ public class UnifiedAssetService implements UUIDWrapper, FacetsMerger {
     return getUUID(idOrKey)
         .map(assetRepository::existsById)
         .orElseGet(() -> assetRepository.existsByKey(idOrKey));
+  }
+
+  @Transactional(readOnly = true)
+  public UnifiedAssetDto findOneIfExist(String idOrKey) {
+    if (existed(idOrKey)) {
+      UnifiedAssetEntity entity = findOneByIdOrKey(idOrKey);
+      return toAsset(entity, true);
+    }
+    return null;
   }
 }
