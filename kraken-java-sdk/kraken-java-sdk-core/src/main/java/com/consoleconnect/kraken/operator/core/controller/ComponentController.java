@@ -37,7 +37,6 @@ public class ComponentController {
           boolean facetIncluded,
       @RequestParam(value = "q", required = false) String q,
       @RequestParam(value = "parentProductType", required = false) String parentProductType,
-      @RequestParam(value = "productType", required = false) String productType,
       @RequestParam(value = "orderBy", required = false, defaultValue = "createdAt") String orderBy,
       @RequestParam(value = "direction", required = false, defaultValue = "DESC")
           Sort.Direction direction,
