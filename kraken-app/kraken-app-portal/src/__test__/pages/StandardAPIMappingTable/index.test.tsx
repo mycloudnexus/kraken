@@ -143,7 +143,9 @@ test("productTypeOptions should return correct options", () => {
   );
 
   // Check that the productTypeOptions are correctly displayed in the component
-  const options = screen.getAllByText(/Access E Line|UNI/);
+  const options = screen.getAllByText((content) => {
+    return /access e line/i.test(content) || /uni/i.test(content);
+  });
   expect(options).toHaveLength(2);
   expect(options[0].textContent).toBe("UNI");
   expect(options[1].textContent).toBe("Access E Line");
