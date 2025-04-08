@@ -43,7 +43,7 @@ public interface LatestDeploymentCalculator {
                 eqConditions,
                 labelConditions,
                 null,
-                PageRequest.of(0, 10, Sort.Direction.DESC, FIELD_CREATE_AT),
+                PageRequest.of(0, 1, Sort.Direction.DESC, FIELD_CREATE_AT),
                 null);
     return deployments.getData().stream().findFirst();
   }

@@ -2,6 +2,7 @@ package com.consoleconnect.kraken.operator.controller.api.v3;
 
 import com.consoleconnect.kraken.operator.controller.dto.ApiMapperDeploymentDTO;
 import com.consoleconnect.kraken.operator.controller.service.ProductDeploymentService;
+import com.consoleconnect.kraken.operator.core.annotation.LogExecutionTime;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,9 +22,9 @@ public class ProductDeploymentV3Controller {
 
   @Operation(summary = "list running api mapper deployments in the env")
   @GetMapping("running-api-mapper-deployments")
+  @LogExecutionTime
   public HttpResponse<List<ApiMapperDeploymentDTO>> retrieveApiMapperDeployment(
       @PathVariable String productId, @RequestParam String envId) {
-
     return HttpResponse.ok(productDeploymentService.listRunningApiMapperDeploymentV3(envId));
   }
 }
