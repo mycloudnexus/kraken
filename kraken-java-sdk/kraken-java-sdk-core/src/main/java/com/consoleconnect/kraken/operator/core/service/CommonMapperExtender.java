@@ -1,6 +1,6 @@
 package com.consoleconnect.kraken.operator.core.service;
 
-import static com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants.CUSTOMIZED_PLACE_HOLDER;
+import static com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants.CUSTOMIZED_PLACE_HOLDER_WITH_VALUE;
 import static com.consoleconnect.kraken.operator.core.toolkit.ConstructExpressionUtil.extractMapperParam;
 
 import com.consoleconnect.kraken.operator.core.model.CommonMapperRef;
@@ -93,8 +93,13 @@ public interface CommonMapperExtender extends AssetReader {
           (original, setter) -> {
             List<String> extractedParams = extractMapperParam(original);
             if (CollectionUtils.isNotEmpty(extractedParams)) {
-              String replacement = paramMap.getOrDefault(extractedParams.get(0), "");
-              setter.accept(original.replaceAll(CUSTOMIZED_PLACE_HOLDER, replacement));
+              for (String param : extractedParams) {
+                String replacement = paramMap.getOrDefault(param, "");
+                original =
+                    original.replace(
+                        String.format(CUSTOMIZED_PLACE_HOLDER_WITH_VALUE, param), replacement);
+                setter.accept(original);
+              }
             } else {
               setter.accept(original);
             }
