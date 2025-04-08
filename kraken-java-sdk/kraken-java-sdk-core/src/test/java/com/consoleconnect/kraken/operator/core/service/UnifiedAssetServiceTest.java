@@ -531,4 +531,10 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
       Assertions.assertTrue(MapUtils.isNotEmpty(result));
     }
   }
+
+  @Test
+  void givenInitialization_whenFindIfExists_thenReturnData() {
+    UnifiedAssetDto assetDto = unifiedAssetService.findOneIfExist("mef.sonata.api-spec.order");
+    Assertions.assertNotNull(assetDto);
+  }
 }
