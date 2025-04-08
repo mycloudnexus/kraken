@@ -533,7 +533,7 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
   }
 
   @Test
-  void givenInitialCreate_whenFindIfExists_thenReturnData() throws Exception {
+  void givenInitialization_whenFindIfExists_thenReturnData() {
     UnifiedAssetDto assetDto = unifiedAssetService.findOneIfExist("mef.sonata.api-spec.order");
     Assertions.assertNotNull(assetDto);
   }
