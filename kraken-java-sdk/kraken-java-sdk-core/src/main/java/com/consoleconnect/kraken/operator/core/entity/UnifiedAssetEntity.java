@@ -20,6 +20,7 @@ import org.hibernate.annotations.Type;
       @Index(name = "kraken_asset_idx_kind_name", columnList = "kind,name"),
       @Index(name = "kraken_asset_idx_parentId", columnList = "parent_id"),
       @Index(name = "kraken_asset_idx_status", columnList = "status"),
+      @Index(name = "kraken_asset_idx_kind_createdAt", columnList = "kind,created_at"),
       @Index(name = "kraken_asset_idx_kind_status", columnList = "kind,status")
     },
     uniqueConstraints = {
