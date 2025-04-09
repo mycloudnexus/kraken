@@ -8,6 +8,9 @@ import {
   useGetComponentDetail,
   useGetComponentDetailMapping,
 } from "@/hooks/product";
+import {
+  useGetProductTypeList,
+} from "@/hooks/homepage";
 import { useAppStore } from "@/stores/app.store";
 import { IMapperDetails } from "@/utils/types/env.type";
 import { Badge, Button, Flex, Spin, Table, TableColumnsType } from "antd";
@@ -23,6 +26,29 @@ interface RowSpanDetails {
     firstIndex?: number;
   };
 }
+
+// Define this type above your component
+type ProductTypeOption = {
+  key: string;
+  label: string;
+};
+
+type ComponentItem = {
+  kind: string;
+  apiVersion: string;
+  metadata: {
+    id: string;
+    name: string;
+    key: string;
+  };
+  facets?: {
+    supportedProductTypesAndActions?: {
+      path: string;
+      method: string;
+      productTypes: string[];
+    }[];
+  };
+};
 
 const StandardAPIMappingTable = () => {
   const navigate = useNavigate();
@@ -41,6 +67,8 @@ const StandardAPIMappingTable = () => {
       componentId ?? "",
       productType
     );
+  
+  const { data: productTypeList } = useGetProductTypeList(currentProduct);
 
   const componentName = useMemo(
     () => get(componentDetail, "metadata.name", ""),
@@ -81,6 +109,39 @@ const StandardAPIMappingTable = () => {
     return mergePath(filteredData);
   }, [detailDataMapping, productType]);
 
+  const productTypeOptions = useMemo(() => {
+    if (!productTypeList) return [];
+    // Safely assert the type to string[] just inside this block
+    const list = productTypeList as string[];
+    return list.reduce<ProductTypeOption[]>((acc, item) => {
+      const [key, label] = item.split(":");
+      if (key && label) {
+        acc.push({ key, label });
+      }
+      return acc;
+    }, []);
+  }, [productTypeList]);
+
+  const filteredComponentList = useMemo(() => {
+    const components = (componentList?.data ?? []) as ComponentItem[];
+    if (!components.length) return [];
+    if (productType === "SHARE") {
+      return components.filter((item) => {
+        const supportedTypes = item.facets?.supportedProductTypesAndActions ?? [];
+        return supportedTypes?.some((entry) =>
+          entry.productTypes?.includes("SHARE")
+        );
+      });
+    } else {
+      return components.filter((item) => {
+        const supportedTypes = item.facets?.supportedProductTypesAndActions ?? [];
+        return supportedTypes?.every((entry) =>
+          !entry.productTypes?.includes("SHARE")
+        );
+      });
+    }
+  }, [componentList, productType]);
+  
   const columns: TableColumnsType = [
     {
       title: "Endpoints",
@@ -148,11 +209,14 @@ const StandardAPIMappingTable = () => {
           style={{ padding: "5px 0" }}
         >
           <BreadCrumb
-            mainTitle="Standard API mapping"
+            mainTitle={
+              productTypeOptions.find((opt) => opt.key === productType)?.label ??
+              "Standard API mapping"
+            }
             mainUrl="/components"
             lastItem={
               <ComponentSelect
-                componentList={componentList}
+                componentList={{data : filteredComponentList}}
                 componentName={componentName}
                 productType={productType}
               />
