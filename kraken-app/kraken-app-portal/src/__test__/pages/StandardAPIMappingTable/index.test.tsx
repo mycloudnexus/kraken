@@ -158,7 +158,9 @@ test("filteredComponentList returns empty array if componentList is empty", () =
   });
 
   vi.spyOn(productHooks, "useGetComponentListAPI").mockReturnValue({
-    data: [],
+    data: {
+       data: []
+    }
   } as any);
 
   vi.spyOn(productHooks, "useGetComponentDetail").mockReturnValue({ data: {} } as any);
@@ -191,8 +193,8 @@ test("filteredComponentList should exclude SHARE if productType is not SHARE", (
   });
 
   vi.spyOn(productHooks, "useGetComponentListAPI").mockReturnValue({
-    data: [
-      {
+    data: {
+      data: [{
         kind: "kind",
         apiVersion: "v1",
         metadata: {
@@ -227,7 +229,8 @@ test("filteredComponentList should exclude SHARE if productType is not SHARE", (
           ],
         },
       },
-    ],
+    ]
+  }
   } as any);
 
   vi.spyOn(productHooks, "useGetComponentDetail").mockReturnValue({
@@ -288,7 +291,8 @@ test("filteredComponentList should include only SHARE components if productType 
   });
 
   vi.spyOn(productHooks, "useGetComponentListAPI").mockReturnValue({
-    data: [
+    data : { 
+      data: [
       {
         kind: "kind",
         apiVersion: "v1",
@@ -323,7 +327,8 @@ test("filteredComponentList should include only SHARE components if productType 
           ],
         },
       },
-    ],
+    ]
+   }
   } as any);
 
   vi.spyOn(productHooks, "useGetComponentDetail").mockReturnValue({

@@ -34,6 +34,8 @@ type ProductTypeOption = {
 };
 
 type ComponentItem = {
+  kind: string;
+  apiVersion: string;
   metadata: {
     id: string;
     name: string;
