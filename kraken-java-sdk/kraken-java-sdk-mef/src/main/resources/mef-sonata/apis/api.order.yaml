@@ -78,7 +78,7 @@ spec:
                   if (typeof type === 'string' && type.startsWith('UNI')) {
                     targetAPIConfigKey = 'mef.sonata.api-target.order.uni.delete';
                     matrixConfigKey = 'mef.sonata.api.matrix.order.uni.delete'
-                  } else if(typeof type === 'string' && type.startsWith('ACCESS_E_LINE')) {
+                  } else if (typeof type === 'string' && type.startsWith('ACCESS_E_LINE')) {
                     targetAPIConfigKey = 'mef.sonata.api-target.order.eline.delete';
                     matrixConfigKey = 'mef.sonata.api.matrix.order.eline.delete'
                   } else if (type === undefined) {
@@ -137,19 +137,21 @@ spec:
                   errorMsg: errorMsg,
                   errorCode: errorCode,
                   routeParams: {
-                      type: type,
-                      action: action
+                    type: type,
+                    action: action
                   }
                 };
                 return JSON.stringify(ret);
               }
           outputKey: order
+
         - id: mapping_matrix_check_order
           actionType: buildin@mapping-matrix-checker
           env:
             mappingMatrixKey: ${order.matrixConfigKey}
             targetKey: ${order.targetAPIConfigKey}
             routeParams: ${order.routeParams}
+
         - id: persist_http_request
           actionType: buildin@db
           env:
@@ -285,11 +287,13 @@ spec:
                 return JSON.stringify(ret);
               }
           outputKey: order
+
         - id: mapping_matrix_check_read_order
           actionType: buildin@mapping-matrix-checker
           env:
             mappingMatrixKey: ${order.matrixConfigKey}
             targetKey: ${order.targetAPIConfigKey}
+
         - id: load-downstream-api-config
           actionType: buildin@load-target-api-config
           env:
