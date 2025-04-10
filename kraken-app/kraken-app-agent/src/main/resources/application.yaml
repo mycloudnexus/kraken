@@ -84,7 +84,7 @@ springdoc:
       description: localhost
 logging:
   level:
-    com.consoleconnect.kraken: DEBUG
+    com.consoleconnect.kraken: INFO
 #    reactor.netty: DEBUG
 app:
   tenant:
