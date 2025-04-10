@@ -6,6 +6,7 @@ import com.consoleconnect.kraken.operator.controller.dto.UnifiedAssetDetailsDto;
 import com.consoleconnect.kraken.operator.controller.mapper.AssetMapper;
 import com.consoleconnect.kraken.operator.controller.service.ComponentAPIServerService;
 import com.consoleconnect.kraken.operator.core.dto.AssetLinkDto;
+import com.consoleconnect.kraken.operator.core.dto.SearchQueryParams;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
@@ -46,15 +47,16 @@ public class ComponentController {
           int page,
       @RequestParam(value = "size", required = false, defaultValue = PagingHelper.DEFAULT_SIZE_STR)
           int size) {
-
+    SearchQueryParams searchQueryParams =
+        SearchQueryParams.builder()
+            .parentId(productId)
+            .kind(AssetKindEnum.COMPONENT_API.getKind())
+            .facetIncluded(facetIncluded)
+            .query(null)
+            .parentProductType(parentProductType)
+            .build();
     return HttpResponse.ok(
-        service.search(
-            productId,
-            AssetKindEnum.COMPONENT_API.getKind(),
-            facetIncluded,
-            null,
-            parentProductType,
-            getSearchPageRequest(page, size, direction, orderBy)));
+        service.search(searchQueryParams, getSearchPageRequest(page, size, direction, orderBy)));
   }
 
   @Operation(summary = "Retrieve a component details")

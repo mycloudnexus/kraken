@@ -55,6 +55,11 @@ public class JsonToolkit {
     }
   }
 
+  public static Map<String, Object> convertToMap(Object obj) {
+    return JsonToolkit.fromJson(
+        JsonToolkit.toJson(obj), new TypeReference<Map<String, Object>>() {});
+  }
+
   public static <T> T fromJson(Object object, Class<T> classOfT) {
     return fromJson(toJson(object), classOfT);
   }
