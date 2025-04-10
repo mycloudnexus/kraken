@@ -29,6 +29,7 @@ import org.springframework.http.HttpStatus;
 public interface DataTypeChecker {
 
   String API_CASE_NOT_SUPPORTED = "api use case is not supported: %s";
+  String ACTION_NOT_SUPPORTED = "this action is not supported due to business constraints: %s";
   String EXPECT_INT_MSG = "invalidValue, can not process @{{%s}} = %s, %s found, %s expected";
   String EXPECT_INF_MSG = "invalidFormat, can not process @{{%s}} = %s, %s found, %s expected";
   String PARAM_NOT_EXIST_MSG =

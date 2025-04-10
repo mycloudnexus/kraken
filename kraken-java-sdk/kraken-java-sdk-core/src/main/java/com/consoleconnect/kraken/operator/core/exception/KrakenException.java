@@ -12,6 +12,8 @@ public class KrakenException extends RuntimeException {
       "422 UnProcessable Entity, missingProperty";
   private static final String UNPROCESSABLE_ENTITY_INVALID_VALUE =
       "422 UnProcessable Entity, invalidValue";
+  private static final String UNPROCESSABLE_ENTITY_OTHER_ISSUE =
+      "422 UnProcessable Entity, otherIssue";
   private static final String UNPROCESSABLE_ENTITY_INVALID_FORMAT =
       "422 UnProcessable Entity, invalidFormat";
   private static final String BAD_REQUEST_INVALID_BODY = "400 Bad Request, invalidBody";
@@ -62,6 +64,11 @@ public class KrakenException extends RuntimeException {
   public static KrakenException unProcessableEntityInvalidValue(String message) {
     return new KrakenException(
         422, UNPROCESSABLE_ENTITY_INVALID_VALUE, new IllegalArgumentException(message));
+  }
+
+  public static KrakenException unProcessableEntityOtherIssue(String message) {
+    return new KrakenException(
+        422, UNPROCESSABLE_ENTITY_OTHER_ISSUE, new IllegalArgumentException(message));
   }
 
   public static KrakenException unProcessableEntityMissingProperty(String message) {

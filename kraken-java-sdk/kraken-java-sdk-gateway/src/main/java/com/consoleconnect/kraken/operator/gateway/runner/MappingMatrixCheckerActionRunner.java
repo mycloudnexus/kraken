@@ -103,8 +103,8 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     String matrixKey = inputs.get(MAPPING_MATRIX_KEY).toString();
     String targetKey = inputs.get(TARGET_KEY).toString();
     if (unifiedAssetRepository.findOneByKey(targetKey).isEmpty()) {
-      throw KrakenException.unProcessableEntityInvalidValue(
-          API_CASE_NOT_SUPPORTED.formatted(inputs.get(ROUTE_PARAMS)));
+      throw KrakenException.unProcessableEntityOtherIssue(
+          ACTION_NOT_SUPPORTED.formatted(inputs.get(ROUTE_PARAMS)));
     }
     if (StringUtils.isNotBlank(matrixKey)
         && matrixKey.endsWith(NOT_FOUND)

@@ -55,7 +55,7 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest
             KrakenException.class, () -> mappingMatrixCheckerActionRunner.onCheck(inputs));
     MatcherAssert.assertThat(
         krakenException.getCause().getMessage(),
-        Matchers.containsString("api use case is not supported:"));
+        Matchers.containsString("this action is not supported due to business constraints:"));
   }
 
   @Test
@@ -69,8 +69,9 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest
             KrakenException.class, () -> mappingMatrixCheckerActionRunner.onCheck(inputs));
     MatcherAssert.assertThat(
         krakenException.getCause().getMessage(),
-        Matchers.containsString("""
-            api use case is not supported: """));
+        Matchers.containsString(
+            """
+            this action is not supported due to business constraints: """));
   }
 
   @Test
