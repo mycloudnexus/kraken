@@ -200,9 +200,12 @@ const StandardAPIMappingTable = () => {
   ];
 
   const handleNavigate = () => {
+    const mainTitle = productTypeOptions.find((opt) => opt.key === productType)?.label ??
+              "Standard API mapping"
     navigate('StandardAPIMapping', {
       state: {
         productType: productType,
+        mainTitle: mainTitle,
       },
     })
   };
