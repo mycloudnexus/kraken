@@ -23,6 +23,7 @@ import { delay, get, isEmpty, chain, cloneDeep, flatMap, reduce } from "lodash";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router";
 import { useBoolean } from "usehooks-ts";
+import { useLocation } from "react-router-dom";
 import NewAPIMapping from "../NewAPIMapping";
 import DeployHistory from "../NewAPIMapping/components/DeployHistory";
 import { Deployment } from "../NewAPIMapping/components/Deployment";
@@ -36,6 +37,8 @@ import styles from "./index.module.scss";
 const StandardAPIMapping = () => {
   const { currentProduct } = useAppStore();
   const { componentId } = useParams();
+  const { state } = useLocation();
+  const { productType } = state || {};
   const { activePath, setActivePath, selectedKey, setSelectedKey } =
     useMappingUiStore();
 
@@ -309,7 +312,7 @@ const StandardAPIMapping = () => {
           style={{ padding: "5px 0" }}
         >
           <BreadCrumb
-            mainTitle="Standard API mapping"
+            mainTitle= {productType}
             mainUrl="/components"
             items={[
               {

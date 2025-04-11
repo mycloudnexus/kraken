@@ -27,7 +27,6 @@ interface RowSpanDetails {
   };
 }
 
-// Define this type above your component
 type ProductTypeOption = {
   key: string;
   label: string;
@@ -199,6 +198,14 @@ const StandardAPIMappingTable = () => {
       ),
     },
   ];
+
+  const handleNavigate = () => {
+    navigate('StandardAPIMapping', {
+      state: {
+        productType: productType,
+      },
+    })
+  };
 
   return (
     <PageLayout
