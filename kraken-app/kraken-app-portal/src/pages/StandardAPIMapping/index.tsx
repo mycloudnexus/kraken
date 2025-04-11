@@ -38,7 +38,7 @@ const StandardAPIMapping = () => {
   const { currentProduct } = useAppStore();
   const { componentId } = useParams();
   const { state } = useLocation();
-  const { productType } = state || {};
+  const { productType, mainTitle } = state || { productType:"unknown product type", mainTitle:"unknown main title" };
   const { activePath, setActivePath, selectedKey, setSelectedKey } =
     useMappingUiStore();
 
@@ -312,7 +312,7 @@ const StandardAPIMapping = () => {
           style={{ padding: "5px 0" }}
         >
           <BreadCrumb
-            mainTitle= {productType}
+            mainTitle= {mainTitle}
             mainUrl="/components"
             items={[
               {
