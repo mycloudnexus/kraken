@@ -87,10 +87,10 @@ springdoc:
       description: localhost
 logging:
   level:
-    com.consoleconnect.kraken: DEBUG
+    com.consoleconnect.kraken: INFO
     # reactor.netty: DEBUG
     # org.springframework.cloud.gateway: DEBUG
-    org.springframework.security: DEBUG
+    org.springframework.security: INFO
 app:
   tenant:
     workspacePath: classpath:/mock/kraken.yaml
@@ -128,5 +128,5 @@ app:
 
   workflow:
     base-url: https://external-kraken-conductor.dev.consolecore.io/api
-    enabled: true
+    enabled: false
     enable-register-worker: true
