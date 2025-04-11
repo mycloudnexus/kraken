@@ -204,7 +204,6 @@ const StandardAPIMappingTable = () => {
               "Standard API mapping"
     navigate('StandardAPIMapping', {
       state: {
-        productType: productType,
         mainTitle: mainTitle,
       },
     })

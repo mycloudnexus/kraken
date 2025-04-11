@@ -21,7 +21,7 @@ import { Flex, Spin, Button, Tooltip, notification, Drawer } from "antd";
 import dayjs from "dayjs";
 import { delay, get, isEmpty, chain, cloneDeep, flatMap, reduce } from "lodash";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { useBoolean } from "usehooks-ts";
 import { useLocation } from "react-router-dom";
 import NewAPIMapping from "../NewAPIMapping";
@@ -38,7 +38,8 @@ const StandardAPIMapping = () => {
   const { currentProduct } = useAppStore();
   const { componentId } = useParams();
   const { state } = useLocation();
-  const { productType, mainTitle } = state || { productType:"unknown product type", mainTitle:"unknown main title" };
+  console.log("state", state);
+  const { mainTitle } = state || { mainTitle:"unknown main title" };
   const { activePath, setActivePath, selectedKey, setSelectedKey } =
     useMappingUiStore();
 
