@@ -5,7 +5,6 @@ import { PageLayout } from "@/components/Layout";
 import {
   useGetComponentDetail,
   useGetComponentDetailMapping,
-  useGetComponentListAPI,
   useUpdateTargetMapper,
   useGetLatestRunningList,
 } from "@/hooks/product";
@@ -21,7 +20,7 @@ import { Flex, Spin, Button, Tooltip, notification, Drawer } from "antd";
 import dayjs from "dayjs";
 import { delay, get, isEmpty, chain, cloneDeep, flatMap, reduce } from "lodash";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useParams } from "react-router";
 import { useBoolean } from "usehooks-ts";
 import { useLocation } from "react-router-dom";
 import NewAPIMapping from "../NewAPIMapping";
@@ -37,9 +36,9 @@ import styles from "./index.module.scss";
 const StandardAPIMapping = () => {
   const { currentProduct } = useAppStore();
   const { componentId } = useParams();
-  const { state } = useLocation();
-  console.log("state", state);
-  const { mainTitle } = state || { mainTitle:"unknown main title" };
+  const location = useLocation();
+  const { mainTitle } = location.state || { mainTitle:"unknown main title"};
+  const filteredComponentList = location?.state?.filteredComponentList || [];
   const { activePath, setActivePath, selectedKey, setSelectedKey } =
     useMappingUiStore();
 
@@ -67,7 +66,7 @@ const StandardAPIMapping = () => {
     currentProduct,
     componentId ?? ""
   );
-  const { data: componentList } = useGetComponentListAPI(currentProduct);
+  
   const { value: isChangeMappingKey, setValue: setIsChangeMappingKey } =
     useBoolean(false);
 
@@ -319,7 +318,7 @@ const StandardAPIMapping = () => {
               {
                 title: (
                   <ComponentSelect
-                    componentList={componentList}
+                    componentList={{data : filteredComponentList}}
                     componentName={componentName}
                     middle={true}
                   />

@@ -121,6 +121,9 @@ const StandardAPIMappingTable = () => {
     }, []);
   }, [productTypeList]);
 
+  const mainTitle = productTypeOptions.find((opt) => opt.key === productType)?.label ??
+              "Standard API mapping";
+
   const filteredComponentList = useMemo(() => {
     const components = (componentList?.data ?? []) as ComponentItem[];
     if (!components.length) return [];
@@ -192,22 +195,22 @@ const StandardAPIMappingTable = () => {
       title: "Actions",
       dataIndex: "targetKey",
       render: (targetKey) => (
-        <Button type="link" onClick={() => navigate(targetKey)}>
+        <Button type="link" onClick={
+          () => {
+            navigate(targetKey, {
+              state: {
+                mainTitle, 
+                filteredComponentList,
+                productType
+              }
+            })
+           }
+          }>
           Mapping
         </Button>
       ),
     },
   ];
-
-  const handleNavigate = () => {
-    const mainTitle = productTypeOptions.find((opt) => opt.key === productType)?.label ??
-              "Standard API mapping"
-    navigate('StandardAPIMapping', {
-      state: {
-        mainTitle: mainTitle,
-      },
-    })
-  };
 
   return (
     <PageLayout
@@ -218,10 +221,7 @@ const StandardAPIMappingTable = () => {
           style={{ padding: "5px 0" }}
         >
           <BreadCrumb
-            mainTitle={
-              productTypeOptions.find((opt) => opt.key === productType)?.label ??
-              "Standard API mapping"
-            }
+            mainTitle={mainTitle}
             mainUrl="/components"
             lastItem={
               <ComponentSelect
