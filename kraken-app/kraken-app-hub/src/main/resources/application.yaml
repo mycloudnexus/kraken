@@ -130,4 +130,3 @@ app:
     base-url: https://external-kraken-conductor.dev.consolecore.io/api
     enabled: false
     enable-register-worker: false
-
