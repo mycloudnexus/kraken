@@ -92,7 +92,6 @@ const PushHistoryDrawer = ({ isOpen, onClose, envOptions }: Props) => {
   useEffect(() => {
     const stageId = envOptions.find((key) => key.label === "stage")?.value;
     form.setFieldValue("envId", stageId);
-    form.setFieldValue("requestTime", dayjs());
   }, []);
 
   const isFormValid = useMemo(() => {
