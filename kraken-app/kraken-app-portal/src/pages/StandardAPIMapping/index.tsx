@@ -5,7 +5,6 @@ import { PageLayout } from "@/components/Layout";
 import {
   useGetComponentDetail,
   useGetComponentDetailMapping,
-  useGetComponentListAPI,
   useUpdateTargetMapper,
   useGetLatestRunningList,
 } from "@/hooks/product";
@@ -23,6 +22,7 @@ import { delay, get, isEmpty, chain, cloneDeep, flatMap, reduce } from "lodash";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router";
 import { useBoolean } from "usehooks-ts";
+import { useLocation } from "react-router-dom";
 import NewAPIMapping from "../NewAPIMapping";
 import DeployHistory from "../NewAPIMapping/components/DeployHistory";
 import { Deployment } from "../NewAPIMapping/components/Deployment";
@@ -36,6 +36,9 @@ import styles from "./index.module.scss";
 const StandardAPIMapping = () => {
   const { currentProduct } = useAppStore();
   const { componentId } = useParams();
+  const location = useLocation();
+  const { mainTitle } = location.state ?? { mainTitle:"unknown main title"};
+  const filteredComponentList = location?.state?.filteredComponentList ?? [];
   const { activePath, setActivePath, selectedKey, setSelectedKey } =
     useMappingUiStore();
 
@@ -63,7 +66,7 @@ const StandardAPIMapping = () => {
     currentProduct,
     componentId ?? ""
   );
-  const { data: componentList } = useGetComponentListAPI(currentProduct);
+  
   const { value: isChangeMappingKey, setValue: setIsChangeMappingKey } =
     useBoolean(false);
 
@@ -309,13 +312,13 @@ const StandardAPIMapping = () => {
           style={{ padding: "5px 0" }}
         >
           <BreadCrumb
-            mainTitle="Standard API mapping"
+            mainTitle= {mainTitle}
             mainUrl="/components"
             items={[
               {
                 title: (
                   <ComponentSelect
-                    componentList={componentList}
+                    componentList={{data : filteredComponentList}}
                     componentName={componentName}
                     middle={true}
                   />
