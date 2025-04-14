@@ -15,6 +15,7 @@ spec:
       method: post
       actionTypes:
         - add
+        - modify
       productTypes:
         - UNI
         - ACCESS_E_LINE

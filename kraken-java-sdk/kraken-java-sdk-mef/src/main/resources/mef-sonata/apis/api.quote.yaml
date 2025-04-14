@@ -17,6 +17,10 @@ spec:
         - add
         - modify
       supportedConfig: $.quote
+      productTypes:
+        - UNI
+        - ACCESS_E_LINE
+        - INTERNET_ACCESS
     - path: /mefApi/sonata/quoteManagement/v8/quote/{id}
       method: get
       supportedConfig: $.quote
