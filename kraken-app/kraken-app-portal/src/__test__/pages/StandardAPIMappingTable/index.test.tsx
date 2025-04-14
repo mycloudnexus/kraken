@@ -10,6 +10,8 @@ import { vi } from "vitest";
 
 let mockedProductType = "UNI";
 
+const mockNavigate = vi.fn();
+
 vi.mock("react-router-dom", async () => {
   const actual = await vi.importActual("react-router-dom");
   return {
@@ -17,6 +19,7 @@ vi.mock("react-router-dom", async () => {
     useLocation: () => ({
       state: { productType: mockedProductType },
     }),
+    useNavigate: () => mockNavigate,
   };
 });
 
@@ -359,4 +362,88 @@ test("filteredComponentList should include only SHARE components if productType 
   // SHARE component should appear, non-SHARE should not
   expect(screen.queryByText("SHARE Component")).toBeInTheDocument();
   expect(screen.queryByText("Non-SHARE Component")).not.toBeInTheDocument();
+});
+
+test("clicking Mapping button navigates with correct state", async () => {
+  mockedProductType = "UNI";
+  vi.spyOn(mappingStore, "useMappingUiStore").mockReturnValue({
+    currentProduct: "test",
+  });
+  vi.spyOn(productHooks, "useGetComponentListAPI").mockReturnValue({
+    data : {
+      data: [
+      {
+        kind: "kind",
+        apiVersion: "v1",
+        metadata: {
+          name: "Product Offering Qualification (POQ) API Management",
+          key: "mock_key",
+        },
+        facets: {
+          supportedProductTypesAndActions: [
+            {
+              path: "/a/b/c/d/e",
+              method: "GET",
+              actionTypes: ["add"],
+              productTypes: ["UNI"],
+            },
+          ],
+        },
+      },
+    ], 
+   }
+  } as any);
+  vi.spyOn(productHooks, "useGetComponentDetail").mockReturnValue({
+    data: {
+      metadata: {
+        name: "Product Offering Qualification (POQ) API Management",
+      },
+    },
+  } as any);
+  vi.spyOn(productHooks, "useGetComponentDetailMapping").mockReturnValue({
+    data: {
+      details: [
+        {
+          description: "mock_mapping",
+          mappingMatrix: {
+            productType: "uni",
+          },
+          mappingStatus: "in progress",
+          method: "GET",
+          orderBy: "createdAt",
+          path: "/a/b/c/d/e",
+          requiredMapping: false,
+          targetKey: "targetKey",
+          targetMapperKey: "targetMapperKey",
+          updatedAt: "2024-12-3T01:22:00Z",
+          actionType: "actionType",
+          diffWithStage: false,
+          lastDeployedAt: "2024-12-3T01:22:00Z",
+          order: 1,
+          productType: "uni",
+        },
+      ],
+    },
+    isLoading: false,
+    isFetching: false,
+    isFetched: true,
+  } as any);
+  const { container } = render(
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <StandardAPIMappingTable />
+      </BrowserRouter>
+    </QueryClientProvider>
+  );
+  console.log(container.innerHTML);
+  expect(container).toBeInTheDocument();
+  const mappingButton = await screen.findByText("Mapping");
+  mappingButton.click();
+  expect(mockNavigate).toHaveBeenCalledWith("targetKey", {
+    state: expect.objectContaining({
+      mainTitle: expect.any(String),
+      filteredComponentList: expect.any(Array),
+      productType: "UNI",
+    }),
+  });
 });

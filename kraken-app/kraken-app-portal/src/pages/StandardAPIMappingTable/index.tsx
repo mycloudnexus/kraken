@@ -104,7 +104,6 @@ const StandardAPIMappingTable = () => {
       (product) =>
         product.mappingMatrix?.productType === productType?.toLowerCase()
     );
-
     return mergePath(filteredData);
   }, [detailDataMapping, productType]);
 
