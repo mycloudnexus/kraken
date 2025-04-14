@@ -88,6 +88,10 @@ public class ErrorResponse {
           && StringUtils.isNotBlank(throwable.getCause().getMessage())
           && throwable.getCause().getMessage().contains(ERROR_422_INVALID_VALUE.getMsg())) {
         return ERROR_422_INVALID_VALUE.getMsg();
+      } else if (null != throwable
+          && StringUtils.isNotBlank(throwable.getMessage())
+          && throwable.getMessage().contains(ERROR_422_OTHER_ISSUE.getMsg())) {
+        return ERROR_422_OTHER_ISSUE.getMsg();
       } else {
         return ERROR_422_INVALID_FORMAT.getMsg();
       }

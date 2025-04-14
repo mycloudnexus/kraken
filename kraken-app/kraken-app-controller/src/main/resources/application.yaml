@@ -82,8 +82,8 @@ springdoc:
       description: localhost
 logging:
   level:
-    com.consoleconnect.kraken: DEBUG
-    org.springframework.security: DEBUG
+    com.consoleconnect.kraken: INFO
+    org.springframework.security: INFO
 app:
   products:
     - key: mef.sonata
