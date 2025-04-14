@@ -27,3 +27,7 @@ export const parseProductName = (product: string) => {
       return (product as string).split(':').pop();
   }
 };
+
+export const parseProductValue = (product: string) => {
+  return (product as string).split(':').shift();
+};
