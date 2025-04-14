@@ -14,8 +14,8 @@ spec:
     actionType: delete
   endpoints:
     - id: delete connection by id
-      path: ""
-      method: ""
+      path: /api/v2/company/{username}/connections/{connectionId}
+      method: DELETE
       serverKey: mef.sonata.api-target-spec.con1718940696857
       mappers:
         request:

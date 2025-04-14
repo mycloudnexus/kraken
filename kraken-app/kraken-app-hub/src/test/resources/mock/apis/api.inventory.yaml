@@ -40,6 +40,7 @@ spec:
           with:
             action: read
           preRequest: true
+
         - id: calculate_list_type_for_via_javascript
           actionType: engine@javascript
           env:
@@ -84,6 +85,7 @@ spec:
                 return JSON.stringify(ret);
               }
           outputKey: order
+
         - id: mapping-matrix-check-inventory
           actionType: buildin@mapping-matrix-checker
           env:

@@ -166,12 +166,14 @@ public class RenderRequestService implements MappingTransformer {
       Optional<ComponentAPITargetFacets.Mapper> instanceOpt =
           response.stream().filter(v -> Objects.equals(pathReferIds[1], v.getName())).findFirst();
       uniqueMapper = instanceOpt;
+      // handle delete order instanceId to add order id
     }
 
     if (uniqueMapper.isPresent()) {
       ComponentAPITargetFacets.Mapper referMapper = uniqueMapper.get();
       String source = referMapper.getSource();
       List<String> paramLocations = extractMapperParam(source);
+      // handle delete order instanceId to add order id
       mapper.setSource(constructOriginalDBParam(paramLocations.get(0)));
       log.info("converted value: {}", mapper.getSource());
     }

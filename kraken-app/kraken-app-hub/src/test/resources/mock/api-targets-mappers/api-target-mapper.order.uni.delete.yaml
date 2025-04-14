@@ -13,8 +13,8 @@ spec:
     actionType: delete
   endpoints:
     - id: delete port
-      path: ""
-      method: ""
+      path: /api/company/{companyName}/ports/{portId}
+      method: DELETE
       serverKey: mef.sonata.api-target-spec.con1718940696857
       mappers:
         request:

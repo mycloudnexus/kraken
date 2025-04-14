@@ -118,7 +118,7 @@ app:
   modify-use-case: "classpath:/config/component-modify-validation.yaml"
   security:
     resource-server:
-      enabled: true
+      enabled: false
       jwt:
         - issuer: https://kraken.consoleconnect.com/issuer
           key-id: kraken
@@ -129,4 +129,5 @@ app:
   workflow:
     base-url: https://external-kraken-conductor.dev.consolecore.io/api
     enabled: false
-    enable-register-worker: true
+    enable-register-worker: false
+
