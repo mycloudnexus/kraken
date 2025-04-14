@@ -24,10 +24,10 @@ export const parseProductName = (product: string) => {
     case "SHARE":
       return "Share";
     default:
-      return (product as string).split(':').pop();
+      return product.split(':').pop();
   }
 };
 
 export const parseProductValue = (product: string) => {
-  return (product as string).split(':').shift();
+  return product.split(':').shift();
 };

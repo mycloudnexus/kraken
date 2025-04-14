@@ -248,7 +248,7 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
 
   const productOptions =
     productTypes?.map((type: string) => {
-      return { value: parseProductValue(type), text: parseProductName(type) };
+      return { value: parseProductValue(type ?? "-"), text: parseProductName(type ?? "-") };
     }) ?? [];
 
   const handleTimeFilter = () => {
