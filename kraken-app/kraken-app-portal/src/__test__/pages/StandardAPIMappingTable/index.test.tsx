@@ -435,7 +435,6 @@ test("clicking Mapping button navigates with correct state", async () => {
       </BrowserRouter>
     </QueryClientProvider>
   );
-  console.log(container.innerHTML);
   expect(container).toBeInTheDocument();
   const mappingButton = await screen.findByText("Mapping");
   mappingButton.click();
