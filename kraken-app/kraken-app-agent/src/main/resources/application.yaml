@@ -110,14 +110,6 @@ app:
     deployment:
       enabled: false
   cron-job:
-    pull-api-server-info: 0/20 * * * * *
-    pull-server-assets: 0 0/1 * * * *
-    pull-latest-release: 0 0/1 * * * *
-    pull-reset-event: 0 0/1 * * * *
-    push-heartbeat: 0/20 * * * * *
-    push-log: 0/20 * * * * *
-    push-log-external-system: 0 0/1 * * * *
-    push-workflow-status: 0 0/1 * * * *
     lock:
       at-most-for: 2m
       at-least-for: 10s
