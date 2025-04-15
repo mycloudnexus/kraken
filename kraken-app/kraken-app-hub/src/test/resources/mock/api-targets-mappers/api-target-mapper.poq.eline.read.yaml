@@ -21,6 +21,7 @@ spec:
     - id: Retrieves a product offering qualification by id for connection
       path: /api/pricing/calculate
       method: post
+      serverKey: ""
       mappers:
         request:
         response:
