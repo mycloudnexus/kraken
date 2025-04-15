@@ -8,7 +8,7 @@ metadata:
   labels:
     productSpec: grace
     productVersion: V2.0.0
-    publishDate: 2025-04-08
+    publishDate: 2025-04-15
   description: |
-    fix workflow template initial load failed
+    fix null server key of poq read
   version: 1
