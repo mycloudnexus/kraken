@@ -8,7 +8,7 @@ import { useCommonListProps } from "@/hooks/useCommonListProps";
 import { toDateTime } from "@/libs/dayjs";
 import { useAppStore } from "@/stores/app.store";
 import { DEFAULT_PAGING } from "@/utils/constants/common";
-import { getProductName, parseProductName } from "@/utils/helpers/name";
+import { getProductName, parseProductName, parseProductValue } from "@/utils/helpers/name";
 import { IActivityLog } from "@/utils/types/env.type";
 import {
   CheckCircleFilled,
@@ -248,7 +248,7 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
 
   const productOptions =
     productTypes?.map((type: string) => {
-      return { value: type, text: parseProductName(type) };
+      return { value: parseProductValue(type ?? "-"), text: parseProductName(type ?? "-") };
     }) ?? [];
 
   const handleTimeFilter = () => {
