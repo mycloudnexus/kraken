@@ -21,6 +21,7 @@ spec:
     - id: Retrieves a product offering qualification by id for port
       path: ""
       method: ""
+      serverKey: ""
       mappers:
         request:
         response:
