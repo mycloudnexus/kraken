@@ -16,7 +16,14 @@ spec:
       actionTypes:
         - add
         - modify
+<<<<<<< Updated upstream
       supportedConfig: $.quote
+=======
+      productTypes:
+        - UNI
+        - ACCESS_E_LINE
+        - INTERNET_ACCESS
+>>>>>>> Stashed changes
     - path: /mefApi/sonata/quoteManagement/v8/quote/{id}
       method: get
       supportedConfig: $.quote
