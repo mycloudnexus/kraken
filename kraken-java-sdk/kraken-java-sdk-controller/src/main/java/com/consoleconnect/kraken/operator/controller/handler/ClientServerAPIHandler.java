@@ -12,6 +12,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +42,9 @@ public class ClientServerAPIHandler extends ClientEventHandler {
       return HttpResponse.ok(null);
     }
     Map<String, List<ServerAPIDto>> serverKeyMap =
-        serverAPIDtos.stream().collect(Collectors.groupingBy(ServerAPIDto::getServerKey));
+        serverAPIDtos.stream()
+            .filter(item -> Objects.nonNull(item.getServerKey()))
+            .collect(Collectors.groupingBy(ServerAPIDto::getServerKey));
     serverKeyMap
         .entrySet()
         .forEach(
