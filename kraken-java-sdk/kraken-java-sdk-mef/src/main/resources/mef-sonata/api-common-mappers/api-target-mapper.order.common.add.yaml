@@ -11,7 +11,7 @@ spec:
     - id: create order
       mappers:
         request:
-          - name: mapper.order.@{{productType}}.@{{action}}.buyerId
+          - name: mapper.order.@{{productType}}.add.buyerId
             title: The unique identifier of the organization that is acting as the a Buyer.
             description: ""
             source: '@{{buyerId}}'
@@ -20,7 +20,7 @@ spec:
             targetLocation: ""
             requiredMapping: false
             customizedField: false
-          - name: mapper.order.@{{productType}}.@{{action}}.duration
+          - name: mapper.order.@{{productType}}.add.duration
             title: "order item Term duration"
             source: "@{{productOrderItem[0].requestedItemTerm.duration.amount}}"
             sourceLocation: BODY
@@ -29,7 +29,7 @@ spec:
             target: ""
             targetLocation: ""
             requiredMapping: true
-          - name: mapper.order.@{{productType}}.@{{action}}.duration.units
+          - name: mapper.order.@{{productType}}.add.duration.units
             title: "order item Term unit"
             source: "@{{productOrderItem[0].requestedItemTerm.duration.units}}"
             sourceType: enum
@@ -47,7 +47,7 @@ spec:
             targetLocation: BODY
             valueMapping: {}
             requiredMapping: true
-          - name: mapper.order.@{{productType}}.@{{action}}.endOfTermAction
+          - name: mapper.order.@{{productType}}.add.endOfTermAction
             title: "MEFEndOfTermAction"
             source: "@{{productOrderItem[0].requestedItemTerm.endOfTermAction}}"
             sourceLocation: BODY
@@ -59,7 +59,7 @@ spec:
             target: ""
             targetLocation: BODY
             requiredMapping: true
-          - name: mapper.order.@{{productType}}.@{{action}}.rollInterval.amount
+          - name: mapper.order.@{{productType}}.add.rollInterval.amount
             title: " quote item Term roll duration"
             source: "@{{productOrderItem[0].requestedItemTerm.rollInterval.amount}}"
             sourceLocation: BODY
@@ -74,7 +74,7 @@ spec:
             target: ""
             targetLocation: BODY
             requiredMapping: false
-          - name: mapper.order.@{{productType}}.@{{action}}.rollInterval.units
+          - name: mapper.order.@{{productType}}.add.rollInterval.units
             title: " quote item Term roll unit"
             source: "@{{productOrderItem[0].requestedItemTerm.rollInterval.units}}"
             sourceLocation: BODY
@@ -97,7 +97,7 @@ spec:
             target: ""
             targetLocation: BODY
             requiredMapping: false
-          - name: mapper.order.@{{productType}}.@{{action}}.bandwidthUnit
+          - name: mapper.order.@{{productType}}.add.bandwidthUnit
             title: "The unit of bandwidth"
             source: "@{{productOrderItem[0].product.productConfiguration.bandwidthUnit}}"
             sourceType: enum
@@ -109,7 +109,7 @@ spec:
             target: ""
             targetLocation: BODY
             requiredMapping: true
-          - name: mapper.order.@{{productType}}.@{{action}}.bandwidth
+          - name: mapper.order.@{{productType}}.add.bandwidth
             title: "Bandwidth of the @{{productType}}"
             source: "@{{productOrderItem[0].product.productConfiguration.bandwidth}}"
             sourceLocation: BODY
@@ -120,7 +120,7 @@ spec:
             target: ""
             targetLocation: BODY
             requiredMapping: true
-          - name: mapper.order.@{{productType}}.@{{action}}.name
+          - name: mapper.order.@{{productType}}.add.name
             title: "The name of the @{{productType}}"
             source: "@{{productOrderItem[0].product.productConfiguration.name}}"
             sourceLocation: BODY
@@ -128,7 +128,7 @@ spec:
             target: ""
             targetLocation: BODY
             requiredMapping: false
-          - name: mapper.order.@{{productType}}.@{{action}}.paymentType
+          - name: mapper.order.@{{productType}}.add.paymentType
             title: "The payment type of the @{{productType}}"
             source: "@{{productOrderItem[0].product.productConfiguration.paymentType}}"
             sourceLocation: BODY
@@ -136,7 +136,7 @@ spec:
             target: ""
             targetLocation: BODY
             requiredMapping: false
-          - name: mapper.order.@{{productType}}.@{{action}}.productOffering.id
+          - name: mapper.order.@{{productType}}.add.productOffering.id
             title: "id of a Product Offering"
             source: "@{{productOrderItem[0].product.productOffering.id}}"
             sourceLocation: BODY
@@ -145,7 +145,7 @@ spec:
             targetLocation: BODY
             requiredMapping: true
         response:
-          - name: mapper.order.@{{productType}}.@{{action}}.state
+          - name: mapper.order.@{{productType}}.add.state
             title: Order State
             source: ""
             target: '@{{state}}'
@@ -168,7 +168,7 @@ spec:
             targetLocation: BODY
             requiredMapping: true
             customizedField: false
-          - name: mapper.order.@{{productType}}.@{{action}}.orderId
+          - name: mapper.order.@{{productType}}.add.orderId
             title: order Id from seller
             source: ""
             target: '@{{orderId}}'
@@ -176,7 +176,7 @@ spec:
             sourceLocation: BODY
             targetLocation: BODY
             requiredMapping: true
-          - name: mapper.order.@{{productType}}.@{{action}}.instanceId
+          - name: mapper.order.@{{productType}}.add.instanceId
             title: instance id from seller
             source: ""
             target: '@{{instanceId}}'
@@ -184,7 +184,7 @@ spec:
             sourceLocation: BODY
             targetLocation: BODY
             requiredMapping: false
-          - name: mapper.order.@{{productType}}.@{{action}}.product.id
+          - name: mapper.order.@{{productType}}.add.product.id
             title: product instance id
             description: ""
             source: ""
@@ -193,7 +193,7 @@ spec:
             targetLocation: BODY
             customizedField: false
             requiredMapping: false
-          - name: mapper.order.@{{productType}}.@{{action}}.term.endOfTermAction
+          - name: mapper.order.@{{productType}}.add.term.endOfTermAction
             title: MEFEndOfTermAction
             description: ""
             source: ""
@@ -202,7 +202,7 @@ spec:
             targetLocation: BODY
             customizedField: false
             requiredMapping: true
-          - name: mapper.order.@{{productType}}.@{{action}}.term.rollInterval.amount
+          - name: mapper.order.@{{productType}}.add.term.rollInterval.amount
             title: order item Term roll duration
             description: ""
             source: ""
@@ -211,7 +211,7 @@ spec:
             targetLocation: BODY
             customizedField: false
             requiredMapping: false
-          - name: mapper.order.@{{productType}}.@{{action}}.term.rollInterval.unit
+          - name: mapper.order.@{{productType}}.add.term.rollInterval.unit
             title: order item Term roll unit
             description: ""
             source: ""
@@ -220,7 +220,7 @@ spec:
             targetLocation: BODY
             customizedField: false
             requiredMapping: false
-          - name: mapper.order.@{{productType}}.@{{action}}.term.name
+          - name: mapper.order.@{{productType}}.add.term.name
             title: order item Term name
             description: ""
             source: ""
