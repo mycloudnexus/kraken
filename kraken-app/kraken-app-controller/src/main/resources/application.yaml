@@ -126,6 +126,7 @@ app:
   security:
     login:
       enabled: true
+      mode: default
       hmac-secret: OWUxMjFhNmEtZmY5My00MTNkLWIzNTctZTczY2ZjNWM5ODMy
       user-list:
         - name: admin

@@ -1,6 +1,7 @@
 package com.consoleconnect.kraken.operator.auth.config;
 
 import com.consoleconnect.kraken.operator.auth.model.AuthDataProperty;
+import com.consoleconnect.kraken.operator.auth.model.DefaultUserLoginEnabled;
 import com.consoleconnect.kraken.operator.auth.model.ResourceServerEnabled;
 import com.consoleconnect.kraken.operator.auth.model.UserLoginEnabled;
 import com.consoleconnect.kraken.operator.auth.security.*;
@@ -29,6 +30,7 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 @Configuration
 @Slf4j
 @EnableWebFluxSecurity
+@ConditionalOnBean(DefaultUserLoginEnabled.class)
 public class WebSecurityConfig {
 
   @ConditionalOnMissingBean(ResourceServerEnabled.class)
