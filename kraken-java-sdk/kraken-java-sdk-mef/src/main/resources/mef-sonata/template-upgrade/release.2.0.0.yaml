@@ -8,7 +8,34 @@ metadata:
   labels:
     productSpec: grace
     productVersion: V2.0.0
-    publishDate: 2025-04-15
+    publishDate: 2025-04-16
   description: |
-    fix null server key of poq read
+    Fixed issues:
+      - Fixed the internal server error in component routing
+      - Resolved the loss of source values during control plane upgrades.
+      - fix issue about whether the request should be forwarded
+      - fix check forward downstream issue
+      - fix null server key of poq read
+
+    Improvements: 
+      - Adding a property named 'allowValueLimit' to mark whether allowing customized value limitation.
+      - change 422 to 400 if properties are missing except predefined paths
+      - Support of condition dependencies in request mappers
+      - Replace the routing parameter 'productConfiguration.@type' with 'productOrderItem[0].id'
+      - Replace the checking path 'dutyFreeAmount.unit' with 'dutyFreeAmount.value'
+      - [create delete order] create/delete eline order
+      - Added support for deleting nodes when the number is of a negative double type
+      - Removed 'keyName' in the mapper for creating quote
+      - Added support for ID-based routing in inventory details by retrieving productType from the database
+      - Added support for parent product type searching such as 'access.eline'
+      - Added template labels for product offering qualification
+      - Added support for state related issue in retrieve by id cases when using workflow
+      - Change eline modify template
+      - Support common mapper
+      - Split modify apis: 
+          - create modify eline quote
+          - create modify eline order
+          - get modify eline order by id
+      - Delete route for hub api
+      - Add orderId in api target
   version: 1
