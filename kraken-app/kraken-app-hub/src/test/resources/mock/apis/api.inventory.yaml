@@ -45,6 +45,7 @@ spec:
           actionType: engine@javascript
           env:
             bizType: ${entity.bizType}
+            actType: ${entity.request.productOrderItem[0].action}
           with:
             code: |
               (jsonStr) => {
@@ -54,6 +55,8 @@ spec:
                 let matrixConfigKey = '';
                 let errorCode = '';
                 let errorMsg = '';
+                let forwardDownstream = true;
+                let listInventory = true;
                 if(input.bizType === 'UNI') {
                   targetAPIConfigKey = 'mef.sonata.api-target.inventory.uni.list';
                   matrixConfigKey = 'mef.sonata.api.matrix.inventory.uni.list';
@@ -77,6 +80,9 @@ spec:
                 }
                 let ret = {
                   productType: input.bizType || 'undefined',
+                  actType: input.actType || 'undefined',
+                  forwardDownstream: forwardDownstream,
+                  listInventory : listInventory,
                   targetAPIConfigKey: targetAPIConfigKey,
                   matrixConfigKey: matrixConfigKey,
                   errorMsg: errorMsg,
@@ -84,20 +90,23 @@ spec:
                 };
                 return JSON.stringify(ret);
               }
-          outputKey: order
+          outputKey: inventoryList
 
         - id: mapping-matrix-check-inventory
           actionType: buildin@mapping-matrix-checker
           env:
-            mappingMatrixKey: ${order.matrixConfigKey}
-            targetKey: ${order.targetAPIConfigKey}
+            mappingMatrixKey: ${inventoryList.matrixConfigKey}
+            targetKey: ${inventoryList.targetAPIConfigKey}
 
         - id: load-downstream-api-config
           actionType: buildin@load-target-api-config
           env:
-            configKey: ${order.targetAPIConfigKey}
+            configKey: ${inventoryList.targetAPIConfigKey}
             mefQuery: ${query}
             entity: ${entity}
+            actType: ${inventoryList.actType}
+            productType: ${inventoryList.productType}
+            listInventory: ${inventoryList.listInventory}
           with:
             render: true
             replaceStar: true
@@ -112,7 +121,7 @@ spec:
         - id: mock-response
           actionType: buildin@mock-response
           env:
-            forwardDownstream: ${(entity.renderedResponse.orderId!='' && entity.renderedResponse.orderId!=null) || (entity.renderedResponse.uniqueId!=null && entity.renderedResponse.uniqueId!='')}
+            forwardDownstream: ${inventoryList.forwardDownstream}
 
         - id: modify-response-body
           actionType: buildin@modify-response-body
@@ -202,17 +211,17 @@ spec:
                 };
                 return JSON.stringify(ret);
               }
-          outputKey: order
+          outputKey: inventoryDetail
         - id: mapping-matrix-check-inventory-read
           actionType: buildin@mapping-matrix-checker
           env:
-            mappingMatrixKey: ${order.matrixConfigKey}
-            targetKey: ${order.targetAPIConfigKey}
+            mappingMatrixKey: ${inventoryDetail.matrixConfigKey}
+            targetKey: ${inventoryDetail.targetAPIConfigKey}
             id: ${segment}
         - id: load-downstream-api-config
           actionType: buildin@load-target-api-config
           env:
-            configKey: ${order.targetAPIConfigKey}
+            configKey: ${inventoryDetail.targetAPIConfigKey}
             mefQuery: ${query}
             id: ${segment}
           with:

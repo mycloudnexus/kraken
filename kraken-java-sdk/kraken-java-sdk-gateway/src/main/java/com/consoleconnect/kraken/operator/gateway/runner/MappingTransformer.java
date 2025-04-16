@@ -36,8 +36,8 @@ public interface MappingTransformer extends PathOperator {
   String RESPONSE_BODY = "responseBody";
   String WORKFLOW_PREFIX = "workflow.";
   String ARRAY_PATTERN = ".*\\[\\d+\\]$";
-  String RESPONSE_UNIQUE_ID = "$.entity.renderedResponse.uniqueId";
-  String RESPONSE_ORDER_ID = "$.entity.renderedResponse.orderId";
+  String RENDERED_RESPONSE_UNIQUE_ID = "$.entity.renderedResponse.uniqueId";
+  String RENDERED_RESPONSE_ORDER_ID = "$.entity.renderedResponse.orderId";
 
   @Slf4j
   final class LogHolder {}

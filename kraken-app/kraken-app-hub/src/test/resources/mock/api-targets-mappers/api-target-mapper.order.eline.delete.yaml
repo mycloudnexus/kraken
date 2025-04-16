@@ -24,8 +24,8 @@ spec:
             description: ""
             source: "@{{buyerId}}"
             sourceLocation: "QUERY"
-            target: ""
-            targetLocation: ""
+            target: "@{{username}}"
+            targetLocation: PATH
             requiredMapping: false
           - name: mapper.order.eline.delete.productId
             title: "The unique identifier of an in-service Product that is the ordering subject"
@@ -34,7 +34,7 @@ spec:
             sourceLocation: "BODY"
             sourceType: string
             target: "@{{connectionId}}"
-            targetLocation: ""
+            targetLocation: PATH
             requiredMapping: false
         response:
           - name: mapper.order.eline.delete.state

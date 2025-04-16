@@ -18,6 +18,7 @@ import com.consoleconnect.kraken.operator.core.model.facet.ComponentWorkflowFace
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.gateway.filter.KrakenFilterConstants;
+import com.consoleconnect.kraken.operator.gateway.repo.HttpRequestRepository;
 import com.consoleconnect.kraken.operator.gateway.service.RenderRequestService;
 import com.consoleconnect.kraken.operator.gateway.template.SpELEngine;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -34,19 +35,22 @@ import org.springframework.web.server.ServerWebExchange;
 @Service
 @Slf4j
 public class LoadTargetAPIConfigActionRunner extends AbstractActionRunner
-    implements SellerContactInjector {
+    implements SellerContactInjector, OrderDeleteInventoryInjector {
 
   public static final String INPUT_CONFIG_KEY = "configKey";
   public static final String INPUT_RENDER = "render";
   public static final String URLS = "urls";
+  @Getter private final HttpRequestRepository httpRequestRepository;
   @Getter private final UnifiedAssetService unifiedAssetService;
   private final RenderRequestService renderRequestService;
 
   public LoadTargetAPIConfigActionRunner(
       AppProperty appProperty,
+      HttpRequestRepository httpRequestRepository,
       UnifiedAssetService unifiedAssetService,
       RenderRequestService renderRequestService) {
     super(appProperty);
+    this.httpRequestRepository = httpRequestRepository;
     this.unifiedAssetService = unifiedAssetService;
     this.renderRequestService = renderRequestService;
   }
@@ -132,13 +136,14 @@ public class LoadTargetAPIConfigActionRunner extends AbstractActionRunner
             }
             if (Objects.nonNull(endpoint.getResponseBody())) {
               stateValueMappingDto.setUniqueId(
-                  (String) readWithJsonPath(inputs, RESPONSE_UNIQUE_ID));
-              stateValueMappingDto.setOrderId((String) readWithJsonPath(inputs, RESPONSE_ORDER_ID));
-
+                  (String) readWithJsonPath(inputs, RENDERED_RESPONSE_UNIQUE_ID));
+              stateValueMappingDto.setOrderId(
+                  (String) readWithJsonPath(inputs, RENDERED_RESPONSE_ORDER_ID));
               String transformedResp = transform(endpoint, stateValueMappingDto);
               endpoint.setResponseBody(SpELEngine.evaluate(transformedResp, inputs));
             }
             if (Objects.nonNull(endpoint.getPath())) {
+              handleInventoryOfDeleteOrder(inputs);
               String evaluate =
                   SpELEngine.evaluate(replaceStar(endpoint.getPath()), inputs, String.class);
               endpoint.setPath(encodeUrlParam(evaluate));

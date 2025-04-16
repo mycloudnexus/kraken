@@ -15,6 +15,7 @@ import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFac
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.core.toolkit.YamlToolkit;
+import com.consoleconnect.kraken.operator.gateway.repo.HttpRequestRepository;
 import com.consoleconnect.kraken.operator.gateway.runner.LoadTargetAPIConfigActionRunner;
 import com.consoleconnect.kraken.operator.gateway.runner.MappingTransformer;
 import com.consoleconnect.kraken.operator.gateway.service.RenderRequestService;
@@ -34,21 +35,23 @@ class RequestMapperTest implements MappingTransformer {
 
   private static UnifiedAssetService unifiedAssetService;
   private static RenderRequestService renderRequestService;
+  private static HttpRequestRepository httpRequestRepository;
   private static LoadTargetAPIConfigActionRunner runner;
 
   @BeforeAll
   static void init() {
     unifiedAssetService = Mockito.mock(UnifiedAssetService.class);
+    httpRequestRepository = Mockito.mock(HttpRequestRepository.class);
     renderRequestService = new RenderRequestService(unifiedAssetService);
     runner =
         new LoadTargetAPIConfigActionRunner(
-            new AppProperty(), unifiedAssetService, renderRequestService);
+            new AppProperty(), httpRequestRepository, unifiedAssetService, renderRequestService);
   }
 
   @Test
   void requestParserTest() throws IOException {
     ComponentAPITargetFacets facets = renderFacets("mockData/api-target.address.validate.yaml");
-    runner.encodeUrlParam(facets.getEndpoints().get(0).getPath());
+    LoadTargetAPIConfigActionRunner.encodeUrlParam(facets.getEndpoints().get(0).getPath());
     log.info("test address validation");
     Assertions.assertTrue(facets.getEndpoints().get(0).getPath().contains("criteria"));
 

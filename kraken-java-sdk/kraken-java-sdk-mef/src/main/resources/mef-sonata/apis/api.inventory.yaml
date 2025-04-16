@@ -100,11 +100,6 @@ spec:
             path: ${targetApiConfig.endpoints[0].path}
             method: ${targetApiConfig.endpoints[0].method}
 
-        - id: mock-response
-          actionType: buildin@mock-response
-          env:
-            forwardDownstream: ${(entity.renderedResponse.orderId!='' && entity.renderedResponse.orderId!=null) || (entity.renderedResponse.uniqueId!=null && entity.renderedResponse.uniqueId!='')}
-
         - id: modify-response-body
           actionType: buildin@modify-response-body
           with:
