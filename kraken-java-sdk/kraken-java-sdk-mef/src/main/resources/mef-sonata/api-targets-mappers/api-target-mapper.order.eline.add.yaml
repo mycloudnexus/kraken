@@ -29,8 +29,6 @@ spec:
           params:
             - key: productType
               val: eline
-            - key: action
-              val: add
         request:
           - name: mapper.order.eline.add.classOfService
             title: "The class of Service of the Eline"
