@@ -423,6 +423,7 @@ const StandardAPIMapping = () => {
         <Drawer
           title="Deploy History"
           open={open}
+          destroyOnClose={true}
           onClose={() => setOpen(false)}
           width={1200}
         >
