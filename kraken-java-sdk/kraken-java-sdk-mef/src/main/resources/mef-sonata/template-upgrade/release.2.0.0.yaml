@@ -10,32 +10,28 @@ metadata:
     productVersion: V2.0.0
     publishDate: 2025-04-16
   description: |
-    Fixed issues:
-      - Fixed the internal server error in component routing
-      - Resolved the loss of source values during control plane upgrades.
-      - fix issue about whether the request should be forwarded
-      - fix check forward downstream issue
-      - fix null server key of poq read
-
-    Improvements: 
-      - Adding a property named 'allowValueLimit' to mark whether allowing customized value limitation.
-      - change 422 to 400 if properties are missing except predefined paths
-      - Support of condition dependencies in request mappers
-      - Replace the routing parameter 'productConfiguration.@type' with 'productOrderItem[0].id'
-      - Replace the checking path 'dutyFreeAmount.unit' with 'dutyFreeAmount.value'
-      - [create delete order] create/delete eline order
-      - Added support for deleting nodes when the number is of a negative double type
-      - Removed 'keyName' in the mapper for creating quote
-      - Added support for ID-based routing in inventory details by retrieving productType from the database
-      - Added support for parent product type searching such as 'access.eline'
-      - Added template labels for product offering qualification
-      - Added support for state related issue in retrieve by id cases when using workflow
-      - Change eline modify template
-      - Support common mapper
-      - Split modify apis: 
-          - create modify eline quote
-          - create modify eline order
-          - get modify eline order by id
-      - Delete route for hub api
-      - Add orderId in api target
+    create quote use cases
+      - Added quoteItem[0].terminationError field to responses when quote state is unableToProvide
+      - Removed validFor field from responses when quote state is unableToProvide
+    Get address id
+      - response : remove all the properties under associatedGeographicAddress to the root level which includes country, city, streetName, locality
+    create quote
+      - request : Validate Property Type as "String" for Quote Place Type in Eline ADD Quote
+      - request: remove quoteItem[0].product.place[0].keyName for create UNI ADD quote as it is not defined by MEF
+      - response : The quoteItemPrice field will no longer be returned in the response for "unableToProvide" quotes.
+      - response : Added quoteItem[0].terminationError field to responses when quote state is unableToProvide
+      - response : Removed validFor field from responses when quote state is unableToProvide
+    create add order
+      - request : remove productOrderItem[0].product.place[0].keyName for create UNI ADD order as it is not defined by MEF
+    create delete order
+      - request : The productOrderItem[].id field is now used to replace productOrderItem[0].product.productConfiguration.@type as the routing property.
+      - request : The productOrderItem[].id field must be prefixed with UNI or ACCESS_E_LINE.
+      - request : The @{{productOrderItem[].product.productOffering.id}} field has been removed from the request mapping.
+    get product by id
+      - request : does not support passing productType as a filter parameter now
+    add POQ template
+    add modify quote and modify order template
+    Property Type Validation
+    Allowed Values Validation (Enumeration/Whitelist Validation)
+    Mandatory Property Validation (Null/Missing Checks)
   version: 1
