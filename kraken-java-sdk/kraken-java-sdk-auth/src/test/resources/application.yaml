@@ -47,6 +47,7 @@ app:
   security:
     login:
       enabled: false
+      mode: default
       hmac-secret: W7YBfqDrZfpsU8ql
       user-list:
         - email: admin

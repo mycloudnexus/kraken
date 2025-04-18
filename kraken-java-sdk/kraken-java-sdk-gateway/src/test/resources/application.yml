@@ -113,6 +113,7 @@ app:
   security:
     login:
       enabled: false
+      mode: default
     auth-server:
       enabled: false
     resource-server:
