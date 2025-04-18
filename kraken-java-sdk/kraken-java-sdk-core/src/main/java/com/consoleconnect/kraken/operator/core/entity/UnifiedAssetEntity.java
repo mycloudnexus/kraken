@@ -51,7 +51,7 @@ public class UnifiedAssetEntity extends AbstractEntity {
   @Column(name = "mapper_key")
   private String mapperKey;
 
-  @Column(name = "description", length = 1024)
+  @Column(name = "description", length = 4096)
   private String description;
 
   @Column(name = "logo")
