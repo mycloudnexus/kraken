@@ -1,0 +1,29 @@
+---
+kind: kraken.component.api-target-mapper
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target-mapper.quote.uni.read.sync
+  name: Mapper Of Reading Quote UNI
+  description: This operation retrieves a Quote entity. Attribute selection is enabled for all first level attributes.
+spec:
+  trigger:
+    path: /mefApi/sonata/quoteManagement/v8/quote/{id}
+    method: get
+    productType: uni
+  endpoints:
+    - id: retrieve quote for port
+      path: /api/pricing/calculate
+      method: post
+      serverKey: mef.sonata.api-target-spec.con1718940696857
+      mappers:
+        pathRules:
+          - name: mapper.quite.uni.read.sync.pathRule.state
+            checkPath: "$[?(@.state != 'unableToProvide')]"
+            deletePath: "$.validFor"
+            insertPath:
+              - key: "$.quoteItem[0].terminationError.code"
+                val: "otherIssue"
+              - key: "$.quoteItem[0].terminationError.value"
+                val: "the quoted item is not available"
+        request:
+        response:

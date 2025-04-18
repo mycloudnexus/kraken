@@ -1,0 +1,40 @@
+---
+kind: kraken.product.mapping.matrix
+apiVersion: v1
+metadata:
+  key: mef.sonata.api.matrix.quote.uni.add.sync
+  name: MEF Sonata API
+  labels:
+    mef-api-release: grace
+  version: 14
+spec:
+  expect-http-status-422-if-missing:
+    - $.body.quoteItem[0].product.productConfiguration
+  matrix:
+    mef.sonata.api-target.quote.uni.add.sync:
+      - name: product_type_UNI
+        path: "$.body.quoteItem[*].product.productConfiguration.['@type']"
+        expectType: EXPECTED
+        value: UNI
+      - name: action_add
+        path: "$.body.quoteItem[*].['action']"
+        expectType: EXPECTED
+        value: add
+        code: 400
+      - name: syn_mode
+        path: "$.body.instantSyncQuote"
+        expectType: EXPECTED
+        value: true
+      - name: buyer.requested.quote.level.firm
+        path: "$.body.buyerRequestedQuoteLevel"
+        expectType: EXPECTED
+        value: firm
+      - name: quoteItem[0].product.place[0].role
+        path: "$.body.quoteItem[0].product.place[0].role"
+        expectType: EXPECTED
+        value: INSTALL_LOCATION
+      - name: quoteItem[0].product.place[0].@type
+        path: "$.body.quoteItem[0].product.place[0].@type"
+        expectType: EXPECTED_STR
+        value: true
+        code: 422

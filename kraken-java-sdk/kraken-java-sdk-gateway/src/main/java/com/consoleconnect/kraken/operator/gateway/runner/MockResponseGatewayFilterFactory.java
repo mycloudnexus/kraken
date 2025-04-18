@@ -21,8 +21,12 @@ public class MockResponseGatewayFilterFactory
       log.info("Running mock response action: {}", config.getActionType());
       Optional<Map<String, Object>> contextOptional =
           AbstractActionRunner.generateActionContext(exchange, config);
+      if (contextOptional.isEmpty()) {
+        log.info("No context found for action: {}", config.getActionType());
+        return chain.filter(exchange);
+      }
       Boolean forwardDownstream = forwardDownstream(contextOptional.get(), config);
-      if (contextOptional.isPresent() && !Boolean.TRUE.equals(forwardDownstream)) {
+      if (!Boolean.TRUE.equals(forwardDownstream)) {
         ServerHttpResponse httpResponse = exchange.getResponse();
         Map<String, Object> context = contextOptional.get();
         Integer statusCode = (Integer) context.getOrDefault("statusCode", 200);
@@ -44,7 +48,7 @@ public class MockResponseGatewayFilterFactory
         DataBuffer buffer = httpResponse.bufferFactory().wrap(bytes);
         return httpResponse.writeWith(Mono.just(buffer));
       } else {
-        log.info("No context found for action: {}", config.getActionType());
+        log.info("forward to downstream for action: {}", config.getActionType());
         return chain.filter(exchange);
       }
     };

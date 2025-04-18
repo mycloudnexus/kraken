@@ -1,0 +1,61 @@
+---
+kind: kraken.product.mapping.matrix
+apiVersion: v1
+metadata:
+  key: mef.sonata.api.matrix.order.uni.add
+  name: MEF Sonata API
+  labels:
+    mef-api-release: grace
+  version: 18
+spec:
+  expect-http-status-422-if-missing:
+    - $.body.productOrderItem[0].product.productConfiguration
+  matrix:
+    mef.sonata.api-target.order.uni.add:
+      - name: product_type_UNI
+        path: "$.body.productOrderItem[*].product.productConfiguration.['@type']"
+        expectType: EXPECTED
+        value: UNI
+      - name: action_add
+        path: "$.body.productOrderItem[*].['action']"
+        expectType: EXPECTED
+        value: add
+      - name: productOrderItem[0].product.place[0].role
+        path: "$.body.productOrderItem[0].product.place[0].role"
+        expectType: EXPECTED
+        value: "INSTALL_LOCATION"
+      - name: productOrderItem[0].product.place[0].@type
+        path: "$.body.productOrderItem[0].product.place[0].@type"
+        expectType: EXPECTED_STR
+        value: true
+        code: 422
+      - name: relatedContactInformation_emailAddress
+        path: "$.body.relatedContactInformation[*]"
+        expectType: EXPECTED_TRUE
+        value: ${param.emailAddress}
+        expectedValueType: String
+      - name: relatedContactInformation_name
+        path: "$.body.relatedContactInformation[*]"
+        expectType: EXPECTED_TRUE
+        value: ${param.name}
+        expectedValueType: String
+      - name: relatedContactInformation_number
+        path: "$.body.relatedContactInformation[*]"
+        expectType: EXPECTED_TRUE
+        value: ${param.number}
+        expectedValueType: String
+      - name: relatedContactInformation_role
+        path: "$.body.relatedContactInformation[*]"
+        expectType: EXPECTED_TRUE
+        value: ${param.role}
+        expectedValueType: String
+      - name: productOrderItem_id
+        path: "$.body.productOrderItem[0].id"
+        expectType: EXPECTED_STR
+        value: true
+        code: 422
+      - name: productOrderItem_requestedItemTerm_name
+        path: "$.body.productOrderItem[0].requestedItemTerm.name"
+        expectType: EXPECTED_STR
+        value: true
+        code: 422

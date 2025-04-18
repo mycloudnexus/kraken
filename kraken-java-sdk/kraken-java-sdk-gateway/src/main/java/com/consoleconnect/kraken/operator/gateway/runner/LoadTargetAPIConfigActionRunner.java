@@ -35,7 +35,7 @@ import org.springframework.web.server.ServerWebExchange;
 @Service
 @Slf4j
 public class LoadTargetAPIConfigActionRunner extends AbstractActionRunner
-    implements SellerContactInjector, OrderDeleteInventoryInjector {
+    implements SellerContactInjector {
 
   public static final String INPUT_CONFIG_KEY = "configKey";
   public static final String INPUT_RENDER = "render";
@@ -69,8 +69,6 @@ public class LoadTargetAPIConfigActionRunner extends AbstractActionRunner
       Map<String, Object> outputs) {
 
     String configKey = (String) inputs.get(INPUT_CONFIG_KEY);
-    Boolean render = (Boolean) inputs.get(INPUT_RENDER);
-
     UnifiedAsset asset = unifiedAssetService.findOne(configKey);
     ComponentAPITargetFacets facets = UnifiedAsset.getFacets(asset, ComponentAPITargetFacets.class);
     // merge mapper and base template file
@@ -95,12 +93,12 @@ public class LoadTargetAPIConfigActionRunner extends AbstractActionRunner
       UnifiedAssetDto workflowAsset = unifiedAssetService.findOne(facets.getWorkflow().getKey());
       ComponentWorkflowFacets workflowFacts =
           UnifiedAsset.getFacets(workflowAsset, ComponentWorkflowFacets.class);
-      renderTaskList(workflowFacts.getValidationStage(), inputs, stateValueMappingDto, render);
-      renderTaskList(workflowFacts.getPreparationStage(), inputs, stateValueMappingDto, render);
-      renderTaskList(workflowFacts.getExecutionStage(), inputs, stateValueMappingDto, render);
+      renderTaskList(workflowFacts.getValidationStage(), inputs, stateValueMappingDto);
+      renderTaskList(workflowFacts.getPreparationStage(), inputs, stateValueMappingDto);
+      renderTaskList(workflowFacts.getExecutionStage(), inputs, stateValueMappingDto);
       outputs.put(X_KRAKEN_WORKFLOW_CONFIG, JsonToolkit.toJson(workflowFacts));
     } else {
-      renderEndPoint(inputs, facets.getEndpoints(), stateValueMappingDto, render);
+      renderEndPoint(inputs, facets.getEndpoints(), stateValueMappingDto);
     }
     outputs.put(action.getOutputKey(), JsonToolkit.toJson(facets));
     outputs.put(
@@ -113,18 +111,17 @@ public class LoadTargetAPIConfigActionRunner extends AbstractActionRunner
   private void renderTaskList(
       List<HttpTask> workflowFacts,
       Map<String, Object> inputs,
-      StateValueMappingDto stateValueMappingDto,
-      Boolean render) {
+      StateValueMappingDto stateValueMappingDto) {
     workflowFacts.forEach(
-        task -> renderEndPoint(inputs, List.of(task.getEndpoint()), stateValueMappingDto, render));
+        task -> renderEndPoint(inputs, List.of(task.getEndpoint()), stateValueMappingDto));
   }
 
   private void renderEndPoint(
       Map<String, Object> inputs,
       List<ComponentAPITargetFacets.Endpoint> endpoints,
-      StateValueMappingDto stateValueMappingDto,
-      Boolean render) {
+      StateValueMappingDto stateValueMappingDto) {
     renderRequestService.parseRequest(endpoints, stateValueMappingDto);
+    Boolean render = (Boolean) inputs.get(INPUT_RENDER);
     if (render != null && render) {
       endpoints.forEach(
           endpoint -> {
@@ -143,7 +140,6 @@ public class LoadTargetAPIConfigActionRunner extends AbstractActionRunner
               endpoint.setResponseBody(SpELEngine.evaluate(transformedResp, inputs));
             }
             if (Objects.nonNull(endpoint.getPath())) {
-              handleInventoryOfDeleteOrder(inputs);
               String evaluate =
                   SpELEngine.evaluate(replaceStar(endpoint.getPath()), inputs, String.class);
               endpoint.setPath(encodeUrlParam(evaluate));

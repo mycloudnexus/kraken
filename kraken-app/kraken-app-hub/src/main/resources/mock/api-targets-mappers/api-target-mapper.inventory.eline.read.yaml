@@ -1,0 +1,68 @@
+---
+kind: kraken.component.api-target-mapper
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target-mapper.inventory.eline.read
+  name: Inventory Connection API
+  description: This operation retrieves a product entity
+  version: 11
+spec:
+  trigger:
+    path: /mefApi/sonata/productInventory/v7/product/{id}
+    method: get
+    productType: access_e_line
+  endpoints:
+    - id: retrieve eline product inventory detail by id
+      path: "/api/v2/company/{username}/connections/{connectionId}"
+      method: "get"
+      serverKey: ""
+      mappers:
+        request:
+          - name: mapper.product.inventory.id
+            title: Identifier of the Product
+            description: ""
+            source: "@{{id}}"
+            sourceLocation: "PATH"
+            target: "@{{connectionId}}"
+            targetLocation: "PATH"
+            requiredMapping: true
+          - name: mapper.inventory.eline.read.buyerId
+            title: "The unique identifier of the organization that is acting as the a Buyer"
+            source: "@{{buyerId}}"
+            sourceLocation: "QUERY"
+            target: "@{{username}}"
+            targetType: string
+            targetLocation: "PATH"
+            requiredMapping: false
+        response:
+          - name: mapper.product.inventory.read.status
+            title:  the status of a MEF product
+            description: ""
+            target: "@{{status}}"
+            targetType: enum
+            targetLocation: BODY
+            requiredMapping: true
+            targetValues:
+              - active
+              - active.pendingChange
+              - cancelled
+              - pendingActive
+              - pendingTerminate
+              - suspended
+              - suspendedPendingTerminate
+              - terminated
+            valueMapping:
+              ACTIVE : active
+              CANCELLED: cancelled
+              DELETED: terminated
+              DISABLED: suspended
+            source: "@{{status}}"
+            sourceLocation: BODY
+          - name: mapper.product.inventory.read.startDate
+            title: The date from which the product starts
+            description: ""
+            target: "@{{startDate}}"
+            targetLocation: BODY
+            requiredMapping: true
+            source: "@{{createdAt}}"
+            sourceLocation: BODY

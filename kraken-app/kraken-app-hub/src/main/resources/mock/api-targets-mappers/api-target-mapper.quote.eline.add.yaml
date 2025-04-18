@@ -1,0 +1,59 @@
+---
+kind: kraken.component.api-target-mapper
+apiVersion: v1
+metadata:
+  key: mef.sonata.api-target-mapper.quote.eline.add
+  name: Mapper Of Creating Quote Eline
+  description: This operation creates a Quote entity
+spec:
+  trigger:
+    path: /mefApi/sonata/quoteManagement/v8/quote
+    method: post
+    productType: access_e_line
+    actionType: add
+  endpoints:
+    - id: create quote for connection
+      path: /api/pricing/calculate
+      method: post
+      serverKey: mef.sonata.api-target-spec.con1718940696857
+      mappers:
+        request:
+        response:
+          - name: mapper.quote.eline.add.state
+            title: Quote State Mapping
+            description: quote state mapping
+            source: "answered"
+            sourceLocation: ""
+            target: "@{{quoteItem[0].state}}"
+            targetType: enum
+            targetLocation: BODY
+            targetValues:
+              - accepted
+              - acknowledged
+              - answered
+              - approved.orderable
+              - approved.orderableAlternate
+              - inProgress
+              - inProgress.draft
+              - abandoned
+              - rejected
+              - unableToProvide
+            valueMapping:
+              answered: answered too
+              ACCEPTED: accepted
+            requiredMapping: true
+          - name: mapper.quote.eline.add.price.value
+            title: Quote Price Value Mapping
+            description: quote price value mapping
+            source: "@{{responseBody.results[0].price}}"
+            sourceLocation: ""
+            target: "@{{quoteItem[0].quoteItemPrice[*].price.dutyFreeAmount.value}}"
+            requiredMapping: true
+          - name: mapper.quote.eline.add.price.unit
+            title: Quote Price Unit Mapping
+            description: quote price unit mapping
+            source: "USD"
+            sourceLocation: BODY
+            target: "@{{quoteItem[0].quoteItemPrice[*].price.dutyFreeAmount.unit}}"
+            targetLocation: BODY
+            requiredMapping: true
