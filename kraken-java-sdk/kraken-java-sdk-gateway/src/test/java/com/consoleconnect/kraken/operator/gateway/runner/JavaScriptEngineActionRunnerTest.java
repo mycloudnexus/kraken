@@ -11,6 +11,7 @@ import com.consoleconnect.kraken.operator.core.service.ApiActivityLogService;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.core.toolkit.YamlToolkit;
 import com.consoleconnect.kraken.operator.gateway.CustomConfig;
+import com.consoleconnect.kraken.operator.gateway.dto.RoutingResultDto;
 import com.consoleconnect.kraken.operator.gateway.filter.KrakenFilterConstants;
 import com.consoleconnect.kraken.operator.gateway.template.SpELEngine;
 import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
@@ -72,7 +73,12 @@ class JavaScriptEngineActionRunnerTest extends AbstractIntegrationTest {
   @MethodSource(value = "buildRoutingErrorResult")
   void givenRoutingError_whenHandle_thenThrowsException(String resultJson) {
     Assertions.assertThrowsExactly(
-        KrakenException.class, () -> runner.handleRoutingResult(resultJson));
+        KrakenException.class,
+        () -> {
+          RoutingResultDto routingResultDto =
+              JsonToolkit.fromJson(resultJson, RoutingResultDto.class);
+          runner.handleRoutingResult(routingResultDto);
+        });
   }
 
   @SneakyThrows
@@ -103,7 +109,8 @@ class JavaScriptEngineActionRunnerTest extends AbstractIntegrationTest {
     Mockito.doReturn(entity.getId().toString())
         .when(exchange)
         .getAttribute(KrakenFilterConstants.X_LOG_ENTITY_ID);
-    runner.recordProductType(exchange, resultInJson);
+    RoutingResultDto routingResultDto = JsonToolkit.fromJson(resultInJson, RoutingResultDto.class);
+    runner.recordProductType(exchange, routingResultDto);
     entity = apiActivityLogRepository.findById(entity.getId()).orElseThrow();
     String productType = entity.getProductType();
     Assertions.assertEquals("UNI", productType);
