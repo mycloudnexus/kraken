@@ -27,10 +27,9 @@ spec:
       actions:
         - id: persist_http_request_address_validate
           actionType: buildin@db
-          env:
-            bizType: SHARE
           with:
             action: create
+            bizType: SHARE
             properties:
               - headers
               - queryParameters
