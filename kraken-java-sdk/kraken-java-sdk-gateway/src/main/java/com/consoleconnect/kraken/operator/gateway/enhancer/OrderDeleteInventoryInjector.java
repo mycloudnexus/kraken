@@ -23,7 +23,6 @@ public interface OrderDeleteInventoryInjector {
   final class LogHolder {}
 
   String RESPONSE_ID = "$.entity.response.id";
-  String INVENTORY_LIST_KEY = "inventory.list";
   String INVENTORY_LIST_OUTPUT_KEY = "inventoryList";
   String DELETE_KEY = "delete";
   String ADD_KEY = "add";
@@ -61,7 +60,7 @@ public interface OrderDeleteInventoryInjector {
     // 2. check this created order id exist or not
     if (entityOfAddOptional.isPresent()) {
       // replace entity and entity id in the inputs and go forward
-      LogHolder.log.info("created order record exists for this instanceId:{}", instanceId);
+      LogHolder.log.info("Order created record has existed for this instanceId:{}", instanceId);
       HttpRequestEntity httpRequestEntity = entityOfAddOptional.get();
       outputs.put(KrakenFilterConstants.X_ENTITY, JsonToolkit.toJson(httpRequestEntity));
       outputs.put(KrakenFilterConstants.X_ENTITY_ID, httpRequestEntity.getId().toString());
@@ -69,7 +68,7 @@ public interface OrderDeleteInventoryInjector {
       // read product information of delete order from database and step into mock response
       Optional<HttpRequestEntity> entityOfDeleteOptional =
           filterRequestByProductAction(httpRequestEntities, DELETE_KEY);
-      LogHolder.log.info("created order record doesn't exist for this instanceId:{}", instanceId);
+      LogHolder.log.info("Order created record doesn't exist for this instanceId:{}", instanceId);
       if (entityOfDeleteOptional.isPresent()) {
         routingResultDto.setForwardDownstream(false);
       }

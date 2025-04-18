@@ -126,8 +126,11 @@ spec:
 
         - id: mock-response
           actionType: buildin@mock-response
+          with:
+            render: true
           env:
             forwardDownstream: ${inventoryList.forwardDownstream}
+            body: ${targetApiConfig.endpoints[0].responseBody}
 
         - id: modify-response-body
           actionType: buildin@modify-response-body

@@ -2,6 +2,7 @@ package com.consoleconnect.kraken.operator.gateway.runner;
 
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPIFacets;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
+import com.consoleconnect.kraken.operator.gateway.template.SpELEngine;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
@@ -31,11 +32,15 @@ public class MockResponseGatewayFilterFactory
         Map<String, Object> context = contextOptional.get();
         Integer statusCode = (Integer) context.getOrDefault("statusCode", 200);
         Map<String, String> headers = (Map<String, String>) context.get("headers");
+        Boolean render = (Boolean) context.getOrDefault("render", false);
         String body =
             context.get("body") instanceof String str
                 ? str
                 : JsonToolkit.toJson(context.get("body"));
-
+        if (Boolean.TRUE.equals(render)) {
+          String result = SpELEngine.evaluate(body, context);
+          log.info("Mock rendered result:{}", result);
+        }
         log.info("Mock response status code: {}", statusCode);
         log.info("Mock response headers: {}", headers);
         log.info("Mock response body: {}", body);
