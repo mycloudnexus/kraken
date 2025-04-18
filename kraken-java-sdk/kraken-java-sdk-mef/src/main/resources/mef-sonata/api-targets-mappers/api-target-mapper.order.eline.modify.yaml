@@ -25,68 +25,10 @@ spec:
       serverKey: ""
       mappers:
         schemaRef:
-          ref: "classpath:/mef-sonata/api-common-mappers/api-target-mapper.order.common.add.yaml"
+          ref: "classpath:/mef-sonata/api-common-mappers/api-target-mapper.order.common.modify.yaml"
           params:
             - key: productType
               val: eline
-            - key: action
-              val: modify
         request:
-          - name: mapper.order.eline.modify.classOfService
-            title: "The class of Service of the Eline"
-            source: "@{{productOrderItem[0].product.productConfiguration.classOfService}}"
-            sourceLocation: BODY
-            sourceType: string
-            target: ""
-            targetLocation: BODY
-            requiredMapping: false
-          - name: mapper.order.eline.modify.product.productConfiguration.buyerCompanyId
-            title: "The Id of buyer Company"
-            source: "@{{productOrderItem[0].product.productConfiguration.buyerCompanyId}}"
-            sourceLocation: BODY
-            sourceType: string
-            target: ""
-            targetLocation: BODY
-            requiredMapping: false
-          - name: mapper.order.eline.modify.product.productConfiguration.destUNIMetroId
-            title: "The metro id of the destination UNI"
-            source: "@{{productOrderItem[0].product.productConfiguration.destUNIMetroId}}"
-            sourceLocation: BODY
-            sourceType: string
-            target: ""
-            targetLocation: BODY
-            requiredMapping: false
-          - name: mapper.order.eline.modify.product.productConfiguration.type
-            title: "customized product type"
-            source: "@{{productOrderItem[0].product.productConfiguration.type}}"
-            sourceLocation: BODY
-            sourceType: string
-            target: ""
-            targetLocation: BODY
-            requiredMapping: false
-          - name: mapper.order.eline.modify.srcUNI
-            title: "source UNI or ENNI id"
-            source: "@{{productOrderItem[0].product.productRelationship[0].id}}"
-            sourceLocation: BODY
-            sourceType: string
-            target: ""
-            targetLocation: BODY
-            requiredMapping: true
-          - name: mapper.order.eline.modify.destUNI
-            title: "destination UNI id"
-            source: "@{{productOrderItem[0].product.productRelationship[1].id}}"
-            sourceLocation: BODY
-            sourceType: string
-            target: ""
-            targetLocation: BODY
-            requiredMapping: true
-          - name: mapper.order.eline.modify.product.id
-            title: "The unique identifier of an in-service Product that is the ordering subject"
-            source: "@{{productOrderItem[0].product.id}}"
-            sourceLocation: BODY
-            sourceType: string
-            target: ""
-            targetLocation: BODY
-            requiredMapping: true
         response:
 
