@@ -105,7 +105,7 @@ const AuditLog = () => {
     {
       key: "resources",
       title: "Affected Resources",
-      render: (log: ILogActivity) => log?.request?.metadata?.name,
+      render: (log: ILogActivity) => log?.resource,
     },
     {
       key: "userEmail",
