@@ -1,30 +1,19 @@
-export const getProductName = (product: string) => {
-  switch (product) {
-    case "ACCESS_E_LINE":
-      return "Access Eline";
-    case "UNI":
-      return "UNI";
-    case "INTERNET_ACCESS":
-      return "Internet Access";
-    case "SHARE":
-      return "Share";
-    default:
-      return "-";
-  }
+export const getProductName = (productTypes: string[], product: string) => {
+  const prod = productTypes.find(prod => prod.split(':').shift() === product);
+  console.log("----------------prod:" + prod);
+  return parseProductName(prod);
 };
 
-export const parseProductName = (product: string) => {
+export const parseProductName = (product?: string) => {
   switch (product) {
     case "ACCESS_E_LINE":
       return "Access Eline";
     case "UNI":
       return "UNI";
-    case "INTERNET_ACCESS":
-      return "Internet Access";
     case "SHARE":
-      return "Share";
+      return "Shared";
     default:
-      return product.split(':').pop();
+      return product?.split(':')?.pop();
   }
 };
 
