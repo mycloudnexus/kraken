@@ -278,8 +278,8 @@ app:
     mef.sonata.api-target-mapper.inventory.uni.read: <2,1>
     mef.sonata.api-target-mapper.inventory.eline.read: <2,2>
   product-types:
-    - "UNI:Uni"
-    - "ACCESS_E_LINE:Access Eline "
+    - "UNI:UNI"
+    - "ACCESS_E_LINE:Access Eline"
     - "INTERNET_ACCESS:Internet Access"
     - "SHARE:Shared"
   supported-product-types:
