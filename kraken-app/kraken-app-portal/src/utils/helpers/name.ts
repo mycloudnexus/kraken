@@ -1,6 +1,5 @@
 export const getProductName = (productTypes: string[], product: string) => {
   const prod = productTypes.find(prod => prod.split(':').shift() === product);
-  console.log("----------------prod:" + prod);
   return parseProductName(prod);
 };
 
