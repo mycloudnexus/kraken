@@ -79,8 +79,7 @@ public interface ResponseCodeTransform extends PathOperator {
     }
   }
 
-  default void handleRoutingResult(String resultJson) {
-    RoutingResultDto routingResultDto = JsonToolkit.fromJson(resultJson, RoutingResultDto.class);
+  default void handleRoutingResult(RoutingResultDto routingResultDto) {
     String errorMsg = routingResultDto.getErrorMsg();
     String errorCode = routingResultDto.getErrorCode();
     LogHolder.log.info(
