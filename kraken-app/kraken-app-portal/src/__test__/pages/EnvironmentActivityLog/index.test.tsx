@@ -25,6 +25,14 @@ test("EnvironmentActivityLog page", () => {
     isFetched: true,
   } as any)
 
+  vi.spyOn(envHooks, 'useGetProductTypes').mockReturnValue({
+          data: [
+              "UNI:UNI",
+              "ACCESS_E_LINE:Access Eline",
+              "SHARE:Shared"
+          ]
+      } as any)
+
   vi.spyOn(envHooks, 'useGetProductEnvActivities').mockReturnValue({
     data: {
       data: [
