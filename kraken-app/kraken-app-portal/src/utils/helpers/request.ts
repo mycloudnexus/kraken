@@ -1,118 +1,85 @@
-import { message, notification } from "antd";
-import axios, { AxiosResponse } from "axios";
-import qs from "qs";
-import { clearData, getData, isRefreshTokenExpired, storeData } from "./token";
-import { AXIOS_MESSAGE } from "../constants/message";
-import { ROUTES } from "../constants/route";
-import { get } from "lodash";
-import createAuthRefreshInterceptor from "axios-auth-refresh";
-
-export const DIRECT_LOGIN_MSG = [
-  AXIOS_MESSAGE.TOKEN_EXPIRED,
-  AXIOS_MESSAGE.TOKEN_INVALID,
-];
-
-export const refreshTokenFnc = async () => {
-  const token = getData("token");
-  const refreshToken = getData("refreshToken");
-  if (!refreshToken || isRefreshTokenExpired() || !token) {
-    clearData("token");
-    clearData("tokenExpired");
-    window.location.href = `${window.location.origin}${ROUTES.LOGIN}`;
-    return;
-  }
-  try {
-    const res = await axios.post(
-      import.meta.env.VITE_BASE_API + "/auth/token",
-      {
-        refreshToken,
-        grantType: "REFRESH_TOKEN",
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${getData("token")}`,
-        },
-      }
-    );
-
-    const expiresIn = get(res, "data.data.expiresIn");
-    const nToken = get(res, "data.data.accessToken");
-    const refreshTokenExpiresIn = get(res, "data.data.refreshTokenExpiresIn");
-    const newRefreshToken = get(res, "data.data.refreshToken");
-    if (nToken && expiresIn) {
-      storeData("token", nToken);
-      storeData("refreshToken", newRefreshToken);
-      storeData("tokenExpired", String(Date.now() + expiresIn * 1000));
-      storeData(
-        "refreshTokenExpiresIn",
-        String(Date.now() + refreshTokenExpiresIn * 1000)
-      );
-    }
-  } catch (e) {
-    void message.error("Your session has expired. Please log in again.");
-    clearData("token");
-    clearData("tokenExpired");
-    window.location.href = `${window.location.origin}${ROUTES.LOGIN}`;
-    return Promise.reject(new Error("Token expired"));
-  }
-};
+import axios, { AxiosError, AxiosResponse, isCancel } from 'axios'
+import _ from 'lodash'
+import { ENV } from '@/constants'
 
 const request = axios.create({
   timeout: 50000,
-  baseURL: import.meta.env.VITE_BASE_API,
-});
-
-createAuthRefreshInterceptor(request, refreshTokenFnc, {
-  statusCodes: [401],
-  pauseInstanceWhileRefreshing: true,
-  onRetry: (requestConfig) => {
-    return {
-      ...requestConfig,
-      headers: {
-        ...requestConfig.headers,
-        Authorization: `Bearer ${getData("token")}`,
-      },
-      skipAuthRefresh: false,
-    };
-  },
-  shouldRefresh: (error) => {
-    const errorMsg = get(error, "response.data.error", "");
-    return (
-      DIRECT_LOGIN_MSG.includes(String(errorMsg)) ||
-      error?.response?.status === 401
-    );
-  },
-});
+  baseURL: ENV.API_BASE_URL
+})
+request.interceptors.request.use(async (config) => {
+  const { getAccessToken } = window.portalConfig ?? {}
+  if (!_.isFunction(window?.portalConfig?.getAccessToken)) {
+    return config
+  }
+  const token = await getAccessToken({
+    authorizationParams: {
+      redirect_uri: window.location.origin
+    }
+  })
+  config.headers.Authorization = `Bearer ${token}`
+  return config;
+})
 
 request.interceptors.request.use((config: any) => {
-  const token = getData("token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+  const currentCompany = window.sessionStorage.getItem('currentCompany')
+  if (currentCompany) {
+    config.headers['x-mef-lso-api-adapter-customer-id'] = currentCompany
   }
-  if (config.method === "get") {
-    config.paramsSerializer = {
-      serialize: (params: any) =>
-        qs.stringify(params, { arrayFormat: "repeat" }),
-    };
-  }
-  return config;
-});
+  return config
+})
 
 request.interceptors.response.use(
-  (response: AxiosResponse<any>) => {
-    const code = response.data.code || 200;
-    const message = response.data.error || "";
-    if (
-      (code === 401 || code === 403) &&
-      process.env.NODE_ENV !== "development"
-    ) {
-      notification.error({ message });
+  (response: AxiosResponse) => response.data,
+  (error: AxiosError) => {
+    const status = _.get(error, 'response.status')
+    const message = _.get(error, 'response.data.error.message')
+    const principalId = _.get(error, 'response.data.error.details.principalId')
+    const pbacErrorEmptyPrincipal =
+      status === 401 && message === accessDenied && _.isPlainObject(principalId) && _.isEmpty(principalId)
+    const sessionExpired = status === 401 && invalidToken.includes(message!)
+    if (pbacErrorEmptyPrincipal || sessionExpired) {
+      const origin = window.location.origin
+      window.location.href = origin +"/login/sso"
     }
-    return response.data;
-  },
-  (err) => {
-    return Promise.reject(get(err, "response.data", err));
-  }
-);
 
-export default request;
+    /**
+     * Send contextual data to Sentry
+     */
+    if (error.response?.data) {
+      let errorData = error.response.data
+
+      try {
+        errorData = JSON.stringify(error.response.data)
+      } catch (err) {
+        console.log('-err', err)
+      }
+    }
+
+    return Promise.reject(error)
+  }
+)
+
+export const isCancelCaught = (thrown: object) => isCancel(thrown)
+
+const invalidToken = ['The user is not logged in', 'The session token has expired', 'The session token been deleted']
+
+const accessDenied = 'Access denied'
+
+export const fetchData = (path: string, config?: any) => request.get(path, config).then((value) => value.data)
+
+export const fetchCollection = (path: string) => fetchData(path).then((d: { results: any[] }) => d.results)
+
+export const post = <ResponseBody = any>(path: string, data: any, config?: any) =>
+  request.post<ResponseBody>(path, data, config)
+
+export const get = <ResponseBody = any>(path: string, config?: any) => request.get<ResponseBody>(path, config)
+
+export const put = <ResponseBody = any>(path: string, data: any, config?: any) =>
+  request.put<ResponseBody>(path, data, config)
+
+export const patch = <ResponseBody = any>(path: string, data: any, config?: any) =>
+  request.patch<ResponseBody>(path, data, config)
+
+export const deleteData = <ResponseBody = any>(path: string, config?: any) => request.delete<ResponseBody>(path, config)
+
+export default request

@@ -1,5 +1,7 @@
-import { USER } from "@/utils/constants/api";
+import { SIGN_UP, USER, USER_AUTH_TOKEN, USER_ROLES } from "@/utils/constants/api";
 import request from "@/utils/helpers/request";
+import { SignUpPayload, ResponseType } from "./types";
+import { BasicAuthUser } from "@/components/AuthProviders/basic/BasicAuthContext";
 
 export const getListUser = (params: any) => {
   return request(`${USER}`, {
@@ -50,3 +52,22 @@ export const resetPwdUser = (id: string, password: string) => {
 export function getSystemInfo() {
   return request(`system-info`);
 };
+
+export const getUserDetail = (name: string) => {
+  return request(`/userinfo`);
+}
+
+export const getUserAuthToken = () => {
+  return request(USER_AUTH_TOKEN)
+}
+
+export const getUserRoles = () => {
+  return request(USER_ROLES)
+}
+
+export const signUpUser = (data: SignUpPayload): Promise<ResponseType<any>> => {
+  return request(SIGN_UP, {
+    method: 'post',
+    data
+  })
+}

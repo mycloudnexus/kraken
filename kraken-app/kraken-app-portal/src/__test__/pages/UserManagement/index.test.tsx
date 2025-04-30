@@ -1,5 +1,5 @@
+import { UserManagement } from "@/components/AuthProviders/common/UserManagement";
 import * as userHooks from "@/hooks/user";
-import UserManagement from "@/pages/UserManagement";
 import { queryClient } from "@/utils/helpers/reactQuery";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render } from "@testing-library/react";

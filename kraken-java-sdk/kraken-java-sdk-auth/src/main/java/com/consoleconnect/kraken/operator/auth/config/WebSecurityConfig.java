@@ -2,16 +2,12 @@ package com.consoleconnect.kraken.operator.auth.config;
 
 import com.consoleconnect.kraken.operator.auth.model.AuthDataProperty;
 import com.consoleconnect.kraken.operator.auth.model.ResourceServerEnabled;
-import com.consoleconnect.kraken.operator.auth.model.UserLoginEnabled;
 import com.consoleconnect.kraken.operator.auth.security.*;
 import com.consoleconnect.kraken.operator.auth.service.JwtDecoderService;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -22,33 +18,12 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtIss
 import org.springframework.security.oauth2.server.resource.web.server.authentication.ServerBearerTokenAuthenticationConverter;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.ServerAuthenticationConverter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.reactive.CorsConfigurationSource;
-import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @Slf4j
 @EnableWebFluxSecurity
 public class WebSecurityConfig {
 
-  @ConditionalOnMissingBean(ResourceServerEnabled.class)
-  @Bean
-  public SecurityWebFilterChain noAuthSecurityWebFilterChain(
-      ServerHttpSecurity http, AuthDataProperty.ResourceServer resourceServer) {
-    log.warn("Webflux security with no auth activated");
-    return http.authorizeExchange(auth -> auth.anyExchange().permitAll())
-        .csrf(ServerHttpSecurity.CsrfSpec::disable)
-        .cors(
-            cors ->
-                cors.configurationSource(
-                    corsConfigurationSource(
-                        resourceServer.getCorsAllowedHeaders(),
-                        resourceServer.getCorsAllowedOrigins(),
-                        resourceServer.getCorsAllowedMethods())))
-        .build();
-  }
-
-  @ConditionalOnBean(ResourceServerEnabled.class)
   @Bean
   @Order(1)
   public SecurityWebFilterChain securityWebFilterChain(
@@ -56,13 +31,12 @@ public class WebSecurityConfig {
       AuthDataProperty.ResourceServer resourceServer,
       JwtIssuerReactiveAuthenticationManagerResolver resolver,
       ServerAuthenticationConverter authenticationConverter,
-      Map<String, SecurityChecker> securityCheckerMap,
-      ApplicationContext applicationContext) {
+      Map<String, SecurityChecker> securityCheckerMap) {
     http.csrf(ServerHttpSecurity.CsrfSpec::disable)
         .cors(
             cors ->
                 cors.configurationSource(
-                    corsConfigurationSource(
+                    CommonAuthConfig.corsConfigurationSource(
                         resourceServer.getCorsAllowedHeaders(),
                         resourceServer.getCorsAllowedOrigins(),
                         resourceServer.getCorsAllowedMethods())))
@@ -98,9 +72,7 @@ public class WebSecurityConfig {
             oauth2 ->
                 oauth2
                     .authenticationManagerResolver(resolver)
-                    .bearerTokenConverter(authenticationConverter))
-        .addFilterAfter(
-            new JWTSecurityGlobalFilter(resourceServer), SecurityWebFiltersOrder.AUTHORIZATION);
+                    .bearerTokenConverter(authenticationConverter));
     addSecurityFilter(http, resourceServer, securityCheckerMap);
     return http.build();
   }
@@ -128,24 +100,6 @@ public class WebSecurityConfig {
   public TenantAuthenticationManagerResolver tenantAuthenticationManagerResolver(
       AuthDataProperty.ResourceServer resourceServer, JwtDecoderService decoderProvider) {
     return new TenantAuthenticationManagerResolver(resourceServer, decoderProvider);
-  }
-
-  @ConditionalOnBean(UserLoginEnabled.class)
-  @Bean
-  public KrakenPasswordEncoder passwordEncoder(AuthDataProperty.Login login) {
-    return new KrakenPasswordEncoder(login);
-  }
-
-  CorsConfigurationSource corsConfigurationSource(
-      List<String> allowedHeaders, List<String> allowedOrigins, List<String> allowedMethods) {
-    CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedHeaders(allowedHeaders);
-    configuration.setAllowedOrigins(allowedOrigins);
-    configuration.setAllowedMethods(allowedMethods);
-    UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource =
-        new UrlBasedCorsConfigurationSource();
-    urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", configuration);
-    return urlBasedCorsConfigurationSource;
   }
 
   private void addSecurityFilter(

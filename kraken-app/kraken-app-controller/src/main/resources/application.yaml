@@ -126,6 +126,7 @@ app:
   security:
     login:
       enabled: true
+      mode: basic
       hmac-secret: OWUxMjFhNmEtZmY5My00MTNkLWIzNTctZTczY2ZjNWM5ODMy
       user-list:
         - name: admin
@@ -152,6 +153,14 @@ app:
     resource-server:
       enabled: true
       pathPermissions:
+        - path: /mgmt/**
+          http-methods:
+            - POST
+            - PATCH
+            - DELETE
+            - GET
+          roles:
+            - ADMIN
         - path: /auth/resetPassword
           http-methods:
             - POST
@@ -196,6 +205,8 @@ app:
         - issuer: https://kraken.consoleconnect.com/issuer
           key-id: kraken
           secret: MjRhMjNhNGYtMWUzMS00ZTY4LTlhYzgtMzY5NDcwYzNjNDE4
+        - issuer: ${IAM_CUSTOMER_TOKEN_ISSUER_URI:https://${app.security.iam.auth0.domain}/}
+          jwks-uri: https://${app.security.iam.auth0.domain}/.well-known/jwks.json
       allowed-paths:
         - /assets/mef.sonata.api-spec.order/api-docs
         - /assets/mef.sonata.api-spec.serviceability.address/api-docs
