@@ -153,12 +153,6 @@ export interface InviteUserResponse {
   roles: string[]
 }
 
-export interface InviteUserRequestBody {
-  email: string
-  roles: string[]
-  sendEmail?: boolean
-}
-
 export interface InviteCompanyMemberRequestBody {
   userId: string
   roles: string[]
