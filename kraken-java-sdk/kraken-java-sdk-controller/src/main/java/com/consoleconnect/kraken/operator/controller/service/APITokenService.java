@@ -161,6 +161,13 @@ public class APITokenService {
         || jwtDecoderPropertyOptional.get().getIntrospection().isEnabled()) {
       log.info("introspection the accessToken to get envId");
       return findOneByAuth(authentication.getToken().getTokenValue())
+          .map(
+              apiToken -> {
+                if (apiToken.isRevoked()) {
+                  throw KrakenException.unauthorized("The api token has been deprecated.");
+                }
+                return apiToken;
+              })
           .map(APIToken::getEnvId)
           .orElseThrow(
               () -> {
