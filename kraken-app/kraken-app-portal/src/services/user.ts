@@ -1,7 +1,6 @@
 import { SIGN_UP, USER, USER_AUTH_TOKEN, USER_ROLES } from "@/utils/constants/api";
 import request from "@/utils/helpers/request";
 import { SignUpPayload, ResponseType } from "./types";
-import { BasicAuthUser } from "@/components/AuthProviders/basic/BasicAuthContext";
 
 export const getListUser = (params: any) => {
   return request(`${USER}`, {
