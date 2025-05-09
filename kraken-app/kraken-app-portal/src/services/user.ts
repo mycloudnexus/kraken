@@ -63,10 +63,3 @@ export const getUserAuthToken = () => {
 export const getUserRoles = () => {
   return request(USER_ROLES)
 }
-
-export const signUpUser = (data: SignUpPayload): Promise<ResponseType<any>> => {
-  return request(SIGN_UP, {
-    method: 'post',
-    data
-  })
-}
