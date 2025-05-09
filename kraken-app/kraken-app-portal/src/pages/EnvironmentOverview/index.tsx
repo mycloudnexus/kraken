@@ -80,7 +80,7 @@ const EnvironmentOverview = () => {
           closeConfirm && modalConfirmRef?.current?.destroy();
           showModalShowNew(res?.data?.token);
         } catch (e: any) {
-          notification.error({ message: e?.data?.error || "Rotation failed" });
+          notification.error({ message: e?.data?.error ?? "Rotation failed" });
         }
       },
       [currentProduct, createApiKeyMutate]
