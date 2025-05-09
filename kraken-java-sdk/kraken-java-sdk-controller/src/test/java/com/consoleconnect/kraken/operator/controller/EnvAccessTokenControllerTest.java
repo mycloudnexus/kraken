@@ -78,7 +78,9 @@ class EnvAccessTokenControllerTest extends AbstractIntegrationTest {
   @Test
   void givenCorrectRequestPayload_whenRotate_thenReturnOk() {
     CreateAPITokenRequest body = new CreateAPITokenRequest();
-    body.setName("token-2" + System.currentTimeMillis());
+    body.setName("token-" + System.currentTimeMillis());
+    body.setUserId(UUID.randomUUID().toString());
+    body.setTokenExpiresInSeconds(100_100_100);
     this.webTestClientHelper.postAndVerify(
         uriBuilder -> uriBuilder.path(ROTATE_ALL_URL).build(),
         body,
