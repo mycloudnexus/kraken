@@ -46,6 +46,7 @@ import {
   getValidateServerName,
   editContactInformation,
   getProductTypes,
+  rotateApiKey,
 } from "@/services/products";
 import { STALE_TIME } from "@/utils/constants/common";
 import {
@@ -90,6 +91,7 @@ import { get } from "lodash";
 export const PRODUCT_CACHE_KEYS = {
   active_buyer: "active_buyer",
   create_api_key: "create_api_key",
+  rotate_api_key: "rotate_api_key",
   create_buyer: "create_buyer",
   create_new_component: "create_new_component",
   create_new_version: "create_new_version",
@@ -473,6 +475,18 @@ export const useCreateApiKey = () => {
   return useMutation<any, Error>({
     mutationKey: [PRODUCT_CACHE_KEYS.create_api_key],
     mutationFn: (data: any): any => createApiKey(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [PRODUCT_CACHE_KEYS.get_all_api_key],
+      });
+    },
+  });
+};
+
+export const useRotateApiKey = () => {
+  return useMutation<any, Error>({
+    mutationKey: [PRODUCT_CACHE_KEYS.rotate_api_key],
+    mutationFn: (data: any): any => rotateApiKey(data),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [PRODUCT_CACHE_KEYS.get_all_api_key],
