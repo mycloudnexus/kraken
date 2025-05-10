@@ -11,7 +11,7 @@ request.interceptors.request.use(async (config) => {
   if (!_.isFunction(window?.portalConfig?.getAccessToken)) {
     return config
   }
-  const token = await getAccessToken({
+  const token = await getAccessToken?.({
     authorizationParams: {
       redirect_uri: window.location.origin
     }
@@ -41,20 +41,6 @@ request.interceptors.response.use(
       const origin = window.location.origin
       window.location.href = origin +"/login/sso"
     }
-
-    /**
-     * Send contextual data to Sentry
-     */
-    if (error.response?.data) {
-      let errorData = error.response.data
-
-      try {
-        errorData = JSON.stringify(error.response.data)
-      } catch (err) {
-        console.log('-err', err)
-      }
-    }
-
     return Promise.reject(error)
   }
 )

@@ -1,4 +1,4 @@
-import { SIGN_UP, USER, USER_AUTH_TOKEN, USER_ROLES } from "@/utils/constants/api";
+import { USER, USER_AUTH_TOKEN, USER_ROLES } from "@/utils/constants/api";
 import request from "@/utils/helpers/request";
 
 export const getListUser = (params: any) => {
@@ -50,10 +50,6 @@ export const resetPwdUser = (id: string, password: string) => {
 export function getSystemInfo() {
   return request(`system-info`);
 };
-
-export const getUserDetail = (name: string) => {
-  return request(`/userinfo`);
-}
 
 export const getUserAuthToken = () => {
   return request(USER_AUTH_TOKEN)

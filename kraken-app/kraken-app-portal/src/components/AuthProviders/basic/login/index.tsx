@@ -3,20 +3,16 @@ import Logo from "@/assets/logo.svg";
 import Flex from "@/components/Flex";
 import { useLogin } from "@/hooks/login";
 import { PRODUCT_NAME } from "@/utils/constants/common";
-import { storeData } from "@/utils/helpers/token";
 import { Alert, Button, Form, Input, Typography } from "antd";
-import { get } from "lodash";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import styles from "./index.module.scss";
 import { useBasicAuth } from "@/components/AuthProviders/basic/BasicAuthProvider";
 
 const Login = () => {
-  const navigate = useNavigate();
-  const { mutateAsync: login, isPending } = useLogin();
+  const { isPending } = useLogin();
   const { loginWithCredentials } = useBasicAuth();
 
-  const [error, setError] = useState<string | null>(null);
+  const [error] = useState<string | null>(null);
 
   return (
     <Flex

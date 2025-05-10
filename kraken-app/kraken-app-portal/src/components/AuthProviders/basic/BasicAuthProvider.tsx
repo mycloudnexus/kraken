@@ -1,5 +1,5 @@
 
-import React, { useCallback, useContext, useEffect, useMemo, useReducer, useRef } from 'react';
+import React, { useContext, useEffect, useMemo, useReducer, useRef } from 'react';
 import BasicAuthContext, { BasicAuthContextInterface, BasicAuthUser, initialAuthState } from './BasicAuthContext';
 import { AuthStates, stateReducer } from './AuthStates';
 import { clearData, getData, isRefreshTokenExpired, isTokenExpiredIn, storeData } from '@/utils/helpers/token';
@@ -12,7 +12,7 @@ import { ENV } from '@/constants';
 import { getCurrentUser } from '@/services/user';
 import { AuthUser } from './types';
 
-window.portalConfig = ENV;
+window.portalConfig = ENV
 
 export interface BasicAuthenticateProps {
   children?: React.ReactNode;
@@ -30,14 +30,6 @@ const BasicAuthProvider = (opts : BasicAuthenticateProps) => {
 
   const [state, dispatch] = useReducer(stateReducer, initialAuthState);
   const init = useRef(false);
-
-  const handleError = useCallback((error: Error) => {
-    dispatch({
-      type: AuthStates.ERROR,
-      error: error,
-    });
-    return error;
-  }, []);
 
   useEffect(() => {
     if (init.current) {

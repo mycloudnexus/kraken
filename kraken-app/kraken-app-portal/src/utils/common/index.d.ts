@@ -14,7 +14,7 @@ declare module '*.png'
 
 declare interface Window {
   portalConfig: Record<string, unknown> & {
-    getAccessToken: {
+    getAccessToken?: {
       (
         options: GetTokenSilentlyOptions & { detailedResponse: true }
       ): Promise<GetTokenSilentlyVerboseResponse>;
@@ -23,8 +23,8 @@ declare interface Window {
         GetTokenSilentlyVerboseResponse | string
       >;
     };
-    checkAuthenticated: () => boolean;
-    getCurrentAuthUser: () => any;
+    checkAuthenticated?: () => boolean;
+    getCurrentAuthUser?: () => any;
   }
   portalLoggedInUser: Record<string, unknown>
   portalAccessRoles: Record<string, unknown>
