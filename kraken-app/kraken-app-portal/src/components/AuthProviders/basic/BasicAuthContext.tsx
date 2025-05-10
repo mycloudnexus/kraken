@@ -1,8 +1,7 @@
-import { AuthUser } from "@/stores/type";
 import { createContext } from "react";
+import { AuthUser } from "./types";
 
-const err = (): never => {
-  throw new Error('Invalid context');
+const err = (): any => {
 };
 
 export const initialAuthState: BasicAuthState<AuthUser> = {

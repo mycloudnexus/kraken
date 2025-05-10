@@ -2,7 +2,7 @@ import { render } from "@testing-library/react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@/utils/helpers/reactQuery";
 import { BrowserRouter } from "react-router-dom";
-import UserModal from "@/pages/UserManagement/components/UserModal";
+import UserModal from "@/components/AuthProviders/basic/components/UserManagement/components/UserModal";
 
 test("UserModal test", () => {
   const { container } = render(

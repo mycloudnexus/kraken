@@ -19,7 +19,6 @@ import { useBasicAuth } from "../../BasicAuthProvider";
 const BasicHeader = ({ info }: Readonly<{ info?: ISystemInfo }>) => {
   const { logout } = useBasicAuth();
   const user = window.portalConfig.getCurrentAuthUser();
-  console.log("window.portalConfig.getCurrentAuthUser: " + JSON.stringify(user))
   
   const location = useLocation();
   const { currentUser } = useUser();

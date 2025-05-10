@@ -1,5 +1,5 @@
 import { fireEvent, render } from "@/__test__/utils";
-import Login from "@/pages/Login";
+import Login from "@/components/AuthProviders/basic/login";
 
 describe("test login", () => {
   test("Login page", async () => {

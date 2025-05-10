@@ -9,9 +9,9 @@ export * from '@testing-library/react'
 export function render(component: React.ReactNode) {
   return jestRender(
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        {component}
-      </BrowserRouter>
+        <BrowserRouter>
+          {component}
+        </BrowserRouter>
     </QueryClientProvider>
   )
 }
