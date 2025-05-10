@@ -24,6 +24,7 @@ import org.springframework.security.web.server.authentication.ServerAuthenticati
 @EnableWebFluxSecurity
 public class WebSecurityConfig {
 
+  @ConditionalOnBean(ResourceServerEnabled.class)
   @Bean
   @Order(1)
   public SecurityWebFilterChain securityWebFilterChain(
