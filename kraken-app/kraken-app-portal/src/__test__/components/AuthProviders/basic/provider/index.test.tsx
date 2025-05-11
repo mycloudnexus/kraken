@@ -8,7 +8,6 @@ import { useBoolean } from 'usehooks-ts';
 import Login from '@/components/AuthProviders/basic/login';
 import * as requests from "@/components/AuthProviders/basic/components/utils/request";
 
-
 const TestingComponent = () => {
   const { checkAuthenticated } = useBasicAuth();
   const { value: isAuthenticated, setTrue, setFalse } = useBoolean(false);
@@ -18,7 +17,7 @@ const TestingComponent = () => {
       } else {
         setFalse();
       }
-    }, [checkAuthenticated])
+    }, [checkAuthenticated]);
   return (
     <>
       <p data-testId="checkAuthenticated">{ "" + isAuthenticated }</p>
@@ -133,7 +132,9 @@ describe('Use basic auth provider', () => {
       data: {
         data: {
           expiresIn: Date.now(),
-          accessToken: "a"
+          refreshTokenExpiresIn: Date.now(),
+          accessToken: "a",
+          refreshToken: "b"
         }
       }
     });
