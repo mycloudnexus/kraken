@@ -49,7 +49,7 @@ const BasicAuthProvider = (opts : BasicAuthenticateProps) => {
     init.current = true;
     if (checkAuth()) {
       window.portalConfig.getAccessToken = getAccessToken;
-      console.log("Fetching user info...");
+      console.log("Authenticated, Fetching user info...");
 
       let user : BasicAuthUser;
         let userStr = getData("user");
@@ -61,6 +61,7 @@ const BasicAuthProvider = (opts : BasicAuthenticateProps) => {
             user: user,
           });
         } else {
+          console.log("user info not found, fetching new...")
           fetchUser();
         }
     } else {
@@ -111,7 +112,6 @@ const BasicAuthProvider = (opts : BasicAuthenticateProps) => {
       }
       return Promise.resolve(nToken);
     } catch (e) {
-      console.log(`Exception while request access token: ${e}`);
       void message.error("Your session has expired. Please log in again.");
       clearData("token");
       clearData("tokenExpired");
