@@ -1,4 +1,4 @@
-import Role, { ERole } from "@/components/Role";
+import Role from "@/components/Role";
 import { IUser } from "@/utils/types/user.type";
 import { Select, notification } from "antd";
 import clsx from "clsx";
@@ -6,16 +6,11 @@ import { useBoolean } from "usehooks-ts";
 import styles from "./index.module.scss";
 import { useEditUser } from "@/hooks/user";
 import { get } from "lodash";
-import { renderRole } from "../UserModal";
+import { renderRole, roleOptions } from "../UserModal";
 type Props = {
   user: IUser;
   isAdmin?: boolean;
 };
-
-export const roleOptions = [
-  { label: "Admin", value: ERole.ADMIN },
-  { label: "User", value: ERole.USER },
-];
 
 const UserRoleEdit = ({ user, isAdmin }: Props) => {
   const {
