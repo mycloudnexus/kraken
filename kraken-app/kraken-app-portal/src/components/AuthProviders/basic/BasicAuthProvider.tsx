@@ -32,6 +32,7 @@ const BasicAuthProvider = (opts : BasicAuthenticateProps) => {
   const init = useRef(false);
 
   useEffect(() => {
+    console.log("initialize user context");
     if (init.current) {
       return;
     }
@@ -172,8 +173,10 @@ const BasicAuthProvider = (opts : BasicAuthenticateProps) => {
         window.portalConfig.checkAuthenticated = checkAuthenticated;
         window.portalConfig.getCurrentAuthUser = getCurrentAuthUser;
         const curUser = getCurrentUser();
-        console.log("store currentUser: " + JSON.stringify(curUser))
-        storeData("user", JSON.stringify(curUser));
+        if (curUser) {
+          console.log("store currentUser: " + JSON.stringify(curUser))
+          storeData("user", JSON.stringify(curUser));
+        }
       }
     }
   };
