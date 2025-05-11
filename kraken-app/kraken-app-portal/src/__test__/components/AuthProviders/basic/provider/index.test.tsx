@@ -36,7 +36,7 @@ const TestingComponent = () => {
 
 describe('Use basic auth provider', () => {
   it('request access token', () => {
-    mockedAxios.post.mockResolvedValue({
+    mockedAxios.post.mockReturnValue({
       accessToken: "1"
     });
     requests.requestToken("1");
