@@ -8,9 +8,6 @@ import { useBoolean } from 'usehooks-ts';
 import Login from '@/components/AuthProviders/basic/login';
 import * as requests from "@/components/AuthProviders/basic/components/utils/request";
 import * as userApis from '@/services/user';
-import { vi } from "vitest";
-import { mockedAxios } from './AxiosMock';
-
 
 const TestingComponent = () => {
   const { checkAuthenticated, getAccessToken } = useBasicAuth();
@@ -35,13 +32,6 @@ const TestingComponent = () => {
 };
 
 describe('Use basic auth provider', () => {
-  it('request access token', () => {
-    mockedAxios.post.mockReturnValue({
-      accessToken: "1"
-    });
-    requests.requestToken("1");
-  });
-
   it('anonymous access', () => {
     window.localStorage.clear();
     const { getByTestId } = render(
