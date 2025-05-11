@@ -36,6 +36,7 @@ const BasicAuthProvider = (opts : BasicAuthenticateProps) => {
     if (init.current) {
       return;
     }
+    console.log("Checking auth status");
     const fetchUser = async () => {
       const curUser = (getCurrentUser())?.data;
       dispatch({
