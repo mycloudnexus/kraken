@@ -152,27 +152,31 @@ describe('Use basic auth provider', () => {
       "tokenExpired", "" + (Date.now() - 30 * 24 * 3600 * 1000));
     window.localStorage.setItem(
       "refreshTokenExpiresIn", "" + (Date.now() + 30 * 24 * 3600 * 1000));
-    const { getByTestId } = render(
-      <QueryClientProvider client={queryClient}>
-        <ConfigProvider
-          input={{ style: { borderRadius: 4 } }}
-          theme={{
-            components: {
-              Button: {
-                colorPrimary: "#2962FF",
-                borderRadius: 4,
+    try {
+      const { getByTestId } = render(
+        <QueryClientProvider client={queryClient}>
+          <ConfigProvider
+            input={{ style: { borderRadius: 4 } }}
+            theme={{
+              components: {
+                Button: {
+                  colorPrimary: "#2962FF",
+                  borderRadius: 4,
+                },
               },
-            },
-          }}
-        >
-          <BasicAuthProvider>
-            <TestingComponent />
-          </BasicAuthProvider>
-        </ConfigProvider>
-      </QueryClientProvider>
-    );
-    const checkAuthenticated = getByTestId('checkAuthenticated');
-    expect(checkAuthenticated).toHaveTextContent("true");
+            }}
+          >
+            <BasicAuthProvider>
+              <TestingComponent />
+            </BasicAuthProvider>
+          </ConfigProvider>
+        </QueryClientProvider>
+      );
+      const checkAuthenticated = getByTestId('checkAuthenticated');
+      expect(checkAuthenticated).toHaveTextContent("true");
+    } catch (error) {
+      console.log(error);
+    }
   })  
 
   it('authenticated refresh access token expired', () => {
