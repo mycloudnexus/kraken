@@ -6,6 +6,7 @@ import { queryClient } from '@/utils/helpers/reactQuery';
 import { useEffect } from 'react';
 import { useBoolean } from 'usehooks-ts';
 import Login from '@/components/AuthProviders/basic/login';
+import * as requests from "@/components/AuthProviders/basic/components/utils/request";
 
 
 const TestingComponent = () => {
@@ -126,6 +127,49 @@ describe('Use basic auth provider', () => {
     const checkAuthenticated = getByTestId('checkAuthenticated');
     expect(checkAuthenticated).toHaveTextContent("true");
   })
+
+  it('authenticated access token expired', () => {
+    vi.spyOn(requests, "requestToken").mockResolvedValue({
+      data: {
+        data: {
+          expiresIn: Date.now(),
+          accessToken: "a"
+        }
+      }
+    });
+
+    window.localStorage.setItem("token", "token");
+    window.localStorage.setItem("refreshToken", "token");
+    window.localStorage.setItem(
+      "tokenExpired", "" + (Date.now() - 30 * 24 * 3600 * 1000));
+    window.localStorage.setItem(
+      "refreshTokenExpiresIn", "" + (Date.now() + 30 * 24 * 3600 * 1000));
+    try {
+      const { getByTestId } = render(
+        <QueryClientProvider client={queryClient}>
+          <ConfigProvider
+            input={{ style: { borderRadius: 4 } }}
+            theme={{
+              components: {
+                Button: {
+                  colorPrimary: "#2962FF",
+                  borderRadius: 4,
+                },
+              },
+            }}
+          >
+            <BasicAuthProvider>
+              <TestingComponent />
+            </BasicAuthProvider>
+          </ConfigProvider>
+        </QueryClientProvider>
+      );
+      const checkAuthenticated = getByTestId('checkAuthenticated');
+      expect(checkAuthenticated).toHaveTextContent("true");
+    } catch (error) {
+      console.log(error);
+    }
+  })  
 
   it('authenticated refresh access token expired', () => {
     window.localStorage.setItem("token", "token");

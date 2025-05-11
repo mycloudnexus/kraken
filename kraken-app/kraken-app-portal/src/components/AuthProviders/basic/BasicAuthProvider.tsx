@@ -3,7 +3,6 @@ import React, { useContext, useEffect, useMemo, useReducer, useRef } from 'react
 import BasicAuthContext, { BasicAuthContextInterface, BasicAuthUser, initialAuthState } from './BasicAuthContext';
 import { AuthStates, stateReducer } from './AuthStates';
 import { clearData, getData, isRefreshTokenExpired, isTokenExpiredIn, storeData } from '@/utils/helpers/token';
-import axios from 'axios';
 import { get } from 'lodash';
 import { ROUTES } from '@/utils/constants/route';
 import message from 'antd/es/message';
@@ -11,6 +10,7 @@ import { useLogin } from '@/hooks/login';
 import { ENV } from '@/constants';
 import { getCurrentUser } from '@/services/user';
 import { AuthUser } from './types';
+import { requestToken } from './components/utils/request';
 
 window.portalConfig = ENV
 
@@ -91,19 +91,7 @@ const BasicAuthProvider = (opts : BasicAuthenticateProps) => {
       return Promise.resolve(token);
     }
     try {
-      const res = await axios.post(
-        import.meta.env.VITE_BASE_API + "/auth/token",
-        {
-          refreshToken,
-          grantType: "REFRESH_TOKEN",
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${getData("token")}`,
-          },
-        }
-      );
-  
+      const res = await requestToken(refreshToken);
       const expiresIn = get(res, "data.data.expiresIn");
       const nToken = get(res, "data.data.accessToken");
       const refreshTokenExpiresIn = get(res, "data.data.refreshTokenExpiresIn");
