@@ -36,7 +36,7 @@ const BasicAuthProvider = (opts : BasicAuthenticateProps) => {
       return;
     }
     const fetchUser = async () => {
-      const curUser = (await getCurrentUser())?.data;
+      const curUser = (getCurrentUser())?.data;
       dispatch({
         type: AuthStates.LOGIN_COMPLETE,
         user: curUser,
@@ -84,7 +84,7 @@ const BasicAuthProvider = (opts : BasicAuthenticateProps) => {
     if (!refreshToken || isRefreshTokenExpired() || !token) {
       clearData("token");
       clearData("tokenExpired");
-      return Promise.reject(new Error("Token expired"));
+      return Promise.reject(new Error("Refresh token expired"));
     }
     //whether be expired in 5 min
     if (!isTokenExpiredIn(5 * 60 * 1000 * 1000)) {
@@ -112,7 +112,7 @@ const BasicAuthProvider = (opts : BasicAuthenticateProps) => {
       clearData("token");
       clearData("tokenExpired");
       window.location.href = `${window.location.origin}${ROUTES.LOGIN}`;
-      return Promise.resolve("");
+      return Promise.reject(new Error(`Exception while request access token: ${e}`));
     }
   };
 
@@ -140,7 +140,7 @@ const BasicAuthProvider = (opts : BasicAuthenticateProps) => {
       window.portalConfig.getAccessToken = getAccessToken;
       window.portalConfig.checkAuthenticated = checkAuthenticated;
       window.portalConfig.getCurrentAuthUser = getCurrentAuthUser;
-      const curUser = (await getCurrentUser())?.data;
+      const curUser = getCurrentUser();
       console.log("store currentUser: " + JSON.stringify(curUser))
       storeData("user", JSON.stringify(curUser));
 

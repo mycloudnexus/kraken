@@ -7,15 +7,21 @@ import { useEffect } from 'react';
 import { useBoolean } from 'usehooks-ts';
 import Login from '@/components/AuthProviders/basic/login';
 import * as requests from "@/components/AuthProviders/basic/components/utils/request";
+import * as userApis from '@/services/user';
 
 const TestingComponent = () => {
-  const { checkAuthenticated } = useBasicAuth();
+  const { checkAuthenticated, getAccessToken } = useBasicAuth();
   const { value: isAuthenticated, setTrue, setFalse } = useBoolean(false);
   useEffect(() => {
       if (checkAuthenticated()) {
         setTrue();
       } else {
         setFalse();
+      }
+      if (isAuthenticated) {
+        getAccessToken().then(token => {
+          console.log(token)
+        });
       }
     }, [checkAuthenticated]);
   return (
@@ -52,6 +58,14 @@ describe('Use basic auth provider', () => {
   })
 
   it("Login page", async () => {
+
+    window.localStorage.clear();
+
+    vi.spyOn(userApis, "getCurrentUser").mockReturnValue({
+      name: "user1",
+      email: "user1@test.com"
+    });
+
     vi.mock("@/hooks/login", async () => {
       const actual = await vi.importActual("@/hooks/login");
       return {
@@ -100,8 +114,15 @@ describe('Use basic auth provider', () => {
   });
 
   it('authenticated access', () => {
+    vi.spyOn(userApis, "getCurrentUser").mockReturnValue({
+      name: "user1",
+      email: "user1@test.com"
+    });
+
     window.localStorage.setItem("token", "token");
     window.localStorage.setItem("refreshToken", "token");
+    window.localStorage.setItem(
+      "tokenExpired", "" + (Date.now() + 30 * 24 * 3600 * 1000));
     window.localStorage.setItem(
       "refreshTokenExpiresIn", "" + (Date.now() + 30 * 24 * 3600 * 1000));
     const { getByTestId } = render(
@@ -137,6 +158,10 @@ describe('Use basic auth provider', () => {
           refreshToken: "b"
         }
       }
+    });
+    vi.spyOn(userApis, "getCurrentUser").mockReturnValue({
+      name: "user1",
+      email: "user1@test.com"
     });
 
     window.localStorage.setItem("token", "token");
@@ -175,6 +200,8 @@ describe('Use basic auth provider', () => {
   it('authenticated refresh access token expired', () => {
     window.localStorage.setItem("token", "token");
     window.localStorage.setItem("refreshToken", "token");
+    window.localStorage.setItem(
+      "tokenExpired", "" + (Date.now() + 30 * 24 * 3600 * 1000));
     window.localStorage.setItem(
       "refreshTokenExpiresIn", "" + (Date.now() - 30 * 24 * 3600 * 1000));
     const { getByTestId } = render(

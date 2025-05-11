@@ -1,3 +1,4 @@
+import { BasicAuthUser } from "@/components/AuthProviders/basic/BasicAuthContext";
 import { USER, USER_AUTH_TOKEN, USER_ROLES } from "@/utils/constants/api";
 import request from "@/utils/helpers/request";
 
@@ -8,7 +9,7 @@ export const getListUser = (params: any) => {
   });
 };
 
-export const getCurrentUser = () => {
+export const getCurrentUser = () : BasicAuthUser => {
   return request(`/userinfo`);
 };
 
