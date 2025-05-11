@@ -164,6 +164,16 @@ const BasicAuthProvider = (opts : BasicAuthenticateProps) => {
     if (accessToken && expiresIn && refreshToken && refreshTokenExpiresIn) {
       if (!isRefreshTokenExpired()) {
         console.log("refresh token");
+        console.log("Logout...");
+        console.log("current state: " + state);
+        console.log("tokenExpired..." + expiresIn);
+        console.log("refreshTokenExpiresIn..." + refreshTokenExpiresIn);
+        window.portalConfig.getAccessToken = getAccessToken;
+        window.portalConfig.checkAuthenticated = checkAuthenticated;
+        window.portalConfig.getCurrentAuthUser = getCurrentAuthUser;
+        const curUser = getCurrentUser();
+        console.log("store currentUser: " + JSON.stringify(curUser))
+        storeData("user", JSON.stringify(curUser));
       }
     }
   };
