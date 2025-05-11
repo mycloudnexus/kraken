@@ -14,6 +14,10 @@ const Login = () => {
 
   const [error] = useState<string | null>(null);
 
+  const onFinish = async (values: any) : Promise<void> => {
+    return await loginWithCredentials(values);
+  }
+
   return (
     <Flex
       className={styles.pageWrapper}
@@ -45,7 +49,7 @@ const Login = () => {
           <Alert className={styles.errorAlert} type="error" message={error} />
         )}
 
-        <Form layout="vertical" className={styles.form} onFinish={loginWithCredentials}>
+        <Form layout="vertical" className={styles.form} onFinish={onFinish}>
           <Form.Item name="userName">
             <Input placeholder="User Name" required />
           </Form.Item>
