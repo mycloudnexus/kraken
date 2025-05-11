@@ -111,7 +111,7 @@ const BasicAuthProvider = (opts : BasicAuthenticateProps) => {
       clearData("token");
       clearData("tokenExpired");
       window.location.href = `${window.location.origin}${ROUTES.LOGIN}`;
-      return Promise.reject(new Error("Token expired"));
+      return Promise.resolve("");
     }
   };
 
