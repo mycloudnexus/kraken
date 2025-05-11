@@ -8,8 +8,6 @@ import { useBoolean } from 'usehooks-ts';
 import Login from '@/components/AuthProviders/basic/login';
 import * as requests from "@/components/AuthProviders/basic/components/utils/request";
 import * as userApis from '@/services/user';
-import BasicHeader from '@/components/AuthProviders/basic/components/header';
-import { BrowserRouter } from 'react-router-dom';
 
 const TestingComponent = () => {
   const { checkAuthenticated, getAccessToken, logout } = useBasicAuth();
