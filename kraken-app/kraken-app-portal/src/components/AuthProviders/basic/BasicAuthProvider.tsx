@@ -167,6 +167,8 @@ const BasicAuthProvider = (opts : BasicAuthenticateProps) => {
   };
 
   const logout = async () : Promise<void> => {
+    console.log("Logout...");
+    console.log("current state: " + state);
     dispatch({ type: AuthStates.LOGOUT});
     clearData("user");
     clearData("token");

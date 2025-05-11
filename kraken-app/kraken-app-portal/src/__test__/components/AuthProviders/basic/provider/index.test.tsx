@@ -1,16 +1,18 @@
 import { BasicAuthProvider, useBasicAuth } from '@/components/AuthProviders/basic/BasicAuthProvider';
 import { fireEvent, render } from '@testing-library/react';
 import { QueryClientProvider } from "@tanstack/react-query";
-import { ConfigProvider } from "antd";
+import { Button, ConfigProvider } from "antd";
 import { queryClient } from '@/utils/helpers/reactQuery';
 import { useEffect } from 'react';
 import { useBoolean } from 'usehooks-ts';
 import Login from '@/components/AuthProviders/basic/login';
 import * as requests from "@/components/AuthProviders/basic/components/utils/request";
 import * as userApis from '@/services/user';
+import BasicHeader from '@/components/AuthProviders/basic/components/header';
+import { BrowserRouter } from 'react-router-dom';
 
 const TestingComponent = () => {
-  const { checkAuthenticated, getAccessToken } = useBasicAuth();
+  const { checkAuthenticated, getAccessToken, logout } = useBasicAuth();
   const { value: isAuthenticated, setTrue, setFalse } = useBoolean(false);
   useEffect(() => {
       if (checkAuthenticated()) {
@@ -27,6 +29,12 @@ const TestingComponent = () => {
   return (
     <>
       <p data-testId="checkAuthenticated">{ "" + isAuthenticated }</p>
+      <Button
+            type="link"
+            data-testId="testLogout"
+            onClick={logout}
+          >
+        </Button>
     </>
   );
 };
@@ -226,5 +234,41 @@ describe('Use basic auth provider', () => {
     const checkAuthenticated = getByTestId('checkAuthenticated');
     expect(checkAuthenticated).toHaveTextContent("false");
   })  
+
+  it('logout', () => {
+    vi.spyOn(userApis, "getCurrentUser").mockReturnValue({
+      name: "user1",
+      email: "user1@test.com"
+    });
+
+    window.localStorage.setItem("token", "token");
+    window.localStorage.setItem("refreshToken", "token");
+    window.localStorage.setItem(
+      "tokenExpired", "" + (Date.now() + 30 * 24 * 3600 * 1000));
+    window.localStorage.setItem(
+      "refreshTokenExpiresIn", "" + (Date.now() + 30 * 24 * 3600 * 1000));
+    const { getByTestId } = render(
+      <QueryClientProvider client={queryClient}>
+        <ConfigProvider
+          input={{ style: { borderRadius: 4 } }}
+          theme={{
+            components: {
+              Button: {
+                colorPrimary: "#2962FF",
+                borderRadius: 4,
+              },
+            },
+          }}
+        >
+          <BasicAuthProvider>
+            <TestingComponent />
+          </BasicAuthProvider>
+        </ConfigProvider>
+      </QueryClientProvider>
+    );
+    const btnLogout = getByTestId("testLogout");
+    expect(btnLogout).toBeInTheDocument();
+    fireEvent.click(btnLogout);
+  })
 })
 
