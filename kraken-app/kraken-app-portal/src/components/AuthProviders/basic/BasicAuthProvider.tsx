@@ -47,6 +47,7 @@ const BasicAuthProvider = (opts : BasicAuthenticateProps) => {
     init.current = true;
     if (checkAuth()) {
       window.portalConfig.getAccessToken = getAccessToken;
+      console.log("Fetching user info...");
 
       let user : BasicAuthUser;
         let userStr = getData("user");
@@ -84,13 +85,14 @@ const BasicAuthProvider = (opts : BasicAuthenticateProps) => {
     if (!refreshToken || isRefreshTokenExpired() || !token) {
       clearData("token");
       clearData("tokenExpired");
-      return Promise.reject(new Error("Refresh token expired"));
+      return Promise.resolve("Refresh token expired");
     }
     //whether be expired in 5 min
     if (!isTokenExpiredIn(5 * 60 * 1000 * 1000)) {
       return Promise.resolve(token);
     }
     try {
+      console.log("requesting token...");
       const res = await requestToken(refreshToken);
       const expiresIn = get(res, "data.data.expiresIn");
       const nToken = get(res, "data.data.accessToken");
@@ -169,6 +171,8 @@ const BasicAuthProvider = (opts : BasicAuthenticateProps) => {
   const logout = async () : Promise<void> => {
     console.log("Logout...");
     console.log("current state: " + state);
+    console.log("tokenExpired..." + getData("tokenExpired"));
+    console.log("refreshTokenExpiresIn..." + getData("refreshTokenExpiresIn"));
     dispatch({ type: AuthStates.LOGOUT});
     clearData("user");
     clearData("token");
