@@ -81,7 +81,7 @@ const BasicHeader = ({ info }: Readonly<{ info?: ISystemInfo }>) => {
         <Divider type="vertical" className={styles.divider} />
 
         <Text.LightMedium data-testid="productName">
-          {info?.productName || info?.productKey}
+          {info?.productName ?? info?.productKey}
         </Text.LightMedium>
         <Tag
           data-testid="productSpec"

@@ -107,6 +107,7 @@ const BasicAuthProvider = (opts : BasicAuthenticateProps) => {
       }
       return Promise.resolve(nToken);
     } catch (e) {
+      console.log(`Exception while request access token: ${e}`);
       void message.error("Your session has expired. Please log in again.");
       clearData("token");
       clearData("tokenExpired");
@@ -166,7 +167,7 @@ const BasicAuthProvider = (opts : BasicAuthenticateProps) => {
   };
 
   const logout = async () : Promise<void> => {
-    await dispatch({ type: AuthStates.LOGOUT});
+    dispatch({ type: AuthStates.LOGOUT});
     clearData("user");
     clearData("token");
     clearData("tokenExpired");
