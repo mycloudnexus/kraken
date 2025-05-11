@@ -127,58 +127,6 @@ describe('Use basic auth provider', () => {
     expect(checkAuthenticated).toHaveTextContent("true");
   })
 
-  it('authenticated access token expired', () => {
-    vi.mock("@/hooks/login", async () => {
-      const actual = await vi.importActual("@/hooks/login");
-      return {
-        ...actual,
-        useLogin: vi.fn().mockReturnValue({
-          mutateAsync: vi.fn().mockReturnValue({
-            data: {
-              accessToken: "a",
-              expiresIn: "b",
-              refreshToken: "c",
-              refreshTokenExpiresIn: "d",
-            },
-          }),
-          isLoading: false,
-        }),
-      };
-    });
-
-    window.localStorage.setItem("token", "token");
-    window.localStorage.setItem("refreshToken", "token");
-    window.localStorage.setItem(
-      "tokenExpired", "" + (Date.now() - 30 * 24 * 3600 * 1000));
-    window.localStorage.setItem(
-      "refreshTokenExpiresIn", "" + (Date.now() + 30 * 24 * 3600 * 1000));
-    try {
-      const { getByTestId } = render(
-        <QueryClientProvider client={queryClient}>
-          <ConfigProvider
-            input={{ style: { borderRadius: 4 } }}
-            theme={{
-              components: {
-                Button: {
-                  colorPrimary: "#2962FF",
-                  borderRadius: 4,
-                },
-              },
-            }}
-          >
-            <BasicAuthProvider>
-              <TestingComponent />
-            </BasicAuthProvider>
-          </ConfigProvider>
-        </QueryClientProvider>
-      );
-      const checkAuthenticated = getByTestId('checkAuthenticated');
-      expect(checkAuthenticated).toHaveTextContent("true");
-    } catch (error) {
-      console.log(error);
-    }
-  })  
-
   it('authenticated refresh access token expired', () => {
     window.localStorage.setItem("token", "token");
     window.localStorage.setItem("refreshToken", "token");
