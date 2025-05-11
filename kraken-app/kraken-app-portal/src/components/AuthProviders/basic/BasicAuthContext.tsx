@@ -14,6 +14,7 @@ export const initialContext = {
   loginWithCredentials: err,
   getAccessToken: err,
   logout: err,
+  refreshAuth: err,
   checkAuthenticated: err,
   getCurrentAuthUser: err
 };
@@ -54,6 +55,7 @@ export interface BasicAuthContextInterface<TUser extends BasicAuthUser = BasicAu
     loginWithCredentials: (values: any) => Promise<void>;
     getAccessToken: () => Promise<string>; 
     logout: () => Promise<void>;
+    refreshAuth: () => Promise<void>;
     checkAuthenticated: () => boolean;
     getCurrentAuthUser: () => any;
 }

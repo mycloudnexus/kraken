@@ -156,6 +156,18 @@ const BasicAuthProvider = (opts : BasicAuthenticateProps) => {
     }
   };
 
+  const refreshAuth = async () : Promise<void> => {
+    const accessToken = getData("token");
+    const expiresIn = getData("tokenExpired");
+    const refreshToken = getData("refreshToken");
+    const refreshTokenExpiresIn = getData("refreshTokenExpiresIn");
+    if (accessToken && expiresIn && refreshToken && refreshTokenExpiresIn) {
+      if (!isRefreshTokenExpired()) {
+        console.log("refresh token");
+      }
+    }
+  };
+
   const checkAuth = () : boolean => {
     const token = getData("token");
     const refreshToken = getData("refreshToken");
@@ -185,6 +197,7 @@ const BasicAuthProvider = (opts : BasicAuthenticateProps) => {
       loginWithCredentials,
       getAccessToken,
       logout,
+      refreshAuth,
       checkAuthenticated,
       getCurrentAuthUser
     };
@@ -193,6 +206,7 @@ const BasicAuthProvider = (opts : BasicAuthenticateProps) => {
     loginWithCredentials,
     getAccessToken,
     logout,
+    refreshAuth,
     checkAuthenticated,
     getCurrentAuthUser
   ]);
