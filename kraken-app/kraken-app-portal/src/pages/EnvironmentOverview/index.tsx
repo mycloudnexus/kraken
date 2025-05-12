@@ -5,6 +5,7 @@ import {
   useGetAllDataPlaneList,
   useGetRunningComponentList,
   useCreateApiKey,
+  useRotateApiKey,
 } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
 import { IEnv } from "@/utils/types/env.type";
@@ -59,6 +60,7 @@ const EnvironmentOverview = () => {
     useGetAllDataPlaneList(currentProduct, initPaginationParams);
   const { data: runningComponent } = useGetRunningComponentList(currentProduct);
   const { mutateAsync: createApiKeyMutate } = useCreateApiKey();
+  const { mutateAsync: rotateApiKeyMutate } = useRotateApiKey();
 
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("running_api");
@@ -66,27 +68,27 @@ const EnvironmentOverview = () => {
   const [selectedEnv, setSelectedEnv] = useState<IEnv | undefined>();
   const modalConfirmRef = useRef<any>();
 
-  const generateApiKey = useCallback(
-    async (envId: string, evName: string, closeConfirm = false) => {
-      const name = `${evName}_${dayjs.utc().format("YYYY-MM-DD HH:mm:ss")}`;
-      try {
-        const res = await createApiKeyMutate({
-          productId: currentProduct,
-          envId,
-          name,
-        } as any);
-        closeConfirm && modalConfirmRef?.current?.destroy();
-        showModalShowNew(res?.data?.token);
-      } catch (e: any) {
-        notification.error({ message: e?.data?.error || "Generate failed" });
-      }
-    },
-    [currentProduct, createApiKeyMutate]
+  const rotateApiKey = useCallback(
+      async (envId: string, evName: string, closeConfirm = false) => {
+        const name = `${evName}_${dayjs.utc().format("YYYY-MM-DD HH:mm:ss")}`;
+        try {
+          const res = await rotateApiKeyMutate({
+            productId: currentProduct,
+            envId,
+            name,
+          } as any);
+          closeConfirm && modalConfirmRef?.current?.destroy();
+          showModalShowNew(res?.data?.token);
+        } catch (e: any) {
+          notification.error({ message: e?.data?.error ?? "Rotation failed" });
+        }
+      },
+      [currentProduct, createApiKeyMutate]
   );
 
   const onConfirmRotate = useCallback(
-    (id: string, name: string) => () => generateApiKey(id, name, true),
-    [generateApiKey]
+    (id: string, name: string) => () => rotateApiKey(id, name, true),
+    [rotateApiKey]
   );
 
   const dropdownItems = useCallback(

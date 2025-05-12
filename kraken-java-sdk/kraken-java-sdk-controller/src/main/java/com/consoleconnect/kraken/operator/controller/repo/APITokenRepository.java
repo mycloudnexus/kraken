@@ -1,6 +1,8 @@
 package com.consoleconnect.kraken.operator.controller.repo;
 
 import com.consoleconnect.kraken.operator.auth.entity.UserTokenEntity;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,4 +36,15 @@ public interface APITokenRepository
       @Param("envId") String envId,
       @Param("productId") String productId,
       Pageable pageable);
+
+  @Query(
+      nativeQuery = true,
+      value =
+          "SELECT * "
+              + "FROM  kraken_user_token "
+              + "WHERE token_type ='API_TOKEN' "
+              + "AND claims ->> 'envId' = :envId ")
+  List<UserTokenEntity> findAllByEnvId(String envId);
+
+  Optional<UserTokenEntity> findOneByToken(String token);
 }
