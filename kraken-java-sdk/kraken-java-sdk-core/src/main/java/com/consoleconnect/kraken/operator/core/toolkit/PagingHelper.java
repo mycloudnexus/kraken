@@ -9,6 +9,7 @@ public class PagingHelper {
 
   private PagingHelper() {}
 
+  public static final int ALL = -1;
   public static final int DEFAULT_PAGE = 0;
   public static final int DEFAULT_SIZE = 20;
 

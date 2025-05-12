@@ -123,6 +123,7 @@ app:
       enabled: false
     login:
       enabled: false
+      mode: basic
     auth-server:
       enabled: false
   api-spec-order-by:

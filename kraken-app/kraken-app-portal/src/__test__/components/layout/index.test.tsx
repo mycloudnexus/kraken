@@ -30,6 +30,9 @@ describe('layout and related component testing', () => {
       refetch: vi.fn()
     } as any)
 
+    window.portalConfig.getCurrentAuthUser = () : any => {
+      return {"name": "u"};
+    };
     const { getByTestId } = render(<BasicLayout />)
 
     // Side bar navigation

@@ -3,6 +3,7 @@ import { ConfigProvider, notification } from "antd";
 import { RouterProvider } from "react-router-dom";
 import router from "./router";
 import { queryClient } from "./utils/helpers/reactQuery";
+import { AuthProvider } from "./components/AuthProviders/common/provider";
 
 function App() {
   notification.config({
@@ -21,7 +22,9 @@ function App() {
           },
         }}
       >
-        <RouterProvider router={router} />
+        <AuthProvider>
+          <RouterProvider router={router} />
+        </AuthProvider>
       </ConfigProvider>
     </QueryClientProvider>
   );

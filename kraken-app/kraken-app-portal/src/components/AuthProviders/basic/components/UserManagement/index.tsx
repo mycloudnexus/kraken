@@ -29,7 +29,7 @@ function parseFiltersObj(
   );
 }
 
-const UserManagement = () => {
+const BasicUserManagement = () => {
   const { currentUser } = useUser();
   const { userParams, setUserParams, resetParams } = useUserStore();
 
@@ -165,11 +165,9 @@ const UserManagement = () => {
             style={{ width: 264 }}
             onChange={handleChange}
           />
-          {currentUser?.role === ERole.ADMIN && (
             <Button type="primary" onClick={open}>
               Create new user
             </Button>
-          )}
         </Flex>
         <Table
           loading={loadingUser}
@@ -202,4 +200,4 @@ const UserManagement = () => {
   );
 };
 
-export default UserManagement;
+export default BasicUserManagement;

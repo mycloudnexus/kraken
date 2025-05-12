@@ -73,9 +73,12 @@ public class AuthDataProperty {
     private Verifier verifier = new Verifier();
   }
 
+  private static final String LOGIN_MODE_DEFAULT = "basic";
+
   @Data
   public static class Login {
     private boolean enabled = false;
+    private String mode = LOGIN_MODE_DEFAULT;
     private String hmacSecret;
     private long tokenExpiresInSeconds = 3600; // 1 hour
     private List<UserEntity> userList = List.of();
@@ -110,6 +113,8 @@ public class AuthDataProperty {
     private Introspection introspection = new Introspection();
 
     private Map<String, Object> verifier;
+
+    private String claimNamespace = "https://kraken.consoleconnnect.com/";
   }
 
   @Data
