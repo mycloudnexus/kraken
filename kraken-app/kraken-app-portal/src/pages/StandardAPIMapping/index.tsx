@@ -38,9 +38,7 @@ const StandardAPIMapping = () => {
   const { componentId } = useParams();
   const location = useLocation();
   console.log("location state", location.state);
-  //const { mainTitle } = location.state ?? { mainTitle:"unknown main title"};
   const [mainTitle, setMainTitle] = useState(() => location?.state?.mainTitle ?? "unknown main title");
-  //const filteredComponentList = location?.state?.filteredComponentList ?? [];
   const [filteredComponentList, setFilteredComponentList] = useState(() => location?.state?.filteredComponentList ?? []);
   const [productType, setProductType] = useState(() => location?.state?.productType ?? "");
   const { activePath, setActivePath, selectedKey, setSelectedKey } =
