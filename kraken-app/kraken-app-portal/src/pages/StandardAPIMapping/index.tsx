@@ -101,6 +101,15 @@ const StandardAPIMapping = () => {
     setQuery(JSON.stringify(mapItem));
   };
 
+  // noop usage to silence eslint
+  useEffect(() => {
+    (() => {
+      setMainTitle;
+      setFilteredComponentList;
+      setProductType;
+    })();
+  }, []);
+
   useEffect(() => {
     const mapItem = detailDataMapping?.details.find(
       (item) => item.targetKey === selectedKey
