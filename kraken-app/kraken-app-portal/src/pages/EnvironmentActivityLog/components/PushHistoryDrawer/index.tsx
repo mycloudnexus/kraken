@@ -1,7 +1,7 @@
 import LogMethodTag from "@/components/LogMethodTag";
 import renderRequiredMark from "@/components/RequiredFormMark";
 import TrimmedPath from "@/components/TrimmedPath";
-import { useGetProductEnvActivitiesMutation } from "@/hooks/product";
+import { useGetProductEnvActivitiesMutation, useGetProductTypes } from "@/hooks/product";
 import { usePostPushActivityLog } from "@/hooks/pushApiEvent";
 import { toDateTime } from "@/libs/dayjs";
 import { useAppStore } from "@/stores/app.store";
@@ -105,11 +105,13 @@ const PushHistoryDrawer = ({ isOpen, onClose, envOptions }: Props) => {
     );
   }, [responseData, form]);
 
+  const { data: productTypes } = useGetProductTypes(currentProduct);
+
   const columns: ColumnsType = [
     {
       title: "Product",
       dataIndex: "productType",
-      render: (product) => getProductName(product),
+      render: (product) => getProductName(productTypes, product),
     },
     {
       title: "Method",

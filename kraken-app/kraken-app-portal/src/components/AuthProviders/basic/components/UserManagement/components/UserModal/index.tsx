@@ -1,4 +1,4 @@
-import Role from "@/components/Role";
+import Role, { ERole } from "@/components/Role";
 import { Text } from "@/components/Text";
 import { useCreateUser } from "@/hooks/user";
 import { CloseOutlined } from "@ant-design/icons";
@@ -13,8 +13,12 @@ import {
   notification,
 } from "antd";
 import { get } from "lodash";
-import { roleOptions } from "../UserRoleEdit";
 import styles from "./index.module.scss";
+
+export const roleOptions = [
+  { label: "Admin", value: ERole.ADMIN },
+  { label: "User", value: ERole.USER },
+];
 
 type Props = {
   open: boolean;

@@ -1,5 +1,6 @@
+import Login from "@/components/AuthProviders/basic/login";
+import { UserManagement } from "@/components/AuthProviders/common/UserManagement";
 import AuthLayout from "@/components/Layout/AuthLayout";
-import BasicLayout from "@/components/Layout/BasicLayout";
 import APIServerList from "@/pages/APIServerList";
 import AuditLog from "@/pages/AuditLog";
 import Buyer from "@/pages/Buyer";
@@ -10,11 +11,9 @@ import ApiComponents from "@/pages/HomePage/components/ApiComponents";
 import NewAPIServer from "@/pages/NewAPIServer";
 import StandardAPIMapping from "@/pages/StandardAPIMapping";
 import StandardAPIMappingTable from "@/pages/StandardAPIMappingTable";
-import UserManagement from "@/pages/UserManagement";
 import { lazy } from "react";
 import { createBrowserRouter } from "react-router-dom";
 
-const Login = lazy(() => import("@/pages/Login"));
 const MappingTemplate = lazy(() => import("@/pages/MappingTemplate"));
 const UpgradePlane = lazy(
   () => import("@/pages/MappingTemplate/DataPlaneUpgrade")
@@ -22,15 +21,13 @@ const UpgradePlane = lazy(
 
 const router = createBrowserRouter([
   {
-    path: "/login",
+    path: "/login/basic",
     element: <Login />,
   },
   {
     path: "",
     element: (
-      <AuthLayout>
-        <BasicLayout />
-      </AuthLayout>
+      <AuthLayout />
     ),
     children: [
       {

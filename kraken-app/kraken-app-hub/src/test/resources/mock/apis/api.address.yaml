@@ -29,31 +29,37 @@ spec:
       actions:
         - id: persist_http_request_address_validate
           actionType: buildin@db
-          env:
-            bizType: "address.validate"
           with:
             action: create
+            bizType: SHARE
             properties:
               - headers
               - queryParameters
               - requestBody
           preRequest: true
+
         - id: calculate_address_type_and_action_via_javascript
           actionType: engine@javascript
           with:
+            bizType: SHARE
             code: |
-              (jsonstr) => {
-                        let ret = {
-                            targetAPIConfigKey: 'mef.sonata.api-target.address.validate'
-                         };
+              (jsonStr) => {
+                console.log("input: " + jsonStr);
+                let input = JSON.parse(jsonStr);
+                let ret = {
+                  targetAPIConfigKey: 'mef.sonata.api-target.address.validate',
+                  productType: input.bizType || 'undefined'
+                };
                 return JSON.stringify(ret);
               }
           outputKey: address
+
         - id: mapping_matrix_check_address
           actionType: buildin@mapping-matrix-checker
           env:
             mappingMatrixKey: mef.sonata.api.matrix.address.validation
             targetKey: ${address.targetAPIConfigKey}
+
         - id: load-downstream-api-config
           actionType: buildin@load-target-api-config
           env:
@@ -64,6 +70,7 @@ spec:
           with:
             render: true
           outputKey: targetApiConfig
+
         - id: rewrite-path
           actionType: buildin@rewrite-path
           with:
@@ -109,14 +116,18 @@ spec:
       actions:
         - name: retrieve addressId from path
           actionType: buildin@pattern
+          with:
+            bizType: SHARE
           env:
             input: ${path}
             pattern: /mefApi/sonata/geographicAddressManagement/v7/geographicAddress/(?<segment>.*)
+
         - id: mapping_matrix_check_retrieve_address
           actionType: buildin@mapping-matrix-checker
           env:
             mappingMatrixKey: mef.sonata.api.matrix.address.retrieve
             targetKey: mef.sonata.api-target.address.retrieve
+
         - id: load-downstream-api-config
           actionType: buildin@load-target-api-config
           env:

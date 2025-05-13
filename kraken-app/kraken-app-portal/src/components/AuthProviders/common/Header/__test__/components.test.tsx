@@ -8,6 +8,10 @@ test("test Header", () => {
     result.current.setOpenTutorial(false)
     result.current.setTutorialCompleted(false)
   });
+  window.portalConfig.getCurrentAuthUser = () : any => {
+    return {"name": "u"};
+  };
+
   const { container } = render(
     <Header />
   );

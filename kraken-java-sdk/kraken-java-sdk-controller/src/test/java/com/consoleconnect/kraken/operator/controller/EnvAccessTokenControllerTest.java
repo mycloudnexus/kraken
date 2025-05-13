@@ -34,6 +34,8 @@ class EnvAccessTokenControllerTest extends AbstractIntegrationTest {
       "/products/" + PRODUCT_ID + "/envs/" + ENV_ID + "/api-tokens";
 
   public static final String LIST_ALL_URL = "/products/" + PRODUCT_ID + "/env-api-tokens";
+  public static final String ROTATE_ALL_URL =
+      "/products/" + PRODUCT_ID + "/envs/" + ENV_ID + "/rotate-api-tokens";
 
   @Autowired private APITokenService apiTokenService;
 
@@ -69,6 +71,24 @@ class EnvAccessTokenControllerTest extends AbstractIntegrationTest {
           assertThat(bodyStr, Matchers.notNullValue());
           assertThat(
               bodyStr, hasJsonPath("$.data.data", Matchers.hasSize(Matchers.greaterThan(0))));
+        });
+  }
+
+  @Order(2)
+  @Test
+  void givenCorrectRequestPayload_whenRotate_thenReturnOk() {
+    CreateAPITokenRequest body = new CreateAPITokenRequest();
+    body.setName("token-" + System.currentTimeMillis());
+    body.setUserId(UUID.randomUUID().toString());
+    body.setTokenExpiresInSeconds(100_100_100);
+    this.webTestClientHelper.postAndVerify(
+        uriBuilder -> uriBuilder.path(ROTATE_ALL_URL).build(),
+        body,
+        bodyStr -> {
+          assertThat(bodyStr, Matchers.notNullValue());
+          assertThat(bodyStr, hasJsonPath("$.data", notNullValue()));
+          assertThat(bodyStr, hasJsonPath("$.data.id", notNullValue()));
+          assertThat(bodyStr, hasJsonPath("$.data.token", notNullValue()));
         });
   }
 

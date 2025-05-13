@@ -2,10 +2,10 @@ import { render } from "@testing-library/react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@/utils/helpers/reactQuery";
 import { BrowserRouter } from "react-router-dom";
-import ResetPwdModal from "@/pages/UserManagement/components/ResetPwdModal";
 import { ERole } from "@/components/Role";
 import dayjs from "dayjs";
-import ResetPwd from "@/pages/UserManagement/components/ResetPwd";
+import ResetPwdModal from "@/components/AuthProviders/basic/components/UserManagement/components/ResetPwdModal";
+import ResetPwd from "@/components/AuthProviders/basic/components/UserManagement/components/ResetPwd";
 
 test("ResetPwdModal test", () => {
   const { container } = render(

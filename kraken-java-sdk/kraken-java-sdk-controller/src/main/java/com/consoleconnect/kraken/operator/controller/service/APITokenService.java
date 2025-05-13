@@ -8,6 +8,7 @@ import com.consoleconnect.kraken.operator.auth.jwt.JwtEncoderToolkit;
 import com.consoleconnect.kraken.operator.auth.mapper.UserTokenMapper;
 import com.consoleconnect.kraken.operator.auth.model.AuthDataProperty;
 import com.consoleconnect.kraken.operator.auth.model.UserToken;
+import com.consoleconnect.kraken.operator.auth.repo.UserTokenRepository;
 import com.consoleconnect.kraken.operator.auth.security.UserContext;
 import com.consoleconnect.kraken.operator.auth.service.UserTokenService;
 import com.consoleconnect.kraken.operator.controller.dto.CreateAPITokenRequest;
@@ -24,6 +25,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -42,6 +44,9 @@ public class APITokenService {
   private final Map<String, String> envCache = new ConcurrentHashMap<>();
 
   private final UserTokenService userTokenService;
+  private final UserTokenRepository userTokenRepository;
+
+  private final ObjectProvider<APITokenService> selfApiTokenServiceObjectProvider;
 
   public static final String PRODUCT_ID = "productId";
   public static final String ENV_ID = "envId";
@@ -130,6 +135,26 @@ public class APITokenService {
     return toAPIToken(userToken);
   }
 
+  @Transactional(rollbackFor = Exception.class)
+  public APIToken revokeAllTokenByEnvId(
+      String productId,
+      CreateAPITokenRequest createAPITokenRequest,
+      String createdBy,
+      String envId) {
+    // revoke all existed
+    apiTokenRepository.findAllByEnvId(envId).stream()
+        .filter(userTokenEntity -> !userTokenEntity.isRevoked())
+        .forEach(
+            userTokenEntity ->
+                userTokenService.revokeToken(userTokenEntity.getId().toString(), createdBy));
+    // create a new api key
+    createAPITokenRequest.setEnvId(envId);
+    createAPITokenRequest.setUserId(createdBy);
+    return selfApiTokenServiceObjectProvider
+        .getObject()
+        .createToken(productId, createAPITokenRequest, createdBy);
+  }
+
   private APIToken toAPIToken(UserToken userToken) {
     APIToken apiToken = APITokenMapper.INSTANCE.toAPIToken(userToken);
     apiToken.setEnvId((String) userToken.getClaims().get(ENV_ID));
@@ -138,7 +163,16 @@ public class APITokenService {
   }
 
   public Optional<APIToken> findOneByAuth(String token) {
-    return userTokenService.findOneByToken(token).map(this::toAPIToken);
+    return apiTokenRepository
+        .findOneByToken(JwtEncoderToolkit.hashToken(token))
+        .map(UserTokenMapper.INSTANCE::toToken)
+        .map(this::toAPIToken);
+  }
+
+  private boolean isTokenExpiredOrRevoked(APIToken apiTokenEntity) {
+    return apiTokenEntity.isRevoked()
+        || apiTokenEntity.getExpiresAt() < System.currentTimeMillis()
+        || apiTokenEntity.getMaxLifeEndAt() < System.currentTimeMillis();
   }
 
   public String findEnvId(JwtAuthenticationToken authentication, String envIdOrKey) {
@@ -150,7 +184,11 @@ public class APITokenService {
       }
       return envId;
     }
-
+    // authentication existed
+    Optional<APIToken> apiTokenOptional = findOneByAuth(authentication.getToken().getTokenValue());
+    if (apiTokenOptional.isPresent() && isTokenExpiredOrRevoked(apiTokenOptional.get())) {
+      throw KrakenException.unauthorized("The api token has been deprecated or expired.");
+    }
     String issuer = authentication.getToken().getIssuer().toString();
     String envId = (String) authentication.getTokenAttributes().getOrDefault(ENV_ID, null);
 
@@ -160,7 +198,7 @@ public class APITokenService {
         || jwtDecoderPropertyOptional.isEmpty()
         || jwtDecoderPropertyOptional.get().getIntrospection().isEnabled()) {
       log.info("introspection the accessToken to get envId");
-      return findOneByAuth(authentication.getToken().getTokenValue())
+      return apiTokenOptional
           .map(APIToken::getEnvId)
           .orElseThrow(
               () -> {

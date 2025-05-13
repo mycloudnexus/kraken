@@ -11,19 +11,23 @@ import {
 } from "@ant-design/icons";
 import { Button, Card, Divider, Dropdown, Flex, Tag } from "antd";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Text } from "../Text";
-import { UserAvatar } from "./UserAvatar";
+import { Text } from "../../../../Text";
 import styles from "./index.module.scss";
+import { UserAvatar } from "./UserAvatar";
+import { useBasicAuth } from "../../BasicAuthProvider";
 
-const Header = ({ info }: Readonly<{ info?: ISystemInfo }>) => {
+const BasicHeader = ({ info }: Readonly<{ info?: ISystemInfo }>) => {
+  const { logout } = useBasicAuth();
+  const user = window.portalConfig.getCurrentAuthUser?.();
+  
   const location = useLocation();
   const { currentUser } = useUser();
   const { toggleTutorial } = useTutorialStore();
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.clear();
-    navigate("/login");
+    logout();
+    navigate("/login/basic");
   };
 
   const dropdownRender = () => {
@@ -45,7 +49,7 @@ const Header = ({ info }: Readonly<{ info?: ISystemInfo }>) => {
         ]}
       >
         <Flex justify="center" align="center" vertical gap={8}>
-          <div style={{ position: "relative" }}>
+        <div style={{ position: "relative" }}>
             <UserAvatar
               size={64}
               className={styles.avatarLg}
@@ -56,10 +60,10 @@ const Header = ({ info }: Readonly<{ info?: ISystemInfo }>) => {
             </div>
           </div>
           <Text.Custom size="20px" lineHeight="28px" bold="500">
-            {currentUser?.name}
+            {user?.name}
           </Text.Custom>
           <Text.LightMedium lineHeight="22px" color="rgba(0, 0, 0, 0.45)">
-            {currentUser?.email}
+            {user?.email}
           </Text.LightMedium>
         </Flex>
       </Card>
@@ -77,7 +81,7 @@ const Header = ({ info }: Readonly<{ info?: ISystemInfo }>) => {
         <Divider type="vertical" className={styles.divider} />
 
         <Text.LightMedium data-testid="productName">
-          {info?.productName || info?.productKey}
+          {info?.productName ?? info?.productKey}
         </Text.LightMedium>
         <Tag
           data-testid="productSpec"
@@ -130,4 +134,4 @@ const Header = ({ info }: Readonly<{ info?: ISystemInfo }>) => {
   );
 };
 
-export default Header;
+export default BasicHeader;

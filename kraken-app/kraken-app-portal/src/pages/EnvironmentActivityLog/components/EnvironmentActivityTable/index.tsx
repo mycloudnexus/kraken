@@ -263,7 +263,7 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
     {
       key: "productType",
       title: "Product",
-      render: (log: IActivityLog) => getProductName(log.productType),
+      render: (log: IActivityLog) => getProductName(productTypes, log.productType),
       width: 200,
       filters: productOptions,
       filterMultiple: false,

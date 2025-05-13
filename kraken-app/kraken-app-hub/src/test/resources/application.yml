@@ -88,6 +88,7 @@ app:
   security:
     login:
       enabled: false
+      mode: basic
     auth-server:
       enabled: false
     resource-server:
