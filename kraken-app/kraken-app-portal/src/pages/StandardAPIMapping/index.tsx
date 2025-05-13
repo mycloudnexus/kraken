@@ -101,13 +101,11 @@ const StandardAPIMapping = () => {
     setQuery(JSON.stringify(mapItem));
   };
 
-  // noop usage to silence eslint
   useEffect(() => {
-    (() => {
-      setMainTitle;
-      setFilteredComponentList;
-      setProductType;
-    })();
+    // Silence unused setter warnings without changing state
+    setMainTitle((prev: string) => prev);
+    setFilteredComponentList((prev: any[]) => prev);
+    setProductType((prev: string) => prev);
   }, []);
 
   useEffect(() => {
