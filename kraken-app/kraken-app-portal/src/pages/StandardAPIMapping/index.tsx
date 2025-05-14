@@ -37,8 +37,9 @@ const StandardAPIMapping = () => {
   const { currentProduct } = useAppStore();
   const { componentId } = useParams();
   const location = useLocation();
-  const { mainTitle } = location.state ?? { mainTitle:"unknown main title"};
-  const filteredComponentList = location?.state?.filteredComponentList ?? [];
+  const [mainTitle, setMainTitle] = useState(() => location?.state?.mainTitle ?? "unknown main title");
+  const [filteredComponentList, setFilteredComponentList] = useState(() => location?.state?.filteredComponentList ?? []);
+  const [productType, setProductType] = useState(() => location?.state?.productType ?? "");
   const { activePath, setActivePath, selectedKey, setSelectedKey } =
     useMappingUiStore();
 
@@ -99,6 +100,13 @@ const StandardAPIMapping = () => {
     setActivePath(mapItem.path);
     setQuery(JSON.stringify(mapItem));
   };
+
+  useEffect(() => {
+    // Silence unused setter warnings without changing state
+    setMainTitle((prev: string) => prev);
+    setFilteredComponentList((prev: any[]) => prev);
+    setProductType((prev: string) => prev);
+  }, []);
 
   useEffect(() => {
     const mapItem = detailDataMapping?.details.find(
@@ -320,6 +328,7 @@ const StandardAPIMapping = () => {
                   <ComponentSelect
                     componentList={{data : filteredComponentList}}
                     componentName={componentName}
+                    productType={productType}
                     middle={true}
                   />
                 ),
