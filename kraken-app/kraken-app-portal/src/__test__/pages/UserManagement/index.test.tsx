@@ -1,9 +1,12 @@
 import { UserManagement } from "@/components/AuthProviders/common/UserManagement";
+import { ENV } from "@/constants";
 import * as userHooks from "@/hooks/user";
 import { queryClient } from "@/utils/helpers/reactQuery";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
+
+ENV.AUTHENTICATION_TYPE = "basic"
 
 test("UserManagement test", () => {
   vi.spyOn(userHooks, "useGetUserList").mockReturnValue({
