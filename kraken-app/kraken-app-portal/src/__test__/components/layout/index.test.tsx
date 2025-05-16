@@ -1,6 +1,9 @@
 import { fireEvent, render, waitFor } from "@/__test__/utils"
 import BasicLayout from "@/components/Layout/BasicLayout"
+import { ENV } from "@/constants"
 import * as hooks from '@/hooks/user'
+
+ENV.AUTHENTICATION_TYPE = "basic"
 
 beforeEach(() => {
   vi.clearAllMocks()
