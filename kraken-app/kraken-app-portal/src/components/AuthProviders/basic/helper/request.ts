@@ -154,17 +154,17 @@ export const handleResponseError = (error: AxiosError) => {
   }
   const statusCode = parseInt(status as unknown as string);
   if (statusCode === 400) {
-    return "Bad Request: " + message;
+    return new Error("Bad Request: " + message);
   } else if (statusCode === 401) {
-    return "Unauthorized: " + message;
+    return new Error("Unauthorized: " + message);
   } else if (statusCode === 403) {
-    return "Forbidden: " + message;
+    return new Error("Forbidden: " + message);
   }else if (statusCode === 404) {
-    return "Not Fund: " + message;
+    return new Error("Not Fund: " + message);
   } else if (statusCode >= 500) {
-    return "Internal Error: " + message;
+    return new Error("Internal Error: " + message);
   } else {
-    return "failed: " + message;
+    return new Error("failed: " + message);
   }
 }
 
