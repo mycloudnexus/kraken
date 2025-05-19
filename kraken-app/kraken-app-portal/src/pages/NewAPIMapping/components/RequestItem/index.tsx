@@ -176,10 +176,30 @@ const RequestItem = ({ item, index }: Props) => {
         name,
       },
     ]);
+    console.log("handle add listMapping", JSON.stringify(listMapping, null, 2));
   };
 
   const handleDeleteMapping = (key: React.Key) => {
-    setListMappingStateRequest(listMapping.filter((item) => item.key !== key));
+    const targetItem = listMapping.find((item) => item.key === key);
+    if (!targetItem) {
+      return;
+    }
+    // Filter out the deleted item
+    const filtered = listMapping.filter((item) => item.key !== key);
+    // Check if this was the last item of its group (by name)
+    const remainingGroupItems = filtered.filter(item => item.name === targetItem.name);
+    const updated = filtered;
+    if (remainingGroupItems.length === 0) {
+      // Re-add a placeholder entry with empty mapping
+      updated.push({
+        name: targetItem.name,
+        key: targetItem.key, // Reuse key or generate new one
+        from: undefined,
+        to: undefined,
+      });
+    }
+    console.log("handleDeleteMapping setListMappingStateRequest", JSON.stringify(updated, null, 2));
+    setListMappingStateRequest(updated);
   };
 
   const handleSelect = (value: string, key: React.Key) => {
