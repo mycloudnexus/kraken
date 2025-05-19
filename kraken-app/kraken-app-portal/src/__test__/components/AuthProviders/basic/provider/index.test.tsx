@@ -10,7 +10,7 @@ import * as requests from "@/components/AuthProviders/basic/components/utils/req
 import * as userApis from '@/services/user';
 
 const TestingComponent = () => {
-  const { checkAuthenticated, getAccessToken, logout, refreshAuth } = useBasicAuth();
+  const { checkAuthenticated, logout, refreshAuth } = useBasicAuth();
   const { value: isAuthenticated, setTrue, setFalse } = useBoolean(false);
   useEffect(() => {
       if (checkAuthenticated()) {
