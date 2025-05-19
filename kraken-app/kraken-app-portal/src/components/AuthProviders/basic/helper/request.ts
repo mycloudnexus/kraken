@@ -90,7 +90,7 @@ BasicRequest.interceptors.request.use(async (config) => {
   return updateToken(config);
 })
 
-const updateToken = async (config: any) => {
+export const updateToken = async (config: any) => {
   const { getAccessToken } = window.portalConfig ?? {}
   if (!_.isFunction(window?.portalConfig?.getAccessToken)) {
     return config
