@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import { AuthUser } from "./types";
+import { AuthUser } from "../types";
 
 const err = (): any => {
 };
