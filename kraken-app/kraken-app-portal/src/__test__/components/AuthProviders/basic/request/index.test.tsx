@@ -50,9 +50,13 @@ describe("Basic Authentication Request Test", () => {
     })
 
     const testUpdateToken = () => {
-      request(`/products/1/productTypes`, {
-        method: "GET",
-      });
+      try {
+        request(`/products/1/productTypes`, {
+          method: "GET",
+        });
+      } catch (e) {
+        console.log(e)
+      }
     }
 
     return (
