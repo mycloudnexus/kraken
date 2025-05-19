@@ -137,8 +137,17 @@ BasicRequest.interceptors.request.use((config: any) => {
 BasicRequest.interceptors.response.use(
   (response: AxiosResponse) => response.data,
   (error: AxiosError) => {
-    const err = handleResponseError(error)
-    return Promise.reject(err)
+    const status = _.get(error, 'response.status')
+    const message = _.get(error, 'response.data.error.message')
+    const principalId = _.get(error, 'response.data.error.details.principalId')
+    const pbacErrorEmptyPrincipal =
+      status === 401 && message === accessDenied && _.isPlainObject(principalId) && _.isEmpty(principalId)
+    const sessionExpired = status === 401 && invalidToken.includes(message!)
+    if (pbacErrorEmptyPrincipal || sessionExpired) {
+      const origin = window.location.origin
+      window.location.href = origin +"/login/sso"
+    }
+    return Promise.reject(error)
   }
 )
 
@@ -154,18 +163,19 @@ export const handleResponseError = (error: AxiosError) => {
   }
   const statusCode = parseInt(status as unknown as string);
   if (statusCode === 400) {
-    return new Error("Bad Request: " + message);
+    _.set(error, 'response.data.error.message', "Bad Request: " + message)
   } else if (statusCode === 401) {
-    return new Error("Unauthorized: " + message);
+    _.set(error, 'response.data.error.message', "Unauthorized: " + message);
   } else if (statusCode === 403) {
-    return new Error("Forbidden: " + message);
+    _.set(error, 'response.data.error.message', "Forbidden: " + message);
   }else if (statusCode === 404) {
-    return new Error("Not Fund: " + message);
+    _.set(error, 'response.data.error.message', "Not Fund: " + message);
   } else if (statusCode >= 500) {
-    return new Error("Internal Error: " + message);
+    _.set(error, 'response.data.error.message', "Internal Error: " + message);
   } else {
-    return new Error("failed: " + message);
+    _.set(error, 'response.data.error.message', "failed: " + message);
   }
+  return error;
 }
 
 export const isCancelCaught = (thrown: object) => isCancel(thrown)
