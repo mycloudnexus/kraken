@@ -197,9 +197,6 @@ export const post = <ResponseBody = any>(path: string, data: any, config?: any) 
 
 export const get = <ResponseBody = any>(path: string, config?: any) => BasicRequest.get<ResponseBody>(path, config)
 
-export const put = <ResponseBody = any>(path: string, data: any, config?: any) =>
-  BasicRequest.put<ResponseBody>(path, data, config)
-
 export const patch = <ResponseBody = any>(path: string, data: any, config?: any) =>
   BasicRequest.patch<ResponseBody>(path, data, config)
 
