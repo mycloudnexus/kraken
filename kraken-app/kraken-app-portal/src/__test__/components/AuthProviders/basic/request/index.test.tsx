@@ -10,6 +10,7 @@ import { Button, ConfigProvider } from "antd";
 import { AxiosError, AxiosHeaders } from "axios";
 import { useEffect } from "react";
 import { describe, it, vi } from "vitest";
+import * as callAPI from "@/components/AuthProviders/basic/helper/request";
 
 describe("Basic Authentication Request Test", () => {
 
@@ -29,6 +30,9 @@ describe("Basic Authentication Request Test", () => {
           refreshToken: "b"
         }
       }
+    } as any);
+    vi.spyOn(callAPI, "get").mockResolvedValue({
+      data: {}
     } as any);
 
     storeData("token", "a")
@@ -50,13 +54,9 @@ describe("Basic Authentication Request Test", () => {
     })
 
     const testUpdateToken = () => {
-      try {
-        request(`/products/1/productTypes`, {
-          method: "GET",
-        });
-      } catch (e) {
-        console.log(e)
-      }
+      request(`/products/1/productTypes`, {
+        method: "GET",
+      });
     }
 
     return (
@@ -88,6 +88,10 @@ describe("Basic Authentication Request Test", () => {
       }
     } as any);
 
+    vi.spyOn(callAPI, "get").mockResolvedValue({
+      data: {}
+    } as any);
+
     const { getByTestId } = render(
       <QueryClientProvider client={queryClient}>
         <ConfigProvider
@@ -114,15 +118,16 @@ describe("Basic Authentication Request Test", () => {
   });
 
   it("handle response error", async () => {
-    handleResponseError(createError(400, "Bad Request"))
-    handleResponseError(createError(401, "Unauthorized"))
-    handleResponseError(createError(403, "Forbidden"))
-    handleResponseError(createError(404, "Not Found"))
-    handleResponseError(createError(405, "Not Supported"))
-    handleResponseError(createError(500, "Internal Error"))
+    handleResponseError(createStatus(200, "OK"))
+    handleResponseError(createStatus(400, "Bad Request"))
+    handleResponseError(createStatus(401, "Unauthorized"))
+    handleResponseError(createStatus(403, "Forbidden"))
+    handleResponseError(createStatus(404, "Not Found"))
+    handleResponseError(createStatus(405, "Not Supported"))
+    handleResponseError(createStatus(500, "Internal Error"))
   });
 
-  const createError = (status: number, error: string) => {
+  const createStatus = (status: number, error: string) => {
     var request = { path: "/" };
     const headers = new AxiosHeaders();
     const config = {

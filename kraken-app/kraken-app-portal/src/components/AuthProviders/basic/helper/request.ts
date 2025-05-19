@@ -162,14 +162,18 @@ export const handleResponseError = (error: AxiosError) => {
     window.location.href = `${window.location.origin}${ROUTES.LOGIN}`
   }
   const statusCode = parseInt(status as unknown as string);
-  if (statusCode === 400) {
+  if (statusCode < 300) {
+    _.unset(error, 'response.data.error.message')
+  } else if (statusCode === 400) {
     _.set(error, 'response.data.error.message', "Bad Request: " + message)
   } else if (statusCode === 401) {
     _.set(error, 'response.data.error.message', "Unauthorized: " + message);
   } else if (statusCode === 403) {
     _.set(error, 'response.data.error.message', "Forbidden: " + message);
-  }else if (statusCode === 404) {
-    _.set(error, 'response.data.error.message', "Not Fund: " + message);
+  } else if (statusCode === 404) {
+    _.set(error, 'response.data.error.message', "Not Found: " + message);
+  } else if (statusCode === 405) {
+    _.set(error, 'response.data.error.message', "method not allowed" + message);
   } else if (statusCode >= 500) {
     _.set(error, 'response.data.error.message', "Internal Error: " + message);
   } else {
