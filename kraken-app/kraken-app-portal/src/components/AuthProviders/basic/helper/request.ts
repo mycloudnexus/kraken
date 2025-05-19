@@ -21,27 +21,23 @@ export const refreshTokenFnc = async () => {
     handleExpiration();
     return;
   }
-  try {
-    console.log("refreshing token...");
-    const res = await refresh(refreshToken);
-    console.log("refreshing token completed");
+  console.log("refreshing token...");
+  const res = await refresh(refreshToken);
+  console.log("refreshing token completed");
 
-    const expiresIn = _.get(res, "data.data.expiresIn");
-    const nToken = _.get(res, "data.data.accessToken");
-    const refreshTokenExpiresIn = _.get(res, "data.data.refreshTokenExpiresIn") ?? 0;
-    const newRefreshToken = _.get(res, "data.data.refreshToken") ?? "";
-    if (nToken && expiresIn) {
-      console.log("Success: refreshing token");
-      storeData("token", nToken);
-      storeData("refreshToken", newRefreshToken);
-      storeData("tokenExpired", String(Date.now() + expiresIn * 1000));
-      storeData(
-        "refreshTokenExpiresIn",
-        String(Date.now() + refreshTokenExpiresIn * 1000)
-      );
-    }
-  } catch (e) {
-    handleExpiration();
+  const expiresIn = _.get(res, "data.data.expiresIn");
+  const nToken = _.get(res, "data.data.accessToken");
+  const refreshTokenExpiresIn = _.get(res, "data.data.refreshTokenExpiresIn") ?? 0;
+  const newRefreshToken = _.get(res, "data.data.refreshToken") ?? "";
+  if (nToken && expiresIn) {
+    console.log("Success: refreshing token");
+    storeData("token", nToken);
+    storeData("refreshToken", newRefreshToken);
+    storeData("tokenExpired", String(Date.now() + expiresIn * 1000));
+    storeData(
+      "refreshTokenExpiresIn",
+      String(Date.now() + refreshTokenExpiresIn * 1000)
+    );
   }
 };
 
