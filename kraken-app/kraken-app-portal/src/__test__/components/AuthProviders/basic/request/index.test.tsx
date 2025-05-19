@@ -15,6 +15,9 @@ import * as callAPI from "@/components/AuthProviders/basic/helper/request";
 describe("Basic Authentication Request Test", () => {
 
   it("no stored token", async () => {
+    vi.spyOn(callAPI, "get").mockResolvedValue({
+      data: {}
+    } as any);
     clearData("token");
     refreshTokenFnc();
     refreshTokenWithConfig({});
