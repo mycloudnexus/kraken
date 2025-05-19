@@ -3,7 +3,7 @@ import axios from "axios";
 
 
 export const refresh = async (refreshToken: string) => {
-  axios.post(
+  return await axios.post(
     import.meta.env.VITE_BASE_API + "/auth/token",
     {
       refreshToken,
