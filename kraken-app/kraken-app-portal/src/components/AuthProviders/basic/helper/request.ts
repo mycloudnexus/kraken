@@ -87,6 +87,10 @@ const BasicRequest = axios.create({
   baseURL: ENV.API_BASE_URL
 })
 BasicRequest.interceptors.request.use(async (config) => {
+  return updateToken(config);
+})
+
+const updateToken = async (config: any) => {
   const { getAccessToken } = window.portalConfig ?? {}
   if (!_.isFunction(window?.portalConfig?.getAccessToken)) {
     return config
@@ -98,7 +102,7 @@ BasicRequest.interceptors.request.use(async (config) => {
   })
   config.headers.Authorization = `Bearer ${token}`
   return config;
-})
+}
 
 createAuthRefreshInterceptor(BasicRequest, refreshTokenFnc, {
   statusCodes: [401],
