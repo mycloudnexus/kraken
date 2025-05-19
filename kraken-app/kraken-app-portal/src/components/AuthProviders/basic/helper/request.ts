@@ -7,6 +7,7 @@ import { clearData, getData, isRefreshTokenExpired, storeData } from '@/utils/he
 import { message } from 'antd';
 import createAuthRefreshInterceptor from 'axios-auth-refresh';
 import { AXIOS_MESSAGE } from '@/utils/constants/message';
+import { refresh } from './refresh';
 
 export const DIRECT_LOGIN_MSG = [
   AXIOS_MESSAGE.TOKEN_EXPIRED,
@@ -23,23 +24,12 @@ export const refreshTokenFnc = async () => {
     return;
   }
   try {
-    const res = await axios.post(
-      import.meta.env.VITE_BASE_API + "/auth/token",
-      {
-        refreshToken,
-        grantType: "REFRESH_TOKEN",
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${getData("token")}`,
-        },
-      }
-    );
+    const res = await refresh(refreshToken);
 
     const expiresIn = _.get(res, "data.data.expiresIn");
     const nToken = _.get(res, "data.data.accessToken");
-    const refreshTokenExpiresIn = _.get(res, "data.data.refreshTokenExpiresIn");
-    const newRefreshToken = _.get(res, "data.data.refreshToken");
+    const refreshTokenExpiresIn = _.get(res, "data.data.refreshTokenExpiresIn") ?? 0;
+    const newRefreshToken = _.get(res, "data.data.refreshToken") ?? "";
     if (nToken && expiresIn) {
       storeData("token", nToken);
       storeData("refreshToken", newRefreshToken);
