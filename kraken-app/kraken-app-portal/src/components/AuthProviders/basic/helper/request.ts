@@ -46,6 +46,40 @@ export const refreshTokenFnc = async () => {
   }
 };
 
+interface TokenConfig {
+  keyToken?: string
+  tokenExpired?: string
+  refreshToken?: string
+  refreshTokenExpiresIn?: string
+}
+
+export const refreshTokenWithConfig = async (config : TokenConfig) => {
+  const token = getData(config.keyToken ?? "token");
+  const refreshToken = getData(config.refreshToken ?? "refreshToken");
+  if (!refreshToken || isRefreshTokenExpired() || !token) {
+    handleExpiration();
+    return;
+  }
+  console.log("refreshing token...");
+    const res = await refresh(refreshToken);
+    console.log("refreshing token completed");
+
+    const expiresIn = _.get(res, "data.data.expiresIn");
+    const nToken = _.get(res, "data.data.accessToken");
+    const refreshTokenExpiresIn = _.get(res, "data.data.refreshTokenExpiresIn") ?? 0;
+    const newRefreshToken = _.get(res, "data.data.refreshToken") ?? "";
+    if (nToken && expiresIn) {
+      console.log("Success: refreshing token");
+      storeData(config.keyToken ?? "token", nToken);
+      storeData(config.refreshToken ?? "refreshToken", newRefreshToken);
+      storeData(config.tokenExpired ?? "tokenExpired", String(Date.now() + expiresIn * 1000));
+      storeData(
+        config.tokenExpired ?? "refreshTokenExpiresIn",
+        String(Date.now() + refreshTokenExpiresIn * 1000)
+      );
+    }
+};
+
 const handleExpiration = () => {
   void message.error("Your session has expired. Please log in again.");
   console.log("expired");
