@@ -138,9 +138,7 @@ BasicRequest.interceptors.response.use(
   (response: AxiosResponse) => response.data,
   (error: AxiosError) => {
     const err = handleResponseError(error)
-    if (err) {
-      return Promise.reject(err)
-    }
+    return Promise.reject(err)
   }
 )
 
@@ -166,7 +164,7 @@ export const handleResponseError = (error: AxiosError) => {
   } else if (statusCode >= 500) {
     return new Error("Internal Error: " + message);
   } else {
-    return null;
+    return new Error("failed: " + message);
   }
 }
 
