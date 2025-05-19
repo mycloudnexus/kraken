@@ -22,16 +22,13 @@ export const refreshTokenFnc = async () => {
     return;
   }
   try {
-    console.log("refreshing token...");
     const res = await refresh(refreshToken);
-    console.log("refreshing token completed");
 
     const expiresIn = _.get(res, "data.data.expiresIn");
     const nToken = _.get(res, "data.data.accessToken");
     const refreshTokenExpiresIn = _.get(res, "data.data.refreshTokenExpiresIn") ?? 0;
     const newRefreshToken = _.get(res, "data.data.refreshToken") ?? "";
     if (nToken && expiresIn) {
-      console.log("Success: refreshing token");
       storeData("token", nToken);
       storeData("refreshToken", newRefreshToken);
       storeData("tokenExpired", String(Date.now() + expiresIn * 1000));
@@ -61,29 +58,25 @@ export const refreshTokenWithConfig = async (config : TokenConfig) => {
     handleExpiration();
     return;
   }
-  console.log("refreshing token...");
-    const res = await refresh(refreshToken);
-    console.log("refreshing token completed");
+  const res = await refresh(refreshToken);
 
-    const expiresIn = _.get(res, "data.data.expiresIn");
-    const nToken = _.get(res, "data.data.accessToken");
-    const refreshTokenExpiresIn = _.get(res, "data.data.refreshTokenExpiresIn") ?? 0;
-    const newRefreshToken = _.get(res, "data.data.refreshToken") ?? "";
-    if (nToken && expiresIn) {
-      console.log("Success: refreshing token");
-      storeData(config.keyToken ?? "token", nToken);
-      storeData(config.refreshToken ?? "refreshToken", newRefreshToken);
-      storeData(config.tokenExpired ?? "tokenExpired", String(Date.now() + expiresIn * 1000));
-      storeData(
-        config.tokenExpired ?? "refreshTokenExpiresIn",
-        String(Date.now() + refreshTokenExpiresIn * 1000)
-      );
-    }
+  const expiresIn = _.get(res, "data.data.expiresIn");
+  const nToken = _.get(res, "data.data.accessToken");
+  const refreshTokenExpiresIn = _.get(res, "data.data.refreshTokenExpiresIn") ?? 0;
+  const newRefreshToken = _.get(res, "data.data.refreshToken") ?? "";
+  if (nToken && expiresIn) {
+    storeData(config.keyToken ?? "token", nToken);
+    storeData(config.refreshToken ?? "refreshToken", newRefreshToken);
+    storeData(config.tokenExpired ?? "tokenExpired", String(Date.now() + expiresIn * 1000));
+    storeData(
+      config.tokenExpired ?? "refreshTokenExpiresIn",
+      String(Date.now() + refreshTokenExpiresIn * 1000)
+    );
+  }
 };
 
 const handleExpiration = () => {
   void message.error("Your session has expired. Please log in again.");
-  console.log("expired");
   clearData("token");
   clearData("tokenExpired");
   window.location.href = `${window.location.origin}${ROUTES.LOGIN}`;
@@ -140,18 +133,36 @@ BasicRequest.interceptors.request.use((config: any) => {
 BasicRequest.interceptors.response.use(
   (response: AxiosResponse) => response.data,
   (error: AxiosError) => {
-    const status = _.get(error, 'response.status')
-    const message = _.get(error, 'response.data.error.message')
-    const principalId = _.get(error, 'response.data.error.details.principalId')
-    const pbacErrorEmptyPrincipal =
-      status === 401 && message === accessDenied && _.isPlainObject(principalId) && _.isEmpty(principalId)
-    const sessionExpired = status === 401 && invalidToken.includes(message!)
-    if (pbacErrorEmptyPrincipal || sessionExpired) {
-      window.location.href = `${window.location.origin}${ROUTES.LOGIN}`
-    }
-    return Promise.reject(error)
+    const err = handleResponseError(error)
+    return Promise.reject(err)
   }
 )
+
+export const handleResponseError = (error: AxiosError) => {
+  const status = _.get(error, 'response.status')
+  const message = _.get(error, 'response.data.error.message')
+  const principalId = _.get(error, 'response.data.error.details.principalId')
+  const pbacErrorEmptyPrincipal =
+    status === 401 && message === accessDenied && _.isPlainObject(principalId) && _.isEmpty(principalId)
+  const sessionExpired = status === 401 && invalidToken.includes(message!)
+  if (pbacErrorEmptyPrincipal || sessionExpired) {
+    window.location.href = `${window.location.origin}${ROUTES.LOGIN}`
+  }
+  const statusCode = parseInt(status as unknown as string);
+  if (statusCode === 400) {
+    return "Bad Request: " + message;
+  } else if (statusCode === 401) {
+    return "Unauthorized: " + message;
+  } else if (statusCode === 403) {
+    return "Forbidden: " + message;
+  }else if (statusCode === 404) {
+    return "Not Fund: " + message;
+  } else if (statusCode >= 500) {
+    return "Internal Error: " + message;
+  } else {
+    return "failed: " + message;
+  }
+}
 
 export const isCancelCaught = (thrown: object) => isCancel(thrown)
 

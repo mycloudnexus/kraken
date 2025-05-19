@@ -8,6 +8,12 @@ import { useBoolean } from 'usehooks-ts';
 import Login from '@/components/AuthProviders/basic/login';
 import * as requests from "@/components/AuthProviders/basic/components/utils/request";
 import * as userApis from '@/services/user';
+import AuthLayout from '@/components/Layout/AuthLayout';
+import { ENV } from '@/constants';
+import { BrowserRouter } from 'react-router-dom';
+import * as authHooks from '@/components/AuthProviders/basic/provider/BasicAuthProvider';
+
+ENV.AUTHENTICATION_TYPE = "basic"
 
 const TestingComponent = () => {
   const { checkAuthenticated, logout, refreshAuth } = useBasicAuth();
@@ -305,6 +311,39 @@ describe('Use basic auth provider', () => {
     const btnRefresh = getByTestId("testRefresh");
     expect(btnRefresh).toBeInTheDocument();
     fireEvent.click(btnRefresh);
+  })
+
+  it('authenticate layout', () => {
+    const useBasicAuthSpy = vi.spyOn(authHooks, "useBasicAuth").mockReturnValue(
+      {
+        checkAuthenticated: () => { return false; },
+        loginWithCredentials: function (_values: any): Promise<void> {
+          throw new Error('Function not implemented.');
+        },
+        getAccessToken: function (): Promise<string> {
+          throw new Error('Function not implemented.');
+        },
+        logout: function (): Promise<void> {
+          throw new Error('Function not implemented.');
+        },
+        refreshAuth: function (): Promise<void> {
+          throw new Error('Function not implemented.');
+        },
+        getCurrentAuthUser: function () {
+          throw new Error('Function not implemented.');
+        },
+        isAuthenticated: false,
+        isLoading: false
+      } 
+    );
+    render(
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <AuthLayout />
+        </BrowserRouter>
+      </QueryClientProvider>
+    );
+    expect(useBasicAuthSpy).toBeCalled();
   })
 })
 
