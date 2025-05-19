@@ -18,19 +18,20 @@ export const refreshTokenFnc = async () => {
   const token = getData("token");
   const refreshToken = getData("refreshToken");
   if (!refreshToken || isRefreshTokenExpired() || !token) {
-    clearData("token");
-    clearData("tokenExpired");
-    window.location.href = `${window.location.origin}${ROUTES.LOGIN}`;
+    handleExpiration();
     return;
   }
   try {
+    console.log("refreshing token...");
     const res = await refresh(refreshToken);
+    console.log("refreshing token completed");
 
     const expiresIn = _.get(res, "data.data.expiresIn");
     const nToken = _.get(res, "data.data.accessToken");
     const refreshTokenExpiresIn = _.get(res, "data.data.refreshTokenExpiresIn") ?? 0;
     const newRefreshToken = _.get(res, "data.data.refreshToken") ?? "";
     if (nToken && expiresIn) {
+      console.log("Success: refreshing token");
       storeData("token", nToken);
       storeData("refreshToken", newRefreshToken);
       storeData("tokenExpired", String(Date.now() + expiresIn * 1000));
@@ -40,13 +41,18 @@ export const refreshTokenFnc = async () => {
       );
     }
   } catch (e) {
-    void message.error("Your session has expired. Please log in again.");
-    clearData("token");
-    clearData("tokenExpired");
-    window.location.href = `${window.location.origin}${ROUTES.LOGIN}`;
+    handleExpiration();
     return Promise.reject(new Error("Token expired"));
   }
 };
+
+const handleExpiration = () => {
+  void message.error("Your session has expired. Please log in again.");
+  console.log("expired");
+  clearData("token");
+  clearData("tokenExpired");
+  window.location.href = `${window.location.origin}${ROUTES.LOGIN}`;
+}
 
 const BasicRequest = axios.create({
   timeout: 50000,
