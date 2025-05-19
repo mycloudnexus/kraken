@@ -32,11 +32,9 @@ const BasicAuthProvider = (opts : BasicAuthenticateProps) => {
   const init = useRef(false);
 
   useEffect(() => {
-    console.log("initialize user context");
     if (init.current) {
       return;
     }
-    console.log("Checking auth status");
     const fetchUser = async () => {
       const curUser = (getCurrentUser())?.data;
       dispatch({
@@ -49,23 +47,19 @@ const BasicAuthProvider = (opts : BasicAuthenticateProps) => {
     init.current = true;
     if (checkAuth()) {
       window.portalConfig.getAccessToken = getAccessToken;
-      console.log("Authenticated, Fetching user info...");
 
       let user : BasicAuthUser;
         let userStr = getData("user");
         if (userStr) {
           user = JSON.parse(userStr);
-          console.log("Login data found")
           dispatch({
             type: AuthStates.LOGIN_COMPLETE,
             user: user,
           });
         } else {
-          console.log("user info not found, fetching new...")
           fetchUser();
         }
     } else {
-      console.log("Login data not found")
       dispatch({type: AuthStates.LOGOUT});
     }
   }, []);
@@ -95,7 +89,6 @@ const BasicAuthProvider = (opts : BasicAuthenticateProps) => {
       return Promise.resolve(token);
     }
     try {
-      console.log("requesting token...");
       const res = await requestToken(refreshToken);
       const expiresIn = get(res, "data.data.expiresIn");
       const nToken = get(res, "data.data.accessToken");
@@ -145,7 +138,6 @@ const BasicAuthProvider = (opts : BasicAuthenticateProps) => {
       window.portalConfig.checkAuthenticated = checkAuthenticated;
       window.portalConfig.getCurrentAuthUser = getCurrentAuthUser;
       const curUser = getCurrentUser();
-      console.log("store currentUser: " + JSON.stringify(curUser))
       storeData("user", JSON.stringify(curUser));
 
       dispatch({
@@ -165,17 +157,11 @@ const BasicAuthProvider = (opts : BasicAuthenticateProps) => {
     const refreshTokenExpiresIn = getData("refreshTokenExpiresIn");
     if (accessToken && expiresIn && refreshToken && refreshTokenExpiresIn) {
       if (!isRefreshTokenExpired()) {
-        console.log("refresh token");
-        console.log("Logout...");
-        console.log("current state: " + state);
-        console.log("tokenExpired..." + expiresIn);
-        console.log("refreshTokenExpiresIn..." + refreshTokenExpiresIn);
         window.portalConfig.getAccessToken = getAccessToken;
         window.portalConfig.checkAuthenticated = checkAuthenticated;
         window.portalConfig.getCurrentAuthUser = getCurrentAuthUser;
         const curUser = getCurrentUser();
         if (curUser) {
-          console.log("store currentUser: " + JSON.stringify(curUser))
           storeData("user", JSON.stringify(curUser));
         }
       }
@@ -195,10 +181,6 @@ const BasicAuthProvider = (opts : BasicAuthenticateProps) => {
   };
 
   const logout = async () : Promise<void> => {
-    console.log("Logout...");
-    console.log("current state: " + state);
-    console.log("tokenExpired..." + getData("tokenExpired"));
-    console.log("refreshTokenExpiresIn..." + getData("refreshTokenExpiresIn"));
     dispatch({ type: AuthStates.LOGOUT});
     clearData("user");
     clearData("token");

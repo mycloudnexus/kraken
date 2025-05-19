@@ -18,11 +18,6 @@ const TestingComponent = () => {
       } else {
         setFalse();
       }
-      if (isAuthenticated) {
-        getAccessToken().then(token => {
-          console.log(token)
-        });
-      }
     }, [checkAuthenticated]);
   return (
     <>
