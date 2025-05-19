@@ -9,8 +9,8 @@ import message from 'antd/es/message';
 import { useLogin } from '@/hooks/login';
 import { ENV } from '@/constants';
 import { getCurrentUser } from '@/services/user';
-import { AuthUser } from './types';
-import { requestToken } from './components/utils/request';
+import { AuthUser } from '../types';
+import { requestToken } from '../components/utils/request';
 
 window.portalConfig = ENV
 

@@ -1,4 +1,4 @@
-import { BasicAuthProvider, useBasicAuth } from '@/components/AuthProviders/basic/BasicAuthProvider';
+import { BasicAuthProvider, useBasicAuth } from '@/components/AuthProviders/basic/provider/BasicAuthProvider';
 import { fireEvent, render } from '@testing-library/react';
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Button, ConfigProvider } from "antd";
