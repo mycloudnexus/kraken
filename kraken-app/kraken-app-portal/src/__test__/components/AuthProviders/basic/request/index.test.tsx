@@ -1,13 +1,12 @@
 import * as requestAPI from "@/components/AuthProviders/basic/components/utils/request";
 import * as refreshAPI from "@/components/AuthProviders/basic/helper/refresh";
-import { handleResponseError, refreshTokenFnc, refreshTokenWithConfig, updateToken } from "@/components/AuthProviders/basic/helper/request";
+import { refreshTokenFnc, refreshTokenWithConfig, updateToken } from "@/components/AuthProviders/basic/helper/request";
 import { BasicAuthProvider, useBasicAuth } from "@/components/AuthProviders/basic/provider/BasicAuthProvider";
 import { queryClient } from "@/utils/helpers/reactQuery";
 import { clearData, storeData } from "@/utils/helpers/token";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render } from "@testing-library/react";
 import { Button, ConfigProvider } from "antd";
-import { AxiosError, AxiosHeaders } from "axios";
 import { describe, it, vi } from "vitest";
 import * as callAPI from "@/components/AuthProviders/basic/helper/request";
 import * as userApis from '@/services/user';
@@ -134,33 +133,6 @@ describe("Basic Authentication Request Test", () => {
     expect(btnUpdateToken).toBeInTheDocument();
     fireEvent.click(btnUpdateToken);
   });
-
-  it("handle response error", async () => {
-    handleResponseError(createStatus(200, "OK"))
-    handleResponseError(createStatus(302, "Found"))
-    handleResponseError(createStatus(400, "Bad Request"))
-    handleResponseError(createStatus(401, "Unauthorized"))
-    handleResponseError(createStatus(403, "Forbidden"))
-    handleResponseError(createStatus(404, "Not Found"))
-    handleResponseError(createStatus(405, "Not Supported"))
-    handleResponseError(createStatus(500, "Internal Error"))
-  });
-
-  const createStatus = (status: number, error: string) => {
-    var request = { path: "/" };
-    const headers = new AxiosHeaders();
-    const config = {
-      url: "http://localhost:3000",
-      headers
-    };
-    return new AxiosError("err", "ERR", config, request, {
-      status: status,
-      data: { },
-      statusText: error,
-      config,
-      headers
-    });
-  }
 
   const mockRequest = () => {
     vi.spyOn(requestAPI, "requestToken").mockResolvedValue({

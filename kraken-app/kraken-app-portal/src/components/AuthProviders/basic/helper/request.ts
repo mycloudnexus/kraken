@@ -143,37 +143,6 @@ BasicRequest.interceptors.response.use(
   }
 )
 
-export const handleResponseError = (error: AxiosError) => {
-  const status = _.get(error, 'response.status')
-  const message = _.get(error, 'response.data.error.message')
-  const principalId = _.get(error, 'response.data.error.details.principalId')
-  const pbacErrorEmptyPrincipal =
-    status === 401 && message === accessDenied && _.isPlainObject(principalId) && _.isEmpty(principalId)
-  const sessionExpired = status === 401 && invalidToken.includes(message!)
-  if (pbacErrorEmptyPrincipal || sessionExpired) {
-    window.location.href = `${window.location.origin}${ROUTES.LOGIN}`
-  }
-  const statusCode = parseInt(status as unknown as string);
-  if (statusCode < 300) {
-    _.unset(error, 'response.data.error.message')
-  } else if (statusCode === 400) {
-    _.set(error, 'response.data.error.message', "Bad Request: " + message)
-  } else if (statusCode === 401) {
-    _.set(error, 'response.data.error.message', "Unauthorized: " + message);
-  } else if (statusCode === 403) {
-    _.set(error, 'response.data.error.message', "Forbidden: " + message);
-  } else if (statusCode === 404) {
-    _.set(error, 'response.data.error.message', "Not Found: " + message);
-  } else if (statusCode === 405) {
-    _.set(error, 'response.data.error.message', "method not allowed" + message);
-  } else if (statusCode >= 500) {
-    _.set(error, 'response.data.error.message', "Internal Error: " + message);
-  } else {
-    _.set(error, 'response.data.error.message', "failed: " + message);
-  }
-  return error;
-}
-
 export const isCancelCaught = (thrown: object) => isCancel(thrown)
 
 const invalidToken = ['The user is not logged in', 'The session token has expired', 'The session token been deleted']
