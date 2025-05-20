@@ -7,8 +7,6 @@ import { BasicAuthenticateProps, useBasicAuth } from './BasicAuthProvider';
 
 const BasicAuthenticate = ({ children }: BasicAuthenticateProps) => {
   const { checkAuthenticated } = useBasicAuth();
-
-  console.log("BasicAuthenticate isAuthenticated: " + checkAuthenticated())
   const navigate = useNavigate()
   useEffect(() => {
     if (!checkAuthenticated()) {

@@ -6,7 +6,7 @@ import { PRODUCT_NAME } from "@/utils/constants/common";
 import { Alert, Button, Form, Input, Typography } from "antd";
 import { useState } from "react";
 import styles from "./index.module.scss";
-import { useBasicAuth } from "@/components/AuthProviders/basic/BasicAuthProvider";
+import { useBasicAuth } from "@/components/AuthProviders/basic/provider/BasicAuthProvider";
 
 const Login = () => {
   const { isPending } = useLogin();

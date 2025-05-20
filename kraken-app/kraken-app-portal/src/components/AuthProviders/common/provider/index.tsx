@@ -1,6 +1,6 @@
 import React from 'react'
 import { ENV } from '@/constants'
-import { BasicAuthProvider } from '../../basic/BasicAuthProvider'
+import { BasicAuthProvider } from '../../basic/provider/BasicAuthProvider'
 
 interface AuthProviderProps {
   children: React.ReactElement

@@ -64,6 +64,7 @@ describe(" Environment Overview component list", () => {
   });
 
   it("running components list", async () => {
+    vi.clearAllMocks()
     vi.spyOn(sizeHooks, 'useContainerHeight').mockReturnValue([1000])
 
     const { getByText, getAllByRole } = render(

@@ -1,4 +1,4 @@
-import { BasicAuthUser } from "@/components/AuthProviders/basic/BasicAuthContext";
+import { BasicAuthUser } from "@/components/AuthProviders/basic/provider/BasicAuthContext";
 import { USER, USER_AUTH_TOKEN, USER_ROLES } from "@/utils/constants/api";
 import request from "@/utils/helpers/request";
 
