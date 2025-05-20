@@ -81,14 +81,34 @@ const ResponseItem = ({ item, index }: Props) => {
       {
         key: nanoid(),
         from: undefined,
-        to: undefined,
+        to: [],
         name,
       },
     ]);
   };
 
   const handleDeleteMapping = (key: React.Key) => {
-    setListMappingStateResponse(listMapping.filter((item) => item.key !== key));
+    console.log("handleDeleteMapping setListMappingStateResponse key", key);
+    const targetItem = listMapping.find((item) => item.key === key);
+    if (!targetItem) {
+      return;
+    }
+    // Filter out the deleted item
+    const filtered = listMapping.filter((item) => item.key !== key);
+    // Check if this was the last item of its group (by name)
+    const remainingGroupItems = filtered.filter(item => item.name === targetItem.name);
+    const updated = [...filtered];
+    if (remainingGroupItems.length === 0) {
+      // Re-add a placeholder entry with empty mapping
+      updated.push({
+        name: targetItem.name,
+        key: nanoid(), // generate a new unique key
+        from: undefined,
+        to: [],
+      });
+    }
+    console.log("handleDeleteMapping setListMappingStateResponse", JSON.stringify(updated, null, 2));
+    setListMappingStateResponse(updated);
   };
 
   const handleSelect = (value: string, key: React.Key) => {
@@ -239,6 +259,7 @@ const ResponseItem = ({ item, index }: Props) => {
                       value: item,
                     }))}
                   />
+                  {from !== undefined && (
                   <Button
                     className={styles.btnRemoveValueMapping}
                     type="link"
@@ -246,6 +267,7 @@ const ResponseItem = ({ item, index }: Props) => {
                   >
                     <DeleteOutlined />
                   </Button>
+                  )}
                 </Flex>
                 <MappingIcon />
                 <Select

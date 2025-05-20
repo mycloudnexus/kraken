@@ -180,6 +180,7 @@ const RequestItem = ({ item, index }: Props) => {
   };
 
   const handleDeleteMapping = (key: React.Key) => {
+    console.log("handleDeleteMapping setListMappingStateRequest key", key);
     const targetItem = listMapping.find((item) => item.key === key);
     if (!targetItem) {
       return;
@@ -188,12 +189,12 @@ const RequestItem = ({ item, index }: Props) => {
     const filtered = listMapping.filter((item) => item.key !== key);
     // Check if this was the last item of its group (by name)
     const remainingGroupItems = filtered.filter(item => item.name === targetItem.name);
-    const updated = filtered;
+    const updated = [...filtered];
     if (remainingGroupItems.length === 0) {
       // Re-add a placeholder entry with empty mapping
       updated.push({
         name: targetItem.name,
-        key: targetItem.key, // Reuse key or generate new one
+        key: nanoid(), // generate a new unique key
         from: undefined,
         to: undefined,
       });
