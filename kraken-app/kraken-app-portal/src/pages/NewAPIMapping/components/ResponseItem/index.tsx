@@ -232,8 +232,7 @@ const ResponseItem = ({ item, index }: Props) => {
         <Flex vertical gap={20} style={{ width: "100%", marginTop: 8 }}>
           {listMapping
             ?.filter((i) => i.name === item?.name)
-            ?.map(({ key, from, to }) => {
-              return (
+            ?.map(({ key, from, to }) => (
               <Flex
                 className={styles.itemContainer}
                 key={`${item.title}-${item.name}-${key}`}
@@ -279,8 +278,7 @@ const ResponseItem = ({ item, index }: Props) => {
                   onChange={(e) => handleChangeInput(e, key)}
                 />
               </Flex>
-            )}
-            )}
+            ))}
           <Flex className={styles.itemContainer}>
             <Button
               type="link"
