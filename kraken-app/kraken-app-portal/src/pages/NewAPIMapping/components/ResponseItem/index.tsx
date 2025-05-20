@@ -88,7 +88,6 @@ const ResponseItem = ({ item, index }: Props) => {
   };
 
   const handleDeleteMapping = (key: React.Key) => {
-    console.log("handleDeleteMapping setListMappingStateResponse key", key);
     const targetItem = listMapping.find((item) => item.key === key);
     if (!targetItem) {
       return;
@@ -107,7 +106,6 @@ const ResponseItem = ({ item, index }: Props) => {
         to: [],
       });
     }
-    console.log("handleDeleteMapping setListMappingStateResponse", JSON.stringify(updated, null, 2));
     setListMappingStateResponse(updated);
   };
 

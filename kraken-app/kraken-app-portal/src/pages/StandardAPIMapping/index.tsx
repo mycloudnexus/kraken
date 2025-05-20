@@ -184,10 +184,7 @@ const StandardAPIMapping = () => {
   };
 
   const requestValueMapping = (item: IMapping) => {
-    console.log("requestValueMapping", JSON.stringify(item, null, 2));
-    const x = [{ [item.from as string]: item.to?.[0] }];
-    console.log("requestValueMapping converted", JSON.stringify(x, null, 2));
-    return x;
+    return [{ [item.from as string]: item.to?.[0] }];
   };
 
   const responseValueMapping = (item: IMapping) => {
@@ -204,7 +201,6 @@ const StandardAPIMapping = () => {
     items: IMapping[],
     type: "request" | "response"
   ) => {
-    console.log("transformListMappingItem items", JSON.stringify(items, null, 2));  
     const grouped = chain(items)
     .groupBy("name")
     .map((groupItems, name) => {
@@ -215,7 +211,6 @@ const StandardAPIMapping = () => {
       };
     })
     .value();
-    console.log("transformListMappingItem result", JSON.stringify(grouped, null, 2));  
     return grouped;
   };
 
@@ -286,18 +281,14 @@ const StandardAPIMapping = () => {
 
   const handleSave = async (callback?: () => void) => {
     try {
-      console.log("handleSave listMappingStateResponse", JSON.stringify(listMappingStateResponse, null, 2));
       const newDataResponse = transformListMappingItem(
         listMappingStateResponse,
         "response"
       );
-      console.log("handleSave transformed newDataResponse", JSON.stringify(newDataResponse, null, 2));
-      console.log("handleSave listMappingStateRequest", JSON.stringify(listMappingStateRequest, null, 2));
       const newDataRequest = transformListMappingItem(
         listMappingStateRequest,
         "request"
       );
-      console.log("handleSave transformed newDataRequest", JSON.stringify(newDataRequest, null, 2));
 
       let newResponse = cloneDeep(responseMapping);
       if (!isEmpty(newDataResponse)) {
@@ -305,14 +296,12 @@ const StandardAPIMapping = () => {
           newResponse = getNewResponse(newResponse, it);
         });
       }
-      console.log("handleSave newResponse", JSON.stringify(newResponse, null, 2));
       let newRequest = cloneDeep(requestMapping);
       if (!isEmpty(newDataRequest)) {
         newDataRequest.forEach((it) => {
           newRequest = getNewRequest(newRequest, it);
         });
       }
-      console.log("handleSave newRequest", JSON.stringify(newRequest, null, 2));
       const mappers: IMappers = {
         request: newRequest.map((rm) => ({
           ...rm,

@@ -176,11 +176,9 @@ const RequestItem = ({ item, index }: Props) => {
         name,
       },
     ]);
-    console.log("handle add listMapping", JSON.stringify(listMapping, null, 2));
   };
 
   const handleDeleteMapping = (key: React.Key) => {
-    console.log("handleDeleteMapping setListMappingStateRequest key", key);
     const targetItem = listMapping.find((item) => item.key === key);
     if (!targetItem) {
       return;
@@ -199,7 +197,6 @@ const RequestItem = ({ item, index }: Props) => {
         to: undefined,
       });
     }
-    console.log("handleDeleteMapping setListMappingStateRequest", JSON.stringify(updated, null, 2));
     setListMappingStateRequest(updated);
   };
 
