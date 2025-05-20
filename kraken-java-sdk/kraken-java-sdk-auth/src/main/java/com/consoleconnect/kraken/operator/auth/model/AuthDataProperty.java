@@ -98,7 +98,7 @@ public class AuthDataProperty {
   public static class JwtEncoderProperty {
     private String privateKey;
     private String secret;
-    private long tokenExpiresInSeconds = 180;
+    private long tokenExpiresInSeconds = 3600;
     private String keyId = "kraken";
     private String issuer = "https://kraken.consoleconnnect.com/issuer";
   }
