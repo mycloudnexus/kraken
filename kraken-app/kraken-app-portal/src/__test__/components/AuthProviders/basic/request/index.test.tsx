@@ -69,43 +69,46 @@ describe("Basic Authentication Request Test", () => {
       </>
     );
   };
-  
 
   it("update token to request header", async () => {
     storeData("token", "a")
     storeData("refreshToken", "a")
     storeData("refreshTokenExpiresIn", "" + (Date.now() + 3600 * 1000 * 24))
 
-    vi.spyOn(requestAPI, "requestToken").mockResolvedValue({
-      data: {
-        data: {
-          expiresIn: Date.now(),
-          refreshTokenExpiresIn: Date.now(),
-          accessToken: "a",
-          refreshToken: "b"
-        }
-      }
-    } as any);
+    mockRequest()
 
-    vi.spyOn(requestAPI, "requestToken").mockResolvedValue({
-      data: {
-        data: {
-          expiresIn: Date.now(),
-          refreshTokenExpiresIn: Date.now(),
-          accessToken: "a",
-          refreshToken: "b"
-        }
-      }
-    } as any);
+    const { getByTestId } = render(
+      <QueryClientProvider client={queryClient}>
+        <ConfigProvider
+          input={{ style: { borderRadius: 4 } }}
+          theme={{
+            components: {
+              Button: {
+                colorPrimary: "#2962FF",
+                borderRadius: 4,
+              },
+            },
+          }}
+        >
+          <BasicAuthProvider>
+            <TestingComponent />
+          </BasicAuthProvider>
+        </ConfigProvider>
+      </QueryClientProvider>
+    );
 
-    vi.spyOn(userApis, "getCurrentUser").mockReturnValue({
-          name: "user1",
-          email: "user1@test.com"
-        });
+    const btnUpdateToken = getByTestId("testUpdateToken");
+    expect(btnUpdateToken).toBeInTheDocument();
+    fireEvent.click(btnUpdateToken);
+  });
 
-    vi.spyOn(callAPI, "get").mockResolvedValue({
-      data: {}
-    } as any);
+  it("update token to request header when expired", async () => {
+    storeData("token", "a")
+    storeData("refreshToken", "a")
+    storeData("tokenExpired", "" + (Date.now() - 3600 * 1000 * 24))
+    storeData("refreshTokenExpiresIn", "" + (Date.now() + 3600 * 1000 * 24))
+
+    mockRequest()
 
     const { getByTestId } = render(
       <QueryClientProvider client={queryClient}>
@@ -134,6 +137,7 @@ describe("Basic Authentication Request Test", () => {
 
   it("handle response error", async () => {
     handleResponseError(createStatus(200, "OK"))
+    handleResponseError(createStatus(302, "Found"))
     handleResponseError(createStatus(400, "Bad Request"))
     handleResponseError(createStatus(401, "Unauthorized"))
     handleResponseError(createStatus(403, "Forbidden"))
@@ -156,6 +160,29 @@ describe("Basic Authentication Request Test", () => {
       config,
       headers
     });
+  }
+
+  const mockRequest = () => {
+    vi.spyOn(requestAPI, "requestToken").mockResolvedValue({
+      data: {
+        data: {
+          expiresIn: Date.now(),
+          refreshTokenExpiresIn: Date.now(),
+          accessToken: "a",
+          refreshToken: "b"
+        }
+      }
+    } as any);
+
+    vi.spyOn(userApis, "getCurrentUser").mockReturnValue({
+          name: "user1",
+          email: "user1@test.com"
+        });
+
+    vi.spyOn(callAPI, "get").mockResolvedValue({
+      data: {}
+    } as any);
+
   }
 });
   

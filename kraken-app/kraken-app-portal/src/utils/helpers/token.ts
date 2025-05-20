@@ -40,7 +40,7 @@ export const isTokenExpiredIn = (reserved : number) => {
     return true;
   }
   const currentTime = Date.now();
-  return currentTime > Number(storedTime) + reserved;
+  return currentTime > Number(storedTime) - reserved;
 };
 
 export const isRefreshTokenExpired = () => {

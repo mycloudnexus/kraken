@@ -25,21 +25,33 @@ const TestingComponent = () => {
         setFalse();
       }
     }, [checkAuthenticated]);
+
+  const getCurrentUser = () => {
+    if (window.portalConfig && window.portalConfig.getCurrentAuthUser) {
+      window?.portalConfig?.getCurrentAuthUser();
+    }
+  }
   return (
     <>
       <p data-testId="checkAuthenticated">{ "" + isAuthenticated }</p>
       <Button
-            type="link"
-            data-testId="testLogout"
-            onClick={logout}
-          >
-        </Button>
-        <Button
-            type="link"
-            data-testId="testRefresh"
-            onClick={refreshAuth}
-          >
-        </Button>
+          type="link"
+          data-testId="testLogout"
+          onClick={logout}
+        >
+      </Button>
+      <Button
+          type="link"
+          data-testId="testRefresh"
+          onClick={refreshAuth}
+        >
+      </Button>
+      <Button
+          type="link"
+          data-testId="testGetCurrentUser"
+          onClick={getCurrentUser}
+        >
+      </Button>
     </>
   );
 };
@@ -159,6 +171,10 @@ describe('Use basic auth provider', () => {
     );
     const checkAuthenticated = getByTestId('checkAuthenticated');
     expect(checkAuthenticated).toHaveTextContent("true");
+
+    const btnGetCurrentUser = getByTestId("testGetCurrentUser");
+    expect(btnGetCurrentUser).toBeInTheDocument();
+    fireEvent.click(btnGetCurrentUser);
   })
 
   it('authenticated access token expired', () => {

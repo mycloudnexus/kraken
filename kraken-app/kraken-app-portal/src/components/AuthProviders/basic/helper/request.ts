@@ -21,26 +21,19 @@ export const refreshTokenFnc = async () => {
     handleExpiration();
     return;
   }
-  try {
-    const res = await refresh(refreshToken);
-
-    const expiresIn = _.get(res, "data.data.expiresIn");
-    const nToken = _.get(res, "data.data.accessToken");
-    const refreshTokenExpiresIn = _.get(res, "data.data.refreshTokenExpiresIn") ?? 0;
-    const newRefreshToken = _.get(res, "data.data.refreshToken") ?? "";
-    if (nToken && expiresIn) {
-      storeData("token", nToken);
-      storeData("refreshToken", newRefreshToken);
-      storeData("tokenExpired", String(Date.now() + expiresIn * 1000));
-      storeData(
-        "refreshTokenExpiresIn",
-        String(Date.now() + refreshTokenExpiresIn * 1000)
-      );
-    }
-  } catch (e) {
-    console.error("Faied to refresh token:", e);
-    handleExpiration();
-    return Promise.reject(new Error("Reresh token failure"));
+  const res = await refresh(refreshToken);
+  const expiresIn = _.get(res, "data.data.expiresIn");
+  const nToken = _.get(res, "data.data.accessToken");
+  const refreshTokenExpiresIn = _.get(res, "data.data.refreshTokenExpiresIn") ?? 0;
+  const newRefreshToken = _.get(res, "data.data.refreshToken") ?? "";
+  if (nToken && expiresIn) {
+    storeData("token", nToken);
+    storeData("refreshToken", newRefreshToken);
+    storeData("tokenExpired", String(Date.now() + expiresIn * 1000));
+    storeData(
+      "refreshTokenExpiresIn",
+      String(Date.now() + refreshTokenExpiresIn * 1000)
+    );
   }
 };
 
@@ -144,8 +137,7 @@ BasicRequest.interceptors.response.use(
       status === 401 && message === accessDenied && _.isPlainObject(principalId) && _.isEmpty(principalId)
     const sessionExpired = status === 401 && invalidToken.includes(message!)
     if (pbacErrorEmptyPrincipal || sessionExpired) {
-      const origin = window.location.origin
-      window.location.href = origin +"/login/sso"
+      window.location.href = `${window.location.origin}${ROUTES.LOGIN}`
     }
     return Promise.reject(error)
   }

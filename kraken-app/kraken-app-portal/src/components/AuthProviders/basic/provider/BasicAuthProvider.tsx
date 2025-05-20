@@ -4,8 +4,6 @@ import BasicAuthContext, { BasicAuthContextInterface, BasicAuthUser, initialAuth
 import { AuthStates, stateReducer } from './AuthStates';
 import { clearData, getData, isRefreshTokenExpired, isTokenExpiredIn, storeData } from '@/utils/helpers/token';
 import { get } from 'lodash';
-import { ROUTES } from '@/utils/constants/route';
-import message from 'antd/es/message';
 import { useLogin } from '@/hooks/login';
 import { ENV } from '@/constants';
 import { getCurrentUser } from '@/services/user';
@@ -84,8 +82,8 @@ const BasicAuthProvider = (opts : BasicAuthenticateProps) => {
       clearData("tokenExpired");
       return Promise.resolve("Refresh token expired");
     }
-    //whether be expired in 5 min
-    if (!isTokenExpiredIn(5 * 60 * 1000 * 1000)) {
+    //whether be expired in 30 sec
+    if (!isTokenExpiredIn(30 * 1000)) {
       return Promise.resolve(token);
     }
     try {
@@ -105,10 +103,6 @@ const BasicAuthProvider = (opts : BasicAuthenticateProps) => {
       }
       return Promise.resolve(nToken);
     } catch (e) {
-      void message.error("Your session has expired. Please log in again.");
-      clearData("token");
-      clearData("tokenExpired");
-      window.location.href = `${window.location.origin}${ROUTES.LOGIN}`;
       return Promise.reject(new Error(`Exception while request access token: ${e}`));
     }
   };
