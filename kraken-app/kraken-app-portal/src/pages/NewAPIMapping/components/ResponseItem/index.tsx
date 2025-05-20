@@ -86,7 +86,7 @@ const ResponseItem = ({ item, index }: Props) => {
       },
     ]);
   };
-
+  
   const handleDeleteMapping = (key: React.Key) => {
     const targetItem = listMapping.find((item) => item.key === key);
     if (!targetItem) {
@@ -109,6 +109,7 @@ const ResponseItem = ({ item, index }: Props) => {
     setListMappingStateResponse(updated);
   };
 
+  
   const handleSelect = (value: string, key: React.Key) => {
     const cloneArr = cloneDeep(listMapping);
     const itemIndex = listMapping.findIndex((l) => l.key === key);
@@ -231,7 +232,8 @@ const ResponseItem = ({ item, index }: Props) => {
         <Flex vertical gap={20} style={{ width: "100%", marginTop: 8 }}>
           {listMapping
             ?.filter((i) => i.name === item?.name)
-            ?.map(({ key, from, to }) => (
+            ?.map(({ key, from, to }) => {
+              return (
               <Flex
                 className={styles.itemContainer}
                 key={`${item.title}-${item.name}-${key}`}
@@ -257,7 +259,6 @@ const ResponseItem = ({ item, index }: Props) => {
                       value: item,
                     }))}
                   />
-                  {from !== undefined && (
                   <Button
                     className={styles.btnRemoveValueMapping}
                     type="link"
@@ -265,7 +266,6 @@ const ResponseItem = ({ item, index }: Props) => {
                   >
                     <DeleteOutlined />
                   </Button>
-                  )}
                 </Flex>
                 <MappingIcon />
                 <Select
@@ -279,7 +279,8 @@ const ResponseItem = ({ item, index }: Props) => {
                   onChange={(e) => handleChangeInput(e, key)}
                 />
               </Flex>
-            ))}
+            )}
+            )}
           <Flex className={styles.itemContainer}>
             <Button
               type="link"

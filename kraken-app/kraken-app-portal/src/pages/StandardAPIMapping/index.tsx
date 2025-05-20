@@ -220,7 +220,7 @@ const StandardAPIMapping = () => {
       name: string;
       valueMapping: (
         | {
-            [x: string]: string[] | undefined;
+            [x: string]: string | undefined;
           }
         | undefined
       )[];
@@ -296,6 +296,7 @@ const StandardAPIMapping = () => {
           newResponse = getNewResponse(newResponse, it);
         });
       }
+      
       let newRequest = cloneDeep(requestMapping);
       if (!isEmpty(newDataRequest)) {
         newDataRequest.forEach((it) => {
