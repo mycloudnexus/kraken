@@ -1,6 +1,7 @@
 import { IMappers } from "@/utils/types/component.type";
 import { chain, flatMap } from "lodash";
 import { IMapping } from "./components/ResponseMapping";
+import { nanoid } from "nanoid";
 
 /**
  *  Returns properties id whose source/target/location data is missing (applicable for seller apis, and sonata's custom fields only)
@@ -104,3 +105,29 @@ export function transformListMappingItem(
     }))
     .value();
 };
+
+export function handleDeleteMappingItems(
+  key: React.Key,
+  listMapping: IMapping[],
+  emptyToValue: any
+): IMapping[] | undefined {
+  const targetItem = listMapping.find((item) => item.key === key);
+  if (!targetItem) {
+    return;
+  }
+
+  const filtered = listMapping.filter((item) => item.key !== key);
+  const remainingGroupItems = filtered.filter(item => item.name === targetItem.name);
+  const updated = [...filtered];
+
+  if (remainingGroupItems.length === 0) {
+    updated.push({
+      name: targetItem.name,
+      key: nanoid(),
+      from: undefined,
+      to: emptyToValue,
+    });
+  }
+
+  return updated;
+}
