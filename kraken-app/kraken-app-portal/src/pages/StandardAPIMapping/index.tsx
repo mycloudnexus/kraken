@@ -345,7 +345,7 @@ const StandardAPIMapping = () => {
         componentId: data.metadata.id,
         data,
       } as any);
-      console.log("handleSave, end to updateTargetMapper", res);
+      console.log("handleSave, end to updateTargetMapper");
       notification.success({ message: res.message });
       refreshMappingDetail();
       callback && callback();
