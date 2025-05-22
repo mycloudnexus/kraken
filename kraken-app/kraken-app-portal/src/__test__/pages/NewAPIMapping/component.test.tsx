@@ -1337,6 +1337,44 @@ describe("requestItem render", () => {
     const btnAdd = getByTestId("btn-add-state");
     fireEvent.click(btnAdd);
   });
+  it("delete value mapping", () => {
+    const { container, getByTestId } = render(
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <RequestItem
+            index={2}
+            item={{
+              id: "id",
+              description: "",
+              name: "mapper.order.eline.add.duration.unit",
+              title: "order item Term unit",
+              source:
+                "@{{productOrderItem[0].requestedItemTerm.duration.units}}",
+              target: "@{{requestBody.durationUnit}}",
+              sourceValues: [
+                "calendarMonths",
+                "calendarDays",
+                "calendarHours",
+                "calendarMinutes",
+                "businessDays",
+                "businessHours",
+              ],
+              valueMapping: {
+                calendarMonths: "calendarMonths",
+              },
+              sourceLocation: "BODY",
+              targetLocation: "BODY",
+              customizedField: true,
+              requiredMapping: true,
+            }}
+          />
+        </BrowserRouter>
+      </QueryClientProvider>
+    );
+    expect(container).toBeInTheDocument();
+    const btnDeleteMapping = getByTestId("btn-delete-mapping-items");
+    fireEvent.click(btnDeleteMapping);
+  });
   it("add value limit integer discrete", () => {
     const { container, getByTestId } = render(
       <QueryClientProvider client={queryClient}>
