@@ -156,10 +156,10 @@ test("StandardAPIMapping handleSave updates and sends correct mapping", async ()
   }));
 
   // 5. Mock the actual hook the component uses
-  vi.mock("@/hooks/product", async (importOriginal) => {
-    const original = await importOriginal();
+  vi.mock("@/hooks/product", async () => {
+    const actual = await vi.importActual<typeof import("@/hooks/product")>("@/hooks/product");
     return {
-      ...original,
+      ...actual,
       useUpdateTargetMapper: () => ({
         mutateAsync: mockUpdateTargetMapper,
         isPending: false,

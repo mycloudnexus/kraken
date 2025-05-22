@@ -226,6 +226,7 @@ const StandardAPIMapping = () => {
       )[];
     }
   ) => {
+    console.log("getNewRequest newRequest:",  JSON.stringify(newRequest, null, 2));
     return newRequest.map((rm) => {
       if (rm.name === it.name) {
         if (isEmpty(it.valueMapping)) {

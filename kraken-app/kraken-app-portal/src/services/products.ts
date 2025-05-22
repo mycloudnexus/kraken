@@ -212,7 +212,6 @@ export const updateTargetMapper = (
   componentId: string,
   data: unknown
 ) => {
-  console.log("start to updateTargetMapper");
   return request(
     `${PRODUCT}/${productId}/components/${componentId}/targetMapper`,
     {

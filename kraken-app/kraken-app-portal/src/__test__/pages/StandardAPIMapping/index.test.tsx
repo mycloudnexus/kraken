@@ -1,11 +1,10 @@
-import { fireEvent, render, waitFor } from "@testing-library/react";
+import { fireEvent, render } from "@testing-library/react";
 import * as productHooks from "@/hooks/product";
 import StandardAPIMapping from "@/pages/StandardAPIMapping";
 import * as mappingStore from "@/stores/mappingUi.store";
 import { queryClient } from "@/utils/helpers/reactQuery";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
-import * as newApiMappingStore from "@/stores/newApiMapping.store";
 
 test("StandardAPIMapping btn-create-version", () => {
   vi.spyOn(mappingStore, "useMappingUiStore").mockReturnValue({
