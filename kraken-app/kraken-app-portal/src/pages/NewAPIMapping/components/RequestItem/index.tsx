@@ -19,6 +19,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useBoolean } from "usehooks-ts";
 import { SourceInput } from "./SourceInput";
 import { TargetInput } from "./TargetInput";
+import { handleDeleteMappingItems } from "@/pages/NewAPIMapping/helper";
 import styles from "./index.module.scss";
 
 type Props = {
@@ -179,24 +180,7 @@ const RequestItem = ({ item, index }: Props) => {
   };
 
   const handleDeleteMapping = (key: React.Key) => {
-    const targetItem = listMapping.find((item) => item.key === key);
-    if (!targetItem) {
-      return;
-    }
-    // Filter out the deleted item
-    const filtered = listMapping.filter((item) => item.key !== key);
-    // Check if this was the last item of its group (by name)
-    const remainingGroupItems = filtered.filter(item => item.name === targetItem.name);
-    const updated = [...filtered];
-    if (remainingGroupItems.length === 0) {
-      // Re-add a placeholder entry with empty mapping
-      updated.push({
-        name: targetItem.name,
-        key: nanoid(), // generate a new unique key
-        from: undefined,
-        to: undefined,
-      });
-    }
+    const updated = handleDeleteMappingItems(key, listMapping, undefined);
     setListMappingStateRequest(updated);
   };
 

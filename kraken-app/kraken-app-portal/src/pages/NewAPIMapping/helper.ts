@@ -106,6 +106,7 @@ export function transformListMappingItem(
     .value();
 };
 
+//Deletes a mapping item and adds a placeholder if the group becomes empty.
 export function handleDeleteMappingItems(
   key: React.Key,
   listMapping: IMapping[],
