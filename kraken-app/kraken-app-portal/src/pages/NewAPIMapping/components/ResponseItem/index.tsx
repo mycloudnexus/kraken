@@ -260,6 +260,7 @@ const ResponseItem = ({ item, index }: Props) => {
                   />
                   <Button
                     className={styles.btnRemoveValueMapping}
+                     data-testid="btn-resp-delete-mapping-items"
                     type="link"
                     onClick={() => handleDeleteMapping(key)}
                   >
