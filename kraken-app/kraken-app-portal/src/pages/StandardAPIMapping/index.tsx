@@ -268,6 +268,7 @@ const StandardAPIMapping = () => {
       )[];
     }
   ) => {
+    console.log("getNewResponse newResponse:",  JSON.stringify(newResponse, null, 2));
     return newResponse.map((rm) => {
       if (rm.name === it.name) {
         rm.valueMapping = reduce(
@@ -282,21 +283,24 @@ const StandardAPIMapping = () => {
 
   const handleSave = async (callback?: () => void) => {
     try {
+      console.log("handleSave listMappingStateResponse", JSON.stringify(listMappingStateResponse, null, 2));
       const newDataResponse = transformListMappingItem(
         listMappingStateResponse,
         "response"
       );
+      console.log("handleSave listMappingStateRequest", JSON.stringify(listMappingStateRequest, null, 2));
       const newDataRequest = transformListMappingItem(
         listMappingStateRequest,
         "request"
       );
+      console.log("handleSave responseMapping", JSON.stringify(responseMapping, null, 2));
       let newResponse = cloneDeep(responseMapping);
       if (!isEmpty(newDataResponse)) {
         newDataResponse.forEach((it) => {
           newResponse = getNewResponse(newResponse, it);
         });
       }
-      
+      console.log("handleSave requestMapping", JSON.stringify(requestMapping, null, 2));
       let newRequest = cloneDeep(requestMapping);
       if (!isEmpty(newDataRequest)) {
         newDataRequest.forEach((it) => {

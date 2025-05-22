@@ -221,6 +221,33 @@ test("StandardAPIMapping handleSave updates and sends correct mapping", async ()
         requiredMapping: true,
         valueMapping: { originField: "mappedField" },
       },
+      {
+        name: "mapper.order.uni.add.duration.units",
+        title: "order item Term unit",
+        source: "@{{productOrderItem[0].requestedItemTerm.duration.units}}",
+        target: "@{{durationUnit}}",
+        sourceType: "enum",
+        sourceValues: [
+          "calendarYears",
+          "calendarMonths",
+          "calendarDays",
+          "calendarHours",
+          "calendarMinutes",
+          "businessDays",
+          "businessHours",
+          "businessMinutes"
+        ],
+        valueMapping: {
+          "calendarYears": "y",
+          "calendarMonths": "m"
+        },
+        sourceLocation: "BODY",
+        targetLocation: "BODY",
+        allowValueLimit: false,
+        customizedField: false,
+        requiredMapping: true,
+        id: "uwH5h5MtdyTwUYIAPc1Zb"
+      },
     ],
     responseMapping: [
       {
@@ -232,6 +259,36 @@ test("StandardAPIMapping handleSave updates and sends correct mapping", async ()
         requiredMapping: true,
         valueMapping: { mappedField: "originField" },
       },
+      {
+        name: "mapper.order.uni.add.state",
+        title: "Order State",
+        source: "@{{status}}",
+        target: "@{{state}}",
+        targetType: "enum",
+        description: "",
+        targetValues: [
+          "acknowledged",
+          "assessingCancellation",
+          "held.assessingCharge",
+          "pending.assessingModification",
+          "cancelled",
+          "pendingCancellation",
+          "completed",
+          "failed",
+          "inProgress",
+          "partial",
+          "rejected"
+        ],
+        valueMapping: {
+          "failed": "failed"
+        },
+        sourceLocation: "BODY",
+        targetLocation: "BODY",
+        allowValueLimit: false,
+        customizedField: false,
+        requiredMapping: true,
+        id: "8v-IOJDaH6JSob1eV1u7Y"
+      },
     ],
     listMappingStateRequest: [
       {
@@ -240,6 +297,22 @@ test("StandardAPIMapping handleSave updates and sends correct mapping", async ()
         to: ["mappedField"],
         key: "key-1",
       },
+      {
+        "name": "mapper.order.uni.add.duration.units",
+        "key": "GK5U5fd4wS46GwwtGil10",
+        "from": "calendarYears",
+        "to": [
+          "y"
+        ]
+      },
+      {
+        "name": "mapper.order.uni.add.duration.units",
+        "key": "5FEsD7sefMvcotR72Gl-r",
+        "from": "calendarMonths",
+        "to": [
+          "m"
+        ]
+      }
     ],
     listMappingStateResponse: [
       {
@@ -248,6 +321,14 @@ test("StandardAPIMapping handleSave updates and sends correct mapping", async ()
         to: ["originField"],
         key: "key-2",
       },
+      {
+        "from": "failed",
+        "to": [
+          "failed"
+        ],
+        "key": "1jpxSBSD7JnNe_laTgFzt",
+        "name": "mapper.order.uni.add.state"
+      }
     ],
     setRequestMapping: vi.fn(),
     setResponseMapping: vi.fn(),
