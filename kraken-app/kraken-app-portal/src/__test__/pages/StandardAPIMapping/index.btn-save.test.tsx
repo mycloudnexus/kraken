@@ -252,6 +252,7 @@ test("StandardAPIMapping handleSave updates and sends correct mapping", async ()
     setRequestMapping: vi.fn(),
     setResponseMapping: vi.fn(),
     setSellerApi: vi.fn(),
+    setListMappingStateRequest: vi.fn,
     setListMappingStateResponse: vi.fn(),
     reset: vi.fn(),
     setQuery: vi.fn(),

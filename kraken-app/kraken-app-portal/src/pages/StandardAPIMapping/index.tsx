@@ -280,7 +280,6 @@ const StandardAPIMapping = () => {
   };
 
   const handleSave = async (callback?: () => void) => {
-    console.log("handleSave triggered");
     try {
       const newDataResponse = transformListMappingItem(
         listMappingStateResponse,
@@ -290,7 +289,6 @@ const StandardAPIMapping = () => {
         listMappingStateRequest,
         "request"
       );
-      console.log("handleSave transformListMappingItem finished");
       let newResponse = cloneDeep(responseMapping);
       if (!isEmpty(newDataResponse)) {
         newDataResponse.forEach((it) => {
@@ -304,7 +302,6 @@ const StandardAPIMapping = () => {
           newRequest = getNewRequest(newRequest, it);
         });
       }
-      console.log("handleSave cloneMappingItems finished");
       const mappers: IMappers = {
         request: newRequest.map((rm) => ({
           ...rm,
@@ -328,10 +325,7 @@ const StandardAPIMapping = () => {
           id: undefined, // Omit id from patch payload
         })),
       };
-      console.log("handleSave clone Mapping Items finished");
       const data = cloneDeep(mapperResponse)!;
-      console.log("handleSave clone mapper response finished, mapperResponse is undefined:", mapperResponse === undefined);
-      console.log("handleSave data", data);
       data.facets.endpoints[0] = {
         ...data.facets.endpoints[0],
         serverKey: serverKey as any,
@@ -339,19 +333,16 @@ const StandardAPIMapping = () => {
         path: sellerApi.url,
         mappers,
       };
-      console.log("handleSave, start to updateTargetMapper");
       const res = await updateTargetMapper({
         productId: currentProduct,
         componentId: data.metadata.id,
         data,
       } as any);
-      console.log("handleSave, end to updateTargetMapper");
       notification.success({ message: res.message });
       refreshMappingDetail();
       callback && callback();
       return true;
     } catch (error) {
-      console.error("handleSave error:", error);
       notification.error({
         message: get(
           error,
