@@ -19,7 +19,6 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useBoolean } from "usehooks-ts";
 import { SourceInput } from "./SourceInput";
 import { TargetInput } from "./TargetInput";
-import { handleDeleteMappingItems } from "@/pages/NewAPIMapping/helper";
 import styles from "./index.module.scss";
 
 type Props = {
@@ -180,8 +179,7 @@ const RequestItem = ({ item, index }: Props) => {
   };
 
   const handleDeleteMapping = (key: React.Key) => {
-    const updated = handleDeleteMappingItems(key, listMapping, undefined);
-    setListMappingStateRequest(updated);
+    setListMappingStateRequest(listMapping.filter((item) => item.key !== key));
   };
 
   const handleSelect = (value: string, key: React.Key) => {
@@ -368,7 +366,6 @@ const RequestItem = ({ item, index }: Props) => {
                   />
                   <Button
                     className={styles.btnRemoveValueMapping}
-                    data-testid="btn-req-delete-mapping-items"
                     type="link"
                     onClick={() => handleDeleteMapping(key)}
                   >

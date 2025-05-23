@@ -1,9 +1,9 @@
-import { fireEvent, render } from "@testing-library/react";
 import * as productHooks from "@/hooks/product";
 import StandardAPIMapping from "@/pages/StandardAPIMapping";
 import * as mappingStore from "@/stores/mappingUi.store";
 import { queryClient } from "@/utils/helpers/reactQuery";
 import { QueryClientProvider } from "@tanstack/react-query";
+import { fireEvent, render } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 
 test("StandardAPIMapping btn-create-version", () => {
@@ -116,9 +116,12 @@ test("StandardAPIMapping btn-save", () => {
     isFetched: true,
   } as any);
 
-  const mockUpdateTargetMapper = vi.fn().mockResolvedValue({ message: "success" });
   vi.spyOn(productHooks, "useUpdateTargetMapper").mockReturnValue({
-    mutateAsync: mockUpdateTargetMapper,
+    mutateAsync: () => {
+      return {
+        message: "success",
+      };
+    },
     isPending: false,
   } as any);
 

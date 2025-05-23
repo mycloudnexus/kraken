@@ -198,61 +198,16 @@ const StandardAPIMapping = () => {
   };
 
   const transformListMappingItem = (
-    items: IMapping[],
+    item: IMapping[],
     type: "request" | "response"
   ) => {
-    const grouped = chain(items)
-    .groupBy("name")
-    .map((groupItems, name) => {
-      const valueMapping = flatMap(groupItems, (item) => getValueMapping(item, type));
-      return {
+    return chain(item)
+      .groupBy("name")
+      .map((items, name) => ({
         name,
-        valueMapping, // even if this is empty, still return it
-      };
-    })
-    .value();
-    return grouped;
-  };
-
-  const getNewRequest = (
-    newRequest: typeof requestMapping,
-    it: {
-      name: string;
-      valueMapping: (
-        | {
-            [x: string]: string | undefined;
-          }
-        | undefined
-      )[];
-    }
-  ) => {
-    return newRequest.map((rm) => {
-      if (rm.name === it.name) {
-        if (isEmpty(it.valueMapping)) {
-          rm.valueMapping = []; // explicitly clear if needed
-          return rm;
-        }
-        const merged = reduce(
-          it.valueMapping,
-          (acc, obj) => {
-            if (!obj) return acc;
-            for (const key in obj) {
-              const val = obj[key];
-              if (Array.isArray(val) && val.length > 0 && typeof val[0] === "string") {
-                acc[key] = val[0];
-              } else if (typeof val === "string") {
-                acc[key] = val; // Already flat
-              }
-              // skip undefined or unexpected formats
-            }
-            return acc;
-          },
-          {} as Record<string, string>
-        );
-        rm.valueMapping = merged;
-      }
-      return rm;
-    });
+        valueMapping: flatMap(items, (item) => getValueMapping(item, type)),
+      }))
+      .value();
   };
 
   const getNewResponse = (
@@ -289,6 +244,7 @@ const StandardAPIMapping = () => {
         listMappingStateRequest,
         "request"
       );
+
       let newResponse = cloneDeep(responseMapping);
       if (!isEmpty(newDataResponse)) {
         newDataResponse.forEach((it) => {
@@ -298,9 +254,10 @@ const StandardAPIMapping = () => {
       let newRequest = cloneDeep(requestMapping);
       if (!isEmpty(newDataRequest)) {
         newDataRequest.forEach((it) => {
-          newRequest = getNewRequest(newRequest, it);
+          newResponse = getNewResponse(newResponse, it);
         });
       }
+
       const mappers: IMappers = {
         request: newRequest.map((rm) => ({
           ...rm,
@@ -324,6 +281,7 @@ const StandardAPIMapping = () => {
           id: undefined, // Omit id from patch payload
         })),
       };
+
       const data = cloneDeep(mapperResponse)!;
       data.facets.endpoints[0] = {
         ...data.facets.endpoints[0],
@@ -332,6 +290,7 @@ const StandardAPIMapping = () => {
         path: sellerApi.url,
         mappers,
       };
+
       const res = await updateTargetMapper({
         productId: currentProduct,
         componentId: data.metadata.id,
