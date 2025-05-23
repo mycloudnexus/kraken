@@ -93,7 +93,9 @@ export const updateToken = async (config: any) => {
       redirect_uri: window.location.origin
     }
   })
-  config.headers.Authorization = `Bearer ${token}`
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
   return config;
 }
 
