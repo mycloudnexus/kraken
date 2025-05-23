@@ -80,7 +80,7 @@ const BasicAuthProvider = (opts : BasicAuthenticateProps) => {
     if (!refreshToken || isRefreshTokenExpired() || !token) {
       clearData("token");
       clearData("tokenExpired");
-      return Promise.resolve("Refresh token expired");
+      return Promise.reject(new Error("Refresh token expired"));
     }
     //whether be expired in 30 sec
     if (!isTokenExpiredIn(30 * 1000)) {

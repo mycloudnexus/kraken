@@ -88,12 +88,18 @@ export const updateToken = async (config: any) => {
   if (!_.isFunction(window?.portalConfig?.getAccessToken)) {
     return config
   }
-  const token = await getAccessToken?.({
-    authorizationParams: {
-      redirect_uri: window.location.origin
+  try {
+    const token = await getAccessToken?.({
+      authorizationParams: {
+        redirect_uri: window.location.origin
+      }
+    })
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
     }
-  })
-  config.headers.Authorization = `Bearer ${token}`
+  } catch (e) {
+    console.error(e);
+  }
   return config;
 }
 
