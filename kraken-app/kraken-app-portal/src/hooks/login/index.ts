@@ -1,4 +1,4 @@
-import { login } from "@/services/login";
+import { login } from "@/components/AuthProviders/basic/helper/auth";
 import { useMutation } from "@tanstack/react-query";
 
 const LOGIN_CACHE_KEYS = {

@@ -1,5 +1,5 @@
 import * as requestAPI from "@/components/AuthProviders/basic/components/utils/request";
-import * as refreshAPI from "@/components/AuthProviders/basic/helper/refresh";
+import * as refreshAPI from "@/components/AuthProviders/basic/helper/auth";
 import { refreshTokenFnc, refreshTokenWithConfig, updateToken } from "@/components/AuthProviders/basic/helper/request";
 import { BasicAuthProvider, useBasicAuth } from "@/components/AuthProviders/basic/provider/BasicAuthProvider";
 import { queryClient } from "@/utils/helpers/reactQuery";

@@ -7,7 +7,7 @@ import { clearData, getData, isRefreshTokenExpired, storeData } from '@/utils/he
 import { message } from 'antd';
 import createAuthRefreshInterceptor from 'axios-auth-refresh';
 import { AXIOS_MESSAGE } from '@/utils/constants/message';
-import { refresh } from './refresh';
+import { refresh } from './auth';
 
 export const DIRECT_LOGIN_MSG = [
   AXIOS_MESSAGE.TOKEN_EXPIRED,

@@ -15,5 +15,11 @@ export const refresh = async (refreshToken: string) => {
       },
     }
   );
+}
 
+export const login = async (data: unknown) => {
+  return await axios.post(
+    import.meta.env.VITE_BASE_API + "/login",
+    data
+  );
 }

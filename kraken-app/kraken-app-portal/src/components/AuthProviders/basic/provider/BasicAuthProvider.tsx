@@ -1,4 +1,3 @@
-
 import React, { useContext, useEffect, useMemo, useReducer, useRef } from 'react';
 import BasicAuthContext, { BasicAuthContextInterface, BasicAuthUser, initialAuthState } from './BasicAuthContext';
 import { AuthStates, stateReducer } from './AuthStates';
@@ -80,7 +79,7 @@ const BasicAuthProvider = (opts : BasicAuthenticateProps) => {
     if (!refreshToken || isRefreshTokenExpired() || !token) {
       clearData("token");
       clearData("tokenExpired");
-      return Promise.resolve("Refresh token expired");
+      return Promise.reject(new Error("Refresh token expired"));
     }
     //whether be expired in 30 sec
     if (!isTokenExpiredIn(30 * 1000)) {
@@ -111,10 +110,10 @@ const BasicAuthProvider = (opts : BasicAuthenticateProps) => {
     dispatch({ type: AuthStates.LOGIN_STARTED});
 
     const res = await login(values);
-    const accessToken = get(res, "data.accessToken");
-    const expiresIn = get(res, "data.expiresIn");
-    const refreshToken = get(res, "data.refreshToken");
-    const refreshTokenExpiresIn = get(res, "data.refreshTokenExpiresIn");
+    const accessToken = get(res, "data.data.accessToken");
+    const expiresIn = get(res, "data.data.expiresIn");
+    const refreshToken = get(res, "data.data.refreshToken");
+    const refreshTokenExpiresIn = get(res, "data.data.refreshTokenExpiresIn");
 
     if (accessToken && expiresIn) {
       storeData("token", accessToken);
