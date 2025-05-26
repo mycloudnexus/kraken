@@ -1,5 +1,5 @@
 export const ROUTES = {
-  LOGIN: "/login/basic",
+  LOGIN: "/login",
   ENV_OVERVIEW: "/env",
   ENV_ACTIVITY_LOG: (envId: string) => `/env/${envId}`,
   API_MAPPING: (componentId: string) => `/api-mapping/${componentId}`,

@@ -27,7 +27,7 @@ const BasicHeader = ({ info }: Readonly<{ info?: ISystemInfo }>) => {
 
   const handleLogout = () => {
     logout();
-    navigate("/login/basic");
+    navigate("/login");
   };
 
   const dropdownRender = () => {
