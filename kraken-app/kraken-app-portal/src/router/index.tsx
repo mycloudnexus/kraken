@@ -21,7 +21,7 @@ const UpgradePlane = lazy(
 
 const router = createBrowserRouter([
   {
-    path: "/login/basic",
+    path: "/login",
     element: <Login />,
   },
   {
