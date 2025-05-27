@@ -37,8 +37,9 @@ const StandardAPIMapping = () => {
   const { currentProduct } = useAppStore();
   const { componentId } = useParams();
   const location = useLocation();
-  const { mainTitle } = location.state ?? { mainTitle:"unknown main title"};
-  const filteredComponentList = location?.state?.filteredComponentList ?? [];
+  const [mainTitle, setMainTitle] = useState(() => location?.state?.mainTitle ?? "unknown main title");
+  const [filteredComponentList, setFilteredComponentList] = useState(() => location?.state?.filteredComponentList ?? []);
+  const [productType, setProductType] = useState(() => location?.state?.productType ?? "");
   const { activePath, setActivePath, selectedKey, setSelectedKey } =
     useMappingUiStore();
 
@@ -99,6 +100,13 @@ const StandardAPIMapping = () => {
     setActivePath(mapItem.path);
     setQuery(JSON.stringify(mapItem));
   };
+
+  useEffect(() => {
+    // Silence unused setter warnings without changing state
+    setMainTitle((prev: string) => prev);
+    setFilteredComponentList((prev: any[]) => prev);
+    setProductType((prev: string) => prev);
+  }, []);
 
   useEffect(() => {
     const mapItem = detailDataMapping?.details.find(
@@ -190,16 +198,61 @@ const StandardAPIMapping = () => {
   };
 
   const transformListMappingItem = (
-    item: IMapping[],
+    items: IMapping[],
     type: "request" | "response"
   ) => {
-    return chain(item)
-      .groupBy("name")
-      .map((items, name) => ({
+    const grouped = chain(items)
+    .groupBy("name")
+    .map((groupItems, name) => {
+      const valueMapping = flatMap(groupItems, (item) => getValueMapping(item, type));
+      return {
         name,
-        valueMapping: flatMap(items, (item) => getValueMapping(item, type)),
-      }))
-      .value();
+        valueMapping, // even if this is empty, still return it
+      };
+    })
+    .value();
+    return grouped;
+  };
+
+  const getNewRequest = (
+    newRequest: typeof requestMapping,
+    it: {
+      name: string;
+      valueMapping: (
+        | {
+            [x: string]: string | undefined;
+          }
+        | undefined
+      )[];
+    }
+  ) => {
+    return newRequest.map((rm) => {
+      if (rm.name === it.name) {
+        if (isEmpty(it.valueMapping)) {
+          rm.valueMapping = []; // explicitly clear if needed
+          return rm;
+        }
+        const merged = reduce(
+          it.valueMapping,
+          (acc, obj) => {
+            if (!obj) return acc;
+            for (const key in obj) {
+              const val = obj[key];
+              if (Array.isArray(val) && val.length > 0 && typeof val[0] === "string") {
+                acc[key] = val[0];
+              } else if (typeof val === "string") {
+                acc[key] = val; // Already flat
+              }
+              // skip undefined or unexpected formats
+            }
+            return acc;
+          },
+          {} as Record<string, string>
+        );
+        rm.valueMapping = merged;
+      }
+      return rm;
+    });
   };
 
   const getNewResponse = (
@@ -236,7 +289,6 @@ const StandardAPIMapping = () => {
         listMappingStateRequest,
         "request"
       );
-
       let newResponse = cloneDeep(responseMapping);
       if (!isEmpty(newDataResponse)) {
         newDataResponse.forEach((it) => {
@@ -246,10 +298,9 @@ const StandardAPIMapping = () => {
       let newRequest = cloneDeep(requestMapping);
       if (!isEmpty(newDataRequest)) {
         newDataRequest.forEach((it) => {
-          newResponse = getNewResponse(newResponse, it);
+          newRequest = getNewRequest(newRequest, it);
         });
       }
-
       const mappers: IMappers = {
         request: newRequest.map((rm) => ({
           ...rm,
@@ -273,7 +324,6 @@ const StandardAPIMapping = () => {
           id: undefined, // Omit id from patch payload
         })),
       };
-
       const data = cloneDeep(mapperResponse)!;
       data.facets.endpoints[0] = {
         ...data.facets.endpoints[0],
@@ -282,7 +332,6 @@ const StandardAPIMapping = () => {
         path: sellerApi.url,
         mappers,
       };
-
       const res = await updateTargetMapper({
         productId: currentProduct,
         componentId: data.metadata.id,
@@ -320,6 +369,7 @@ const StandardAPIMapping = () => {
                   <ComponentSelect
                     componentList={{data : filteredComponentList}}
                     componentName={componentName}
+                    productType={productType}
                     middle={true}
                   />
                 ),

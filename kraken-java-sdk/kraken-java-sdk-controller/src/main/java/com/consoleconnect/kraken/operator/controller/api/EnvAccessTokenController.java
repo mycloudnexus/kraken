@@ -90,4 +90,16 @@ public class EnvAccessTokenController {
         apiTokenService.search(
             productId, null, revoked, expiredIncluded, PageRequest.of(page, size)));
   }
+
+  @Operation(summary = "Rotate all api tokens under an environment")
+  @PostMapping("/envs/{envId}/rotate-api-tokens")
+  public Mono<HttpResponse<APIToken>> revokeAll(
+      @PathVariable("productId") String productId,
+      @PathVariable("envId") String envId,
+      @RequestBody CreateAPITokenRequest request) {
+    return UserContext.getUserId()
+        .publishOn(Schedulers.boundedElastic())
+        .map(userId -> apiTokenService.revokeAllTokenByEnvId(productId, request, userId, envId))
+        .map(HttpResponse::ok);
+  }
 }

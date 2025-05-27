@@ -126,6 +126,16 @@ export const createApiKey = (payload: ICreateParameter) => {
   });
 };
 
+export const rotateApiKey = (payload: ICreateParameter) => {
+  const { productId, envId, name } = payload;
+  return request(`${PRODUCT}/${productId}/envs/${envId}/rotate-api-tokens`, {
+    method: "POST",
+    data: {
+      name,
+    },
+  });
+};
+
 export const getAPIServers = (
   productId: string,
   params: Record<string, any>

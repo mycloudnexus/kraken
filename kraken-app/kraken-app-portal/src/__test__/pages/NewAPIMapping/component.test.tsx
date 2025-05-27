@@ -1,4 +1,5 @@
 import RequestItem from "@/pages/NewAPIMapping/components/RequestItem";
+import ResponseItem from "@/pages/NewAPIMapping/components/ResponseItem";
 import ResponseMapping from "@/pages/NewAPIMapping/components/ResponseMapping";
 import RightAddSellerProp from "@/pages/NewAPIMapping/components/RightAddSellerProp";
 import RightAddSonataProp, {
@@ -1337,6 +1338,44 @@ describe("requestItem render", () => {
     const btnAdd = getByTestId("btn-add-state");
     fireEvent.click(btnAdd);
   });
+  it("delete request value mapping", () => {
+    const { container, getByTestId } = render(
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <RequestItem
+            index={2}
+            item={{
+              id: "id",
+              description: "",
+              name: "mapper.order.eline.add.duration.unit",
+              title: "order item Term unit",
+              source:
+                "@{{productOrderItem[0].requestedItemTerm.duration.units}}",
+              target: "@{{requestBody.durationUnit}}",
+              sourceValues: [
+                "calendarMonths",
+                "calendarDays",
+                "calendarHours",
+                "calendarMinutes",
+                "businessDays",
+                "businessHours",
+              ],
+              valueMapping: {
+                calendarMonths: "calendarMonths",
+              },
+              sourceLocation: "BODY",
+              targetLocation: "BODY",
+              customizedField: true,
+              requiredMapping: true,
+            }}
+          />
+        </BrowserRouter>
+      </QueryClientProvider>
+    );
+    expect(container).toBeInTheDocument();
+    const btnDeleteMapping = getByTestId("btn-req-delete-mapping-items");
+    fireEvent.click(btnDeleteMapping);
+  });
   it("add value limit integer discrete", () => {
     const { container, getByTestId } = render(
       <QueryClientProvider client={queryClient}>
@@ -1466,6 +1505,88 @@ describe("requestItem render", () => {
       </QueryClientProvider>
     );
     expect(container).toBeInTheDocument();
+  });
+});
+
+describe("responseItem render", () => {
+  it("add value mapping", () => {
+    const { container, getByTestId } = render(
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <ResponseItem
+            index={2}
+            item={{
+              id: "id",
+              description: "",
+              name: "mapper.order.eline.add.duration.unit",
+              title: "order item Term unit",
+              source:
+                "@{{productOrderItem[0].requestedItemTerm.duration.units}}",
+              target: "@{{requestBody.durationUnit}}",
+              targetType: "enum",
+              targetValues: [
+                "calendarMonths",
+                "calendarDays",
+                "calendarHours",
+                "calendarMinutes",
+                "businessDays",
+                "businessHours",
+              ],
+              valueMapping: {
+                calendarMonths: "calendarMonths",
+                calendarDays: "calendarDays",
+              },
+              sourceLocation: "BODY",
+              targetLocation: "BODY",
+              customizedField: true,
+              requiredMapping: true,
+            }}
+          />
+        </BrowserRouter>
+      </QueryClientProvider>
+    );
+    expect(container).toBeInTheDocument();
+    const btnAdd = getByTestId("btn-add-state");
+    fireEvent.click(btnAdd);
+  });
+  it("delete response value mapping", () => {
+    const { container, getByTestId } = render(
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <ResponseItem
+            index={2}
+            item={{
+              id: "id",
+              description: "",
+              name: "mapper.order.eline.add.duration.unit",
+              title: "order item Term unit",
+              source:
+                "@{{productOrderItem[0].requestedItemTerm.duration.units}}",
+              target: "@{{requestBody.durationUnit}}",
+              targetType: "enum",
+              targetValues: [
+                "calendarMonths",
+                "calendarDays",
+                "calendarHours",
+                "calendarMinutes",
+                "businessDays",
+                "businessHours",
+              ],
+              valueMapping: {
+                calendarMonths: "calendarMonths",
+              },
+              sourceLocation: "BODY",
+              targetLocation: "BODY",
+              customizedField: true,
+              requiredMapping: true,
+            }}
+          />
+        </BrowserRouter>
+      </QueryClientProvider>
+    );
+    expect(container).toBeInTheDocument();
+    const btnDeleteMapping = getByTestId("btn-resp-delete-mapping-items");
+    fireEvent.click(btnDeleteMapping);
   });
 });
 
