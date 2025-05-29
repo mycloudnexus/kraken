@@ -35,7 +35,7 @@ spec:
               {
                 "productOrderHref":"",
                 "productOrderItemId":"${entity.renderedResponse.productOrderItem[0]['id']}",
-                "productOrderId":"${entity.renderedResponse['orderId']}"
+                "productOrderId":"${entity.renderedResponse['id']}"
               }
             ]
           }
