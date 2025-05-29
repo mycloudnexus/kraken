@@ -1,0 +1,14 @@
+
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.2.0.1
+  name: V2.0.1
+  labels:
+    productSpec: grace
+    productVersion: V2.0.1
+    publishDate: 2025-05-29
+  description: |
+    Adjust productOrderId mapping in inventory list
+  version: 1
