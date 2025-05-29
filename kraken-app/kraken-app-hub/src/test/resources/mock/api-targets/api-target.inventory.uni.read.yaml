@@ -24,9 +24,29 @@ spec:
           "status": "",
           "productOrderItem":[
             {
-                "productOrderHref":"",
-                "productOrderItemId":"${entity.renderedResponse.productOrderItem[0]['id']}",
-                "productOrderId":"${entity.renderedResponse['id']}"
-              }
-          ]
+              "productOrderHref":"",
+              "productOrderItemId":"${entity.renderedResponse.productOrderItem[0]['id']}",
+              "productOrderId":"${entity.renderedResponse['id']}"
+            }
+          ],
+          "relatedSite":[
+            {
+              "role":"${entity.renderedResponse.productOrderItem[0].product.place[0].role}",
+              "id":"${entity.renderedResponse.productOrderItem[0].product.place[0].id}",
+              "href":""
+            }
+          ],
+          "productOffering":{
+            "href":"",
+            "id":"${entity.renderedResponse.productOrderItem[0].product.productOffering.id}"
+          },
+          "productTerm":[{
+              "duration":"${entity.renderedResponse.productOrderItem[0].requestedItemTerm.duration}",
+              "endOfTermAction":"${entity.renderedResponse.productOrderItem[0].requestedItemTerm.endOfTermAction}",
+              "name":"${entity.renderedResponse.productOrderItem[0].requestedItemTerm.name}",
+              "rollInterval":"${entity.renderedResponse.productOrderItem[0].requestedItemTerm.rollInterval}"
+            }
+          ],
+          "productRelationship":"${entity.renderedResponse.productOrderItem[0].product.productRelationship}",
+          "productConfiguration":"${entity.renderedResponse.productOrderItem[0].product.productConfiguration}"
         }
