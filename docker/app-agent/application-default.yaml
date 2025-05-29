@@ -8,8 +8,6 @@ spring:
     username: postgresql
     password: password
 app:
-  cron-job:
-    push-heartbeat: 0/5 * * * * *
   controlPlane:
     url: http://kraken-app-controller:8080
     auth:
