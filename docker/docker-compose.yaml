@@ -80,7 +80,7 @@ services:
   kraken-app-agent:
     image: cloudnexusopsdockerhub/kraken-app-agent:latest
     environment:
-      CONTROL_PLANE_TOKEN: eyJraWQiOiJrcmFrZW4iLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJmYzVmNjE2NS1hYTIwLTQ3OTgtYTllZS03OGFmYmUzY2YwNmQiLCJwcm9kdWN0SWQiOiJtZWYuc29uYXRhIiwicm9sZXMiOlsiQVBJX0NMSUVOVCJdLCJlbnZJZCI6IjJmZDkyMjQ0LWE4ZDEtNDNmYy1iNzZkLWQ4N2ZmYjAxNzJmNCIsImlhdCI6MTc0ODQ5NzE4MiwiZXhwIjoxOTA2MTc3MTgyLCJpc3MiOiJodHRwczovL2tyYWtlbi5jb25zb2xlY29ubmVjdC5jb20vaXNzdWVyIn0._UcT_Fjv6zvnSEwmo-gJ8LQXPZCO4FmsrHhEPskvrM4
+      CONTROL_PLANE_TOKEN: none
     volumes:
       - >-
         ./app-agent/application-default.yaml:/opt/app/config/application-default.yaml:ro

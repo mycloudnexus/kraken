@@ -79,7 +79,9 @@ If all services start correctly, the following servers will be accessible(The de
 
 Configure token for Hub to access to Controller
 
-1. Login to portal http://localhost:3000 and navigate to "Deployment" page and generate new token on the page
+1. Login to portal http://localhost:3000 and navigate to "Deployment" page and click on "Create API Key" button to generate new token
+   ![controller-deployment-page](docs/img/controller-deployment-page.png)
+   ![controller-generate-token](docs/img/controller-generate-token.png)
 2. Copy and assign generated token to environment variable CONTROL_PLANE_TOKEN in [docker-compose.yaml](docker/docker-compose.yaml) 
 3. Restart services using Docker Compose:
 ```
