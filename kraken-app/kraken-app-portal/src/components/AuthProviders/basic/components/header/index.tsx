@@ -14,7 +14,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Text } from "../../../../Text";
 import styles from "./index.module.scss";
 import { UserAvatar } from "./UserAvatar";
-import { useBasicAuth } from "../../BasicAuthProvider";
+import { useBasicAuth } from "../../provider/BasicAuthProvider";
 
 const BasicHeader = ({ info }: Readonly<{ info?: ISystemInfo }>) => {
   const { logout } = useBasicAuth();
@@ -27,7 +27,7 @@ const BasicHeader = ({ info }: Readonly<{ info?: ISystemInfo }>) => {
 
   const handleLogout = () => {
     logout();
-    navigate("/login/basic");
+    navigate("/login");
   };
 
   const dropdownRender = () => {

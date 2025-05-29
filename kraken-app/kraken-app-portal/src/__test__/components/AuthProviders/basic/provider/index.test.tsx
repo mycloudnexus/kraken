@@ -1,4 +1,4 @@
-import { BasicAuthProvider, useBasicAuth } from '@/components/AuthProviders/basic/BasicAuthProvider';
+import { BasicAuthProvider, useBasicAuth } from '@/components/AuthProviders/basic/provider/BasicAuthProvider';
 import { fireEvent, render } from '@testing-library/react';
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Button, ConfigProvider } from "antd";
@@ -8,9 +8,15 @@ import { useBoolean } from 'usehooks-ts';
 import Login from '@/components/AuthProviders/basic/login';
 import * as requests from "@/components/AuthProviders/basic/components/utils/request";
 import * as userApis from '@/services/user';
+import AuthLayout from '@/components/Layout/AuthLayout';
+import { ENV } from '@/constants';
+import { BrowserRouter } from 'react-router-dom';
+import * as authHooks from '@/components/AuthProviders/basic/provider/BasicAuthProvider';
+
+ENV.AUTHENTICATION_TYPE = "basic"
 
 const TestingComponent = () => {
-  const { checkAuthenticated, getAccessToken, logout, refreshAuth } = useBasicAuth();
+  const { checkAuthenticated, logout, refreshAuth } = useBasicAuth();
   const { value: isAuthenticated, setTrue, setFalse } = useBoolean(false);
   useEffect(() => {
       if (checkAuthenticated()) {
@@ -18,27 +24,34 @@ const TestingComponent = () => {
       } else {
         setFalse();
       }
-      if (isAuthenticated) {
-        getAccessToken().then(token => {
-          console.log(token)
-        });
-      }
     }, [checkAuthenticated]);
+
+  const getCurrentUser = () => {
+    if (window.portalConfig && window.portalConfig.getCurrentAuthUser) {
+      window?.portalConfig?.getCurrentAuthUser();
+    }
+  }
   return (
     <>
       <p data-testId="checkAuthenticated">{ "" + isAuthenticated }</p>
       <Button
-            type="link"
-            data-testId="testLogout"
-            onClick={logout}
-          >
-        </Button>
-        <Button
-            type="link"
-            data-testId="testRefresh"
-            onClick={refreshAuth}
-          >
-        </Button>
+          type="link"
+          data-testId="testLogout"
+          onClick={logout}
+        >
+      </Button>
+      <Button
+          type="link"
+          data-testId="testRefresh"
+          onClick={refreshAuth}
+        >
+      </Button>
+      <Button
+          type="link"
+          data-testId="testGetCurrentUser"
+          onClick={getCurrentUser}
+        >
+      </Button>
     </>
   );
 };
@@ -158,6 +171,10 @@ describe('Use basic auth provider', () => {
     );
     const checkAuthenticated = getByTestId('checkAuthenticated');
     expect(checkAuthenticated).toHaveTextContent("true");
+
+    const btnGetCurrentUser = getByTestId("testGetCurrentUser");
+    expect(btnGetCurrentUser).toBeInTheDocument();
+    fireEvent.click(btnGetCurrentUser);
   })
 
   it('authenticated access token expired', () => {
@@ -310,6 +327,39 @@ describe('Use basic auth provider', () => {
     const btnRefresh = getByTestId("testRefresh");
     expect(btnRefresh).toBeInTheDocument();
     fireEvent.click(btnRefresh);
+  })
+
+  it('authenticate layout', () => {
+    const useBasicAuthSpy = vi.spyOn(authHooks, "useBasicAuth").mockReturnValue(
+      {
+        checkAuthenticated: () => { return false; },
+        loginWithCredentials: function (_values: any): Promise<void> {
+          throw new Error('Function not implemented.');
+        },
+        getAccessToken: function (): Promise<string> {
+          throw new Error('Function not implemented.');
+        },
+        logout: function (): Promise<void> {
+          throw new Error('Function not implemented.');
+        },
+        refreshAuth: function (): Promise<void> {
+          throw new Error('Function not implemented.');
+        },
+        getCurrentAuthUser: function () {
+          throw new Error('Function not implemented.');
+        },
+        isAuthenticated: false,
+        isLoading: false
+      } 
+    );
+    render(
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <AuthLayout />
+        </BrowserRouter>
+      </QueryClientProvider>
+    );
+    expect(useBasicAuthSpy).toBeCalled();
   })
 })
 

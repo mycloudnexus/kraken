@@ -1,4 +1,4 @@
-import BasicAuthenticate from '../../basic/BasicAuthenticate';
+import BasicAuthenticate from '../../basic/provider/BasicAuthenticate';
 
 export interface AuthenticateProps {
   children?: React.ReactNode;
