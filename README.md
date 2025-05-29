@@ -52,13 +52,19 @@ cd kraken
 
 The simplest way to get kraken up and running is with Docker. Follow these steps:
 
-1. Navigate to the docker directory:
+1. Navigate to the root directory of project to build docker image:
+
+```
+sh docker/dockerBuild.sh
+```
+
+2. Navigate to the docker directory:
 
 ```
 cd docker
 ```
 
-2. Start the services using Docker Compose:
+3. Start the services using Docker Compose:
 ```
 docker-compose up
 ```
@@ -70,6 +76,15 @@ If all services start correctly, the following servers will be accessible(The de
 - Hub: http://localhost:8000
 - Agent: http://localhost:8002
 
+
+Configure token for Hub to access to Controller
+
+1. Login to portal http://localhost:3000 and navigate to "Deployment" page and generate new token on the page
+2. Copy and assign generated token to environment variable CONTROL_PLANE_TOKEN in [docker-compose.yaml](docker/docker-compose.yaml) 
+3. Restart services using Docker Compose:
+```
+docker-compose up
+```
 
 ### Run via Source Code
 
