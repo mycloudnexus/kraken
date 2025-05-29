@@ -21,5 +21,12 @@ spec:
         { 
           "id": "${segment}",
           "startDate": "",
-          "status": ""
+          "status": "",
+          "productOrderItem":[
+            {
+                "productOrderHref":"",
+                "productOrderItemId":"${entity.renderedResponse.productOrderItem[0]['id']}",
+                "productOrderId":"${entity.renderedResponse['id']}"
+              }
+          ]
         }
