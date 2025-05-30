@@ -80,7 +80,7 @@ services:
   kraken-app-agent:
     image: cloudnexusopsdockerhub/kraken-app-agent:latest
     environment:
-      CONTROL_PLANE_TOKEN: none
+      CONTROL_PLANE_TOKEN: ${CONTROL_PLANE_TOKEN}
     volumes:
       - >-
         ./app-agent/application-default.yaml:/opt/app/config/application-default.yaml:ro

@@ -82,14 +82,11 @@ Configure token for Hub to access to Controller
 1. Login to portal http://localhost:3000 and navigate to "Deployment" page and click on "Create API Key" button to generate new token
    ![controller-deployment-page](docs/img/controller-deployment-page.png)
    ![controller-generate-token](docs/img/controller-generate-token.png)
-2. Copy and assign generated token to environment variable CONTROL_PLANE_TOKEN in [docker/docker-compose.yaml](docker/docker-compose.yaml) 
-3. Configure heartbeat of hub via property app.cron-job.push-heartbeat in  [docker/app-agent/application-default.yaml](docker/app-agent/application-default.yaml):
-```yaml
-app:
-  cron-job:
-    push-heartbeat: 0/20 * * * * *
+2. Copy and assign generated token to environment variable CONTROL_PLANE_TOKEN and restart the kraken service:
 ```
-4. Restart services using Docker Compose:
+export CONTROL_PLANE_TOKEN=YOUR_TOKEN
+```
+3. Restart services using Docker Compose:
 ```
 docker-compose up
 ```
