@@ -7,3 +7,8 @@ spring:
     url: jdbc:postgresql://db-data-plane:5432/kraken
     username: postgresql
     password: password
+
+app:
+  cron-job:
+    push-heartbeat: 0/20 * * * * *
+
