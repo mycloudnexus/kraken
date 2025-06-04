@@ -25,6 +25,7 @@ COPY kraken-app/kraken-app-portal/src /opt/app/src
 
 
 RUN npm ci --ignore-scripts
+
 RUN npm run build
 
 FROM docker.io/nginxinc/nginx-unprivileged:bookworm
