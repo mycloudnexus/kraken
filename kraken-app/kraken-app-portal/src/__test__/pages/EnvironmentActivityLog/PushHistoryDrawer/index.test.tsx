@@ -8,6 +8,14 @@ import dayjs from "dayjs";
 import { BrowserRouter } from "react-router-dom";
 
 test("PushHistoryDrawer", () => {
+  vi.spyOn(productHooks, 'useGetProductTypes').mockReturnValue({
+            data: [
+                "UNI:UNI",
+                "ACCESS_E_LINE:Access Eline",
+                "SHARE:Shared"
+            ]
+        } as any);
+
   vi.spyOn(productHooks, "useGetProductEnvActivitiesMutation").mockReturnValue({
     data: {
       data: {

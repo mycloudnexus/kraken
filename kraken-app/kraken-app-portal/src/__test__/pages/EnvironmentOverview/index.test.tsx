@@ -3,6 +3,7 @@ import * as productHooks from "@/hooks/product";
 import * as sizeHooks from '@/hooks/useContainerHeight'
 import { fireEvent, render, waitFor } from "@/__test__/utils";
 
+import {screen} from "@/__test__/utils.tsx";
 const ResizeObserverMock = vi.fn(() => ({
   observe: vi.fn(),
   unobserve: vi.fn(),
@@ -63,6 +64,7 @@ describe(" Environment Overview component list", () => {
   });
 
   it("running components list", async () => {
+    vi.clearAllMocks()
     vi.spyOn(sizeHooks, 'useContainerHeight').mockReturnValue([1000])
 
     const { getByText, getAllByRole } = render(
@@ -83,5 +85,57 @@ describe(" Environment Overview component list", () => {
     // Open deployment history tab
     fireEvent.click(tabs[1])
     await waitFor(() => expect(getByText('API mapping')).toBeInTheDocument())
+  });
+
+  it("rotateApiKeyMutate", async () => {
+    vi.spyOn(sizeHooks, 'useContainerHeight').mockReturnValue([1000])
+
+    vi.spyOn(productHooks, "useGetAllApiKeyList").mockReturnValue({
+        data: {
+          data:[
+              {
+                "id": "a4d4097a-0188-4fab-9f52-2d8352210a5d",
+                "productId": "mef.sonata",
+                "envId": "32b4832f-fb2f-4c99-b89a-c5c995b18dfc"
+              }
+           ]
+       },
+      isLoading: false,
+    } as any);
+    const useRotateApiKeySpy= vi.spyOn(productHooks, "useRotateApiKey").mockReturnValue({
+      data: {
+        data:[
+          {
+            "token": "XXXX"
+          }
+        ]
+      },
+      isLoading: false,
+    } as any);
+    const { getByText, getByRole,findByRole } = render(
+        <EnvironmentOverview />
+    );
+
+    const envElement = getByText("production Environment");
+    fireEvent.click(envElement);
+
+    const dropdownMenu = getByRole("img", {
+      name: 'more'
+    });
+    fireEvent.mouseEnter(dropdownMenu);
+
+    await waitFor(() => {
+      expect(screen.getByText('Rotate API Key')).toBeInTheDocument();
+    });
+    const rotateMenuItem = await findByRole("menuitem", {
+      name: /Rotate API Key/i,
+    });
+    fireEvent.click(rotateMenuItem);
+
+    const rotateButton = await findByRole("button", {
+      name: /Rotate/i,
+    });
+    fireEvent.click(rotateButton);
+    expect(useRotateApiKeySpy).toBeCalled();
   });
 });
