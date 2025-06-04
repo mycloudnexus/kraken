@@ -83,13 +83,13 @@ Configure token for Hub to access to Controller
    ![controller-deployment-page](docs/img/controller-deployment-page.png)
    ![controller-generate-token](docs/img/controller-generate-token.png)
 2. Copy and assign generated token to environment variable CONTROL_PLANE_TOKEN and restart the kraken service:
-```
-export CONTROL_PLANE_TOKEN=YOUR_TOKEN
-```
+   ```bash
+   export CONTROL_PLANE_TOKEN=YOUR_TOKEN
+   ```
 3. Restart services using Docker Compose:
-```
-docker-compose up
-```
+   ```bash
+   docker-compose up
+   ```
 
 ### Run via Source Code
 
@@ -117,14 +117,14 @@ You can verify the installed versions with the following commands:
 #### Step 1 - Run the Control Portal
 
 1. From the base of the repository, navigate to the portal directory:
-```
-cd kraken-app/kraken-app-portal
-```
+   ```bash
+   cd kraken-app/kraken-app-portal
+   ```
 2. Install the dependencies and start the development server:
-```
-npm install
-npm run dev
-```
+   ```bash
+   npm install
+   npm run dev
+   ```
 
 3. Open the portal in your browser at [http://localhost:5173](http://localhost:5173).  
    > **Note**: You will not be able to log in yet as the API server is not running. The default login is **admin/admin**.
@@ -134,7 +134,7 @@ npm run dev
 
 The Control API Server relies on a PostgreSQL database. You can set up a PostgreSQL server using Docker:
 
-1. **Start PostgreSQL** using Docker Compose:
+1. **Start PostgreSQL** for control-plane using Docker Compose:
 
    ```bash
    cd docker
@@ -152,7 +152,7 @@ The Control API Server relies on a PostgreSQL database. You can set up a Postgre
 3. **Set up environment variables**:
 
    ```bash
-   export DB_URL=jdbc:postgresql://localhost:5432/kraken-mgmt
+   export DB_URL=jdbc:postgresql://localhost:5433/kraken
    export DB_USERNAME=postgresql
    export DB_PASSWORD=password
    ```
@@ -170,27 +170,51 @@ The Control API Server relies on a PostgreSQL database. You can set up a Postgre
 
 If you want to test the data plane features, you can run the Hub and Agent API servers as follows:
 
-1. **Set up environment variables** for both servers:
+1. **Start PostgreSQL** for data-plane using Docker Compose:
+
+   ```bash
+   cd docker
+   docker-compose up db-data-plane
+   ```
+
+   Alternatively, you can set up PostgreSQL manually based on your environment's requirements.
+
+2. **Set up database environment variables** for both servers:
 
    ```bash
    export DB_URL=jdbc:postgresql://localhost:5432/kraken
    export DB_USERNAME=postgresql
    export DB_PASSWORD=password
    ```
-
-2. **Run the Hub API Server**:
+3. **Run the Hub API Server**:
 
    ```bash
    java -jar kraken-app/kraken-app-hub/target/*.jar
    ```
+4. Login to portal http://localhost:5173 and navigate to "Deployment" page and click on "Create API Key" button to generate new token
+   ![controller-deployment-page](docs/img/controller-deployment-page.png)
+   ![controller-generate-token](docs/img/controller-generate-token.png)
 
-3. **Run the Agent API Server**:
-
+5. Copy and set previous generated token to environment variable KRAKEN_CONTROL_PLANE_AGENT_TOKEN:
    ```bash
-   java -jar kraken-app/kraken-app-agent/target/*.jar
+   export KRAKEN_CONTROL_PLANE_AGENT_TOKEN=YOUR_TOKEN
+   export DB_URL=jdbc:postgresql://localhost:5432/kraken
+   export DB_USERNAME=postgresql
+   export DB_PASSWORD=password
    ```
 
-4. Access the Hub’s Swagger UI at [http://localhost:8000](http://localhost:8000).
+6. **Run the Agent API Server**:
+
+   ```bash
+   java -jar kraken-app/kraken-app-agent/target/*.jar \
+   --app.cron-job.pull-latest-release='*/20 * * * * *' \
+   --app.cron-job.pull-api-server-info='0 0/1 * * * *' \
+   --app.cron-job.pull-server-assets='0 0/1 * * * *' \
+   --app.cron-job.push-heartbeat='0 0/1 * * * *' \
+   --app.cron-job.push-running-mapper='0 0/1 * * * *'
+   ```
+
+7. Access the Hub’s Swagger UI at [http://localhost:8000](http://localhost:8000).
 
 ---
 
