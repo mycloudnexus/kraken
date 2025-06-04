@@ -81,7 +81,6 @@ public class LoadTargetAPIConfigActionRunner extends AbstractActionRunner
       String serverUrl = getServerUrl(serverKey);
       outputs.put("url", serverUrl);
     }
-
     StateValueMappingDto stateValueMappingDto = new StateValueMappingDto();
     // replace env.seller if the seller contact key exists
     inject(exchange, inputs, asset.getMetadata().getKey());
