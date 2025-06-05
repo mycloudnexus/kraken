@@ -85,14 +85,18 @@ Configure token for Hub to access to Controller
 1. Login to portal http://localhost:3000 and navigate to "Deployment" page and click on "Create API Key" button to generate new token
    ![controller-deployment-page](docs/img/controller-deployment-page.png)
    ![controller-generate-token](docs/img/controller-generate-token.png)
-2. Copy and assign generated token to environment variable CONTROL_PLANE_TOKEN and restart the kraken service:
+2. Quit the docker-compose commandline (Ctrl-C)
+3. Copy and assign generated token to environment variable CONTROL_PLANE_TOKEN and restart the kraken service:
    ```bash
    export CONTROL_PLANE_TOKEN=YOUR_TOKEN
    ```
-3. Restart services using Docker Compose:
+4. Restart services using Docker Compose:
    ```bash
+   docker-compose down
    docker-compose up
    ```
+5. Login to portal http://localhost:3000 and navigate to "Deployment" page, the number of "In use data plane" should be 1:
+   ![atahub-registration.png](docs/img/datahub-registration.png)
 
 ### Run via Source Code
 
