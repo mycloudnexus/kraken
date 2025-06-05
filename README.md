@@ -54,28 +54,31 @@ The simplest way to get kraken up and running is with Docker. Follow these steps
 
 1. Navigate to the root directory of project to build docker image:
 
-```
-sh docker/dockerBuild.sh
-```
+   ```bash
+   sh docker/dockerBuild.sh
+   ```
 
 2. Navigate to the docker directory:
 
-```
-cd docker
-```
+   ```bash
+   cd docker
+   ```
 
 3. Start the services using Docker Compose:
-```
-docker-compose up
-```
+   ```bash
+   docker-compose up
+   ```
 
-If all services start correctly, the following servers will be accessible(The default login is **admin/admin**):
+NOTE: If you are using Linux Operating System with selinux enabled (check using "sestatus" command)
+Specify docker-compose file docker-compose-selinux.yaml when execute docker-compose:
+   ```bash
+   docker-compose -f docker-compose-selinux.yaml up
+   ```
 
 - Portal: http://localhost:3000
 - Controller: http://localhost:8001
 - Hub: http://localhost:8000
 - Agent: http://localhost:8002
-
 
 Configure token for Hub to access to Controller
 
