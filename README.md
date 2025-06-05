@@ -69,8 +69,10 @@ The simplest way to get kraken up and running is with Docker. Follow these steps
    docker-compose up
    ```
 
-[!NOTE] If you are using Linux Operating System with selinux enabled (check using "sestatus" command)
+> [!NOTE]
+> If you are using Linux Operating System with selinux enabled (check using "sestatus" command)
 Specify docker-compose file docker-compose-selinux.yaml when execute docker-compose:
+
    ```bash
    docker-compose -f docker-compose-selinux.yaml up
    ```
