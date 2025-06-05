@@ -10,4 +10,9 @@ spring:
 app:
   controlPlane:
     url: http://kraken-app-controller:8080
-    token: Token kraken_1mUcTdxABn7zU6F6EjaI9byYXkBQkDTsuCEhcB2ecSt3rMJrG_301528299
+    auth:
+      authMode: internalToken
+      internalToken:
+        accessToken: ${CONTROL_PLANE_TOKEN}
+  cron-job:
+    push-heartbeat: 0/20 * * * * *

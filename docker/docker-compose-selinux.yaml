@@ -53,7 +53,7 @@ services:
     image: cloudnexusopsdockerhub/kraken-app-hub:latest
     volumes:
       - >-
-        ./app-hub/application-default.yaml:/opt/app/config/application-default.yaml:ro
+        ./app-hub/application-default.yaml:/opt/app/config/application-default.yaml:Z
     ports:
       - '8000:8080'
     links:
@@ -67,7 +67,7 @@ services:
     image: cloudnexusopsdockerhub/kraken-app-controller:latest
     volumes:
       - >-
-        ./app-controller/application-default.yaml:/opt/app/config/application-default.yaml:ro
+        ./app-controller/application-default.yaml:/opt/app/config/application-default.yaml:Z
     ports:
       - '8001:8080'
     links:
@@ -83,7 +83,7 @@ services:
       CONTROL_PLANE_TOKEN: ${CONTROL_PLANE_TOKEN}
     volumes:
       - >-
-        ./app-agent/application-default.yaml:/opt/app/config/application-default.yaml:ro
+        ./app-agent/application-default.yaml:/opt/app/config/application-default.yaml:Z
     ports:
       - '8002:8080'
     links:
