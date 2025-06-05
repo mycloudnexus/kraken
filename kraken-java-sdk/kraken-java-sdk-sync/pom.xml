@@ -5,12 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>kraken-java-sdk-sync</artifactId>
     <name>kraken-java-sdk-sync</name>
-    <version>3.0.0-snapshot.0</version>
+    <version>3.0.0-snapshot.1</version>
     <packaging>jar</packaging>
     <parent>
         <groupId>com.consoleconnect.kraken</groupId>
         <artifactId>kraken-java-sdk</artifactId>
-        <version>3.0.0-snapshot.0</version>
+        <version>3.0.0-snapshot.1</version>
     </parent>
     <dependencies>
         <dependency>
@@ -26,18 +26,18 @@
         <dependency>
             <groupId>com.consoleconnect.kraken</groupId>
             <artifactId>kraken-java-sdk-data</artifactId>
-            <version>3.0.0-snapshot.0</version>
+            <version>3.0.0-snapshot.1</version>
         </dependency>
         <dependency>
             <groupId>com.consoleconnect.kraken</groupId>
             <artifactId>kraken-java-sdk-auth</artifactId>
-            <version>3.0.0-snapshot.0</version>
+            <version>3.0.0-snapshot.1</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.consoleconnect.kraken</groupId>
             <artifactId>kraken-java-sdk-test</artifactId>
-            <version>3.0.0-snapshot.0</version>
+            <version>3.0.0-snapshot.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
