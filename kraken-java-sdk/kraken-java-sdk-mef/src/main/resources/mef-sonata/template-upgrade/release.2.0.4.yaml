@@ -1,0 +1,14 @@
+
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.2.0.4
+  name: V2.0.4
+  labels:
+    productSpec: grace
+    productVersion: V2.0.4
+    publishDate: 2025-06-09
+  description: |
+    Remove expectedCompletionDate mapping from order read template
+  version: 1
