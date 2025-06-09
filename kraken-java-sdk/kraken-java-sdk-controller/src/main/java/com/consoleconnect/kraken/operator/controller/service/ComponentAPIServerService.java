@@ -30,7 +30,9 @@ import org.springframework.util.Assert;
 @Slf4j
 public class ComponentAPIServerService extends AssetStatusManager {
   private static final String ENVIRONMENTS_KEY = "environments";
+  private static final String BASE_SPEC_KEY = "baseSpec";
   private static final String SELECTED_API_KEY = "selectedAPIs";
+  private static final String CONTENT = "content";
   private final UnifiedAssetService unifiedAssetService;
 
   @Transactional
@@ -98,6 +100,11 @@ public class ComponentAPIServerService extends AssetStatusManager {
               Object env = facets.get(ENVIRONMENTS_KEY);
               assetDto.setFacets(new HashMap<>());
               assetDto.getFacets().put(ENVIRONMENTS_KEY, env);
+
+              Object baseSpec = facets.get(BASE_SPEC_KEY);
+              Map<String, Object> map = JsonToolkit.fromJson(baseSpec, Map.class);
+              map.remove(CONTENT);
+              assetDto.getFacets().put(BASE_SPEC_KEY, map);
             });
   }
 
