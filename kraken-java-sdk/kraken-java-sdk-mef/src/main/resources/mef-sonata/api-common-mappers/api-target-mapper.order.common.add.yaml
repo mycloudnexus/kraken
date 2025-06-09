@@ -229,3 +229,32 @@ spec:
             targetLocation: BODY
             customizedField: false
             requiredMapping: true
+          - name: mapper.order.@{{productType}}.add.term.duration.amount
+            title: order item Term duration
+            description: ""
+            source: ""
+            sourceLocation: ""
+            target: "@{{productOrderItem[0].itemTerm.duration.amount}}"
+            targetLocation: BODY
+            customizedField: false
+            requiredMapping: true
+          - name: mapper.order.@{{productType}}.add.term.duration.units
+            title: order item Term unit
+            description: ""
+            source: ""
+            sourceLocation: ""
+            target: "@{{productOrderItem[0].itemTerm.duration.units}}"
+            targetLocation: BODY
+            targetType: enum
+            targetValues:
+              - calenderYears
+              - calenderMonths
+              - calendarDays
+              - calendarHours
+              - calendarMinutes
+              - businessDays
+              - businessHours
+              - businessMinutes
+            valueMapping: {}
+            customizedField: false
+            requiredMapping: true
