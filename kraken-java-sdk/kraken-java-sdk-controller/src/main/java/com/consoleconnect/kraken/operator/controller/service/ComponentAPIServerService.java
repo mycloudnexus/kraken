@@ -102,9 +102,11 @@ public class ComponentAPIServerService extends AssetStatusManager {
               assetDto.getFacets().put(ENVIRONMENTS_KEY, env);
 
               Object baseSpec = facets.get(BASE_SPEC_KEY);
-              Map<String, Object> map = JsonToolkit.fromJson(baseSpec, Map.class);
-              map.remove(CONTENT);
-              assetDto.getFacets().put(BASE_SPEC_KEY, map);
+              if (baseSpec != null) {
+                Map<String, Object> map = JsonToolkit.fromJson(baseSpec, Map.class);
+                map.remove(CONTENT);
+                assetDto.getFacets().put(BASE_SPEC_KEY, map);
+              }
             });
   }
 
