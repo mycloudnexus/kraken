@@ -94,13 +94,6 @@ const ContactInformationSetup = ({
                     <Text.BoldMedium style={{ marginLeft: "10px" }}>
                       {getCardTitle(item.metadata.labels.componentKey)}
                     </Text.BoldMedium>
-                    <Tag color="purple" style={{ marginLeft: "10px" }}>
-                      <span style={{ fontWeight: "400" }}>
-                        {item.metadata.labels["access.eline"] === "true"
-                          ? "Access Eline"
-                          : "Internet Access"}
-                      </span>
-                    </Tag>
                   </div>
                 }
                 extra={
@@ -269,7 +262,7 @@ const APIServerList = () => {
       <Drawer
         title={
           <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <Text.BoldMedium>Add contact information</Text.BoldMedium>
+            <Text.BoldMedium>Edit contact information</Text.BoldMedium>
             <CloseOutlined onClick={() => setDrawerOpen(false)} />
           </div>
         }
