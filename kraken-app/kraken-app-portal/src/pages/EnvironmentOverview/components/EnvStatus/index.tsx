@@ -5,7 +5,6 @@ import { IEnv } from "@/utils/types/env.type";
 import {
   ApiOutlined,
   CheckCircleFilled,
-  InfoCircleOutlined,
 } from "@ant-design/icons";
 import { Flex, Spin, Typography } from "antd";
 import classes from "classnames";
