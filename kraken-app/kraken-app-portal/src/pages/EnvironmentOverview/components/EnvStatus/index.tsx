@@ -139,10 +139,6 @@ const EnvStatus = ({
             <Flex className={styles.dataPlaneInfo} gap={8} align="center">
               <ApiOutlined style={{ width: 14, height: 14 }} />
               <Text.LightMedium>In use data plane</Text.LightMedium>
-              <InfoCircleOutlined
-                className={styles.dataPlaneInfoIcon}
-                style={{ width: 14, height: 14 }}
-              />
             </Flex>
           </Flex>
         </Flex>
