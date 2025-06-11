@@ -258,6 +258,10 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
             .toList();
 
     productReleaseAsset.getFacets().put(KEY_COMPONENT_TAGS, componentTags);
+    productReleaseAsset
+        .getMetadata()
+        .getLabels()
+        .put(componentTags.get(0).getParentComponentKey(), Boolean.TRUE.toString());
 
     List<AssetLink> links =
         Stream.concat(
