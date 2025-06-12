@@ -8,6 +8,7 @@ import { get } from "lodash";
 import { useState } from "react";
 import { useBoolean } from "usehooks-ts";
 import styles from "./index.module.scss";
+import {AxiosError} from "axios";
 
 export const DeploymentBtn = ({
   record,
@@ -38,7 +39,8 @@ export const DeploymentBtn = ({
 
       notification.success({ message: get(res, "message", "Success!") });
     } catch (error) {
-      setModalText(get(error, "reason", "Error. Please try again"));
+      const e = error as AxiosError;
+      setModalText(get(e, "response.data.reason", "Error. Please try again"));
       open();
     }
   };
