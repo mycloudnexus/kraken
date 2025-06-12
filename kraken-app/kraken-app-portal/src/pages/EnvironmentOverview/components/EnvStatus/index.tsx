@@ -5,7 +5,6 @@ import { IEnv } from "@/utils/types/env.type";
 import {
   ApiOutlined,
   CheckCircleFilled,
-  InfoCircleOutlined,
 } from "@ant-design/icons";
 import { Flex, Spin, Typography } from "antd";
 import classes from "classnames";
@@ -139,10 +138,6 @@ const EnvStatus = ({
             <Flex className={styles.dataPlaneInfo} gap={8} align="center">
               <ApiOutlined style={{ width: 14, height: 14 }} />
               <Text.LightMedium>In use data plane</Text.LightMedium>
-              <InfoCircleOutlined
-                className={styles.dataPlaneInfoIcon}
-                style={{ width: 14, height: 14 }}
-              />
             </Flex>
           </Flex>
         </Flex>
