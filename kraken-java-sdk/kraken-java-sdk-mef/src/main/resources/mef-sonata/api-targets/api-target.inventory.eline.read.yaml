@@ -53,14 +53,5 @@ spec:
             }
           ],
           "productRelationship":"${entity.renderedResponse.productOrderItem[0].product.productRelationship}",
-          "productConfiguration": {
-            "name": "${entity.renderedResponse.productOrderItem[0].product.productConfiguration.name}",
-            "@type":"${entity.renderedResponse.productOrderItem[0].product.productConfiguration['@type']?:''}",
-            "bandwidth":"${entity.renderedResponse.productOrderItem[0].product.productConfiguration.bandwidth}",
-            "paymentType":"${entity.renderedResponse.productOrderItem[0].product.productConfiguration.paymentType}",
-            "bandwidthUnit":"${entity.renderedResponse.productOrderItem[0].product.productConfiguration[bandwidthUnit]?:''}",
-            "buyerCompanyId":"${entity.renderedResponse.productOrderItem[0].product.productConfiguration[buyerCompanyId]?:''}",
-            "classOfService":"${entity.renderedResponse.productOrderItem[0].product.productConfiguration[classOfService]?:''}",
-            "destUNIMetroId":"${entity.renderedResponse.productOrderItem[0].product.productConfiguration[destUNIMetroId]?:''}"
-          }
+          "productConfiguration": "${@spelFunc.appendFromResponseMapping(entity.renderedResponse.productOrderItem[0].product.productConfiguration, 'productConfiguration', 'mef.sonata.api-target-mapper.inventory.eline.read')}"
         }
