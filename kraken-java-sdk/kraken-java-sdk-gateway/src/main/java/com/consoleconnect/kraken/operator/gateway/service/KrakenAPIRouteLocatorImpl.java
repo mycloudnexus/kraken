@@ -92,7 +92,11 @@ public class KrakenAPIRouteLocatorImpl implements RouteLocator {
   public Flux<Route> getRoutes() {
     log.info("loading routes");
     RouteLocatorBuilder.Builder builder = routeLocatorBuilder.routes();
-    for (UnifiedAssetDto product : listProducts()) {
+    List<UnifiedAssetDto> assetDtos = listProducts();
+    if (CollectionUtils.isEmpty(assetDtos)) {
+      return builder.build().getRoutes();
+    }
+    for (UnifiedAssetDto product : assetDtos) {
       for (UnifiedAssetDto component : listComponents(product.getId())) {
         ComponentAPIFacets componentAPIFacets =
             JsonToolkit.fromJson(
