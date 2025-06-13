@@ -221,11 +221,12 @@ export const updateTargetMapper = (
   );
 };
 
-export const getMapperDetails = (productId: string, componentId: string) => {
+export const getMapperDetails = (productId: string, componentId: string, productType?: string) => {
   return request(
     `${PRODUCT}/${productId}/components/${componentId}/mapper-details`,
     {
       method: "GET",
+      params: { productType },
     }
   );
 };

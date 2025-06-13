@@ -580,10 +580,10 @@ export const useUpdateTargetMapper = () => {
   });
 };
 
-export const useGetMapperDetails = (productId: string, componentId: string) => {
+export const useGetMapperDetails = (productId: string, componentId: string, productType?: string) => {
   return useQuery<any, Error, any>({
     queryKey: [PRODUCT_CACHE_KEYS.get_mapper_details, productId, componentId],
-    queryFn: () => getMapperDetails(productId, componentId),
+    queryFn: () => getMapperDetails(productId, componentId, productType),
     enabled: Boolean(productId && componentId),
     select: (data) => get(data, "data.details"),
   });
