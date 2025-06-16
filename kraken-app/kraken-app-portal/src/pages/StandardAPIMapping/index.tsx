@@ -363,6 +363,7 @@ const StandardAPIMapping = () => {
           <BreadCrumb
             mainTitle= {mainTitle}
             mainUrl="/components"
+            optionalParam={productType}
             items={[
               {
                 title: (
