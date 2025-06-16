@@ -12,6 +12,7 @@ type Props = {
     url: string;
   }[];
   mainTitle?: string;
+  optionalParam?: string;
 };
 
 const BreadCrumb = ({
