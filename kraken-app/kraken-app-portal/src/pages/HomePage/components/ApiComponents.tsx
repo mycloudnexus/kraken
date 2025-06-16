@@ -89,7 +89,7 @@ const ApiComponents = () => {
   }, [state]);
   useEffect(() => {
     if (selectedProductType) {
-      setActiveKey(selectedProductType!);
+      setActiveKey(selectedProductType);
     }
   }, [selectedProductType]);
   return (
