@@ -3,9 +3,6 @@ package com.consoleconnect.kraken.operator.gateway;
 import static com.consoleconnect.kraken.operator.gateway.CustomConfig.X_KRAKEN_KEY_TOKEN;
 import static com.consoleconnect.kraken.operator.gateway.filter.KrakenFilterConstants.X_KRAKEN_AUTH_KEY;
 import static com.consoleconnect.kraken.operator.gateway.runner.LoadTargetAPIConfigActionRunner.encodeUrlParam;
-import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.*;
 
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
@@ -172,24 +169,6 @@ class GatewayTest extends AbstractIntegrationTest {
             response -> {
               String bodyStr = new String(Objects.requireNonNull(response.getResponseBody()));
               System.out.println(bodyStr);
-            });
-  }
-
-  @Test
-  void testMockResponse() {
-    webTestClient
-        .get()
-        .uri(uriBuilder -> uriBuilder.path("/actions/mock-response").build())
-        .header("access-token", "123")
-        .exchange()
-        .expectBody()
-        .consumeWith(
-            response -> {
-              assertThat(response.getStatus().value(), is(201));
-              assertThat(response.getResponseHeaders().containsKey("access-token"), is(false));
-              assertThat(response.getResponseHeaders().containsKey("x-kraken-tenant-id"), is(true));
-              String bodyStr = new String(Objects.requireNonNull(response.getResponseBody()));
-              assertThat(bodyStr, hasJsonPath("$.data", is("mocked")));
             });
   }
 

@@ -8,8 +8,7 @@
 - Sonata Property Type validation
 - Allow user to Limit Sonata property values
 - Support Mapping templates for Product Offering Qualification
-- Support Mapping templates for Basic Internet Access
-- Support one to many mapping between Sonata API and Seller API
+- Support one to many mapping between Sonata API and Seller API(preview)
 
 
 ## 3.0
@@ -18,6 +17,7 @@
 - June, 2025
 
 ### Planned Feature List
-- to be determined
+- Mapping template updates based on feedback
+- UI bug fix
 
 

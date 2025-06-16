@@ -1,4 +1,5 @@
-import { USER } from "@/utils/constants/api";
+import { BasicAuthUser } from "@/components/AuthProviders/basic/provider/BasicAuthContext";
+import { USER, USER_AUTH_TOKEN, USER_ROLES } from "@/utils/constants/api";
 import request from "@/utils/helpers/request";
 
 export const getListUser = (params: any) => {
@@ -8,7 +9,7 @@ export const getListUser = (params: any) => {
   });
 };
 
-export const getCurrentUser = () => {
+export const getCurrentUser = () : BasicAuthUser => {
   return request(`/userinfo`);
 };
 
@@ -50,3 +51,11 @@ export const resetPwdUser = (id: string, password: string) => {
 export function getSystemInfo() {
   return request(`system-info`);
 };
+
+export const getUserAuthToken = () => {
+  return request(USER_AUTH_TOKEN)
+}
+
+export const getUserRoles = () => {
+  return request(USER_ROLES)
+}

@@ -8,7 +8,7 @@ import {
   useGetProductEnvs,
 } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
-import { useNavigate, useParams } from "react-router-dom";
+import {useLocation, useNavigate, useParams} from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { get, isEmpty } from "lodash";
 import RequestMethod from "../Method";
@@ -23,10 +23,13 @@ type Props = {
 const DeployStandardAPIModal = ({ open, onClose, defaultKey }: Props) => {
   const [checkedList, setCheckedList] = useState<string[]>([]);
   const { currentProduct } = useAppStore();
+  const location = useLocation();
+  const [productType] = useState(() => location?.state?.productType ?? "");
   const { componentId } = useParams();
   const { data: dataMappers, isLoading } = useGetMapperDetails(
     currentProduct,
-    componentId ?? ""
+    componentId ?? "",
+  productType,
   );
   const { mutateAsync: deployment } = useDeployToEnv();
   const { data: dataEnv } = useGetProductEnvs(currentProduct);

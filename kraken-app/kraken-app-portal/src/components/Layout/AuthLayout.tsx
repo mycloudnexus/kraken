@@ -1,13 +1,12 @@
-import { useUser } from "@/hooks/user/useUser";
-import { useEffect } from "react";
+import Authenticate from "../AuthProviders/common/authenticte";
+import BasicLayout from "./BasicLayout";
 
-const AuthLayout = ({ children }: any) => {
-  const { runUser } = useUser();
-  useEffect(() => {
-    runUser();
-  }, []);
-
-  return children;
+const AuthLayout = () => {
+  return (
+    <Authenticate>
+      <BasicLayout />
+    </Authenticate>
+  );
 };
 
 export default AuthLayout;

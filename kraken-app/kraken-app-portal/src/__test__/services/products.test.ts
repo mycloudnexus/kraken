@@ -1,10 +1,13 @@
 import { PRODUCT } from "@/utils/constants/api";
+import { ENV } from "@/constants";
 import request from "@/utils/helpers/request";
 import { describe, it, expect, vi } from "vitest";
 import * as service from "../../services/products";
 
 // Mock request function
 vi.mock("@/utils/helpers/request");
+
+ENV.AUTHENTICATION_TYPE = "basic"
 
 describe("Service Tests", () => {
   afterEach(() => {

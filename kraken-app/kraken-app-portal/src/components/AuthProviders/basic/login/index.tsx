@@ -3,44 +3,20 @@ import Logo from "@/assets/logo.svg";
 import Flex from "@/components/Flex";
 import { useLogin } from "@/hooks/login";
 import { PRODUCT_NAME } from "@/utils/constants/common";
-import { storeData } from "@/utils/helpers/token";
 import { Alert, Button, Form, Input, Typography } from "antd";
-import { get } from "lodash";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import styles from "./index.module.scss";
+import { useBasicAuth } from "@/components/AuthProviders/basic/provider/BasicAuthProvider";
 
 const Login = () => {
-  const navigate = useNavigate();
-  const { mutateAsync: login, isPending } = useLogin();
+  const { isPending } = useLogin();
+  const { loginWithCredentials } = useBasicAuth();
 
-  const [error, setError] = useState<string | null>(null);
+  const [error] = useState<string | null>(null);
 
-  const handleFinish = async (values: any) => {
-    try {
-      const res = await login(values);
-      const accessToken = get(res, "data.accessToken");
-      const expiresIn = get(res, "data.expiresIn");
-      const refreshToken = get(res, "data.refreshToken");
-      const refreshTokenExpiresIn = get(res, "data.refreshTokenExpiresIn");
-
-      if (accessToken && expiresIn) {
-        storeData("token", accessToken);
-        storeData("tokenExpired", String(Date.now() + expiresIn * 1000));
-        storeData("refreshToken", refreshToken);
-        storeData(
-          "refreshTokenExpiresIn",
-          String(Date.now() + refreshTokenExpiresIn * 1000)
-        );
-        setError(null);
-        navigate("/", { replace: true });
-      } else {
-        throw new Error("Invalid username or password.");
-      }
-    } catch (e: any) {
-      setError(e.message || "Error on login!");
-    }
-  };
+  const onFinish = async (values: any) : Promise<void> => {
+    return await loginWithCredentials(values);
+  }
 
   return (
     <Flex
@@ -73,7 +49,7 @@ const Login = () => {
           <Alert className={styles.errorAlert} type="error" message={error} />
         )}
 
-        <Form layout="vertical" className={styles.form} onFinish={handleFinish}>
+        <Form layout="vertical" className={styles.form} onFinish={onFinish}>
           <Form.Item name="userName">
             <Input placeholder="User Name" required />
           </Form.Item>

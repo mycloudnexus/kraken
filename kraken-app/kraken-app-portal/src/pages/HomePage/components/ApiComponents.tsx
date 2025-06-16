@@ -9,8 +9,9 @@ import { CloseOutlined } from "@ant-design/icons";
 import { Tabs, Card, Col, Drawer, Flex, Row, Spin } from "antd";
 import { decode } from "js-base64";
 import yaml from "js-yaml";
-import { useCallback, useState } from "react";
+import {useCallback, useEffect, useState} from "react";
 import ApiComponent from "./ApiComponent";
+import {useLocation} from "react-router-dom";
 
 export type DrawerDetails = {
   apiTitle: string;
@@ -30,7 +31,6 @@ const ApiComponents = () => {
   const [selectedProductType, setSelectedProductType] = useState<
     string | undefined
   >(undefined);
-
   const { data: productTypeList } = useGetProductTypeList(currentProduct);
   const { data: standardApiComponents, isLoading: apiLoading } =
     useGetStandardApiComponents(currentProduct, selectedProductType || "UNI");
@@ -80,12 +80,23 @@ const ApiComponents = () => {
         </Tabs.TabPane>
       );
     });
-
+  const [activeKey, setActiveKey] = useState('UNI');
+  const state = useLocation().state;
+  useEffect(() => {
+    if (state) {
+      setActiveKey(state);
+    }
+  }, [state]);
+  useEffect(() => {
+    if (selectedProductType) {
+      setActiveKey(selectedProductType);
+    }
+  }, [selectedProductType]);
   return (
     <PageLayout title="Standard API Mapping">
       <Spin spinning={apiLoading}>
         <Card style={{ height: "100%", borderRadius: "4px" }}>
-          <Tabs onChange={setSelectedProductType}>{renderTabs()}</Tabs>
+          <Tabs activeKey={activeKey} onChange={setSelectedProductType}>{renderTabs()}</Tabs>
         </Card>
         <Drawer
           width={576}

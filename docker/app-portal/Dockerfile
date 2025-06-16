@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.2
 
-FROM docker.io/library/node:20-alpine as builder
+FROM docker.io/library/node:20.10.0-alpine as builder
 
 RUN apk --no-cache update && \
     apk upgrade && \

@@ -129,14 +129,6 @@ public class JsonToolkit {
       setArrayNodeValue(arrayNode, fieldName, value);
     } else if (parentNode.isObject()) {
       ((ObjectNode) parentNode).set(fieldName, value);
-    } else {
-      throw new IllegalArgumentException(
-          "`"
-              + fieldName
-              + "` can't be set for parent node `"
-              + parentPointer
-              + "` because parent is not a container but "
-              + parentNode.getNodeType().name());
     }
   }
 

@@ -33,6 +33,16 @@ export const isTokenExpired = () => {
   return currentTime > Number(storedTime);
 };
 
+export const isTokenExpiredIn = (reserved : number) => {
+  const storedTime = getData("tokenExpired");
+  const token = getData("token");
+  if (!storedTime || !token) {
+    return true;
+  }
+  const currentTime = Date.now();
+  return currentTime > Number(storedTime) - reserved;
+};
+
 export const isRefreshTokenExpired = () => {
   const storedTime = getData("refreshTokenExpiresIn");
   const refreshToken = getData("refreshToken");

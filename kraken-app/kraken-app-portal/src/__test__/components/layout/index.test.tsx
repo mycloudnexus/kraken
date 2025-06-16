@@ -1,6 +1,9 @@
 import { fireEvent, render, waitFor } from "@/__test__/utils"
 import BasicLayout from "@/components/Layout/BasicLayout"
+import { ENV } from "@/constants"
 import * as hooks from '@/hooks/user'
+
+ENV.AUTHENTICATION_TYPE = "basic"
 
 beforeEach(() => {
   vi.clearAllMocks()
@@ -30,6 +33,9 @@ describe('layout and related component testing', () => {
       refetch: vi.fn()
     } as any)
 
+    window.portalConfig.getCurrentAuthUser = () : any => {
+      return {"name": "u"};
+    };
     const { getByTestId } = render(<BasicLayout />)
 
     // Side bar navigation
