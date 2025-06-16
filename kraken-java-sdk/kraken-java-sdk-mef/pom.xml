@@ -5,12 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>kraken-java-sdk-mef</artifactId>
     <name>kraken-java-sdk-mef</name>
-    <version>3.0.0-snapshot.1</version>
+    <version>2.2.0-snapshot.0</version>
     <packaging>jar</packaging>
     <parent>
         <groupId>com.consoleconnect.kraken</groupId>
         <artifactId>kraken-java-sdk</artifactId>
-        <version>3.0.0-snapshot.1</version>
+        <version>2.2.0-snapshot.0</version>
     </parent>
 
     <dependencies>
