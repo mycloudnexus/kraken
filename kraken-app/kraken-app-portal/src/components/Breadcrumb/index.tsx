@@ -12,6 +12,7 @@ type Props = {
     url: string;
   }[];
   mainTitle?: string;
+  optionalParam?: string;
 };
 
 const BreadCrumb = ({
@@ -19,6 +20,7 @@ const BreadCrumb = ({
   lastItem,
   items,
   mainTitle = "Seller API setup",
+  optionalParam
 }: Props) => {
   const navigate = useNavigate();
   return (
@@ -27,7 +29,9 @@ const BreadCrumb = ({
         gap={8}
         align="center"
         style={{ cursor: "pointer" }}
-        onClick={() => navigate(mainUrl)}
+        onClick={() => {
+          navigate(mainUrl, {state: optionalParam});
+        }}
         className={styles.canClick}
       >
         <LeftOutlined style={{ fontSize: 10 }} />

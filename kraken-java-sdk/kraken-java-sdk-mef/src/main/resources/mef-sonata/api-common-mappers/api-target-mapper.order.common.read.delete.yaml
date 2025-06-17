@@ -57,14 +57,6 @@ spec:
             deletePath: "$.productOrderItem[?(@.state != 'completed')].completionDate"
             targetLocation: "BODY"
             requiredMapping: false
-          - name: mapper.order.@{{productType}}.read.delete.productOrderItem.expectedCompleteDate
-            title: "order item expected complete date"
-            description: ""
-            source: ""
-            sourceLocation: "BODY"
-            target: "@{{productOrderItem[0].expectedCompletionDate}}"
-            targetLocation: "BODY"
-            requiredMapping: false
           - name: mapper.order.@{{productType}}.read.stateChange.state
             title: state in state change history
             description: ''
