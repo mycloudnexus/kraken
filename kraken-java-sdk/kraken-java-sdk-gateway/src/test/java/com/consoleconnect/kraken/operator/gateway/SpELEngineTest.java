@@ -4,15 +4,20 @@ import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyString;
 
+import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
+import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.core.toolkit.YamlToolkit;
 import com.consoleconnect.kraken.operator.gateway.func.SpelFunc;
 import com.consoleconnect.kraken.operator.gateway.runner.MappingTransformer;
 import com.consoleconnect.kraken.operator.gateway.template.SpELEngine;
+import com.consoleconnect.kraken.operator.test.AbstractIntegrationTest;
+import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -22,12 +27,23 @@ import java.util.regex.Pattern;
 import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.test.context.ContextConfiguration;
 
-class SpELEngineTest implements MappingTransformer {
+@MockIntegrationTest
+@ContextConfiguration(classes = CustomConfig.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+class SpELEngineTest extends AbstractIntegrationTest implements MappingTransformer {
+  @SpyBean private UnifiedAssetService unifiedAssetService;
+  @Autowired SpelFunc spelFunc;
 
   @Test
   void givenDateTimePlus_whenEvaluate_thenReturnOK() {
@@ -238,5 +254,18 @@ class SpELEngineTest implements MappingTransformer {
         SpELEngine.evaluate(JsonToolkit.fromJson(s, Object.class), new HashMap<>(), true);
     assertThat(
         String.valueOf(evaluate), hasJsonPath("$.alternateGeographicAddress[0].tags", hasSize(1)));
+  }
+
+  @Test
+  void givenProductConfiguration_whenAppendFromResponseMapping_thenSuccess() throws IOException {
+    UnifiedAssetDto dto = new UnifiedAssetDto();
+    dto.setFacets(JsonToolkit.fromJson(readFileToString("/mockData/facetData.json"), Map.class));
+    Mockito.doReturn(dto).when(unifiedAssetService).findOne(anyString());
+    Map<String, Object> map = new HashMap<>();
+    map.put("type", "UNI");
+    Map<String, Object> resultMap =
+        spelFunc.appendFromResponseMapping(
+            map, "productConfiguration", "mef.sonata.api-target-mapper.inventory.uni.read");
+    Assertions.assertTrue(resultMap.containsKey("ccProductOrderId"));
   }
 }

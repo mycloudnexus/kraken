@@ -50,7 +50,7 @@ export const useCommonAddProp = ({
     // propery name should follow this format: @{{ prop_name }}
     onSelect?.({
       ...selectedProp,
-      name: `@{{${selectedProp.name}}}`,
+      name: selectedProp?.location === 'HYBRID'?`${selectedProp.name}`:`@{{${selectedProp.name}}}`,
       title: rightSideInfo?.title,
     });
   }, [selectedProp, onSelect, rightSideInfo]);
@@ -72,6 +72,7 @@ export const useCommonAddProp = ({
     field: keyof typeof sellerAPIExampleProps,
     value: string
   ) => {
+    console.log('hybrid: ', value)
     if (isEmpty(value)) {
       setSellerAPIExampleProps({
         ...sellerAPIExampleProps,
