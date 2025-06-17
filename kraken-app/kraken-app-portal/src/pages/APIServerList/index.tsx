@@ -347,15 +347,6 @@ const APIServerList = () => {
           <Text.LightSmall className={styles["contactInformation-field-value"]}>
             {drawerDetails.apiComponent || "-"}
           </Text.LightSmall>
-          <Text.LightSmall
-            className={styles["contactInformation-field-label"]}
-            color="#00000073"
-          >
-            Product type
-          </Text.LightSmall>
-          <Text.LightSmall className={styles["contactInformation-field-value"]}>
-            {drawerDetails.productType || "-"}
-          </Text.LightSmall>
           <Text.LightSmall className={styles["contactInformation-field-label"]}>
             Contact name
           </Text.LightSmall>
