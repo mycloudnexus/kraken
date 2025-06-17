@@ -65,7 +65,8 @@ const StandardAPIMapping = () => {
   );
   const { data: detailDataMapping, refetch } = useGetComponentDetailMapping(
     currentProduct,
-    componentId ?? ""
+    componentId ?? "",
+      productType
   );
   
   const { value: isChangeMappingKey, setValue: setIsChangeMappingKey } =
