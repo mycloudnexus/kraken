@@ -65,3 +65,19 @@ spec:
               - suspendedPendingTerminate
               - terminated
             valueMapping: {}
+          - name: mapper.product.inventory.list.lastUpdateDate
+            title: Last Updated At
+            description: ""
+            target: "@{{lastUpdateDate}}"
+            targetLocation: BODY
+            requiredMapping: false
+            source: ""
+            sourceLocation: ""
+          - name: mapper.product.inventory.list.createdDate
+            title: Created At
+            description: ""
+            target: "@{{createdDate}}"
+            targetLocation: BODY
+            requiredMapping: false
+            source: ""
+            sourceLocation: ""

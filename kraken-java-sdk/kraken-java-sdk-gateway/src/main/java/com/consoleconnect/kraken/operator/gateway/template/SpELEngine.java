@@ -20,8 +20,10 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.expression.spel.support.StandardTypeConverter;
 import org.springframework.integration.json.JsonPropertyAccessor;
+import org.springframework.stereotype.Service;
 
 @Slf4j
+@Service
 public class SpELEngine implements BeanFactoryAware {
 
   private static final ExpressionParser expressionParser = new SpelExpressionParser();

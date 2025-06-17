@@ -65,7 +65,8 @@ const StandardAPIMapping = () => {
   );
   const { data: detailDataMapping, refetch } = useGetComponentDetailMapping(
     currentProduct,
-    componentId ?? ""
+    componentId ?? "",
+      productType
   );
   
   const { value: isChangeMappingKey, setValue: setIsChangeMappingKey } =
@@ -363,6 +364,7 @@ const StandardAPIMapping = () => {
           <BreadCrumb
             mainTitle= {mainTitle}
             mainUrl="/components"
+            optionalParam={productType}
             items={[
               {
                 title: (

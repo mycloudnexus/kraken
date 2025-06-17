@@ -232,7 +232,7 @@ public class ComponentTagService implements TargetMappingChecker, LatestDeployme
         mapperKeyMap.put(componentTag.getParentComponentKey(), Boolean.TRUE.toString());
       }
     }
-
+    log.info("mapper key map: {}", JsonToolkit.toJson(mapperKeyMap));
     return mapperKeyMap;
   }
 
