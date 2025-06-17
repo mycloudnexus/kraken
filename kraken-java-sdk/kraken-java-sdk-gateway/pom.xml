@@ -5,12 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>kraken-java-sdk-gateway</artifactId>
     <name>kraken-java-sdk-gateway</name>
-    <version>2.1.0</version>
+    <version>2.2.0-snapshot.0</version>
     <packaging>jar</packaging>
     <parent>
         <groupId>com.consoleconnect.kraken</groupId>
         <artifactId>kraken-java-sdk</artifactId>
-        <version>2.1.0</version>
+        <version>2.2.0-snapshot.0</version>
     </parent>
 
     <dependencies>
@@ -18,13 +18,13 @@
         <dependency>
             <groupId>com.consoleconnect.kraken</groupId>
             <artifactId>kraken-java-sdk-data</artifactId>
-            <version>2.1.0</version>
+            <version>2.2.0-snapshot.0</version>
         </dependency>
 
         <dependency>
             <groupId>com.consoleconnect.kraken</groupId>
             <artifactId>kraken-java-sdk-auth</artifactId>
-            <version>2.1.0</version>
+            <version>2.2.0-snapshot.0</version>
         </dependency>
 
         <!-- spring cloud gateway -->
@@ -37,7 +37,7 @@
         <dependency>
             <groupId>com.consoleconnect.kraken</groupId>
             <artifactId>kraken-java-sdk-workflow</artifactId>
-            <version>2.1.0</version>
+            <version>2.2.0-snapshot.0</version>
         </dependency>
 
         <!-- SpEL -->
@@ -100,7 +100,7 @@
             <groupId>com.consoleconnect.kraken</groupId>
             <artifactId>kraken-java-sdk-test</artifactId>
             <scope>test</scope>
-            <version>2.1.0</version>
+            <version>2.2.0-snapshot.0</version>
         </dependency>
     </dependencies>
 </project>
