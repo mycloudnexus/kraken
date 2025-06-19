@@ -1,0 +1,14 @@
+{
+  "kind": "kraken.component.api-availability",
+  "metadata": {
+    "version": 1,
+    "key": "mef.sonata.api-availability",
+    "labels": {}
+  },
+  "facets": {
+    "stageDisableApiList": [
+      "mef.sonata.api-target-mapper.order.eline.add"
+    ],
+    "prodDisableApiList": []
+  }
+}

@@ -9,6 +9,7 @@ import com.consoleconnect.kraken.operator.config.TestApplication;
 import com.consoleconnect.kraken.operator.controller.dto.ComponentExpandDTO;
 import com.consoleconnect.kraken.operator.controller.dto.SaveWorkflowTemplateRequest;
 import com.consoleconnect.kraken.operator.controller.model.Environment;
+import com.consoleconnect.kraken.operator.controller.model.UpdateAipAvailabilityRequest;
 import com.consoleconnect.kraken.operator.controller.service.EnvironmentService;
 import com.consoleconnect.kraken.operator.core.client.ClientEvent;
 import com.consoleconnect.kraken.operator.core.client.ClientEventTypeEnum;
@@ -59,6 +60,8 @@ public class ComponentMgmtControllerTest extends AbstractIntegrationTest
   public static final String LIST_VERSIONS_URL = "products/mef.sonata/component-versions";
   public static final String UPDATE_COMPONENT =
       "/products/kraken.component.api-target-mapper/components/{id}/targetMapper";
+  public static final String DISABLE_TARGET_MAPPER =
+      "/products/kraken.component.api-target-mapper/components/disableTargetMapper";
   public static final String UPDATE_WORKFLOW =
       "/products/kraken.component.api-target-mapper/components/{id}/workflow";
   public static final String LIST_API_USE_CASES =
@@ -449,6 +452,23 @@ public class ComponentMgmtControllerTest extends AbstractIntegrationTest
     getTestClientHelper()
         .getAndVerify(
             (uriBuilder -> uriBuilder.path(path).queryParam("productType", "UNI").build()),
+            bodyStr -> {
+              log.info(bodyStr);
+              assertThat(bodyStr, hasJsonPath("$.data", notNullValue()));
+            });
+  }
+
+  @Test
+  @Order(13)
+  void givenUpdateDisablePayload_whenUpdateApiAvailability_thenReturnOK() {
+    UpdateAipAvailabilityRequest request = new UpdateAipAvailabilityRequest();
+    request.setDisabled(true);
+    request.setMapperKey("mef.sonata.api-target-mapper.order.eline.add");
+    request.setEnvName("stage");
+    getTestClientHelper()
+        .patchAndVerify(
+            uriBuilder -> uriBuilder.path(DISABLE_TARGET_MAPPER).build(),
+            request,
             bodyStr -> {
               log.info(bodyStr);
               assertThat(bodyStr, hasJsonPath("$.data", notNullValue()));

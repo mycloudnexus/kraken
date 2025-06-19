@@ -11,6 +11,7 @@ import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants;
 import com.consoleconnect.kraken.operator.core.toolkit.Constants;
 import com.consoleconnect.kraken.operator.core.toolkit.LabelConstants;
+import com.consoleconnect.kraken.operator.gateway.filter.KrakenFilterConstants;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -44,11 +45,11 @@ public class BuyerCheckerService implements SecurityChecker {
   @Override
   public Mono<Object> internalRun(ServerWebExchange exchange) {
     return ReactiveSecurityContextHolder.getContext()
-        .handle(getSecurityContextSynchronousSinkBiConsumer());
+        .handle(getSecurityContextSynchronousSinkBiConsumer(exchange));
   }
 
   public BiConsumer<SecurityContext, SynchronousSink<Object>>
-      getSecurityContextSynchronousSinkBiConsumer() {
+      getSecurityContextSynchronousSinkBiConsumer(ServerWebExchange exchange) {
     return (securityContext, sink) -> {
       Authentication authentication = securityContext.getAuthentication();
       List<UnifiedAssetDto> list =
@@ -96,6 +97,9 @@ public class BuyerCheckerService implements SecurityChecker {
         sink.error(KrakenException.badRequest("Token expired "));
         return;
       }
+      exchange
+          .getAttributes()
+          .put(KrakenFilterConstants.X_KRAKEN_CURRENT_ENV, resourceServer.getVerifier().getEnv());
       sink.next(new Object());
     };
   }

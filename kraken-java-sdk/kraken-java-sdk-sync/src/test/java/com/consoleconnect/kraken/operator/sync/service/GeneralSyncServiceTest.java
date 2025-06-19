@@ -84,6 +84,7 @@ public class GeneralSyncServiceTest extends AbstractIntegrationTest {
             return switch (assetKindEnum) {
               case PRODUCT_BUYER -> mockerBuyer();
               case COMPONENT_SELLER_CONTACT -> mockerSellerContact(isEmpty);
+              case COMPONENT_API_AVAILABILITY -> mockerDisableRecord();
               default -> new MockResponse().setResponseCode(404);
             };
           }
@@ -121,6 +122,16 @@ public class GeneralSyncServiceTest extends AbstractIntegrationTest {
     }
     MockResponse mockResponse = new MockResponse();
     mockResponse.setBody(JsonToolkit.toJson(HttpResponse.ok(assets)));
+    mockResponse.addHeader("Content-Type", "application/json");
+    return mockResponse;
+  }
+
+  @SneakyThrows
+  private MockResponse mockerDisableRecord() {
+    MockResponse mockResponse = new MockResponse();
+    String mockData = readFileToString("data/api-availability.json");
+    UnifiedAssetDto mockAsset = JsonToolkit.fromJson(mockData, new TypeReference<>() {});
+    mockResponse.setBody(JsonToolkit.toJson(HttpResponse.ok(Collections.singletonList(mockAsset))));
     mockResponse.addHeader("Content-Type", "application/json");
     return mockResponse;
   }

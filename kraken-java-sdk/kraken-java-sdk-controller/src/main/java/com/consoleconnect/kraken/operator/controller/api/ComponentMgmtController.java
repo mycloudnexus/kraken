@@ -4,6 +4,7 @@ import com.consoleconnect.kraken.operator.auth.security.UserContext;
 import com.consoleconnect.kraken.operator.controller.dto.*;
 import com.consoleconnect.kraken.operator.controller.model.ComponentTagFacet;
 import com.consoleconnect.kraken.operator.controller.model.StandardComponentInfo;
+import com.consoleconnect.kraken.operator.controller.model.UpdateAipAvailabilityRequest;
 import com.consoleconnect.kraken.operator.controller.service.ApiComponentService;
 import com.consoleconnect.kraken.operator.controller.service.ComponentTagService;
 import com.consoleconnect.kraken.operator.controller.service.ProductDeploymentService;
@@ -118,6 +119,15 @@ public class ComponentMgmtController {
     return UserContext.getUserId()
         .publishOn(Schedulers.boundedElastic())
         .map(userId -> apiComponentService.updateApiTargetMapper(asset, id, userId));
+  }
+
+  @Operation(summary = "disable/enable use case)")
+  @PatchMapping("/components/disableTargetMapper")
+  public Mono<IngestionDataResult> updateApiAvailability(
+      @RequestBody UpdateAipAvailabilityRequest request) {
+    return UserContext.getUserId()
+        .publishOn(Schedulers.boundedElastic())
+        .map(userId -> apiComponentService.updateApiAvailability(request, userId));
   }
 
   @Operation(summary = "update workflow template)")

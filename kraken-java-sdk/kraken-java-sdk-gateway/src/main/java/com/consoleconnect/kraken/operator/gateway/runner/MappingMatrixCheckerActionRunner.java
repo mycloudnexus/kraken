@@ -8,7 +8,9 @@ import static com.consoleconnect.kraken.operator.core.toolkit.ConstructExpressio
 
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
+import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
 import com.consoleconnect.kraken.operator.core.enums.ActionTypeEnum;
+import com.consoleconnect.kraken.operator.core.enums.EnvNameEnum;
 import com.consoleconnect.kraken.operator.core.enums.MappingTypeEnum;
 import com.consoleconnect.kraken.operator.core.enums.ParamLocationEnum;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
@@ -17,10 +19,7 @@ import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.core.model.FilterRule;
 import com.consoleconnect.kraken.operator.core.model.HttpTask;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
-import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPIFacets;
-import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
-import com.consoleconnect.kraken.operator.core.model.facet.ComponentValidationFacets;
-import com.consoleconnect.kraken.operator.core.model.facet.ComponentWorkflowFacets;
+import com.consoleconnect.kraken.operator.core.model.facet.*;
 import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
 import com.consoleconnect.kraken.operator.core.service.AssetReader;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
@@ -63,6 +62,8 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
   public static final String MODIFICATION_RULE_KEY = "modificationFilterRule";
   public static final String EXPECTED422_PATH_KEY = "expect-http-status-422-if-missing";
   public static final String ROUTE_PARAMS = "routeParams";
+  public static final String CURRENT_ENV_NAME = "current-env-name";
+  public static final String API_AVAILABILITY = "mef.sonata.api-availability";
   private final UnifiedAssetService unifiedAssetService;
   private final UnifiedAssetRepository unifiedAssetRepository;
   private final HttpRequestRepository httpRequestRepository;
@@ -123,7 +124,8 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
       throw KrakenException.badRequest(
           API_CASE_NOT_SUPPORTED.formatted(":lack in check rules for target key: " + targetKey));
     }
-    if (unifiedAssetRepository.findOneByKey(targetKey).isEmpty()) {
+    Optional<UnifiedAssetEntity> targetAssetOpt = unifiedAssetRepository.findOneByKey(targetKey);
+    if (targetAssetOpt.isEmpty() || checkApiDisable(inputs, targetAssetOpt)) {
       throw KrakenException.badRequest(API_CASE_NOT_SUPPORTED.formatted(":not deployed"));
     }
 
@@ -139,6 +141,29 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     // mapper checking, if-missing-return-400, wrong-value-return-422, paths under
     // 'expect-http-status-422-if-missing' always return 422
     checkMapperConstraints(targetKey, inputs, pathsExpected422);
+  }
+
+  public boolean checkApiDisable(
+      Map<String, Object> inputs, Optional<UnifiedAssetEntity> targetAssetOpt) {
+    if (!unifiedAssetService.existed(API_AVAILABILITY)) {
+      return false;
+    }
+    UnifiedAssetDto assetDto = unifiedAssetService.findOne(API_AVAILABILITY);
+    ComponentAPIAvailabilityFacets apiAvailabilityFacets =
+        UnifiedAsset.getFacets(assetDto, ComponentAPIAvailabilityFacets.class);
+    String envName = (String) inputs.get(CURRENT_ENV_NAME);
+    if (EnvNameEnum.STAGE.name().equalsIgnoreCase(envName)) {
+      return apiAvailabilityFacets
+          .getStageDisableApiList()
+          .contains(
+              targetAssetOpt.isPresent() ? targetAssetOpt.get().getMapperKey() : StringUtils.EMPTY);
+    } else if (EnvNameEnum.PRODUCTION.name().equalsIgnoreCase(envName)) {
+      return apiAvailabilityFacets
+          .getProdDisableApiList()
+          .contains(
+              targetAssetOpt.isPresent() ? targetAssetOpt.get().getMapperKey() : StringUtils.EMPTY);
+    }
+    return false;
   }
 
   public Map<String, List<PathCheck>> readMatrixFacets(Paging<UnifiedAssetDto> assetDtoPaging) {

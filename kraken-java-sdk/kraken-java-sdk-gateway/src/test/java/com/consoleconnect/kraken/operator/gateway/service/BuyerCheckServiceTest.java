@@ -19,6 +19,7 @@ import java.time.format.DateTimeFormatter;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.*;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextImpl;
@@ -26,6 +27,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.SynchronousSink;
 
 @MockIntegrationTest
@@ -77,7 +79,9 @@ public class BuyerCheckServiceTest extends AbstractIntegrationTest {
     when(principal.getName()).thenReturn("buyer02");
     when(principal.getPrincipal()).thenReturn(jwt);
     SecurityContextImpl context = new SecurityContextImpl(this.principal);
-    buyerCheckerService.getSecurityContextSynchronousSinkBiConsumer().accept(context, sink);
+    buyerCheckerService
+        .getSecurityContextSynchronousSinkBiConsumer(Mockito.mock(ServerWebExchange.class))
+        .accept(context, sink);
     Assertions.assertEquals(200, ingestionDataResult.getCode());
   }
 }

@@ -31,7 +31,8 @@ public enum AssetKindEnum {
   COMPONENT_API_SERVER("kraken.component.api-server"),
   COMPONENT_SELLER_CONTACT("kraken.component.seller-contact"),
   PRODUCT_APP_KRAKEN("kraken.product.app.kraken"),
-  PRODUCT_COMPATIBILITY("kraken.product.compatibility");
+  PRODUCT_COMPATIBILITY("kraken.product.compatibility"),
+  COMPONENT_API_AVAILABILITY("kraken.component.api-availability");
 
   AssetKindEnum(String kind) {
     this.kind = kind;
