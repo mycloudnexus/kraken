@@ -474,4 +474,40 @@ public class ComponentMgmtControllerTest extends AbstractIntegrationTest
               assertThat(bodyStr, hasJsonPath("$.data", notNullValue()));
             });
   }
+
+  @Test
+  @Order(14)
+  void givenUpdateDisablePayload2_whenUpdateApiAvailability_thenReturnOK() {
+    UpdateAipAvailabilityRequest request = new UpdateAipAvailabilityRequest();
+    request.setDisabled(false);
+    request.setMapperKey("mef.sonata.api-target-mapper.order.eline.add");
+    request.setEnvName("production");
+    getTestClientHelper()
+        .patchAndVerify(
+            uriBuilder -> uriBuilder.path(DISABLE_TARGET_MAPPER).build(),
+            request,
+            bodyStr -> {
+              log.info(bodyStr);
+              assertThat(bodyStr, hasJsonPath("$.data", notNullValue()));
+            });
+  }
+
+  @Test
+  @Order(14)
+  void givenUpdateDisablePayload3_whenUpdateApiAvailability_thenThrowException() {
+    UpdateAipAvailabilityRequest request = new UpdateAipAvailabilityRequest();
+    request.setDisabled(true);
+    request.setMapperKey("mef.sonata.api-target-mapper.order.eline.add");
+    getTestClientHelper()
+        .requestAndVerify(
+            HttpMethod.PATCH,
+            uriBuilder -> uriBuilder.path(DISABLE_TARGET_MAPPER).build(),
+            new HashMap<>(),
+            400,
+            request,
+            bodyStr -> {
+              log.info(bodyStr);
+              assertThat(bodyStr, notNullValue());
+            });
+  }
 }
