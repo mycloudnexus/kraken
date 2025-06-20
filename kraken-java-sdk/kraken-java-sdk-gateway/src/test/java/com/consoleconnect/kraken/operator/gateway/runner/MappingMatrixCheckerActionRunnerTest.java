@@ -1,7 +1,10 @@
 package com.consoleconnect.kraken.operator.gateway.runner;
 
 import static com.consoleconnect.kraken.operator.gateway.runner.ResponseCodeTransform.TARGET_KEY_NOT_FOUND;
+import static org.mockito.ArgumentMatchers.anyString;
 
+import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
+import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
 import com.consoleconnect.kraken.operator.core.enums.ExpectTypeEnum;
 import com.consoleconnect.kraken.operator.core.enums.MappingTypeEnum;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
@@ -31,7 +34,9 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -42,7 +47,7 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest
     implements FilterRulesCreator {
   @Autowired MappingMatrixCheckerActionRunner mappingMatrixCheckerActionRunner;
   @Autowired HttpRequestRepository httpRequestRepository;
-  @Autowired UnifiedAssetService unifiedAssetService;
+  @SpyBean UnifiedAssetService unifiedAssetService;
 
   @Test
   @Order(1)
@@ -747,6 +752,26 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest
         () ->
             mappingMatrixCheckerActionRunner.checkModifyConstraints(
                 filterRules, targetKey, inputs));
+  }
+
+  @Test
+  @SneakyThrows
+  void givenTargetAsset_whenCheckApiAvailability_thenThrowException() {
+    Mockito.doReturn(true).when(unifiedAssetService).existed(anyString());
+    Mockito.doReturn(
+            JsonToolkit.fromJson(
+                readFileToString("mockData/api-availability.json"), UnifiedAssetDto.class))
+        .when(unifiedAssetService)
+        .findOne(anyString());
+    UnifiedAssetEntity entity = new UnifiedAssetEntity();
+    entity.setMapperKey("mef.sonata.api-target-mapper.order.eline.add");
+    Map<String, Object> inputs = new HashMap<>();
+    inputs.put("current-env-name", "stage");
+    Assertions.assertTrue(
+        mappingMatrixCheckerActionRunner.checkApiDisable(inputs, Optional.of(entity)));
+    inputs.put("current-env-name", "production");
+    Assertions.assertFalse(
+        mappingMatrixCheckerActionRunner.checkApiDisable(inputs, Optional.of(entity)));
   }
 
   @SneakyThrows

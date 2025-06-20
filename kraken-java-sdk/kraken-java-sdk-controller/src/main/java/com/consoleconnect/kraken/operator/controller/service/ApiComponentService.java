@@ -1,5 +1,6 @@
 package com.consoleconnect.kraken.operator.controller.service;
 
+import static com.consoleconnect.kraken.operator.core.service.UnifiedAssetService.toAsset;
 import static com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants.*;
 import static com.consoleconnect.kraken.operator.core.toolkit.LabelConstants.*;
 
@@ -15,15 +16,11 @@ import com.consoleconnect.kraken.operator.core.dto.Tuple2;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.entity.AssetFacetEntity;
 import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
-import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
-import com.consoleconnect.kraken.operator.core.enums.AssetLinkKindEnum;
-import com.consoleconnect.kraken.operator.core.enums.ParentProductTypeEnum;
-import com.consoleconnect.kraken.operator.core.enums.SupportedCaseEnum;
+import com.consoleconnect.kraken.operator.core.enums.*;
 import com.consoleconnect.kraken.operator.core.event.IngestionDataResult;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
-import com.consoleconnect.kraken.operator.core.model.AppProperty;
-import com.consoleconnect.kraken.operator.core.model.AssetLink;
-import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
+import com.consoleconnect.kraken.operator.core.model.*;
+import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPIAvailabilityFacets;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPIFacets;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPISpecFacets;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
@@ -32,10 +29,7 @@ import com.consoleconnect.kraken.operator.core.repo.EnvironmentClientRepository;
 import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
 import com.consoleconnect.kraken.operator.core.service.ApiUseCaseSelector;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
-import com.consoleconnect.kraken.operator.core.toolkit.JsonDiffTool;
-import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
-import com.consoleconnect.kraken.operator.core.toolkit.LabelConstants;
-import com.consoleconnect.kraken.operator.core.toolkit.Paging;
+import com.consoleconnect.kraken.operator.core.toolkit.*;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -62,6 +56,8 @@ public class ApiComponentService
   private static final Logger log = LoggerFactory.getLogger(ApiComponentService.class);
   public static final KrakenException ASSET_NOT_FOUND = KrakenException.notFound("asset not found");
   public static final String NOT_FOUND_SPEC = "not found spec";
+  private static final String API_AVAILABILITY_KEY = "mef.sonata.api-availability";
+  public static final String MEF_SONATA = "mef.sonata";
   @Getter private final UnifiedAssetService unifiedAssetService;
   @Getter private final EnvironmentClientRepository environmentClientRepository;
   @Getter private final EnvironmentService environmentService;
@@ -365,9 +361,7 @@ public class ApiComponentService
             .toList();
     Map<String, UnifiedAssetDto> assetEntityMap =
         unifiedAssetRepository.findAllByKeyIn(assetKeyList).stream()
-            .collect(
-                Collectors.toMap(
-                    UnifiedAssetEntity::getKey, t -> UnifiedAssetService.toAsset(t, true)));
+            .collect(Collectors.toMap(UnifiedAssetEntity::getKey, t -> toAsset(t, true)));
 
     List<ComponentExpandDTO.TargetMappingDetail> details = new ArrayList<>();
     assetEntityMap.forEach(
@@ -479,7 +473,7 @@ public class ApiComponentService
         unifiedAssetRepository
             .findByKindOrderByCreatedAtDesc(AssetKindEnum.COMPONENT_API.getKind())
             .stream()
-            .map(t -> UnifiedAssetService.toAsset(t, true))
+            .map(t -> toAsset(t, true))
             .toList();
     List<UnifiedAssetDto> mapperAssetList =
         unifiedAssetService.findByKind(AssetKindEnum.COMPONENT_API_TARGET_MAPPER.getKind());
@@ -614,9 +608,52 @@ public class ApiComponentService
   }
 
   private boolean isWorkflowEnabled(UnifiedAssetEntity mapperEntity) {
-    UnifiedAssetDto mapperAsset = UnifiedAssetService.toAsset(mapperEntity, true);
+    UnifiedAssetDto mapperAsset = toAsset(mapperEntity, true);
     ComponentAPITargetFacets mapperFacets =
         UnifiedAsset.getFacets(mapperAsset, ComponentAPITargetFacets.class);
     return mapperFacets.getWorkflow() != null && mapperFacets.getWorkflow().isEnabled();
+  }
+
+  @Transactional
+  public IngestionDataResult updateApiAvailability(
+      UpdateAipAvailabilityRequest request, String userId) {
+    if (request.getMapperKey() == null || request.getEnvName() == null) {
+      throw KrakenException.badRequest("mapperKey and envName can not be null");
+    }
+    Optional<UnifiedAssetEntity> assetOpt =
+        unifiedAssetRepository.findOneByKey(API_AVAILABILITY_KEY);
+    UnifiedAsset asset = new UnifiedAsset();
+    ComponentAPIAvailabilityFacets facets = new ComponentAPIAvailabilityFacets();
+    if (assetOpt.isEmpty()) {
+      asset.setKind(AssetKindEnum.COMPONENT_API_AVAILABILITY.getKind());
+      Metadata metadata = new Metadata();
+      metadata.setKey(API_AVAILABILITY_KEY);
+      metadata.setVersion(1);
+      asset.setMetadata(metadata);
+    } else {
+      UnifiedAssetEntity assetEntity = assetOpt.get();
+      asset = toAsset(assetEntity, true);
+      facets = UnifiedAsset.getFacets(asset, ComponentAPIAvailabilityFacets.class);
+    }
+    SyncMetadata syncMetadata = new SyncMetadata();
+    syncMetadata.setSyncedAt(DateTime.nowInUTC().toString());
+    syncMetadata.setSyncedBy(userId);
+    if (EnvNameEnum.STAGE.name().equalsIgnoreCase(request.getEnvName())) {
+      performDisableList(
+          facets.getStageDisableApiList(), request.getMapperKey(), request.isDisabled());
+    } else if (EnvNameEnum.PRODUCTION.name().equalsIgnoreCase(request.getEnvName())) {
+      performDisableList(
+          facets.getProdDisableApiList(), request.getMapperKey(), request.isDisabled());
+    }
+    asset.setFacets(JsonToolkit.convertToMap(facets));
+    return unifiedAssetService.syncAsset(MEF_SONATA, asset, syncMetadata, true);
+  }
+
+  private void performDisableList(Set<String> set, String key, boolean disabled) {
+    if (disabled) {
+      set.add(key);
+    } else {
+      set.remove(key);
+    }
   }
 }

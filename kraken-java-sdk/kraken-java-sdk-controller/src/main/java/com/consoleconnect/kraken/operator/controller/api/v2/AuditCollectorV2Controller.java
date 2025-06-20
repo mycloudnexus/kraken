@@ -99,6 +99,10 @@ public class AuditCollectorV2Controller {
       List<UnifiedAssetDto> assetDtoList =
           unifiedAssetService.findByKind(AssetKindEnum.COMPONENT_SELLER_CONTACT.getKind());
       return HttpResponse.ok(assetDtoList);
+    } else if (AssetKindEnum.COMPONENT_API_AVAILABILITY.getKind().equals(kind)) {
+      List<UnifiedAssetDto> assetDtoList =
+          unifiedAssetService.findByKind(AssetKindEnum.COMPONENT_API_AVAILABILITY.getKind());
+      return HttpResponse.ok(assetDtoList);
     } else {
       return HttpResponse.of(
           HttpStatus.NOT_IMPLEMENTED.value(),

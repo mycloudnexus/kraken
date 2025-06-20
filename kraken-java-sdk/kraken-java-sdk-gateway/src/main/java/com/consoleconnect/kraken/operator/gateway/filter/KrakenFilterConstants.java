@@ -26,4 +26,5 @@ public abstract class KrakenFilterConstants {
   public static final String X_KRAKEN_BUYER_ID = "x-kraken-buyer-id";
   public static final String X_KRAKEN_AUTH_KEY = "x-kraken-key";
   public static final String X_KRAKEN_URL = "x-kraken-url";
+  public static final String X_KRAKEN_CURRENT_ENV = "x-kraken-current-env-name";
 }
