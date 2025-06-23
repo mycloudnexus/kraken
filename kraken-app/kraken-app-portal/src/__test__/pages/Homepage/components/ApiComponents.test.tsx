@@ -7,12 +7,14 @@ import { vi } from "vitest";
 
 const mockOpenDrawer = vi.fn();
 const mockNavigate = vi.fn();
+const mockLocation = vi.fn();
 
 vi.mock("react-router-dom", () => ({
   useNavigate: () => mockNavigate,
   BrowserRouter: ({ children }: { children: React.ReactNode }) => (
     <div>{children}</div>
   ),
+  useLocation: () => mockLocation,
 }));
 
 vi.mock("@/hooks/homepage", () => ({

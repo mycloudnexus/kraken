@@ -48,5 +48,5 @@ spec:
             }
           ],
           "productRelationship":"${entity.renderedResponse.productOrderItem[0].product.productRelationship}",
-          "productConfiguration":"${entity.renderedResponse.productOrderItem[0].product.productConfiguration}"
+          "productConfiguration": "${@spelFunc.appendFromResponseMapping(entity.renderedResponse.productOrderItem[0].product.productConfiguration, 'productConfiguration', 'mef.sonata.api-target-mapper.inventory.uni.read')}"
         }
