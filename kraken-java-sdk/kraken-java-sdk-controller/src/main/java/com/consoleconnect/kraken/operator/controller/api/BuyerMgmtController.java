@@ -7,6 +7,7 @@ import com.consoleconnect.kraken.operator.controller.dto.BuyerAssetDto;
 import com.consoleconnect.kraken.operator.controller.dto.CreateBuyerRequest;
 import com.consoleconnect.kraken.operator.controller.model.MgmtProperty;
 import com.consoleconnect.kraken.operator.controller.service.BuyerService;
+import com.consoleconnect.kraken.operator.controller.service.TokenStorageService;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import com.consoleconnect.kraken.operator.core.toolkit.Paging;
@@ -31,6 +32,7 @@ import reactor.core.scheduler.Schedulers;
 public class BuyerMgmtController {
 
   private BuyerService buyerService;
+  private TokenStorageService storageService;
 
   @Operation(summary = "Create a buyer")
   @PostMapping("")
@@ -100,6 +102,15 @@ public class BuyerMgmtController {
     return UserContext.getUserId()
         .publishOn(Schedulers.boundedElastic())
         .map(userId -> buyerService.deactivate(productId, id, userId))
+        .map(HttpResponse::ok);
+  }
+
+  @Operation(summary = "read jwt token")
+  @GetMapping(value = "/{id}/token")
+  public Mono<HttpResponse<String>> readToken(@PathVariable("id") String id) {
+    return UserContext.getUserId()
+        .publishOn(Schedulers.boundedElastic())
+        .map(userId -> storageService.readSecret(id))
         .map(HttpResponse::ok);
   }
 }
