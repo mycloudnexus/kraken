@@ -6,7 +6,7 @@
     <groupId>com.consoleconnect.kraken</groupId>
     <artifactId>kraken-platform</artifactId>
     <name>kraken platform</name>
-    <version>3.0.0-snapshot.1</version>
+    <version>3.0.0-snapshot.2</version>
     <packaging>pom</packaging>
 
     <parent>
