@@ -153,4 +153,8 @@ public class JsonToolkit {
       }
     }
   }
+
+  public static void validateJson(String json) {
+    fromJson(json, Map.class);
+  }
 }
