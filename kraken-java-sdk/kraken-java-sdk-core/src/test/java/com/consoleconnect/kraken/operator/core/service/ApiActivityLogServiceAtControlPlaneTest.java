@@ -7,6 +7,7 @@ import com.consoleconnect.kraken.operator.core.config.AppConfig;
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
 import com.consoleconnect.kraken.operator.core.enums.AchieveScopeEnum;
 import com.consoleconnect.kraken.operator.core.enums.LifeStatusEnum;
+import com.consoleconnect.kraken.operator.core.enums.SyncStatusEnum;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogBodyRepository;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
@@ -278,7 +279,8 @@ class ApiActivityLogServiceAtControlPlaneTest extends AbstractIntegrationTest {
     entity.setBuyer("buy");
     entity.setUri("uri");
     entity.setPath("path");
-    this.apiActivityLogService.setSynced(List.of(entity), ZonedDateTime.now());
+    this.apiActivityLogService.setSynced(
+        List.of(entity), ZonedDateTime.now(), SyncStatusEnum.SYNCED);
 
     Assertions.assertEquals(1, this.apiActivityLogRepository.findAll().size());
   }
