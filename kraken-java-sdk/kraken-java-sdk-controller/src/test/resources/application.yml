@@ -22,7 +22,7 @@ spring:
     hikari:
       pool-name: hikari-platform-service-platform
       connection-test-query: SELECT 1
-      maximum-pool-size: 2
+      maximum-pool-size: 30
       max-lifetime: 600000
       connection-timeout: 60000
   jpa:
