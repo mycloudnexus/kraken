@@ -3,12 +3,12 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>kraken-java-sdk-workflow</artifactId>
     <name>kraken-java-sdk-workflow</name>
-    <version>3.0.0-snapshot.1</version>
+    <version>3.0.0-snapshot.2</version>
     <packaging>jar</packaging>
     <parent>
         <groupId>com.consoleconnect.kraken</groupId>
         <artifactId>kraken-java-sdk</artifactId>
-        <version>3.0.0-snapshot.1</version>
+        <version>3.0.0-snapshot.2</version>
     </parent>
 
     <properties>
@@ -25,7 +25,7 @@
         <dependency>
             <groupId>com.consoleconnect.kraken</groupId>
             <artifactId>kraken-java-sdk-core</artifactId>
-            <version>3.0.0-snapshot.1</version>
+            <version>3.0.0-snapshot.2</version>
         </dependency>
         <!-- workflow dependency -->
         <dependency>
@@ -42,7 +42,7 @@
         <dependency>
             <groupId>com.consoleconnect.kraken</groupId>
             <artifactId>kraken-java-sdk-test</artifactId>
-            <version>3.0.0-snapshot.1</version>
+            <version>3.0.0-snapshot.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>

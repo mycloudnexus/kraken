@@ -350,10 +350,11 @@ public class ApiActivityLogService {
     return repository.findByRequestIdAndCallSeq(requestId, seq);
   }
 
-  public void setSynced(List<ApiActivityLogEntity> logEntities, ZonedDateTime now) {
+  public void setSynced(
+      List<ApiActivityLogEntity> logEntities, ZonedDateTime now, SyncStatusEnum syncState) {
     logEntities.forEach(
         logEntity -> {
-          logEntity.setSyncStatus(SyncStatusEnum.SYNCED);
+          logEntity.setSyncStatus(syncState);
           logEntity.setSyncedAt(now);
         });
 
