@@ -11,6 +11,7 @@ import com.consoleconnect.kraken.operator.controller.entity.TokenStorageEntity;
 import com.consoleconnect.kraken.operator.controller.model.Environment;
 import com.consoleconnect.kraken.operator.controller.repo.TokenStorageRepository;
 import com.consoleconnect.kraken.operator.controller.service.EnvironmentService;
+import com.consoleconnect.kraken.operator.controller.service.TokenStorageService;
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
@@ -42,6 +43,7 @@ class BuyerControllerTest extends AbstractIntegrationTest implements EnvCreator,
   @Autowired private UnifiedAssetService unifiedAssetService;
   @Getter @Autowired EnvironmentService environmentService;
   @Autowired private TokenStorageRepository tokenStorageRepository;
+  @Autowired private TokenStorageService tokenStorageService;
 
   @Autowired
   public BuyerControllerTest(WebTestClient webTestClient) {
@@ -71,6 +73,23 @@ class BuyerControllerTest extends AbstractIntegrationTest implements EnvCreator,
           TokenStorageEntity entity =
               tokenStorageRepository.findFirstByAssetId(buyerCreated.getId());
           Assertions.assertNotNull(entity.getToken());
+          BuyerAssetDto.BuyerToken buyerToken =
+              tokenStorageService.readSecret(buyerCreated.getId());
+          Assertions.assertNotNull(buyerToken.getAccessToken());
+        });
+  }
+
+  @Test
+  @Order(2)
+  void givenNoneExistBuyer_whenRead_thenReturnError() {
+    String readTokenUrl = BUYER_BASE_URL + "/" + BUYER_ID + "/token";
+    webTestClient.requestAndVerify(
+        HttpMethod.GET,
+        uriBuilder -> uriBuilder.path(readTokenUrl).build(),
+        HttpStatus.NOT_FOUND.value(),
+        null,
+        bodyStr -> {
+          assertThat(bodyStr, hasJsonPath("$.code", is("notFound")));
         });
   }
 
