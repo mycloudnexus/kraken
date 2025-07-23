@@ -16,6 +16,14 @@ spring:
       detection-strategy: ANNOTATED
   datasource:
     driverClassName: org.postgresql.Driver
+  cloud:
+    vault:
+      uri: http://localhost:8200
+      authentication: TOKEN
+      token: ${VAULT_ACCESS_TOKEN:mock-token}
+      enabled: false
+      reactive:
+        enabled: false
 #    password: ${DB_PASSWORD}
 #    url: ${DB_URL}
 #    username: ${DB_USERNAME}
@@ -84,3 +92,8 @@ app:
         include: asset, component, product, ingestion, component-operation
   mgmt:
     mgmt-server-enabled: false
+    token-storage:
+      enabled: true
+      engine: postgres
+    vault:
+      namespace: secret/data
