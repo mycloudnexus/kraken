@@ -107,10 +107,10 @@ public class BuyerMgmtController {
 
   @Operation(summary = "read jwt token")
   @GetMapping(value = "/{id}/token")
-  public Mono<HttpResponse<String>> readToken(@PathVariable("id") String id) {
+  public Mono<HttpResponse<BuyerAssetDto.BuyerToken>> readToken(@PathVariable("id") String id) {
     return UserContext.getUserId()
         .publishOn(Schedulers.boundedElastic())
-        .map(userId -> storageService.readSecret(id))
+        .map(userId -> buyerService.readToken(id))
         .map(HttpResponse::ok);
   }
 }

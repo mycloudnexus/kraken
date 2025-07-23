@@ -97,7 +97,6 @@ app:
       distribution-envs:
         - local_dev
     mgmt-server-enabled: false
-
   tenant:
     tenantId: ef90f7e7-dc7d-4538-aa5b-a4a7d8432da2
     mode: SINGLE

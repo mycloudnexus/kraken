@@ -1,7 +1,9 @@
 package com.consoleconnect.kraken.operator.controller.service;
 
-public interface TokenStorageService {
-  void writeSecret(String key, String value);
+import com.consoleconnect.kraken.operator.controller.dto.BuyerAssetDto;
 
-  String readSecret(String key);
+public interface TokenStorageService {
+  void writeSecret(BuyerAssetDto value, String createdBy);
+
+  BuyerAssetDto.BuyerToken readSecret(String buyerId);
 }
