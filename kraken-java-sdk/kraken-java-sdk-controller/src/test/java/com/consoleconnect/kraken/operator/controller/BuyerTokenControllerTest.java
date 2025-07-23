@@ -60,8 +60,8 @@ class BuyerTokenControllerTest extends AbstractIntegrationTest implements EnvCre
     buyerToken.setExpiredAt(new Date());
     response.setData(Map.of("data", buyerToken));
     when(vaultTemplate.write(anyString(), any())).thenReturn(response);
-    Environment envStage = createStage(PRODUCT_ID);
-    BuyerAssetDto buyerCreated = createBuyer(BUYER_ID, envStage.getId(), COMPANY_NAME);
+    Environment envProd = createProduction(PRODUCT_ID);
+    BuyerAssetDto buyerCreated = createBuyer(BUYER_ID, envProd.getId(), COMPANY_NAME);
     String refreshAccessTokenUrl = BUYER_BASE_URL + "/" + buyerCreated.getId() + "/access-tokens";
     webTestClient.requestAndVerify(
         HttpMethod.POST,
