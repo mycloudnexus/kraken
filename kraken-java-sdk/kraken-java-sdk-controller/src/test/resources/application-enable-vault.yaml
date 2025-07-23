@@ -10,7 +10,7 @@ spring:
     vault:
       uri: http://localhost:8200
       authentication: TOKEN
-      token: ${VAULT_ACCESS_TOKEN:hvs.Rn201wqJfr47TlxbaNtq48L9}
+      token: ${VAULT_ACCESS_TOKEN:mock-token}
       enabled: true
       reactive:
         enabled: false
