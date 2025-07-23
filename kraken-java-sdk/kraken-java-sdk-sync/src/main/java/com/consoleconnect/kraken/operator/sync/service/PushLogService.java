@@ -74,9 +74,11 @@ public class PushLogService extends KrakenServerConnector {
             logEntities.stream().map(this::map).toList());
 
     HttpResponse<Void> res = pushEvent(event);
+    ZonedDateTime now = DateTime.nowInUTC();
     if (res.getCode() == 200) {
-      ZonedDateTime now = DateTime.nowInUTC();
-      this.apiActivityLogService.setSynced(logEntities, now);
+      this.apiActivityLogService.setSynced(logEntities, now, SyncStatusEnum.SYNCED);
+    } else {
+      this.apiActivityLogService.setSynced(logEntities, now, SyncStatusEnum.SYNCING);
     }
   }
 

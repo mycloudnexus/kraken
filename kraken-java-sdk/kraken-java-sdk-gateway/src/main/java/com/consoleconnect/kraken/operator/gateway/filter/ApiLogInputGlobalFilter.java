@@ -1,5 +1,6 @@
 package com.consoleconnect.kraken.operator.gateway.filter;
 
+import static com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit.validateJson;
 import static com.consoleconnect.kraken.operator.gateway.filter.KrakenFilterConstants.GATEWAY_SERVICE;
 import static org.springframework.core.io.buffer.DataBufferUtils.join;
 
@@ -95,6 +96,7 @@ public class ApiLogInputGlobalFilter extends AbstractGlobalFilter {
       if (db != null) {
         String requestPayload = db.toString(Charset.defaultCharset());
         if (StringUtils.isNotBlank(requestPayload)) {
+          validateJson(requestPayload);
           entity.setRequest(requestPayload);
         }
       }
