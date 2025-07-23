@@ -61,7 +61,7 @@ class BuyerTokenControllerTest extends AbstractIntegrationTest implements EnvCre
     response.setData(Map.of("data", buyerToken));
     when(vaultTemplate.write(anyString(), any())).thenReturn(response);
     Environment envProd = createProduction(PRODUCT_ID);
-    BuyerAssetDto buyerCreated = createBuyer(BUYER_ID, envProd.getId(), COMPANY_NAME);
+    BuyerAssetDto buyerCreated = createBuyer("mock-buyer", envProd.getId(), "mock-company");
     String refreshAccessTokenUrl = BUYER_BASE_URL + "/" + buyerCreated.getId() + "/access-tokens";
     webTestClient.requestAndVerify(
         HttpMethod.POST,
