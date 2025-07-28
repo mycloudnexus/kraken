@@ -98,7 +98,6 @@ const PushHistoryList = () => {
       page: (pagination.current ?? 1) - 1,
       size: pagination.pageSize,
     });
-    // setPagination(pagination);
   };
   return (
     <Flex ref={refWrapper} style={{ height: "100%" }}>
