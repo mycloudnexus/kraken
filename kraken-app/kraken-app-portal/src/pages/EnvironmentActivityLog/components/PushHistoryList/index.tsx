@@ -5,11 +5,11 @@ import { useUser } from "@/hooks/user/useUser";
 import { DEFAULT_PAGING } from "@/utils/constants/common";
 import { DAY_FORMAT, DAY_TIME_FORMAT_NORMAL } from "@/utils/constants/format";
 import { getStatusBadge } from "@/utils/helpers/ui";
-import {IActivityLog, IPushHistory} from "@/utils/types/env.type";
+import {IPushHistory} from "@/utils/types/env.type";
 import { Badge, Flex, Table } from "antd";
 import {ColumnsType, TableProps} from "antd/es/table";
 import dayjs from "dayjs";
-import {capitalize, omit} from "lodash";
+import {capitalize} from "lodash";
 import { useEffect, useRef } from "react";
 import styles from "../../index.module.scss";
 
