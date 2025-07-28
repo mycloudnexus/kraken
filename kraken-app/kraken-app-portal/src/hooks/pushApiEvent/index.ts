@@ -11,10 +11,11 @@ const PUSH_API_EVENT_CACHE_KEYS = {
   get_push_button_enabled: "get_push_button_enabled",
 };
 
-export const useGetPushActivityLogHistory = () => {
+export const useGetPushActivityLogHistory = (queryParams: unknown) => {
+  console.log(queryParams)
   return useQuery<AxiosResponse, Error, IPagingData<IActivityHistoryLog>>({
-    queryKey: [PUSH_API_EVENT_CACHE_KEYS.get_product_env_list],
-    queryFn: () => getPushEventHistory(),
+    queryKey: ['query_push_log', queryParams],
+    queryFn: () => getPushEventHistory(queryParams),
     select: (data) => data.data,
     staleTime: STALE_TIME,
   });

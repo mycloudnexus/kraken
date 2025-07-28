@@ -2,8 +2,8 @@ import request from "@/utils/helpers/request";
 import { PUSH_API_ACTIVITY } from "@/utils/constants/api";
 import { ICreateActivityHistoryLogRequest } from '@/utils/types/common.type';
 
-export const getPushEventHistory = () =>
-  request(`${PUSH_API_ACTIVITY}/history`);
+export const getPushEventHistory = (params: unknown) =>
+    request(`${PUSH_API_ACTIVITY}/history`, {params});
 
 export const getPushButtonEnabledStatus = () =>
   request(`${PUSH_API_ACTIVITY}/enabled`);
