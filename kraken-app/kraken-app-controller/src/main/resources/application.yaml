@@ -13,6 +13,13 @@ spring:
         pool:
           max-connections: 1500
           type: FIXED
+    vault:
+      uri: http://localhost:8200
+      authentication: TOKEN
+      token: ${VAULT_ACCESS_TOKEN:mock-token}
+      enabled: true
+      reactive:
+        enabled: false
   application:
     name: "@project.artifactId@"
     description: "@project.name@"
@@ -119,6 +126,11 @@ app:
         - kraken.component.api-spec
       exclude-keys:
         - mef.sonata.api-target.order.notification.state.change
+    token-storage:
+      enabled: true
+      engine: postgres
+    vault:
+      namespace: secret/data
   tenant:
     workspacePath: classpath:/assets/workspace.yaml
     componentOperation:

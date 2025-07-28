@@ -66,6 +66,13 @@
             <version>3.0.0-snapshot.2</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- vault spring cloud -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-vault-config</artifactId>
+            <version>4.1.2</version>
+        </dependency>
     </dependencies>
 
 </project>

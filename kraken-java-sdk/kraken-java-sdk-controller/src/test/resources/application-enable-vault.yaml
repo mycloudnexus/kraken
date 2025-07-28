@@ -1,0 +1,16 @@
+app:
+  mgmt:
+    token-storage:
+      enabled: true
+      engine: vault
+    vault:
+      namespace: secret/data
+spring:
+  cloud:
+    vault:
+      uri: http://localhost:8200
+      authentication: TOKEN
+      token: ${VAULT_ACCESS_TOKEN:mock-token}
+      enabled: true
+      reactive:
+        enabled: false

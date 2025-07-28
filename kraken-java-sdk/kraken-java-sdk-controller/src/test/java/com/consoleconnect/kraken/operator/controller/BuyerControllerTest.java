@@ -7,8 +7,11 @@ import static org.hamcrest.Matchers.*;
 import com.consoleconnect.kraken.operator.config.TestApplication;
 import com.consoleconnect.kraken.operator.controller.dto.BuyerAssetDto;
 import com.consoleconnect.kraken.operator.controller.dto.CreateBuyerRequest;
+import com.consoleconnect.kraken.operator.controller.entity.TokenStorageEntity;
 import com.consoleconnect.kraken.operator.controller.model.Environment;
+import com.consoleconnect.kraken.operator.controller.repo.TokenStorageRepository;
 import com.consoleconnect.kraken.operator.controller.service.EnvironmentService;
+import com.consoleconnect.kraken.operator.controller.service.TokenStorageService;
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
@@ -21,10 +24,7 @@ import com.consoleconnect.kraken.operator.test.MockIntegrationTest;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -36,12 +36,14 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @MockIntegrationTest
 @ContextConfiguration(classes = {TestApplication.class})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@ActiveProfiles("test-rs256")
+@ActiveProfiles({"test-rs256", "enable-postgres"})
 class BuyerControllerTest extends AbstractIntegrationTest implements EnvCreator, BuyerCreator {
 
   @Getter private final WebTestClientHelper webTestClient;
   @Autowired private UnifiedAssetService unifiedAssetService;
   @Getter @Autowired EnvironmentService environmentService;
+  @Autowired private TokenStorageRepository tokenStorageRepository;
+  @Autowired private TokenStorageService tokenStorageService;
 
   @Autowired
   public BuyerControllerTest(WebTestClient webTestClient) {
@@ -67,6 +69,27 @@ class BuyerControllerTest extends AbstractIntegrationTest implements EnvCreator,
           assertThat(bodyStr, hasJsonPath("$.data", notNullValue()));
           assertThat(bodyStr, hasJsonPath("$.data.buyerToken", notNullValue()));
           assertThat(bodyStr, hasJsonPath("$.data.buyerToken.accessToken", notNullValue()));
+
+          TokenStorageEntity entity =
+              tokenStorageRepository.findFirstByAssetId(buyerCreated.getId());
+          Assertions.assertNotNull(entity.getToken());
+          BuyerAssetDto.BuyerToken buyerToken =
+              tokenStorageService.readSecret(buyerCreated.getId());
+          Assertions.assertNotNull(buyerToken.getAccessToken());
+        });
+  }
+
+  @Test
+  @Order(2)
+  void givenNoneExistBuyer_whenRead_thenReturnError() {
+    String readTokenUrl = BUYER_BASE_URL + "/" + BUYER_ID + "/token";
+    webTestClient.requestAndVerify(
+        HttpMethod.GET,
+        uriBuilder -> uriBuilder.path(readTokenUrl).build(),
+        HttpStatus.NOT_FOUND.value(),
+        null,
+        bodyStr -> {
+          assertThat(bodyStr, hasJsonPath("$.code", is("notFound")));
         });
   }
 

@@ -10,6 +10,7 @@ import com.consoleconnect.kraken.operator.controller.dto.CreateBuyerRequest;
 import com.consoleconnect.kraken.operator.controller.mapper.BuyerAssetDtoMapper;
 import com.consoleconnect.kraken.operator.controller.model.Environment;
 import com.consoleconnect.kraken.operator.controller.model.MgmtProperty;
+import com.consoleconnect.kraken.operator.controller.model.TokenStorageEnabled;
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
@@ -53,6 +54,8 @@ public class BuyerService extends AssetStatusManager {
   private final AuthDataProperty.AuthServer authServer;
   private final MgmtProperty appProperty;
   private final EnvironmentService environmentService;
+  private final TokenStorageService tokenStorageService;
+  private final TokenStorageEnabled tokenStorageEnabled;
 
   @Transactional
   public BuyerAssetDto create(String productId, CreateBuyerRequest buyerOnboard, String createdBy) {
@@ -89,8 +92,14 @@ public class BuyerService extends AssetStatusManager {
 
     UnifiedAssetDto buyerCreated =
         unifiedAssetService.findOne(syncResult.getData().getId().toString());
-    return generateBuyer(
-        buyerCreated, buyerOnboard.getBuyerId(), buyerOnboard.getTokenExpiredInSeconds());
+    BuyerAssetDto buyerAssetDto =
+        generateBuyer(
+            buyerCreated, buyerOnboard.getBuyerId(), buyerOnboard.getTokenExpiredInSeconds());
+    if (tokenStorageEnabled.isEnabled()) {
+      log.info("token storage enabled");
+      tokenStorageService.writeSecret(buyerAssetDto, createdBy);
+    }
+    return buyerAssetDto;
   }
 
   @Transactional(readOnly = true)
@@ -174,6 +183,10 @@ public class BuyerService extends AssetStatusManager {
         .put(LABEL_ISSUE_AT, DateTimeFormatter.ISO_INSTANT.format(Instant.now()));
     SyncMetadata syncMetadata = new SyncMetadata("", "", DateTime.nowInUTCString(), createdBy);
     unifiedAssetService.syncAsset(productId, buyer, syncMetadata, true);
+    if (tokenStorageEnabled.isEnabled()) {
+      log.info("token storage enabled");
+      tokenStorageService.writeSecret(buyerAssetDto, createdBy);
+    }
     return buyerAssetDto;
   }
 
@@ -273,5 +286,12 @@ public class BuyerService extends AssetStatusManager {
 
     afterCompletion(assetDto, createdBy);
     return true;
+  }
+
+  public BuyerAssetDto.BuyerToken readToken(String id) {
+    if (tokenStorageEnabled.isEnabled()) {
+      return tokenStorageService.readSecret(id);
+    }
+    throw KrakenException.forbidden("token is not restored, please enable token storage");
   }
 }
