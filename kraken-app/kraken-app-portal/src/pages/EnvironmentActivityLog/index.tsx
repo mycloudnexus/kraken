@@ -1,8 +1,8 @@
 import { PageLayout } from "@/components/Layout";
-import { useGetProductEnvs } from "@/hooks/product";
+import {useGetProductEnvs} from "@/hooks/product";
 import { useGetPushButtonEnabled } from "@/hooks/pushApiEvent";
 import { useAppStore } from "@/stores/app.store";
-import { Button, Flex, Tabs, Input } from "antd";
+import {Button, Flex, Tabs, Input, Select} from "antd";
 import { startCase } from "lodash";
 import { useMemo, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -12,6 +12,8 @@ import EnvironmentActivityTable from "./components/EnvironmentActivityTable";
 import PushHistoryDrawer from "./components/PushHistoryDrawer";
 import PushHistoryList from "./components/PushHistoryList";
 import styles from "./index.module.scss";
+import {ValueType} from "recharts/types/component/DefaultTooltipContent";
+import {getBuyerList} from "@/services/products.ts";
 
 const { Search } = Input;
 
@@ -25,6 +27,7 @@ const EnvironmentActivityLog = () => {
   const [mainTabKey, setMainTabKey] = useState<string>("activityLog");
   const { value: isOpen, setTrue: open, setFalse: close } = useBoolean(false);
   const [pathQuery, setPathQuery] = useState("");
+  const [buyerQuery, setBuyerQuery] = useState("");
 
   const envOptions = useMemo(() => {
     return (
@@ -36,6 +39,8 @@ const EnvironmentActivityLog = () => {
   }, [envData]);
 
   const [modalActivityId, setModalActivityId] = useState<string | undefined>();
+  const [options, setOptions] = useState<ValueType[]>([]);
+  const [value, setValue] = useState<UserValue>();
   const [modalOpen, setModalOpen] = useState(false);
   const isActivityLogActive = useMemo(
     () => mainTabKey === "activityLog",
@@ -56,16 +61,37 @@ const EnvironmentActivityLog = () => {
           <EnvironmentActivityTable
             openActionModal={openActionModal}
             pathQuery={pathQuery}
+            buyerQuery={buyerQuery}
           />
         ),
       })) ?? []
     );
-  }, [envData, pathQuery]);
+  }, [envData, pathQuery, buyerQuery]);
 
   const searchPathQuery = (value: string) => {
     setPathQuery(value);
   };
+    const fetchBuyerList = (buyer: string): Promise<UserValue[]> => {
+        const response = getBuyerList(currentProduct, {page: 0, size: 30, buyerId: buyer});
+        return response.then((res) => res.data?.data).then((res) => {
+            const results = Array.isArray(res) ? res : [];
+            console.log(results)
+            return results.map((item) => ({
+                value: item.facets.buyerInfo.buyerId,
+                label: item.facets.buyerInfo.companyName,
+            }));
+        }).then((newOptions) => setOptions(newOptions));
+    }
 
+  const handleChange = (buyer: UserValue) => {
+      console.log('buyer', buyer)
+      setValue(buyer);
+      setBuyerQuery(buyer?.value ?? '');
+  }
+    interface UserValue {
+        value: string,
+        label: string,
+    }
   return (
     <PageLayout
       title={
@@ -117,12 +143,28 @@ const EnvironmentActivityLog = () => {
                 navigate(`/env/${key}`);
               }}
               tabBarExtraContent={
-                <Search
-                  placeholder="Please copy full path here"
-                  style={{ width: "250px" }}
-                  onSearch={searchPathQuery}
-                  allowClear
-                />
+                  <div>
+                      <Search
+                          placeholder="Please copy full path here"
+                          style={{ width: "250px", marginRight: "20px"}}
+                          onSearch={searchPathQuery}
+                          allowClear
+                      />
+                      <Select
+                          title="select-buyer"
+                          labelInValue
+                          filterOption={false}
+                          style={{ width: "250px"}}
+                          showSearch
+                          onSearch={fetchBuyerList}
+                          onChange={handleChange}
+                          placeholder="Please select buyer"
+                          notFoundContent={'No results found'}
+                          options={options}
+                          autoClearSearchValue
+                          allowClear
+                      />
+                  </div>
               }
             />
           ) : (

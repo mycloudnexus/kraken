@@ -529,7 +529,8 @@ public class UnifiedAssetService implements UUIDWrapper, FacetsMerger {
       List<Tuple2> eqConditions,
       List<Tuple2> labelConditions,
       List<String> tags,
-      List<Tuple2> inConditions) {
+      List<Tuple2> inConditions,
+      List<Tuple2> likeConditions) {
     return (root, query, criteriaBuilder) -> {
       List<Predicate> predicateList = new ArrayList<>();
       if (CollectionUtils.isNotEmpty(eqConditions)) {
@@ -581,7 +582,21 @@ public class UnifiedAssetService implements UUIDWrapper, FacetsMerger {
               predicateList.add(predicate);
             });
       }
-
+      if (CollectionUtils.isNotEmpty(likeConditions)) {
+        likeConditions.stream()
+            .forEach(
+                tuple3 -> {
+                  Predicate predicate =
+                      criteriaBuilder.like(
+                          criteriaBuilder.function(
+                              FUNCTION_JSON_EXTRACT_PATH_TEXT,
+                              String.class,
+                              root.get(AssetsConstants.FIELD_LABELS),
+                              criteriaBuilder.literal(tuple3.field())),
+                          tuple3.value() + "%");
+                  predicateList.add(predicate);
+                });
+      }
       if (CollectionUtils.isNotEmpty(tags)) {
         Expression<Object> cast =
             criteriaBuilder.function("jsonb", Object.class, root.get(AssetsConstants.FIELD_TAGS));
@@ -618,7 +633,24 @@ public class UnifiedAssetService implements UUIDWrapper, FacetsMerger {
       pageable = PageRequest.of(0, 20);
     }
     Specification<UnifiedAssetEntity> specification =
-        generateSpecification(eqConditions, labelConditions, tags, inConditions);
+        generateSpecification(eqConditions, labelConditions, tags, inConditions, new ArrayList<>());
+    return PagingHelper.toPaging(
+        assetRepository.findAll(specification, pageable), t -> toAsset(t, true));
+  }
+
+  @Transactional(readOnly = true)
+  public Paging<UnifiedAssetDto> findBySpecification(
+      List<Tuple2> eqConditions,
+      List<Tuple2> labelConditions,
+      List<String> tags,
+      Pageable pageable,
+      List<Tuple2> inConditions,
+      List<Tuple2> likeConditions) {
+    if (pageable == null) {
+      pageable = PageRequest.of(0, 20);
+    }
+    Specification<UnifiedAssetEntity> specification =
+        generateSpecification(eqConditions, labelConditions, tags, inConditions, likeConditions);
     return PagingHelper.toPaging(
         assetRepository.findAll(specification, pageable), t -> toAsset(t, true));
   }

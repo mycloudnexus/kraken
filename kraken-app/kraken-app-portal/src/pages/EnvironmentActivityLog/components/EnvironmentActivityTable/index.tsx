@@ -28,6 +28,7 @@ import styles from "../../index.module.scss";
 type EnvironmentActivityTablePropsType = {
   openActionModal: (requestId: string) => void;
   pathQuery: string;
+  buyerQuery: string
 };
 
 const initPagination = {
@@ -138,7 +139,7 @@ const getStatusCodeWithIcon = (statusCode: number) => {
 };
 
 const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
-  const { openActionModal, pathQuery } = props;
+  const { openActionModal, pathQuery, buyerQuery } = props;
   const { currentProduct } = useAppStore();
   const { envId } = useParams();
   const [dates, setDates] = useState<[Dayjs | null, Dayjs | null] | null>(null);
@@ -352,8 +353,9 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
     setQueryParams({
       ...queryParams,
       path: pathQuery,
+      buyer: buyerQuery,
     });
-  }, [pathQuery]);
+  }, [pathQuery, buyerQuery]);
 
   const handleTableChange: TableProps<IActivityLog>["onChange"] = (
     pagination,
