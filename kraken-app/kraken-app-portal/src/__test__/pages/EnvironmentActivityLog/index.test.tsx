@@ -100,5 +100,5 @@ test("EnvironmentActivityLog page", () => {
   );
   expect(container).toBeInTheDocument();
   const selectInput = screen.getByTitle('select-buyer');
-  fireEvent.change(selectInput, {target: {value: 'test'}})
+  fireEvent.change(selectInput, {target: {option: {label: 'test', value: 'test'}}})
 });
