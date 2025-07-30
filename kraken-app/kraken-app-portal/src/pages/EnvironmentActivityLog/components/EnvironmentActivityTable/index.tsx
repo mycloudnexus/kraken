@@ -162,6 +162,7 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
     envId: queryParams?.envId || String(envId),
     params: omit(queryParams, ["envId"]),
   };
+
   const { data, isLoading } = useGetProductEnvActivities(
       envActivityParams.productId,
       envActivityParams.envId,
@@ -314,9 +315,7 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
           setIsTimeFiltered,
         }),
       filterIcon: isTimeFiltered ? (
-        <FilterFilled style={{
-          color: "#1677ff"
-        }} />
+        <FilterFilled style={{ color: "#1677ff" }} />
       ) : (
         <FilterFilled />
       ),
@@ -329,11 +328,9 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
       render: (log: IActivityLog) => (
         <Button
           type="link"
-          onClick={
-            () => {
-              openActionModal(log.requestId);
-            }
-          }
+          onClick={() => {
+            openActionModal(log.requestId);
+          }}
         >
           View details
         </Button>
@@ -399,12 +396,14 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
         showTotal: (total) => `Total ${total} items`,
         showQuickJumper: true,
       }}
-      scroll={{
-        y: 640,
-        x: "max-content",
-        scrollToFirstRowOnChange: false,
-      }}
       onChange={handleTableChange}
+      scroll={
+        {
+          scrollToFirstRowOnChange: false,
+          x: "max-content",
+          y: 640,
+        }
+      }
     />
   );
 };
