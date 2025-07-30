@@ -103,27 +103,27 @@ const EnvironmentActivityLog = () => {
     <PageLayout
       title={
         <Flex
-          align="center"
+          style={
+                { width: "100%" }
+            }
           justify="space-between"
           vertical={false}
-          style={
-            { width: "100%" }
-          }
+          align="center"
         >
           <Tabs
+            items={[
+                  {
+                      label: "Activity log",
+                      key: "activityLog",
+                  },
+                  {
+                      label: "Push history",
+                      key: "pushHistory",
+                  },
+              ]}
+            onChange={setMainTabKey}
             activeKey={mainTabKey}
             hideAdd
-            onChange={setMainTabKey}
-            items={[
-              {
-                label: "Activity log",
-                key: "activityLog",
-              },
-              {
-                label: "Push history",
-                key: "pushHistory",
-              },
-            ]}
           />
           {isActivityLogActive && !!isPushButtonEnabledResponse?.enabled && (
             <Button type="primary" onClick={open}>
@@ -146,9 +146,11 @@ const EnvironmentActivityLog = () => {
           {isActivityLogActive ? (
             <Tabs
               items={envTabs}
-              onChange={(key) => {
+              onChange={
+                (key) => {
                   navigate(`/env/${key}`);
-              }}
+                }
+              }
               activeKey={envId}
               type="card"
               tabBarExtraContent={
@@ -156,7 +158,9 @@ const EnvironmentActivityLog = () => {
                       <Search
                           placeholder="Please copy full path here"
                           style={
-                            { width: "250px", marginRight: "20px"}
+                            { width: "250px",
+                              marginRight: "20px"
+                            }
                           }
                           onSearch={searchPathQuery}
                           allowClear
@@ -197,9 +201,9 @@ const EnvironmentActivityLog = () => {
       </div>
 
       <ActivityDetailModal
-        envId={String(envId)}
-        activityId={modalActivityId ?? ""}
         open={modalOpen}
+        activityId={modalActivityId ?? ""}
+        envId={String(envId)}
         setOpen={(value) => setModalOpen(value)}
       />
     </PageLayout>
