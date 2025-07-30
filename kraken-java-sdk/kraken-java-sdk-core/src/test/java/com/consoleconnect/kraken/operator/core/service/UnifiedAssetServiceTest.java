@@ -117,8 +117,12 @@ class UnifiedAssetServiceTest extends AbstractIntegrationTest {
     PageRequest pageRequest =
         PageRequest.of(0, 1, Sort.Direction.DESC, AssetsConstants.FIELD_CREATE_AT);
     Paging<UnifiedAssetDto> assetDtoPaging =
+        unifiedAssetService.findBySpecification(
+            tuple2List, tuple3List, tags, null, null, tuple3List);
+    Paging<UnifiedAssetDto> assetDtoPaging1 =
         unifiedAssetService.findBySpecification(tuple2List, tuple3List, tags, pageRequest, null);
     assertThat(assetDtoPaging.getData(), hasSize(0));
+    assertThat(assetDtoPaging1.getData(), hasSize(0));
   }
 
   @Test

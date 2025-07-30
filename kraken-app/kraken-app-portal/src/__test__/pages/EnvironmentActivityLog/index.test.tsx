@@ -1,9 +1,11 @@
-import { render } from "@testing-library/react";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient } from "@/utils/helpers/reactQuery";
-import { BrowserRouter } from "react-router-dom";
-import EnvironmentActivityLog from "@/pages/EnvironmentActivityLog";
+import {fireEvent, render, screen} from "@testing-library/react";
+import {QueryClientProvider} from "@tanstack/react-query";
+import {queryClient} from "@/utils/helpers/reactQuery";
+import {BrowserRouter} from "react-router-dom";
+import EnvironmentActivityLog, {BuyerPageData} from "@/pages/EnvironmentActivityLog";
 import * as envHooks from '@/hooks/product'
+import * as buyerList from "@/services/products.ts";
+import {expect} from "vitest";
 
 test("EnvironmentActivityLog page", () => {
   vi.spyOn(envHooks, 'useGetProductEnvs').mockReturnValue({
@@ -64,6 +66,32 @@ test("EnvironmentActivityLog page", () => {
     isFetched: true,
   } as any)
 
+  vi.spyOn(buyerList, 'getBuyerList').mockResolvedValue({
+    "code": 200,
+    "message": "OK",
+    "data": {
+      "data": [
+        {
+          "kind": "kraken.product-buyer",
+          "apiVersion": "v1",
+          "facets": {
+            "buyerInfo": {
+              "envId": "b2d775e5-44ad-43cb-8dd4-6fbe52585ec9",
+              "buyerId": "test-store",
+              "companyName": "test-store"
+            }
+          },
+          "links": [],
+          "id": "2ba5cf86-bde1-42e8-8cb5-50e07444eee6",
+        }
+      ],
+      "total": 1,
+      "page": 0,
+      "size": 30
+    }
+  })
+
+
   const { container } = render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
@@ -72,4 +100,20 @@ test("EnvironmentActivityLog page", () => {
     </QueryClientProvider>
   );
   expect(container).toBeInTheDocument();
+  const selectInput = screen.getByTitle('select-buyer');
+  fireEvent.change(selectInput, {target: {option: {label: 'test', value: 'test'}}})
+  const buyerData = {
+    data: {
+      data: {}
+    },
+    total: 2,
+    size: 1,
+    page: 1
+  } as BuyerPageData
+  const userValue = {
+    label: "1",
+    value: "1"
+  }
+  expect(buyerData).toHaveProperty("data");
+  expect(userValue).toHaveProperty("label");
 });

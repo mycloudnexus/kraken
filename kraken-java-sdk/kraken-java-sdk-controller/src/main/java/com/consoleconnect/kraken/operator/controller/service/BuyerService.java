@@ -125,11 +125,12 @@ public class BuyerService extends AssetStatusManager {
       eqConditions.add(Tuple2.of("status", status));
     }
     List<Tuple2> labelConditions = new ArrayList<>();
+    List<Tuple2> likeConditions = new ArrayList<>();
     if (StringUtils.isNotBlank(envId)) {
       labelConditions.add(Tuple2.of(LABEL_ENV_ID, envId));
     }
     if (StringUtils.isNotBlank(buyerId)) {
-      labelConditions.add(Tuple2.of(LABEL_BUYER_ID, buyerId));
+      likeConditions.add(Tuple2.of(LABEL_BUYER_ID, buyerId));
     }
     if (StringUtils.isNotBlank(orderBy)) {
       pageRequest =
@@ -137,7 +138,7 @@ public class BuyerService extends AssetStatusManager {
               pageRequest.getPageNumber(), pageRequest.getPageSize(), Sort.Direction.DESC, orderBy);
     }
     return unifiedAssetService.findBySpecification(
-        eqConditions, labelConditions, null, pageRequest, null);
+        eqConditions, labelConditions, null, pageRequest, null, likeConditions);
   }
 
   @Transactional(readOnly = true)

@@ -122,7 +122,6 @@ test("PushHistoryList", () => {
     isFetching: false,
     isFetched: true,
   } as any);
-
   const { container } = render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>

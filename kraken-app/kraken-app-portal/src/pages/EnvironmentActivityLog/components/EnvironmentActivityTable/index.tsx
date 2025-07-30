@@ -28,6 +28,7 @@ import styles from "../../index.module.scss";
 type EnvironmentActivityTablePropsType = {
   openActionModal: (requestId: string) => void;
   pathQuery: string;
+  buyerQuery: string
 };
 
 const initPagination = {
@@ -51,7 +52,9 @@ const TimeFilter = ({
   setIsTimeFiltered: Dispatch<SetStateAction<boolean>>;
 }) => {
   return (
-    <div style={{ padding: "8px" }}>
+    <div style={
+      { padding: "8px" }
+    }>
       <Flex vertical>
         <Button
           type="text"
@@ -138,7 +141,7 @@ const getStatusCodeWithIcon = (statusCode: number) => {
 };
 
 const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
-  const { openActionModal, pathQuery } = props;
+  const { openActionModal, pathQuery, buyerQuery } = props;
   const { currentProduct } = useAppStore();
   const { envId } = useParams();
   const [dates, setDates] = useState<[Dayjs | null, Dayjs | null] | null>(null);
@@ -161,9 +164,9 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
   };
 
   const { data, isLoading } = useGetProductEnvActivities(
-    envActivityParams.productId,
-    envActivityParams.envId,
-    envActivityParams.params
+      envActivityParams.productId,
+      envActivityParams.envId,
+      envActivityParams.params
   );
 
   const { data: productTypes } = useGetProductTypes(currentProduct);
@@ -352,8 +355,9 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
     setQueryParams({
       ...queryParams,
       path: pathQuery,
+      buyer: buyerQuery,
     });
-  }, [pathQuery]);
+  }, [pathQuery, buyerQuery]);
 
   const handleTableChange: TableProps<IActivityLog>["onChange"] = (
     pagination,
@@ -376,8 +380,9 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
           dayjs(b.createdAt).valueOf() - dayjs(a.createdAt).valueOf()
       )}
       columns={columns}
-      rowKey={(record) =>
-        `${record.method}_${record.requestId}_${record.createdAt}`
+      rowKey={
+        (record) =>
+          `${record.method}_${record.requestId}_${record.createdAt}`
       }
       loading={isLoading}
       className={styles.table}
@@ -391,12 +396,14 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
         showTotal: (total) => `Total ${total} items`,
         showQuickJumper: true,
       }}
-      scroll={{
-        y: 640,
-        x: "max-content",
-        scrollToFirstRowOnChange: false,
-      }}
       onChange={handleTableChange}
+      scroll={
+        {
+          scrollToFirstRowOnChange: false,
+          x: "max-content",
+          y: 640,
+        }
+      }
     />
   );
 };

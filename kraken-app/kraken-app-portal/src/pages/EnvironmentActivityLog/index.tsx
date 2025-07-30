@@ -1,8 +1,8 @@
 import { PageLayout } from "@/components/Layout";
-import { useGetProductEnvs } from "@/hooks/product";
+import {useGetProductEnvs} from "@/hooks/product";
 import { useGetPushButtonEnabled } from "@/hooks/pushApiEvent";
 import { useAppStore } from "@/stores/app.store";
-import { Button, Flex, Tabs, Input } from "antd";
+import {Button, Flex, Tabs, Input, Select} from "antd";
 import { startCase } from "lodash";
 import { useMemo, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -12,8 +12,22 @@ import EnvironmentActivityTable from "./components/EnvironmentActivityTable";
 import PushHistoryDrawer from "./components/PushHistoryDrawer";
 import PushHistoryList from "./components/PushHistoryList";
 import styles from "./index.module.scss";
+import {getBuyerList} from "@/services/products.ts";
 
 const { Search } = Input;
+
+export type UserValue = {
+    value: string,
+    label: string,
+}
+export type BuyerPageData = {
+    data: {
+        data: unknown;
+    },
+    total: number,
+    page: number,
+    size: number,
+}
 
 const EnvironmentActivityLog = () => {
   const { envId } = useParams();
@@ -25,6 +39,7 @@ const EnvironmentActivityLog = () => {
   const [mainTabKey, setMainTabKey] = useState<string>("activityLog");
   const { value: isOpen, setTrue: open, setFalse: close } = useBoolean(false);
   const [pathQuery, setPathQuery] = useState("");
+  const [buyerQuery, setBuyerQuery] = useState("");
 
   const envOptions = useMemo(() => {
     return (
@@ -36,6 +51,8 @@ const EnvironmentActivityLog = () => {
   }, [envData]);
 
   const [modalActivityId, setModalActivityId] = useState<string | undefined>();
+  const [options, setOptions] = useState<UserValue[]>([]);
+  const [value, setValue] = useState<UserValue>();
   const [modalOpen, setModalOpen] = useState(false);
   const isActivityLogActive = useMemo(
     () => mainTabKey === "activityLog",
@@ -56,39 +73,57 @@ const EnvironmentActivityLog = () => {
           <EnvironmentActivityTable
             openActionModal={openActionModal}
             pathQuery={pathQuery}
+            buyerQuery={buyerQuery}
           />
         ),
       })) ?? []
     );
-  }, [envData, pathQuery]);
+  }, [envData, pathQuery, buyerQuery]);
 
   const searchPathQuery = (value: string) => {
     setPathQuery(value);
   };
+  const fetchBuyerList = (buyer: string): Promise<UserValue[] | void> => {
+        console.log(value)
+        const response: Promise<BuyerPageData> = getBuyerList(currentProduct, {page: 0, size: 30, buyerId: buyer});
+        return response.then((res) => res?.data?.data).then((res) => {
+            const results = Array.isArray(res) ? res : [];
+            return results.map((item) => ({
+                value: item.facets.buyerInfo.buyerId,
+                label: item.facets.buyerInfo.companyName,
+            } as UserValue));
+        }).then((newOptions) => setOptions(newOptions));
+    }
 
+  const handleChange = (buyer: UserValue) => {
+      setValue(buyer);
+      setBuyerQuery(buyer?.value ?? '');
+  }
   return (
     <PageLayout
       title={
         <Flex
-          align="center"
+          style={
+                { width: "100%" }
+            }
           justify="space-between"
           vertical={false}
-          style={{ width: "100%" }}
+          align="center"
         >
           <Tabs
+            items={[
+                  {
+                      label: "Activity log",
+                      key: "activityLog",
+                  },
+                  {
+                      label: "Push history",
+                      key: "pushHistory",
+                  },
+              ]}
+            onChange={setMainTabKey}
             activeKey={mainTabKey}
             hideAdd
-            onChange={setMainTabKey}
-            items={[
-              {
-                label: "Activity log",
-                key: "activityLog",
-              },
-              {
-                label: "Push history",
-                key: "pushHistory",
-              },
-            ]}
           />
           {isActivityLogActive && !!isPushButtonEnabledResponse?.enabled && (
             <Button type="primary" onClick={open}>
@@ -110,19 +145,53 @@ const EnvironmentActivityLog = () => {
         <div className={styles.tableWrapper}>
           {isActivityLogActive ? (
             <Tabs
-              type="card"
-              activeKey={envId}
               items={envTabs}
-              onChange={(key) => {
-                navigate(`/env/${key}`);
-              }}
+              onChange={
+                (key) => {
+                  navigate(`/env/${key}`);
+                }
+              }
+              activeKey={envId}
+              type="card"
               tabBarExtraContent={
-                <Search
-                  placeholder="Please copy full path here"
-                  style={{ width: "250px" }}
-                  onSearch={searchPathQuery}
-                  allowClear
-                />
+                  <div>
+                      <Search
+                          placeholder="Please copy full path here"
+                          style={
+                            { width: "250px",
+                              marginRight: "20px"
+                            }
+                          }
+                          onSearch={searchPathQuery}
+                          allowClear
+                      />
+                      <Select
+                          id = "select-buyer"
+                          title="select-buyer"
+                          disabled={false}
+                          labelInValue
+                          filterOption={false}
+                          style={
+                            { width: "250px"
+                            }
+                          }
+                          showSearch
+                          onSearch={
+                            fetchBuyerList
+                          }
+                          onChange={handleChange}
+                          placeholder="Please select buyer"
+                          notFoundContent={
+                           'No results found'
+                          }
+                          options={
+                            options
+                          }
+                          autoClearSearchValue
+                          allowClear
+                          defaultActiveFirstOption={true}
+                      />
+                  </div>
               }
             />
           ) : (
@@ -132,9 +201,9 @@ const EnvironmentActivityLog = () => {
       </div>
 
       <ActivityDetailModal
-        envId={String(envId)}
-        activityId={modalActivityId ?? ""}
         open={modalOpen}
+        activityId={modalActivityId ?? ""}
+        envId={String(envId)}
         setOpen={(value) => setModalOpen(value)}
       />
     </PageLayout>
