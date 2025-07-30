@@ -52,7 +52,9 @@ const TimeFilter = ({
   setIsTimeFiltered: Dispatch<SetStateAction<boolean>>;
 }) => {
   return (
-    <div style={{ padding: "8px" }}>
+    <div style={
+      { padding: "8px" }
+    }>
       <Flex vertical>
         <Button
           type="text"
@@ -155,7 +157,11 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
     handlePaginationShowSizeChange,
   } = useCommonListProps({}, initPagination);
 
-
+  const envActivityParams = {
+    productId: currentProduct,
+    envId: queryParams?.envId || String(envId),
+    params: omit(queryParams, ["envId"]),
+  };
   const { data, isLoading } = useGetProductEnvActivities(
       envActivityParams.productId,
       envActivityParams.envId,
@@ -163,12 +169,6 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
   );
 
   const { data: productTypes } = useGetProductTypes(currentProduct);
-
-  const envActivityParams = {
-    productId: currentProduct,
-    envId: queryParams?.envId || String(envId),
-    params: omit(queryParams, ["envId"]),
-  };
 
   const methodOptions = [
     {
@@ -329,9 +329,11 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
       render: (log: IActivityLog) => (
         <Button
           type="link"
-          onClick={() => {
-            openActionModal(log.requestId);
-          }}
+          onClick={
+            () => {
+              openActionModal(log.requestId);
+            }
+          }
         >
           View details
         </Button>
@@ -381,8 +383,9 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
           dayjs(b.createdAt).valueOf() - dayjs(a.createdAt).valueOf()
       )}
       columns={columns}
-      rowKey={(record) =>
-        `${record.method}_${record.requestId}_${record.createdAt}`
+      rowKey={
+        (record) =>
+          `${record.method}_${record.requestId}_${record.createdAt}`
       }
       loading={isLoading}
       className={styles.table}
