@@ -4,13 +4,11 @@ import { queryClient } from "@/utils/helpers/reactQuery";
 import { QueryClientProvider } from "@tanstack/react-query";
 import {
   fireEvent,
-  getByPlaceholderText,
   render,
   screen,
   waitFor
 } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
-import * as buyerList from "@/services/products.ts";
 
 test("PushHistoryList", () => {
   vi.spyOn(pushHistoryHook, "useGetPushActivityLogHistory").mockReturnValue({

@@ -12,7 +12,6 @@ import EnvironmentActivityTable from "./components/EnvironmentActivityTable";
 import PushHistoryDrawer from "./components/PushHistoryDrawer";
 import PushHistoryList from "./components/PushHistoryList";
 import styles from "./index.module.scss";
-import {ValueType} from "recharts/types/component/DefaultTooltipContent";
 import {getBuyerList} from "@/services/products.ts";
 
 const { Search } = Input;
@@ -39,7 +38,7 @@ const EnvironmentActivityLog = () => {
   }, [envData]);
 
   const [modalActivityId, setModalActivityId] = useState<string | undefined>();
-  const [options, setOptions] = useState<ValueType[]>([]);
+  const [options, setOptions] = useState<UserValue[]>([]);
   const [value, setValue] = useState<UserValue>();
   const [modalOpen, setModalOpen] = useState(false);
   const isActivityLogActive = useMemo(
@@ -71,20 +70,19 @@ const EnvironmentActivityLog = () => {
   const searchPathQuery = (value: string) => {
     setPathQuery(value);
   };
-    const fetchBuyerList = (buyer: string): Promise<UserValue[]> => {
-        const response = getBuyerList(currentProduct, {page: 0, size: 30, buyerId: buyer});
-        return response.then((res) => res.data?.data).then((res) => {
+    const fetchBuyerList = (buyer: string): Promise<UserValue[] | void> => {
+        console.log(value)
+        const response: Promise<{data: {data: unknown}}> = getBuyerList(currentProduct, {page: 0, size: 30, buyerId: buyer});
+        return response.then((res) => res?.data?.data).then((res) => {
             const results = Array.isArray(res) ? res : [];
-            console.log(results)
             return results.map((item) => ({
                 value: item.facets.buyerInfo.buyerId,
                 label: item.facets.buyerInfo.companyName,
-            }));
+            } as UserValue));
         }).then((newOptions) => setOptions(newOptions));
     }
 
   const handleChange = (buyer: UserValue) => {
-      console.log('buyer', buyer)
       setValue(buyer);
       setBuyerQuery(buyer?.value ?? '');
   }

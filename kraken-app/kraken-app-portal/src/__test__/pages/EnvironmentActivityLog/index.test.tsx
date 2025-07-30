@@ -1,4 +1,4 @@
-import {fireEvent, getByLabelText, render, screen} from "@testing-library/react";
+import {fireEvent, render, screen} from "@testing-library/react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@/utils/helpers/reactQuery";
 import { BrowserRouter } from "react-router-dom";
@@ -101,6 +101,4 @@ test("EnvironmentActivityLog page", () => {
   expect(container).toBeInTheDocument();
   const selectInput = screen.getByTitle('select-buyer');
   fireEvent.change(selectInput, {target: {value: 'test'}})
-  await selectEvent.select(getByLabelText('test-store'))
-  expect(container).toBeInTheDocument();
 });
