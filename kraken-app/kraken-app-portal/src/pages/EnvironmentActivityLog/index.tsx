@@ -164,7 +164,7 @@ const EnvironmentActivityLog = () => {
                       <Select
                           id = "select-buyer"
                           title="select-buyer"
-                          disabled=false
+                          disabled={false}
                           labelInValue
                           filterOption={false}
                           style={
@@ -185,7 +185,7 @@ const EnvironmentActivityLog = () => {
                           }
                           autoClearSearchValue
                           allowClear
-                          defaultActiveFirstOption=true
+                          defaultActiveFirstOption={true}
                       />
                   </div>
               }
