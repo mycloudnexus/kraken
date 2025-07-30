@@ -16,6 +16,19 @@ import {getBuyerList} from "@/services/products.ts";
 
 const { Search } = Input;
 
+export type UserValue = {
+    value: string,
+    label: string,
+}
+export type BuyerPageData = {
+    data: {
+        data: unknown;
+    },
+    total: number,
+    page: number,
+    size: number,
+}
+
 const EnvironmentActivityLog = () => {
   const { envId } = useParams();
   const { currentProduct } = useAppStore();
@@ -70,9 +83,9 @@ const EnvironmentActivityLog = () => {
   const searchPathQuery = (value: string) => {
     setPathQuery(value);
   };
-    const fetchBuyerList = (buyer: string): Promise<UserValue[] | void> => {
+  const fetchBuyerList = (buyer: string): Promise<UserValue[] | void> => {
         console.log(value)
-        const response: Promise<{data: {data: unknown}}> = getBuyerList(currentProduct, {page: 0, size: 30, buyerId: buyer});
+        const response: Promise<BuyerPageData> = getBuyerList(currentProduct, {page: 0, size: 30, buyerId: buyer});
         return response.then((res) => res?.data?.data).then((res) => {
             const results = Array.isArray(res) ? res : [];
             return results.map((item) => ({
@@ -86,10 +99,6 @@ const EnvironmentActivityLog = () => {
       setValue(buyer);
       setBuyerQuery(buyer?.value ?? '');
   }
-    interface UserValue {
-        value: string,
-        label: string,
-    }
   return (
     <PageLayout
       title={
@@ -149,6 +158,7 @@ const EnvironmentActivityLog = () => {
                           allowClear
                       />
                       <Select
+                          id = "select-buyer"
                           title="select-buyer"
                           labelInValue
                           filterOption={false}

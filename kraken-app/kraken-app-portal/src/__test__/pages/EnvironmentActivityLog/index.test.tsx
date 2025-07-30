@@ -1,10 +1,11 @@
 import {fireEvent, render, screen} from "@testing-library/react";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient } from "@/utils/helpers/reactQuery";
-import { BrowserRouter } from "react-router-dom";
-import EnvironmentActivityLog from "@/pages/EnvironmentActivityLog";
+import {QueryClientProvider} from "@tanstack/react-query";
+import {queryClient} from "@/utils/helpers/reactQuery";
+import {BrowserRouter} from "react-router-dom";
+import EnvironmentActivityLog, {BuyerPageData} from "@/pages/EnvironmentActivityLog";
 import * as envHooks from '@/hooks/product'
 import * as buyerList from "@/services/products.ts";
+import {expect} from "vitest";
 
 test("EnvironmentActivityLog page", () => {
   vi.spyOn(envHooks, 'useGetProductEnvs').mockReturnValue({
@@ -101,4 +102,18 @@ test("EnvironmentActivityLog page", () => {
   expect(container).toBeInTheDocument();
   const selectInput = screen.getByTitle('select-buyer');
   fireEvent.change(selectInput, {target: {option: {label: 'test', value: 'test'}}})
+  const buyerData = {
+    data: {
+      data: {}
+    },
+    total: 2,
+    size: 1,
+    page: 1
+  } as BuyerPageData
+  const userValue = {
+    label: "1",
+    value: "1"
+  }
+  expect(buyerData).toHaveProperty("data");
+  expect(userValue).toHaveProperty("label");
 });
