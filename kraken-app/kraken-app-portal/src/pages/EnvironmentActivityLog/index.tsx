@@ -145,12 +145,12 @@ const EnvironmentActivityLog = () => {
         <div className={styles.tableWrapper}>
           {isActivityLogActive ? (
             <Tabs
-              type="card"
-              activeKey={envId}
               items={envTabs}
               onChange={(key) => {
-                navigate(`/env/${key}`);
+                  navigate(`/env/${key}`);
               }}
+              activeKey={envId}
+              type="card"
               tabBarExtraContent={
                   <div>
                       <Search
@@ -164,13 +164,17 @@ const EnvironmentActivityLog = () => {
                       <Select
                           id = "select-buyer"
                           title="select-buyer"
+                          disabled=false
                           labelInValue
                           filterOption={false}
                           style={
-                            { width: "250px"}
+                            { width: "250px"
+                            }
                           }
                           showSearch
-                          onSearch={fetchBuyerList}
+                          onSearch={
+                            fetchBuyerList
+                          }
                           onChange={handleChange}
                           placeholder="Please select buyer"
                           notFoundContent={
@@ -181,6 +185,7 @@ const EnvironmentActivityLog = () => {
                           }
                           autoClearSearchValue
                           allowClear
+                          defaultActiveFirstOption=true
                       />
                   </div>
               }
