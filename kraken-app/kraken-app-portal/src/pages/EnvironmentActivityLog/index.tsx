@@ -106,7 +106,9 @@ const EnvironmentActivityLog = () => {
           align="center"
           justify="space-between"
           vertical={false}
-          style={{ width: "100%" }}
+          style={
+            { width: "100%" }
+          }
         >
           <Tabs
             activeKey={mainTabKey}
@@ -153,7 +155,9 @@ const EnvironmentActivityLog = () => {
                   <div>
                       <Search
                           placeholder="Please copy full path here"
-                          style={{ width: "250px", marginRight: "20px"}}
+                          style={
+                            { width: "250px", marginRight: "20px"}
+                          }
                           onSearch={searchPathQuery}
                           allowClear
                       />
@@ -162,13 +166,19 @@ const EnvironmentActivityLog = () => {
                           title="select-buyer"
                           labelInValue
                           filterOption={false}
-                          style={{ width: "250px"}}
+                          style={
+                            { width: "250px"}
+                          }
                           showSearch
                           onSearch={fetchBuyerList}
                           onChange={handleChange}
                           placeholder="Please select buyer"
-                          notFoundContent={'No results found'}
-                          options={options}
+                          notFoundContent={
+                           'No results found'
+                          }
+                          options={
+                            options
+                          }
                           autoClearSearchValue
                           allowClear
                       />
