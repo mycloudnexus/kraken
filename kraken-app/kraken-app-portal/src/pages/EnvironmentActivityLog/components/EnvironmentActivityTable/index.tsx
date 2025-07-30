@@ -155,19 +155,20 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
     handlePaginationShowSizeChange,
   } = useCommonListProps({}, initPagination);
 
+
+  const { data, isLoading } = useGetProductEnvActivities(
+      envActivityParams.productId,
+      envActivityParams.envId,
+      envActivityParams.params
+  );
+
+  const { data: productTypes } = useGetProductTypes(currentProduct);
+
   const envActivityParams = {
     productId: currentProduct,
     envId: queryParams?.envId || String(envId),
     params: omit(queryParams, ["envId"]),
   };
-
-  const { data, isLoading } = useGetProductEnvActivities(
-    envActivityParams.productId,
-    envActivityParams.envId,
-    envActivityParams.params
-  );
-
-  const { data: productTypes } = useGetProductTypes(currentProduct);
 
   const methodOptions = [
     {
@@ -313,7 +314,9 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
           setIsTimeFiltered,
         }),
       filterIcon: isTimeFiltered ? (
-        <FilterFilled style={{ color: "#1677ff" }} />
+        <FilterFilled style={{
+          color: "#1677ff"
+        }} />
       ) : (
         <FilterFilled />
       ),
