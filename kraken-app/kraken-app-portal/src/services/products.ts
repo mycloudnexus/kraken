@@ -418,6 +418,12 @@ export const editContactInformation = (
   );
 };
 
+export const retrieveBuyerToken = (productId: string, id: string) => {
+  return request(`${PRODUCT}/${productId}/buyers/${id}/token`, {
+    method: "GET",
+  });
+}
+
 export const getProductTypes = (productId: string) => {
   return request(`${PRODUCT}/${productId}/productTypes`, {
     method: "GET",

@@ -4,7 +4,7 @@ import { queryClient } from "@/utils/helpers/reactQuery";
 import { BrowserRouter } from "react-router-dom";
 import NewBuyerModal from "@/pages/Buyer/components/NewBuyerModal";
 import TokenModal from "@/pages/Buyer/components/TokenModal";
-import { IBuyer } from "@/utils/types/component.type";
+import {IBuyerToken} from "@/utils/types/component.type";
 
 test("Buyer modal", () => {
   const { container } = render(
@@ -30,7 +30,7 @@ test("Token modal", () => {
                 accessToken: "accessToken",
                 expiredAt: "",
               },
-            } as IBuyer
+            } as IBuyerToken
           }
         />
       </BrowserRouter>

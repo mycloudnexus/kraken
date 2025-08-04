@@ -1,5 +1,5 @@
 import { Text } from "@/components/Text";
-import { IBuyer } from "@/utils/types/component.type";
+import {IBuyerToken} from "@/utils/types/component.type";
 import { Flex, Modal, Typography, notification } from "antd";
 import styles from "./index.module.scss";
 import { get } from "lodash";
@@ -8,7 +8,7 @@ import { CopyIcon } from "@/components/Icon";
 type Props = {
   open: boolean;
   onClose: () => void;
-  item: IBuyer;
+  item: IBuyerToken;
 };
 
 const TokenModal = ({ open, onClose, item }: Props) => {

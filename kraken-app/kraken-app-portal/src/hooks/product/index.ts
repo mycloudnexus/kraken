@@ -87,12 +87,14 @@ import {
 import { useMutation, useQuery, useQueries } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { get } from "lodash";
+import {retrieveBuyerToken} from "@/services/products.ts";
 
 export const PRODUCT_CACHE_KEYS = {
   active_buyer: "active_buyer",
   create_api_key: "create_api_key",
   rotate_api_key: "rotate_api_key",
   create_buyer: "create_buyer",
+  retrieve_buyer_token: "retrieve_buyer_token",
   create_new_component: "create_new_component",
   create_new_version: "create_new_version",
   deactive_buyer: "deactive_buyer",
@@ -814,6 +816,18 @@ export const useRegenToken = () => {
         queryKey: [PRODUCT_CACHE_KEYS.get_buyer_list],
       });
     },
+  });
+};
+
+export const useRetrieveToken = () => {
+  return useMutation<any, Error>({
+    mutationKey: [PRODUCT_CACHE_KEYS.retrieve_buyer_token],
+    mutationFn: ({productId, buyerId}: any) => retrieveBuyerToken(productId, buyerId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [PRODUCT_CACHE_KEYS.get_buyer_list],
+      });
+    }
   });
 };
 
