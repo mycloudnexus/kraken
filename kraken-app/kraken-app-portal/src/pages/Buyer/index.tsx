@@ -157,6 +157,7 @@ const Buyer = () => {
                       }
                     >
                       <button
+                          data-testid={`retrieve-token-${record.id}`}
                           style={
                             { color: 'red',
                               background: 'white',
