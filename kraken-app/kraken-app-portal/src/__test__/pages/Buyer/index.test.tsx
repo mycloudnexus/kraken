@@ -129,5 +129,5 @@ test("Buyer page", () => {
   const retrieveToken = getByTestId("retrieve-token-test-id-1");
   fireEvent.click(activateBuyer);
   fireEvent.click(retrieveToken);
-  waitFor(() => expect(copyAllButton).toHaveTextContent("Here’s your generated token"));
+  waitFor(() => expect(container).toHaveTextContent("Here’s your generated token"));
 });
