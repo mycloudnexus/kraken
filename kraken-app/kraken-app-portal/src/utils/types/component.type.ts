@@ -38,6 +38,13 @@ export interface IBuyer extends IComponent {
   };
   createdBy?: string;
 }
+
+export interface IBuyerToken {
+  buyerToken: {
+    accessToken: string;
+    expiredAt: string;
+  };
+}
 export interface IResponseMapping {
   name: string;
   title: string;

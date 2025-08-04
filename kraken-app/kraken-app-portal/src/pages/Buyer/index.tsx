@@ -5,13 +5,13 @@ import { Text } from "@/components/Text";
 import {
   useActiveBuyer,
   useDeactiveBuyer,
-  useGetBuyerList,
+  useGetBuyerList, useRetrieveToken,
 } from "@/hooks/product";
 import useDebouncedCallback from "@/hooks/useDebouncedCallback";
 import useSize from "@/hooks/useSize";
 import { useAppStore } from "@/stores/app.store";
 import { useBuyerStore } from "@/stores/buyer.store";
-import { IBuyer } from "@/utils/types/component.type";
+import {IBuyer, IBuyerToken} from "@/utils/types/component.type";
 import { Button, Flex, Popconfirm, Table, notification } from "antd";
 import { get } from "lodash";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -21,11 +21,15 @@ import NewBuyerModal from "./components/NewBuyerModal";
 import RegenToken from "./components/RegenToken";
 import TokenModal from "./components/TokenModal";
 import styles from "./index.module.scss";
+import {IUser} from "@/utils/types/user.type.ts";
+import {useUser} from "@/hooks/user/useUser.tsx";
+import {ERole} from "@/components/Role";
 
 const Buyer = () => {
   const { currentProduct } = useAppStore();
   const { params, setParams, resetParams } = useBuyerStore();
   const { data: dataList, isLoading } = useGetBuyerList(currentProduct, params);
+  const { mutateAsync: retrieveToken } = useRetrieveToken();
   const {
     value: isModalVisible,
     setFalse: hideModal,
@@ -37,11 +41,19 @@ const Buyer = () => {
     setFalse: hideReactivateModal,
     setTrue: showReactivateModal,
   } = useBoolean(false);
-  const [responseItem, setResponseItem] = useState<IBuyer>();
+  const [responseItem, setResponseItem] = useState<IBuyerToken>();
+  const [tokenItem, setTokenItem] = useState<IBuyerToken>();
+
   const { mutateAsync: runActive } = useActiveBuyer();
   const { mutateAsync: runDeactive } = useDeactiveBuyer();
   const ref = useRef<any>();
   const size = useSize(ref);
+  const { currentUser } = useUser();
+  const isAdmin = useMemo(
+      () => currentUser?.role === ERole.ADMIN,
+      [currentUser?.role]
+  );
+
 
   const handleActive = async (id: string) => {
     try {
@@ -78,6 +90,16 @@ const Buyer = () => {
     }
   };
 
+
+  const RetrieveToken = async (id: string) => {
+    const params = {buyerId: id, productId: currentProduct} as any;
+    const res = await retrieveToken(params);
+    setTokenItem({
+      buyerToken: get(res, "data")
+    });
+    showReactivateModal();
+  }
+
   const columns = useMemo(
     () => [
       {
@@ -91,6 +113,7 @@ const Buyer = () => {
       {
         title: "Company name",
         dataIndex: "facets",
+        width: 150,
         render: (r: Record<string, string>) => (
           <Text.LightMedium>
             {get(r, "buyerInfo.companyName", "")}
@@ -112,6 +135,43 @@ const Buyer = () => {
         render: (record: IBuyer) => (
           <ContentTime content={record.createdBy} time={record.createdAt} />
         ),
+      },
+      {
+        title: "Buyer API token",
+        dataIndex: "",
+        width: 200,
+        hidden: !isAdmin,
+        render: (record: IBuyer) => (
+                  <div>
+                    <dev style={
+                      { width: '40px',
+                        filter: 'blur(5px)',
+                        position: "relative"
+                      }
+                    }
+                    >
+                      xxxxxxxxxxxxxxxxxxxxxxxxxxx
+                    </dev>
+                    <dev style={
+                      { position: 'absolute',
+                        left: '30px'}
+                      }
+                    >
+                      <button
+                          style={
+                            { color: 'red',
+                              background: 'white',
+                              borderColor: '#ffa39e'
+                            }
+                          }
+                          onClick={() =>
+                              RetrieveToken(record.id)}
+                      >
+                        Reveal Buyer Token
+                      </button>
+                    </dev>
+                  </div>
+                )
       },
       {
         title: "Action",
@@ -217,6 +277,13 @@ const Buyer = () => {
           onClose={hideReactivateModal}
           item={responseItem}
         />
+      )}
+      {tokenItem && (
+          <TokenModal
+              item={tokenItem}
+              open={isReactivateModalVisible}
+              onClose={hideReactivateModal}
+          />
       )}
     </PageLayout>
   );
