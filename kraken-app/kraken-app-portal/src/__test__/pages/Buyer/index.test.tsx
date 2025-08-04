@@ -104,12 +104,13 @@ test("Buyer page", () => {
     mutateAsync: () => {
       return {
         data: {
-          accessToken: "test-token",
-          expiresAt: "",
-        }
+          buyerToken: {
+            accessToken: "test-token",
+          },
+        },
       };
-    }
-  });
+    },
+  } as any);
   vi.spyOn(userHooks, "useUser").mockReturnValue({
     findUserName: () => 'ADMIN',
     currentUser: {
