@@ -21,7 +21,6 @@ import NewBuyerModal from "./components/NewBuyerModal";
 import RegenToken from "./components/RegenToken";
 import TokenModal from "./components/TokenModal";
 import styles from "./index.module.scss";
-import {IUser} from "@/utils/types/user.type.ts";
 import {useUser} from "@/hooks/user/useUser.tsx";
 import {ERole} from "@/components/Role";
 
