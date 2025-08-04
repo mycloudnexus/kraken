@@ -143,16 +143,16 @@ const Buyer = () => {
         hidden: !isAdmin,
         render: (record: IBuyer) => (
                   <div>
-                    <dev style={
-                      { width: '40px',
+                    <span style={
+                      { width: '200px',
                         filter: 'blur(5px)',
                         position: "relative"
                       }
                     }
                     >
                       xxxxxxxxxxxxxxxxxxxxxxxxxxx
-                    </dev>
-                    <dev style={
+                    </span>
+                    <span style={
                       { position: 'absolute',
                         left: '30px'}
                       }
@@ -169,7 +169,7 @@ const Buyer = () => {
                       >
                         Reveal Buyer Token
                       </button>
-                    </dev>
+                    </span>
                   </div>
                 )
       },
