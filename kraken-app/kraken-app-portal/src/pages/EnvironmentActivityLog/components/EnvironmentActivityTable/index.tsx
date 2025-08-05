@@ -20,7 +20,7 @@ import { Table, Flex, Button, DatePicker, Divider } from "antd";
 import { ColumnsType, TableProps } from "antd/es/table";
 import { FilterDropdownProps } from "antd/es/table/interface";
 import dayjs, { Dayjs } from "dayjs";
-import { omit } from "lodash";
+import {omit, pick} from "lodash";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import styles from "../../index.module.scss";
@@ -28,7 +28,8 @@ import styles from "../../index.module.scss";
 type EnvironmentActivityTablePropsType = {
   openActionModal: (requestId: string) => void;
   pathQuery: string;
-  buyerQuery: string
+  buyerQuery: string;
+  page: number | undefined;
 };
 
 const initPagination = {
@@ -141,7 +142,7 @@ const getStatusCodeWithIcon = (statusCode: number) => {
 };
 
 const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
-  const { openActionModal, pathQuery, buyerQuery } = props;
+  const { openActionModal, pathQuery, buyerQuery, page} = props;
   const { currentProduct } = useAppStore();
   const { envId } = useParams();
   const [dates, setDates] = useState<[Dayjs | null, Dayjs | null] | null>(null);
@@ -356,8 +357,10 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
       ...queryParams,
       path: pathQuery,
       buyer: buyerQuery,
+      page: page ?? pick(queryParams, 'page'),
     });
-  }, [pathQuery, buyerQuery]);
+
+  }, [pathQuery, buyerQuery, page]);
 
   const handleTableChange: TableProps<IActivityLog>["onChange"] = (
     pagination,
