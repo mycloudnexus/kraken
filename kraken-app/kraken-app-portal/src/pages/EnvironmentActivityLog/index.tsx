@@ -40,6 +40,7 @@ const EnvironmentActivityLog = () => {
   const { value: isOpen, setTrue: open, setFalse: close } = useBoolean(false);
   const [pathQuery, setPathQuery] = useState("");
   const [buyerQuery, setBuyerQuery] = useState("");
+  const [page, setPage] = useState(0);
 
   const envOptions = useMemo(() => {
     return (
@@ -74,14 +75,16 @@ const EnvironmentActivityLog = () => {
             openActionModal={openActionModal}
             pathQuery={pathQuery}
             buyerQuery={buyerQuery}
+            page={page}
           />
         ),
       })) ?? []
     );
-  }, [envData, pathQuery, buyerQuery]);
+  }, [envData, pathQuery, buyerQuery, page]);
 
   const searchPathQuery = (value: string) => {
     setPathQuery(value);
+    setPage(0);
   };
   const fetchBuyerList = (buyer: string): Promise<UserValue[] | void> => {
         console.log(value)
@@ -98,6 +101,7 @@ const EnvironmentActivityLog = () => {
   const handleChange = (buyer: UserValue) => {
       setValue(buyer);
       setBuyerQuery(buyer?.value ?? '');
+      setPage(0);
   }
   return (
     <PageLayout
