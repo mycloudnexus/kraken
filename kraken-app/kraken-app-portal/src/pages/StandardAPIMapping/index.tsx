@@ -55,6 +55,7 @@ const StandardAPIMapping = () => {
     setResponseMapping,
     setSellerApi,
     setListMappingStateResponse,
+      setListMappingStateRequest,
     listMappingStateResponse,
     listMappingStateRequest,
   } = useNewApiMappingStore();
@@ -180,6 +181,7 @@ const StandardAPIMapping = () => {
     setListMappingStateResponse(
       buildInitListMapping(mappers?.response as any, "response")
     );
+    setListMappingStateRequest(buildInitListMapping(mappers?.request as any, "request"));
     // Store to default seller api?
     setSellerApi(defaultSellerApi);
   };
