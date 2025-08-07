@@ -102,6 +102,7 @@ const EnvironmentActivityLog = () => {
       setValue(buyer);
       setBuyerQuery(buyer?.value ?? '');
       setPage(0);
+      setOptions([]);
   }
   return (
     <PageLayout
