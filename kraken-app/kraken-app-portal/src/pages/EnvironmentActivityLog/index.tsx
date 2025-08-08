@@ -88,7 +88,7 @@ const EnvironmentActivityLog = () => {
   };
   const fetchBuyerList = (buyer: string): Promise<UserValue[] | void> => {
         console.log(value)
-        const response: Promise<BuyerPageData> = getBuyerList(currentProduct, {page: 0, size: 30, buyerId: buyer});
+        const response: Promise<BuyerPageData> = getBuyerList(currentProduct, {page: 0, size: 30, buyerId: buyer, envId});
         return response.then((res) => res?.data?.data).then((res) => {
             const results = Array.isArray(res) ? res : [];
             return results.map((item) => ({
@@ -102,6 +102,7 @@ const EnvironmentActivityLog = () => {
       setValue(buyer);
       setBuyerQuery(buyer?.value ?? '');
       setPage(0);
+      setOptions([]);
   }
   return (
     <PageLayout
@@ -193,7 +194,6 @@ const EnvironmentActivityLog = () => {
                           }
                           autoClearSearchValue
                           allowClear
-                          defaultActiveFirstOption={true}
                       />
                   </div>
               }
