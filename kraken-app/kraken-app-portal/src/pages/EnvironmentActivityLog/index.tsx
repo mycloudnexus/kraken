@@ -88,14 +88,18 @@ const EnvironmentActivityLog = () => {
   };
   const fetchBuyerList = (buyer: string): Promise<UserValue[] | void> => {
         console.log(value)
-        const response: Promise<BuyerPageData> = getBuyerList(currentProduct, {page: 0, size: 30, buyerId: buyer, envId});
-        return response.then((res) => res?.data?.data).then((res) => {
-            const results = Array.isArray(res) ? res : [];
-            return results.map((item) => ({
-                value: item.facets.buyerInfo.buyerId,
-                label: item.facets.buyerInfo.companyName,
-            } as UserValue));
-        }).then((newOptions) => setOptions(newOptions));
+        if (buyer) {
+            const response: Promise<BuyerPageData> = getBuyerList(currentProduct, {page: 0, size: 30, buyerId: buyer, envId});
+            return response.then((res) => res?.data?.data).then((res) => {
+                const results = Array.isArray(res) ? res : [];
+                return results.map((item) => ({
+                    value: item.facets.buyerInfo.buyerId,
+                    label: item.facets.buyerInfo.companyName,
+                } as UserValue));
+            }).then((newOptions) => setOptions(newOptions));
+        } else {
+            setOptions([]);
+        }
     }
 
   const handleChange = (buyer: UserValue) => {
@@ -154,6 +158,9 @@ const EnvironmentActivityLog = () => {
               onChange={
                 (key) => {
                   navigate(`/env/${key}`);
+                  setOptions([]);
+                  setValue(null);
+                  setBuyerQuery('')
                 }
               }
               activeKey={envId}
@@ -175,6 +182,7 @@ const EnvironmentActivityLog = () => {
                           title="select-buyer"
                           disabled={false}
                           labelInValue
+                          value={value}
                           filterOption={false}
                           style={
                             { width: "250px"
