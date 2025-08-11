@@ -53,7 +53,7 @@ const EnvironmentActivityLog = () => {
 
   const [modalActivityId, setModalActivityId] = useState<string | undefined>();
   const [options, setOptions] = useState<UserValue[]>([]);
-  const [value, setValue] = useState<UserValue>();
+  const [value, setValue] = useState<UserValue | undefined | null>();
   const [modalOpen, setModalOpen] = useState(false);
   const isActivityLogActive = useMemo(
     () => mainTabKey === "activityLog",
@@ -99,6 +99,7 @@ const EnvironmentActivityLog = () => {
             }).then((newOptions) => setOptions(newOptions));
         } else {
             setOptions([]);
+            return Promise.resolve();
         }
     }
 
