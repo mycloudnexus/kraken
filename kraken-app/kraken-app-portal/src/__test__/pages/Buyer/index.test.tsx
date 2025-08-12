@@ -5,9 +5,10 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import {render, fireEvent, waitFor} from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import * as userHooks from '@/hooks/user/useUser'
+import {ENV} from "@/constants";
 
 test("Buyer page", () => {
-  vi.stubEnv("VITE_VIEW_TOKEN", "true");
+  ENV.VIEW_BUYER_TOKEN = 'true'
   vi.spyOn(productModule, "useGetBuyerList").mockReturnValue({
     data: {
       data: [
