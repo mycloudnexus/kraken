@@ -24,6 +24,7 @@ import com.consoleconnect.kraken.operator.core.enums.*;
 import com.consoleconnect.kraken.operator.core.event.IngestionDataResult;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.model.*;
+import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPIAvailabilityFacets;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
 import com.consoleconnect.kraken.operator.core.repo.EnvironmentClientRepository;
 import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
@@ -687,8 +688,31 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
 
     List<ApiMapperDeploymentDTO> result =
         getApiMapperDeploymentDTOS(deployments, mapperAssetMap, mapper2Component, envId);
+    fillAvailabilityState(result);
     return PagingHelper.toPageNoSubList(
         result, deployments.getPage(), deployments.getSize(), deployments.getTotal());
+  }
+
+  private void fillAvailabilityState(List<ApiMapperDeploymentDTO> result) {
+    List<UnifiedAssetDto> assetDtoList =
+        unifiedAssetService.findByKind(AssetKindEnum.COMPONENT_API_AVAILABILITY.getKind());
+    if (CollectionUtils.isNotEmpty(assetDtoList)) {
+      UnifiedAssetDto assetDto = assetDtoList.get(0);
+      ComponentAPIAvailabilityFacets facets =
+          UnifiedAsset.getFacets(assetDto, ComponentAPIAvailabilityFacets.class);
+      Set<String> stageDisableApiList =
+          facets.getStageDisableApiList() == null
+              ? new HashSet<>()
+              : facets.getStageDisableApiList();
+      Set<String> prodDisableApiList =
+          facets.getProdDisableApiList() == null ? new HashSet<>() : facets.getProdDisableApiList();
+      result.stream()
+          .forEach(
+              dto -> {
+                dto.setStageAvailable(stageDisableApiList.contains(dto.getTargetMapperKey()));
+                dto.setProdAvailable(prodDisableApiList.contains(dto.getTargetMapperKey()));
+              });
+    }
   }
 
   private @NotNull List<ApiMapperDeploymentDTO> getApiMapperDeploymentDTOS(

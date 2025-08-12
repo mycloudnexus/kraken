@@ -9,7 +9,10 @@ import com.consoleconnect.kraken.operator.controller.dto.ComponentExpandDTO;
 import com.consoleconnect.kraken.operator.controller.dto.ComponentProductCategoryDTO;
 import com.consoleconnect.kraken.operator.controller.dto.EndPointUsageDTO;
 import com.consoleconnect.kraken.operator.controller.dto.SaveWorkflowTemplateRequest;
+import com.consoleconnect.kraken.operator.controller.entity.ApiAvailabilityChangeHistoryEntity;
+import com.consoleconnect.kraken.operator.controller.mapper.ApiAvailabilityMapper;
 import com.consoleconnect.kraken.operator.controller.model.*;
+import com.consoleconnect.kraken.operator.controller.repo.ApiAvailabilityChangeHistoryRepository;
 import com.consoleconnect.kraken.operator.controller.tools.VersionHelper;
 import com.consoleconnect.kraken.operator.core.dto.ApiUseCaseDto;
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
@@ -63,6 +66,7 @@ public class ApiComponentService
   @Getter private final EnvironmentService environmentService;
   private final UnifiedAssetRepository unifiedAssetRepository;
   private final AssetFacetRepository assetFacetRepository;
+  private final ApiAvailabilityChangeHistoryRepository changeHistoryRepository;
   private final AppProperty appProperty;
 
   @Transactional
@@ -646,7 +650,28 @@ public class ApiComponentService
           facets.getProdDisableApiList(), request.getMapperKey(), request.isDisabled());
     }
     asset.setFacets(JsonToolkit.convertToMap(facets));
+    recordChangeHistory(request, userId);
     return unifiedAssetService.syncAsset(MEF_SONATA, asset, syncMetadata, true);
+  }
+
+  private void recordChangeHistory(UpdateAipAvailabilityRequest request, String userId) {
+    // record history
+    ApiAvailabilityChangeHistoryEntity changeHistory = new ApiAvailabilityChangeHistoryEntity();
+    changeHistory.setMapperKey(request.getMapperKey());
+    changeHistory.setEnv(request.getEnvName());
+    changeHistory.setVersion(request.getVersion());
+    changeHistory.setUpdatedBy(userId);
+    changeHistory.setAvailable(!request.isDisabled());
+    changeHistoryRepository.save(changeHistory);
+  }
+
+  public List<ApiAvailabilityChangeHistory> getApiAvailabilityChangeHistory(
+      String mapperKey, String env) {
+    return changeHistoryRepository
+        .findAllByMapperKeyAndEnvOOrderByCreatedAtDesc(mapperKey, env)
+        .stream()
+        .map(ApiAvailabilityMapper.INSTANCE::toChangeHistory)
+        .toList();
   }
 
   private void performDisableList(Set<String> set, String key, boolean disabled) {

@@ -2,6 +2,7 @@ package com.consoleconnect.kraken.operator.controller.api;
 
 import com.consoleconnect.kraken.operator.auth.security.UserContext;
 import com.consoleconnect.kraken.operator.controller.dto.*;
+import com.consoleconnect.kraken.operator.controller.model.ApiAvailabilityChangeHistory;
 import com.consoleconnect.kraken.operator.controller.model.ComponentTagFacet;
 import com.consoleconnect.kraken.operator.controller.model.StandardComponentInfo;
 import com.consoleconnect.kraken.operator.controller.model.UpdateAipAvailabilityRequest;
@@ -128,6 +129,13 @@ public class ComponentMgmtController {
     return UserContext.getUserId()
         .publishOn(Schedulers.boundedElastic())
         .map(userId -> apiComponentService.updateApiAvailability(request, userId));
+  }
+
+  @Operation(summary = "api use case availability change history")
+  @GetMapping("/components/apiAvailability/change-history")
+  public HttpResponse<List<ApiAvailabilityChangeHistory>> listApiAvailabilityChangeHistory(
+      @RequestParam("mapperKey") String mapperKey, @RequestParam("env") String env) {
+    return HttpResponse.ok(apiComponentService.getApiAvailabilityChangeHistory(mapperKey, env));
   }
 
   @Operation(summary = "update workflow template)")

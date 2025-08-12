@@ -7,4 +7,5 @@ public class UpdateAipAvailabilityRequest {
   private String mapperKey;
   private boolean disabled;
   private String envName;
+  private String version;
 }
