@@ -7,7 +7,7 @@ import { BrowserRouter } from "react-router-dom";
 import * as userHooks from '@/hooks/user/useUser'
 
 test("Buyer page", () => {
-  vi.stubEnv("VITE_VIEW_TOKEN", "false");
+  vi.stubEnv("VITE_VIEW_TOKEN", "true");
   vi.spyOn(productModule, "useGetBuyerList").mockReturnValue({
     data: {
       data: [
