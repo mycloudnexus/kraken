@@ -17,7 +17,7 @@ spring:
       uri: http://localhost:8200
       authentication: TOKEN
       token: ${VAULT_ACCESS_TOKEN:mock-token}
-      enabled: true
+      enabled: false
       reactive:
         enabled: false
   application:
@@ -127,7 +127,7 @@ app:
       exclude-keys:
         - mef.sonata.api-target.order.notification.state.change
     token-storage:
-      enabled: true
+      enabled: fase
       engine: postgres
     vault:
       namespace: secret/data
