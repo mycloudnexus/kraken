@@ -3,13 +3,19 @@ package com.consoleconnect.kraken.operator.controller;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
+import com.consoleconnect.kraken.operator.auth.entity.UserEntity;
+import com.consoleconnect.kraken.operator.auth.repo.UserRepository;
 import com.consoleconnect.kraken.operator.auth.security.UserContext;
 import com.consoleconnect.kraken.operator.config.TestApplication;
 import com.consoleconnect.kraken.operator.controller.dto.ComponentExpandDTO;
 import com.consoleconnect.kraken.operator.controller.dto.SaveWorkflowTemplateRequest;
+import com.consoleconnect.kraken.operator.controller.entity.ApiAvailabilityChangeHistoryEntity;
 import com.consoleconnect.kraken.operator.controller.model.Environment;
 import com.consoleconnect.kraken.operator.controller.model.UpdateAipAvailabilityRequest;
+import com.consoleconnect.kraken.operator.controller.repo.ApiAvailabilityChangeHistoryRepository;
 import com.consoleconnect.kraken.operator.controller.service.EnvironmentService;
 import com.consoleconnect.kraken.operator.core.client.ClientEvent;
 import com.consoleconnect.kraken.operator.core.client.ClientEventTypeEnum;
@@ -36,9 +42,11 @@ import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.*;
+import org.mockito.ArgumentMatchers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
@@ -71,6 +79,8 @@ public class ComponentMgmtControllerTest extends AbstractIntegrationTest
       "/products/kraken.component.api-target-mapper/api-use-cases";
   @Autowired UnifiedAssetService unifiedAssetService;
   @Getter @Autowired EnvironmentService environmentService;
+  @MockBean UserRepository userRepository;
+  @MockBean ApiAvailabilityChangeHistoryRepository changeHistoryRepository;
 
   @Autowired
   public ComponentMgmtControllerTest(WebTestClient webTestClient) {
@@ -517,6 +527,16 @@ public class ComponentMgmtControllerTest extends AbstractIntegrationTest
   @Test
   @Order(15)
   void givenEnv_whenGetApiAvailabilityChangeHistory_thenReturnOK() {
+    UserEntity userEntity = new UserEntity();
+    userEntity.setName("mock-user");
+    when(userRepository.findById(ArgumentMatchers.any())).thenReturn(Optional.of(userEntity));
+    ApiAvailabilityChangeHistoryEntity changeHistory = new ApiAvailabilityChangeHistoryEntity();
+    changeHistory.setCreatedBy(UUID.randomUUID().toString());
+    ApiAvailabilityChangeHistoryEntity changeHistory1 = new ApiAvailabilityChangeHistoryEntity();
+    changeHistory1.setCreatedBy("user-id");
+    when(changeHistoryRepository.findAllByMapperKeyAndEnvOrderByCreatedAtDesc(
+            anyString(), anyString()))
+        .thenReturn(List.of(changeHistory, changeHistory1));
     getTestClientHelper()
         .requestAndVerify(
             HttpMethod.GET,
