@@ -4,12 +4,14 @@ import static com.consoleconnect.kraken.operator.core.service.UnifiedAssetServic
 import static com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants.*;
 import static com.consoleconnect.kraken.operator.core.toolkit.LabelConstants.*;
 
+import com.consoleconnect.kraken.operator.auth.entity.UserEntity;
+import com.consoleconnect.kraken.operator.auth.repo.UserRepository;
 import com.consoleconnect.kraken.operator.auth.security.UserContext;
-import com.consoleconnect.kraken.operator.controller.dto.ComponentExpandDTO;
-import com.consoleconnect.kraken.operator.controller.dto.ComponentProductCategoryDTO;
-import com.consoleconnect.kraken.operator.controller.dto.EndPointUsageDTO;
-import com.consoleconnect.kraken.operator.controller.dto.SaveWorkflowTemplateRequest;
+import com.consoleconnect.kraken.operator.controller.dto.*;
+import com.consoleconnect.kraken.operator.controller.entity.ApiAvailabilityChangeHistoryEntity;
+import com.consoleconnect.kraken.operator.controller.mapper.ApiAvailabilityMapper;
 import com.consoleconnect.kraken.operator.controller.model.*;
+import com.consoleconnect.kraken.operator.controller.repo.ApiAvailabilityChangeHistoryRepository;
 import com.consoleconnect.kraken.operator.controller.tools.VersionHelper;
 import com.consoleconnect.kraken.operator.core.dto.ApiUseCaseDto;
 import com.consoleconnect.kraken.operator.core.dto.Tuple2;
@@ -63,7 +65,9 @@ public class ApiComponentService
   @Getter private final EnvironmentService environmentService;
   private final UnifiedAssetRepository unifiedAssetRepository;
   private final AssetFacetRepository assetFacetRepository;
+  private final ApiAvailabilityChangeHistoryRepository changeHistoryRepository;
   private final AppProperty appProperty;
+  private final UserRepository userRepository;
 
   @Transactional
   public IngestionDataResult updateApiTargetMapper(
@@ -646,7 +650,50 @@ public class ApiComponentService
           facets.getProdDisableApiList(), request.getMapperKey(), request.isDisabled());
     }
     asset.setFacets(JsonToolkit.convertToMap(facets));
+    recordChangeHistory(request, userId);
     return unifiedAssetService.syncAsset(MEF_SONATA, asset, syncMetadata, true);
+  }
+
+  private void recordChangeHistory(UpdateAipAvailabilityRequest request, String userId) {
+    // record history
+    ApiAvailabilityChangeHistoryEntity changeHistory = new ApiAvailabilityChangeHistoryEntity();
+    changeHistory.setMapperKey(request.getMapperKey());
+    changeHistory.setEnv(request.getEnvName());
+    changeHistory.setVersion(request.getVersion());
+    changeHistory.setUpdatedBy(userId);
+    changeHistory.setAvailable(!request.isDisabled());
+    changeHistoryRepository.save(changeHistory);
+  }
+
+  private String getUserName(String id) {
+    String userName = UserContext.ANONYMOUS;
+    if (StringUtils.isNotBlank(id)) {
+      try {
+        UUID uuid = UUID.fromString(id);
+        Optional<UserEntity> optionalUserEntity = userRepository.findById(uuid);
+        if (optionalUserEntity.isPresent()) {
+          return optionalUserEntity.get().getName();
+        }
+      } catch (Exception e) {
+        log.error("failed to find user name");
+      }
+    }
+    return userName;
+  }
+
+  public List<ApiAvailabilityChangeHistory> getApiAvailabilityChangeHistory(
+      String mapperKey, String env) {
+    return changeHistoryRepository
+        .findAllByMapperKeyAndEnvOrderByCreatedAtDesc(mapperKey, env)
+        .stream()
+        .map(
+            entity -> {
+              ApiAvailabilityChangeHistory changeHistory =
+                  ApiAvailabilityMapper.INSTANCE.toChangeHistory(entity);
+              changeHistory.setUpdatedBy(getUserName(entity.getCreatedBy()));
+              return changeHistory;
+            })
+        .toList();
   }
 
   private void performDisableList(Set<String> set, String key, boolean disabled) {

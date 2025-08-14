@@ -27,4 +27,6 @@ public class ApiMapperDeploymentDTO extends ComponentExpandDTO.TargetMappingDeta
   private String verifiedAt;
   private boolean verifiedStatus;
   private boolean productionEnable;
+  private boolean stageAvailable = true;
+  private boolean prodAvailable = true;
 }
