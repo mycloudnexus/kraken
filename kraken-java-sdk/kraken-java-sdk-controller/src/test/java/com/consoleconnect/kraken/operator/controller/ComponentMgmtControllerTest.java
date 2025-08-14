@@ -62,6 +62,9 @@ public class ComponentMgmtControllerTest extends AbstractIntegrationTest
       "/products/kraken.component.api-target-mapper/components/{id}/targetMapper";
   public static final String DISABLE_TARGET_MAPPER =
       "/products/kraken.component.api-target-mapper/components/disableTargetMapper";
+  public static final String API_AVAILABILITY_CHANGE_HISTORY =
+      "/products/mef.sonata/components/apiAvailability/change-history";
+
   public static final String UPDATE_WORKFLOW =
       "/products/kraken.component.api-target-mapper/components/{id}/workflow";
   public static final String LIST_API_USE_CASES =
@@ -505,6 +508,26 @@ public class ComponentMgmtControllerTest extends AbstractIntegrationTest
             new HashMap<>(),
             400,
             request,
+            bodyStr -> {
+              log.info(bodyStr);
+              assertThat(bodyStr, notNullValue());
+            });
+  }
+
+  @Test
+  @Order(15)
+  void givenEnv_whenGetApiAvailabilityChangeHistory_thenReturnOK() {
+    getTestClientHelper()
+        .requestAndVerify(
+            HttpMethod.GET,
+            uriBuilder ->
+                uriBuilder
+                    .path(API_AVAILABILITY_CHANGE_HISTORY)
+                    .queryParam("env", "production")
+                    .queryParam("mapperKey", "mef.sonata.api-target-mapper.order.eline.add")
+                    .build(),
+            200,
+            null,
             bodyStr -> {
               log.info(bodyStr);
               assertThat(bodyStr, notNullValue());

@@ -688,7 +688,6 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
 
     List<ApiMapperDeploymentDTO> result =
         getApiMapperDeploymentDTOS(deployments, mapperAssetMap, mapper2Component, envId);
-    fillAvailabilityState(result);
     return PagingHelper.toPageNoSubList(
         result, deployments.getPage(), deployments.getSize(), deployments.getTotal());
   }
@@ -967,41 +966,44 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
     Map<String, UnifiedAssetEntity> tagEntityMap =
         unifiedAssetService.findAllByIdIn(tagIds).stream()
             .collect(Collectors.toMap(t -> t.getId().toString(), t -> t));
-    return mapper2PayLoadMap.entrySet().stream()
-        .map(
-            entry -> {
-              String mapperKey = entry.getKey();
-              ClientMapperVersionPayloadDto payload = entry.getValue();
-              UnifiedAssetEntity tagEntity = tagEntityMap.get(payload.getTagId());
-              UnifiedAssetDto tagAsset = UnifiedAssetService.toAsset(tagEntity, false);
-              Map<String, String> labels = tagAsset.getMetadata().getLabels();
-              UnifiedAssetDto mapperAsset = mapperAssetMap.get(mapperKey);
-              ComponentAPITargetFacets componentAPITargetFacets =
-                  UnifiedAsset.getFacets(mapperAsset, ComponentAPITargetFacets.class);
-              ComponentAPITargetFacets.Trigger trigger = componentAPITargetFacets.getTrigger();
-              ApiMapperDeploymentDTO deploymentDTO = new ApiMapperDeploymentDTO();
-              if (trigger != null) {
-                BeanUtils.copyProperties(trigger, deploymentDTO);
-                ComponentExpandDTO.MappingMatrix mappingMatrix =
-                    new ComponentExpandDTO.MappingMatrix();
-                BeanUtils.copyProperties(trigger, mappingMatrix);
-                deploymentDTO.setMappingMatrix(mappingMatrix);
-              }
-              deploymentDTO.setCreateAt(tagAsset.getCreatedAt());
-              deploymentDTO.setCreateBy(tagAsset.getCreatedBy());
-              setUserName(deploymentDTO);
-              deploymentDTO.setStatus(DeployStatusEnum.SUCCESS.name());
-              deploymentDTO.setTargetMapperKey(mapperKey);
-              deploymentDTO.setVersion(labels.get(LABEL_VERSION_NAME));
-              deploymentDTO.setSubVersion(labels.get(LABEL_SUB_VERSION_NAME));
-              deploymentDTO.setTagId(payload.getTagId());
-              deploymentDTO.setEnvId(environment.getId());
-              deploymentDTO.setEnvName(environment.getName());
-              deploymentDTO.setComponentKey(mapper2Component.get(mapperKey).getKey());
-              deploymentDTO.setComponentName(mapper2Component.get(mapperKey).getValue());
-              return deploymentDTO;
-            })
-        .sorted(Comparator.comparing(ApiMapperDeploymentDTO::getCreateAt).reversed())
-        .toList();
+    List<ApiMapperDeploymentDTO> result =
+        mapper2PayLoadMap.entrySet().stream()
+            .map(
+                entry -> {
+                  String mapperKey = entry.getKey();
+                  ClientMapperVersionPayloadDto payload = entry.getValue();
+                  UnifiedAssetEntity tagEntity = tagEntityMap.get(payload.getTagId());
+                  UnifiedAssetDto tagAsset = UnifiedAssetService.toAsset(tagEntity, false);
+                  Map<String, String> labels = tagAsset.getMetadata().getLabels();
+                  UnifiedAssetDto mapperAsset = mapperAssetMap.get(mapperKey);
+                  ComponentAPITargetFacets componentAPITargetFacets =
+                      UnifiedAsset.getFacets(mapperAsset, ComponentAPITargetFacets.class);
+                  ComponentAPITargetFacets.Trigger trigger = componentAPITargetFacets.getTrigger();
+                  ApiMapperDeploymentDTO deploymentDTO = new ApiMapperDeploymentDTO();
+                  if (trigger != null) {
+                    BeanUtils.copyProperties(trigger, deploymentDTO);
+                    ComponentExpandDTO.MappingMatrix mappingMatrix =
+                        new ComponentExpandDTO.MappingMatrix();
+                    BeanUtils.copyProperties(trigger, mappingMatrix);
+                    deploymentDTO.setMappingMatrix(mappingMatrix);
+                  }
+                  deploymentDTO.setCreateAt(tagAsset.getCreatedAt());
+                  deploymentDTO.setCreateBy(tagAsset.getCreatedBy());
+                  setUserName(deploymentDTO);
+                  deploymentDTO.setStatus(DeployStatusEnum.SUCCESS.name());
+                  deploymentDTO.setTargetMapperKey(mapperKey);
+                  deploymentDTO.setVersion(labels.get(LABEL_VERSION_NAME));
+                  deploymentDTO.setSubVersion(labels.get(LABEL_SUB_VERSION_NAME));
+                  deploymentDTO.setTagId(payload.getTagId());
+                  deploymentDTO.setEnvId(environment.getId());
+                  deploymentDTO.setEnvName(environment.getName());
+                  deploymentDTO.setComponentKey(mapper2Component.get(mapperKey).getKey());
+                  deploymentDTO.setComponentName(mapper2Component.get(mapperKey).getValue());
+                  return deploymentDTO;
+                })
+            .sorted(Comparator.comparing(ApiMapperDeploymentDTO::getCreateAt).reversed())
+            .toList();
+    fillAvailabilityState(result);
+    return result;
   }
 }

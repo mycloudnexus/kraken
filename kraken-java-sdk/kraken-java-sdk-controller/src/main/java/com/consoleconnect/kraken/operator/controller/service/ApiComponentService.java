@@ -668,7 +668,7 @@ public class ApiComponentService
   public List<ApiAvailabilityChangeHistory> getApiAvailabilityChangeHistory(
       String mapperKey, String env) {
     return changeHistoryRepository
-        .findAllByMapperKeyAndEnvOOrderByCreatedAtDesc(mapperKey, env)
+        .findAllByMapperKeyAndEnvOrderByCreatedAtDesc(mapperKey, env)
         .stream()
         .map(ApiAvailabilityMapper.INSTANCE::toChangeHistory)
         .toList();

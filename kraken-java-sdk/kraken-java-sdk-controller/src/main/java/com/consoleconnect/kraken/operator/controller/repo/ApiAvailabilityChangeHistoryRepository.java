@@ -12,6 +12,6 @@ public interface ApiAvailabilityChangeHistoryRepository
         JpaRepository<ApiAvailabilityChangeHistoryEntity, UUID>,
         JpaSpecificationExecutor<ApiAvailabilityChangeHistoryEntity> {
 
-  List<ApiAvailabilityChangeHistoryEntity> findAllByMapperKeyAndEnvOOrderByCreatedAtDesc(
+  List<ApiAvailabilityChangeHistoryEntity> findAllByMapperKeyAndEnvOrderByCreatedAtDesc(
       String mapperKey, String env);
 }
