@@ -23,6 +23,7 @@ import TokenModal from "./components/TokenModal";
 import styles from "./index.module.scss";
 import {useUser} from "@/hooks/user/useUser.tsx";
 import {ERole} from "@/components/Role";
+import {ENV} from "@/constants";
 
 const Buyer = () => {
   const { currentProduct } = useAppStore();
@@ -139,7 +140,7 @@ const Buyer = () => {
         title: "Buyer API token",
         dataIndex: "",
         width: 200,
-        hidden: !isAdmin,
+        hidden: !isAdmin || ENV.VIEW_BUYER_TOKEN === 'false',
         render: (record: IBuyer) => (
                   <div>
                     <span style={
