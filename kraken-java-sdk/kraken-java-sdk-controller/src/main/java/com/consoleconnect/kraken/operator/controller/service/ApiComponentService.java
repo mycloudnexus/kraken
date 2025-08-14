@@ -4,11 +4,10 @@ import static com.consoleconnect.kraken.operator.core.service.UnifiedAssetServic
 import static com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants.*;
 import static com.consoleconnect.kraken.operator.core.toolkit.LabelConstants.*;
 
+import com.consoleconnect.kraken.operator.auth.entity.UserEntity;
+import com.consoleconnect.kraken.operator.auth.repo.UserRepository;
 import com.consoleconnect.kraken.operator.auth.security.UserContext;
-import com.consoleconnect.kraken.operator.controller.dto.ComponentExpandDTO;
-import com.consoleconnect.kraken.operator.controller.dto.ComponentProductCategoryDTO;
-import com.consoleconnect.kraken.operator.controller.dto.EndPointUsageDTO;
-import com.consoleconnect.kraken.operator.controller.dto.SaveWorkflowTemplateRequest;
+import com.consoleconnect.kraken.operator.controller.dto.*;
 import com.consoleconnect.kraken.operator.controller.entity.ApiAvailabilityChangeHistoryEntity;
 import com.consoleconnect.kraken.operator.controller.mapper.ApiAvailabilityMapper;
 import com.consoleconnect.kraken.operator.controller.model.*;
@@ -68,6 +67,7 @@ public class ApiComponentService
   private final AssetFacetRepository assetFacetRepository;
   private final ApiAvailabilityChangeHistoryRepository changeHistoryRepository;
   private final AppProperty appProperty;
+  private final UserRepository userRepository;
 
   @Transactional
   public IngestionDataResult updateApiTargetMapper(
@@ -665,12 +665,34 @@ public class ApiComponentService
     changeHistoryRepository.save(changeHistory);
   }
 
+  private String getUserName(String id) {
+    String userName = UserContext.ANONYMOUS;
+    if (StringUtils.isNotBlank(id)) {
+      try {
+        UUID uuid = UUID.fromString(id);
+        Optional<UserEntity> optionalUserEntity = userRepository.findById(uuid);
+        if (optionalUserEntity.isPresent()) {
+          return optionalUserEntity.get().getName();
+        }
+      } catch (Exception e) {
+        log.error("failed to find user name");
+      }
+    }
+    return userName;
+  }
+
   public List<ApiAvailabilityChangeHistory> getApiAvailabilityChangeHistory(
       String mapperKey, String env) {
     return changeHistoryRepository
         .findAllByMapperKeyAndEnvOrderByCreatedAtDesc(mapperKey, env)
         .stream()
-        .map(ApiAvailabilityMapper.INSTANCE::toChangeHistory)
+        .map(
+            entity -> {
+              ApiAvailabilityChangeHistory changeHistory =
+                  ApiAvailabilityMapper.INSTANCE.toChangeHistory(entity);
+              changeHistory.setUpdatedBy(getUserName(entity.getCreatedBy()));
+              return changeHistory;
+            })
         .toList();
   }
 
