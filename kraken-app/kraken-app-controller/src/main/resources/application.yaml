@@ -127,7 +127,7 @@ app:
       exclude-keys:
         - mef.sonata.api-target.order.notification.state.change
     token-storage:
-      enabled: fase
+      enabled: false
       engine: postgres
     vault:
       namespace: secret/data
