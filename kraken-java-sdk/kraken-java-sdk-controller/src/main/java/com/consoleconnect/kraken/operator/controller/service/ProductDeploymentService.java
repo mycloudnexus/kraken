@@ -708,8 +708,8 @@ public class ProductDeploymentService implements LatestDeploymentCalculator {
       result.stream()
           .forEach(
               dto -> {
-                dto.setStageAvailable(stageDisableApiList.contains(dto.getTargetMapperKey()));
-                dto.setProdAvailable(prodDisableApiList.contains(dto.getTargetMapperKey()));
+                dto.setStageAvailable(!stageDisableApiList.contains(dto.getTargetMapperKey()));
+                dto.setProdAvailable(!prodDisableApiList.contains(dto.getTargetMapperKey()));
               });
     }
   }

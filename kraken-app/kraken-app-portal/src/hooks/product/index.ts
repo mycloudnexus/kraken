@@ -46,7 +46,7 @@ import {
   getValidateServerName,
   editContactInformation,
   getProductTypes,
-  rotateApiKey,
+  rotateApiKey, disableApiUseCase, getAPIUscCaseChangeHistory,
 } from "@/services/products";
 import { STALE_TIME } from "@/utils/constants/common";
 import {
@@ -71,7 +71,7 @@ import {
 import {
   IActivityDetail,
   IActivityLog,
-  IApiKeyDetail,
+  IApiKeyDetail, IApiUseCaseChangeHistory,
   IDataPlaneDetail,
   IEnv,
   IMapperDetails,
@@ -146,6 +146,8 @@ export const PRODUCT_CACHE_KEYS = {
   verify_product: "verify_product",
   edit_contact_information: "edit_contact_information",
   get_product_type_list: "get_product_type_list",
+  disable_api_use_case: "disable_api_use_case",
+  get_api_use_case_change_history: "get_api_use_case_change_history",
 };
 
 export const useCreateNewComponent = () => {
@@ -612,6 +614,34 @@ export const useGetRunningAPIList = (
     queryKey: [PRODUCT_CACHE_KEYS.get_running_api_list, productId, params],
     queryFn: () => getRunningAPIMappingList(productId, params),
     enabled: Boolean(productId) && Boolean(params.envId),
+    select: (data) => data?.data,
+  });
+};
+
+export const useDisableApiUseCase = (
+    productId: string,
+    params: Record<string, any>
+) => {
+  return useMutation<any, Error>({
+    mutationKey: [PRODUCT_CACHE_KEYS.disable_api_use_case],
+    mutationFn: ({ productId, mapperKey, envName, checked, version}: any) =>
+        disableApiUseCase(productId, mapperKey, envName, version, checked),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [PRODUCT_CACHE_KEYS.get_running_api_list],
+      });
+    },
+  });
+};
+
+export const useGetApiUseCaseChangeHistory = (
+    productId: string,
+    params: Record<string, any>
+) => {
+  return useQuery<any, Error, IApiUseCaseChangeHistory[]>({
+    queryKey: [PRODUCT_CACHE_KEYS.get_api_use_case_change_history, productId, params],
+    queryFn: () => getAPIUscCaseChangeHistory(productId, params),
+    enabled: Boolean(productId) && Boolean(params.mapperKey),
     select: (data) => data?.data,
   });
 };
