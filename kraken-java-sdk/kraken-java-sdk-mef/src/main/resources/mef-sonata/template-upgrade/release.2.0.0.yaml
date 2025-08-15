@@ -8,7 +8,30 @@ metadata:
   labels:
     productSpec: grace
     productVersion: V2.0.0
-    publishDate: 2025-04-15
+    publishDate: 2025-04-16
   description: |
-    fix null server key of poq read
+    create quote use cases
+      - Added quoteItem[0].terminationError field to responses when quote state is unableToProvide
+      - Removed validFor field from responses when quote state is unableToProvide
+    Get address id
+      - response : remove all the properties under associatedGeographicAddress to the root level which includes country, city, streetName, locality
+    create quote
+      - request : Validate Property Type as "String" for Quote Place Type in Eline ADD Quote
+      - request: remove quoteItem[0].product.place[0].keyName for create UNI ADD quote as it is not defined by MEF
+      - response : The quoteItemPrice field will no longer be returned in the response for "unableToProvide" quotes.
+      - response : Added quoteItem[0].terminationError field to responses when quote state is unableToProvide
+      - response : Removed validFor field from responses when quote state is unableToProvide
+    create add order
+      - request : remove productOrderItem[0].product.place[0].keyName for create UNI ADD order as it is not defined by MEF
+    create delete order
+      - request : The productOrderItem[].id field is now used to replace productOrderItem[0].product.productConfiguration.@type as the routing property.
+      - request : The productOrderItem[].id field must be prefixed with UNI or ACCESS_E_LINE.
+      - request : The @{{productOrderItem[].product.productOffering.id}} field has been removed from the request mapping.
+    get product by id
+      - request : does not support passing productType as a filter parameter now
+    add POQ template
+    add modify quote and modify order template
+    Property Type Validation
+    Allowed Values Validation (Enumeration/Whitelist Validation)
+    Mandatory Property Validation (Null/Missing Checks)
   version: 1
