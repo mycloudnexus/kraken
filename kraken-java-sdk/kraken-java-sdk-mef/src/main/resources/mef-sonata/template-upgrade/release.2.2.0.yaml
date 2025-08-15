@@ -1,0 +1,23 @@
+
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.2.2.0
+  name: V2.2.0
+  labels:
+    productSpec: grace
+    productVersion: V2.2.0
+    publishDate: 2025-06-17
+  description: |
+   Create order cases: 
+    - Removed expectedCompletionDate mapping from order read template
+    - Added two missing mapping fields in add order template
+   Get inventory cases:  
+    - Adjusted productOrderId mapping in basic template of inventory list
+    - Added properties in common template of inventory detail
+    - Supported nest structure in basic template for inventory detail
+    - Fixed @type in productConfiguration for inventory detail
+    - Updated get inventory by id template to enable customized fields into productConfiguration
+    - Added lastUpdateDate and createdDate in inventory template
+  version: 1
