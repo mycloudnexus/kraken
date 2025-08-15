@@ -257,6 +257,35 @@ export const getRunningAPIMappingList = (
   });
 };
 
+export const disableApiUseCase = (
+    productId: string,
+    mapperKey: string,
+    envName: string,
+    version: string,
+    checked: boolean,
+) => {
+  return request(`/products/${productId}/components/disableTargetMapper`, {
+    method: "PATCH",
+    data: {
+      mapperKey,
+      envName,
+      version,
+      disabled: !checked
+    }
+  });
+};
+
+export const getAPIUscCaseChangeHistory = (
+    productId: string,
+    params: Record<any, unknown>
+) => {
+  return request(`/products/${productId}/components/apiAvailability/change-history`, {
+    method: "GET",
+    params,
+  });
+};
+
+
 export const getAPIMapperDeployments = (
   productId: string,
   params: Record<string, any>
