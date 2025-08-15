@@ -46,7 +46,7 @@ import {
   getValidateServerName,
   editContactInformation,
   getProductTypes,
-  rotateApiKey, disableApiUseCase, getAPIUscCaseChangeHistory,
+  rotateApiKey, disableApiUseCase,
 } from "@/services/products";
 import { STALE_TIME } from "@/utils/constants/common";
 import {
@@ -71,7 +71,7 @@ import {
 import {
   IActivityDetail,
   IActivityLog,
-  IApiKeyDetail, IApiUseCaseChangeHistory,
+  IApiKeyDetail,
   IDataPlaneDetail,
   IEnv,
   IMapperDetails,
@@ -618,11 +618,8 @@ export const useGetRunningAPIList = (
   });
 };
 
-export const useDisableApiUseCase = (
-    productId: string,
-    params: Record<string, any>
-) => {
-  return useMutation<any, Error>({
+export const useDisableApiUseCase = () => {
+  return useMutation<any, Error, any, unknown>({
     mutationKey: [PRODUCT_CACHE_KEYS.disable_api_use_case],
     mutationFn: ({ productId, mapperKey, envName, checked, version}: any) =>
         disableApiUseCase(productId, mapperKey, envName, version, checked),
@@ -631,18 +628,6 @@ export const useDisableApiUseCase = (
         queryKey: [PRODUCT_CACHE_KEYS.get_running_api_list],
       });
     },
-  });
-};
-
-export const useGetApiUseCaseChangeHistory = (
-    productId: string,
-    params: Record<string, any>
-) => {
-  return useQuery<any, Error, IApiUseCaseChangeHistory[]>({
-    queryKey: [PRODUCT_CACHE_KEYS.get_api_use_case_change_history, productId, params],
-    queryFn: () => getAPIUscCaseChangeHistory(productId, params),
-    enabled: Boolean(productId) && Boolean(params.mapperKey),
-    select: (data) => data?.data,
   });
 };
 

@@ -4,6 +4,10 @@ import * as sizeHooks from '@/hooks/useContainerHeight'
 import { fireEvent, render, waitFor } from "@/__test__/utils";
 
 import {screen} from "@/__test__/utils.tsx";
+import {expect} from "vitest";
+import BasicLayout from "@/components/Layout/BasicLayout.tsx";
+import FetchHistoryDrawer from "@/pages/EnvironmentOverview/components/ApiUseCaseChangeHistory";
+import {IApiUseCaseChangeHistory} from "@/utils/types/env.type.ts";
 const ResizeObserverMock = vi.fn(() => ({
   observe: vi.fn(),
   unobserve: vi.fn(),
@@ -12,7 +16,7 @@ const ResizeObserverMock = vi.fn(() => ({
 
 // Stub the global ResizeObserver
 vi.stubGlobal('ResizeObserver', ResizeObserverMock);
-
+const { getByTestId } = render(<BasicLayout />)
 describe(" Environment Overview component list", () => {
   beforeAll(() => {
     vi.spyOn(productHooks, "useGetProductEnvs").mockReturnValue({
@@ -27,6 +31,9 @@ describe(" Environment Overview component list", () => {
         ],
       },
       isLoading: false,
+    } as any);
+    vi.spyOn(productHooks, 'useDisableApiUseCase').mockReturnValue({
+      mutateAsync: vi.fn()
     } as any);
     vi.spyOn(productHooks, "useGetRunningAPIList").mockReturnValue({
       data: [
@@ -81,6 +88,8 @@ describe(" Environment Overview component list", () => {
 
     // Should default open running api mapping tab
     await waitFor(() => expect(getByText('Component')).toBeInTheDocument())
+    const disableSwitch = getByTestId('disable-switch');
+    fireEvent.click(disableSwitch);
 
     // Open deployment history tab
     fireEvent.click(tabs[1])
@@ -138,4 +147,24 @@ describe(" Environment Overview component list", () => {
     fireEvent.click(rotateButton);
     expect(useRotateApiKeySpy).toBeCalled();
   });
+  it('change history page render',async () => {
+    const changeHistoryResult = {
+      "code": 200,
+      "message": "OK",
+      "data": [
+        {
+          "mapperKey": "mef.sonata.api-target-mapper.order.uni.add",
+          "updatedAt": "2025-08-14T11:02:21.915897Z",
+          "updatedBy": "Admin",
+          "available": true,
+          "version": "26.4",
+          "env": "stage"
+        }
+      ]
+    };
+    render(<FetchHistoryDrawer data={changeHistoryResult.data as IApiUseCaseChangeHistory[]} open={true} onClose={()=>console.log('close')}></FetchHistoryDrawer>);
+    await waitFor(() => expect(getByTestId("history-table")).toBeInTheDocument())
+
+  })
+
 });

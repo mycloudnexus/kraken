@@ -270,16 +270,16 @@ export const disableApiUseCase = (
       mapperKey,
       envName,
       version,
-      disable: !checked
+      disabled: !checked
     }
   });
 };
 
 export const getAPIUscCaseChangeHistory = (
     productId: string,
-    params
+    params: Record<any, unknown>
 ) => {
-  return request(`/v3${PRODUCT}/${productId}/components/apiAvailability/change-history`, {
+  return request(`/products/${productId}/components/apiAvailability/change-history`, {
     method: "GET",
     params,
   });

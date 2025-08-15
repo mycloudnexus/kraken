@@ -2,13 +2,16 @@ import { ApiCard } from "@/components/ApiMapping";
 import { Text } from "@/components/Text";
 import {useDisableApiUseCase, useGetRunningAPIList} from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
-import { IEnv, IRunningMapping } from "@/utils/types/env.type";
-import {Badge, Flex, Switch, Table, Tag, Typography} from "antd";
-import { useMemo } from "react";
+import {IApiUseCaseChangeHistory, IEnv, IRunningMapping} from "@/utils/types/env.type";
+import {Flex, Switch, Table, Tag, Typography} from "antd";
+import {useMemo, useState} from "react";
 import { ColumnsType } from "antd/es/table";
 import { toDateTime } from "@/libs/dayjs";
 import styles from './index.module.scss'
-import {ClockCircleOutlined, HistoryOutlined} from "@ant-design/icons";
+import {HistoryOutlined} from "@ant-design/icons";
+import {getAPIUscCaseChangeHistory} from "@/services/products.ts";
+import FetchHistoryDrawer from "@/pages/EnvironmentOverview/components/ApiUseCaseChangeHistory";
+import {DisableRequest} from "@/utils/types/product.type.ts";
 
 type Props = {
   scrollHeight: number;
@@ -19,19 +22,22 @@ type GroupedMapping = IRunningMapping & { mappingCount: number }
 
 const RunningAPIMapping = ({ scrollHeight, env }: Props) => {
   const { currentProduct } = useAppStore();
+  const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
+  const [historyData, setHistoryData] = useState<IApiUseCaseChangeHistory[]>();
   const { data, isLoading } = useGetRunningAPIList(currentProduct, {
     envId: env?.id,
     orderBy: "createdAt",
     direction: "DESC",
   });
-
-  const onStatusChange = (checked, item: GroupedMapping) => {
-    useDisableApiUseCase(currentProduct, {
+  const { mutateAsync: disableUseCase } = useDisableApiUseCase();
+  const onStatusChange = (checked: boolean, item: GroupedMapping) => {
+    disableUseCase({
+      productId: currentProduct,
       mapperKey: item.targetMapperKey,
-      envName: env?.name,
+      envName: env?.name??'',
       checked,
       version: item.version,
-    });
+    } as DisableRequest);
   }
 
   const mappings = useMemo(() => {
@@ -101,19 +107,35 @@ const RunningAPIMapping = ({ scrollHeight, env }: Props) => {
       title: "Status",
       width: 120,
       render: (item: GroupedMapping) => (
-          <Switch defaultChecked={env?.name === 'stage'?item.stageAvailable:item.prodAvailable} onChange={(checked) => {onStatusChange(checked, item)}} />
+          <Switch
+              data-testid="disable-switch"
+              defaultChecked={env?.name === 'stage'?item.stageAvailable:item.prodAvailable}
+              onChange={(checked) => {
+                onStatusChange(checked, item)}
+          } />
       ),
     },
     {
       title: "History",
       width: 90,
       render: (item: GroupedMapping) => (
-          <button icon={<HistoryOutlined />} onClick={}></button>
+          <div
+            data-testid="history-button"
+            style={{cursor: 'pointer'}}
+            onClick={async () => {
+            await getAPIUscCaseChangeHistory(currentProduct, {mapperKey: item.targetMapperKey, env: env?.name}).then((items: {data: IApiUseCaseChangeHistory[]}) => {
+              setHistoryData(items.data);
+              setDrawerOpen(true)
+            })
+          }}>
+            <HistoryOutlined />
+          </div>
       ),
     },
   ];
 
   return (
+    <>
     <Table
       scroll={{ y: scrollHeight, x: 800 }}
       columns={columns}
@@ -124,6 +146,12 @@ const RunningAPIMapping = ({ scrollHeight, env }: Props) => {
       rowKey={(item) => JSON.stringify(item)}
       pagination={false}
     />
+    <FetchHistoryDrawer
+      open={drawerOpen}
+      data={historyData}
+      onClose={() => setDrawerOpen(false)}
+    />
+    </>
   );
 };
 

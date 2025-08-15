@@ -9,6 +9,14 @@ export interface IMetadata {
   status?: string;
 }
 
+export type DisableRequest = {
+  productId: string;
+  mapperKey: string;
+  envName: string;
+  checked: boolean;
+  version: string;
+}
+
 export interface INewVersionParams {
   productId: string;
   componentId: string;
