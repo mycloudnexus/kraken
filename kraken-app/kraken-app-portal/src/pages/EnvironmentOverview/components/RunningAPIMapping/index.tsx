@@ -1,13 +1,14 @@
 import { ApiCard } from "@/components/ApiMapping";
 import { Text } from "@/components/Text";
-import { useGetRunningAPIList } from "@/hooks/product";
+import {useDisableApiUseCase, useGetRunningAPIList} from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
 import { IEnv, IRunningMapping } from "@/utils/types/env.type";
-import { Flex, Table, Tag, Typography } from "antd";
+import {Badge, Flex, Switch, Table, Tag, Typography} from "antd";
 import { useMemo } from "react";
 import { ColumnsType } from "antd/es/table";
 import { toDateTime } from "@/libs/dayjs";
 import styles from './index.module.scss'
+import {ClockCircleOutlined, HistoryOutlined} from "@ant-design/icons";
 
 type Props = {
   scrollHeight: number;
@@ -23,6 +24,15 @@ const RunningAPIMapping = ({ scrollHeight, env }: Props) => {
     orderBy: "createdAt",
     direction: "DESC",
   });
+
+  const onStatusChange = (checked, item: GroupedMapping) => {
+    useDisableApiUseCase(currentProduct, {
+      mapperKey: item.targetMapperKey,
+      envName: env?.name,
+      checked,
+      version: item.version,
+    });
+  }
 
   const mappings = useMemo(() => {
     if (!data) return []
@@ -85,6 +95,20 @@ const RunningAPIMapping = ({ scrollHeight, env }: Props) => {
           <Text.LightMedium data-testid="createdBy">{item.userName}</Text.LightMedium>
           <Text.LightSmall data-testid="createdAt" color="#00000073">{toDateTime(item?.createAt)}</Text.LightSmall>
         </Flex>
+      ),
+    },
+    {
+      title: "Status",
+      width: 120,
+      render: (item: GroupedMapping) => (
+          <Switch defaultChecked={env?.name === 'stage'?item.stageAvailable:item.prodAvailable} onChange={(checked) => {onStatusChange(checked, item)}} />
+      ),
+    },
+    {
+      title: "History",
+      width: 90,
+      render: (item: GroupedMapping) => (
+          <button icon={<HistoryOutlined />} onClick={}></button>
       ),
     },
   ];
