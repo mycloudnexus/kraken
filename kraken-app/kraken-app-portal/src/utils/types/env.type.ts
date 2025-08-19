@@ -92,6 +92,17 @@ export interface IRunningMapping {
   version: string;
   status: string;
   mappingStatus: string;
+  stageAvailable?: boolean;
+  prodAvailable?: boolean;
+}
+
+export interface IApiUseCaseChangeHistory {
+  mapperKey: string;
+  updatedAt: string;
+  updatedBy: string;
+  available: boolean;
+  version: string;
+  env: string;
 }
 
 export interface IRunningComponentItem {

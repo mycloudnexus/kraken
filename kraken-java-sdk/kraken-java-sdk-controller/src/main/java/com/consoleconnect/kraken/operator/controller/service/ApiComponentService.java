@@ -32,6 +32,7 @@ import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
 import com.consoleconnect.kraken.operator.core.service.ApiUseCaseSelector;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.*;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -661,6 +662,9 @@ public class ApiComponentService
     changeHistory.setEnv(request.getEnvName());
     changeHistory.setVersion(request.getVersion());
     changeHistory.setUpdatedBy(userId);
+    changeHistory.setCreatedBy(userId);
+    changeHistory.setCreatedAt(ZonedDateTime.now());
+    changeHistory.setUpdatedAt(changeHistory.getCreatedAt());
     changeHistory.setAvailable(!request.isDisabled());
     changeHistoryRepository.save(changeHistory);
   }
@@ -690,7 +694,7 @@ public class ApiComponentService
             entity -> {
               ApiAvailabilityChangeHistory changeHistory =
                   ApiAvailabilityMapper.INSTANCE.toChangeHistory(entity);
-              changeHistory.setUpdatedBy(getUserName(entity.getCreatedBy()));
+              changeHistory.setUpdatedBy(getUserName(entity.getUpdatedBy()));
               return changeHistory;
             })
         .toList();
