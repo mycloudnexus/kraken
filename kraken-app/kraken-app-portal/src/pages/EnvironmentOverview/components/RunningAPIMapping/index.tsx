@@ -121,6 +121,7 @@ const RunningAPIMapping = ({ scrollHeight, env }: Props) => {
       render: (item: GroupedMapping) => (
           <div
             data-testid="history-button"
+            role={"button"}
             style={{cursor: 'pointer'}}
             onClick={async () => {
             await getAPIUscCaseChangeHistory(currentProduct, {mapperKey: item.targetMapperKey, env: env?.name}).then((items: {data: IApiUseCaseChangeHistory[]}) => {

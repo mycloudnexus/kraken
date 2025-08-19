@@ -49,7 +49,6 @@ const FetchHistoryDrawer = ({data, open, onClose}: {data: IApiUseCaseChangeHisto
         },
     ]
     return (
-    <>
     <Drawer width={640} placement="right" closable={false} open={open} onClose={onClose}>
     <p className="site-description-item-profile-p" style={{ marginBottom: 24, fontSize: "larger"}}>
     Change History
@@ -65,7 +64,6 @@ const FetchHistoryDrawer = ({data, open, onClose}: {data: IApiUseCaseChangeHisto
     >
     </Table>
     </Drawer>
-    </>
     );
 };
 
