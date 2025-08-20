@@ -550,7 +550,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     String jsonPathExpression = null;
     ParamLocationEnum location = ParamLocationEnum.valueOf(mapper.getSourceLocation());
     switch (location) {
-      case BODY -> {
+      case BODY, CONSTANT -> {
         target = constructBody(replaceStarToZero(mapper.getSource()));
         jsonPathExpression = constructJsonPathBody(replaceStarToZero(mapper.getSource()));
       }

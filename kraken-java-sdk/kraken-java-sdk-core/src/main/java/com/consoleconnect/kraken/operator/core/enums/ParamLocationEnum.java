@@ -6,5 +6,6 @@ public enum ParamLocationEnum {
   PATH,
   BODY,
   TASK,
+  CONSTANT,
   HYBRID;
 }
