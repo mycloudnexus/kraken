@@ -126,7 +126,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     }
     Optional<UnifiedAssetEntity> targetAssetOpt = unifiedAssetRepository.findOneByKey(targetKey);
     if (targetAssetOpt.isEmpty() || checkApiDisable(inputs, targetAssetOpt)) {
-      throw KrakenException.badRequest(API_CASE_NOT_SUPPORTED.formatted(":not deployed"));
+      throw KrakenException.badRequest(API_CASE_NOT_SUPPORTED.formatted("not deployed"));
     }
 
     // disable checking, 400
