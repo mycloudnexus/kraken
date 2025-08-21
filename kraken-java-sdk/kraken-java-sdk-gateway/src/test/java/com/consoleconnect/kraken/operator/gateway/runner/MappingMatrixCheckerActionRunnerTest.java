@@ -768,10 +768,10 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest
     Map<String, Object> inputs = new HashMap<>();
     inputs.put("current-env-name", "stage");
     Assertions.assertTrue(
-        mappingMatrixCheckerActionRunner.checkApiDisable(inputs, Optional.of(entity)));
+        mappingMatrixCheckerActionRunner.checkApiDisable(inputs, entity));
     inputs.put("current-env-name", "production");
     Assertions.assertFalse(
-        mappingMatrixCheckerActionRunner.checkApiDisable(inputs, Optional.of(entity)));
+        mappingMatrixCheckerActionRunner.checkApiDisable(inputs, entity));
   }
 
   @SneakyThrows

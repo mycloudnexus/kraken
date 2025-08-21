@@ -125,7 +125,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
           API_CASE_NOT_SUPPORTED.formatted(":lack in check rules for target key: " + targetKey));
     }
     Optional<UnifiedAssetEntity> targetAssetOpt = unifiedAssetRepository.findOneByKey(targetKey);
-    if (targetAssetOpt.isEmpty() || checkApiDisable(inputs, targetAssetOpt)) {
+    if (targetAssetOpt.isEmpty() || checkApiDisable(inputs, targetAssetOpt.get())) {
       throw KrakenException.badRequest(API_CASE_NOT_SUPPORTED.formatted("not deployed"));
     }
 
@@ -144,7 +144,7 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
   }
 
   public boolean checkApiDisable(
-      Map<String, Object> inputs, Optional<UnifiedAssetEntity> targetAssetOpt) {
+      Map<String, Object> inputs, UnifiedAssetEntity targetAsset) {
     if (!unifiedAssetService.existed(API_AVAILABILITY)) {
       return false;
     }
@@ -155,13 +155,12 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
     if (EnvNameEnum.STAGE.name().equalsIgnoreCase(envName)) {
       return apiAvailabilityFacets
           .getStageDisableApiList()
-          .contains(
-              targetAssetOpt.isPresent() ? targetAssetOpt.get().getMapperKey() : StringUtils.EMPTY);
+          .contains(targetAsset.getMapperKey());
     } else if (EnvNameEnum.PRODUCTION.name().equalsIgnoreCase(envName)) {
       return apiAvailabilityFacets
           .getProdDisableApiList()
           .contains(
-              targetAssetOpt.isPresent() ? targetAssetOpt.get().getMapperKey() : StringUtils.EMPTY);
+              targetAsset.getMapperKey());
     }
     return false;
   }
