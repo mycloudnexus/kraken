@@ -111,10 +111,10 @@ export function handleDeleteMappingItems(
   key: React.Key,
   listMapping: IMapping[],
   emptyToValue: any
-): IMapping[] | undefined {
+): IMapping[] {
   const targetItem = listMapping.find((item) => item.key === key);
   if (!targetItem) {
-    return;
+    return listMapping;
   }
 
   const filtered = listMapping.filter((item) => item.key !== key);

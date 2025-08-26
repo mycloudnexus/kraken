@@ -3,6 +3,7 @@ import { Text } from "@/components/Text";
 import { Input } from "@/components/form";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import { IRequestMapping } from "@/utils/types/component.type";
+import { IMapping } from "@/pages/NewAPIMapping/components/ResponseMapping";
 import {
   CheckOutlined,
   CloseOutlined,
@@ -181,7 +182,15 @@ const RequestItem = ({ item, index }: Props) => {
 
   const handleDeleteMapping = (key: React.Key) => {
     const updated = handleDeleteMappingItems(key, listMapping, undefined);
+    console.log("handleDeleteMapping updated", updated);
     setListMappingStateRequest(updated);
+  };
+
+  const handleDeleteMappingCustomized = (key: React.Key) => {
+    const updated = handleDeleteMappingItems(key, listMapping, undefined);
+    console.log("handleDeleteMappingCustomized updated", updated);
+    setListMappingStateRequest(updated);
+    updateSourceValuesAndMapping(updated);
   };
 
   const handleSelect = (value: string, key: React.Key) => {
@@ -220,6 +229,48 @@ const RequestItem = ({ item, index }: Props) => {
     setRequestMapping(newRequest);
   };
 
+  // Handle customized descrete enum input
+  const updateSourceValuesAndMapping = (updatedList: IMapping[]) => {
+    const rows = updatedList.filter((m) => m.name === item.name);
+    console.log("updateSourceValuesAndMapping rows", rows);
+    const sourceValues = rows
+      .map((m) => m.from?.trim())
+      .filter((v): v is string => Boolean(v));
+  
+    const valueMapping: Record<string, string> = {};
+    rows.forEach((m) => {
+      const from = m.from?.trim();
+      // take first element of string[]
+      const to = m.to?.[0]?.trim();
+      if (from && to) {
+        valueMapping[from] = to;
+      }
+    });
+    console.log("updateSourceValuesAndMapping valueMapping", valueMapping);
+    const newRequest = cloneDeep(requestMapping);
+    set(newRequest, `[${index}].sourceValues`, sourceValues);
+    set(newRequest, `[${index}].valueMapping`, valueMapping);
+    setRequestMapping(newRequest);
+  };
+  
+  const handleChangeFrom = (value: string, key: React.Key) => {
+    console.log("handleChangeFrom value:", value);
+    const cloneArr = cloneDeep(listMapping);
+    const idx = cloneArr.findIndex((l) => l.key === key);
+    set(cloneArr, `[${idx}].from`, value);
+    setListMappingStateRequest(cloneArr);
+    updateSourceValuesAndMapping(cloneArr);
+  };
+  
+  const handleChangeTo = (value: string, key: React.Key) => {
+    console.log("handleChangeTo value:", value);
+    const cloneArr = cloneDeep(listMapping);
+    const idx = cloneArr.findIndex((l) => l.key === key);
+    set(cloneArr, `[${idx}].to`, [value]);
+    setListMappingStateRequest(cloneArr);
+    updateSourceValuesAndMapping(cloneArr);
+  };
+
   useEffect(() => {
     const continuousInputValues = Object.values(continuousInput);
     if (continuousInputValues[1] > continuousInputValues[0]) {
@@ -233,7 +284,9 @@ const RequestItem = ({ item, index }: Props) => {
       setRequestMapping(newRequest);
     }
   }, [continuousInput]);
-
+  //console.log("item?.sourceValues", item?.sourceValues);
+  //console.log("item.allowValueLimit", item.allowValueLimit);
+  //console.log("item.customizedField", item.customizedField);
   return (
     <div
       className={clsx([
@@ -336,58 +389,93 @@ const RequestItem = ({ item, index }: Props) => {
         {/* Target property mapping */}
         <TargetInput item={item} index={index} />
       </Flex>
+      {/* Case-1. When sourceValues is not empty and allowValueLimit is false */}
       {!isEmpty(item?.sourceValues) && !item.allowValueLimit && (
         <Flex vertical gap={20} style={{ marginTop: 8, width: "100%" }}>
           {listMapping
             ?.filter((i) => i.name === item?.name)
-            ?.map(({ key, from, to }) => (
-              <Flex
-                className={styles.itemContainer}
-                align="center"
-                key={`${item.title}-${item.name}-${key}`}
-                wrap="wrap"
-                gap={8}
-              >
-                <Flex align="center" gap={8} style={{ flex: 1 }}>
-                  <Select
-                    data-testid="select-sonata-state"
-                    className={styles.stateSelect}
-                    placeholder="State"
-                    onSelect={(v) => handleSelect(v, key)}
-                    value={from}
+            ?.map(({ key, from, to }) => { 
+              if (!item.customizedField) {
+                return (
+                  <Flex
+                    className={styles.itemContainer}
+                    align="center"
+                    key={`${item.title}-${item.name}-${key}`}
+                    wrap="wrap"
+                    gap={8}
+                  >
+                    <Flex align="center" gap={8} style={{ flex: 1 }}>
+                      <Select
+                        data-testid="select-sonata-state"
+                        className={styles.stateSelect}
+                        placeholder="State"
+                        onSelect={(v) => handleSelect(v, key)}
+                        value={from}
+                        style={{ flex: 1 }}
+                        options={difference(
+                          item?.sourceValues,
+                          listMapping
+                            ?.filter((l) => l.name === item.name)
+                            .map((item) => item.from)
+                        ).map((item) => ({
+                          value: item,
+                          title: item,
+                        }))}
+                      />
+                      <Button
+                        className={styles.btnRemoveValueMapping}
+                        data-testid="btn-req-delete-mapping-items"
+                        type="link"
+                        onClick={() => handleDeleteMapping(key)}
+                      >
+                        <DeleteOutlined />
+                      </Button>
+                    </Flex>
+                    <MappingIcon />
+                    <Select
+                      popupClassName={styles.selectPopup}
+                      mode="tags"
+                      key={`enum-${key}`}
+                      placeholder="Input seller order state"
+                      value={to?.[0]}
+                      style={{ flex: 1 }}
+                      className={styles.stateSelect}
+                      onChange={(value) => handleChangeInput([value], key)}
+                    />
+                  </Flex>
+                );
+            } else {
+              return (
+                <Flex
+                  className={styles.itemContainer}
+                  align="center"
+                  key={`${item.title}-${item.name}-${key}`}
+                  wrap="wrap"
+                  gap={8}
+                >
+                  <Input
+                    placeholder="From value"
+                    value={from ?? ""}
+                    onChange={(val) => handleChangeFrom(val, key)}
                     style={{ flex: 1 }}
-                    options={difference(
-                      item?.sourceValues,
-                      listMapping
-                        ?.filter((l) => l.name === item.name)
-                        .map((item) => item.from)
-                    ).map((item) => ({
-                      value: item,
-                      title: item,
-                    }))}
                   />
                   <Button
                     className={styles.btnRemoveValueMapping}
-                    data-testid="btn-req-delete-mapping-items"
                     type="link"
-                    onClick={() => handleDeleteMapping(key)}
+                    onClick={() => handleDeleteMappingCustomized(key)}
                   >
                     <DeleteOutlined />
                   </Button>
+                  <MappingIcon />
+                  <Input
+                    placeholder="To value"
+                    value={to?.[0] ?? ""}
+                    onChange={(val) => handleChangeTo(val, key)}
+                    style={{ flex: 1 }}
+                  />
                 </Flex>
-                <MappingIcon />
-                <Select
-                  popupClassName={styles.selectPopup}
-                  mode="tags"
-                  key={`enum-${key}`}
-                  placeholder="Input seller order state"
-                  value={to?.[0]}
-                  style={{ flex: 1 }}
-                  className={styles.stateSelect}
-                  onChange={(value) => handleChangeInput([value], key)}
-                />
-              </Flex>
-            ))}
+              );} 
+            })}
           <Flex className={styles.itemContainer}>
             <Button
               style={{ marginBottom: 12 }}
@@ -400,6 +488,59 @@ const RequestItem = ({ item, index }: Props) => {
           </Flex>
         </Flex>
       )}
+      
+      {/* Case-2. When sourceValues is empty and allowValueLimit is false */}
+      {isEmpty(item?.sourceValues) && !item.allowValueLimit && (
+        <Flex vertical gap={20} style={{ marginTop: 8, width: "100%" }}>
+          {listMapping
+            ?.filter((i) => i.name === item?.name)
+            ?.map(({ key, from, to }) => (
+              <Flex
+                className={styles.itemContainer}
+                align="center"
+                key={`${item.title}-${item.name}-${key}`}
+                wrap="wrap"
+                gap={8}
+              >
+                <Input
+                  placeholder="From value"
+                  value={from ?? ""}
+                  onChange={(val) => handleChangeFrom(val, key)}
+                  style={{ flex: 1 }}
+                />
+
+                <MappingIcon />
+
+                <Input
+                  placeholder="To value"
+                  value={to?.[0] ?? ""}
+                  onChange={(val) => handleChangeTo(val, key)}
+                  style={{ flex: 1 }}
+                />
+
+                <Button
+                  className={styles.btnRemoveValueMapping}
+                  type="link"
+                  onClick={() => handleDeleteMappingCustomized(key)}
+                >
+                  <DeleteOutlined />
+                </Button>
+              </Flex>
+            ))}
+
+          <Flex className={styles.itemContainer}>
+            <Button
+              style={{ marginBottom: 12 }}
+              type="link"
+              onClick={() => handleAdd(item?.name)}
+            >
+              + Add value mapping
+            </Button>
+          </Flex>
+        </Flex>
+      )}
+
+      {/* Case-3. When sourceValues is empty and allowValueLimit is true */}
       {item.allowValueLimit && isEmpty(item?.sourceValues) && (
         <Flex className={styles.limitRangeContainer}>
           {editValueLimit ? (
@@ -450,6 +591,7 @@ const RequestItem = ({ item, index }: Props) => {
           )}
         </Flex>
       )}
+       {/* Case-4. When sourceValues is not empty and allowValueLimit is true */}
       {item.allowValueLimit && !isEmpty(item?.sourceValues) && (
         <Flex className={styles.limitRangeContainer}>
           <div>

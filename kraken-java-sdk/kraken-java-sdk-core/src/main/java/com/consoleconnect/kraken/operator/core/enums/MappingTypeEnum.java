@@ -8,6 +8,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum MappingTypeEnum {
   ENUM("enum", true, "normal enumeration, can be shown repeated in front side UI"),
+  CUSTOMIZED_ENUM("customized_enum", true, ""),
   STRING(
       "string",
       true,
