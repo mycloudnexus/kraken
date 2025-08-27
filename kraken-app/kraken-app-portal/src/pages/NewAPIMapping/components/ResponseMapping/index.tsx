@@ -12,6 +12,7 @@ export interface IMapping {
   from?: string;
   to?: string[];
   name?: string;
+  groupId: string;
 }
 
 const ResponseMapping = () => {

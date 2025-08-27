@@ -60,6 +60,7 @@ export interface IResponseMapping {
   valueMapping?: Record<string, any>;
   // Custom field
   id?: string;
+  groupId?: string;
 }
 
 export interface IComponent {
