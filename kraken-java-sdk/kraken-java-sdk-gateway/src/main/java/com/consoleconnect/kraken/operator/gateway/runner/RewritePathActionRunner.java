@@ -56,18 +56,16 @@ public class RewritePathActionRunner extends AbstractActionRunner {
         exchange
             .getRequest()
             .mutate()
-            .uri(buildUri(exchange, path))
+            .uri(buildUri(path))
             .method(HttpMethod.valueOf(method.toUpperCase()))
             .build();
     return Optional.of(exchange.mutate().request(request).build());
   }
 
-  private URI buildUri(ServerWebExchange exchange, String targetPath) {
+  private URI buildUri(String targetPath) {
     URI targetUri = URI.create(targetPath);
     String queryStr =
-        Stream.of(exchange.getRequest().getURI().getQuery(), targetUri.getQuery())
-            .filter(Objects::nonNull)
-            .collect(Collectors.joining("&"));
+        Stream.of(targetUri.getQuery()).filter(Objects::nonNull).collect(Collectors.joining("&"));
     String url =
         LoadTargetAPIConfigActionRunner.encodeUrlParam(
             Stream.of(targetUri.getPath(), queryStr).collect(Collectors.joining("?")));

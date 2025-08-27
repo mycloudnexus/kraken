@@ -111,7 +111,7 @@ public class RenderRequestService implements MappingTransformer {
           log.info("handleBody skip source:{}, target:{}", mapper.getSource(), mapper.getTarget());
           continue;
         }
-        String source = constructBody(mapper.getSource());
+        String source = constructBodyFromSource(mapper.getSource(), mapper.getSourceLocation());
         requestBody =
             JsonToolkit.generateJson(
                 convertToJsonPointer(mapper.getTarget().replace(REQUEST_BODY, StringUtils.EMPTY)),
@@ -138,6 +138,17 @@ public class RenderRequestService implements MappingTransformer {
     }
     endpoints.get(0).setRequestBody(requestBody);
     log.info("handleBody rendered request body:{}", requestBody);
+  }
+
+  private String constructBodyFromSource(String source, String sourceLocation) {
+    if (BODY.name().equalsIgnoreCase(sourceLocation)) {
+      return constructBody(source);
+    } else if (PATH.name().equalsIgnoreCase(sourceLocation)) {
+      return constructPath(source);
+    } else if (QUERY.name().equalsIgnoreCase(sourceLocation)) {
+      return constructQuery(source);
+    }
+    return StringUtils.EMPTY;
   }
 
   private void handlePathRefer(ComponentAPITargetFacets.Mapper mapper) {
