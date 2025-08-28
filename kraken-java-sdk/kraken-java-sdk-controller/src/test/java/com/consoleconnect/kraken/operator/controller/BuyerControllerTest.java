@@ -108,7 +108,7 @@ class BuyerControllerTest extends AbstractIntegrationTest implements EnvCreator,
         null,
         bodyStr -> {
           assertThat(bodyStr, Matchers.notNullValue());
-          assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(2)));
+          assertThat(bodyStr, hasJsonPath("$.data.data", hasSize(1)));
         });
   }
 

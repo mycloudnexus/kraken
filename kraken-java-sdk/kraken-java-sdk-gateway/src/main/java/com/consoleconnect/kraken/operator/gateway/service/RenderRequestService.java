@@ -82,7 +82,7 @@ public class RenderRequestService implements MappingTransformer {
     } else if (Objects.equals(QUERY.name(), targetLocation)) {
       path = whenTargetQuery(path, sourceLocation, pathParams, s, needConvertFromDB);
     } else if (Objects.equals(HYBRID.name(), targetLocation)) {
-      path = whenTargetHYBRID(path, target);
+      path = whenTargetHYBRID(path, target, sourceLocation, pathParams, s, needConvertFromDB);
     }
     return path;
   }
@@ -230,12 +230,21 @@ public class RenderRequestService implements MappingTransformer {
     return path;
   }
 
-  private String whenTargetHYBRID(String path, String target) {
+  private String whenTargetHYBRID(
+      String path,
+      String target,
+      String sourceLocation,
+      List<String> pathParams,
+      String s,
+      boolean needConvertFromDB) {
     StringBuilder pathBuilder = new StringBuilder();
     return pathBuilder
         .append(path)
         .append((path.contains("?") ? "&" : "?"))
-        .append(constructBody(target))
+        .append(
+            needConvertFromDB
+                ? target.replace("@{{" + pathParams.get(0) + "}}", constructParam(s))
+                : constructBodyFromSource(target, sourceLocation))
         .toString();
   }
 }
