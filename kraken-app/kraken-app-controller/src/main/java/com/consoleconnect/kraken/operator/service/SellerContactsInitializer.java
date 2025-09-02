@@ -3,10 +3,17 @@ package com.consoleconnect.kraken.operator.service;
 import com.consoleconnect.kraken.operator.config.AppMgmtProperty;
 import com.consoleconnect.kraken.operator.controller.dto.CreateSellerContactRequest;
 import com.consoleconnect.kraken.operator.controller.service.SellerContactService;
+import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
+import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
+import com.consoleconnect.kraken.operator.core.model.Metadata;
+import com.consoleconnect.kraken.operator.core.model.SyncMetadata;
 import com.consoleconnect.kraken.operator.core.service.AssetKeyGenerator;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
+import com.consoleconnect.kraken.operator.core.toolkit.DateTime;
 import jakarta.annotation.PostConstruct;
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -42,9 +49,19 @@ public class SellerContactsInitializer implements AssetKeyGenerator {
       String finalProductId, CreateSellerContactRequest detail) {
     String sellerContactKey =
         generateSellerContactKey(detail.getComponentKey(), detail.getParentProductType());
-    boolean exist = unifiedAssetService.existed(sellerContactKey);
-    if (exist) {
+    UnifiedAssetDto current = unifiedAssetService.findOneIfExist(sellerContactKey);
+    if (Objects.nonNull(current)) {
       log.info("seller contact key has exist:{}, no need to create", sellerContactKey);
+      List<UnifiedAssetDto> list = unifiedAssetService.findByKind(AssetKindEnum.PRODUCT.getKind());
+      String productKey =
+          Optional.ofNullable(list.get(0))
+              .map(UnifiedAssetDto::getMetadata)
+              .map(Metadata::getKey)
+              .orElse(null);
+      // update parent id here
+      current.setParentId(productKey);
+      SyncMetadata syncMetadata = new SyncMetadata("", "", DateTime.nowInUTCString(), "system");
+      unifiedAssetService.syncAsset(productKey, current, syncMetadata, true);
       return;
     }
     createSellerContact(finalProductId, detail);
