@@ -9,6 +9,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 public class UserSpecifications {
   private UserSpecifications() {}
+
   public static Specification<UserEntity> search(
       String q, List<String> filterRoles, UserStateEnum state, String role) {
 
