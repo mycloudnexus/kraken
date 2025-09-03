@@ -10,6 +10,7 @@ import com.consoleconnect.kraken.operator.auth.jwt.JwtEncoderToolkit;
 import com.consoleconnect.kraken.operator.auth.mapper.UserMapper;
 import com.consoleconnect.kraken.operator.auth.model.*;
 import com.consoleconnect.kraken.operator.auth.repo.UserRepository;
+import com.consoleconnect.kraken.operator.auth.repo.UserSpecifications;
 import com.consoleconnect.kraken.operator.auth.security.UserContext;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.toolkit.DateTime;
@@ -138,12 +139,13 @@ public class UserService {
     UserStateEnum userStateEnum =
         (StringUtils.isBlank(state) ? null : UserStateEnum.valueOf(state));
     Page<UserEntity> userEntityPage =
-        userRepository.search(
-            q,
-            pageRequest,
-            filterInternalUser ? List.of(UserRoleEnum.INTERNAL_USER.name()) : null,
-            userStateEnum,
-            role);
+        userRepository.findAll(
+            UserSpecifications.search(
+                q,
+                filterInternalUser ? List.of(UserRoleEnum.INTERNAL_USER.name()) : null,
+                userStateEnum,
+                role),
+            pageRequest);
     log.info("Users found:{}", userEntityPage.getTotalElements());
     return PagingHelper.toPaging(userEntityPage, UserMapper.INSTANCE::toUser);
   }
