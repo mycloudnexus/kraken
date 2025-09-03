@@ -5,23 +5,23 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>kraken-java-sdk-data</artifactId>
     <name>kraken-java-sdk-data</name>
-    <version>3.0.0</version>
+    <version>3.1.0</version>
     <packaging>jar</packaging>
     <parent>
         <groupId>com.consoleconnect.kraken</groupId>
         <artifactId>kraken-java-sdk</artifactId>
-        <version>3.0.0</version>
+        <version>3.1.0</version>
     </parent>
     <dependencies>
         <dependency>
             <groupId>com.consoleconnect.kraken</groupId>
             <artifactId>kraken-java-sdk-core</artifactId>
-            <version>3.0.0</version>
+            <version>3.1.0</version>
         </dependency>
         <dependency>
             <groupId>com.consoleconnect.kraken</groupId>
             <artifactId>kraken-java-sdk-test</artifactId>
-            <version>3.0.0</version>
+            <version>3.1.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
