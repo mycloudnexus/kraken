@@ -19,7 +19,7 @@ public interface UserRepository
   @Query(
       value =
           "select e from #{#entityName} e "
-              + " where  ( (:q) is null or LOWER(e.name) like %:q% or LOWER(e.email) like %:q% )"
+                + " where  ( (:q) is null or LOWER(e.name) like %:q% or e.name like %:q% or LOWER(e.email) like %:q% )"
               + " and ( (:filterRoles) is null or e.role not in :filterRoles )"
               + "  and  ((:state) is null or  e.state = :state)"
               + "  and  ((:role) is null or  e.role = :role)")
