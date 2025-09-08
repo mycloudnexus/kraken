@@ -22,7 +22,6 @@ import { delay, get, isEmpty, chain, cloneDeep, flatMap, reduce } from "lodash";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router";
 import { useBoolean } from "usehooks-ts";
-import { useLocation } from "react-router-dom";
 import NewAPIMapping from "../NewAPIMapping";
 import DeployHistory from "../NewAPIMapping/components/DeployHistory";
 import { Deployment } from "../NewAPIMapping/components/Deployment";
@@ -32,14 +31,16 @@ import useGetDefaultSellerApi from "../NewAPIMapping/components/useGetDefaultSel
 import ComponentSelect from "./components/ComponentSelect";
 import MappingDetailsList from "./components/MappingDetailsList";
 import styles from "./index.module.scss";
+import {getData} from "@/utils/helpers/token.ts";
 
 const StandardAPIMapping = () => {
   const { currentProduct } = useAppStore();
   const { componentId } = useParams();
-  const location = useLocation();
-  const [mainTitle, setMainTitle] = useState(() => location?.state?.mainTitle ?? "unknown main title");
-  const [filteredComponentList, setFilteredComponentList] = useState(() => location?.state?.filteredComponentList ?? []);
-  const [productType, setProductType] = useState(() => location?.state?.productType ?? "");
+  const location = JSON.parse(getData("currentLocation"));
+  console.log(location)
+  const [mainTitle, setMainTitle] = useState(() => location?.productType ?? "unknown main title");
+  const [filteredComponentList, setFilteredComponentList] = useState(() => location?.filteredComponentList ?? []);
+  const [productType, setProductType] = useState(() => location?.productType ?? "");
   const { activePath, setActivePath, selectedKey, setSelectedKey } =
     useMappingUiStore();
 

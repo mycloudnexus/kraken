@@ -19,6 +19,7 @@ import { useMemo } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import ComponentSelect from "../StandardAPIMapping/components/ComponentSelect";
 import styles from "./index.module.scss";
+import {storeData} from "@/utils/helpers/token.ts";
 
 interface RowSpanDetails {
   [path: string]: {
@@ -196,6 +197,7 @@ const StandardAPIMappingTable = () => {
       render: (targetKey) => (
         <Button type="link" onClick={
           () => {
+            storeData("currentLocation", JSON.stringify(state));
             navigate(targetKey, {
               state: {
                 mainTitle, 
