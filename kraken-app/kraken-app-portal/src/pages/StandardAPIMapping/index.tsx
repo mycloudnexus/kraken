@@ -36,7 +36,7 @@ import {getData} from "@/utils/helpers/token.ts";
 const StandardAPIMapping = () => {
   const { currentProduct } = useAppStore();
   const { componentId } = useParams();
-  const location = JSON.parse(getData("currentLocation"));
+  const location = JSON.parse(getData("currentLocation")??'');
   console.log(location)
   const [mainTitle, setMainTitle] = useState(() => location?.productType ?? "unknown main title");
   const [filteredComponentList, setFilteredComponentList] = useState(() => location?.filteredComponentList ?? []);
