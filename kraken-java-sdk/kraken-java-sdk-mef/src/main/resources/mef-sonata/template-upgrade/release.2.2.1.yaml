@@ -1,0 +1,14 @@
+
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.2.2.1
+  name: V2.2.1
+  labels:
+    productSpec: grace
+    productVersion: V2.2.1
+    publishDate: 2025-10-30
+  description: |
+    Saas upgrade POC
+  version: 1
