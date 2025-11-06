@@ -209,7 +209,9 @@ public class ApiComponentService
               }
               ComponentAPITargetFacets.Mapper updateMapper = updateMap.get(entry.getKey());
               ComponentAPITargetFacets.Mapper originMapper = entry.getValue();
-
+              // check source and target contains sensitive tokens in the updateMapper
+              SecurityTool.evaluate(updateMapper.getSource());
+              SecurityTool.evaluate(updateMapper.getTarget());
               if (isResponse) {
                 compareProperty(updateMapper.getTarget(), originMapper.getTarget());
                 compareProperty(updateMapper.getTargetType(), originMapper.getTargetType());
