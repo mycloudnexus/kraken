@@ -197,32 +197,32 @@ public class ApiComponentService
       Map<String, ComponentAPITargetFacets.Mapper> originMap,
       Map<String, ComponentAPITargetFacets.Mapper> updateMap,
       boolean isResponse) {
-    originMap
-            .forEach((key, originMapper) -> {
-                if (!updateMap.containsKey(key)) {
-                    throw KrakenException.badRequest(
-                            "The pre-defined field: "
-                                    + key
-                                    + " not existed in the update request! Please check your request payload.");
-                }
-                ComponentAPITargetFacets.Mapper updateMapper = updateMap.get(key);
-                // check source and target contains sensitive tokens in the updateMapper
-                SecurityTool.evaluate(updateMapper.getSource());
-                SecurityTool.evaluate(updateMapper.getTarget());
-                if (isResponse) {
-                    compareProperty(updateMapper.getTarget(), originMapper.getTarget());
-                    compareProperty(updateMapper.getTargetType(), originMapper.getTargetType());
-                    compareProperty(updateMapper.getTargetLocation(), originMapper.getTargetLocation());
-                    compareProperty(updateMapper.getTargetValues(), originMapper.getTargetValues());
-                } else {
-                    compareProperty(updateMapper.getSource(), originMapper.getSource());
-                    compareProperty(updateMapper.getSourceLocation(), originMapper.getSourceLocation());
-                }
-                compareProperty(updateMapper.getTitle(), originMapper.getTitle());
-                compareProperty(updateMapper.getRequiredMapping(), originMapper.getRequiredMapping());
-                compareProperty(updateMapper.getCheckPath(), originMapper.getCheckPath());
-                compareProperty(updateMapper.getDeletePath(), originMapper.getDeletePath());
-            });
+    originMap.forEach(
+        (key, originMapper) -> {
+          if (!updateMap.containsKey(key)) {
+            throw KrakenException.badRequest(
+                "The pre-defined field: "
+                    + key
+                    + " not existed in the update request! Please check your request payload.");
+          }
+          ComponentAPITargetFacets.Mapper updateMapper = updateMap.get(key);
+          // check source and target contains sensitive tokens in the updateMapper
+          SecurityTool.evaluate(updateMapper.getSource());
+          SecurityTool.evaluate(updateMapper.getTarget());
+          if (isResponse) {
+            compareProperty(updateMapper.getTarget(), originMapper.getTarget());
+            compareProperty(updateMapper.getTargetType(), originMapper.getTargetType());
+            compareProperty(updateMapper.getTargetLocation(), originMapper.getTargetLocation());
+            compareProperty(updateMapper.getTargetValues(), originMapper.getTargetValues());
+          } else {
+            compareProperty(updateMapper.getSource(), originMapper.getSource());
+            compareProperty(updateMapper.getSourceLocation(), originMapper.getSourceLocation());
+          }
+          compareProperty(updateMapper.getTitle(), originMapper.getTitle());
+          compareProperty(updateMapper.getRequiredMapping(), originMapper.getRequiredMapping());
+          compareProperty(updateMapper.getCheckPath(), originMapper.getCheckPath());
+          compareProperty(updateMapper.getDeletePath(), originMapper.getDeletePath());
+        });
   }
 
   private void compareProperty(Object o1, Object o2) {

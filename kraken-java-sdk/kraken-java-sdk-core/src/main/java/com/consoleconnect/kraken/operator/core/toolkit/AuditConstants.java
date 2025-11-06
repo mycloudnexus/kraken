@@ -17,7 +17,8 @@ public class AuditConstants {
   public static final String API_MAPPING = "api mapping use case";
   public static final String DEVELOPMENT = "development";
 
-  public static final Pattern BANNED_TOKENS = Pattern.compile(
+  public static final Pattern BANNED_TOKENS =
+      Pattern.compile(
           "(?i)\\bT\\s*\\(|\\.class\\b|\\bnew\\b|getRuntime\\b|\\.exec\\b|ProcessBuilder\\b|Class\\.forName\\b|reflect\\.|javax\\.script\\b|java\\.lang\\b|java\\.io\\b",
           Pattern.CASE_INSENSITIVE);
 }
