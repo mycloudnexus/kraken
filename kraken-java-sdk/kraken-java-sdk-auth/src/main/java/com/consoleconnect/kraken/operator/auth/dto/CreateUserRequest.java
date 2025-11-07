@@ -13,16 +13,16 @@ public class CreateUserRequest {
 
   @NotNull
   @Pattern(
-      regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&+=])(?=\\S+$).{12,64}$",
+      regexp = "^(?=.*[A-Z])(?=.*\\d)(?=.*[\\W_])(?=.{12,})(?!.*\\s).+$",
       message =
           """
-    - at least one digit
-    - at least one lowercase letter
-    - at least one uppercase letter
-    - at least one special character
-    - none whitespace
-    - length be between 12 and 64 characters long.
-  """)
+        - at least one digit
+        - at least one lowercase letter
+        - at least one uppercase letter
+        - at least one special character
+        - none whitespace
+        - at least 12 characters long.
+      """)
   private String password;
 
   private String role = UserRoleEnum.USER.name();
