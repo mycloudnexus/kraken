@@ -57,7 +57,7 @@ const ResetPwdModal = ({ user, open, onClose }: Props) => {
             {
               validator: (_, value) => {
                 if (
-                  /^(?=.*[A-Z])(?=.*\d)(?=.*[\W_])(?=.{12,})(?!.*\s).+$/.test(
+                  /^(?=.*[A-Z])(?=.*\d)(?=.*[\W_])(?=.{12,64})(?!.*\s).+$/.test(
                     value
                   )
                 ) {
@@ -65,7 +65,7 @@ const ResetPwdModal = ({ user, open, onClose }: Props) => {
                 }
                 return Promise.reject(
                   new Error(
-                    "You must be a password that is at least 12 characters long, 1 uppercase letter, 1 symbol, 1 number, and no spaces."
+                    "You must be a password that length be between 12 and 64 characters long, 1 uppercase letter, 1 symbol, 1 number, and no spaces."
                   )
                 );
               },
