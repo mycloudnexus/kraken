@@ -79,14 +79,10 @@ Specify docker-compose file docker-compose-selinux.yaml when execute docker-comp
 If all services start correctly, the following servers will be accessible(The default login is admin/Changeme_12345$):
 > [!NOTE]
 > Please never use the above credentials in your production environment!
-Follow the steps below to enable your initial account with the customized credentials:
+Follow the steps below to configure your initial account with the customized credentials:
 >   1. Specify your own HMAC-key for HMAC-SHA512 encryption through property app.security.login.hmac-secret
 >   2. Generate encrypted-password by the HMAC-key and your raw-password: encrypted-password = HMAC-SHA512(HMAC-key, raw-password),
 >   3. Update encrypted-password to property app.security.login.user-list[name=admin].password
-
-   ```bash
-   docker-compose -f docker-compose-selinux.yaml up
-   ```
 
 - Portal: http://localhost:3000
 - Controller: http://localhost:8001
