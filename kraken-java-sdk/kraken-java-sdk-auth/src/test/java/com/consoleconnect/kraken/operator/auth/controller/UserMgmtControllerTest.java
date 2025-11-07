@@ -93,7 +93,7 @@ class UserMgmtControllerTest extends AbstractIntegrationTest {
 
     CreateUserRequest createUserRequest = new CreateUserRequest();
     createUserRequest.setEmail(email);
-    createUserRequest.setPassword(UUID.randomUUID().toString());
+    createUserRequest.setPassword(TestContextConstants.LOGIN_PASSWORD);
     createUserRequest.setRole("USER");
     createUserRequest.setName(UUID.randomUUID().toString());
 
