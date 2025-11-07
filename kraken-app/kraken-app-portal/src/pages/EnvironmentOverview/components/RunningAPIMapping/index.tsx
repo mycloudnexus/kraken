@@ -100,7 +100,7 @@ const RunningAPIMapping = ({ scrollHeight, env }: Props) => {
       width: 200,
       render: (item: GroupedMapping) => (
         <Flex vertical gap={2}>
-          <Text.LightMedium data-testid="createdBy">{findUserName(item.createBy)}</Text.LightMedium>
+          <Text.LightMedium data-testid="createdBy">{findUserName(item?.createBy as any)}</Text.LightMedium>
           <Text.LightSmall data-testid="createdAt" color="#00000073">{toDateTime(item?.createAt)}</Text.LightSmall>
         </Flex>
       ),
