@@ -244,7 +244,7 @@ class UserMgmtControllerTest extends AbstractIntegrationTest {
               UserContext.AUTHORIZATION_HEADER_PREFIX + accessToken);
 
           ResetPasswordRequest resetPasswordRequest = new ResetPasswordRequest();
-          resetPasswordRequest.setPassword(UUID.randomUUID().toString());
+          resetPasswordRequest.setPassword("ResetPass_123456@");
 
           String disableEndpoint = "/users/" + userResponse.getData().getId() + "/resetPassword";
           testClientHelper.requestAndVerify(
