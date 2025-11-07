@@ -52,11 +52,11 @@ app:
       user-list:
         - email: admin
           id: fc5f6165-aa20-4798-a9ee-78afbe3cf06d
-          password: 44ce4b6047338ac3de06da480c5717e89eff7fc30f44e8a3a850c5fb3a3f1876d663df4026bab3c5ee6e89d961ffbe275aa670d453a99c6d584af929b96cfa8d
+          password: fb2985b349a547f9945f57312a1155fb0f130a369ea8454e7d172669554c7c87b5701ddd7fce51d7c857170ad381076ee59602d6d4097f8536f3e6d2a7c50c4a
           role: ADMIN
         - email: test
           id: d2694755-c2fb-46b2-97a7-389d0427691d
-          password: 44ce4b6047338ac3de06da480c5717e89eff7fc30f44e8a3a850c5fb3a3f1876d663df4026bab3c5ee6e89d961ffbe275aa670d453a99c6d584af929b96cfa8d
+          password: fb2985b349a547f9945f57312a1155fb0f130a369ea8454e7d172669554c7c87b5701ddd7fce51d7c857170ad381076ee59602d6d4097f8536f3e6d2a7c50c4a
           role: USER
     resource-server:
       enabled: false

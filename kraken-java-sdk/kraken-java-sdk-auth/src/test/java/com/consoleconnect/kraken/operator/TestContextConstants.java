@@ -5,7 +5,7 @@ public class TestContextConstants {
 
   public static final String ADMIN_LOGIN_USERNAME = "admin";
   public static final String LOGIN_USERNAME = "test";
-  public static final String LOGIN_PASSWORD = "Gterewrw_$123";
+  public static final String LOGIN_PASSWORD = "TestPass_12345678#";
 
   public static final String JWT_SECRET = "MjRhMjNhNGYtMWUzMS00ZTY4LTlhYzgtMzY5NDcwYzNjNDE4";
 
