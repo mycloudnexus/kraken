@@ -12,6 +12,7 @@ import {HistoryOutlined} from "@ant-design/icons";
 import {getAPIUscCaseChangeHistory} from "@/services/products.ts";
 import FetchHistoryDrawer from "@/pages/EnvironmentOverview/components/ApiUseCaseChangeHistory";
 import {DisableRequest} from "@/utils/types/product.type.ts";
+import { useUser } from "@/hooks/user/useUser";
 
 type Props = {
   scrollHeight: number;
@@ -24,6 +25,7 @@ const RunningAPIMapping = ({ scrollHeight, env }: Props) => {
   const { currentProduct } = useAppStore();
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
   const [historyData, setHistoryData] = useState<IApiUseCaseChangeHistory[]>();
+  const { findUserName } = useUser();
   const { data, isLoading } = useGetRunningAPIList(currentProduct, {
     envId: env?.id,
     orderBy: "createdAt",
@@ -98,7 +100,7 @@ const RunningAPIMapping = ({ scrollHeight, env }: Props) => {
       width: 200,
       render: (item: GroupedMapping) => (
         <Flex vertical gap={2}>
-          <Text.LightMedium data-testid="createdBy">{item.userName}</Text.LightMedium>
+          <Text.LightMedium data-testid="createdBy">{findUserName(item?.createBy as any)}</Text.LightMedium>
           <Text.LightSmall data-testid="createdAt" color="#00000073">{toDateTime(item?.createAt)}</Text.LightSmall>
         </Flex>
       ),
