@@ -14,6 +14,7 @@ import com.consoleconnect.kraken.operator.core.toolkit.Paging;
 import com.consoleconnect.kraken.operator.core.toolkit.PagingHelper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.http.MediaType;
@@ -53,7 +54,7 @@ public class UserMgmtController {
 
   @Operation(summary = "add a new user")
   @PostMapping()
-  public Mono<HttpResponse<User>> create(@RequestBody CreateUserRequest request) {
+  public Mono<HttpResponse<User>> create(@Valid @RequestBody CreateUserRequest request) {
     return UserContext.getUserId()
         .publishOn(Schedulers.boundedElastic())
         .map(userId -> userService.create(request, userId))
@@ -79,7 +80,7 @@ public class UserMgmtController {
   @Operation(summary = "reset password for a user")
   @PostMapping("/{id}/resetPassword")
   public Mono<HttpResponse<User>> resetPassword(
-      @PathVariable String id, @RequestBody ResetPasswordRequest request) {
+      @PathVariable String id, @Valid @RequestBody ResetPasswordRequest request) {
     return UserContext.getUserId()
         .publishOn(Schedulers.boundedElastic())
         .map(userId -> userService.resetPassword(id, request.getPassword(), userId))
