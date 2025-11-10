@@ -88,12 +88,17 @@ class UserMgmtControllerTest extends AbstractIntegrationTest {
 
   private Optional<String> createUser(
       String token, String email, int statusCode, Consumer<String> verify) {
+    return createUser(token, email, TestContextConstants.LOGIN_PASSWORD, statusCode, verify);
+  }
+
+  private Optional<String> createUser(
+      String token, String email, String password, int statusCode, Consumer<String> verify) {
     Map<String, String> headers = new HashMap<>();
     headers.put(UserContext.AUTHORIZATION_HEADER, UserContext.AUTHORIZATION_HEADER_PREFIX + token);
 
     CreateUserRequest createUserRequest = new CreateUserRequest();
     createUserRequest.setEmail(email);
-    createUserRequest.setPassword(UUID.randomUUID().toString());
+    createUserRequest.setPassword(password);
     createUserRequest.setRole("USER");
     createUserRequest.setName(UUID.randomUUID().toString());
 
@@ -119,6 +124,21 @@ class UserMgmtControllerTest extends AbstractIntegrationTest {
           assertThat(bodyStr, hasJsonPath("$.data.id", notNullValue()));
           assertThat(bodyStr, hasJsonPath("$.data.email", notNullValue()));
           assertThat(bodyStr, hasJsonPath("$.data.role", notNullValue()));
+        });
+  }
+
+  @Test
+  void givenCorrectAccessToken_whenAddNewUser_thenReturnBadRequest() {
+
+    createUser(
+        generateAdminAccessToken(),
+        UUID.randomUUID().toString(),
+        "123",
+        HttpStatus.BAD_REQUEST.value(),
+        bodyStr -> {
+          Assertions.assertNotNull(bodyStr);
+          assertThat(bodyStr, hasJsonPath("$.message", notNullValue()));
+          assertThat(bodyStr, hasJsonPath("$.fieldErrors", notNullValue()));
         });
   }
 
@@ -244,7 +264,7 @@ class UserMgmtControllerTest extends AbstractIntegrationTest {
               UserContext.AUTHORIZATION_HEADER_PREFIX + accessToken);
 
           ResetPasswordRequest resetPasswordRequest = new ResetPasswordRequest();
-          resetPasswordRequest.setPassword(UUID.randomUUID().toString());
+          resetPasswordRequest.setPassword("ResetPass_123456@");
 
           String disableEndpoint = "/users/" + userResponse.getData().getId() + "/resetPassword";
           testClientHelper.requestAndVerify(

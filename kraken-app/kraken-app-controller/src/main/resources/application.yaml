@@ -145,7 +145,7 @@ app:
           id: fc5f6165-aa20-4798-a9ee-78afbe3cf06d
           email: admin
           role: ADMIN
-          password: 182cf072dc112634996cf4abccf2915273ff1a0b53d4436388fe9c55a9531277c6d86a23b7a9addc1c2642a6b62f17cfd18f70c2d98501d520fe4886727b97d1
+          password: 4d76d1ac9d6a604ce3fe4ae071204f98626d5dff6b7aebdf83af2dfb2e69626e4b88e531e5d98f5b6df07b8f70ae8e11ccfeb62c21ea4331825d521d975f2dd9
         - name: user_upgrade
           email: SYSTEM_UPGRADE
           role: INTERNAL_USER
