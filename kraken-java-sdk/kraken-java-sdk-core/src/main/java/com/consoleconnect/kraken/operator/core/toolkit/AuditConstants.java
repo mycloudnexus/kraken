@@ -1,5 +1,7 @@
 package com.consoleconnect.kraken.operator.core.toolkit;
 
+import java.util.regex.Pattern;
+
 public class AuditConstants {
 
   private AuditConstants() {}
@@ -14,4 +16,9 @@ public class AuditConstants {
   public static final String TARGET_SPEC = "target api server";
   public static final String API_MAPPING = "api mapping use case";
   public static final String DEVELOPMENT = "development";
+
+  public static final Pattern BANNED_TOKENS =
+      Pattern.compile(
+          "(?i)\\bT\\s*\\(|\\.class\\b|\\bnew\\b|getRuntime\\b|\\.exec\\b|ProcessBuilder\\b|Class\\.forName\\b|reflect\\.|javax\\.script\\b|java\\.lang\\b|java\\.io\\b",
+          Pattern.CASE_INSENSITIVE);
 }
