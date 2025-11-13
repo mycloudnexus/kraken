@@ -220,7 +220,6 @@ const EnvironmentOverview = () => {
                       <EnvStatus
                         env={env}
                         apiKey={haveApiKey}
-                        //status={getDataPlaneInfo(env.id)?.status}
                         deploymentStatus={deploymentStatus}
                         disConnect={disConnectNum}
                         connect={connectNum}
