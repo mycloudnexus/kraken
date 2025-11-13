@@ -4,7 +4,6 @@ import {
   useGetAllApiKeyList,
   useGetAllDataPlaneList,
   useGetRunningComponentList,
-  useCreateApiKey,
   useRotateApiKey,
 } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
@@ -59,7 +58,6 @@ const EnvironmentOverview = () => {
   const { data: dataPlane, isLoading: loadingDataPlane, refetch: refetchDataPlane, } =
     useGetAllDataPlaneList(currentProduct, initPaginationParams);
   const { data: runningComponent } = useGetRunningComponentList(currentProduct);
-  const { mutateAsync: createApiKeyMutate } = useCreateApiKey();
   const { mutateAsync: rotateApiKeyMutate } = useRotateApiKey();
 
   const [open, setOpen] = useState(false);
@@ -83,7 +81,7 @@ const EnvironmentOverview = () => {
           notification.error({ message: e?.data?.error ?? "Rotation failed" });
         }
       },
-      [currentProduct, createApiKeyMutate]
+      [currentProduct, rotateApiKeyMutate]
   );
 
   const onConfirmRotate = useCallback(
@@ -110,11 +108,11 @@ const EnvironmentOverview = () => {
   const getDataPlaneInfo = useCallback(
     (id: string) => {
       const list = dataPlane?.data?.filter((i) => i.envId === id) || [];
-      const status = list.every((n) => n.status === "OK");
+      const deploymentStatus = list.every((n) => n.status === "OK");
       const len = list.length;
       const disConnectNum = list.filter((n) => n.status !== "OK").length;
       const connectNum = list.filter((n) => n.status === "OK").length;
-      return { len, status, disConnectNum, connectNum };
+      return { len, deploymentStatus, disConnectNum, connectNum };
     },
     [dataPlane]
   );
@@ -122,7 +120,7 @@ const EnvironmentOverview = () => {
   useEffect(() => {
     if (!selectedEnv) return;
 
-    const envStatus = getDataPlaneInfo(selectedEnv.id)?.status;
+    const envStatus = getDataPlaneInfo(selectedEnv.id)?.deploymentStatus;
 
     if (envStatus === false) {
       const interval = setInterval(() => {
@@ -172,7 +170,7 @@ const EnvironmentOverview = () => {
                 const haveApiKey = !!apiKey?.data?.find(
                   (i) => i.envId === env.id
                 );
-                const { disConnectNum, connectNum, len } = getDataPlaneInfo(
+                const { disConnectNum, connectNum, len, deploymentStatus } = getDataPlaneInfo(
                   env.id
                 );
                 return (
@@ -222,7 +220,8 @@ const EnvironmentOverview = () => {
                       <EnvStatus
                         env={env}
                         apiKey={haveApiKey}
-                        status={getDataPlaneInfo(env.id)?.status}
+                        //status={getDataPlaneInfo(env.id)?.status}
+                        deploymentStatus={deploymentStatus}
                         disConnect={disConnectNum}
                         connect={connectNum}
                         dataPlane={len}
