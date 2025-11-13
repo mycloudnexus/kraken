@@ -167,4 +167,67 @@ describe(" Environment Overview component list", () => {
 
   })
 
+  it("should poll refetchDataPlane until deploymentStatus becomes OK", async () => {
+    vi.useFakeTimers();
+    vi.spyOn(sizeHooks, 'useContainerHeight').mockReturnValue([1000]);
+
+    vi.spyOn(productHooks, "useGetProductEnvs").mockReturnValue({
+      data: {
+        data: [
+          {
+            id: "env-prod",
+            name: "production",
+            productId: "mef.sonata",
+          },
+        ],
+      },
+      isLoading: false,
+    } as any);
+
+    vi.spyOn(productHooks, "useGetAllApiKeyList").mockReturnValue({
+      data: { data: [] },
+      isLoading: false,
+    } as any);
+
+    const refetchMock = vi.fn();
+    const dataPlaneInitial = {
+      data: [
+        { envId: "env-prod", status: "In progress" }, // not OK yet
+      ],
+    };
+
+    const useGetAllDataPlaneListSpy = vi
+      .spyOn(productHooks, "useGetAllDataPlaneList")
+      .mockReturnValue({
+        data: dataPlaneInitial,
+        isLoading: false,
+        refetch: refetchMock,
+      } as any);
+
+    render(<EnvironmentOverview />);
+
+    await waitFor(() => {
+      expect(refetchMock).not.toHaveBeenCalled();
+    });
+
+    vi.advanceTimersByTime(5000);
+    expect(refetchMock).toHaveBeenCalledTimes(1);
+
+    vi.advanceTimersByTime(5000);
+    expect(refetchMock).toHaveBeenCalledTimes(2);
+
+    useGetAllDataPlaneListSpy.mockReturnValueOnce({
+      data: { data: [{ envId: "env-prod", status: "OK" }] },
+      isLoading: false,
+      refetch: refetchMock,
+    } as any);
+
+    render(<EnvironmentOverview />);
+
+    vi.advanceTimersByTime(10000);
+    expect(refetchMock).toHaveBeenCalledTimes(2);
+
+    vi.useRealTimers();
+  });
+
 });
