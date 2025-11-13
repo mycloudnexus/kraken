@@ -806,4 +806,21 @@ class MappingMatrixCheckerActionRunnerTest extends AbstractIntegrationTest
             mappingMatrixCheckerActionRunner.checkModifyConstraints(
                 filterRules, targetKey, inputs));
   }
+
+  @Test
+  void givenIllegalMapper_whenCheckRemoteCodeExecution_thenThrowsException() {
+    String exp =
+        "@{{buyerId==null?0:T(java.lang.Runtime).getRuntime().exec(new java.lang.String[]{body.p[0].body.p[1].body.p[2]})}}";
+    List<ComponentAPITargetFacets.Mapper> mappers = new ArrayList<>();
+    ComponentAPITargetFacets.Mapper mapper = new ComponentAPITargetFacets.Mapper();
+    mapper.setSource(exp);
+    mapper.setTarget(exp);
+    mappers.add(mapper);
+    Assertions.assertThrows(
+        KrakenException.class,
+        () -> mappingMatrixCheckerActionRunner.checkRemoteCodeExecution(mappers, true));
+    Assertions.assertThrows(
+        KrakenException.class,
+        () -> mappingMatrixCheckerActionRunner.checkRemoteCodeExecution(mappers, false));
+  }
 }

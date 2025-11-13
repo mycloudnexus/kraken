@@ -26,6 +26,7 @@ import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.consoleconnect.kraken.operator.core.toolkit.Paging;
+import com.consoleconnect.kraken.operator.core.toolkit.SecurityTool;
 import com.consoleconnect.kraken.operator.gateway.dto.PathCheck;
 import com.consoleconnect.kraken.operator.gateway.entity.HttpRequestEntity;
 import com.consoleconnect.kraken.operator.gateway.repo.HttpRequestRepository;
@@ -434,6 +435,8 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
               .getEndpoints()
               .get(0)
               .getMappers();
+      checkRemoteCodeExecution(mappers.getRequest(), true);
+      checkRemoteCodeExecution(mappers.getResponse(), false);
       request.addAll(mappers.getRequest());
     }
     DocumentContext documentContext = JsonPath.parse(inputs);
@@ -451,6 +454,18 @@ public class MappingMatrixCheckerActionRunner extends AbstractActionRunner
       } else {
         checkMappingValue(documentContext, mapper, inputs, pathsExpected422);
       }
+    }
+  }
+
+  public void checkRemoteCodeExecution(
+      List<ComponentAPITargetFacets.Mapper> mappers, boolean isRequest) {
+    if (CollectionUtils.isEmpty(mappers)) {
+      return;
+    }
+    if (isRequest) {
+      mappers.forEach(mapper -> SecurityTool.evaluate(mapper.getSource()));
+    } else {
+      mappers.forEach(mapper -> SecurityTool.evaluate(mapper.getTarget()));
     }
   }
 
