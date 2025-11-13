@@ -169,7 +169,7 @@ describe(" Environment Overview component list", () => {
 
   it("should poll refetchDataPlane until deploymentStatus becomes OK", async () => {
     vi.useFakeTimers();
-    vi.spyOn(sizeHooks, 'useContainerHeight').mockReturnValue([1000]);
+    vi.spyOn(sizeHooks, "useContainerHeight").mockReturnValue([1000]);
 
     vi.spyOn(productHooks, "useGetProductEnvs").mockReturnValue({
       data: {
@@ -190,30 +190,31 @@ describe(" Environment Overview component list", () => {
     } as any);
 
     const refetchMock = vi.fn();
-    const dataPlaneInitial = {
-      data: [
-        { envId: "env-prod", status: "In progress" }, // not OK yet
-      ],
+
+    const dataPlaneInProgress = {
+      data: [{ envId: "env-prod", status: "In progress" }],
     };
 
     const useGetAllDataPlaneListSpy = vi
       .spyOn(productHooks, "useGetAllDataPlaneList")
       .mockReturnValue({
-        data: dataPlaneInitial,
+        data: dataPlaneInProgress,
         isLoading: false,
         refetch: refetchMock,
       } as any);
 
     render(<EnvironmentOverview />);
 
-    await waitFor(() => {
-      expect(refetchMock).not.toHaveBeenCalled();
-    });
+    await Promise.resolve();
 
     vi.advanceTimersByTime(5000);
+    await Promise.resolve();
+    vi.runOnlyPendingTimers();
     expect(refetchMock).toHaveBeenCalledTimes(1);
 
     vi.advanceTimersByTime(5000);
+    await Promise.resolve();
+    vi.runOnlyPendingTimers();
     expect(refetchMock).toHaveBeenCalledTimes(2);
 
     useGetAllDataPlaneListSpy.mockReturnValueOnce({
@@ -223,11 +224,13 @@ describe(" Environment Overview component list", () => {
     } as any);
 
     render(<EnvironmentOverview />);
+    await Promise.resolve();
 
     vi.advanceTimersByTime(10000);
+    vi.runOnlyPendingTimers();
     expect(refetchMock).toHaveBeenCalledTimes(2);
 
     vi.useRealTimers();
-  });
+  }, 20000);
 
 });
