@@ -56,7 +56,7 @@ const EnvironmentOverview = () => {
     currentProduct,
     initPaginationParams
   );
-  const { data: dataPlane, isLoading: loadingDataPlane } =
+  const { data: dataPlane, isLoading: loadingDataPlane, refetch: refetchDataPlane, } =
     useGetAllDataPlaneList(currentProduct, initPaginationParams);
   const { data: runningComponent } = useGetRunningComponentList(currentProduct);
   const { mutateAsync: createApiKeyMutate } = useCreateApiKey();
@@ -118,6 +118,21 @@ const EnvironmentOverview = () => {
     },
     [dataPlane]
   );
+
+  useEffect(() => {
+    if (!selectedEnv) return;
+
+    const envStatus = getDataPlaneInfo(selectedEnv.id)?.status;
+
+    if (envStatus === false) {
+      const interval = setInterval(() => {
+        refetchDataPlane();
+      }, 5000); 
+
+      return () => clearInterval(interval);
+    }
+  }, [selectedEnv, dataPlane, refetchDataPlane, getDataPlaneInfo]);
+
 
   const envList = useMemo(
     () =>

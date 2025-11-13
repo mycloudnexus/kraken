@@ -16,7 +16,7 @@ import styles from "./index.module.scss";
 interface Props {
   env: IEnv;
   apiKey?: boolean;
-  status?: boolean;
+  deploymentStatus?: boolean;
   dataPlane?: number;
   disConnect?: number;
   runningApi?: number;
@@ -24,8 +24,8 @@ interface Props {
   loading?: boolean;
 }
 
-const parseColors = (status: string) => {
-  switch (status) {
+const parseColors = (deploymentStatus: string) => {
+  switch (deploymentStatus) {
     case "SUCCESS":
       return "#389E0D";
     case "WARNING":
@@ -38,7 +38,7 @@ const parseColors = (status: string) => {
 const EnvStatus = ({
   env,
   apiKey,
-  status,
+  deploymentStatus,
   dataPlane = 0,
   disConnect = 0,
   connect = 0,
@@ -114,7 +114,7 @@ const EnvStatus = ({
           flex={1}
           className={classes(styles.statusWrapper, {
             [styles.nothing]: dataPlane === 0,
-            [styles.success]: status,
+            [styles.success]: deploymentStatus,
             [styles.error]: isDisConnect,
             [styles.warning]: connectStatus === "someConnect",
             [styles.noAPI]: !apiKey,
