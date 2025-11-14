@@ -180,6 +180,10 @@ public class ApiComponentService
     }
     ComponentAPITargetFacets.Endpoint endpoint = requestFacets.getEndpoints().get(0);
     ComponentAPITargetFacets.Mappers requestMapper = endpoint.getMappers();
+    // check source and target contains sensitive tokens in the updateMapper
+    requestMapper.getRequest().forEach(mapper -> SecurityTool.evaluate(mapper.getSource()));
+    requestMapper.getResponse().forEach(mapper -> SecurityTool.evaluate(mapper.getTarget()));
+
     ComponentAPITargetFacets.Mappers originMapper = originFacets.getEndpoints().get(0).getMappers();
     if (originMapper == null) {
       return;
@@ -206,9 +210,6 @@ public class ApiComponentService
                     + " not existed in the update request! Please check your request payload.");
           }
           ComponentAPITargetFacets.Mapper updateMapper = updateMap.get(key);
-          // check source and target contains sensitive tokens in the updateMapper
-          SecurityTool.evaluate(updateMapper.getSource());
-          SecurityTool.evaluate(updateMapper.getTarget());
           if (isResponse) {
             compareProperty(updateMapper.getTarget(), originMapper.getTarget());
             compareProperty(updateMapper.getTargetType(), originMapper.getTargetType());
