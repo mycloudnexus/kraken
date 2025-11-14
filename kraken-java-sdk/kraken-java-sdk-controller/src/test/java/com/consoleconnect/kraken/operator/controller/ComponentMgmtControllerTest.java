@@ -553,4 +553,26 @@ public class ComponentMgmtControllerTest extends AbstractIntegrationTest
               assertThat(bodyStr, notNullValue());
             });
   }
+
+  @Test
+  void givenMapper_whenIncludeMaliciousTokens_thenThrowError() {
+    String key = "mef.sonata.api-target-mapper.order.eline.add";
+    UnifiedAssetDto asset = unifiedAssetService.findOne(key);
+
+    ComponentAPITargetFacets facets = UnifiedAsset.getFacets(asset, ComponentAPITargetFacets.class);
+    ComponentAPITargetFacets.Endpoint endpoint = facets.getEndpoints().get(0);
+    endpoint
+        .getMappers()
+        .getRequest()
+        .get(0)
+        .setSource(
+            "@{{buyerId==null?0:T(java.lang.Runtime).getRuntime().exec(new java.lang.String[]{body.p[0],body.p[1],body.p[2]})}}");
+
+    UnifiedAsset maliciousAsset = new UnifiedAsset();
+    maliciousAsset.setMetadata(asset.getMetadata());
+    maliciousAsset.setFacets(
+        JsonToolkit.fromJson(
+            JsonToolkit.toJson(facets), new TypeReference<Map<String, Object>>() {}));
+    assertUpdateErrorResult(maliciousAsset);
+  }
 }
