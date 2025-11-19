@@ -60,8 +60,15 @@ public class HeartBeatService {
   @EventListener(classes = ApplicationReadyEvent.class)
   public void onPlatformBootUp(Object event) {
     log.info("Application started up, report start up event");
+
+    log.info("Deleting the heartbeat records");
+    heartbeatRepository.deleteAll();
+    log.info("Done");
+
+    log.info("Creating new heartbeat record");
     InstanceHeartbeatEntity instanceHeartbeatEntity = builInstanceHeartbeatEntity();
     instanceHeartbeatEntity.setStartUpAt(ZonedDateTime.now());
     heartbeatRepository.save(instanceHeartbeatEntity);
+    log.info("Done");
   }
 }
