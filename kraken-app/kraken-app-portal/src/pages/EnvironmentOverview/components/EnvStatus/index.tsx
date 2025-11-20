@@ -71,7 +71,7 @@ const EnvStatus = ({
     }
   );
 
-  const { data: latestDeployment, isLoading } = useGetAPIDeploymentStatus(
+  const { data: latestDeployment } = useGetAPIDeploymentStatus(
     currentProduct,
     env?.id
   );
