@@ -7,8 +7,11 @@ import * as productHooks from "@/hooks/product";
 
 describe(" EnvironmentOverview status  component", () => {
   it("EnvironmentOverview success status  component", () => {
-    vi.spyOn(productHooks, "useGetAPIDeploymentStatus").mockReturnValue({
-          status: "SUCCESS",
+    vi.spyOn(productHooks, "useGetAPIDeploymentStatus").mockReturnValue(
+        {
+          data: {
+            status: "SUCCESS",
+          }
         } as any);
 
     const { container } = render(
@@ -19,9 +22,12 @@ describe(" EnvironmentOverview status  component", () => {
   });
 
   it("EnvironmentOverview warning status  component", () => {
-    vi.spyOn(productHooks, "useGetAPIDeploymentStatus").mockReturnValue({
+    vi.spyOn(productHooks, "useGetAPIDeploymentStatus").mockReturnValue(
+      {
+        data: {
           status: "WARNING",
-        } as any);
+        }
+      } as any);
 
     const { container } = render(
       <QueryClientProvider client={queryClient}>
@@ -31,9 +37,12 @@ describe(" EnvironmentOverview status  component", () => {
   });
 
   it("EnvironmentOverview in-progress status  component", () => {
-    vi.spyOn(productHooks, "useGetAPIDeploymentStatus").mockReturnValue({
+    vi.spyOn(productHooks, "useGetAPIDeploymentStatus").mockReturnValue(
+      {
+        data: {
           status: "IN-PRGRESS",
-        } as any);
+        }
+      } as any);
 
     const { container } = render(
       <QueryClientProvider client={queryClient}>
