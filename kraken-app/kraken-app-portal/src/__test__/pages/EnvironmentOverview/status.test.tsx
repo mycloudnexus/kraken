@@ -6,9 +6,33 @@ import { IEnv } from '@/utils/types/env.type';
 import * as productHooks from "@/hooks/product";
 
 describe(" EnvironmentOverview status  component", () => {
-  it("EnvironmentOverview status  component", () => {
+  it("EnvironmentOverview success status  component", () => {
     vi.spyOn(productHooks, "useGetAPIDeploymentStatus").mockReturnValue({
-          status: "Success",
+          status: "SUCCESS",
+        } as any);
+
+    const { container } = render(
+      <QueryClientProvider client={queryClient}>
+        <EnvironmentStatus env={{ id: "1", name: "2" } as IEnv} />
+      </QueryClientProvider>);
+    expect(container).toBeInTheDocument();
+  });
+
+  it("EnvironmentOverview warning status  component", () => {
+    vi.spyOn(productHooks, "useGetAPIDeploymentStatus").mockReturnValue({
+          status: "WARNING",
+        } as any);
+
+    const { container } = render(
+      <QueryClientProvider client={queryClient}>
+        <EnvironmentStatus env={{ id: "1", name: "2" } as IEnv} />
+      </QueryClientProvider>);
+    expect(container).toBeInTheDocument();
+  });
+
+  it("EnvironmentOverview in-progress status  component", () => {
+    vi.spyOn(productHooks, "useGetAPIDeploymentStatus").mockReturnValue({
+          status: "IN-PRGRESS",
         } as any);
 
     const { container } = render(
