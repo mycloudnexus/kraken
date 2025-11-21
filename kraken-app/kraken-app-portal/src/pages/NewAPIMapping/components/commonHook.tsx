@@ -72,7 +72,6 @@ export const useCommonAddProp = ({
     field: keyof typeof sellerAPIExampleProps,
     value: string
   ) => {
-    console.log('commonHook hybrid: ', value)
     if (isEmpty(value)) {
       setSellerAPIExampleProps({
         ...sellerAPIExampleProps,
