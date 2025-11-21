@@ -38,7 +38,6 @@ export function SourceInput({
   const isFocused =
     rightSide === EnumRightType.AddSellerResponse && activeResponseName === id;
 
-  console.log("xlhan test selec or input property 3");
   return (
     <Flex className={styles.flexColumn} gap={4}>
       {item.source ? (

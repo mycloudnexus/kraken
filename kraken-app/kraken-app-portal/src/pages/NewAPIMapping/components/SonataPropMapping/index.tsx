@@ -82,7 +82,6 @@ const SonataPropMapping = ({ list, title }: Readonly<Props>) => {
 
   const notEmptyList = !!list.length
 
-  console.log("xlhan test selec or input property 5");
   return (
     <Flex gap={16}>
       <div className={styles.sonataPropMappingWrapper}>

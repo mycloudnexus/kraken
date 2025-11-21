@@ -30,7 +30,6 @@ export function TargetInput({
   const isFocused =
     rightSide === EnumRightType.SonataResponse && activeSonataResponse === id;
 
-  console.log("xlhan test selec or input property 4");
   return (
     <Flex className={styles.flexColumn} gap={4}>
       {item.target ? (
