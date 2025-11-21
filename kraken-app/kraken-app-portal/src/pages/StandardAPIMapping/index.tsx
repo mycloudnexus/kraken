@@ -37,7 +37,6 @@ const StandardAPIMapping = () => {
   const { currentProduct } = useAppStore();
   const { componentId } = useParams();
   const location = JSON.parse(getData("currentLocation")??'{}');
-  console.log(location)
   const [mainTitle, setMainTitle] = useState(() => location?.productType ?? "unknown main title");
   const [filteredComponentList, setFilteredComponentList] = useState(() => location?.filteredComponentList ?? []);
   const [productType, setProductType] = useState(() => location?.productType ?? "");

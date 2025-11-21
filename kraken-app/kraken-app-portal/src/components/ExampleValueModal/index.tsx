@@ -13,6 +13,7 @@ type Props = {
   onClose: () => void;
   onOK: (value: string) => void;
   location: string;
+  defaultValue?: string;
 };
 
 const ExampleValueModal = ({
@@ -21,6 +22,7 @@ const ExampleValueModal = ({
   onClose,
   onOK,
   location,
+  defaultValue,
 }: Props) => {
   const [value, setValue] = useState("");
   const { sellerAPIExampleProps } = useNewApiMappingStore();
@@ -28,16 +30,20 @@ const ExampleValueModal = ({
     onOK(value);
   };
   useEffect(() => {
-    const item = get(
+    const storeItem = get(
       sellerAPIExampleProps,
       `${location === "PATH" ? "path" : "param"}.${attribute}`,
       ""
     );
-    if (item) {
-      setValue(item);
-    }
-  }, [sellerAPIExampleProps]);
+    /*if (storeItem) {
+      setValue(storeItem);
+    }*/
+    console.log('storeItem:', storeItem);
+    const initial = defaultValue || '';
+    setValue(initial);
+  }, [sellerAPIExampleProps, defaultValue, attribute, location]);
 
+  console.log('ExampleValueModal value:', value);
   return (
     <Modal
       open={isOpen}

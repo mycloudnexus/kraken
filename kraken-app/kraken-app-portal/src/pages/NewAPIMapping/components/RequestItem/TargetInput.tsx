@@ -45,7 +45,6 @@ export function TargetInput({
 
     setRequestMapping(newRequest);
   };
-
   return (
     <Flex className={styles.flexColumn} gap={4}>
       {item.target ? (

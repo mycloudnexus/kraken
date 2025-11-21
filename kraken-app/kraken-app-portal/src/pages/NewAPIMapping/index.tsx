@@ -143,6 +143,7 @@ const NewAPIMapping = ({
 
   const handleSelectSonataProp = useCallback(
     (selected: any) => {
+      console.log("NewAPIMapping handleSelectSonataProp rightSideInfo:", rightSideInfo)
       if (rightSideInfo?.method === "add") {
         const updatedMapping = uniqBy(
           [
@@ -198,6 +199,7 @@ const NewAPIMapping = ({
 
   const handleSelectSellerProp = useCallback(
     (selected: any) => {
+      console.log("NewAPIMapping handleSelectSellerProp rightSideInfo:", rightSideInfo)
       const updatedMapping = uniqBy(
         requestMapping.map((rm) => {
           if (
