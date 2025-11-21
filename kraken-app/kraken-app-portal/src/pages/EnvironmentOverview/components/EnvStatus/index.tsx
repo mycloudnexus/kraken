@@ -1,5 +1,5 @@
 import { Text } from "@/components/Text";
-import { useGetAPIDeployments, useGetRunningAPIList } from "@/hooks/product";
+import { useGetAPIDeploymentStatus, useGetRunningAPIList } from "@/hooks/product";
 import { useAppStore } from "@/stores/app.store";
 import { IEnv } from "@/utils/types/env.type";
 import {
@@ -71,24 +71,10 @@ const EnvStatus = ({
     }
   );
 
-  const { data: deploymentsData, isLoading } = useGetAPIDeployments(
+  const { data: latestDeployment } = useGetAPIDeploymentStatus(
     currentProduct,
-    {
-      envId: env?.id,
-      orderBy: "createdAt",
-      direction: "DESC",
-      page: 0,
-      size: 20,
-    }
+    env?.id
   );
-
-  const lastElement = useMemo(() => {
-    if (!isLoading) {
-      return deploymentsData?.data[0];
-    } else {
-      return null;
-    }
-  }, [deploymentsData, isLoading]);
 
   return (
     <Flex vertical gap={20} className={styles.container}>
@@ -143,13 +129,13 @@ const EnvStatus = ({
         </Flex>
       </Flex>
       <Flex gap={4} wrap="wrap">
-        {lastElement?.status && (
+        {latestDeployment?.status && (
           <>
             <CheckCircleFilled
-              style={{ color: parseColors(lastElement.status) }}
+              style={{ color: parseColors(latestDeployment.status) }}
             />
-            <Typography.Text style={{ color: parseColors(lastElement.status) }}>
-              {upperFirst(lastElement.status.toLowerCase())}
+            <Typography.Text style={{ color: parseColors(latestDeployment.status) }}>
+              {upperFirst(latestDeployment.status.toLowerCase())}
             </Typography.Text>
           </>
         )}
@@ -160,7 +146,7 @@ const EnvStatus = ({
             <Flex gap={4}>
               Last deployed to {upperFirst(envName)}{" "}
               {dayjs
-                .utc(lastElement?.createAt)
+                .utc(latestDeployment?.createAt)
                 .local()
                 .format("YYYY-MM-DD HH:mm:ss")}
             </Flex>

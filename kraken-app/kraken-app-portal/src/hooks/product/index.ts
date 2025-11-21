@@ -121,6 +121,7 @@ export const PRODUCT_CACHE_KEYS = {
   get_current_version: "get_current_version",
   get_product_env_list: "get_product_env_list",
   get_list_api_deployments: "get_list_api_deployments",
+  get_list_api_deployment_status: "get_list_api_deployment_status",
   get_mapper_details: "get_mapper_details",
   get_product_component_list: "get_product_component_list",
   get_product_component_version_list: "get_product_component_version_list",
@@ -640,8 +641,31 @@ export const useGetAPIDeployments = (
     queryFn: () => getAPIMapperDeployments(productId, params),
     enabled: Boolean(productId),
     select: (data) => data?.data,
+    refetchInterval: 10 * 1000,
   });
 };
+
+export const useGetAPIDeploymentStatus = (
+  productId: string,
+  envId?: string
+) => {
+  return useQuery<any, Error, IDeploymentHistory>({
+    queryKey: [PRODUCT_CACHE_KEYS.get_list_api_deployment_status, productId, envId],
+    queryFn: () => getAPIMapperDeployments(
+        productId,
+        {
+          envId,
+          orderBy: "createdAt",
+          direction: "DESC",
+          page: 0,
+          size: 1,
+        }),
+    enabled: Boolean(productId),
+    select: (data) => data?.data?.data[0],
+    refetchInterval: 10 * 1000,
+  });
+};
+
 
 export const useGetAuditLogs = (params: Record<string, any>) => {
   return useQuery<any, Error>({
