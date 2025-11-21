@@ -72,7 +72,6 @@ export const useCommonAddProp = ({
     field: keyof typeof sellerAPIExampleProps,
     value: string
   ) => {
-    console.log('hybrid: ', value)
     if (isEmpty(value)) {
       setSellerAPIExampleProps({
         ...sellerAPIExampleProps,
@@ -210,6 +209,7 @@ export const useCommonAddProp = ({
                 isOpen={isOpen}
                 onClose={close}
                 onOK={handleAddParamHybrid}
+                defaultValue={rightSideInfo?.previousData?.target}
               />
             )}
             {queryParameters.map((parameter: any) => (

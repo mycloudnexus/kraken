@@ -56,7 +56,6 @@ const RightAddSellerProp = ({ onSelect }: Readonly<Props>) => {
     setSelectedProp,
     onSelect,
   });
-
   return (
     <Flex vertical style={{ width: "100%", height: "100%" }}>
       <div className={styles.header}>
