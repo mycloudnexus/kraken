@@ -101,18 +101,15 @@ export const useCommonAddProp = ({
   };
 
   const handleAddPathHybrid = (value: string) => {
-    //console.log('commonHook handleAddPathHybrid value:', value);
     setHybridField("path", value);
   };
 
   const handleAddParamHybrid = (value: string) => {
-    //console.log('commonHook handleAddParamHybrid value:', value);
     setHybridField("param", value);
   };
 
   const collapseItems = useMemo(() => {
     const items: CollapseProps["items"] = [];
-    //console.log("commonHook pathParameters.length", pathParameters.length);
     if (pathParameters.length) {
       items.push({
         key: "path",
@@ -196,8 +193,6 @@ export const useCommonAddProp = ({
       });
     }
 
-    //console.log('commonHook queryParameters.length:', queryParameters.length);
-    //console.log('commonHook sellerAPIExampleProps?.param', sellerAPIExampleProps?.param);
     if (queryParameters.length) {
       items.push({
         key: "query",
@@ -219,7 +214,6 @@ export const useCommonAddProp = ({
               />
             )}
             {queryParameters.map((parameter: any) => {
-            //console.log('commonHook sellerAPIExampleProps?.param?.[parameter.name]', sellerAPIExampleProps?.param?.[parameter.name]); 
             return (
               <Flex vertical gap={8} key={parameter.name}>
                 <Flex
