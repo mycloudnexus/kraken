@@ -18,7 +18,6 @@ import { last } from "lodash";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useSessionStorage } from "usehooks-ts";
-import ETIcon from "../../assets/et.svg";
 import styles from "./index.module.scss";
 import { ISystemInfo } from "@/utils/types/user.type";
 import { Text } from "../Text";
@@ -207,10 +206,6 @@ const SideNavigation = ({ info }: Readonly<{ info?: ISystemInfo }>) => {
             </Tooltip>
             {!collapsed && (<Divider type="vertical" style={{ margin: '0 6px' }} />)}
           </div>
-
-          {!collapsed ? (
-            <span className={styles.productionBy}>A product by <ETIcon /></span>
-          ) : <ETIcon />}
         </Flex>
 
         <Flex
