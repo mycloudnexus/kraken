@@ -192,6 +192,7 @@ export const useCommonAddProp = ({
         ),
       });
     }
+
     if (queryParameters.length) {
       items.push({
         key: "query",
@@ -212,7 +213,8 @@ export const useCommonAddProp = ({
                 defaultValue={rightSideInfo?.previousData?.target}
               />
             )}
-            {queryParameters.map((parameter: any) => (
+            {queryParameters.map((parameter: any) => {
+            return (
               <Flex vertical gap={8} key={parameter.name}>
                 <Flex
                   align="center"
@@ -246,7 +248,7 @@ export const useCommonAddProp = ({
                         type="link"
                         onClick={() => handleProp(parameter.name, "QUERY")}
                       >
-                        {sellerAPIExampleProps?.param?.[parameter.name]
+                        {rightSideInfo?.previousData?.target
                           ? "Edit value with variable"
                           : "Add value with variable"}
                       </Button>
@@ -254,17 +256,18 @@ export const useCommonAddProp = ({
                     <TypeTag type={parameter.schema.type} />
                   </Flex>
                 </Flex>
-                {sellerAPIExampleProps?.param?.[parameter.name] && (
+                {rightSideInfo?.previousData?.target && (
                   <Typography.Text
                     ellipsis={{
-                      tooltip: sellerAPIExampleProps?.param?.[parameter.name],
+                      tooltip: rightSideInfo?.previousData?.target || '',
                     }}
                   >
-                    {sellerAPIExampleProps?.param?.[parameter.name]}
+                    {rightSideInfo?.previousData?.target || ''}
                   </Typography.Text>
                 )}
               </Flex>
-            ))}
+            );}
+            )}
           </Flex>
         ),
       });
