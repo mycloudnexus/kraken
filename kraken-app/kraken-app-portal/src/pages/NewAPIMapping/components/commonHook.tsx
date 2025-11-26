@@ -192,7 +192,6 @@ export const useCommonAddProp = ({
         ),
       });
     }
-
     if (queryParameters.length) {
       items.push({
         key: "query",
@@ -214,6 +213,8 @@ export const useCommonAddProp = ({
               />
             )}
             {queryParameters.map((parameter: any) => {
+            const sellerValue = sellerAPIExampleProps?.param?.[parameter.name];
+            const sonataValue = rightSideInfo?.previousData?.target;
             return (
               <Flex vertical gap={8} key={parameter.name}>
                 <Flex
@@ -224,14 +225,14 @@ export const useCommonAddProp = ({
                       (selectedProp?.location === "QUERY" &&
                         selectedProp?.name === parameter.name) ||
                       (selectedProp?.name ===
-                        sellerAPIExampleProps?.param?.[parameter.name] &&
+                        sellerValue &&
                         selectedProp?.location === "HYBRID"),
                   })}
                   onClick={() => {
-                    if (sellerAPIExampleProps?.param?.[parameter.name]) {
+                    if (sellerValue) {
                       setSelectedProp({
                         location: "HYBRID",
-                        name: sellerAPIExampleProps?.param?.[parameter.name],
+                        name: sellerValue,
                       });
                       return;
                     }
@@ -248,7 +249,7 @@ export const useCommonAddProp = ({
                         type="link"
                         onClick={() => handleProp(parameter.name, "QUERY")}
                       >
-                        {rightSideInfo?.previousData?.target
+                        {(sellerValue && sonataValue)
                           ? "Edit value with variable"
                           : "Add value with variable"}
                       </Button>
@@ -256,13 +257,13 @@ export const useCommonAddProp = ({
                     <TypeTag type={parameter.schema.type} />
                   </Flex>
                 </Flex>
-                {rightSideInfo?.previousData?.target && (
+                {sellerValue && (
                   <Typography.Text
                     ellipsis={{
-                      tooltip: rightSideInfo?.previousData?.target || '',
+                      tooltip: sellerValue || '',
                     }}
                   >
-                    {rightSideInfo?.previousData?.target || ''}
+                    {sonataValue || ''}
                   </Typography.Text>
                 )}
               </Flex>
