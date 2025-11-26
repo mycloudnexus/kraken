@@ -143,7 +143,7 @@ You can verify the installed versions with the following commands:
    ```
 
 3. Open the portal in your browser at [http://localhost:5173](http://localhost:5173).  
-   > **Note**: You will not be able to log in yet as the API server is not running. The default login is **admin/admin**.
+   > **Note**: You will not be able to log in yet as the API server is not running. The default login is **admin/Changeme_12345$**.
 
 
 #### Step 2 - Run the Control API Server
