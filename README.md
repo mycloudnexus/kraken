@@ -180,7 +180,7 @@ The Control API Server relies on a PostgreSQL database. You can set up a Postgre
    ```
 
 5. Access the Swagger UI at [http://localhost:8001](http://localhost:8001).  
-   You should now be able to log into the portal at [http://localhost:5173](http://localhost:5173) using the default credentials **admin/admin**.
+   You should now be able to log into the portal at [http://localhost:5173](http://localhost:5173) using the default credentials **admin/Changeme_12345$**.
 
 #### Step 3 (Optional): Run Data Plane API Servers
 
