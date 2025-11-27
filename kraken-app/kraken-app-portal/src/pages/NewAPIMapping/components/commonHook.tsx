@@ -249,7 +249,7 @@ export const useCommonAddProp = ({
                         type="link"
                         onClick={() => handleProp(parameter.name, "QUERY")}
                       >
-                        {(sellerValue && sonataValue)
+                        {(sonataValue)
                           ? "Edit value with variable"
                           : "Add value with variable"}
                       </Button>
@@ -260,7 +260,7 @@ export const useCommonAddProp = ({
                 {sellerValue && (
                   <Typography.Text
                     ellipsis={{
-                      tooltip: sellerValue || '',
+                      tooltip: sonataValue || '',
                     }}
                   >
                     {sonataValue || ''}
