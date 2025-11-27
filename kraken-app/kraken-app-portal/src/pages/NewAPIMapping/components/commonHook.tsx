@@ -215,6 +215,8 @@ export const useCommonAddProp = ({
             {queryParameters.map((parameter: any) => {
             const sellerValue = sellerAPIExampleProps?.param?.[parameter.name];
             const sonataValue = rightSideInfo?.previousData?.target;
+            console.log('commonHook seller value:', sellerValue);
+            console.log('commonHook sonata value:', sonataValue )
             return (
               <Flex vertical gap={8} key={parameter.name}>
                 <Flex
@@ -249,7 +251,7 @@ export const useCommonAddProp = ({
                         type="link"
                         onClick={() => handleProp(parameter.name, "QUERY")}
                       >
-                        {(sellerValue && sonataValue)
+                        {(sonataValue)
                           ? "Edit value with variable"
                           : "Add value with variable"}
                       </Button>
@@ -260,7 +262,7 @@ export const useCommonAddProp = ({
                 {sellerValue && (
                   <Typography.Text
                     ellipsis={{
-                      tooltip: sellerValue || '',
+                      tooltip: sonataValue || '',
                     }}
                   >
                     {sonataValue || ''}
