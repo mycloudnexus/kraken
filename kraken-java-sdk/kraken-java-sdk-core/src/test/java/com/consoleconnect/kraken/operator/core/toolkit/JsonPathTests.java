@@ -37,4 +37,15 @@ class JsonPathTests {
     Object jsonObject = mapper.readValue(jsonString, Object.class);
     return mapper.writeValueAsString(jsonObject);
   }
+
+  @SneakyThrows
+  @Test
+  void givenJsonPath_whenGenerateDynamicJson_returnOK() {
+    String s1 = JsonToolkit.generateJsonDynamic("/user/class/0/name", "John", "{}");
+    String s2 = JsonToolkit.generateJsonDynamic("/user/class/0/password", "password", s1);
+    String s3 = JsonToolkit.generateJsonDynamic("/user/class/0/secret/key", "secretKey", s2);
+    String s4 = JsonToolkit.generateJsonDynamic("/user/class/0/deposit/amount", "123456", s3);
+    log.info("final result: {}", s4);
+    assertThat(s4, hasJsonPath("$.user.class[0].deposit.amount", equalTo(123456)));
+  }
 }
