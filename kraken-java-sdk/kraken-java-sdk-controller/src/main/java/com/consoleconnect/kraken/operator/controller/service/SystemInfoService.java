@@ -51,7 +51,7 @@ public class SystemInfoService {
   @Value("${spring.build.version}")
   private String buildVersion;
 
-  @Value("${spring.build.api-spec-version}")
+  @Value("${spring.build.api-spec-version:Haley}")
   private String apiSpecVersion;
 
   @EventListener(PlatformSettingCompletedEvent.class)
