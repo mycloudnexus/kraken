@@ -99,17 +99,30 @@ public class PushAPIActivityLogScheduler extends KrakenServerConnector {
   }
 
   private List<PushExternalSystemPayload> pushLogs(MgmtEventEntity mgmtEvent) {
+    log.info(
+        "Starting pushLogs for eventId:{} with current status={}",
+        mgmtEvent.getId(),
+        mgmtEvent.getStatus());
     mgmtEvent.setStatus(EventStatusType.IN_PROGRESS.name());
     mgmtEventRepository.save(mgmtEvent);
+    log.info("Event {} status updated to IN_PROGRESS", mgmtEvent.getId());
     var logInfo = fromJson(mgmtEvent.getPayload(), PushLogActivityLogInfo.class);
+    log.info("Successfully parsed pushLogs payload for eventId:{}", mgmtEvent.getId());
     try {
+      log.info("pushLogs in batches for eventId:{} ...", mgmtEvent.getId());
       var sent = pushLogsInBatches(logInfo, mgmtEvent.getId());
+      log.info(
+          "pushLogs successfully pushed {} logs for eventId:{}", sent.size(), mgmtEvent.getId());
       mgmtEvent.setStatus(EventStatusType.DONE.name());
       mgmtEventRepository.save(mgmtEvent);
+      log.info("pushLogs Event {} status updated to DONE", mgmtEvent.getId());
       return sent;
     } catch (Exception ex) {
+      log.error(
+          "Failed to pushLogs for eventId:{} error={}", mgmtEvent.getId(), ex.getMessage(), ex);
       mgmtEvent.setStatus(EventStatusType.FAILED.name());
       mgmtEventRepository.save(mgmtEvent);
+      log.warn("pushLogs event {} status updated to FAILED", mgmtEvent.getId());
       return emptyList();
     }
   }
@@ -141,10 +154,33 @@ public class PushAPIActivityLogScheduler extends KrakenServerConnector {
                   entities.getNumber(),
                   entities.getSize(),
                   entities.getTotalElements()));
-      var res =
-          sendLogsToExternalSystem(
-              ClientEvent.of(CLIENT_ID, CLIENT_PUSH_API_ACTIVITY_LOG, payload));
+      HttpResponse<String> res = null;
+      try {
+        res =
+            sendLogsToExternalSystem(
+                ClientEvent.of(CLIENT_ID, CLIENT_PUSH_API_ACTIVITY_LOG, payload));
+        log.info(
+            "External system responded eventId:{} page:{} statusCode:{}",
+            eventId,
+            page,
+            res.getCode());
+      } catch (Exception e) {
+        log.error(
+            "Exception occurred while sending logs to external system "
+                + "eventId:{} page:{} error:{}",
+            eventId,
+            page,
+            e.getMessage(),
+            e);
+        throw new KrakenException(
+            500, "Exception while sending logs to external system: " + e.getMessage(), e);
+      }
       if (res.getCode() != 200) {
+        log.error(
+            "External system returned non-200 status eventId:{} page:{} message:{}",
+            eventId,
+            page,
+            res.getMessage());
         throw new KrakenException(
             400, "Pushing logs to external system filed with status: " + res.getCode());
       }
