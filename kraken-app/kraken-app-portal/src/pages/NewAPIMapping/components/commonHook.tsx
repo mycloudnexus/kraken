@@ -13,7 +13,7 @@ import {
 import classNames from "classnames";
 import clsx from "clsx";
 import { get, isEmpty, omit } from "lodash";
-import { Dispatch, useCallback, useMemo, useState } from "react";
+import { Dispatch, useCallback, useEffect, useMemo, useState } from "react";
 import { useBoolean } from "usehooks-ts";
 import styles from "./RightAddSellerProp/index.module.scss";
 
@@ -40,7 +40,6 @@ export const useCommonAddProp = ({
     useNewApiMappingStore();
   const [currentProp, setCurrentProp] = useState<Record<string, string>>();
   const { value: isOpen, setTrue: open, setFalse: close } = useBoolean(false);
-
   const handleAddProp = useCallback(() => {
     if (!selectedProp) {
       notification.error({ message: "Please select one property!" });
@@ -53,6 +52,7 @@ export const useCommonAddProp = ({
       name: selectedProp?.location === 'HYBRID'?`${selectedProp.name}`:`@{{${selectedProp.name}}}`,
       title: rightSideInfo?.title,
     });
+    console.log("handleAddProp reset visibleSonataParam to null");
   }, [selectedProp, onSelect, rightSideInfo]);
 
   const selectedKey = useMemo(
@@ -101,10 +101,12 @@ export const useCommonAddProp = ({
   };
 
   const handleAddPathHybrid = (value: string) => {
+    console.log('handleAddPathHybrid:', value);
     setHybridField("path", value);
   };
 
   const handleAddParamHybrid = (value: string) => {
+    console.log('handleAddParamHybrid:', value);
     setHybridField("param", value);
   };
 
@@ -215,6 +217,8 @@ export const useCommonAddProp = ({
             {queryParameters.map((parameter: any) => {
             const sellerValue = sellerAPIExampleProps?.param?.[parameter.name];
             const sonataValue = rightSideInfo?.previousData?.target;
+            console.log('commonHook sellerValue:', sellerValue);
+            console.log('commonHook sonataValue:', sonataValue);
             return (
               <Flex vertical gap={8} key={parameter.name}>
                 <Flex
@@ -260,10 +264,10 @@ export const useCommonAddProp = ({
                 {sellerValue && (
                   <Typography.Text
                     ellipsis={{
-                      tooltip: sonataValue || '',
+                      tooltip: sellerValue || '',
                     }}
                   >
-                    {sonataValue || ''}
+                    {sellerValue || ''}
                   </Typography.Text>
                 )}
               </Flex>

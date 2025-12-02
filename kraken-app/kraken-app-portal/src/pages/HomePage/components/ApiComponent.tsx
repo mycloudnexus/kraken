@@ -5,6 +5,7 @@ import { ReactNode, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { DrawerDetails } from "./ApiComponents";
 import styles from "./index.module.scss";
+import { k } from "node_modules/vite/dist/node/types.d-aGj9QkWt";
 
 type Props = {
   targetYaml: Record<string, any>;
@@ -99,10 +100,12 @@ const ApiComponent = ({
               </Flex>
             </Flex>
             <Flex gap={8} style={{ marginTop: 2 }}>
-              {Object.keys(item.labels).map((l) => {
+              {Object.keys(item.labels)
+              .filter((key) => key !== "mef-api-release" && key !== "parentProductType")
+              .map((k) => {
                 return (
-                  <Tooltip title={l} key={l}>
-                    <Col className={styles.tags}>{item.labels[l]}</Col>
+                  <Tooltip title={k} key={k}>
+                    <Col className={styles.tags}>{item.labels[k]}</Col>
                   </Tooltip>
                 );
               })}

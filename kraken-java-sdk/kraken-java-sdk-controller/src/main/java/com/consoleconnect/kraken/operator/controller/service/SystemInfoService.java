@@ -51,24 +51,20 @@ public class SystemInfoService {
   @Value("${spring.build.version}")
   private String buildVersion;
 
+  @Value("${spring.build.api-spec-version}")
+  private String apiSpecVersion;
+
   @EventListener(PlatformSettingCompletedEvent.class)
   @Transactional
   @Async
   public void initialize() {
-
     List<UnifiedAssetDto> list = unifiedAssetService.findByKind(AssetKindEnum.PRODUCT.getKind());
     String productKey =
         Optional.ofNullable(list.get(0))
             .map(UnifiedAssetDto::getMetadata)
             .map(Metadata::getKey)
             .orElse(null);
-    String productSpec =
-        Optional.ofNullable(list.get(0))
-            .map(UnifiedAssetDto::getMetadata)
-            .map(Metadata::getLabels)
-            .map(t -> t.get(LabelConstants.MEF_API_RELEASE))
-            .orElse(null);
-
+    String productSpec = apiSpecVersion;
     systemInfoRepository
         .findOneByKey(KEY)
         .or(
