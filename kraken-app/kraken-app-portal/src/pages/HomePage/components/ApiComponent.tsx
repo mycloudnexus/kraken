@@ -5,7 +5,6 @@ import { ReactNode, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { DrawerDetails } from "./ApiComponents";
 import styles from "./index.module.scss";
-import { k } from "node_modules/vite/dist/node/types.d-aGj9QkWt";
 
 type Props = {
   targetYaml: Record<string, any>;
