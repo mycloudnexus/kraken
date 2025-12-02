@@ -204,6 +204,3 @@ spec:
   sampleConfigPaths:
     - classpath:/mef-sonata/api-targets-mappers-sample-data/api-target-spec.mock.yaml
     - classpath:/mef-sonata/api-targets-mappers-sample-data/api.buyer.mock.yaml
-
-
-

@@ -40,7 +40,6 @@ export const useCommonAddProp = ({
     useNewApiMappingStore();
   const [currentProp, setCurrentProp] = useState<Record<string, string>>();
   const { value: isOpen, setTrue: open, setFalse: close } = useBoolean(false);
-
   const handleAddProp = useCallback(() => {
     if (!selectedProp) {
       notification.error({ message: "Please select one property!" });

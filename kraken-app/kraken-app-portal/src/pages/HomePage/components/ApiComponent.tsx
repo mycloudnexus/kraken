@@ -99,10 +99,12 @@ const ApiComponent = ({
               </Flex>
             </Flex>
             <Flex gap={8} style={{ marginTop: 2 }}>
-              {Object.keys(item.labels).map((l) => {
+              {Object.keys(item.labels)
+              .filter((key) => key !== "mef-api-release" && key !== "parentProductType")
+              .map((k) => {
                 return (
-                  <Tooltip title={l} key={l}>
-                    <Col className={styles.tags}>{item.labels[l]}</Col>
+                  <Tooltip title={k} key={k}>
+                    <Col className={styles.tags}>{item.labels[k]}</Col>
                   </Tooltip>
                 );
               })}
