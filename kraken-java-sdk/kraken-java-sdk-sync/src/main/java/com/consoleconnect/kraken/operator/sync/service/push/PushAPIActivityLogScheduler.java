@@ -80,22 +80,37 @@ public class PushAPIActivityLogScheduler extends KrakenServerConnector {
       lockAtLeastFor = "${app.cron-job.lock.at-least-for}")
   @Scheduled(cron = "${app.cron-job.push-log-external-system:-}")
   List<PushExternalSystemPayload> pushApiActivityLogToExternalSystem() {
-    Optional<MgmtEventEntity> entity =
+    Optional<MgmtEventEntity> stuckEntity =
+        mgmtEventRepository.findFirstByEventTypeAndStatusOrderByCreatedAtAsc(
+            MgmtEventType.PUSH_API_ACTIVITY_LOG.name(), EventStatusType.IN_PROGRESS.name());
+
+    if (stuckEntity.isPresent()) {
+      log.warn(
+          "Found stuck IN_PROGRESS event (ID: {}). Resuming processing...",
+          stuckEntity.get().getId());
+      return processEvent(stuckEntity.get());
+    }
+
+    Optional<MgmtEventEntity> entityOpt =
         mgmtEventRepository.findFirstByEventTypeAndStatus(
             MgmtEventType.PUSH_API_ACTIVITY_LOG.name(), EventStatusType.ACK.name());
-    if (entity.isPresent()) {
-      log.info("Start pushing log to external system for event id: {}", entity.get().getId());
-      var start = ZonedDateTime.now();
-      var sent = pushLogs(entity.get());
-      log.info(
-          "End pushing log to external system for event id: {} in {} seconds.",
-          entity.get().getId(),
-          Duration.between(start, ZonedDateTime.now()).getSeconds());
-      return sent;
+    if (entityOpt.isPresent()) {
+      log.info("Start pushing log to external system for event id: {}", entityOpt.get().getId());
+      return processEvent(entityOpt.get());
     } else {
       log.info("No push api activity log event found.");
       return emptyList();
     }
+  }
+
+  private List<PushExternalSystemPayload> processEvent(MgmtEventEntity entity) {
+    var start = ZonedDateTime.now();
+    var sent = pushLogs(entity);
+    log.info(
+        "End pushing log to external system for event id: {} in {} seconds.",
+        entity.getId(),
+        Duration.between(start, ZonedDateTime.now()).getSeconds());
+    return sent;
   }
 
   private List<PushExternalSystemPayload> pushLogs(MgmtEventEntity mgmtEvent) {

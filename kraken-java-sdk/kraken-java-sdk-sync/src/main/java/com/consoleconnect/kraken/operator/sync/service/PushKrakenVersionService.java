@@ -18,7 +18,6 @@ import org.springframework.util.CollectionUtils;
 public class PushKrakenVersionService {
   private static final String KEY = "CONTROL_PLANE";
   private final SystemInfoRepository systemInfoRepository;
-  private final MgmtEventRepository eventRepository;
   private final MgmtEventRepository mgmtEventRepository;
 
   @SchedulerLock(
@@ -41,14 +40,14 @@ public class PushKrakenVersionService {
                 entity.setPayload(systemInfoEntity);
                 entity.setResourceId(systemInfoEntity.getId().toString());
                 entity.setEventType(MgmtEventType.CLIENT_SYSTEM_INFO.name());
-                eventRepository.save(entity);
+                mgmtEventRepository.save(entity);
               } else {
                 // if sync system info event exists, update state to wait_to_send to re-active the
                 // event
                 MgmtEventEntity eventEntity = mgmtEventEntities.getContent().get(0);
                 eventEntity.setStatus(EventStatusType.WAIT_TO_SEND.name());
                 eventEntity.setPayload(systemInfoEntity);
-                eventRepository.save(eventEntity);
+                mgmtEventRepository.save(eventEntity);
               }
             });
   }
