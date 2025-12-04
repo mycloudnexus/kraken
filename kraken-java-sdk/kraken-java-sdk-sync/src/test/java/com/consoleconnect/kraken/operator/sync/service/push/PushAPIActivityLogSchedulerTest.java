@@ -58,6 +58,44 @@ class PushAPIActivityLogSchedulerTest extends AbstractIntegrationTest {
   }
 
   @Test
+  void
+      givenStuckInProgressEvent_whenPushApiActivityLogToExternalSystem_thenEventResumedAndStatusDone() {
+    givenExternalServerResponses();
+
+    var endTime = ZonedDateTime.parse(NOW_WITH_TIMEZONE);
+    var startTime = ZonedDateTime.parse(NOW_WITH_TIMEZONE).minusDays(1);
+
+    var logs = createLogs(toUTC(endTime), ENV_ID);
+    apiActivityLogRepository.saveAll(logs);
+
+    var stuckEvent = createPushApiActivityLogEvent(ENV_ID, startTime, endTime, "userStuck");
+    stuckEvent.setStatus(EventStatusType.IN_PROGRESS.name());
+    mgmtEventRepository.save(stuckEvent);
+
+    var newEvent = createPushApiActivityLogEvent(ENV_ID, startTime, endTime, "userNew");
+
+    var sent = sut.pushApiActivityLogToExternalSystem();
+
+    assertThat(sent).isNotEmpty();
+    assertThat(sent.get(0).getId()).isEqualTo(stuckEvent.getId());
+
+    verifyPage0(sent.get(0), stuckEvent);
+    verifyPage1(sent.get(1), stuckEvent);
+
+    var updatedStuckEvent =
+        mgmtEventRepository
+            .findById(stuckEvent.getId())
+            .orElseThrow(() -> new RuntimeException("Stuck event not found"));
+    assertThat(updatedStuckEvent.getStatus()).isEqualTo(EventStatusType.DONE.name());
+
+    var ignoredEvent =
+        mgmtEventRepository
+            .findById(newEvent.getId())
+            .orElseThrow(() -> new RuntimeException("New event not found"));
+    assertThat(ignoredEvent.getStatus()).isEqualTo(EventStatusType.ACK.name());
+  }
+
+  @Test
   void givenApiLogs_whenPushApiActivityLogToExternalSystem_thenAllLogsSentAndEventInStatusDone() {
     // given
     givenExternalServerResponses();
