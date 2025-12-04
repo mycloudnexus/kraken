@@ -181,7 +181,13 @@ public class ApiComponentService
     ComponentAPITargetFacets.Endpoint endpoint = requestFacets.getEndpoints().get(0);
     ComponentAPITargetFacets.Mappers requestMapper = endpoint.getMappers();
     // check source and target contains sensitive tokens in the updateMapper
-    requestMapper.getRequest().forEach(mapper -> SecurityTool.evaluate(mapper.getSource()));
+    requestMapper
+        .getRequest()
+        .forEach(
+            mapper -> {
+              SecurityTool.evaluate(mapper.getSource());
+              checkCustomizedSourceLocation(mapper);
+            });
     requestMapper.getResponse().forEach(mapper -> SecurityTool.evaluate(mapper.getTarget()));
 
     ComponentAPITargetFacets.Mappers originMapper = originFacets.getEndpoints().get(0).getMappers();
@@ -224,6 +230,16 @@ public class ApiComponentService
           compareProperty(updateMapper.getCheckPath(), originMapper.getCheckPath());
           compareProperty(updateMapper.getDeletePath(), originMapper.getDeletePath());
         });
+  }
+
+  private void checkCustomizedSourceLocation(ComponentAPITargetFacets.Mapper updateMapper) {
+    if (Boolean.TRUE.equals(updateMapper.getCustomizedField())
+        && StringUtils.isBlank(updateMapper.getSourceLocation())) {
+      throw KrakenException.badRequest(
+          "The customized field: "
+              + updateMapper.getSource()
+              + "should not have blank source location! Please check your mapping location.");
+    }
   }
 
   private void compareProperty(Object o1, Object o2) {
