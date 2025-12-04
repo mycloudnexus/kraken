@@ -60,6 +60,9 @@ class PushAPIActivityLogSchedulerTest extends AbstractIntegrationTest {
   @Test
   void
       givenStuckInProgressEvent_whenPushApiActivityLogToExternalSystem_thenEventResumedAndStatusDone() {
+    apiActivityLogRepository.deleteAll();
+    mgmtEventRepository.deleteAll();
+
     givenExternalServerResponses();
 
     var endTime = ZonedDateTime.parse(NOW_WITH_TIMEZONE);
