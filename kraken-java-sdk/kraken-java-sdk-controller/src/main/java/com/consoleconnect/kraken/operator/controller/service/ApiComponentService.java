@@ -186,13 +186,13 @@ public class ApiComponentService
         .forEach(
             mapper -> {
               SecurityTool.evaluate(mapper.getSource());
-              checkCustomizedSourceLocation(mapper);
+              checkLocationExisted(mapper);
             });
     requestMapper
         .getResponse()
         .forEach(
             mapper -> {
-              checkCustomizedSourceLocation(mapper);
+              checkLocationExisted(mapper);
               SecurityTool.evaluate(mapper.getTarget());
             });
 
@@ -238,7 +238,7 @@ public class ApiComponentService
         });
   }
 
-  private void checkCustomizedSourceLocation(ComponentAPITargetFacets.Mapper updateMapper) {
+  private void checkLocationExisted(ComponentAPITargetFacets.Mapper updateMapper) {
     if (StringUtils.isNotBlank(updateMapper.getSource())
         && StringUtils.isBlank(updateMapper.getSourceLocation())) {
       throw KrakenException.badRequest(
