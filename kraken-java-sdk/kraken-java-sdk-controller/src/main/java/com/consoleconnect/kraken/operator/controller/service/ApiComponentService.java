@@ -233,12 +233,15 @@ public class ApiComponentService
   }
 
   private void checkCustomizedSourceLocation(ComponentAPITargetFacets.Mapper updateMapper) {
-    if (Boolean.TRUE.equals(updateMapper.getCustomizedField())
+    if (StringUtils.isNotBlank(updateMapper.getSource())
         && StringUtils.isBlank(updateMapper.getSourceLocation())) {
       throw KrakenException.badRequest(
-          "The customized field: "
-              + updateMapper.getSource()
-              + "should not have blank source location! Please check your mapping location.");
+          "The field: " + updateMapper.getSource() + "should not have blank source location!");
+    }
+    if (StringUtils.isNotBlank(updateMapper.getTarget())
+        && StringUtils.isBlank(updateMapper.getTargetLocation())) {
+      throw KrakenException.badRequest(
+          "The field: " + updateMapper.getTarget() + "should not have blank target location!");
     }
   }
 
