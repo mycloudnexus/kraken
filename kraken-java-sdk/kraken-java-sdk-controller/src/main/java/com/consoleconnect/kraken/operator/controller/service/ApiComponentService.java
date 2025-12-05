@@ -188,7 +188,13 @@ public class ApiComponentService
               SecurityTool.evaluate(mapper.getSource());
               checkCustomizedSourceLocation(mapper);
             });
-    requestMapper.getResponse().forEach(mapper -> SecurityTool.evaluate(mapper.getTarget()));
+    requestMapper
+        .getResponse()
+        .forEach(
+            mapper -> {
+              checkCustomizedSourceLocation(mapper);
+              SecurityTool.evaluate(mapper.getTarget());
+            });
 
     ComponentAPITargetFacets.Mappers originMapper = originFacets.getEndpoints().get(0).getMappers();
     if (originMapper == null) {
