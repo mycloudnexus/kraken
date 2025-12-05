@@ -14,7 +14,7 @@ public class KrakenPostgresqlContainer extends PostgreSQLContainer<KrakenPostgre
   public static KrakenPostgresqlContainer getInstance() {
     if (container == null) {
       container = new KrakenPostgresqlContainer();
-      container.addFixedExposedPort(6432, 5432);
+      container.addFixedExposedPort(6433, 5432);
     }
     return container;
   }

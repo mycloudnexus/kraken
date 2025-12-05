@@ -580,7 +580,7 @@ public class ComponentMgmtControllerTest extends AbstractIntegrationTest
   @Test
   void givenEmptySourceLocation_whenUpdateTargetMapper_thenThrowsException() {
     UnifiedAssetDto assetDto =
-        unifiedAssetService.findOne("mef.sonata.api-target-mapper.order.uni.add");
+        unifiedAssetService.findOne("mef.sonata.api-target-mapper.order.eline.add");
     Optional<UnifiedAsset> mapperAssetOpt =
         YamlToolkit.parseYaml(
             readFileToString(
@@ -595,6 +595,10 @@ public class ComponentMgmtControllerTest extends AbstractIntegrationTest
           UnifiedAsset.getFacets(assetDto, ComponentAPITargetFacets.class);
       ComponentAPITargetFacets.Endpoint existEndpoints = existFacets.getEndpoints().get(0);
       fillRequestMappers(existEndpoints);
+      existFacets.getEndpoints().set(0, existEndpoints);
+      assetDto.setFacets(
+          JsonToolkit.fromJson(
+              JsonToolkit.toJson(existFacets), new TypeReference<Map<String, Object>>() {}));
       FacetsMapper.INSTANCE.toEndpoint(newEndpoints, existEndpoints);
     }
     log.info(JsonToolkit.toJson(assetDto));
@@ -622,7 +626,7 @@ public class ComponentMgmtControllerTest extends AbstractIntegrationTest
   @Test
   void givenEmptyTargetLocation_whenUpdateTargetMapper_thenThrowsException() {
     UnifiedAssetDto assetDto =
-        unifiedAssetService.findOne("mef.sonata.api-target-mapper.order.uni.add");
+        unifiedAssetService.findOne("mef.sonata.api-target-mapper.order.eline.add");
     Optional<UnifiedAsset> mapperAssetOpt =
         YamlToolkit.parseYaml(
             readFileToString(
@@ -637,6 +641,10 @@ public class ComponentMgmtControllerTest extends AbstractIntegrationTest
           UnifiedAsset.getFacets(assetDto, ComponentAPITargetFacets.class);
       ComponentAPITargetFacets.Endpoint existEndpoints = existFacets.getEndpoints().get(0);
       fillResponseMappers(existEndpoints);
+      existFacets.getEndpoints().set(0, existEndpoints);
+      assetDto.setFacets(
+          JsonToolkit.fromJson(
+              JsonToolkit.toJson(existFacets), new TypeReference<Map<String, Object>>() {}));
       FacetsMapper.INSTANCE.toEndpoint(newEndpoints, existEndpoints);
     }
     log.info(JsonToolkit.toJson(assetDto));
