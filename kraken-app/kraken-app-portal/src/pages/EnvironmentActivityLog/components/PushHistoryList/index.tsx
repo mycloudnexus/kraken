@@ -18,7 +18,6 @@ const initPagination = {
   current: DEFAULT_PAGING.page,
 };
 
-//test2
 const PushHistoryList = () => {
   const {
     tableData,
