@@ -204,7 +204,6 @@ const SideNavigation = ({ info }: Readonly<{ info?: ISystemInfo }>) => {
             <Tooltip title={<KrakenVersion info={info as any} />}>
               <ExclamationCircleOutlined data-testid="appVersionsIndicator" style={{ color: 'var(--text-secondary)' }} />
             </Tooltip>
-            {!collapsed && (<Divider type="vertical" style={{ margin: '0 6px' }} />)}
           </div>
         </Flex>
 
