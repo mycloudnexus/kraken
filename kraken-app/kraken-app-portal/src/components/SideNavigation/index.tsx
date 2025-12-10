@@ -12,7 +12,7 @@ import {
   DoubleLeftOutlined,
   ExclamationCircleOutlined,
 } from "@ant-design/icons";
-import { Button, Divider, Flex, Menu, Tooltip, Typography } from "antd";
+import { Button, Flex, Menu, Tooltip, Typography } from "antd";
 import Sider from "antd/es/layout/Sider";
 import { last } from "lodash";
 import { useEffect, useMemo, useState } from "react";
