@@ -40,8 +40,6 @@ const StandardAPIMapping = () => {
   const location = JSON.parse(getData("currentLocation")??'{}');
   const [filteredComponentList, setFilteredComponentList] = useState(() => location?.filteredComponentList ?? []);
   const [productType, setProductType] = useState(() => location?.productType ?? "");
-  console.log("targetKey:", targetKey);
-  console.log("before productType:", productType);
   useEffect(() => {
     if (!targetKey) {
       return;
@@ -54,7 +52,6 @@ const StandardAPIMapping = () => {
       setProductType("ACCESS_E_LINE");
     }
   }, [targetKey]);
-  console.log("after productType:", productType);
 
   const { activePath, setActivePath, selectedKey, setSelectedKey } =
     useMappingUiStore();
