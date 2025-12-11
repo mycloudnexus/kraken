@@ -242,12 +242,12 @@ public class ApiComponentService
     if (StringUtils.isNotBlank(updateMapper.getSource())
         && StringUtils.isBlank(updateMapper.getSourceLocation())) {
       throw KrakenException.badRequest(
-          "The field: " + updateMapper.getSource() + "should not have blank source location!");
+          "The field: " + updateMapper.getSource() + " should not have blank source location!");
     }
     if (StringUtils.isNotBlank(updateMapper.getTarget())
         && StringUtils.isBlank(updateMapper.getTargetLocation())) {
       throw KrakenException.badRequest(
-          "The field: " + updateMapper.getTarget() + "should not have blank target location!");
+          "The field: " + updateMapper.getTarget() + " should not have blank target location!");
     }
   }
 
