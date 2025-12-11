@@ -86,7 +86,7 @@ const DeployHistory = ({
       }
     } catch (error) {
       const status = get(error, "response.status");
-      let errorMessage = get(error, "reason") || '';
+      let errorMessage = get(error, "reason") ?? '';
       if (status === 403) {
         errorMessage = 'You do not have permission to verify this product.';
       }
