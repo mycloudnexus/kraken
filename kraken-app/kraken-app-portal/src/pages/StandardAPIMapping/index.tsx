@@ -16,6 +16,7 @@ import buildInitListMapping from "@/utils/helpers/buildInitListMapping";
 import groupByPath from "@/utils/helpers/groupByPath";
 import { IMappers } from "@/utils/types/component.type";
 import { IMapperDetails } from "@/utils/types/env.type";
+import { parseProductName } from "@/utils/helpers/name";
 import { Flex, Spin, Button, Tooltip, notification, Drawer } from "antd";
 import dayjs from "dayjs";
 import { delay, get, isEmpty, chain, cloneDeep, flatMap, reduce } from "lodash";
@@ -35,14 +36,28 @@ import {getData} from "@/utils/helpers/token.ts";
 
 const StandardAPIMapping = () => {
   const { currentProduct } = useAppStore();
-  const { componentId } = useParams();
+  const { componentId, targetKey } = useParams();
   const location = JSON.parse(getData("currentLocation")??'{}');
-  const [mainTitle, setMainTitle] = useState(() => location?.productType ?? "unknown main title");
   const [filteredComponentList, setFilteredComponentList] = useState(() => location?.filteredComponentList ?? []);
   const [productType, setProductType] = useState(() => location?.productType ?? "");
+  console.log("targetKey:", targetKey);
+  console.log("before productType:", productType);
+  useEffect(() => {
+    if (!targetKey) {
+      return;
+    }
+    if (targetKey.includes("address")) {
+      setProductType("SHARE");
+    } else if (targetKey.includes("uni")) {
+      setProductType("UNI");
+    } else if (targetKey.includes("eline")) {
+      setProductType("ACCESS_E_LINE");
+    }
+  }, [targetKey]);
+  console.log("after productType:", productType);
+
   const { activePath, setActivePath, selectedKey, setSelectedKey } =
     useMappingUiStore();
-
   const {
     setQuery,
     reset,
@@ -64,10 +79,11 @@ const StandardAPIMapping = () => {
     currentProduct,
     componentId ?? ""
   );
+
   const { data: detailDataMapping, refetch } = useGetComponentDetailMapping(
     currentProduct,
     componentId ?? "",
-      productType
+    productType,
   );
   
   const { value: isChangeMappingKey, setValue: setIsChangeMappingKey } =
@@ -104,8 +120,6 @@ const StandardAPIMapping = () => {
   };
 
   useEffect(() => {
-    // Silence unused setter warnings without changing state
-    setMainTitle((prev: string) => prev);
     setFilteredComponentList((prev: any[]) => prev);
     setProductType((prev: string) => prev);
   }, []);
@@ -364,7 +378,7 @@ const StandardAPIMapping = () => {
           style={{ padding: "5px 0" }}
         >
           <BreadCrumb
-            mainTitle= {mainTitle}
+            mainTitle= {parseProductName(productType)}
             mainUrl="/components"
             optionalParam={productType}
             items={[
