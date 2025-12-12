@@ -1,3 +1,4 @@
+import { AxiosError} from 'axios'
 import RollbackIcon from "@/assets/newAPIMapping/Rollback.svg";
 import BreadCrumb from "@/components/Breadcrumb";
 import DeployStage from "@/components/DeployStage";
@@ -14,6 +15,7 @@ import { useMappingUiStore } from "@/stores/mappingUi.store";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import buildInitListMapping from "@/utils/helpers/buildInitListMapping";
 import groupByPath from "@/utils/helpers/groupByPath";
+import { BackendErrorResponse } from "@/utils/types/common.type";
 import { IMappers } from "@/utils/types/component.type";
 import { IMapperDetails } from "@/utils/types/env.type";
 import { Flex, Spin, Button, Tooltip, notification, Drawer } from "antd";
@@ -345,12 +347,14 @@ const StandardAPIMapping = () => {
       callback && callback();
       return true;
     } catch (error) {
+      const err = error as AxiosError<BackendErrorResponse>;
+      const reason =
+       err?.response?.data?.reason ??
+       err?.response?.data?.message ??
+       err?.message ??
+       "Error on creating/updating mapping";
       notification.error({
-        message: get(
-          error,
-          "reason",
-          get(error, "message", "Error on creating/updating mapping")
-        ),
+        message: reason,
       });
     }
   };
