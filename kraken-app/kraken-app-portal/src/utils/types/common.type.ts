@@ -95,3 +95,11 @@ export interface IPagination {
   size: number;
   total: number;
 }
+
+
+export interface BackendErrorResponse {
+  code?: string;
+  reason?: string;
+  message?: string;
+  referenceError?: string;
+}
