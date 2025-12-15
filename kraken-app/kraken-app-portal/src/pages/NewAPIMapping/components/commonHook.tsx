@@ -212,7 +212,6 @@ export const useCommonAddProp = ({
         children: (
           <Flex vertical gap={8} className={styles.paramList}>
             {queryParameters.map((parameter: any) => {
-            console.log("parameter.schema.type:", parameter?.schema?.type)
             const sellerValue = sellerAPIExampleProps?.param?.[parameter.name];
             const sonataValue = rightSideInfo?.previousData?.target;
             return (
