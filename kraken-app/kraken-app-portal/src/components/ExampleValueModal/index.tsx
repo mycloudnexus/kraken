@@ -42,8 +42,6 @@ const ExampleValueModal = ({
     const initial = defaultValue || '';
     setValue(initial);
   }, [sellerAPIExampleProps, defaultValue, attribute, location]);
-
-  console.log('ExampleValueModal value:', value);
   return (
     <Modal
       open={isOpen}
