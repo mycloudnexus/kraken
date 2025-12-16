@@ -57,7 +57,7 @@ const ActivityDiagrams = ({ envs }: Props) => {
       setSelectedRecentDate(7);
       form.setFieldsValue({ requestTime: null });
 
-      setParams((prev) => ({
+      setParams((prev: DiagramProps) => ({
         ...prev,
         requestStartTime,
         requestEndTime,
@@ -65,7 +65,7 @@ const ActivityDiagrams = ({ envs }: Props) => {
       return;
     }
     setSelectedRecentDate(undefined);
-    setParams((prev) => ({
+    setParams((prev: DiagramProps) => ({
       ...prev,
       envId: values.envId || prev.envId,
       buyer: values.buyer ?? prev.buyer,
