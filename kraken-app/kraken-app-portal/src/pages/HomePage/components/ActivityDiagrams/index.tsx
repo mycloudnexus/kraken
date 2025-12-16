@@ -51,7 +51,6 @@ const ActivityDiagrams = ({ envs }: Props) => {
 
   const handleFormValues = (_: unknown, values: DiagramProps) => {
     const { requestTime = [] } = values ?? {};
-    //if (requestTime?.[0]) setSelectedRecentDate(undefined);
     if (!requestTime || requestTime.length === 0) {
       const { requestStartTime, requestEndTime } = recentXDays(7);
 
