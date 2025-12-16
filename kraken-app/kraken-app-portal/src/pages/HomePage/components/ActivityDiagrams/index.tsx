@@ -42,7 +42,6 @@ const ActivityDiagrams = ({ envs }: Props) => {
     number | undefined
   >(7);
   const { requestStartTime, requestEndTime } = recentXDays(selectedRecentDate);
-
   const [params, setParams] = useState<DiagramProps>({
     envId: productionEnvId,
     requestStartTime,
@@ -52,16 +51,30 @@ const ActivityDiagrams = ({ envs }: Props) => {
 
   const handleFormValues = (_: unknown, values: DiagramProps) => {
     const { requestTime = [] } = values ?? {};
-    if (requestTime?.[0]) setSelectedRecentDate(undefined);
-    setParams({
-      envId: values.envId || params.envId,
-      buyer: values.buyer ?? params.buyer,
+    //if (requestTime?.[0]) setSelectedRecentDate(undefined);
+    if (!requestTime || requestTime.length === 0) {
+      const { requestStartTime, requestEndTime } = recentXDays(7);
+
+      setSelectedRecentDate(7);
+      form.setFieldsValue({ requestTime: null });
+
+      setParams((prev) => ({
+        ...prev,
+        requestStartTime,
+        requestEndTime,
+      }));
+      return;
+    }
+    setSelectedRecentDate(undefined);
+    setParams((prev) => ({
+      ...prev,
+      envId: values.envId || prev.envId,
+      buyer: values.buyer ?? prev.buyer,
       requestStartTime:
-        parseDateStartOrEnd(requestTime?.[0], "start") ??
-        params.requestStartTime,
+        parseDateStartOrEnd(requestTime[0], "start") ?? undefined,
       requestEndTime:
-        parseDateStartOrEnd(requestTime?.[1], "end") ?? params.requestEndTime,
-    });
+        parseDateStartOrEnd(requestTime[1], "end") ?? undefined,
+    }));
   };
 
   const envOptions = useMemo(() => {
