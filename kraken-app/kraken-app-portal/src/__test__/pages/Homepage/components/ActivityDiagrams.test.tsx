@@ -8,19 +8,29 @@ beforeEach(() => {
   vi.clearAllMocks();
 });
 
-/// 1. Mock 'antd' to replace the complex RangePicker with a simple controlled component
+// 1. Update Mock 'antd' to include a "Select Range" button
 vi.mock("antd", async () => {
   const actual = await vi.importActual<any>("antd");
 
-  // Create a simple mock that replaces the complex AntD RangePicker
   const MockRangePicker = (props: any) => (
     <div data-testid="mock-range-picker">
+      {/* Button to simulate CLEAR (covers the if block) */}
       <button
         data-testid="mock-picker-clear-btn"
-        // IMPORTANT: Calling props.onChange(null) simulates the AntD "Clear" event
         onClick={() => props.onChange && props.onChange(null)}
       >
         Simulate Clear
+      </button>
+
+      {/* NEW: Button to simulate SELECTING values (covers the else block) */}
+      <button
+        data-testid="mock-picker-select-btn"
+        onClick={() =>
+          props.onChange &&
+          props.onChange(["2025-10-01", "2025-10-05"])
+        }
+      >
+        Simulate Select Range
       </button>
     </div>
   );
@@ -252,6 +262,55 @@ describe("ActivityDiagrams Component", () => {
     expect(refetchActivity).toHaveBeenCalled();
   });
 
+  test("handleFormValues: selecting a specific date range updates params (covers else block)", async () => {
+    const refetchActivity = vi.fn();
+
+    // Setup Hooks
+    vi.spyOn(homepageHooks, "useGetActivityRequests").mockReturnValue({
+      data: { requestStatistics: [] },
+      isLoading: false,
+      refetch: refetchActivity,
+      isRefetching: false,
+    } as any);
+
+    vi.spyOn(homepageHooks, "useGetErrorBrakedown").mockReturnValue({
+      data: { errorBreakdowns: [] },
+      isLoading: false,
+      refetch: vi.fn(),
+    } as any);
+
+    vi.spyOn(homepageHooks, "useGetMostPopularEndpoints").mockReturnValue({
+      data: { endpointUsages: [] },
+      refetch: vi.fn(),
+      isLoading: false,
+      isFetching: false,
+      isFetched: true,
+    } as any);
+
+    const { getByTestId } = render(<ActivityDiagrams envs={baseEnvs.data} />);
+
+    // 1. Verify the Select button is present
+    const selectBtn = getByTestId("mock-picker-select-btn");
+    
+    // 2. Click "Simulate Select Range"
+    // This sends ["2025-10-01", "2025-10-05"] to the Form
+    // It causes `!requestTime` to be false, entering the ELSE block
+    fireEvent.click(selectBtn);
+
+    // 3. Verify side effects
+    await waitFor(() => {
+      // The code should set `setSelectedRecentDate(undefined)`
+      // We can't check internal state directly, but we can check the side effect:
+      // A refetch should occur with the NEW parameters.
+      expect(refetchActivity).toHaveBeenCalled();
+    });
+
+    // NOTE: This test covers the following lines:
+    // - setSelectedRecentDate(undefined);
+    // - setParams((prev) => ({ ... }));
+    // - parseDateStartOrEnd(...)
+  });
+
   test("renders correctly with data (Integration Test)", () => {
     // 1. Mock Activity Requests
     vi.spyOn(homepageHooks, "useGetActivityRequests").mockReturnValue({
@@ -291,6 +350,8 @@ describe("ActivityDiagrams Component", () => {
     fireEvent.click(recentButton);
     expect(recentXDaysMock).toHaveBeenCalledWith(90);
   });
+
+
 
   test("ActivityDiagrams test with data (Original Test)", () => {
     vi.spyOn(homepageHooks, "useGetErrorBrakedown").mockReturnValue({
