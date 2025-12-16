@@ -7,6 +7,19 @@ beforeEach(() => {
   vi.clearAllMocks();
 });
 
+vi.mock("@/utils/constants/format", async () => {
+  const actual = await vi.importActual<any>(
+    "@/utils/constants/format"
+  );
+  return {
+    ...actual,
+    recentXDays: vi.fn(() => ({
+      requestStartTime: "2025-01-01",
+      requestEndTime: "2025-01-07",
+    })),
+  };
+});
+
 test("ActivityDiagrams test with data", () => {
   const envs = {
     data: [
@@ -148,3 +161,58 @@ test("ActivityDiagrams test with no data", async () => {
     getByText("When errors occur, they will be displayed here.")
   ).toBeInTheDocument();
 });
+
+test("RangePicker clear resets requestStartTime and requestEndTime to recent 7 days", async () => {
+  const envs = {
+    data: [
+      {
+        id: "32b4832f-fb2f-4c99-b89a-c5c995b18dfc",
+        name: "production",
+        productId: "mef.sonata",
+        createdAt: "2024-05-30T13:02:03.224486Z",
+      },
+    ],
+  };
+
+  const refetchActivity = vi.fn();
+  const refetchErrors = vi.fn();
+  const refetchEndpoints = vi.fn();
+
+  vi.spyOn(homepageHooks, "useGetActivityRequests").mockReturnValue({
+    data: {},
+    isLoading: false,
+    refetch: refetchActivity,
+    isRefetching: false,
+  } as any);
+
+  vi.spyOn(homepageHooks, "useGetErrorBrakedown").mockReturnValue({
+    data: {},
+    isLoading: false,
+    refetch: refetchErrors,
+  } as any);
+
+  vi.spyOn(homepageHooks, "useGetMostPopularEndpoints").mockReturnValue({
+    data: {},
+    refetch: refetchEndpoints,
+    isLoading: false,
+    isFetching: false,
+    isFetched: true,
+  } as any);
+
+  const { container } = render(<ActivityDiagrams envs={envs.data} />);
+  expect(container).toBeInTheDocument();
+
+  const clearIcon = container.querySelector(
+    ".ant-picker-clear"
+  ) as HTMLElement;
+
+  expect(clearIcon).toBeInTheDocument();
+
+  fireEvent.mouseDown(clearIcon);
+  fireEvent.click(clearIcon);
+
+  expect(refetchActivity).toHaveBeenCalled();
+  expect(refetchErrors).toHaveBeenCalled();
+  expect(refetchEndpoints).toHaveBeenCalled();
+});
+
