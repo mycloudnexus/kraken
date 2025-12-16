@@ -179,20 +179,26 @@ test("RangePicker clear resets requestStartTime and requestEndTime to recent 7 d
   const refetchEndpoints = vi.fn();
 
   vi.spyOn(homepageHooks, "useGetActivityRequests").mockReturnValue({
-    data: {},
+    data: {
+      requestStatistics: [],
+    },
     isLoading: false,
     refetch: refetchActivity,
     isRefetching: false,
   } as any);
 
   vi.spyOn(homepageHooks, "useGetErrorBrakedown").mockReturnValue({
-    data: {},
+    data: {
+      errorBreakdowns: [],
+    },
     isLoading: false,
     refetch: refetchErrors,
   } as any);
 
   vi.spyOn(homepageHooks, "useGetMostPopularEndpoints").mockReturnValue({
-    data: {},
+    data: {
+      endpointUsages: [],
+    },
     refetch: refetchEndpoints,
     isLoading: false,
     isFetching: false,
