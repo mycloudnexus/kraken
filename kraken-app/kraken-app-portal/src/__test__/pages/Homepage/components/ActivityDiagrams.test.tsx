@@ -205,18 +205,24 @@ test("RangePicker clear resets requestStartTime and requestEndTime to recent 7 d
     isFetched: true,
   } as any);
 
-  const { container } = render(<ActivityDiagrams envs={envs.data} />);
-  expect(container).toBeInTheDocument();
+  const { container } = render(
+    <ActivityDiagrams envs={envs.data} />
+  );
+  const inputs = container.querySelectorAll<HTMLInputElement>(
+    'input[placeholder="Select time"]'
+  );
 
-  const clearIcon = container.querySelector(
-    ".ant-picker-clear"
-  ) as HTMLElement;
+  expect(inputs.length).toBe(2);
 
-  expect(clearIcon).toBeInTheDocument();
+  fireEvent.change(inputs[0], { target: { value: "2025-12-01" } });
+  fireEvent.change(inputs[1], { target: { value: "2025-12-31" } });
 
-  fireEvent.mouseDown(clearIcon);
-  fireEvent.click(clearIcon);
-
+  fireEvent.change(inputs[0], { target: { value: "" } });
+  fireEvent.change(inputs[1], { target: { value: "" } });
+  
+  fireEvent.blur(inputs[0]);
+  fireEvent.blur(inputs[1]);
+  
   expect(refetchActivity).toHaveBeenCalled();
   expect(refetchErrors).toHaveBeenCalled();
   expect(refetchEndpoints).toHaveBeenCalled();
