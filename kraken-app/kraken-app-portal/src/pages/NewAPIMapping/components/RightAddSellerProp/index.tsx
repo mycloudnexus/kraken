@@ -19,6 +19,7 @@ const RightAddSellerProp = ({ onSelect }: Readonly<Props>) => {
   const [selectedProp, setSelectedProp] = useState<any>({
     location: rightSideInfo?.previousData?.targetLocation,
     name: rightSideInfo?.previousData?.target,
+    schemaType: rightSideInfo?.previousData?.schemaType, 
   });
   const pathParameters = useMemo(() => {
     if (!sellerApi?.spec?.parameters) return [];
