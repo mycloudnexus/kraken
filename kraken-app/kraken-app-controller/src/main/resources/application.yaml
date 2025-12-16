@@ -31,7 +31,7 @@ spring:
       fail-on-unknown-properties: false
   datasource:
     driverClassName: org.postgresql.Driver
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/kraken-mgmt}
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/kraken_mgmt}
     username: ${DB_USERNAME:postgresql}
     password: ${DB_PASSWORD:password}
     hikari:

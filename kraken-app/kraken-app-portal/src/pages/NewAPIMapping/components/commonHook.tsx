@@ -250,7 +250,6 @@ export const useCommonAddProp = ({
                         type="link"
                         onClick={() => handleProp(parameter.name, "QUERY")}
                       >
-                        {(sonataValue)}
                       </Button>
                     ) : null}
                     <TypeTag type={parameter.schema.type} />
