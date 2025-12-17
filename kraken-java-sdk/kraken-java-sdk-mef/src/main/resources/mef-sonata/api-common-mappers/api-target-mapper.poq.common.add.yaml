@@ -17,6 +17,7 @@ spec:
       mappers:
         request:
           - name: mapper.poq.@{{productType}}.add.place0.id
+            title: "the id of the place where the products' POQ must be done"
             source: "@{{productOfferingQualificationItem[0].product.place[0].id}}"
             sourceLocation: BODY
             sourceType: string
@@ -24,6 +25,7 @@ spec:
             targetLocation: ""
             requiredMapping: true
           - name: mapper.poq.@{{productType}}.add.productConfiguration.bandwidth
+            title: "Bandwidth of the UNI"
             source: "@{{productOfferingQualificationItem[0].product.productConfiguration.bandwidth}}"
             sourceLocation: BODY
             allowValueLimit: false
@@ -34,6 +36,7 @@ spec:
             targetLocation: ""
             requiredMapping: true
           - name: mapper.poq.@{{productType}}.add.productConfiguration.bandwidthUnit
+            title: "The unit of bandwidth"
             source: "@{{productOfferingQualificationItem[0].product.productConfiguration.bandwidthUnit}}"
             sourceLocation: BODY
             sourceType: enum
@@ -45,6 +48,7 @@ spec:
             targetLocation: ""
             requiredMapping: true
           - name: mapper.poq.@{{productType}}.add.productOffering.id
+            title: "The id of the quoted product offering"
             source: "@{{productOfferingQualificationItem[0].product.productOffering.id}}"
             sourceLocation: BODY
             sourceType: string
