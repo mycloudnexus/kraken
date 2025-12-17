@@ -180,7 +180,8 @@ const RequestItem = ({ item, index }: Props) => {
   };
 
   const handleDeleteMapping = (key: React.Key) => {
-    const updated = handleDeleteMappingItems(key, listMapping, undefined);
+    const listClone = cloneDeep(listMapping);
+    const updated = handleDeleteMappingItems(key, listClone);
     setListMappingStateRequest(updated);
   };
 
@@ -388,6 +389,7 @@ const RequestItem = ({ item, index }: Props) => {
                 />
               </Flex>
             ))}
+          
           <Flex className={styles.itemContainer}>
             <Button
               style={{ marginBottom: 12 }}
