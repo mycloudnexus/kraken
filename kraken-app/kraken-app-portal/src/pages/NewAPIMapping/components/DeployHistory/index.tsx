@@ -88,7 +88,7 @@ const DeployHistory = ({
       const status = get(error, "response.status");
       let errorMessage = get(error, "reason") ?? '';
       if (status === 403) {
-        errorMessage = 'You do not have permission to verify this product.';
+        errorMessage = "You do not have permission to perform the 'Verify' action";
       }
       notification.error({ message: errorMessage || 'An unexpected error occurred during verification.'  });
     }
