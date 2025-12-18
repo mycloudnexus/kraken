@@ -35,12 +35,25 @@ vi.mock("antd", async () => {
     </div>
   );
 
+  const MockSelect = (props: any) => (
+    <div data-testid="mock-select">
+      <div data-testid={`select-value-${props.value}`}>{props.value}</div>
+      <button
+        data-testid={`mock-select-change-${props.className}`} 
+        onClick={() => props.onChange && props.onChange("NEW_VALUE_ID")}
+      >
+        Change Value
+      </button>
+    </div>
+  );
+
   return {
     ...actual,
     DatePicker: {
       ...actual.DatePicker,
       RangePicker: MockRangePicker,
     },
+    Select: MockSelect,
   };
 });
 
@@ -128,7 +141,6 @@ test("ActivityDiagrams test with data", () => {
   const recentButton = getByTestId("recent-90-days");
   fireEvent.click(recentButton);
 
-  // most popular endpoints
   expect(getByText("Endpoint name")).toBeInTheDocument();
   expect(getByText("Popularity")).toBeInTheDocument();
   expect(getByText("Usage")).toBeInTheDocument();
@@ -202,6 +214,8 @@ test("ActivityDiagrams test with no data", async () => {
 const recentXDaysMock = recentXDays as unknown as ReturnType<typeof vi.fn>;
 
 describe("ActivityDiagrams Component", () => {
+  const prodEnvId = "32b4832f-fb2f-4c99-b89a-c5c995b18dfc";
+  const productId = "mef.sonata";
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -209,12 +223,43 @@ describe("ActivityDiagrams Component", () => {
   const baseEnvs = {
     data: [
       {
-        id: "32b4832f-fb2f-4c99-b89a-c5c995b18dfc",
-        productId: "mef.sonata",
+        id: prodEnvId,
+        productId: productId,
         createdAt: "2024-05-30T13:02:03.224486Z",
         name: "production",
       },
+      {
+        id: "stage-id",
+        productId: productId,
+        createdAt: "2024-05-30T13:02:03.224486Z",
+        name: "stage",
+      }
     ],
+  };
+
+  const setupSpies = () => {
+    const getActivitySpy = vi.spyOn(homepageHooks, "useGetActivityRequests").mockReturnValue({
+      data: { requestStatistics: [] },
+      isLoading: false,
+      refetch: vi.fn(),
+      isRefetching: false,
+    } as any);
+  
+    vi.spyOn(homepageHooks, "useGetErrorBrakedown").mockReturnValue({
+      data: { errorBreakdowns: [] },
+      isLoading: false,
+      refetch: vi.fn(),
+    } as any);
+  
+    vi.spyOn(homepageHooks, "useGetMostPopularEndpoints").mockReturnValue({
+      data: { endpointUsages: [] },
+      refetch: vi.fn(),
+      isLoading: false,
+      isFetching: false,
+      isFetched: true,
+    } as any);
+  
+    return { getActivitySpy };
   };
 
   test("handleFormValues: clearing RequestTime resets dates to recent 7 days", async () => {
@@ -447,4 +492,88 @@ describe("ActivityDiagrams Component", () => {
       getByText("When errors occur, they will be displayed here.")
     ).toBeInTheDocument();
   });
+
+  test("handleFormValues: IF block - clearing RequestTime preserves current Env and Buyer", async () => {
+    const { getActivitySpy } = setupSpies();
+    const { getByTestId } = render(<ActivityDiagrams envs={baseEnvs.data} />);
+
+    await waitFor(() => {
+      expect(getActivitySpy).toHaveBeenLastCalledWith(
+        prodEnvId,
+        productId,
+        "2025-01-01",
+        "2025-01-07",
+        undefined // Initial state of buyer is undefined
+      );
+    });
+
+    const clearBtn = getByTestId("mock-picker-clear-btn");
+    fireEvent.click(clearBtn);
+
+    await waitFor(() => {
+      expect(recentXDaysMock).toHaveBeenCalledWith(7);
+      
+      expect(getActivitySpy).toHaveBeenLastCalledWith(
+        prodEnvId,// Env ID preserved
+        productId,       
+        "2025-01-01", // Reset start date
+        "2025-01-07", // Reset end date
+        undefined     // Buyer preserved (undefined)
+      );
+    });
+  });
+
+  test("handleFormValues: ELSE block - selecting Date Range preserves current Env and Buyer", async () => {
+    const { getActivitySpy } = setupSpies();
+    const { getByTestId } = render(<ActivityDiagrams envs={baseEnvs.data} />);
+
+    const selectBtn = getByTestId("mock-picker-select-btn");
+    fireEvent.click(selectBtn);
+
+    await waitFor(() => {
+      expect(getActivitySpy).toHaveBeenLastCalledWith(
+        prodEnvId,
+        productId,
+        expect.stringContaining("2025-10-01"),
+        expect.stringContaining("2025-10-05"), 
+        expect.anything()
+      );
+    });
+  });
+
+  test("handleFormValues: Updating EnvId explicitly (covers 'envId' present in values)", async () => {
+    const { getActivitySpy } = setupSpies();
+    const { getAllByTestId } = render(<ActivityDiagrams envs={baseEnvs.data} />);
+
+    const changeEnvBtns = getAllByTestId(/mock-select-change/);
+    const changeEnvBtn = changeEnvBtns[0]; 
+
+    fireEvent.click(changeEnvBtn);
+
+    await waitFor(() => {
+      expect(getActivitySpy).toHaveBeenLastCalledWith(
+        undefined,
+        "NEW_VALUE_ID", 
+        expect.anything(),
+        expect.anything(),
+        expect.anything()
+      );
+    });
+  });
+
+  test("Initial render sets default values correctly", async () => {
+     const { getActivitySpy } = setupSpies();
+     render(<ActivityDiagrams envs={baseEnvs.data} />);
+
+     await waitFor(() => {
+      expect(getActivitySpy).toHaveBeenCalledWith(
+        prodEnvId,
+        productId,
+        "2025-01-01",
+        "2025-01-07",
+        undefined
+      );
+     });
+  });
 });
+
