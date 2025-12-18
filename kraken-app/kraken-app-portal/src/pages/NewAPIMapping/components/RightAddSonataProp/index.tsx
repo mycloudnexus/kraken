@@ -88,7 +88,6 @@ const RightAddSonataProp = ({
       styles.treeValue
     );
   }, [correctSpec]);
-
   const { handleAddProp, collapseItems } = useCommonAddProp({
     selectedProp,
     rightSideInfo,
@@ -98,7 +97,7 @@ const RightAddSonataProp = ({
     setSelectedProp,
     onSelect,
   });
-
+ 
   return (
     <Flex
       vertical

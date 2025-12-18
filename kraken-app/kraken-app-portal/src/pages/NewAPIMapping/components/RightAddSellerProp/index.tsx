@@ -46,7 +46,6 @@ const RightAddSellerProp = ({ onSelect }: Readonly<Props>) => {
       styles.treeValue
     );
   }, [sellerApi]);
-
   const { handleAddProp, collapseItems } = useCommonAddProp({
     selectedProp,
     rightSideInfo,
