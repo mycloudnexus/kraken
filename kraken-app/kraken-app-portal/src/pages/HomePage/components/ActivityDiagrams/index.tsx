@@ -50,7 +50,7 @@ const ActivityDiagrams = ({ envs }: Props) => {
   });
 
   const handleFormValues = (_: unknown, values: DiagramProps) => {
-    const { requestTime = [] } = values ?? {};
+    const { requestTime = [], envId, buyer } = values ?? {};
     if (!requestTime || requestTime.length === 0) {
       const { requestStartTime, requestEndTime } = recentXDays(7);
 
@@ -59,6 +59,8 @@ const ActivityDiagrams = ({ envs }: Props) => {
 
       setParams((prev: DiagramProps) => ({
         ...prev,
+        envId: envId || prev.envId,
+        buyer: buyer ?? prev.buyer,
         requestStartTime,
         requestEndTime,
       }));
