@@ -80,7 +80,8 @@ const SonataPropMapping = ({ list, title }: Readonly<Props>) => {
     setRightSideInfo(undefined);
   }
 
-  const notEmptyList = !!list.length
+  const notEmptyList = !!list.length;
+  console.log("SonataPropMapping start");
   return (
     <Flex gap={16}>
       <div className={styles.sonataPropMappingWrapper}>

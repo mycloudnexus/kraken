@@ -29,7 +29,6 @@ export function TargetInput({
 
   const isFocused =
     rightSide === EnumRightType.SonataResponse && activeSonataResponse === id;
-
   return (
     <Flex className={styles.flexColumn} gap={4}>
       {item.target ? (

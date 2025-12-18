@@ -233,7 +233,6 @@ const RequestItem = ({ item, index }: Props) => {
       setRequestMapping(newRequest);
     }
   }, [continuousInput]);
-
   return (
     <div
       className={clsx([

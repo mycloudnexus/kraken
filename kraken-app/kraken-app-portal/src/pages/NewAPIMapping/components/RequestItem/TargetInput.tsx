@@ -44,6 +44,12 @@ export function TargetInput({
     }
 
     setRequestMapping(newRequest);
+    if (isFocused && rightSideInfo) {
+      setRightSideInfo({
+        ...rightSideInfo,
+        previousData: newRequest[index],
+      });
+    }
   };
   return (
     <Flex className={styles.flexColumn} gap={4}>

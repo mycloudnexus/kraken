@@ -27,8 +27,8 @@ export function SourceInput({
   const isFocused = useMemo(
     () =>
       rightSide === EnumRightType.AddSonataProp &&
-      isEqual(item, rightSideInfo?.previousData),
-    [rightSide, item, rightSideInfo?.previousData]
+      isEqual(item.id, rightSideInfo?.previousData?.id),
+    [rightSide, item.id, rightSideInfo?.previousData?.id]
   );
 
   const handleChange = (changes: { [field in keyof typeof item]?: any }) => {
@@ -42,6 +42,12 @@ export function SourceInput({
     }
 
     setRequestMapping(newRequest);
+    if (isFocused && rightSideInfo) {
+      setRightSideInfo({
+        ...rightSideInfo,
+        previousData: newRequest[index],
+      });
+    }
   };
   return (
     <Flex className={styles.flexColumn} gap={4}>
