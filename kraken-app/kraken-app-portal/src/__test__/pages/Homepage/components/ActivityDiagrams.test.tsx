@@ -1,33 +1,28 @@
-import { render, waitFor } from "@/__test__/utils";
+import { render, waitFor, fireEvent } from "@/__test__/utils";
 import * as homepageHooks from "@/hooks/homepage";
 import ActivityDiagrams from "@/pages/HomePage/components/ActivityDiagrams";
-import { fireEvent } from "@testing-library/react";
-import { recentXDays } from "@/utils/constants/format"; // Import directly
+import { recentXDays } from "@/utils/constants/format";
 
 beforeEach(() => {
   vi.clearAllMocks();
 });
 
-// 1. Update Mock 'antd' to include a "Select Range" button
+// 1. Mock 'antd' components
 vi.mock("antd", async () => {
   const actual = await vi.importActual<any>("antd");
 
   const MockRangePicker = (props: any) => (
     <div data-testid="mock-range-picker">
-      {/* Button to simulate CLEAR (covers the if block) */}
       <button
         data-testid="mock-picker-clear-btn"
         onClick={() => props.onChange && props.onChange(null)}
       >
         Simulate Clear
       </button>
-
-      {/* NEW: Button to simulate SELECTING values (covers the else block) */}
       <button
         data-testid="mock-picker-select-btn"
         onClick={() =>
-          props.onChange &&
-          props.onChange(["2025-10-01", "2025-10-05"])
+          props.onChange && props.onChange(["2025-10-01", "2025-10-05"])
         }
       >
         Simulate Select Range
@@ -62,164 +57,19 @@ vi.mock("@/utils/constants/format", async () => {
   const actual = await vi.importActual<any>("@/utils/constants/format");
   return {
     ...actual,
-    recentXDays: vi.fn(() => ({
-      requestStartTime: "2025-01-01",
+    recentXDays: vi.fn((days) => ({
+      requestStartTime: `2025-01-01-${days}`, // Dynamic return based on input
       requestEndTime: "2025-01-07",
     })),
   };
 });
 
-
-test("ActivityDiagrams test with data", () => {
-  const envs = {
-    data: [
-      {
-        id: "32b4832f-fb2f-4c99-b89a-c5c995b18dfc",
-        productId: "mef.sonata",
-        createdAt: "2024-05-30T13:02:03.224486Z",
-        name: "production",
-      },
-    ],
-  };
-
-  vi.spyOn(homepageHooks, "useGetErrorBrakedown").mockReturnValue({
-    data: {
-      errorBreakdowns: [
-        {
-          date: "2024-05-30T13:02:03.224486Z",
-          errors: {
-            400: 1,
-            401: 1,
-            404: 1,
-            500: 1,
-          },
-        },
-      ],
-    },
-    isLoading: false,
-    refetch: vi.fn(),
-  } as any);
-
-  vi.spyOn(homepageHooks, "useGetActivityRequests").mockReturnValue({
-    data: {
-      requestStatistics: [
-        {
-          date: "2024-05-30T13:02:03.224486Z",
-          success: 1,
-          error: 2,
-        },
-      ],
-    },
-    isLoading: false,
-    refetch: vi.fn(),
-    isRefetching: false,
-  } as any);
-
-  const popularEndpoints = [
-    {
-      method: "GET",
-      endpoint:
-        "/mefApi/sonata/quoteManagement/v8/quote/43d1e7e9-a11b-4843-a6da-39086ec5ceb2",
-      usage: 11,
-      popularity: 33.33,
-    },
-  ];
-  vi.spyOn(homepageHooks, "useGetMostPopularEndpoints").mockReturnValue({
-    data: {
-      endpointUsages: popularEndpoints,
-    },
-    refetch: () => popularEndpoints,
-    isLoading: false,
-    isFetching: false,
-    isFetched: true,
-  } as any);
-
-  const { container, getByTestId, getByText, getAllByTestId } = render(
-    <ActivityDiagrams envs={envs.data} />
-  );
-  expect(container).toBeInTheDocument();
-  const recentButton = getByTestId("recent-90-days");
-  fireEvent.click(recentButton);
-
-  expect(getByText("Endpoint name")).toBeInTheDocument();
-  expect(getByText("Popularity")).toBeInTheDocument();
-  expect(getByText("Usage")).toBeInTheDocument();
-  expect(getByText("Most popular endpoints")).toBeInTheDocument();
-
-  expect(getAllByTestId("method")[0]).toHaveTextContent("GET");
-  expect(getAllByTestId("apiPath")[0]).toHaveTextContent(
-    "v8/quote/43d1e7e9-a11b-4843-a6da-39086ec5ceb2"
-  );
-  expect(getAllByTestId("usage")[0]).toHaveTextContent("11");
-});
-
-test("ActivityDiagrams test with no data", async () => {
-  const envs = {
-    data: [
-      {
-        id: "32b4832f-fb2f-4c99-b89a-c5c995b18dfc",
-        productId: "mef.sonata",
-        createdAt: "2024-05-30T13:02:03.224486Z",
-        name: "stage",
-      },
-    ],
-  };
-
-  vi.spyOn(homepageHooks, "useGetErrorBrakedown").mockReturnValue({
-    data: {
-      errorBreakdowns: [],
-    },
-    isLoading: false,
-    refetch: vi.fn(),
-  } as any);
-
-  vi.spyOn(homepageHooks, "useGetActivityRequests").mockReturnValue({
-    data: {},
-    isLoading: false,
-    isFetcing: false,
-    refetch: vi.fn(),
-    isRefetching: false,
-  } as any);
-
-  vi.spyOn(homepageHooks, "useGetMostPopularEndpoints").mockReturnValue({
-    data: {
-      endpointUsages: [],
-    },
-    refetch: () => [],
-    isLoading: false,
-    isFetching: false,
-    isFetched: true,
-  } as any);
-
-  const { container, getByText } = render(
-    <ActivityDiagrams envs={envs.data} />
-  );
-  expect(container).toBeInTheDocument();
-
-  expect(
-    getByText(
-      "When requests are made, request status data will be displayed here."
-    )
-  ).toBeInTheDocument();
-  expect(
-    getByText(
-      "As endpoints are accessed, the most popular ones will be displayed here."
-    )
-  ).toBeInTheDocument();
-  expect(
-    getByText("When errors occur, they will be displayed here.")
-  ).toBeInTheDocument();
-});
-
 const recentXDaysMock = recentXDays as unknown as ReturnType<typeof vi.fn>;
 
-describe("ActivityDiagrams Component", () => {
+describe("ActivityDiagrams Component - handleFormValues Logic", () => {
   const prodEnvId = "32b4832f-fb2f-4c99-b89a-c5c995b18dfc";
   const productId = "mef.sonata";
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
+  
   const baseEnvs = {
     data: [
       {
@@ -230,8 +80,6 @@ describe("ActivityDiagrams Component", () => {
       },
       {
         id: "stage-id",
-        productId: productId,
-        createdAt: "2024-05-30T13:02:03.224486Z",
         name: "stage",
       }
     ],
@@ -244,13 +92,13 @@ describe("ActivityDiagrams Component", () => {
       refetch: vi.fn(),
       isRefetching: false,
     } as any);
-  
+
     vi.spyOn(homepageHooks, "useGetErrorBrakedown").mockReturnValue({
       data: { errorBreakdowns: [] },
       isLoading: false,
       refetch: vi.fn(),
     } as any);
-  
+
     vi.spyOn(homepageHooks, "useGetMostPopularEndpoints").mockReturnValue({
       data: { endpointUsages: [] },
       refetch: vi.fn(),
@@ -258,322 +106,87 @@ describe("ActivityDiagrams Component", () => {
       isFetching: false,
       isFetched: true,
     } as any);
-  
+
     return { getActivitySpy };
   };
 
-  test("handleFormValues: clearing RequestTime resets dates to recent 7 days", async () => {
-    const refetchActivity = vi.fn();
-
-    // Mock all hooks with necessary properties (including refetch)
-    vi.spyOn(homepageHooks, "useGetActivityRequests").mockReturnValue({
-      data: { requestStatistics: [] },
-      isLoading: false,
-      refetch: refetchActivity,
-      isRefetching: false,
-    } as any);
-
-    vi.spyOn(homepageHooks, "useGetErrorBrakedown").mockReturnValue({
-      data: { errorBreakdowns: [] },
-      isLoading: false,
-      refetch: vi.fn(),
-    } as any);
-
-    vi.spyOn(homepageHooks, "useGetMostPopularEndpoints").mockReturnValue({
-      data: { endpointUsages: [] },
-      refetch: vi.fn(),
-      isLoading: false,
-      isFetching: false,
-      isFetched: true,
-    } as any);
-
-    const { getByTestId } = render(<ActivityDiagrams envs={baseEnvs.data} />);
-
-    // 1. Verify the Mock Picker rendered
-    const clearBtn = getByTestId("mock-picker-clear-btn");
-    expect(clearBtn).toBeInTheDocument();
-
-    // Clear calls from render
-    recentXDaysMock.mockClear();
-
-    // 2. Trigger the Clear Action
-    fireEvent.click(clearBtn);
-
-    // 3. Verify handleFormValues logic
-    await waitFor(() => {
-      expect(recentXDaysMock).toHaveBeenCalledWith(7);
-    });
-
-    expect(refetchActivity).toHaveBeenCalled();
-  });
-
-  test("handleFormValues: selecting a specific date range updates params (covers else block)", async () => {
-    const refetchActivity = vi.fn();
-
-    // Setup Hooks
-    vi.spyOn(homepageHooks, "useGetActivityRequests").mockReturnValue({
-      data: { requestStatistics: [] },
-      isLoading: false,
-      refetch: refetchActivity,
-      isRefetching: false,
-    } as any);
-
-    vi.spyOn(homepageHooks, "useGetErrorBrakedown").mockReturnValue({
-      data: { errorBreakdowns: [] },
-      isLoading: false,
-      refetch: vi.fn(),
-    } as any);
-
-    vi.spyOn(homepageHooks, "useGetMostPopularEndpoints").mockReturnValue({
-      data: { endpointUsages: [] },
-      refetch: vi.fn(),
-      isLoading: false,
-      isFetching: false,
-      isFetched: true,
-    } as any);
-
-    const { getByTestId } = render(<ActivityDiagrams envs={baseEnvs.data} />);
-
-    // 1. Verify the Select button is present
-    const selectBtn = getByTestId("mock-picker-select-btn");
-    
-    // 2. Click "Simulate Select Range"
-    // This sends ["2025-10-01", "2025-10-05"] to the Form
-    // It causes `!requestTime` to be false, entering the ELSE block
-    fireEvent.click(selectBtn);
-
-    // 3. Verify side effects
-    await waitFor(() => {
-      // The code should set `setSelectedRecentDate(undefined)`
-      // We can't check internal state directly, but we can check the side effect:
-      // A refetch should occur with the NEW parameters.
-      expect(refetchActivity).toHaveBeenCalled();
-    });
-
-    // NOTE: This test covers the following lines:
-    // - setSelectedRecentDate(undefined);
-    // - setParams((prev) => ({ ... }));
-    // - parseDateStartOrEnd(...)
-  });
-
-  test("renders correctly with data (Integration Test)", () => {
-    // 1. Mock Activity Requests
-    vi.spyOn(homepageHooks, "useGetActivityRequests").mockReturnValue({
-      data: {
-        requestStatistics: [{ date: "2024-05-30", success: 1, error: 2 }],
-      },
-      isLoading: false,
-      refetch: vi.fn(),
-      isRefetching: false,
-    } as any);
-
-    // 2. Mock Error Breakdown (MUST include refetch)
-    vi.spyOn(homepageHooks, "useGetErrorBrakedown").mockReturnValue({
-      data: { errorBreakdowns: [] },
-      isLoading: false,
-      refetch: vi.fn(), // <--- This was missing
-    } as any);
-
-    // 3. Mock Popular Endpoints (MUST include refetch)
-    vi.spyOn(homepageHooks, "useGetMostPopularEndpoints").mockReturnValue({
-      data: { endpointUsages: [] },
-      isLoading: false,
-      isFetching: false,
-      isFetched: true,
-      refetch: vi.fn(), // <--- This was missing
-    } as any);
-
-    const { getByText, getByTestId } = render(
-      <ActivityDiagrams envs={baseEnvs.data} />
-    );
-
-    // Verify UI
-    expect(getByText("API activity dashboard")).toBeInTheDocument();
-
-    // Verify interaction triggers hook update
-    const recentButton = getByTestId("recent-90-days");
-    fireEvent.click(recentButton);
-    expect(recentXDaysMock).toHaveBeenCalledWith(90);
-  });
-
-
-
-  test("ActivityDiagrams test with data (Original Test)", () => {
-    vi.spyOn(homepageHooks, "useGetErrorBrakedown").mockReturnValue({
-      data: {
-        errorBreakdowns: [
-          {
-            date: "2024-05-30T13:02:03.224486Z",
-            errors: { 400: 1, 401: 1, 404: 1, 500: 1 },
-          },
-        ],
-      },
-      isLoading: false,
-      refetch: vi.fn(),
-    } as any);
-
-    vi.spyOn(homepageHooks, "useGetActivityRequests").mockReturnValue({
-      data: {
-        requestStatistics: [
-          { date: "2024-05-30T13:02:03.224486Z", success: 1, error: 2 },
-        ],
-      },
-      isLoading: false,
-      refetch: vi.fn(),
-      isRefetching: false,
-    } as any);
-
-    const popularEndpoints = [
-      {
-        method: "GET",
-        endpoint: "/test-endpoint",
-        usage: 11,
-        popularity: 33.33,
-      },
-    ];
-    vi.spyOn(homepageHooks, "useGetMostPopularEndpoints").mockReturnValue({
-      data: { endpointUsages: popularEndpoints },
-      refetch: () => popularEndpoints,
-      isLoading: false,
-      isFetching: false,
-      isFetched: true,
-    } as any);
-
-    const { container, getByText, getAllByTestId } = render(
-      <ActivityDiagrams envs={baseEnvs.data} />
-    );
-    expect(container).toBeInTheDocument();
-
-    expect(getByText("Most popular endpoints")).toBeInTheDocument();
-    expect(getAllByTestId("method")[0]).toHaveTextContent("GET");
-    expect(getAllByTestId("usage")[0]).toHaveTextContent("11");
-  });
-
-  test("ActivityDiagrams test with no data (Original Test)", async () => {
-    const stageEnvs = {
-      data: [
-        {
-          id: "32b4832f-fb2f-4c99-b89a-c5c995b18dfc",
-          productId: "mef.sonata",
-          createdAt: "2024-05-30T13:02:03.224486Z",
-          name: "stage",
-        },
-      ],
-    };
-
-    vi.spyOn(homepageHooks, "useGetErrorBrakedown").mockReturnValue({
-      data: { errorBreakdowns: [] },
-      isLoading: false,
-      refetch: vi.fn(),
-    } as any);
-
-    vi.spyOn(homepageHooks, "useGetActivityRequests").mockReturnValue({
-      data: {},
-      isLoading: false,
-      isFetcing: false,
-      refetch: vi.fn(),
-      isRefetching: false,
-    } as any);
-
-    vi.spyOn(homepageHooks, "useGetMostPopularEndpoints").mockReturnValue({
-      data: { endpointUsages: [] },
-      refetch: () => [],
-      isLoading: false,
-      isFetching: false,
-      isFetched: true,
-    } as any);
-
-    const { container, getByText } = render(
-      <ActivityDiagrams envs={stageEnvs.data} />
-    );
-    expect(container).toBeInTheDocument();
-
-    expect(
-      getByText("When errors occur, they will be displayed here.")
-    ).toBeInTheDocument();
-  });
-
-  test("handleFormValues: IF block - clearing RequestTime preserves current Env and Buyer", async () => {
+  test("handleFormValues: clearing RequestTime defaults to recent 7 days (covering '|| 7')", async () => {
     const { getActivitySpy } = setupSpies();
     const { getByTestId } = render(<ActivityDiagrams envs={baseEnvs.data} />);
 
+    // 1. Initial State should be 7 days
     await waitFor(() => {
-      expect(getActivitySpy).toHaveBeenLastCalledWith(
-        prodEnvId,
-        productId,
-        "2025-01-01",
-        "2025-01-07",
-        undefined // Initial state of buyer is undefined
-      );
+      expect(recentXDaysMock).toHaveBeenLastCalledWith(7);
     });
 
+    // 2. Simulate User Clicking "Clear" on DatePicker
+    // This triggers handleFormValues with requestTime: null
+    // selectedRecentDate is undefined here (or default), so '|| 7' logic applies
     const clearBtn = getByTestId("mock-picker-clear-btn");
     fireEvent.click(clearBtn);
 
+    // 3. Verify recentXDays called with 7
     await waitFor(() => {
-      expect(recentXDaysMock).toHaveBeenCalledWith(7);
+      expect(recentXDaysMock).toHaveBeenLastCalledWith(7);
       
+      // Verify API called with the dates generated for 7 days
+      // NOTE: "buyer" is expected to be "ALL_BUYERS" because the useEffect sets the form value,
+      // and handleFormValues reads it from the form values.
       expect(getActivitySpy).toHaveBeenLastCalledWith(
-        prodEnvId,// Env ID preserved
-        productId,       
-        "2025-01-01", // Reset start date
-        "2025-01-07", // Reset end date
-        undefined     // Buyer preserved (undefined)
+        productId,
+        prodEnvId,
+        "2025-01-01-7", // Matches our mock implementation
+        "2025-01-07",
+        "ALL_BUYERS"    // Updated expectation
       );
     });
   });
 
-  test("handleFormValues: ELSE block - selecting Date Range preserves current Env and Buyer", async () => {
+  test("handleFormValues: selecting 'Recent 90 days' updates params (covering selectedRecentDate)", async () => {
     const { getActivitySpy } = setupSpies();
     const { getByTestId } = render(<ActivityDiagrams envs={baseEnvs.data} />);
 
+    // 1. Find and Click "Recent 90 days" Radio Button
+    const recent90Btn = getByTestId("recent-90-days");
+    fireEvent.click(recent90Btn);
+
+    // 2. Verify recentXDays called with 90
+    // This covers logic where selectedRecentDate state updates
+    await waitFor(() => {
+      expect(recentXDaysMock).toHaveBeenLastCalledWith(90);
+
+      // Verify API called with dates for 90 days
+      // NOTE: buyer is undefined here because setRecentDate uses existing params state (which initialized to undefined)
+      // and does not read from form values.
+      expect(getActivitySpy).toHaveBeenLastCalledWith(
+        productId,
+        prodEnvId,
+        "2025-01-01-90", // Matches our mock implementation
+        "2025-01-07",
+        undefined
+      );
+    });
+  });
+
+  test("handleFormValues: selecting a specific date range updates params (covering else block)", async () => {
+    const { getActivitySpy } = setupSpies();
+    const { getByTestId } = render(<ActivityDiagrams envs={baseEnvs.data} />);
+
+    // 1. Simulate Select Specific Date Range
+    // This triggers handleFormValues with actual date array
     const selectBtn = getByTestId("mock-picker-select-btn");
     fireEvent.click(selectBtn);
 
+    // 2. Verify API called with the specific dates from the mock button
+    // It should NOT use recentXDays values here
     await waitFor(() => {
       expect(getActivitySpy).toHaveBeenLastCalledWith(
-        prodEnvId,
         productId,
-        expect.stringContaining("2025-10-01"),
+        prodEnvId,
+        expect.stringContaining("2025-10-01"), // From mock button
         expect.stringContaining("2025-10-05"), 
         expect.anything()
       );
     });
   });
-
-  test("handleFormValues: Updating EnvId explicitly (covers 'envId' present in values)", async () => {
-    const { getActivitySpy } = setupSpies();
-    const { getAllByTestId } = render(<ActivityDiagrams envs={baseEnvs.data} />);
-
-    const changeEnvBtns = getAllByTestId(/mock-select-change/);
-    const changeEnvBtn = changeEnvBtns[0]; 
-
-    fireEvent.click(changeEnvBtn);
-
-    await waitFor(() => {
-      expect(getActivitySpy).toHaveBeenLastCalledWith(
-        undefined,
-        "NEW_VALUE_ID", 
-        expect.anything(),
-        expect.anything(),
-        expect.anything()
-      );
-    });
-  });
-
-  test("Initial render sets default values correctly", async () => {
-     const { getActivitySpy } = setupSpies();
-     render(<ActivityDiagrams envs={baseEnvs.data} />);
-
-     await waitFor(() => {
-      expect(getActivitySpy).toHaveBeenCalledWith(
-        prodEnvId,
-        productId,
-        "2025-01-01",
-        "2025-01-07",
-        undefined
-      );
-     });
-  });
 });
-

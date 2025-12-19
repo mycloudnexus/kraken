@@ -52,9 +52,11 @@ const ActivityDiagrams = ({ envs }: Props) => {
   const handleFormValues = (_: unknown, values: DiagramProps) => {
     const { requestTime = [], envId, buyer } = values ?? {};
     if (!requestTime || requestTime.length === 0) {
-      const { requestStartTime, requestEndTime } = recentXDays(7);
+      
+      const daysToLookBack = selectedRecentDate || 7;
+      const { requestStartTime, requestEndTime } = recentXDays(daysToLookBack);
 
-      setSelectedRecentDate(7);
+      setSelectedRecentDate(daysToLookBack);
       form.setFieldsValue({ requestTime: null });
 
       setParams((prev: DiagramProps) => ({
