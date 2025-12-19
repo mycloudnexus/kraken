@@ -4,6 +4,7 @@ apiVersion: v1
 metadata:
   key: mef.sonata.api-target-mapper.poq.eline.add
   name: Product Offering Qualification (POQ) API
+  version: 8
   description: | 
     A request initiated by the Buyer to determine whether the Seller is
     able to deliver a product or set of products from among their product
@@ -30,6 +31,7 @@ spec:
               val: eline
         request:
           - name: mapper.poq.eline.add.place1.id
+            title: "the id of the destination place"
             source: "@{{productOfferingQualificationItem[0].product.place[1].id}}"
             sourceLocation: BODY
             sourceType: string
