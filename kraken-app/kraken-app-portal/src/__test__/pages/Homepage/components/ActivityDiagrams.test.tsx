@@ -80,6 +80,8 @@ describe("ActivityDiagrams Component - handleFormValues Logic", () => {
       },
       {
         id: "stage-id",
+        productId: productId,
+        createdAt: "2024-05-30T13:02:03.224486Z",
         name: "stage",
       }
     ],
