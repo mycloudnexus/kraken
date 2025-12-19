@@ -10,14 +10,14 @@ metadata:
     offerings, at the Buyer's location(s); or modify a previously purchased
     product. The Seller also provides estimated time intervals to complete
     these deliveries. Reference: MEF 79 (Sn 8.4).
-  version: 1
+  version: 2
 spec:
   endpoints:
     - id: create a product offering qualification
       mappers:
         request:
           - name: mapper.poq.@{{productType}}.add.place0.id
-            title: "the id of the place where the products' POQ must be done"
+            title: "The id of the source place"
             source: "@{{productOfferingQualificationItem[0].product.place[0].id}}"
             sourceLocation: BODY
             sourceType: string
@@ -58,10 +58,7 @@ spec:
         response:
           - name: mapper.poq.@{{productType}}.add.serviceabilityConfidence
             title: POQ Item State Mapping
-            description: >-
-              A color that indicates confidence to service the request.
-              When the item state is done the Seller MUST provide a value. 
-              It MUST NOT be populated for other states.
+            description: ""
             source: ""
             sourceLocation: ""
             target: "@{{productOfferingQualificationItem[0].serviceabilityConfidence}}"
@@ -76,7 +73,7 @@ spec:
             requiredMapping: true
           - name: mapper.poq.@{{productType}}.add.installationInterval.amount
             title: POQ installationInterval amount Mapping
-            description: Duration amount of Installation
+            description: ""
             source: ""
             sourceLocation: ""
             target: "@{{productOfferingQualificationItem[0].installationInterval.amount}}"
@@ -85,7 +82,7 @@ spec:
             requiredMapping: true
           - name: mapper.poq.@{{productType}}.add.installationInterval.units
             title: POQ installationInterval units Mapping
-            description: Duration unit of Installation
+            description: ""
             source: ""
             sourceLocation: ""
             target: "@{{productOfferingQualificationItem[0].installationInterval.units}}"
