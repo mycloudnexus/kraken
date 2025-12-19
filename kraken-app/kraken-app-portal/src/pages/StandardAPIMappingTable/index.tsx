@@ -197,13 +197,7 @@ const StandardAPIMappingTable = () => {
       render: (targetKey) => (
         <Button type="link" onClick={
           () => {
-            const navigationState = {
-              mainTitle, 
-              filteredComponentList,
-              productType
-            };
-
-            storeData("currentLocation", JSON.stringify(navigationState));
+            storeData("currentLocation", JSON.stringify(state));
             navigate(targetKey, {
               state: {
                 mainTitle, 
