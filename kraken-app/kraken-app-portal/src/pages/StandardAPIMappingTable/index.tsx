@@ -212,7 +212,6 @@ const StandardAPIMappingTable = () => {
       ),
     },
   ];
-
   return (
     <PageLayout
       title={

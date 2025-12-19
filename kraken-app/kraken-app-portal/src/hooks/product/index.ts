@@ -373,6 +373,7 @@ export const useGetComponentDetailMapping = (
       PRODUCT_CACHE_KEYS.get_component_detail_mapping,
       productId,
       componentId,
+      productType,
     ],
     queryFn: () =>
       getComponentDetailMapping(productId, componentId, productType),
