@@ -182,7 +182,6 @@ const StandardAPIMapping = () => {
       buildInitListMapping(mappers?.response as any, "response")
     );
     setListMappingStateRequest(buildInitListMapping(mappers?.request as any, "request"));
-    // Store to default seller api?
     setSellerApi(defaultSellerApi);
   };
 
@@ -210,7 +209,7 @@ const StandardAPIMapping = () => {
       const valueMapping = flatMap(groupItems, (item) => getValueMapping(item, type));
       return {
         name,
-        valueMapping, // even if this is empty, still return it
+        valueMapping,
       };
     })
     .value();
@@ -232,7 +231,7 @@ const StandardAPIMapping = () => {
     return newRequest.map((rm) => {
       if (rm.name === it.name) {
         if (isEmpty(it.valueMapping)) {
-          rm.valueMapping = []; // explicitly clear if needed
+          rm.valueMapping = [];
           return rm;
         }
         const merged = reduce(
@@ -244,9 +243,8 @@ const StandardAPIMapping = () => {
               if (Array.isArray(val) && val.length > 0 && typeof val[0] === "string") {
                 acc[key] = val[0];
               } else if (typeof val === "string") {
-                acc[key] = val; // Already flat
+                acc[key] = val;
               }
-              // skip undefined or unexpected formats
             }
             return acc;
           },
@@ -331,8 +329,8 @@ const StandardAPIMapping = () => {
       data.facets.endpoints[0] = {
         ...data.facets.endpoints[0],
         serverKey: serverKey as any,
-        method: sellerApi.method,
-        path: sellerApi.url,
+        method: sellerApi?.method,
+        path: sellerApi?.url,
         mappers,
       };
       const res = await updateTargetMapper({
