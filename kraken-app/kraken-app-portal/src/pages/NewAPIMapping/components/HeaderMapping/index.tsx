@@ -86,7 +86,6 @@ const HeaderMapping = ({
   const resetMappingFnc = () => {
     setRequestMapping(
       mappers.request
-        //?.filter((rm: IRequestMapping) => !rm.customizedField)
         ?.map((rm: IRequestMapping) => ({
           ...rm,
           target: "",
@@ -98,7 +97,6 @@ const HeaderMapping = ({
     );
     setResponseMapping(
       mappers.response
-        //?.filter((rm: IResponseMapping) => !rm.customizedField)
         ?.map((rm: IResponseMapping) => ({
           ...rm,
           source: "",
