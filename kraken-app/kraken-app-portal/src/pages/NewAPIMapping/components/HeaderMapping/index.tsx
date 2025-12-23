@@ -92,7 +92,7 @@ const HeaderMapping = ({
           targetLocation: "",
           targetType: "",
           targetValues: [],
-          valueMapping: undefined,
+          valueMapping: {},
         }))
     );
     setResponseMapping(
@@ -101,7 +101,7 @@ const HeaderMapping = ({
           ...rm,
           source: "",
           sourceLocation: "",
-          valueMapping: undefined,
+          valueMapping: {},
         }))
     );
     setListMappingStateRequest(undefined);
