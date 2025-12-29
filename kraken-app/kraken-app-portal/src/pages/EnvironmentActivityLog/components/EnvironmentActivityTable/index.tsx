@@ -293,10 +293,10 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
       key: "buyerName",
       title: "Buyer information",
       width: 200,
-      render: (log: IActivityLog) => (
+      render: (_value, log: IActivityLog) => (
         <Flex>
-          <p>log.buyerName</p>
-          <p>log.companyId</p>
+          <p>{log.buyerName}</p>
+          <p>{log.companyId}</p>
         </Flex>
       ),
     },
