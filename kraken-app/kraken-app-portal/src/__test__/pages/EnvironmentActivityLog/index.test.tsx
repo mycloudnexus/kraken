@@ -45,6 +45,7 @@ test("EnvironmentActivityLog page", () => {
           path: "test",
           method: "test",
           buyerName: "test",
+          companyId: "test",
           queryParameters: {},
           headers: {},
           request: {},
