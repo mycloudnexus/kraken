@@ -15,6 +15,7 @@ const mockActivity: IActivityLog = {
   path: "/test-path",
   method: "GET",
   buyerName: "company",
+  companyId: "company-id",
   queryParameters: { param1: "value1" },
   headers: { header1: "value1" },
   request: { param1: "value1", param2: "value2" },

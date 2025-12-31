@@ -25,6 +25,7 @@ public class ApiActivityLog extends AbstractHttpModel {
   private String clientId;
   private String buyer;
   private String buyerId;
+  private String companyId;
   private String buyerName;
   private String productType;
   private String workflowStatus;
