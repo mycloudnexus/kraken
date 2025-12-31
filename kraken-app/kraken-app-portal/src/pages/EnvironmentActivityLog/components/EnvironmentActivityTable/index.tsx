@@ -294,7 +294,7 @@ const EnvironmentActivityTable = (props: EnvironmentActivityTablePropsType) => {
       title: "Buyer information",
       width: 200,
       render: (_value, log: IActivityLog) => (
-        <Flex>
+        <Flex className={styles.productSpec}>
           <p>{log.buyerName}</p>
           <p>{log.companyId}</p>
         </Flex>
