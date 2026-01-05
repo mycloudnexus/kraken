@@ -331,8 +331,8 @@ const StandardAPIMapping = () => {
       data.facets.endpoints[0] = {
         ...data.facets.endpoints[0],
         serverKey: serverKey as any,
-        method: sellerApi.method,
-        path: sellerApi.url,
+        method: sellerApi?.method,
+        path: sellerApi?.url,
         mappers,
       };
       const res = await updateTargetMapper({
