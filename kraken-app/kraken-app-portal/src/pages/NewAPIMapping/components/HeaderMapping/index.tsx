@@ -105,7 +105,7 @@ const HeaderMapping = ({
         }))
     );
     setListMappingStateRequest([]);
-    setListMappingStateResponse(undefined);
+    setListMappingStateResponse([]);
     setSellerApi(undefined);
     setServerKey("");
   };
