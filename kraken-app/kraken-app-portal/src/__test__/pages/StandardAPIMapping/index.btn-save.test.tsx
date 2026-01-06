@@ -173,6 +173,9 @@ test("StandardAPIMapping handleSave updates and sends correct mapping", async ()
     setActivePath: vi.fn(),
     selectedKey: "targetKey",
     setSelectedKey: vi.fn(),
+    activeTab: "request",
+    setActiveTab: vi.fn(),
+    resetUiStore: vi.fn(), 
   });
 
   vi.spyOn(productHooks, "useGetComponentDetailMapping").mockReturnValue({

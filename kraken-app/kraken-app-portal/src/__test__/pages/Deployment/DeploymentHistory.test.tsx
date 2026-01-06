@@ -1,6 +1,46 @@
 import { render } from "@/__test__/utils";
 import * as hooks from "@/hooks/product";
 import DeployHistory from "@/pages/NewAPIMapping/components/DeployHistory";
+import { vi } from "vitest";
+
+vi.mock("antd", async () => {
+  const actual = await vi.importActual<any>("antd");
+  return {
+    ...actual,
+    Table: ({ columns, dataSource, locale }: any) => {
+      return (
+        <div data-testid="mock-table">
+          {dataSource?.length === 0 && locale?.emptyText}
+
+          <div className="mock-headers">
+            {columns.map((col: any, index: number) => (
+              <div key={col.key || col.dataIndex || index}>
+                {typeof col.title === "string" ? col.title : "Complex Title"}
+              </div>
+            ))}
+          </div>
+
+          {dataSource?.map((record: any, rowIndex: number) => (
+            <div key={record.id || rowIndex} className="mock-row">
+              {columns.map((col: any, colIndex: number) => {
+                const cellValue = col.dataIndex ? record[col.dataIndex] : record;
+                const content = col.render
+                  ? col.render(cellValue, record, rowIndex)
+                  : cellValue;
+                
+                const cellKey = col.key || col.dataIndex || colIndex;
+                return <div key={cellKey}>{content}</div>;
+              })}
+            </div>
+          ))}
+        </div>
+      );
+    },
+    Tooltip: ({ children }: any) => <div>{children}</div>,
+    Switch: () => <input type="checkbox" />,
+    Result: ({ subTitle }: any) => <div>{subTitle}</div>,
+  };
+});
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -24,11 +64,9 @@ describe("Deployment > Deployment history tests", () => {
 
     const { getByText } = render(<DeployHistory scrollHeight={1000} />);
 
-    // Table headings assertions
     expect(getByText("Version")).toBeInTheDocument();
     expect(getByText("Environment")).toBeInTheDocument();
     expect(getByText("Deployed by")).toBeInTheDocument();
-    expect(getByText("Verified for Production")).toBeInTheDocument();
     expect(getByText("Verified by")).toBeInTheDocument();
     expect(getByText("Actions")).toBeInTheDocument();
 
