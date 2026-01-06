@@ -1,7 +1,9 @@
 import NewAPIMapping from "@/pages/NewAPIMapping";
 import * as newApiMappingHooks from "@/stores/newApiMapping.store";
 import { render, renderHook } from "@/__test__/utils";
-import HeaderMapping from "@/pages/NewAPIMapping/components/HeaderMapping"
+import HeaderMapping from "@/pages/NewAPIMapping/components/HeaderMapping";
+import * as mappingUiStore from "@/stores/mappingUi.store";
+
 
 beforeEach(() => {
   vi.clearAllMocks()
@@ -155,3 +157,21 @@ describe('api mapping components tests', () => {
     expect(getByTestId('sellerApi')).toHaveTextContent('Seller API')
   })
 })
+
+describe("NewAPIMapping - activeTab reset behavior", () => {
+  it("should set activeTab to request on mount and unmount", () => {
+    const setActiveTab = vi.fn();
+    vi.spyOn(mappingUiStore, "useMappingUiStore").mockReturnValue({
+      activeTab: "response",
+      setActiveTab,
+    } as any);
+    const { unmount } = render(
+      <NewAPIMapping isRequiredMapping={true} />
+    );
+
+    expect(setActiveTab).toHaveBeenCalledWith("request");
+    setActiveTab.mockClear();
+    unmount();
+    expect(setActiveTab).toHaveBeenCalledWith("request");
+  });
+});

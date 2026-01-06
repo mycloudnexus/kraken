@@ -74,6 +74,11 @@ const NewAPIMapping = ({
   const ref = useRef<any>();
 
   useEffect(() => {
+    setActiveTab("request");
+    return () => setActiveTab("request");
+  }, []);
+
+  useEffect(() => {
     if (!sellerApi && defaultSellerApi && firstTimeLoadSellerAPI) {
       setSellerApi(defaultSellerApi);
       setFirstTimeLoadSellerAPI(false);
@@ -248,7 +253,7 @@ const NewAPIMapping = ({
   );
 
   const upgradingVersion = pathQuery.get("version");
-
+  console.log("active tab:", activeTab);
   return (
     <main className={styles.container}>
       {/* User guide */}
