@@ -1,0 +1,18 @@
+import { describe, it, expect } from 'vitest';
+import { decodeBase64Content } from "@/libs/decode";
+
+
+describe('base64 decode testing', () => {
+  it('decode valid base64 content should success', () => {
+    expect(decodeBase64Content()).toEqual("");
+    expect(decodeBase64Content({})).toEqual("");
+    expect(decodeBase64Content("")).toEqual("");
+    expect(decodeBase64Content("e30K")).toEqual("{}\n");
+    expect(decodeBase64Content("data:application/yaml;base64,e30K")).toEqual("{}\n");
+    expect(decodeBase64Content("data:application/x-yaml;base64,e30K")).toEqual("{}\n");
+  })
+
+  it('decode invalid base64 content should throw error', () => {
+    expect(() => decodeBase64Content(1)).toThrow();
+  })
+})

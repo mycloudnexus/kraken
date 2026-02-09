@@ -11,14 +11,19 @@ export const decodeBase64Content = (content?: unknown): string => {
     return "";
   }
 
-  if (typeof content !== "string") {
+  if (typeof content !== "string" && typeof content !== "number") {
     console.log("invalid base64 content");
     return "";
   }
 
-  let str = content as string;
-  console.log("parsing content");
-  let text = str.split(',').pop() as string;
-  console.log("parsing content done");
-  return decode(text);
+  try {
+    let str = content as string;
+    console.log("parsing content");
+    let text = str.split(',').pop() as string;
+    console.log("parsing content done");
+    return decode(text);
+  } catch (e) {
+    console.error("invalide base64 string");
+    throw e;
+  }
 };
