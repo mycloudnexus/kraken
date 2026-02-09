@@ -9,12 +9,13 @@ const PUSH_API_EVENT_CACHE_KEYS = {
   create_activity_history_log: "create_activity_history_log",
   get_product_env_list: "get_product_env_list",
   get_push_button_enabled: "get_push_button_enabled",
+  query_push_log: "query_push_log",
 };
 
 export const useGetPushActivityLogHistory = (queryParams: unknown) => {
   console.log(queryParams)
   return useQuery<AxiosResponse, Error, IPagingData<IActivityHistoryLog>>({
-    queryKey: ['query_push_log', queryParams],
+    queryKey: [PUSH_API_EVENT_CACHE_KEYS.query_push_log, queryParams],
     queryFn: () => getPushEventHistory(queryParams),
     select: (data) => data.data,
     staleTime: STALE_TIME,
@@ -38,7 +39,7 @@ export const usePostPushActivityLog = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [PUSH_API_EVENT_CACHE_KEYS.create_activity_history_log],
+        queryKey: [PUSH_API_EVENT_CACHE_KEYS.query_push_log],
       });
     },
   });

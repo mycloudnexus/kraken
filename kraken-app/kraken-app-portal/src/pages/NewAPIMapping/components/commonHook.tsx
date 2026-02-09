@@ -48,9 +48,19 @@ export const useCommonAddProp = ({
     }
     // selectedProp = { name: string, location: string }
     // propery name should follow this format: @{{ prop_name }}
+    let propertyName = '';
+    if (selectedProp?.location === 'HYBRID') {
+      propertyName = `${selectedProp.name}`;
+    } else if (selectedProp?.location === 'QUERY') {
+      propertyName = selectedProp.schemaType === 'object'
+      ? `${selectedProp.name}={}`
+      : `@{{${selectedProp.name}}}`;
+    } else {
+      propertyName = `@{{${selectedProp.name}}}`;
+    }
     onSelect?.({
       ...selectedProp,
-      name: selectedProp?.location === 'HYBRID'?`${selectedProp.name}`:`@{{${selectedProp.name}}}`,
+      name: propertyName,
       title: rightSideInfo?.title,
     });
   }, [selectedProp, onSelect, rightSideInfo]);
@@ -202,16 +212,6 @@ export const useCommonAddProp = ({
         ),
         children: (
           <Flex vertical gap={8} className={styles.paramList}>
-            {isOpen && currentProp?.path === "QUERY" && (
-              <ExampleValueModal
-                location={currentProp?.path || ""}
-                attribute={currentProp?.name || ""}
-                isOpen={isOpen}
-                onClose={close}
-                onOK={handleAddParamHybrid}
-                defaultValue={rightSideInfo?.previousData?.target}
-              />
-            )}
             {queryParameters.map((parameter: any) => {
             const sellerValue = sellerAPIExampleProps?.param?.[parameter.name];
             const sonataValue = rightSideInfo?.previousData?.target;
@@ -233,12 +233,14 @@ export const useCommonAddProp = ({
                       setSelectedProp({
                         location: "HYBRID",
                         name: sellerValue,
+                        schemaType: parameter.schema?.type,
                       });
                       return;
                     }
                     setSelectedProp({
                       location: "QUERY",
                       name: parameter.name,
+                      schemaType: parameter.schema?.type,
                     });
                   }}
                 >
@@ -249,9 +251,6 @@ export const useCommonAddProp = ({
                         type="link"
                         onClick={() => handleProp(parameter.name, "QUERY")}
                       >
-                        {(sonataValue)
-                          ? "Edit value with variable"
-                          : "Add value with variable"}
                       </Button>
                     ) : null}
                     <TypeTag type={parameter.schema.type} />

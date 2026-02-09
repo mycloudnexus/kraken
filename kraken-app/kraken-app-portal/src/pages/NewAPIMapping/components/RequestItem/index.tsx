@@ -180,7 +180,8 @@ const RequestItem = ({ item, index }: Props) => {
   };
 
   const handleDeleteMapping = (key: React.Key) => {
-    const updated = handleDeleteMappingItems(key, listMapping, undefined);
+    const listClone = cloneDeep(listMapping);
+    const updated = handleDeleteMappingItems(key, listClone);
     setListMappingStateRequest(updated);
   };
 
@@ -233,7 +234,6 @@ const RequestItem = ({ item, index }: Props) => {
       setRequestMapping(newRequest);
     }
   }, [continuousInput]);
-
   return (
     <div
       className={clsx([

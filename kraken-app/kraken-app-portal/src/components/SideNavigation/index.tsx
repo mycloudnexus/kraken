@@ -12,7 +12,7 @@ import {
   DoubleLeftOutlined,
   ExclamationCircleOutlined,
 } from "@ant-design/icons";
-import { Button, Divider, Flex, Menu, Tooltip, Typography } from "antd";
+import { Button, Flex, Menu, Tooltip, Typography } from "antd";
 import Sider from "antd/es/layout/Sider";
 import { last } from "lodash";
 import { useEffect, useMemo, useState } from "react";
@@ -204,7 +204,6 @@ const SideNavigation = ({ info }: Readonly<{ info?: ISystemInfo }>) => {
             <Tooltip title={<KrakenVersion info={info as any} />}>
               <ExclamationCircleOutlined data-testid="appVersionsIndicator" style={{ color: 'var(--text-secondary)' }} />
             </Tooltip>
-            {!collapsed && (<Divider type="vertical" style={{ margin: '0 6px' }} />)}
           </div>
         </Flex>
 

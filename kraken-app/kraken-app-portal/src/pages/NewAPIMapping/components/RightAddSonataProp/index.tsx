@@ -98,7 +98,6 @@ const RightAddSonataProp = ({
     setSelectedProp,
     onSelect,
   });
-
   return (
     <Flex
       vertical

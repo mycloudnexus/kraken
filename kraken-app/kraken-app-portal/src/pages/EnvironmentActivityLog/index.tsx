@@ -194,7 +194,7 @@ const EnvironmentActivityLog = () => {
                             fetchBuyerList
                           }
                           onChange={handleChange}
-                          placeholder="Please select buyer"
+                          placeholder="Please search by buyer id"
                           notFoundContent={
                            'No results found'
                           }

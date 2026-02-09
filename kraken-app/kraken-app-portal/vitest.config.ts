@@ -18,8 +18,8 @@ export default defineConfig({
     setupFiles: ["src/tests/setup.tsx"],
     coverage: {
       provider: "v8",
-      include: ["src/pages/**/*", "src/components/**/*"],
-      exclude: ["src/tests/*", "html_template/*.html", "src/services/*", "src/hooks/*"],
+      include: ["src/pages/**/*", "src/components/**/*", "src/tests/setup.tsx"],
+      exclude: ["html_template/*.html", "src/services/*", "src/hooks/*"],
       extension: [".ts", ".tsx"],
       all: true,
       reporter: ["text", "html", "clover", "json", "lcov"],

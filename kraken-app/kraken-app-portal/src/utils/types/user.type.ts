@@ -19,6 +19,7 @@ export interface ISystemInfo {
   stageProductVersion: string
   productionProductVersion: string
   controlAppVersion: string
+  buildRevision?: string
   productKey: string
   productName: string
   productSpec: string

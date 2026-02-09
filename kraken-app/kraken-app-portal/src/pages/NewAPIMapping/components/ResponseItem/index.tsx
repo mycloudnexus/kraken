@@ -89,7 +89,7 @@ const ResponseItem = ({ item, index }: Props) => {
   };
   
   const handleDeleteMapping = (key: React.Key) => {
-    const updated = handleDeleteMappingItems(key, listMapping, []);
+    const updated = handleDeleteMappingItems(key, listMapping);
     setListMappingStateResponse(updated);
   };
 

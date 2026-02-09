@@ -1,3 +1,4 @@
+import { AxiosError} from 'axios'
 import RollbackIcon from "@/assets/newAPIMapping/Rollback.svg";
 import BreadCrumb from "@/components/Breadcrumb";
 import DeployStage from "@/components/DeployStage";
@@ -14,8 +15,10 @@ import { useMappingUiStore } from "@/stores/mappingUi.store";
 import { useNewApiMappingStore } from "@/stores/newApiMapping.store";
 import buildInitListMapping from "@/utils/helpers/buildInitListMapping";
 import groupByPath from "@/utils/helpers/groupByPath";
+import { BackendErrorResponse } from "@/utils/types/common.type";
 import { IMappers } from "@/utils/types/component.type";
 import { IMapperDetails } from "@/utils/types/env.type";
+import { parseProductName } from "@/utils/helpers/name";
 import { Flex, Spin, Button, Tooltip, notification, Drawer } from "antd";
 import dayjs from "dayjs";
 import { delay, get, isEmpty, chain, cloneDeep, flatMap, reduce } from "lodash";
@@ -35,11 +38,22 @@ import {getData} from "@/utils/helpers/token.ts";
 
 const StandardAPIMapping = () => {
   const { currentProduct } = useAppStore();
-  const { componentId } = useParams();
+  const { componentId, targetKey } = useParams();
   const location = JSON.parse(getData("currentLocation")??'{}');
-  const [mainTitle, setMainTitle] = useState(() => location?.productType ?? "unknown main title");
   const [filteredComponentList, setFilteredComponentList] = useState(() => location?.filteredComponentList ?? []);
   const [productType, setProductType] = useState(() => location?.productType ?? "");
+  useEffect(() => {
+    if (!targetKey) {
+      return;
+    }
+    if (targetKey.includes("address")) {
+      setProductType("SHARE");
+    } else if (targetKey.includes("uni")) {
+      setProductType("UNI");
+    } else if (targetKey.includes("eline")) {
+      setProductType("ACCESS_E_LINE");
+    }
+  }, [targetKey]);
   const { activePath, setActivePath, selectedKey, setSelectedKey } =
     useMappingUiStore();
 
@@ -67,7 +81,7 @@ const StandardAPIMapping = () => {
   const { data: detailDataMapping, refetch } = useGetComponentDetailMapping(
     currentProduct,
     componentId ?? "",
-      productType
+    productType,
   );
   
   const { value: isChangeMappingKey, setValue: setIsChangeMappingKey } =
@@ -104,8 +118,6 @@ const StandardAPIMapping = () => {
   };
 
   useEffect(() => {
-    // Silence unused setter warnings without changing state
-    setMainTitle((prev: string) => prev);
     setFilteredComponentList((prev: any[]) => prev);
     setProductType((prev: string) => prev);
   }, []);
@@ -210,7 +222,7 @@ const StandardAPIMapping = () => {
       const valueMapping = flatMap(groupItems, (item) => getValueMapping(item, type));
       return {
         name,
-        valueMapping, // even if this is empty, still return it
+        valueMapping,
       };
     })
     .value();
@@ -232,7 +244,7 @@ const StandardAPIMapping = () => {
     return newRequest.map((rm) => {
       if (rm.name === it.name) {
         if (isEmpty(it.valueMapping)) {
-          rm.valueMapping = []; // explicitly clear if needed
+          rm.valueMapping = [];
           return rm;
         }
         const merged = reduce(
@@ -244,9 +256,8 @@ const StandardAPIMapping = () => {
               if (Array.isArray(val) && val.length > 0 && typeof val[0] === "string") {
                 acc[key] = val[0];
               } else if (typeof val === "string") {
-                acc[key] = val; // Already flat
+                acc[key] = val;
               }
-              // skip undefined or unexpected formats
             }
             return acc;
           },
@@ -331,8 +342,8 @@ const StandardAPIMapping = () => {
       data.facets.endpoints[0] = {
         ...data.facets.endpoints[0],
         serverKey: serverKey as any,
-        method: sellerApi.method,
-        path: sellerApi.url,
+        method: sellerApi?.method,
+        path: sellerApi?.url,
         mappers,
       };
       const res = await updateTargetMapper({
@@ -345,12 +356,14 @@ const StandardAPIMapping = () => {
       callback && callback();
       return true;
     } catch (error) {
+      const err = error as AxiosError<BackendErrorResponse>;
+      const reason =
+       err?.response?.data?.reason ??
+       err?.response?.data?.message ??
+       err?.message ??
+       "Error on creating/updating mapping";
       notification.error({
-        message: get(
-          error,
-          "reason",
-          get(error, "message", "Error on creating/updating mapping")
-        ),
+        message: reason,
       });
     }
   };
@@ -364,7 +377,7 @@ const StandardAPIMapping = () => {
           style={{ padding: "5px 0" }}
         >
           <BreadCrumb
-            mainTitle= {mainTitle}
+            mainTitle= {parseProductName(productType)}
             mainUrl="/components"
             optionalParam={productType}
             items={[

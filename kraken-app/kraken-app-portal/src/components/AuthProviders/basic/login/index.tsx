@@ -12,10 +12,14 @@ const Login = () => {
   const { isPending } = useLogin();
   const { loginWithCredentials } = useBasicAuth();
 
-  const [error] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const onFinish = async (values: any) : Promise<void> => {
-    return await loginWithCredentials(values);
+    try {
+      return await loginWithCredentials(values);
+    } catch (e) {
+      setError("" + e)
+    }
   }
 
   return (
