@@ -129,7 +129,6 @@ You can verify the installed versions with the following commands:
 4. npm -v
 ```
 
-
 #### Step 1 - Run the Control Portal
 
 1. From the base of the repository, navigate to the portal directory:
