@@ -42,10 +42,7 @@ public class ConfigurationMonitorService {
           "push-log-external-system",
           "pull-latest-release");
 
-  private final CronJobProperties cronJobProperties;
-
   public ConfigurationMonitorService(CronJobProperties cronJobProperties) {
-    this.cronJobProperties = cronJobProperties;
     if (Objects.nonNull(cronJobProperties.getCronJob())) {
 
       log.info("[{}] cron job configurations:", Constants.LOG_FIELD_CRON_JOB);
@@ -53,13 +50,13 @@ public class ConfigurationMonitorService {
       cronJobProperties.getCronJob().entrySet().stream()
           .filter(entry -> monitorList.contains(entry.getKey()))
           .forEach(
-              entry -> {
+              entry ->
                 log.info(
                     "[{}] Configuration app.cron-job.{}: {}",
                     Constants.LOG_FIELD_CRON_JOB,
                     entry.getKey(),
-                    entry.getValue());
-              });
+                    entry.getValue())
+              );
 
       checkLock(cronJobProperties.getCronJob());
     } else {

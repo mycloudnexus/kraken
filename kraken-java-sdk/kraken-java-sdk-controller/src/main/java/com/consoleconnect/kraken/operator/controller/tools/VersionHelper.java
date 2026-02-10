@@ -10,10 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 
 public class VersionHelper {
 
-  private static final String VERSION_SEPARATOR = "-";
-
-  private static final String SNAPSHOT = "SNAPSHOT";
-
   private VersionHelper() {}
 
   public static String generateVersion(UnifiedAssetEntity unifiedAssetEntity) {
