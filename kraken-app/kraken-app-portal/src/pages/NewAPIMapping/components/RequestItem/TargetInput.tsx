@@ -26,28 +26,28 @@ export function TargetInput({
     rightSide,
     errors,
   } = useNewApiMappingStore();
-  const isFocused = useMemo(
+  const isSourceFocused = useMemo(
     () =>
       rightSide === EnumRightType.AddSellerProp &&
       isEqual(item.id, rightSideInfo?.previousData?.id),
     [rightSide, item.id, rightSideInfo?.previousData?.id]
   );
 
-  const handleChange = (changes: { [field in keyof typeof item]?: any }) => {
-    const newRequest = cloneDeep(requestMapping);
+  const handleSourceInputChange = (changes: { [field in keyof typeof item]?: any }) => {
+    const newSourceRequest = cloneDeep(requestMapping);
     for (const field in changes) {
       set(
-        newRequest,
+        newSourceRequest,
         `[${index}].${field}`,
         changes[field as keyof typeof item]
       );
     }
 
-    setRequestMapping(newRequest);
-    if (isFocused && rightSideInfo) {
+    setRequestMapping(newSourceRequest);
+    if (isSourceFocused && rightSideInfo) {
       setRightSideInfo({
         ...rightSideInfo,
-        previousData: newRequest[index],
+        previousData: newSourceRequest[index],
       });
    }
   };
@@ -58,7 +58,7 @@ export function TargetInput({
           type="request"
           // disabled={!item.customizedField}
           value={item.targetLocation}
-          onChange={(value) => handleChange({ targetLocation: value })}
+          onChange={(value) => handleSourceInputChange({ targetLocation: value })}
         />
       ) : <div className={styles.bloater}></div>}
 
@@ -69,7 +69,7 @@ export function TargetInput({
           variant="filled"
           style={{ flex: 1 }}
           className={clsx(styles.sellerPropItemWrapper, {
-            [styles.active]: isFocused,
+            [styles.active]: isSourceFocused,
             [styles.error]:
               errors?.requestIds?.has(item.id as any) && !item.target,
           })}
@@ -86,9 +86,9 @@ export function TargetInput({
           }}
           onChange={(value) => {
             if (!value) {
-              handleChange({ target: value, targetLocation: undefined });
+              handleSourceInputChange({ target: value, targetLocation: undefined });
             } else {
-              handleChange({ target: value });
+              handleSourceInputChange({ target: value });
             }
           }}
         />
