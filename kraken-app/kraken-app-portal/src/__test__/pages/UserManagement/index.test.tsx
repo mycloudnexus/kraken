@@ -5,8 +5,47 @@ import { queryClient } from "@/utils/helpers/reactQuery";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
+import { vi } from "vitest";
+vi.mock("antd", async () => {
+  const actual = await vi.importActual<any>("antd");
+  return {
+    ...actual,
+    Select: ({ children, ...props }: any) => (
+      <div data-testid="mock-antd-select" {...props}>
+        {children}
+      </div>
+    ),
+    Table: ({ dataSource, columns}: any) => {
+      return (
+        <div data-testid="mock-table">
+          {dataSource?.map((record: any, index: number) => (
+            <div key={record.id || index} className="mock-row">
+              {columns.map((col: any, colIndex: number) => {
+                const cellValue = col.dataIndex ? record[col.dataIndex] : record;
+                const content = col.render
+                  ? col.render(cellValue, record, index)
+                  : cellValue;
+                return (
+                  <div key={col.key || col.dataIndex || colIndex}>{content}</div>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      );
+    },
+    Switch: (props: any) => (
+      <button
+        data-testid={props["data-testid"]}
+        onClick={() => props.onChange?.(!props.checked)}
+      >
+        {props.checked ? "On" : "Off"}
+      </button>
+    ),
+  };
+});
 
-ENV.AUTHENTICATION_TYPE = "basic"
+ENV.AUTHENTICATION_TYPE = "basic";
 
 test("UserManagement test", () => {
   vi.spyOn(userHooks, "useGetUserList").mockReturnValue({
