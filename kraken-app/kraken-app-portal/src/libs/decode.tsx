@@ -30,7 +30,7 @@ export const decodeBase64Content = (content?: unknown): string => {
         console.log("validation pass");
       } else {
         console.error("validation failed");
-        throw Error("invalid format");
+        throw new Error("invalid format");
       }
     } else if (str.startsWith("data:application/x-yaml;")) {
       console.log("parsing content with application/x-yaml");
@@ -38,7 +38,7 @@ export const decodeBase64Content = (content?: unknown): string => {
         console.log("validation pass");
       } else {
         console.error("validation failed");
-        throw Error("invalid format");
+        throw new Error("invalid format");
       }
     } else {
       console.log("parsing content, raw base64 content, validation pass");
