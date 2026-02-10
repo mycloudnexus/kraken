@@ -9,6 +9,7 @@ import { useMemo } from "react";
 import { LocationSelector } from "../LocationSelector";
 import styles from "./index.module.scss";
 import { AutoGrowingInput } from "@/components/form";
+import { handleMappingInputChange } from "./InputCommon";
 
 export function TargetInput({
   item,
@@ -26,31 +27,13 @@ export function TargetInput({
     rightSide,
     errors,
   } = useNewApiMappingStore();
-  const isSourceFocused = useMemo(
+  const isFocused = useMemo(
     () =>
       rightSide === EnumRightType.AddSellerProp &&
       isEqual(item.id, rightSideInfo?.previousData?.id),
     [rightSide, item.id, rightSideInfo?.previousData?.id]
   );
 
-  const handleSourceInputChange = (changes: { [field in keyof typeof item]?: any }) => {
-    const newSourceRequest = cloneDeep(requestMapping);
-    for (const field in changes) {
-      set(
-        newSourceRequest,
-        `[${index}].${field}`,
-        changes[field as keyof typeof item]
-      );
-    }
-
-    setRequestMapping(newSourceRequest);
-    if (isSourceFocused && rightSideInfo) {
-      setRightSideInfo({
-        ...rightSideInfo,
-        previousData: newSourceRequest[index],
-      });
-   }
-  };
   return (
     <Flex className={styles.flexColumn} gap={4}>
       {item.target ? (
@@ -58,7 +41,17 @@ export function TargetInput({
           type="request"
           // disabled={!item.customizedField}
           value={item.targetLocation}
-          onChange={(value) => handleSourceInputChange({ targetLocation: value })}
+          onChange={(value) => 
+            handleMappingInputChange(
+              { targetLocation: value },
+              index,
+              isFocused,
+              requestMapping,
+              item,
+              rightSideInfo,
+              setRequestMapping,
+              setRightSideInfo)
+          }
         />
       ) : <div className={styles.bloater}></div>}
 
@@ -69,7 +62,7 @@ export function TargetInput({
           variant="filled"
           style={{ flex: 1 }}
           className={clsx(styles.sellerPropItemWrapper, {
-            [styles.active]: isSourceFocused,
+            [styles.active]: isFocused,
             [styles.error]:
               errors?.requestIds?.has(item.id as any) && !item.target,
           })}

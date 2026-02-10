@@ -9,6 +9,7 @@ import { LocationSelector } from "../LocationSelector";
 import styles from "./index.module.scss";
 import { AutoGrowingInput } from "@/components/form";
 import { Text } from "@/components/Text";
+import { handleMappingInputChange } from "./InputCommon";
 
 export function SourceInput({
   item,
@@ -31,24 +32,6 @@ export function SourceInput({
     [rightSide, item.id, rightSideInfo?.previousData?.id]
   );
 
-  const handleChange = (changes: { [field in keyof typeof item]?: any }) => {
-    const newRequest = cloneDeep(requestMapping);
-    for (const field in changes) {
-      set(
-        newRequest,
-        `[${index}].${field}`,
-        changes[field as keyof typeof item]
-      );
-    }
-
-    setRequestMapping(newRequest);
-    if (isFocused && rightSideInfo) {
-      setRightSideInfo({
-        ...rightSideInfo,
-        previousData: newRequest[index],
-      });
-    }
-  };
   return (
     <Flex className={styles.flexColumn} gap={4}>
       {item.source ? (
@@ -56,7 +39,15 @@ export function SourceInput({
           type="request"
           disabled={!item.customizedField}
           value={item.sourceLocation}
-          onChange={(value) => handleChange({ sourceLocation: value })}
+          onChange={(value) => handleMappingInputChange(
+            { sourceLocation: value },
+            index,
+            isFocused,
+            requestMapping,
+            item,
+            rightSideInfo,
+            setRequestMapping,
+            setRightSideInfo)}
         />
       ) : <div className={styles.bloater}></div>}
 
