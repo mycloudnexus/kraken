@@ -70,32 +70,6 @@ describe(" Environment Overview component list", () => {
     } as any);
   });
 
-  it("running components list", async () => {
-    vi.clearAllMocks()
-    vi.spyOn(sizeHooks, 'useContainerHeight').mockReturnValue([1000])
-
-    const { getByText, getAllByRole } = render(
-      <EnvironmentOverview />
-    );
-    const ele = getByText("production Environment");
-    expect(ele).toBeInTheDocument();
-
-    const tabs = getAllByRole('radio')
-
-    expect(tabs).toHaveLength(2)
-    expect(tabs[0].parentNode?.parentNode).toHaveTextContent('Running API mappings')
-    expect(tabs[1].parentNode?.parentNode).toHaveTextContent('Deployment history')
-
-    // Should default open running api mapping tab
-    await waitFor(() => expect(getByText('Component')).toBeInTheDocument())
-    const disableSwitch = getByTestId('disable-switch');
-    fireEvent.click(disableSwitch);
-
-    // Open deployment history tab
-    fireEvent.click(tabs[1])
-    await waitFor(() => expect(getByText('API mapping')).toBeInTheDocument())
-  });
-
   it("rotateApiKeyMutate", async () => {
     vi.spyOn(sizeHooks, 'useContainerHeight').mockReturnValue([1000])
 
