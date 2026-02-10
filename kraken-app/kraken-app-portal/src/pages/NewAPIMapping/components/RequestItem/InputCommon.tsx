@@ -1,29 +1,34 @@
 import { IRequestMapping } from "@/utils/types/component.type";
 import { cloneDeep, set } from "lodash";
 
-export const handleMappingInputChange = (
-  changes: { [field in keyof typeof item]?: any },
+export type MappingInputParams = {
   index: number,
   isFocused: boolean,
   requestMapping: any[],
-  item: IRequestMapping,
   rightSideInfo: any,
   setRequestMapping: (mapping: any[]) => void,
-  setRightSideInfo: (rightSideInfo: any) => void) => {
-  const newSourceRequest = cloneDeep(requestMapping);
+  setRightSideInfo: (rightSideInfo: any) => void
+  
+}
+
+export const handleMappingInputChange = (
+  item: IRequestMapping,
+  changes: { [field in keyof typeof item]?: any },
+  mappingInputParams: MappingInputParams) => {
+  const newSourceRequest = cloneDeep(mappingInputParams.requestMapping);
   for (const field in changes) {
     set(
       newSourceRequest,
-      `[${index}].${field}`,
+      `[${mappingInputParams.index}].${field}`,
       changes[field as keyof typeof item]
     );
   }
 
-  setRequestMapping(newSourceRequest);
-  if (isFocused && rightSideInfo) {
-    setRightSideInfo({
-      ...rightSideInfo,
-      previousData: newSourceRequest[index],
+  mappingInputParams.setRequestMapping(newSourceRequest);
+  if (mappingInputParams.isFocused && mappingInputParams.rightSideInfo) {
+    mappingInputParams.setRightSideInfo({
+      ...mappingInputParams.rightSideInfo,
+      previousData: newSourceRequest[mappingInputParams.index],
     });
  }
 };

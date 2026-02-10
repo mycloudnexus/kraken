@@ -34,14 +34,17 @@ export function SourceInput({
 
   const handleChange = (changes: { [field in keyof typeof item]?: any }) => {
     handleMappingInputChange(
-      changes,
-      index,
-      isFocused,
-      requestMapping,
       item,
-      rightSideInfo,
-      setRequestMapping,
-      setRightSideInfo);
+      changes,
+      {
+        index,
+        isFocused,
+        requestMapping,
+        rightSideInfo,
+        setRequestMapping,
+        setRightSideInfo
+      }
+    );
   };
 
   return (
