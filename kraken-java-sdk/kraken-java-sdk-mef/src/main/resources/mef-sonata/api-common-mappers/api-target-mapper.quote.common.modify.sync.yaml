@@ -5,7 +5,7 @@ metadata:
   key: mef.sonata.api-target-mapper.quote.common.modify.sync
   name: Mapper Of Creating Quote Eline
   description: This operation modifies a Quote entity
-  version: 4
+  version: 5
 spec:
   trigger:
     path: /mefApi/sonata/quoteManagement/v8/quote
@@ -31,7 +31,7 @@ spec:
             targetLocation:
             requiredMapping: false
           - name: mapper.quote.@{{productType}}.modify.sync.duration.amount
-            title: "quote item Term duration"
+            title: "Quote item term duration"
             source: "@{{quoteItem[0].requestedQuoteItemTerm.duration.amount}}"
             sourceLocation: BODY
             sourceType: integer
@@ -40,7 +40,7 @@ spec:
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.quote.@{{productType}}.modify.sync.duration.units
-            title: "quote item Term unit"
+            title: "Quote item term unit"
             source: "@{{quoteItem[0].requestedQuoteItemTerm.duration.units}}"
             sourceLocation: BODY
             sourceType: enum
@@ -58,7 +58,7 @@ spec:
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.quote.@{{productType}}.modify.sync.endOfTermAction
-            title: "MEFEndOfTermAction"
+            title: "End of term action"
             source: "@{{quoteItem[0].requestedQuoteItemTerm.endOfTermAction}}"
             sourceLocation: BODY
             sourceType: enum
@@ -71,7 +71,7 @@ spec:
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.quote.@{{productType}}.modify.sync.rollInterval.amount
-            title: "quote item Term roll duration"
+            title: "Quote item term roll duration"
             source: "@{{quoteItem[0].requestedQuoteItemTerm.rollInterval.amount}}"
             sourceLocation: BODY
             sourceType: integer
@@ -86,7 +86,7 @@ spec:
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.quote.@{{productType}}.modify.sync.rollInterval.units
-            title: "quote item Term roll unit"
+            title: "Quote item term roll unit"
             source: "@{{quoteItem[0].requestedQuoteItemTerm.rollInterval.units}}"
             sourceLocation: BODY
             sourceType: enum
@@ -110,7 +110,7 @@ spec:
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.quote.@{{productType}}.modify.sync.productConfiguration.bandwidth
-            title: "Bandwidth of the Eline"
+            title: "Bandwidth of the E-Line"
             source: "@{{quoteItem[0].product.productConfiguration.bandwidth}}"
             sourceLocation: BODY
             allowValueLimit: true
@@ -133,7 +133,7 @@ spec:
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.quote.@{{productType}}.modify.sync.productConfiguration.classOfService
-            title: "The class of Service of the Eline"
+            title: "The class of service of the E-Line"
             source: "@{{quoteItem[0].product.productConfiguration.classOfService}}"
             sourceLocation: BODY
             sourceType: string
@@ -141,7 +141,7 @@ spec:
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.quote.@{{productType}}.modify.sync.productConfiguration.paymentType
-            title: "The payment type of the Eline"
+            title: "The payment type of the E-Line"
             source: "@{{quoteItem[0].product.productConfiguration.paymentType}}"
             sourceLocation: BODY
             sourceType: string
@@ -157,6 +157,7 @@ spec:
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.quote.@{{productType}}.modify.sync.product.id
+            title: "The unique identifier of an in-service quoted product"
             source: "@{{quoteItem[0].product.id}}"
             sourceLocation: BODY
             sourceType: string
@@ -165,7 +166,7 @@ spec:
             requiredMapping: true
         response:
           - name: mapper.quote.@{{productType}}.modify.sync.unitOfMeasure
-            title: "Unit of Measure if price depending on it"
+            title: "Unit of measure if price depending on it"
             description: ""
             source: ""
             sourceLocation: BODY
@@ -192,8 +193,8 @@ spec:
             checkPath: "$['quoteItem'][0]['quoteItemPrice'][0]['price']['dutyFreeAmount']['value']"
             deletePath: "$.quoteItem[0].quoteItemPrice"
           - name: mapper.quote.@{{productType}}.modify.sync.taxRate
-            title: "Price Tax Rate. Unit: [%]. E.g. value 16 stand for 16% tax"
-            description: ""
+            title: "Price tax rate. Unit: [%]."
+            description: "e.g. value 16 stand for 16% tax"
             source: ""
             sourceLocation: BODY
             target: "@{{quoteItem[0].quoteItemPrice[*].price.taxRate}}"

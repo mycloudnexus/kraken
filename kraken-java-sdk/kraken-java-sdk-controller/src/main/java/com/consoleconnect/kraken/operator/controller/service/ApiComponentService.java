@@ -181,9 +181,20 @@ public class ApiComponentService
     ComponentAPITargetFacets.Endpoint endpoint = requestFacets.getEndpoints().get(0);
     ComponentAPITargetFacets.Mappers requestMapper = endpoint.getMappers();
     // check source and target contains sensitive tokens in the updateMapper
-    requestMapper.getRequest().forEach(mapper -> SecurityTool.evaluate(mapper.getSource()));
-    requestMapper.getResponse().forEach(mapper -> SecurityTool.evaluate(mapper.getTarget()));
-
+    requestMapper
+        .getRequest()
+        .forEach(
+            mapper -> {
+              SecurityTool.evaluate(mapper.getSource());
+              checkLocationExisted(mapper);
+            });
+    requestMapper
+        .getResponse()
+        .forEach(
+            mapper -> {
+              checkLocationExisted(mapper);
+              SecurityTool.evaluate(mapper.getTarget());
+            });
     ComponentAPITargetFacets.Mappers originMapper = originFacets.getEndpoints().get(0).getMappers();
     if (originMapper == null) {
       return;
@@ -224,6 +235,19 @@ public class ApiComponentService
           compareProperty(updateMapper.getCheckPath(), originMapper.getCheckPath());
           compareProperty(updateMapper.getDeletePath(), originMapper.getDeletePath());
         });
+  }
+
+  private void checkLocationExisted(ComponentAPITargetFacets.Mapper updateMapper) {
+    if (StringUtils.isNotBlank(updateMapper.getSource())
+        && StringUtils.isBlank(updateMapper.getSourceLocation())) {
+      throw KrakenException.badRequest(
+          "The field: " + updateMapper.getSource() + " should not have blank source location!");
+    }
+    if (StringUtils.isNotBlank(updateMapper.getTarget())
+        && StringUtils.isBlank(updateMapper.getTargetLocation())) {
+      throw KrakenException.badRequest(
+          "The field: " + updateMapper.getTarget() + " should not have blank target location!");
+    }
   }
 
   private void compareProperty(Object o1, Object o2) {

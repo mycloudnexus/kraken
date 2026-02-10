@@ -1,13 +1,14 @@
 package com.consoleconnect.kraken.operator.gateway.service;
 
 import com.consoleconnect.kraken.operator.core.enums.ResourceRoleEnum;
+import com.consoleconnect.kraken.operator.core.service.BuildVersionService;
+import com.consoleconnect.kraken.operator.core.toolkit.Constants;
 import com.consoleconnect.kraken.operator.core.toolkit.DateTime;
 import com.consoleconnect.kraken.operator.core.toolkit.IpUtils;
 import com.consoleconnect.kraken.operator.data.entity.InstanceHeartbeatEntity;
 import com.consoleconnect.kraken.operator.data.repo.HeartbeatRepository;
 import java.time.ZonedDateTime;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -23,12 +24,14 @@ public class HeartBeatService {
 
   private final HeartbeatRepository heartbeatRepository;
 
-  public HeartBeatService(final HeartbeatRepository heartbeatRepository) {
-    this.heartbeatRepository = heartbeatRepository;
-  }
+  private final BuildVersionService buildVersionService;
 
-  @Value("${spring.build.version}")
-  private String buildVersion;
+  public HeartBeatService(
+      final HeartbeatRepository heartbeatRepository,
+      final BuildVersionService buildVersionService) {
+    this.heartbeatRepository = heartbeatRepository;
+    this.buildVersionService = buildVersionService;
+  }
 
   @Scheduled(cron = "${app.cron-job.push-heartbeat:-}")
   @Transactional
@@ -39,7 +42,11 @@ public class HeartBeatService {
 
   private InstanceHeartbeatEntity builInstanceHeartbeatEntity() {
     ZonedDateTime now = DateTime.nowInUTC();
-    log.debug("Heartbeat at {}", now);
+    log.debug(
+        "[{}][{}] Heartbeat at {}",
+        Constants.LOG_FIELD_CRON_JOB,
+        Constants.LOG_FIELD_HEARTBEAT,
+        now);
     InstanceHeartbeatEntity entity =
         heartbeatRepository
             .findOneByInstanceId(HOST_ADDRESS)
@@ -52,7 +59,7 @@ public class HeartBeatService {
                   instanceHeartbeatEntity.setCreatedAt(now);
                   return instanceHeartbeatEntity;
                 });
-    entity.setAppVersion(buildVersion);
+    entity.setAppVersion(buildVersionService.getAppVersion());
     entity.setUpdatedAt(now);
     return entity;
   }

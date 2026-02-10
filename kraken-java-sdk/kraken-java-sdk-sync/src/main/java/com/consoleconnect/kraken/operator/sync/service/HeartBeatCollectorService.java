@@ -9,6 +9,7 @@ import com.consoleconnect.kraken.operator.core.enums.PlaneTypeEnum;
 import com.consoleconnect.kraken.operator.core.event.HeartBeatUploadEvent;
 import com.consoleconnect.kraken.operator.core.repo.EnvironmentClientRepository;
 import com.consoleconnect.kraken.operator.core.repo.MgmtEventRepository;
+import com.consoleconnect.kraken.operator.core.toolkit.Constants;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import java.time.ZonedDateTime;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +39,11 @@ public class HeartBeatCollectorService {
       lockAtLeastFor = "${app.cron-job.lock.at-least-for}")
   @Scheduled(cron = "${app.cron-job.push-heartbeat-collector:-}")
   public void runIt() {
+    log.debug(
+        "[{}][{}][{}] Heartbeat collector scheduled",
+        Constants.LOG_FIELD_CRON_JOB,
+        Constants.LOG_FIELD_SYNC_EVENT,
+        Constants.LOG_FIELD_HEARTBEAT);
     ZonedDateTime now = ZonedDateTime.now();
     if (lastSyncedAt == null) {
       lastSyncedAt = now.minusMinutes(1);
@@ -73,6 +79,13 @@ public class HeartBeatCollectorService {
               mgmtEventEntity.setEventType(MgmtEventType.CLIENT_HEART_BEAT.name());
               mgmtEventEntity.setPayload(JsonToolkit.toJson(event));
               mgmtEventEntity.setStatus(EventStatusType.WAIT_TO_SEND.name());
+              log.debug(
+                  "[{}][{}][{}] Heartbeat collector report : clientReportType: {}, appVersion: {}",
+                  Constants.LOG_FIELD_CRON_JOB,
+                  Constants.LOG_FIELD_SYNC_EVENT,
+                  Constants.LOG_FIELD_HEARTBEAT,
+                  clientReportType,
+                  item.getAppVersion());
               mgmtEventRepository.save(mgmtEventEntity);
             });
   }

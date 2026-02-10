@@ -9,6 +9,7 @@ public class SystemInfo extends AbstractModel {
   String stageProductVersion;
   String productionProductVersion;
   String controlAppVersion;
+  String buildRevision;
   String productKey;
   String productSpec;
   String key;

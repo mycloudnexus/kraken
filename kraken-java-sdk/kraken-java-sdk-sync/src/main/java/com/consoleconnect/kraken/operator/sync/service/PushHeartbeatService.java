@@ -3,6 +3,7 @@ package com.consoleconnect.kraken.operator.sync.service;
 import com.consoleconnect.kraken.operator.core.client.ClientEvent;
 import com.consoleconnect.kraken.operator.core.client.ClientEventTypeEnum;
 import com.consoleconnect.kraken.operator.core.client.ClientInstanceHeartbeat;
+import com.consoleconnect.kraken.operator.core.toolkit.Constants;
 import com.consoleconnect.kraken.operator.data.entity.InstanceHeartbeatEntity;
 import com.consoleconnect.kraken.operator.data.repo.HeartbeatRepository;
 import com.consoleconnect.kraken.operator.sync.model.SyncProperty;
@@ -44,11 +45,27 @@ public class PushHeartbeatService extends KrakenServerConnector {
     List<InstanceHeartbeatEntity> instances =
         heartbeatRepository.findAllByUpdatedAtGreaterThanEqual(lastSyncedAt);
     lastSyncedAt = now;
+    log.debug(
+        "[{}][{}][{}] Puh client heartbeat event received, client id: {}",
+        Constants.LOG_FIELD_CRON_JOB,
+        Constants.LOG_FIELD_SYNC_EVENT,
+        Constants.LOG_FIELD_HEARTBEAT,
+        CLIENT_ID);
     if (instances.isEmpty()) {
-      log.info("No instances to push from clientId:{}", CLIENT_ID);
+      log.debug(
+          "[{}][{}][{}] No instances to push from clientId: {}",
+          Constants.LOG_FIELD_CRON_JOB,
+          Constants.LOG_FIELD_SYNC_EVENT,
+          Constants.LOG_FIELD_HEARTBEAT,
+          CLIENT_ID);
       return;
     }
-    log.debug("Pushing instances to kraken server, size: {}", instances.size());
+    log.debug(
+        "[{}][{}][{}] Pushing instances to kraken server, size: {}",
+        Constants.LOG_FIELD_CRON_JOB,
+        Constants.LOG_FIELD_SYNC_EVENT,
+        Constants.LOG_FIELD_HEARTBEAT,
+        instances.size());
     List<ClientInstanceHeartbeat> heartbeats =
         instances.stream()
             .map(
@@ -60,6 +77,13 @@ public class PushHeartbeatService extends KrakenServerConnector {
                   heartbeat.setAppVersion(entity.getAppVersion());
                   heartbeat.setUpdatedAt(entity.getUpdatedAt());
                   heartbeat.setStartUpAt(entity.getStartUpAt());
+                  log.debug(
+                      "[{}][{}][{}] Heartbeat appVersion: {}, instanceId: {}",
+                      Constants.LOG_FIELD_CRON_JOB,
+                      Constants.LOG_FIELD_SYNC_EVENT,
+                      Constants.LOG_FIELD_HEARTBEAT,
+                      entity.getAppVersion(),
+                      entity.getInstanceId());
                   return heartbeat;
                 })
             .toList();

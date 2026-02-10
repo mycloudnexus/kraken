@@ -16,6 +16,7 @@ import com.consoleconnect.kraken.operator.core.event.PlatformSettingCompletedEve
 import com.consoleconnect.kraken.operator.core.model.Metadata;
 import com.consoleconnect.kraken.operator.core.repo.SystemInfoRepository;
 import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
+import com.consoleconnect.kraken.operator.core.service.BuildVersionService;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants;
 import com.consoleconnect.kraken.operator.core.toolkit.Constants;
@@ -48,10 +49,9 @@ public class SystemInfoService {
   private final EnvironmentRepository environmentRepository;
   private final UnifiedAssetRepository unifiedAssetRepository;
 
-  @Value("${spring.build.version}")
-  private String buildVersion;
+  private final BuildVersionService buildVersionService;
 
-  @Value("${spring.build.api-spec-version:Haley}")
+  @Value("${app.api-spec-version:Haley}")
   private String apiSpecVersion;
 
   @EventListener(PlatformSettingCompletedEvent.class)
@@ -78,7 +78,7 @@ public class SystemInfoService {
             })
         .ifPresent(
             systemInfoEntity -> {
-              systemInfoEntity.setControlAppVersion(buildVersion);
+              systemInfoEntity.setControlAppVersion(buildVersionService.getAppVersion());
               systemInfoEntity.setProductKey(productKey);
               systemInfoEntity.setProductSpec(productSpec);
               systemInfoRepository.save(systemInfoEntity);
@@ -269,6 +269,7 @@ public class SystemInfoService {
         .map(
             t -> {
               t.setProductName(mgmtProperty.getProductName());
+              t.setBuildRevision(buildVersionService.getBuildRevision());
               return t;
             })
         .orElse(new SystemInfo());

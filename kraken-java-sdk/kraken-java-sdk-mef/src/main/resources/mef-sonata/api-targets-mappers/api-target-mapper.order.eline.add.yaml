@@ -3,7 +3,7 @@ kind: kraken.component.api-target-mapper
 apiVersion: v1
 metadata:
   name: Mapper Of Creating Order Connection
-  version: 29
+  version: 30
   key: mef.sonata.api-target-mapper.order.eline.add
   description: This operation creates a ProductOrder entity
 spec:
@@ -31,7 +31,7 @@ spec:
               val: eline
         request:
           - name: mapper.order.eline.add.classOfService
-            title: "The class of Service of the Eline"
+            title: "The class of service of the E-Line"
             source: "@{{productOrderItem[0].product.productConfiguration.classOfService}}"
             sourceLocation: BODY
             sourceType: string
@@ -39,7 +39,7 @@ spec:
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.order.eline.add.product.productConfiguration.buyerCompanyId
-            title: "The Id of buyer Company"
+            title: "The id of the buyer company"
             source: "@{{productOrderItem[0].product.productConfiguration.buyerCompanyId}}"
             sourceLocation: BODY
             sourceType: string
@@ -55,7 +55,7 @@ spec:
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.order.eline.add.product.productConfiguration.type
-            title: "customized product type"
+            title: "Customized product type"
             source: "@{{productOrderItem[0].product.productConfiguration.type}}"
             sourceLocation: BODY
             sourceType: string
@@ -63,7 +63,7 @@ spec:
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.order.eline.add.srcUNI
-            title: "source UNI or ENNI id"
+            title: "The source UNI or ENNI id"
             source: "@{{productOrderItem[0].product.productRelationship[0].id}}"
             sourceLocation: BODY
             sourceType: string
@@ -71,7 +71,7 @@ spec:
             targetLocation: BODY
             requiredMapping: true
           - name: mapper.order.eline.add.destUNI
-            title: "destination UNI id"
+            title: "The destination UNI id"
             source: "@{{productOrderItem[0].product.productRelationship[1].id}}"
             sourceLocation: BODY
             sourceType: string

@@ -8,6 +8,7 @@ import com.consoleconnect.kraken.operator.controller.model.SystemInfo;
 import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
 import com.consoleconnect.kraken.operator.core.repo.UnifiedAssetRepository;
+import com.consoleconnect.kraken.operator.core.service.BuildVersionService;
 import com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants;
 import com.consoleconnect.kraken.operator.core.toolkit.DateTime;
 import com.consoleconnect.kraken.operator.core.toolkit.LabelConstants;
@@ -23,7 +24,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -40,8 +40,7 @@ public class KrakenVersionSpecificationBuildService {
   public static final String FILE_NAME = KRAKEN_PREFIX + "%s.yaml";
   public static final String SUFFIX_API_VERSION = "api-version";
 
-  @Value("${spring.build.version}")
-  private String buildVersion;
+  private final BuildVersionService buildVersionService;
 
   private final SystemInfoService systemInfoService;
   private final ApiComponentService apiComponentService;
@@ -55,8 +54,8 @@ public class KrakenVersionSpecificationBuildService {
             .stream()
             .collect(Collectors.toMap(UnifiedAssetEntity::getKey, t -> t));
     SystemInfo systemInfo = systemInfoService.find();
-    String key = KRAKEN_PREFIX + buildVersion;
-    String name = KRAKEN_APP_NAME_PREFIX + buildVersion;
+    String key = KRAKEN_PREFIX + buildVersionService.getAppVersion();
+    String name = KRAKEN_APP_NAME_PREFIX + buildVersionService.getAppVersion();
     Map<String, Object> unifiedAsset = new LinkedHashMap<>();
 
     unifiedAsset.put(AssetsConstants.FIELD_KIND, AssetKindEnum.PRODUCT_APP_KRAKEN.getKind());
@@ -110,7 +109,7 @@ public class KrakenVersionSpecificationBuildService {
     YamlToolkit.mapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, false);
     String s = YamlToolkit.mapper.writerWithDefaultPrettyPrinter().writeValueAsString(unifiedAsset);
     YamlToolkit.mapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
-    String fileName = String.format(FILE_NAME, buildVersion);
+    String fileName = String.format(FILE_NAME, buildVersionService.getAppVersion());
     Resource inputStreamResource =
         new InputStreamResource(new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8)));
     Mono<Resource> resourceMono = Mono.just(inputStreamResource);

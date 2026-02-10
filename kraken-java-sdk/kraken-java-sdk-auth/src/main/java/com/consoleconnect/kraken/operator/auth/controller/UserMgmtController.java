@@ -4,6 +4,7 @@ import com.consoleconnect.kraken.operator.auth.dto.CreateUserRequest;
 import com.consoleconnect.kraken.operator.auth.dto.ResetPasswordRequest;
 import com.consoleconnect.kraken.operator.auth.dto.UpdateUserRequest;
 import com.consoleconnect.kraken.operator.auth.enums.UserStateEnum;
+import com.consoleconnect.kraken.operator.auth.model.BasicUserLoginEnabled;
 import com.consoleconnect.kraken.operator.auth.model.User;
 import com.consoleconnect.kraken.operator.auth.model.UserLoginEnabled;
 import com.consoleconnect.kraken.operator.auth.security.UserContext;
@@ -22,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
-@ConditionalOnBean(UserLoginEnabled.class)
+@ConditionalOnBean({UserLoginEnabled.class, BasicUserLoginEnabled.class})
 @AllArgsConstructor
 @RestController()
 @RequestMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)

@@ -13,9 +13,11 @@ import com.consoleconnect.kraken.operator.core.enums.UpgradeResultEventEnum;
 import com.consoleconnect.kraken.operator.core.enums.UpgradeSourceEnum;
 import com.consoleconnect.kraken.operator.core.event.PlatformSettingCompletedEvent;
 import com.consoleconnect.kraken.operator.core.ingestion.DataIngestionJob;
+import com.consoleconnect.kraken.operator.core.service.BuildVersionService;
 import com.consoleconnect.kraken.operator.core.service.EventSinkService;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants;
+import com.consoleconnect.kraken.operator.core.toolkit.Constants;
 import com.consoleconnect.kraken.operator.core.toolkit.Paging;
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -23,7 +25,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
@@ -45,31 +46,42 @@ public class TemplateIngestService {
   private final EventSinkService eventSinkService;
   private final SystemInfoService systemInfoService;
 
-  @Value("${spring.build.version}")
-  private String buildVersion;
+  private final BuildVersionService buildVersionService;
 
   @EventListener(ApplicationReadyEvent.class)
   public void onApplicationReady(Object event) {
     // trigger  report kraken version upgrade
     reportKrakenVersionUpgrade();
     userService.initSystemUpgradeUser();
-    log.info("Platform Boot Up Event Received, event class:{}", event.getClass());
+    log.info(
+        "[{}][{}] Platform Boot Up Event Received, event class:{}",
+        Constants.LOG_FIELD_TEMPLATE,
+        Constants.LOG_FIELD_TEMPLATE_INGESTION,
+        event.getClass());
     Paging<UnifiedAssetDto> assetDtoPaging =
         unifiedAssetService.search(
             null, AssetKindEnum.PRODUCT.getKind(), false, null, PageRequest.of(0, 1));
     if (mgmtProperty.isMgmtServerEnabled()) {
       // need not init product&workplace
+      log.info(
+          "[{}][{}] Mgmt Server disabled",
+          Constants.LOG_FIELD_TEMPLATE,
+          Constants.LOG_FIELD_TEMPLATE_INGESTION);
       return;
     }
     if (CollectionUtils.isEmpty(assetDtoPaging.getData())) {
-      log.info("Platform Boot Up Event Received, startup firstly,initialize templates ");
+      log.info(
+          "[{}][{}] Platform Boot Up Event Received, startup firstly,initialize templates ",
+          Constants.LOG_FIELD_TEMPLATE,
+          Constants.LOG_FIELD_TEMPLATE_INGESTION);
       dataIngestionJob.ingestionWorkspace();
       eventPublisher.publishEvent(new PlatformSettingCompletedEvent());
       // trigger first installation report
       reportFirstInstallation();
     } else {
       log.info(
-          "Platform Boot Up Event Received, had initialized the templates and ignored for this time  ");
+          "[{}] Platform Boot Up Event Received, had initialized the templates and ignored for this time",
+          Constants.LOG_FIELD_TEMPLATE_INGESTION);
       // upgrading
       List<UpgradeTuple> upgradeTuples =
           upgradeSourceServiceFactory
@@ -118,13 +130,14 @@ public class TemplateIngestService {
 
   private void reportKrakenVersionUpgrade() {
     SystemInfo systemInfo = systemInfoService.find();
-    if (!StringUtils.equalsIgnoreCase(buildVersion, systemInfo.getControlAppVersion())) {
+    if (!StringUtils.equalsIgnoreCase(
+        buildVersionService.getAppVersion(), systemInfo.getControlAppVersion())) {
       log.info(
           "Kraken version upgrade report: old version {},current version {}",
           systemInfo.getControlAppVersion(),
-          buildVersion);
+          buildVersionService.getAppVersion());
       eventSinkService.reportKrakenVersionUpgradeResult(
-          EnvNameEnum.CONTROL_PLANE, buildVersion, ZonedDateTime.now());
+          EnvNameEnum.CONTROL_PLANE, buildVersionService.getAppVersion(), ZonedDateTime.now());
     }
   }
 }

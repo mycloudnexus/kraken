@@ -34,8 +34,7 @@ spec:
               val: add
         request:
           - name: mapper.order.uni.add.place.id
-            title: >-
-              the id of the place where the products' installation must be done.
+            title: "The id of the place where the product installation must be done"
             source: '@{{productOrderItem[0].product.place[0].id}}'
             description: ''
             sourceLocation: BODY

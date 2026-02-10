@@ -5,14 +5,14 @@ metadata:
   key: mef.sonata.api-target-mapper.order.common.modify
   name: Order Modify API Common Mappers
   description: This operation modifies a ProductOrder entity
-  version: 1
+  version: 2
 spec:
   endpoints:
     - id: modify order
       mappers:
         request:
           - name: mapper.order.@{{productType}}.modify.buyerId
-            title: The unique identifier of the organization that is acting as the a Buyer.
+            title: "The unique identifier of the organization that is acting as the a Buyer"
             description:
             target: ""
             source: "@{{buyerId}}"
@@ -22,7 +22,7 @@ spec:
             requiredMapping: false
             replaceStar: true
           - name: mapper.order.@{{productType}}.modify.duration
-            title: "order item Term duration"
+            title: "Order item term duration"
             source: "@{{productOrderItem[0].requestedItemTerm.duration.amount}}"
             sourceLocation: BODY
             sourceType: integer
@@ -31,7 +31,7 @@ spec:
             targetLocation: ""
             requiredMapping: false
           - name: mapper.order.@{{productType}}.modify.duration.unit
-            title: "order item Term unit"
+            title: "Order item term unit"
             source: "@{{productOrderItem[0].requestedItemTerm.duration.units}}"
             sourceType: enum
             sourceValues:
@@ -49,7 +49,7 @@ spec:
             valueMapping: { }
             requiredMapping: false
           - name: mapper.order.@{{productType}}.modify.endOfTermAction
-            title: "MEFEndOfTermAction"
+            title: "End of term action"
             source: "@{{productOrderItem[0].requestedItemTerm.endOfTermAction}}"
             sourceLocation: BODY
             sourceType: enum
@@ -61,7 +61,7 @@ spec:
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.order.@{{productType}}.modify.rollInterval.amount
-            title: " quote item Term roll duration"
+            title: "Order item term roll duration"
             source: "@{{productOrderItem[0].requestedItemTerm.rollInterval.amount}}"
             sourceLocation: BODY
             sourceType: integer
@@ -76,7 +76,7 @@ spec:
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.order.@{{productType}}.modify.rollInterval.units
-            title: " quote item Term roll unit"
+            title: "Order item term roll unit"
             source: "@{{productOrderItem[0].requestedItemTerm.rollInterval.units}}"
             sourceLocation: BODY
             sourceType: enum
@@ -138,7 +138,7 @@ spec:
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.order.@{{productType}}.modify.classOfService
-            title: "The class of Service of the Eline"
+            title: "The class of service of the ELINE"
             source: "@{{productOrderItem[0].product.productConfiguration.classOfService}}"
             sourceLocation: BODY
             sourceType: string
@@ -146,7 +146,7 @@ spec:
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.order.@{{productType}}.modify.product.productConfiguration.buyerCompanyId
-            title: "The Id of buyer Company"
+            title: "The id of the buyer company"
             source: "@{{productOrderItem[0].product.productConfiguration.buyerCompanyId}}"
             sourceLocation: BODY
             sourceType: string
@@ -162,7 +162,7 @@ spec:
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.order.@{{productType}}.modify.product.productConfiguration.type
-            title: "customized product type"
+            title: "Customized product type"
             source: "@{{productOrderItem[0].product.productConfiguration.type}}"
             sourceLocation: BODY
             sourceType: string
@@ -170,7 +170,7 @@ spec:
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.order.@{{productType}}.modify.srcUNI
-            title: "source UNI or ENNI id"
+            title: "The source UNI or ENNI id"
             source: "@{{productOrderItem[0].product.productRelationship[0].id}}"
             sourceLocation: BODY
             sourceType: string
@@ -178,7 +178,7 @@ spec:
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.order.@{{productType}}.modify.destUNI
-            title: "destination UNI id"
+            title: "The destination UNI id"
             source: "@{{productOrderItem[0].product.productRelationship[1].id}}"
             sourceLocation: BODY
             sourceType: string
@@ -186,7 +186,7 @@ spec:
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.order.@{{productType}}.modify.productOffering.id
-            title: "id of a Product Offering"
+            title: "The id of the product offering"
             source: "@{{productOrderItem[0].product.productOffering.id}}"
             sourceLocation: BODY
             sourceType: string
@@ -194,7 +194,7 @@ spec:
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.order.@{{productType}}.modify.product.id
-            title: "The unique identifier of an in-service Product that is the ordering subject"
+            title: "The unique identifier of an in-service product that is the ordering subject"
             source: "@{{productOrderItem[0].product.id}}"
             sourceLocation: BODY
             sourceType: string
@@ -203,7 +203,7 @@ spec:
             requiredMapping: true
         response:
           - name: mapper.order.@{{productType}}.modify.state
-            title: Order State
+            title: "The state of the product order"
             source: ""
             target: "@{{state}}"
             targetType: enum
@@ -227,7 +227,7 @@ spec:
             customizedField: false
             requiredMapping: true
           - name: mapper.order.@{{productType}}.modify.orderId
-            title: order Id from seller
+            title: "The order id from the seller"
             source: ""
             target: "@{{orderId}}"
             description: orderId mapping

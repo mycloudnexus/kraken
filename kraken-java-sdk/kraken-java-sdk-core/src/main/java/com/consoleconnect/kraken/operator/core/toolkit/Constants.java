@@ -31,6 +31,15 @@ public class Constants {
   public static final String ZERO_SEQ = "0";
   public static final String ESCAPED_DOUBLE_QUOTE = "\"";
 
+  public static final String LOG_FIELD_CRON_JOB = "CronJob";
+  public static final String LOG_FIELD_HEARTBEAT = "Heartbeat";
+  public static final String LOG_FIELD_SYNC_EVENT = "SyncEvent";
+  public static final String LOG_FIELD_REPORT_UPGRADE = "ReportUpgrade";
+  public static final String LOG_FIELD_APP_VERSION = "AppVersion";
+  public static final String LOG_FIELD_TEMPLATE = "Template";
+  public static final String LOG_FIELD_TEMPLATE_INGESTION = "TemplateIngestion";
+  public static final String LOG_FIELD_TEMPLATE_UPGRADE = "TemplateUpgrade";
+
   public static String formatVersion(String version) {
     return version.replaceFirst("[V|v]", "");
   }

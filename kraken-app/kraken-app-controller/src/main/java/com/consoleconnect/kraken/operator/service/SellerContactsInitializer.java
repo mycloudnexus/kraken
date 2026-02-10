@@ -5,18 +5,19 @@ import com.consoleconnect.kraken.operator.controller.dto.CreateSellerContactRequ
 import com.consoleconnect.kraken.operator.controller.service.SellerContactService;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.enums.AssetKindEnum;
+import com.consoleconnect.kraken.operator.core.event.PlatformSettingCompletedEvent;
 import com.consoleconnect.kraken.operator.core.model.Metadata;
 import com.consoleconnect.kraken.operator.core.model.SyncMetadata;
 import com.consoleconnect.kraken.operator.core.service.AssetKeyGenerator;
 import com.consoleconnect.kraken.operator.core.service.UnifiedAssetService;
 import com.consoleconnect.kraken.operator.core.toolkit.DateTime;
-import jakarta.annotation.PostConstruct;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 @AllArgsConstructor
@@ -27,7 +28,7 @@ public class SellerContactsInitializer implements AssetKeyGenerator {
   private final SellerContactService sellerContactService;
   private final UnifiedAssetService unifiedAssetService;
 
-  @PostConstruct
+  @EventListener(PlatformSettingCompletedEvent.class)
   public void initialize() {
     log.info("Initializing seller contacts: {}", mgmtProperty.getSellerContacts());
     mgmtProperty.getSellerContacts().forEach(this::processSellerContact);

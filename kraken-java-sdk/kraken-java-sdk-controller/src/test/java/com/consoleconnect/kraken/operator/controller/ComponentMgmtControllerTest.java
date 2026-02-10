@@ -575,4 +575,120 @@ public class ComponentMgmtControllerTest extends AbstractIntegrationTest
             JsonToolkit.toJson(facets), new TypeReference<Map<String, Object>>() {}));
     assertUpdateErrorResult(maliciousAsset);
   }
+
+  @SneakyThrows
+  @Test
+  void givenEmptySourceLocation_whenUpdateTargetMapper_thenThrowsException() {
+    UnifiedAssetDto assetDto =
+        unifiedAssetService.findOne("mef.sonata.api-target-mapper.order.eline.add");
+    Optional<UnifiedAsset> mapperAssetOpt =
+        YamlToolkit.parseYaml(
+            readFileToString(
+                "deployment-config/api-targets-mappers/api-target-mapper.order.eline.add.yaml"),
+            UnifiedAsset.class);
+    if (mapperAssetOpt.isPresent()) {
+      UnifiedAsset targetMapperAsset = mapperAssetOpt.get();
+      ComponentAPITargetFacets newFacets =
+          UnifiedAsset.getFacets(targetMapperAsset, ComponentAPITargetFacets.class);
+      ComponentAPITargetFacets.Endpoint newEndpoints = newFacets.getEndpoints().get(0);
+      ComponentAPITargetFacets existFacets =
+          UnifiedAsset.getFacets(assetDto, ComponentAPITargetFacets.class);
+      ComponentAPITargetFacets.Endpoint existEndpoints = existFacets.getEndpoints().get(0);
+      fillRequestMappers(existEndpoints);
+      existFacets.getEndpoints().set(0, existEndpoints);
+      assetDto.setFacets(
+          JsonToolkit.fromJson(
+              JsonToolkit.toJson(existFacets), new TypeReference<Map<String, Object>>() {}));
+      FacetsMapper.INSTANCE.toEndpoint(newEndpoints, existEndpoints);
+    }
+    log.info(JsonToolkit.toJson(assetDto));
+    webTestClient
+        .mutate()
+        .responseTimeout(Duration.ofSeconds(600))
+        .build()
+        .patch()
+        .uri(
+            uriBuilder ->
+                uriBuilder
+                    .path(UPDATE_COMPONENT)
+                    .build("mef.sonata.api-target-mapper.order.eline.add"))
+        .bodyValue(assetDto)
+        .exchange()
+        .expectBody()
+        .consumeWith(
+            response -> {
+              String bodyStr = new String(Objects.requireNonNull(response.getResponseBody()));
+              assertThat(bodyStr, hasJsonPath("$.code", is("invalidBody")));
+            });
+  }
+
+  @SneakyThrows
+  @Test
+  void givenEmptyTargetLocation_whenUpdateTargetMapper_thenThrowsException() {
+    UnifiedAssetDto assetDto =
+        unifiedAssetService.findOne("mef.sonata.api-target-mapper.order.eline.add");
+    Optional<UnifiedAsset> mapperAssetOpt =
+        YamlToolkit.parseYaml(
+            readFileToString(
+                "deployment-config/api-targets-mappers/api-target-mapper.order.eline.add.yaml"),
+            UnifiedAsset.class);
+    if (mapperAssetOpt.isPresent()) {
+      UnifiedAsset targetMapperAsset = mapperAssetOpt.get();
+      ComponentAPITargetFacets newFacets =
+          UnifiedAsset.getFacets(targetMapperAsset, ComponentAPITargetFacets.class);
+      ComponentAPITargetFacets.Endpoint newEndpoints = newFacets.getEndpoints().get(0);
+      ComponentAPITargetFacets existFacets =
+          UnifiedAsset.getFacets(assetDto, ComponentAPITargetFacets.class);
+      ComponentAPITargetFacets.Endpoint existEndpoints = existFacets.getEndpoints().get(0);
+      fillResponseMappers(existEndpoints);
+      existFacets.getEndpoints().set(0, existEndpoints);
+      assetDto.setFacets(
+          JsonToolkit.fromJson(
+              JsonToolkit.toJson(existFacets), new TypeReference<Map<String, Object>>() {}));
+      FacetsMapper.INSTANCE.toEndpoint(newEndpoints, existEndpoints);
+    }
+    log.info(JsonToolkit.toJson(assetDto));
+    webTestClient
+        .mutate()
+        .responseTimeout(Duration.ofSeconds(600))
+        .build()
+        .patch()
+        .uri(
+            uriBuilder ->
+                uriBuilder
+                    .path(UPDATE_COMPONENT)
+                    .build("mef.sonata.api-target-mapper.order.eline.add"))
+        .bodyValue(assetDto)
+        .exchange()
+        .expectBody()
+        .consumeWith(
+            response -> {
+              String bodyStr = new String(Objects.requireNonNull(response.getResponseBody()));
+              assertThat(bodyStr, hasJsonPath("$.code", is("invalidBody")));
+            });
+  }
+
+  private void fillRequestMappers(ComponentAPITargetFacets.Endpoint existEndpoints) {
+    List<ComponentAPITargetFacets.Mapper> request = new ArrayList<>();
+    ComponentAPITargetFacets.Mapper mapper1 = new ComponentAPITargetFacets.Mapper();
+    mapper1.setSource("@{{productOrderItem[0].product.productConfiguration.dcfName}}");
+    request.add(mapper1);
+    List<ComponentAPITargetFacets.Mapper> response = new ArrayList<>();
+    ComponentAPITargetFacets.Mappers mappers = new ComponentAPITargetFacets.Mappers();
+    mappers.setRequest(request);
+    mappers.setResponse(response);
+    existEndpoints.setMappers(mappers);
+  }
+
+  private void fillResponseMappers(ComponentAPITargetFacets.Endpoint existEndpoints) {
+    List<ComponentAPITargetFacets.Mapper> request = new ArrayList<>();
+    List<ComponentAPITargetFacets.Mapper> response = new ArrayList<>();
+    ComponentAPITargetFacets.Mapper mapper1 = new ComponentAPITargetFacets.Mapper();
+    mapper1.setTarget("@{{note[*].author}}");
+    response.add(mapper1);
+    ComponentAPITargetFacets.Mappers mappers = new ComponentAPITargetFacets.Mappers();
+    mappers.setRequest(request);
+    mappers.setResponse(response);
+    existEndpoints.setMappers(mappers);
+  }
 }

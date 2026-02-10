@@ -1,0 +1,15 @@
+---
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.2.2.2
+  name: V2.2.2
+  labels:
+    productSpec: grace
+    productVersion: V2.2.2
+    publishDate: 2025-12-19
+  description: |
+    Product of Quote order cases: 
+     - Added titles for poq request mapping items
+     - Added a new release file for poq template
+  version: 1

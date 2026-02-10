@@ -5,14 +5,14 @@ metadata:
   key: mef.sonata.api-target-mapper.order.common.read.add
   name:  Mapper Of Reading Created Order entity
   description: This operation retrieves a ProductOrder entity
-  version: 1
+  version: 2
 spec:
   endpoints:
     - id: retrieve add order by id
       mappers:
         request:
           - name: mapper.order.@{{productType}}.read.buyerId
-            title: "The unique identifier of the organization that is acting as the a Buyer."
+            title: "The unique identifier of the organization that is acting as a buyer"
             description: ""
             source: "@{{buyerId}}"
             sourceLocation: "QUERY"
@@ -20,7 +20,7 @@ spec:
             targetLocation: ""
             requiredMapping: false
           - name: mapper.order.@{{productType}}.read.orderId
-            title: "Order Unique Identifier."
+            title: "Order unique identifier"
             description: ""
             source: "@{{id}}"
             sourceLocation: "PATH"
@@ -30,7 +30,7 @@ spec:
             requiredMapping: true
         response:
           - name: mapper.order.@{{productType}}.read.state
-            title: "ProductOrderState"
+            title: "The state of the product order"
             description: ""
             target: "@{{state}}"
             targetType: enum
@@ -52,7 +52,7 @@ spec:
             source: ""
             sourceLocation: "BODY"
           - name: mapper.order.@{{productType}}.read.completionDate
-            title: "order complete date"
+            title: "The order complete date"
             description: ""
             source: ""
             sourceLocation: "BODY"
@@ -62,7 +62,7 @@ spec:
             deletePath: "$.completionDate"
             requiredMapping: false
           - name: mapper.order.@{{productType}}.read.instanceId
-            title: "instance id from seller"
+            title: "The instance id from the seller"
             description: ""
             source: ""
             sourceLocation: "BODY"
@@ -70,7 +70,7 @@ spec:
             targetLocation: "BODY"
             requiredMapping: false
           - name: mapper.order.@{{productType}}.read.productOrderItem.completionDate
-            title: "order item complete date"
+            title: "Order item complete date"
             description: ""
             source: ""
             sourceLocation: "BODY"
@@ -80,7 +80,7 @@ spec:
             checkPath: "$.productOrderItem[?(@.state == 'completed')]"
             deletePath: "$.productOrderItem[?(@.state != 'completed')].completionDate"
           - name: mapper.order.@{{productType}}.read.stateChange.state
-            title: state in state change history
+            title: "State in change history"
             description: ''
             source: ""
             target: '@{{productOrderItem[0].stateChange[*].state}}'
@@ -104,7 +104,7 @@ spec:
             customizedField: false
             requiredMapping: false
           - name: mapper.order.@{{productType}}.read.stateChange.changeDate
-            title: change date in state change history
+            title: "Date of state change"
             description: ''
             source: ''
             target: '@{{productOrderItem[0].stateChange[*].changeDate}}'

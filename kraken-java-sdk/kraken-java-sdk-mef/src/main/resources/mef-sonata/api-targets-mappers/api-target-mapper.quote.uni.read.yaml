@@ -22,8 +22,8 @@ spec:
         request:
         response:
           - name: mapper.quote.uni.read.state
-            title: Quote State Mapping
-            description: quote state mapping
+            title: "The quote state"
+            description: ""
             source: ""
             sourceLocation: ""
             target: "@{{quoteItem[*].state}}"
@@ -45,16 +45,16 @@ spec:
               - rejected
             valueMapping: {}
           - name: mapper.quote.uni.read.price.value
-            title: Quote Price Value Mapping
-            description: quote price value mapping
+            title: "The quote price value"
+            description: ""
             source: ""
             sourceLocation:
             target: "@{{quoteItem[0].quoteItemPrice[*].price.dutyFreeAmount.value}}"
             targetLocation: BODY
             requiredMapping: true
           - name: mapper.quote.uni.read.price.unit
-            title: Quote Price Unit Mapping
-            description: quote price unit mapping
+            title: "The quote price unit"
+            description: ""
             source: ""
             sourceLocation: ""
             target: "@{{quoteItem[0].quoteItemPrice[*].price.dutyFreeAmount.unit}}"

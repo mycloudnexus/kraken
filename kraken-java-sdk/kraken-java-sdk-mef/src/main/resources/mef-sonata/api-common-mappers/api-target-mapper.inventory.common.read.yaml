@@ -5,14 +5,14 @@ metadata:
   key: mef.sonata.api-target-mapper.inventory.common.read
   name: Inventory Connection API Common Mappers
   description: This operation retrieves a product entity
-  version: 1
+  version: 2
 spec:
   endpoints:
     - id: retrieve product inventory detail by id
       mappers:
         request:
           - name: mapper.product.inventory.id
-            title: Identifier of the Product
+            title: "Identifier of the product"
             description: ""
             source: "@{{id}}"
             sourceLocation: "PATH"
@@ -20,7 +20,7 @@ spec:
             targetLocation:
             requiredMapping: true
           - name: mapper.inventory.@{{productType}}.read.buyerId
-            title: "The unique identifier of the organization that is acting as the a Buyer"
+            title: "The unique identifier of the organization that is acting as a buyer"
             source: "@{{buyerId}}"
             sourceLocation: "QUERY"
             target: ""
@@ -29,7 +29,7 @@ spec:
             requiredMapping: false
         response:
           - name: mapper.product.inventory.read.status
-            title:  the status of a MEF product
+            title:  "The status of a MEF product"
             description: ""
             target: "@{{status}}"
             targetType: enum
@@ -48,7 +48,7 @@ spec:
             source: ""
             sourceLocation:
           - name: mapper.product.inventory.read.startDate
-            title: The date from which the product starts
+            title: "The date from which the product starts"
             description: ""
             target: "@{{startDate}}"
             targetLocation: BODY
@@ -56,7 +56,7 @@ spec:
             source: ""
             sourceLocation: ""
           - name: mapper.product.inventory.read.lastUpdateDate
-            title: Last Updated At
+            title: "Last updated at"
             description: ""
             target: "@{{lastUpdateDate}}"
             targetLocation: BODY
@@ -64,7 +64,7 @@ spec:
             source: ""
             sourceLocation: ""
           - name: mapper.product.inventory.read.createdDate
-            title: Created At
+            title: "Created at"
             description: ""
             target: "@{{createdDate}}"
             targetLocation: BODY

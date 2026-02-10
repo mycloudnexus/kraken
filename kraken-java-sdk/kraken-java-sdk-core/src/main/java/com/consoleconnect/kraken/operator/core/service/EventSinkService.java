@@ -11,6 +11,7 @@ import com.consoleconnect.kraken.operator.core.enums.UpgradeResultEventEnum;
 import com.consoleconnect.kraken.operator.core.event.AppVersionUpgradeResultEvent;
 import com.consoleconnect.kraken.operator.core.event.TemplateUpgradeResultEvent;
 import com.consoleconnect.kraken.operator.core.repo.MgmtEventRepository;
+import com.consoleconnect.kraken.operator.core.toolkit.Constants;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -44,6 +45,12 @@ public class EventSinkService {
       UnifiedAssetDto templateDto,
       UpgradeResultEventEnum resultEventEnum,
       Consumer<TemplateUpgradeResultEvent> consumer) {
+    log.info(
+        "[{}][{}][{}] Report template version upgrade result, event category: {}",
+        Constants.LOG_FIELD_SYNC_EVENT,
+        Constants.LOG_FIELD_REPORT_UPGRADE,
+        Constants.LOG_FIELD_TEMPLATE,
+        resultEventEnum);
     MgmtEventEntity mgmtEventEntity = new MgmtEventEntity();
     mgmtEventEntity.setEventType(MgmtEventType.TEMPLATE_UPGRADE_RESULT.name());
     TemplateUpgradeResultEvent receivedEvent = new TemplateUpgradeResultEvent();
@@ -59,6 +66,13 @@ public class EventSinkService {
 
   public void reportKrakenVersionUpgradeResult(
       EnvNameEnum envName, String appVersion, ZonedDateTime upgradeAt) {
+    log.info(
+        "[{}][{}] Report kraken version upgrade result, envName: {}, appVersion: {}",
+        Constants.LOG_FIELD_SYNC_EVENT,
+        Constants.LOG_FIELD_REPORT_UPGRADE,
+        Constants.LOG_FIELD_APP_VERSION,
+        envName,
+        appVersion);
     MgmtEventEntity mgmtEventEntity = new MgmtEventEntity();
     mgmtEventEntity.setEventType(CLIENT_APP_VERSION_UPGRADE_RESULT.name());
     AppVersionUpgradeResultEvent appVersionUpgradeResultEvent = new AppVersionUpgradeResultEvent();

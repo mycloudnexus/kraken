@@ -595,6 +595,11 @@ public class TemplateUpgradeService implements ApiUseCaseSelector {
   }
 
   public String controlPlaneUpgrade(String templateUpgradeId, String userId) {
+    log.info(
+        "[{}][{}] controlPlaneUpgrade, templateUpgradeId: {}",
+        Constants.LOG_FIELD_TEMPLATE,
+        Constants.LOG_FIELD_TEMPLATE_UPGRADE,
+        templateUpgradeId);
     SystemInfo systemInfo = systemInfoService.find();
     if (!SystemStateEnum.CAN_CONTROL_UPGRADE_STATES.contains(systemInfo.getStatus())) {
       throw KrakenException.badRequest("Current system state is not allowed to upgrade");

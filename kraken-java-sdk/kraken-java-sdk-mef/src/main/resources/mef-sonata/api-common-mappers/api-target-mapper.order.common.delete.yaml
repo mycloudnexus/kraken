@@ -5,14 +5,14 @@ metadata:
   key: mef.sonata.api-target-mapper.order.common.delete
   name: Order Delete API Common Mappers
   description: This operation deletes a ProductOrder entity
-  version: 1
+  version: 2
 spec:
   endpoints:
     - id: delete order
       mappers:
         request:
           - name: mapper.order.@{{productType}}.delete.buyerId
-            title: "The unique identifier of the organization that is acting as the a Buyer."
+            title: "The unique identifier of the organization that is acting as a buyer"
             description: ""
             source: "@{{buyerId}}"
             sourceLocation: "QUERY"
@@ -20,7 +20,7 @@ spec:
             targetLocation: ""
             requiredMapping: false
           - name: mapper.order.@{{productType}}.delete.productId
-            title: "The unique identifier of an in-service Product that is the ordering subject"
+            title: "The unique identifier of an in-service product that is the ordering subject"
             description: ""
             source: "@{{productOrderItem[*].product.id}}"
             sourceLocation: "BODY"
@@ -30,7 +30,7 @@ spec:
             requiredMapping: true
         response:
           - name: mapper.order.@{{productType}}.delete.state
-            title: "Order State"
+            title: "The state of the product order"
             description: ""
             target: "@{{state}}"
             targetType: enum
@@ -52,7 +52,7 @@ spec:
             source: ""
             sourceLocation: ""
           - name: mapper.order.@{{productType}}.delete.orderId
-            title: order Id from seller
+            title: "The order id from the seller"
             source: ""
             target: '@{{orderId}}'
             description: ""
