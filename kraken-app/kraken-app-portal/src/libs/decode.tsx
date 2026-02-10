@@ -1,6 +1,7 @@
 import { decode } from "js-base64";
 
 export const decodeBase64Content = (content?: unknown): string => {
+  console.log("decoding bas463 content...");
   console.log("checking: is content null?");
   if (!content && content !== "") {
     console.log("invalid base64 content: null");
@@ -18,7 +19,7 @@ export const decodeBase64Content = (content?: unknown): string => {
     console.log("invalid base64 content");
     return "";
   }
-  console.log("checking: pass");
+  console.log("checking basic: pass");
 
   try {
     let str = content as string;
@@ -28,6 +29,7 @@ export const decodeBase64Content = (content?: unknown): string => {
       if (str.startsWith("data:application/yaml;base64,")) {
         console.log("validation pass");
       } else {
+        console.error("validation failed");
         throw Error("invalid format");
       }
     } else if (str.startsWith("data:application/x-yaml;")) {
@@ -35,6 +37,7 @@ export const decodeBase64Content = (content?: unknown): string => {
       if (str.startsWith("data:application/x-yaml;base64,")) {
         console.log("validation pass");
       } else {
+        console.error("validation failed");
         throw Error("invalid format");
       }
     } else {
