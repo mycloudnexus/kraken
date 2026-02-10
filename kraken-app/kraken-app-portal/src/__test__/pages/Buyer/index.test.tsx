@@ -33,7 +33,7 @@ vi.mock("antd", async () => {
         </div>
       );
     },
-
+    
     Popconfirm: ({ children, onConfirm }: any) => {
       return Children.map(children, (child: any) => {
         if (isValidElement(child)) {
@@ -61,7 +61,7 @@ vi.mock("antd", async () => {
 
 const setupMocks = () => {
   ENV.VIEW_BUYER_TOKEN = 'true';
-
+  
   vi.spyOn(userHooks, "useUser").mockReturnValue({
     findUserName: () => 'ADMIN',
     currentUser: { role: "ADMIN" }

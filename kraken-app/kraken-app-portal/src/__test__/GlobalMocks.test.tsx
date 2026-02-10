@@ -20,7 +20,7 @@ describe("Global Setup Coverage (setup.tsx)", () => {
     );
 
     const mockElement = screen.getByTestId("mock-antd-select");
-
+    
     expect(mockElement).toBeInTheDocument();
     expect(mockElement).toHaveClass("test-class");
     expect(screen.getByTestId("select-child")).toBeInTheDocument();

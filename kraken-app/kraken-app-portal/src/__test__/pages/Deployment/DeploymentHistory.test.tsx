@@ -27,7 +27,7 @@ vi.mock("antd", async () => {
                 const content = col.render
                   ? col.render(cellValue, record, rowIndex)
                   : cellValue;
-
+                
                 const cellKey = col.key || col.dataIndex || colIndex;
                 return <div key={cellKey}>{content}</div>;
               })}

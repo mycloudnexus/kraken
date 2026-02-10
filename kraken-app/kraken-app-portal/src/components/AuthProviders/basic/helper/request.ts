@@ -8,11 +8,26 @@ import { message } from 'antd';
 import createAuthRefreshInterceptor from 'axios-auth-refresh';
 import { AXIOS_MESSAGE } from '@/utils/constants/message';
 import { refresh } from './refresh';
+import { useMutation } from '@tanstack/react-query';
+import { login } from '@/services/login';
 
 export const DIRECT_LOGIN_MSG = [
   AXIOS_MESSAGE.TOKEN_EXPIRED,
   AXIOS_MESSAGE.TOKEN_INVALID,
 ];
+
+const LOGIN_CACHE_KEYS = {
+  login: "login",
+};
+
+export const useLogin = () =>
+  useMutation<any, Error>({
+    mutationKey: [LOGIN_CACHE_KEYS.login],
+    mutationFn: (data: unknown) => login(data),
+    onError: (error) => {
+      throw new Error(error.message);
+    },
+  });
 
 export const refreshTokenFnc = async () => {
   const token = getData("token");

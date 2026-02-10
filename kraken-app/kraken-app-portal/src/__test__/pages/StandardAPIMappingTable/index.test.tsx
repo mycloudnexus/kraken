@@ -207,7 +207,7 @@ test("filteredComponentList should exclude SHARE if productType is not SHARE", a
         },
       ],
     },
-  } as any);
+  } as any);  
 
   vi.spyOn(productHooks, "useGetComponentDetail").mockReturnValue({
     data: {
@@ -231,9 +231,9 @@ test("filteredComponentList should exclude SHARE if productType is not SHARE", a
   );
 
   expect(await screen.findByText("Product Offering Qualification (POQ) API Management")).toBeInTheDocument();
-
+  
   expect(screen.queryByText("Address Validation API Management")).not.toBeInTheDocument();
-
+  
   const componentList = screen.queryAllByText("Product Offering Qualification (POQ) API Management");
   expect(componentList.length).toBe(1);
 });
@@ -317,7 +317,7 @@ test("clicking Mapping button navigates with correct state", async () => {
   vi.spyOn(mappingStore, "useMappingUiStore").mockReturnValue({
     currentProduct: "test",
   });
-
+  
   vi.spyOn(homepageHooks, "useGetProductTypeList").mockReturnValue({ data: [] } as any);
 
   vi.spyOn(productHooks, "useGetComponentListAPI").mockReturnValue({

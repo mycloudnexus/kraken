@@ -77,6 +77,7 @@ const HeaderMapping = ({
     setSellerApi,
     setServerKey,
     setListMappingStateResponse,
+    setListMappingStateRequest,
   } = useNewApiMappingStore();
   const { activeTab } = useMappingUiStore();
   const queryData = JSON.parse(query ?? "{}");
@@ -85,18 +86,17 @@ const HeaderMapping = ({
   const resetMappingFnc = () => {
     setRequestMapping(
       mappers.request
-        ?.filter((rm: IRequestMapping) => !rm.customizedField)
         ?.map((rm: IRequestMapping) => ({
           ...rm,
           target: "",
           targetLocation: "",
           targetType: "",
           targetValues: [],
+          valueMapping: {},
         }))
     );
     setResponseMapping(
       mappers.response
-        ?.filter((rm: IResponseMapping) => !rm.customizedField)
         ?.map((rm: IResponseMapping) => ({
           ...rm,
           source: "",
@@ -104,7 +104,8 @@ const HeaderMapping = ({
           valueMapping: {},
         }))
     );
-    setListMappingStateResponse(undefined);
+    setListMappingStateRequest([]);
+    setListMappingStateResponse([]);
     setSellerApi(undefined);
     setServerKey("");
   };

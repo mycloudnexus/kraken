@@ -37,7 +37,6 @@ export function SourceInput({
   const id = `${index}-${item?.name}`;
   const isFocused =
     rightSide === EnumRightType.AddSellerResponse && activeResponseName === id;
-
   return (
     <Flex className={styles.flexColumn} gap={4}>
       {item.source ? (

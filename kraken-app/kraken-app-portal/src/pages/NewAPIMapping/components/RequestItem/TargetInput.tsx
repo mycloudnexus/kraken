@@ -4,11 +4,12 @@ import { IRequestMapping } from "@/utils/types/component.type";
 import { RightOutlined } from "@ant-design/icons";
 import { Flex, Tooltip } from "antd";
 import clsx from "clsx";
-import { isEqual, cloneDeep, set } from "lodash";
+import { isEqual } from "lodash";
 import { useMemo } from "react";
 import { LocationSelector } from "../LocationSelector";
 import styles from "./index.module.scss";
 import { AutoGrowingInput } from "@/components/form";
+import { handleMappingInputChange } from "./InputCommon";
 
 export function TargetInput({
   item,
@@ -34,17 +35,20 @@ export function TargetInput({
   );
 
   const handleChange = (changes: { [field in keyof typeof item]?: any }) => {
-    const newRequest = cloneDeep(requestMapping);
-    for (const field in changes) {
-      set(
-        newRequest,
-        `[${index}].${field}`,
-        changes[field as keyof typeof item]
-      );
-    }
-
-    setRequestMapping(newRequest);
+    handleMappingInputChange(
+      item,
+      changes,
+      {
+        index,
+        isFocused,
+        requestMapping,
+        rightSideInfo,
+        setRequestMapping,
+        setRightSideInfo
+      }
+    );
   };
+
   return (
     <Flex className={styles.flexColumn} gap={4}>
       {item.target ? (

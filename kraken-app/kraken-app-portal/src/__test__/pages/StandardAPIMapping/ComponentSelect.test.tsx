@@ -35,11 +35,11 @@ vi.mock("antd", async () => {
         <input
           data-testid="mock-select-trigger"
           readOnly
-          value={value?.value || ""}
-          onChange={() => {}}
-          style={{ opacity: 0, position: 'absolute' }}
+          value={value?.value || ""} 
+          onChange={() => {}} 
+          style={{ opacity: 0, position: 'absolute' }} 
         />
-
+        
         <div data-testid="select-options">
           {options?.map((opt: any) => (
             <button
@@ -47,7 +47,7 @@ vi.mock("antd", async () => {
               type="button"
               data-testid={`select-option-${opt.value}`}
               onClick={() => onSelect({ value: opt.value })}
-              style={{ display: 'block', width: '100%' }}
+              style={{ display: 'block', width: '100%' }} 
             >
               {opt.label}
             </button>
@@ -94,9 +94,9 @@ describe("ComponentSelect", () => {
     );
 
     const selectTrigger = screen.getByTestId("mock-select-trigger");
-
+    
     fireEvent.mouseDown(selectTrigger);
-
+    
     const option = screen.getByText("Inventory Component");
     fireEvent.click(option);
 

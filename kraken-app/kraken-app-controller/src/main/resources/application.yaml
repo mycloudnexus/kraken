@@ -25,6 +25,7 @@ spring:
     description: "@project.name@"
   build:
     version: "@project.version@"
+    api-spec-version: Haley
   jackson:
     default-property-inclusion: NON_NULL
     deserialization:

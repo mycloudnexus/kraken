@@ -3,12 +3,13 @@ import { EnumRightType } from "@/utils/types/common.type";
 import { IRequestMapping } from "@/utils/types/component.type";
 import { Flex } from "antd";
 import clsx from "clsx";
-import { isEqual, cloneDeep, set } from "lodash";
+import { isEqual } from "lodash";
 import { useMemo } from "react";
 import { LocationSelector } from "../LocationSelector";
 import styles from "./index.module.scss";
 import { AutoGrowingInput } from "@/components/form";
 import { Text } from "@/components/Text";
+import { handleMappingInputChange } from "./InputCommon";
 
 export function SourceInput({
   item,
@@ -27,22 +28,25 @@ export function SourceInput({
   const isFocused = useMemo(
     () =>
       rightSide === EnumRightType.AddSonataProp &&
-      isEqual(item, rightSideInfo?.previousData),
-    [rightSide, item, rightSideInfo?.previousData]
+      isEqual(item.id, rightSideInfo?.previousData?.id),
+    [rightSide, item.id, rightSideInfo?.previousData?.id]
   );
 
   const handleChange = (changes: { [field in keyof typeof item]?: any }) => {
-    const newRequest = cloneDeep(requestMapping);
-    for (const field in changes) {
-      set(
-        newRequest,
-        `[${index}].${field}`,
-        changes[field as keyof typeof item]
-      );
-    }
-
-    setRequestMapping(newRequest);
+    handleMappingInputChange(
+      item,
+      changes,
+      {
+        index,
+        isFocused,
+        requestMapping,
+        rightSideInfo,
+        setRequestMapping,
+        setRightSideInfo
+      }
+    );
   };
+
   return (
     <Flex className={styles.flexColumn} gap={4}>
       {item.source ? (
