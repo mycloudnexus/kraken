@@ -80,36 +80,64 @@ public class PushAPIActivityLogScheduler extends KrakenServerConnector {
       lockAtLeastFor = "${app.cron-job.lock.at-least-for}")
   @Scheduled(cron = "${app.cron-job.push-log-external-system:-}")
   List<PushExternalSystemPayload> pushApiActivityLogToExternalSystem() {
-    Optional<MgmtEventEntity> entity =
+    Optional<MgmtEventEntity> stuckEntity =
+        mgmtEventRepository.findFirstByEventTypeAndStatusOrderByCreatedAtAsc(
+            MgmtEventType.PUSH_API_ACTIVITY_LOG.name(), EventStatusType.IN_PROGRESS.name());
+
+    if (stuckEntity.isPresent()) {
+      log.warn(
+          "Found stuck IN_PROGRESS event (ID: {}). Resuming processing...",
+          stuckEntity.get().getId());
+      return processEvent(stuckEntity.get());
+    }
+
+    Optional<MgmtEventEntity> entityOpt =
         mgmtEventRepository.findFirstByEventTypeAndStatus(
             MgmtEventType.PUSH_API_ACTIVITY_LOG.name(), EventStatusType.ACK.name());
-    if (entity.isPresent()) {
-      log.info("Start pushing log to external system for event id: {}", entity.get().getId());
-      var start = ZonedDateTime.now();
-      var sent = pushLogs(entity.get());
-      log.info(
-          "End pushing log to external system for event id: {} in {} seconds.",
-          entity.get().getId(),
-          Duration.between(start, ZonedDateTime.now()).getSeconds());
-      return sent;
+    if (entityOpt.isPresent()) {
+      log.info("Start pushing log to external system for event id: {}", entityOpt.get().getId());
+      return processEvent(entityOpt.get());
     } else {
       log.info("No push api activity log event found.");
       return emptyList();
     }
   }
 
+  private List<PushExternalSystemPayload> processEvent(MgmtEventEntity entity) {
+    var start = ZonedDateTime.now();
+    var sent = pushLogs(entity);
+    log.info(
+        "End pushing log to external system for event id: {} in {} seconds.",
+        entity.getId(),
+        Duration.between(start, ZonedDateTime.now()).getSeconds());
+    return sent;
+  }
+
   private List<PushExternalSystemPayload> pushLogs(MgmtEventEntity mgmtEvent) {
+    log.info(
+        "Starting pushLogs for eventId:{} with current status={}",
+        mgmtEvent.getId(),
+        mgmtEvent.getStatus());
     mgmtEvent.setStatus(EventStatusType.IN_PROGRESS.name());
     mgmtEventRepository.save(mgmtEvent);
+    log.info("Event {} status updated to IN_PROGRESS", mgmtEvent.getId());
     var logInfo = fromJson(mgmtEvent.getPayload(), PushLogActivityLogInfo.class);
+    log.info("Successfully parsed pushLogs payload for eventId:{}", mgmtEvent.getId());
     try {
+      log.info("pushLogs in batches for eventId:{} ...", mgmtEvent.getId());
       var sent = pushLogsInBatches(logInfo, mgmtEvent.getId());
+      log.info(
+          "pushLogs successfully pushed {} logs for eventId:{}", sent.size(), mgmtEvent.getId());
       mgmtEvent.setStatus(EventStatusType.DONE.name());
       mgmtEventRepository.save(mgmtEvent);
+      log.info("pushLogs Event {} status updated to DONE", mgmtEvent.getId());
       return sent;
     } catch (Exception ex) {
+      log.error(
+          "Failed to pushLogs for eventId:{} error={}", mgmtEvent.getId(), ex.getMessage(), ex);
       mgmtEvent.setStatus(EventStatusType.FAILED.name());
       mgmtEventRepository.save(mgmtEvent);
+      log.warn("pushLogs event {} status updated to FAILED", mgmtEvent.getId());
       return emptyList();
     }
   }
@@ -141,10 +169,33 @@ public class PushAPIActivityLogScheduler extends KrakenServerConnector {
                   entities.getNumber(),
                   entities.getSize(),
                   entities.getTotalElements()));
-      var res =
-          sendLogsToExternalSystem(
-              ClientEvent.of(CLIENT_ID, CLIENT_PUSH_API_ACTIVITY_LOG, payload));
+      HttpResponse<String> res = null;
+      try {
+        res =
+            sendLogsToExternalSystem(
+                ClientEvent.of(CLIENT_ID, CLIENT_PUSH_API_ACTIVITY_LOG, payload));
+        log.info(
+            "External system responded eventId:{} page:{} statusCode:{}",
+            eventId,
+            page,
+            res.getCode());
+      } catch (Exception e) {
+        log.error(
+            "Exception occurred while sending logs to external system "
+                + "eventId:{} page:{} error:{}",
+            eventId,
+            page,
+            e.getMessage(),
+            e);
+        throw new KrakenException(
+            500, "Exception while sending logs to external system: " + e.getMessage(), e);
+      }
       if (res.getCode() != 200) {
+        log.error(
+            "External system returned non-200 status eventId:{} page:{} message:{}",
+            eventId,
+            page,
+            res.getMessage());
         throw new KrakenException(
             400, "Pushing logs to external system filed with status: " + res.getCode());
       }

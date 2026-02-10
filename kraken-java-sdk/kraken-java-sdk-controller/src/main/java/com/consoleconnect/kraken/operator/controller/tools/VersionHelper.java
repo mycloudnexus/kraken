@@ -9,6 +9,7 @@ import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 
 public class VersionHelper {
+
   private VersionHelper() {}
 
   public static String generateVersion(UnifiedAssetEntity unifiedAssetEntity) {

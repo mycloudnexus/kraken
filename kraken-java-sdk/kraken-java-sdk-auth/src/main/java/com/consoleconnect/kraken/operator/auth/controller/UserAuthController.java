@@ -1,6 +1,7 @@
 package com.consoleconnect.kraken.operator.auth.controller;
 
 import com.consoleconnect.kraken.operator.auth.dto.*;
+import com.consoleconnect.kraken.operator.auth.model.BasicUserLoginEnabled;
 import com.consoleconnect.kraken.operator.auth.model.User;
 import com.consoleconnect.kraken.operator.auth.model.UserLoginEnabled;
 import com.consoleconnect.kraken.operator.auth.security.UserContext;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
-@ConditionalOnBean(UserLoginEnabled.class)
+@ConditionalOnBean({UserLoginEnabled.class, BasicUserLoginEnabled.class})
 @AllArgsConstructor
 @RestController()
 @RequestMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)

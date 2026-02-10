@@ -23,8 +23,8 @@ spec:
         request:
         response:
           - name: mapper.quote.uni.add.state
-            title: Quote State Mapping
-            description: quote state mapping
+            title: "The quote state"
+            description: ""
             source: ""
             sourceLocation: ""
             target: "@{{quoteItem[*].state}}"
@@ -44,16 +44,16 @@ spec:
               - unableToProvide
             valueMapping: {}
           - name: mapper.quote.uni.add.price.value
-            title: Quote Price Value Mapping
-            description: quote price mapping
+            title: "The quote price value"
+            description: ""
             source: ""
             sourceLocation: ""
             target: "@{{quoteItem[0].quoteItemPrice[*].price.dutyFreeAmount.value}}"
             targetLocation: BODY
             requiredMapping: true
           - name: mapper.quote.uni.add.price.unit
-            title: Quote Price Unit Mapping
-            description: quote price mapping
+            title: "The quote price unit"
+            description: ""
             source: ""
             sourceLocation: ""
             target: "@{{quoteItem[0].quoteItemPrice[*].price.dutyFreeAmount.unit}}"

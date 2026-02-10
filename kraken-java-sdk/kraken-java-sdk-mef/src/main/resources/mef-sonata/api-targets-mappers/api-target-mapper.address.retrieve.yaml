@@ -5,7 +5,7 @@ metadata:
   key: mef.sonata.api-target-mapper.address.retrieve
   name: Mapper Of Retrieving Geographic Address
   description: This operation retrieves a GeographicAddress entity
-  version: 3
+  version: 4
 spec:
   trigger:
     path: /mefApi/sonata/geographicAddressManagement/v7/geographicAddress/{id}
@@ -20,7 +20,7 @@ spec:
       mappers:
         request:
           - name: mapper.address.retrieve.id
-            title: "Identifier of the GeographicAddress"
+            title: "Identifier of the geographic address"
             description: ""
             source: "@{{id}}"
             sourceLocation: "PATH"
@@ -29,7 +29,7 @@ spec:
             requiredMapping: true
         response:
           - name: mapper.address.validation.id
-            title: "Identifier of the GeographicAddress"
+            title: "Identifier of the geographic address"
             description: ""
             source: ""
             sourceLocation: ""
@@ -38,7 +38,7 @@ spec:
             targetLocation: BODY
             requiredMapping: true
           - name: mapper.address.validation.country
-            title: "The country of the Geographic Address"
+            title: "The country of the geographic address"
             description: ""
             source: ""
             sourceLocation: ""
@@ -47,7 +47,7 @@ spec:
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.address.validation.city
-            title: "The city of the Geographic Address"
+            title: "The city of the geographic address"
             description: ""
             source: ""
             sourceLocation: ""
@@ -56,7 +56,7 @@ spec:
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.address.validation.streetName
-            title: "The street of the Geographic Address"
+            title: "The street of the geographic address"
             description: ""
             source: ""
             sourceLocation: ""
@@ -65,7 +65,7 @@ spec:
             targetLocation: BODY
             requiredMapping: false
           - name: address.validation.locality.mapper
-            title: "The metroId of the identified alternate Geographic Address"
+            title: "The metroId of the identified alternate geographic address"
             description: ""
             source: ""
             sourceLocation: ""

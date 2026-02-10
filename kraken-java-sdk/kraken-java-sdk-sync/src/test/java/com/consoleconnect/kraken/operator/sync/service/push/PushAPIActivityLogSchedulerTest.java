@@ -58,6 +58,78 @@ class PushAPIActivityLogSchedulerTest extends AbstractIntegrationTest {
   }
 
   @Test
+  void
+      givenStuckInProgressEvent_whenPushApiActivityLogToExternalSystem_thenEventResumedAndStatusDone() {
+    apiActivityLogRepository.deleteAll();
+    mgmtEventRepository.deleteAll();
+
+    givenExternalServerResponses();
+
+    var endTime = ZonedDateTime.parse(NOW_WITH_TIMEZONE);
+    var startTime = ZonedDateTime.parse(NOW_WITH_TIMEZONE).minusDays(1);
+
+    var logs = createLogs(toUTC(endTime), ENV_ID);
+    apiActivityLogRepository.saveAll(logs);
+
+    var stuckEvent = createPushApiActivityLogEvent(ENV_ID, startTime, endTime, "userStuck");
+    stuckEvent.setStatus(EventStatusType.IN_PROGRESS.name());
+    mgmtEventRepository.save(stuckEvent);
+
+    var newEvent = createPushApiActivityLogEvent(ENV_ID, startTime, endTime, "userNew");
+
+    var sent = sut.pushApiActivityLogToExternalSystem();
+
+    assertThat(sent).isNotEmpty();
+    assertThat(sent.get(0).getId()).isEqualTo(stuckEvent.getId());
+
+    verifyPage0(sent.get(0), stuckEvent);
+    verifyPage1(sent.get(1), stuckEvent);
+
+    var updatedStuckEvent =
+        mgmtEventRepository
+            .findById(stuckEvent.getId())
+            .orElseThrow(() -> new RuntimeException("Stuck event not found"));
+    assertThat(updatedStuckEvent.getStatus()).isEqualTo(EventStatusType.DONE.name());
+
+    var ignoredEvent =
+        mgmtEventRepository
+            .findById(newEvent.getId())
+            .orElseThrow(() -> new RuntimeException("New event not found"));
+    assertThat(ignoredEvent.getStatus()).isEqualTo(EventStatusType.ACK.name());
+  }
+
+  @Test
+  void giveApiLogs_whenSendLogsThrowsException_thenEventInStatusFailed() {
+    // given: mock external system throws an exception
+    mockWebServer.enqueue(
+        new MockResponse()
+            .setResponseCode(200)
+            .setBodyDelay(0, java.util.concurrent.TimeUnit.MILLISECONDS)
+            .setSocketPolicy(okhttp3.mockwebserver.SocketPolicy.DISCONNECT_AT_START));
+
+    // prepare logs
+    var endTime = ZonedDateTime.parse(NOW_WITH_TIMEZONE);
+    var startTime = endTime.minusDays(1);
+    var logs = createLogs(toUTC(endTime), ENV_ID);
+    apiActivityLogRepository.saveAll(logs);
+
+    // create mgmt event
+    var logEvent = createPushApiActivityLogEvent(ENV_ID, startTime, endTime, "userId1");
+
+    // when
+    var sent = sut.pushApiActivityLogToExternalSystem();
+
+    // then
+    var event =
+        mgmtEventRepository
+            .findById(logEvent.getId())
+            .orElseThrow(() -> new RuntimeException("Missing event " + logEvent.getId()));
+
+    assertThat(event.getStatus()).isEqualTo(EventStatusType.FAILED.name());
+    assertThat(sent).isEmpty();
+  }
+
+  @Test
   void givenApiLogs_whenPushApiActivityLogToExternalSystem_thenAllLogsSentAndEventInStatusDone() {
     // given
     givenExternalServerResponses();

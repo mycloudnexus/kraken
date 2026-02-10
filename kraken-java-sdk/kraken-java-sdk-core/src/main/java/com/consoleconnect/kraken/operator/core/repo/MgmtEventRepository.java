@@ -30,6 +30,9 @@ public interface MgmtEventRepository
 
   Optional<MgmtEventEntity> findFirstByEventTypeAndStatus(String eventType, String status);
 
+  Optional<MgmtEventEntity> findFirstByEventTypeAndStatusOrderByCreatedAtAsc(
+      String eventType, String status);
+
   @Query(
       value =
           "SELECT EXISTS ("

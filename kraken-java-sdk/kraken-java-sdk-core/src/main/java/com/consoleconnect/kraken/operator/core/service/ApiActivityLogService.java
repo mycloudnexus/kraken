@@ -75,6 +75,8 @@ public class ApiActivityLogService {
                 UnifiedAsset.getFacets(buyerAssetDto, BuyerOnboardFacets.class);
             apiActivityLog.setBuyerName(
                 facets.getBuyerInfo() == null ? "" : facets.getBuyerInfo().getCompanyName());
+            apiActivityLog.setCompanyId(
+                facets.getBuyerInfo() == null ? "" : facets.getBuyerInfo().getBuyerId());
           }
           return apiActivityLog;
         });

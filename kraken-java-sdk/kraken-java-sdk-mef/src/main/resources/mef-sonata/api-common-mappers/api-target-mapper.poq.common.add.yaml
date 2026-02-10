@@ -10,13 +10,14 @@ metadata:
     offerings, at the Buyer's location(s); or modify a previously purchased
     product. The Seller also provides estimated time intervals to complete
     these deliveries. Reference: MEF 79 (Sn 8.4).
-  version: 1
+  version: 3
 spec:
   endpoints:
     - id: create a product offering qualification
       mappers:
         request:
           - name: mapper.poq.@{{productType}}.add.place0.id
+            title: "The id of the source place"
             source: "@{{productOfferingQualificationItem[0].product.place[0].id}}"
             sourceLocation: BODY
             sourceType: string
@@ -24,6 +25,7 @@ spec:
             targetLocation: ""
             requiredMapping: true
           - name: mapper.poq.@{{productType}}.add.productConfiguration.bandwidth
+            title: "Bandwidth of the UNI"
             source: "@{{productOfferingQualificationItem[0].product.productConfiguration.bandwidth}}"
             sourceLocation: BODY
             allowValueLimit: false
@@ -34,6 +36,7 @@ spec:
             targetLocation: ""
             requiredMapping: true
           - name: mapper.poq.@{{productType}}.add.productConfiguration.bandwidthUnit
+            title: "The unit of bandwidth"
             source: "@{{productOfferingQualificationItem[0].product.productConfiguration.bandwidthUnit}}"
             sourceLocation: BODY
             sourceType: enum
@@ -45,6 +48,7 @@ spec:
             targetLocation: ""
             requiredMapping: true
           - name: mapper.poq.@{{productType}}.add.productOffering.id
+            title: "The id of the quoted product offering"
             source: "@{{productOfferingQualificationItem[0].product.productOffering.id}}"
             sourceLocation: BODY
             sourceType: string
@@ -53,11 +57,8 @@ spec:
             requiredMapping: false
         response:
           - name: mapper.poq.@{{productType}}.add.serviceabilityConfidence
-            title: POQ Item State Mapping
-            description: >-
-              A color that indicates confidence to service the request.
-              When the item state is done the Seller MUST provide a value. 
-              It MUST NOT be populated for other states.
+            title: "POQ service confidence level"
+            description: ""
             source: ""
             sourceLocation: ""
             target: "@{{productOfferingQualificationItem[0].serviceabilityConfidence}}"
@@ -71,8 +72,8 @@ spec:
             defaultValue: "green"
             requiredMapping: true
           - name: mapper.poq.@{{productType}}.add.installationInterval.amount
-            title: POQ installationInterval amount Mapping
-            description: Duration amount of Installation
+            title: "POQ installation interval amount"
+            description: ""
             source: ""
             sourceLocation: ""
             target: "@{{productOfferingQualificationItem[0].installationInterval.amount}}"
@@ -80,8 +81,8 @@ spec:
             defaultValue: "0"
             requiredMapping: true
           - name: mapper.poq.@{{productType}}.add.installationInterval.units
-            title: POQ installationInterval units Mapping
-            description: Duration unit of Installation
+            title: "POQ installation interval units"
+            description: ""
             source: ""
             sourceLocation: ""
             target: "@{{productOfferingQualificationItem[0].installationInterval.units}}"

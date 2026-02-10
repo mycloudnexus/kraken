@@ -31,7 +31,7 @@ class JwtTokenVerifierTest {
   private static KeyFactory kf;
 
   @BeforeAll
-  public static void keyFactory() throws NoSuchAlgorithmException {
+  static void keyFactory() throws NoSuchAlgorithmException {
     kf = KeyFactory.getInstance("RSA");
   }
 

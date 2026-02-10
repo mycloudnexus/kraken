@@ -4,14 +4,14 @@ apiVersion: v1
 metadata:
   key: mef.sonata.api-target-mapper.inventory.common.list
   name: Inventory Connection API Common Mappers
-  version: 1
+  version: 2
 spec:
   endpoints:
     - id: list product inventory
       mappers:
         request:
           - name: mapper.inventory.@{{productType}}.list.buyerId
-            title: "The unique identifier of the organization that is acting as the a Buyer. MUST be specified in the request only when the requester represents more than one Buyer."
+            title: "The unique identifier of the organization that is acting as a buyer"
             source: "@{{buyerId}}"
             sourceLocation: "QUERY"
             target: ""
@@ -19,7 +19,7 @@ spec:
             targetLocation: ""
             requiredMapping: false
           - name: mapper.inventory.@{{productType}}.list.orderId
-            title: "associated order Id."
+            title: "Associated order Id."
             source: "@{{productOrderId}}"
             sourceLocation: "QUERY"
             target: ""
@@ -66,7 +66,7 @@ spec:
               - terminated
             valueMapping: {}
           - name: mapper.product.inventory.list.lastUpdateDate
-            title: Last Updated At
+            title: "Last updated at"
             description: ""
             target: "@{{lastUpdateDate}}"
             targetLocation: BODY
@@ -74,7 +74,7 @@ spec:
             source: ""
             sourceLocation: ""
           - name: mapper.product.inventory.list.createdDate
-            title: Created At
+            title: "Created at"
             description: ""
             target: "@{{createdDate}}"
             targetLocation: BODY

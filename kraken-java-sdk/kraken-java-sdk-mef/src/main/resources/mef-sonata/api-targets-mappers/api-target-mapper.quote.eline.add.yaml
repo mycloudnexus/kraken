@@ -23,7 +23,7 @@ spec:
         request:
         response:
           - name: quote.eline.add.state.mapper
-            title: Quote State Mapping
+            title: "The quote item state"
             description: quote state mapping
             source: ""
             sourceLocation: ""
@@ -46,7 +46,7 @@ spec:
               - rejected
             valueMapping: {}
           - name: quote.eline.add.price.value.mapper
-            title: Quote Price Value Mapping
+            title: "The quote value of the duty free amount"
             description: quote price value mapping
             source: ""
             sourceLocation: ""
@@ -54,7 +54,7 @@ spec:
             targetLocation: BODY
             requiredMapping: true
           - name: quote.eline.add.price.unit.mapper
-            title: Quote Price Unit Mapping
+            title: "The quote unit of the duty free amount"
             description: quote price unit mapping
             source: ""
             sourceLocation: ""

@@ -1,0 +1,12 @@
+kind: kraken.product.template-upgrade
+apiVersion: v1
+metadata:
+  key: kraken.product.template-upgrade.2.2.4
+  name: V2.2.4
+  labels:
+    productSpec: grace
+    productVersion: V2.2.4
+    publishDate: 2025-12-29
+  description: |
+     - Unify the title format
+  version: 1

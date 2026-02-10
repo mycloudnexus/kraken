@@ -5,11 +5,12 @@ import com.consoleconnect.kraken.operator.core.enums.ClientReportTypeEnum;
 import com.consoleconnect.kraken.operator.core.enums.EnvNameEnum;
 import com.consoleconnect.kraken.operator.core.enums.ResourceRoleEnum;
 import com.consoleconnect.kraken.operator.core.repo.EnvironmentClientRepository;
+import com.consoleconnect.kraken.operator.core.service.BuildVersionService;
+import com.consoleconnect.kraken.operator.core.toolkit.Constants;
 import com.consoleconnect.kraken.operator.core.toolkit.DateTime;
 import com.consoleconnect.kraken.operator.core.toolkit.IpUtils;
 import java.time.ZonedDateTime;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -24,18 +25,24 @@ public class HeartBeatService {
 
   private final EnvironmentClientRepository environmentClientRepository;
 
-  @Value("${spring.build.version}")
-  private String buildVersion;
+  private BuildVersionService buildVersionService;
 
-  public HeartBeatService(final EnvironmentClientRepository environmentClientRepository) {
+  public HeartBeatService(
+      final EnvironmentClientRepository environmentClientRepository,
+      final BuildVersionService buildVersionService) {
     this.environmentClientRepository = environmentClientRepository;
+    this.buildVersionService = buildVersionService;
   }
 
   @Scheduled(cron = "${app.cron-job.push-heartbeat:-}")
   @Transactional
   public void heartBeat() {
     ZonedDateTime now = DateTime.nowInUTC();
-    log.debug("Heartbeat at {}", now);
+    log.debug(
+        "[{}][{}] Heartbeat at {}",
+        Constants.LOG_FIELD_CRON_JOB,
+        Constants.LOG_FIELD_HEARTBEAT,
+        now);
     EnvironmentClientEntity environmentClientEntity =
         environmentClientRepository
             .findOneByEnvIdAndClientKeyAndKind(
@@ -54,7 +61,7 @@ public class HeartBeatService {
                   entity.setCreatedAt(now);
                   return entity;
                 });
-    environmentClientEntity.setAppVersion(buildVersion);
+    environmentClientEntity.setAppVersion(buildVersionService.getAppVersion());
     environmentClientEntity.setStatus(HttpStatus.OK.name());
     environmentClientEntity.setUpdatedAt(now);
     environmentClientRepository.save(environmentClientEntity);

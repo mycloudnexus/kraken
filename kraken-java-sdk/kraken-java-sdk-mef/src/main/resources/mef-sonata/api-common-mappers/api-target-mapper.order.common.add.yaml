@@ -5,14 +5,14 @@ metadata:
   key: mef.sonata.api-target-mapper.order.common.add
   name: Mapper Of Creating Order
   description: This operation creates a ProductOrder entity
-  version: 1
+  version: 2
 spec:
   endpoints:
     - id: create order
       mappers:
         request:
           - name: mapper.order.@{{productType}}.add.buyerId
-            title: The unique identifier of the organization that is acting as the a Buyer.
+            title: "The unique identifier of the organization that is acting as a buyer."
             description: ""
             source: '@{{buyerId}}'
             sourceLocation: QUERY
@@ -21,7 +21,7 @@ spec:
             requiredMapping: false
             customizedField: false
           - name: mapper.order.@{{productType}}.add.duration
-            title: "order item Term duration"
+            title: "Order item term duration"
             source: "@{{productOrderItem[0].requestedItemTerm.duration.amount}}"
             sourceLocation: BODY
             sourceType: integer
@@ -30,7 +30,7 @@ spec:
             targetLocation: ""
             requiredMapping: true
           - name: mapper.order.@{{productType}}.add.duration.units
-            title: "order item Term unit"
+            title: "Order item term unit"
             source: "@{{productOrderItem[0].requestedItemTerm.duration.units}}"
             sourceType: enum
             sourceValues:
@@ -48,7 +48,7 @@ spec:
             valueMapping: {}
             requiredMapping: true
           - name: mapper.order.@{{productType}}.add.endOfTermAction
-            title: "MEFEndOfTermAction"
+            title: "End of term action"
             source: "@{{productOrderItem[0].requestedItemTerm.endOfTermAction}}"
             sourceLocation: BODY
             sourceType: string
@@ -60,7 +60,7 @@ spec:
             targetLocation: BODY
             requiredMapping: true
           - name: mapper.order.@{{productType}}.add.rollInterval.amount
-            title: " quote item Term roll duration"
+            title: "Order item term roll duration"
             source: "@{{productOrderItem[0].requestedItemTerm.rollInterval.amount}}"
             sourceLocation: BODY
             sourceType: integer
@@ -75,7 +75,7 @@ spec:
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.order.@{{productType}}.add.rollInterval.units
-            title: " quote item Term roll unit"
+            title: "Order item term roll unit"
             source: "@{{productOrderItem[0].requestedItemTerm.rollInterval.units}}"
             sourceLocation: BODY
             sourceType: enum
@@ -137,7 +137,7 @@ spec:
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.order.@{{productType}}.add.productOffering.id
-            title: "id of a Product Offering"
+            title: "The unique identifier of the product offering"
             source: "@{{productOrderItem[0].product.productOffering.id}}"
             sourceLocation: BODY
             sourceType: string
@@ -146,7 +146,7 @@ spec:
             requiredMapping: true
         response:
           - name: mapper.order.@{{productType}}.add.state
-            title: Order State
+            title: "The state of the product order"
             source: ""
             target: '@{{state}}'
             targetType: enum
@@ -169,7 +169,7 @@ spec:
             requiredMapping: true
             customizedField: false
           - name: mapper.order.@{{productType}}.add.orderId
-            title: order Id from seller
+            title: "The order id from the seller"
             source: ""
             target: '@{{orderId}}'
             description: orderId mapping
@@ -177,7 +177,7 @@ spec:
             targetLocation: BODY
             requiredMapping: true
           - name: mapper.order.@{{productType}}.add.instanceId
-            title: instance id from seller
+            title: "The instance id from the seller"
             source: ""
             target: '@{{instanceId}}'
             description: order instanceId mapping
@@ -185,7 +185,7 @@ spec:
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.order.@{{productType}}.add.product.id
-            title: product instance id
+            title: "The product instance id"
             description: ""
             source: ""
             sourceLocation: BODY
@@ -194,7 +194,7 @@ spec:
             customizedField: false
             requiredMapping: false
           - name: mapper.order.@{{productType}}.add.term.endOfTermAction
-            title: MEFEndOfTermAction
+            title: "End of term action"
             description: ""
             source: ""
             sourceLocation: ""
@@ -203,7 +203,7 @@ spec:
             customizedField: false
             requiredMapping: true
           - name: mapper.order.@{{productType}}.add.term.rollInterval.amount
-            title: order item Term roll duration
+            title: "Order item term roll duration"
             description: ""
             source: ""
             sourceLocation: ""
@@ -212,7 +212,7 @@ spec:
             customizedField: false
             requiredMapping: false
           - name: mapper.order.@{{productType}}.add.term.rollInterval.unit
-            title: order item Term roll unit
+            title: "Order item term roll unit"
             description: ""
             source: ""
             sourceLocation: ""
@@ -221,7 +221,7 @@ spec:
             customizedField: false
             requiredMapping: false
           - name: mapper.order.@{{productType}}.add.term.name
-            title: order item Term name
+            title: "Order item term name"
             description: ""
             source: ""
             sourceLocation: ""
@@ -230,7 +230,7 @@ spec:
             customizedField: false
             requiredMapping: true
           - name: mapper.order.@{{productType}}.add.term.duration.amount
-            title: order item Term duration
+            title: "Order item term duration"
             description: ""
             source: ""
             sourceLocation: ""
@@ -239,7 +239,7 @@ spec:
             customizedField: false
             requiredMapping: true
           - name: mapper.order.@{{productType}}.add.term.duration.units
-            title: order item Term unit
+            title: "Order item term unit"
             description: ""
             source: ""
             sourceLocation: ""

@@ -13,6 +13,7 @@ import com.consoleconnect.kraken.operator.core.enums.EnvNameEnum;
 import com.consoleconnect.kraken.operator.core.model.HttpResponse;
 import com.consoleconnect.kraken.operator.core.repo.EnvironmentClientRepository;
 import com.consoleconnect.kraken.operator.core.service.EventSinkService;
+import com.consoleconnect.kraken.operator.core.toolkit.Constants;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.List;
@@ -46,6 +47,11 @@ public class ClientHeartbeatEventHandler extends ClientEventHandler {
   @Transactional
   @Override
   public HttpResponse<Void> onEvent(String envId, String userId, ClientEvent event) {
+    log.info(
+        "[{}] Client heartbeat event received, envId: {}, client id: {}",
+        Constants.LOG_FIELD_SYNC_EVENT,
+        envId,
+        event.getClientId());
     if (event.getEventPayload() == null) {
       return HttpResponse.ok(null);
     }

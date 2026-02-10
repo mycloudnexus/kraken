@@ -24,7 +24,7 @@ spec:
         request:
         response:
           - name: mapper.order.eline.read.delete.state
-            title: "ProductOrderState"
+            title: "The product order state"
             description: ""
             target: "@{{state}}"
             targetType: enum

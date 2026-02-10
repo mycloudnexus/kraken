@@ -44,7 +44,7 @@ spec:
             targetLocation: BODY
             requiredMapping: true
           - name: mapper.quote.eline.add.sync.productConfiguration.classOfService
-            title: "The class of Service of the Eline"
+            title: "The class of Service of the E-Line"
             source: "@{{quoteItem[0].product.productConfiguration.classOfService}}"
             sourceLocation: BODY
             sourceType: string
@@ -52,7 +52,7 @@ spec:
             targetLocation: BODY
             requiredMapping: false
           - name: mapper.quote.eline.add.sync.productConfiguration.paymentType
-            title: "The payment type of the Eline"
+            title: "The payment type of the E-Line"
             source: "@{{quoteItem[0].product.productConfiguration.paymentType}}"
             sourceLocation: BODY
             sourceType: string
