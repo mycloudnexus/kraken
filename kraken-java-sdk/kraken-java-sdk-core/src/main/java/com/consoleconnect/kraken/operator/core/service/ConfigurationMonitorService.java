@@ -51,12 +51,11 @@ public class ConfigurationMonitorService {
           .filter(entry -> monitorList.contains(entry.getKey()))
           .forEach(
               entry ->
-                log.info(
-                    "[{}] Configuration app.cron-job.{}: {}",
-                    Constants.LOG_FIELD_CRON_JOB,
-                    entry.getKey(),
-                    entry.getValue())
-              );
+                  log.info(
+                      "[{}] Configuration app.cron-job.{}: {}",
+                      Constants.LOG_FIELD_CRON_JOB,
+                      entry.getKey(),
+                      entry.getValue()));
 
       checkLock(cronJobProperties.getCronJob());
     } else {
