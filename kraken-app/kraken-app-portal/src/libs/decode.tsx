@@ -23,8 +23,25 @@ export const decodeBase64Content = (content?: unknown): string => {
   try {
     let str = content as string;
     console.log("parsing content");
+    if (str.startsWith("data:application/yaml;")) {
+      console.log("parsing content with application/yaml");
+      if (str.startsWith("data:application/yaml;base64,")) {
+        console.log("validation pass");
+      } else {
+        throw Error("invalid format");
+      }
+    } else if (str.startsWith("data:application/x-yaml;")) {
+      console.log("parsing content with application/x-yaml");
+      if (str.startsWith("data:application/x-yaml;base64,")) {
+        console.log("validation pass");
+      } else {
+        throw Error("invalid format");
+      }
+    } else {
+      console.log("parsing content, raw base64 content, validation pass");
+    }
     let text = str.split(',').pop() as string;
-    console.log("parsing content done");
+    console.log("parsing content: done");
     return decode(text);
   } catch (e) {
     console.error("invalide base64 string");

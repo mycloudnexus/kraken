@@ -14,5 +14,7 @@ describe('base64 decode testing', () => {
 
   it('decode invalid base64 content should throw error', () => {
     expect(() => decodeBase64Content(1)).toThrow();
+    expect(() => decodeBase64Content("data:application/yaml;e30K")).toThrow();
+    expect(() => decodeBase64Content("data:application/x-yaml;e30K")).toThrow();
   })
 })
