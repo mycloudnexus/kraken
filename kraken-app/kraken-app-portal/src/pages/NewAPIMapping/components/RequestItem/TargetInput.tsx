@@ -4,7 +4,7 @@ import { IRequestMapping } from "@/utils/types/component.type";
 import { RightOutlined } from "@ant-design/icons";
 import { Flex, Tooltip } from "antd";
 import clsx from "clsx";
-import { isEqual, cloneDeep, set } from "lodash";
+import { isEqual } from "lodash";
 import { useMemo } from "react";
 import { LocationSelector } from "../LocationSelector";
 import styles from "./index.module.scss";
@@ -34,6 +34,18 @@ export function TargetInput({
     [rightSide, item.id, rightSideInfo?.previousData?.id]
   );
 
+  const handleChange = (changes: { [field in keyof typeof item]?: any }) => {
+    handleMappingInputChange(
+      changes,
+      index,
+      isFocused,
+      requestMapping,
+      item,
+      rightSideInfo,
+      setRequestMapping,
+      setRightSideInfo);
+  };
+
   return (
     <Flex className={styles.flexColumn} gap={4}>
       {item.target ? (
@@ -41,17 +53,7 @@ export function TargetInput({
           type="request"
           // disabled={!item.customizedField}
           value={item.targetLocation}
-          onChange={(value) => 
-            handleMappingInputChange(
-              { targetLocation: value },
-              index,
-              isFocused,
-              requestMapping,
-              item,
-              rightSideInfo,
-              setRequestMapping,
-              setRightSideInfo)
-          }
+          onChange={(value) => handleChange({ targetLocation: value })}
         />
       ) : <div className={styles.bloater}></div>}
 
@@ -79,9 +81,9 @@ export function TargetInput({
           }}
           onChange={(value) => {
             if (!value) {
-              handleSourceInputChange({ target: value, targetLocation: undefined });
+              handleChange({ target: value, targetLocation: undefined });
             } else {
-              handleSourceInputChange({ target: value });
+              handleChange({ target: value });
             }
           }}
         />

@@ -3,7 +3,7 @@ import { EnumRightType } from "@/utils/types/common.type";
 import { IRequestMapping } from "@/utils/types/component.type";
 import { Flex } from "antd";
 import clsx from "clsx";
-import { isEqual, cloneDeep, set } from "lodash";
+import { isEqual } from "lodash";
 import { useMemo } from "react";
 import { LocationSelector } from "../LocationSelector";
 import styles from "./index.module.scss";
@@ -32,6 +32,18 @@ export function SourceInput({
     [rightSide, item.id, rightSideInfo?.previousData?.id]
   );
 
+  const handleChange = (changes: { [field in keyof typeof item]?: any }) => {
+    handleMappingInputChange(
+      changes,
+      index,
+      isFocused,
+      requestMapping,
+      item,
+      rightSideInfo,
+      setRequestMapping,
+      setRightSideInfo);
+  };
+
   return (
     <Flex className={styles.flexColumn} gap={4}>
       {item.source ? (
@@ -39,15 +51,7 @@ export function SourceInput({
           type="request"
           disabled={!item.customizedField}
           value={item.sourceLocation}
-          onChange={(value) => handleMappingInputChange(
-            { sourceLocation: value },
-            index,
-            isFocused,
-            requestMapping,
-            item,
-            rightSideInfo,
-            setRequestMapping,
-            setRightSideInfo)}
+          onChange={(value) => handleChange({ sourceLocation: value })}
         />
       ) : <div className={styles.bloater}></div>}
 
