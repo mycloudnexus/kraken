@@ -8,17 +8,18 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import com.fasterxml.jackson.databind.node.*;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import java.util.Iterator;
 import java.util.Map;
+
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
+@Slf4j
 public class JsonToolkit {
 
   private JsonToolkit() {}
@@ -108,6 +109,43 @@ public class JsonToolkit {
       return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
     } catch (JsonProcessingException e) {
       throw KrakenException.internalError(e.getMessage());
+    }
+  }
+
+  public static String generateJsonDynamic(String jsonPointerPath, String value, String initJson) {
+    initJson = StringUtils.isBlank(initJson) ? "{}" : initJson;
+    try {
+      ObjectMapper mapper = new ObjectMapper();
+      JsonNode root = mapper.readTree(initJson);
+      JsonNode valueNode = createNodeFromValue(value, mapper);
+      setJsonPointerValue(root, JsonPointer.compile(jsonPointerPath), valueNode, mapper);
+      return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
+    } catch (JsonProcessingException e) {
+      throw KrakenException.internalError(e.getMessage());
+    }
+  }
+
+  private static JsonNode createNodeFromValue(String value, ObjectMapper mapper) {
+    if (value == null) {
+      return NullNode.instance;
+    }
+    try {
+      return mapper.readTree(value);
+    } catch (Exception e) {
+      log.error("not valid JSON, fall back to other types");
+    }
+    if (StringUtils.isNumeric(value)) {
+      try {
+        long longValue = Long.parseLong(value);
+        log.info("long value{}", longValue);
+        return JsonNodeFactory.instance.numberNode(longValue);
+      } catch (NumberFormatException e) {
+        return JsonNodeFactory.instance.numberNode(new java.math.BigDecimal(value));
+      }
+    } else if ("true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value)) {
+      return BooleanNode.valueOf(Boolean.parseBoolean(value));
+    } else {
+      return JsonNodeFactory.instance.textNode(value);
     }
   }
 
