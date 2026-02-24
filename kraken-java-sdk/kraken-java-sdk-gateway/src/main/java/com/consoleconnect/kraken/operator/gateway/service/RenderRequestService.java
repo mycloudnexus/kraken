@@ -141,7 +141,8 @@ public class RenderRequestService implements MappingTransformer {
   }
 
   private String constructBodyFromSource(String source, String sourceLocation) {
-    if (BODY.name().equalsIgnoreCase(sourceLocation)) {
+    if (BODY.name().equalsIgnoreCase(sourceLocation)
+        || CONSTANT.name().equalsIgnoreCase(sourceLocation)) {
       return constructBody(source);
     } else if (PATH.name().equalsIgnoreCase(sourceLocation)) {
       return constructPath(source);

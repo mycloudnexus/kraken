@@ -4,7 +4,7 @@ metadata:
   key: kraken.product.template-upgrade.2.2.4
   name: V2.2.4
   labels:
-    productSpec: grace
+    productSpec: Haley
     productVersion: V2.2.4
     publishDate: 2025-12-29
   description: |
