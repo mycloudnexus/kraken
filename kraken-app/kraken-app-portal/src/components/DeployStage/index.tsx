@@ -60,7 +60,8 @@ const DeployStage = ({ inComplete, diffWithStage, metadataKey }: Props) => {
       });
       notification.success({ message: get(res, "message", "Success!") });
     } catch (error) {
-      setModalText(get(error, "reason", "Error. Please try again"));
+      const errorMessage = get(error, "response.data.reason") ?? 'Error. Please try again';
+      setModalText(errorMessage);
       open();
     }
   };

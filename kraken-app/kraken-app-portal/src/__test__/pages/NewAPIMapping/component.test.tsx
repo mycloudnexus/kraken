@@ -19,6 +19,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render, renderHook } from "@testing-library/react";
 import { omit } from "lodash";
 import { BrowserRouter } from "react-router-dom";
+import * as productHooks from "@/hooks/product";
 
 beforeAll(() => {
   const { result: resultUiMapping } = renderHook(() => useMappingUiStore());
@@ -27,6 +28,19 @@ beforeAll(() => {
   );
   resultUiMapping.current.setSelectedKey("1");
   resultUiMapping.current.setActiveTab("/tab");
+
+  vi.spyOn(productHooks, 'useGetComponentDetailV2').mockReturnValue({
+    data: {
+      facets: {
+        baseSpec: {
+          content: "data:application/x-yaml;Cg=="
+        }
+      }
+    },
+    isLoading: false,
+    isFetching: false,
+    isFetched: true,
+  } as any)
 
   const { result } = renderHook(() => useNewApiMappingStore());
   result.current.setActiveResponseName(
@@ -1113,6 +1127,44 @@ test("parse fnc", () => {
   ]);
 });
 
+
+describe("render api item", () => {
+  test("should render api item", () => {
+    const { container } = render(
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <APIItem
+            isOneItem={false}
+            item={
+              {
+                kind: "kraken.component.api-target-spec",
+                metadata: {
+                  id: "b7d7b3ee-f336-4066-97f9-23bd39ec1a82",
+                  name: "console connect 12",
+                  version: 0,
+                  key: "mef.sonata.api-target-spec.con1718940696857",
+                  description: "ABC",
+                },
+                facets: {
+                  environments: {},
+                  selectedAPIs: ["/productOrder/{id} patch"],
+                  baseSpec: {
+                    path: "http://localhost:5173/component/mef.sonata.api.poq/new",
+                  },
+                },
+              } as any
+            }
+            setSellerApi={vi.fn()}
+            selectedAPI={"ABC"}
+            setSelectedServer={vi.fn()}
+          />
+        </BrowserRouter>
+      </QueryClientProvider>
+    );
+    expect(container).toBeInTheDocument();
+  });
+});
+
 describe("select prop", () => {
   test("component new api map page", async () => {
     const { container, getByTestId, getAllByTestId } = render(
@@ -1187,41 +1239,6 @@ test("function getCorrectSpec", () => {
   };
   expect(getCorrectSpec(spec, "get")).toEqual({ a: 1 });
   expect(getCorrectSpec(spec, "post")).toEqual({ a: 2 });
-});
-
-test("APIItem", () => {
-  const { container } = render(
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <APIItem
-          isOneItem={false}
-          item={
-            {
-              kind: "kraken.component.api-target-spec",
-              metadata: {
-                id: "b7d7b3ee-f336-4066-97f9-23bd39ec1a82",
-                name: "console connect 12",
-                version: 0,
-                key: "mef.sonata.api-target-spec.con1718940696857",
-                description: "ABC",
-              },
-              facets: {
-                environments: {},
-                selectedAPIs: ["/productOrder/{id} patch"],
-                baseSpec: {
-                  path: "http://localhost:5173/component/mef.sonata.api.poq/new",
-                },
-              },
-            } as any
-          }
-          setSellerApi={vi.fn()}
-          selectedAPI={"ABC"}
-          setSelectedServer={vi.fn()}
-        />
-      </BrowserRouter>
-    </QueryClientProvider>
-  );
-  expect(container).toBeInTheDocument();
 });
 
 test("SonataPropMapping", () => {

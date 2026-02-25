@@ -3,13 +3,12 @@ import { EnumRightType } from "@/utils/types/common.type";
 import { IRequestMapping } from "@/utils/types/component.type";
 import { Flex } from "antd";
 import clsx from "clsx";
-import { isEqual } from "lodash";
+import { isEqual, cloneDeep, set } from "lodash";
 import { useMemo } from "react";
 import { LocationSelector } from "../LocationSelector";
 import styles from "./index.module.scss";
 import { AutoGrowingInput } from "@/components/form";
 import { Text } from "@/components/Text";
-import { handleMappingInputChange } from "./InputCommon";
 
 export function SourceInput({
   item,
@@ -33,20 +32,23 @@ export function SourceInput({
   );
 
   const handleChange = (changes: { [field in keyof typeof item]?: any }) => {
-    handleMappingInputChange(
-      item,
-      changes,
-      {
-        index,
-        isFocused,
-        requestMapping,
-        rightSideInfo,
-        setRequestMapping,
-        setRightSideInfo
-      }
-    );
-  };
+    const newRequest = cloneDeep(requestMapping);
+    for (const field in changes) {
+      set(
+        newRequest,
+        `[${index}].${field}`,
+        changes[field as keyof typeof item]
+      );
+    }
 
+    setRequestMapping(newRequest);
+    if (isFocused && rightSideInfo) {
+      setRightSideInfo({
+        ...rightSideInfo,
+        previousData: newRequest[index],
+      });
+    }
+  };
   return (
     <Flex className={styles.flexColumn} gap={4}>
       {item.source ? (

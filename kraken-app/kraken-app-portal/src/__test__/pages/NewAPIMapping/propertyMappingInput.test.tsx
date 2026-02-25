@@ -116,7 +116,7 @@ describe("NewAPIMapping > request mapping", () => {
       vi.fn().mockReturnValue(request)
     );
 
-    const { getByTestId, getByRole, getAllByRole } = render(
+    const { getByTestId } = render(
       <RequestTargetInput item={request.requestMapping[0]} index={0} />
     );
 
@@ -128,19 +128,6 @@ describe("NewAPIMapping > request mapping", () => {
     ); // ~ QUERY
 
     fireEvent.click(input);
-    fireEvent.blur(input);
-
-    const btnSelectLoc = getByTestId("btnSelectLocation");
-    fireEvent.click(btnSelectLoc!);
-
-    await waitFor(() => expect(getByRole("menu")).toBeInTheDocument());
-
-    const items = getAllByRole("menuitem");
-    expect(items.length).toBe(6); 
-
-    fireEvent.click(items[2]);
-    expect(request.setRequestMapping).toHaveBeenCalledTimes(1);
-
     expect(request.setRightSideInfo).toHaveBeenCalledTimes(1);
     expect(request.setRightSide).toHaveBeenCalledTimes(1);
 

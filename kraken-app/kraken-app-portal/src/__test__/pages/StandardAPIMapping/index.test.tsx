@@ -12,6 +12,8 @@ test("StandardAPIMapping btn-create-version", () => {
     setActivePath: vi.fn(),
     selectedKey: "targetKey",
     setSelectedKey: vi.fn(),
+    activeTab: "request",
+    setActiveTab: vi.fn(),
   });
 
   vi.spyOn(productHooks, "useGetComponentDetailMapping").mockReturnValue({
@@ -87,6 +89,8 @@ test("StandardAPIMapping btn-save", () => {
     setActivePath: vi.fn(),
     selectedKey: "targetKey",
     setSelectedKey: vi.fn(),
+    activeTab: "request",
+    setActiveTab: vi.fn(),
   });
 
   vi.spyOn(productHooks, "useGetComponentDetailMapping").mockReturnValue({

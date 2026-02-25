@@ -74,6 +74,11 @@ const NewAPIMapping = ({
   const ref = useRef<any>();
 
   useEffect(() => {
+    setActiveTab("request");
+    return () => setActiveTab("request");
+  }, []);
+  
+  useEffect(() => {
     if (!sellerApi && defaultSellerApi && firstTimeLoadSellerAPI) {
       setSellerApi(defaultSellerApi);
       setFirstTimeLoadSellerAPI(false);
