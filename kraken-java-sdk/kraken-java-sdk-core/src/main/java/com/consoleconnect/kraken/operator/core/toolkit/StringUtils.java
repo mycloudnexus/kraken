@@ -5,6 +5,8 @@ import static org.apache.commons.lang3.StringUtils.*;
 
 import com.consoleconnect.kraken.operator.core.exception.ErrorResponse;
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
+import com.fasterxml.jackson.core.JacksonException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 public class StringUtils {
 
   private StringUtils() {}
+
+  private static ObjectMapper objectMapper = new ObjectMapper();
 
   public static String maskString(String data, int plainTextLength) {
     if (data == null || data.trim().isEmpty()) {
@@ -90,6 +94,23 @@ public class StringUtils {
       doc.put(path, node, value);
     } catch (Exception e) {
       log.error(String.format("failed to set json path %s, error: %s", path, e.getMessage()));
+    }
+  }
+
+  public static String convertToJsonSafeString(String str) {
+    try {
+      objectMapper.readTree(str);
+    } catch (JacksonException e) {
+      return convertRawString(str);
+    }
+    return str;
+  }
+
+  private static String convertRawString(String str) {
+    try {
+      return objectMapper.writeValueAsString(str);
+    } catch (JacksonException e) {
+      return "invalid json string";
     }
   }
 }
