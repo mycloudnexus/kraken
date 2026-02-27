@@ -1,4 +1,4 @@
-import { DEFAULT_PRODUCT } from "@/utils/constants/product";
+import { ENV } from "@/constants";
 import { create } from "zustand";
 
 type AppStore = {
@@ -7,6 +7,6 @@ type AppStore = {
 };
 
 export const useAppStore = create<AppStore>()((set) => ({
-  currentProduct: DEFAULT_PRODUCT,
+  currentProduct: ENV.PRODUCT_ID,
   setCurrentProduct: (currentProduct: string) => set({ currentProduct }),
 }));

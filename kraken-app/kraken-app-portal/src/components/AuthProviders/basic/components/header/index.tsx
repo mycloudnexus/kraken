@@ -2,7 +2,6 @@ import UpgradingIcon from "@/assets/icon/upgrading.svg";
 import Logo from "@/assets/logo.svg";
 import { useUser } from "@/hooks/user/useUser";
 import { useTutorialStore } from "@/stores/tutorial.store";
-import { PRODUCT_NAME } from "@/utils/constants/common";
 import { ISystemInfo } from "@/utils/types/user.type";
 import {
   EditTwoTone,
@@ -15,6 +14,7 @@ import { Text } from "../../../../Text";
 import styles from "./index.module.scss";
 import { UserAvatar } from "./UserAvatar";
 import { useBasicAuth } from "../../provider/BasicAuthProvider";
+import { ENV } from "@/constants";
 
 const BasicHeader = ({ info }: Readonly<{ info?: ISystemInfo }>) => {
   const { logout } = useBasicAuth();
@@ -75,7 +75,7 @@ const BasicHeader = ({ info }: Readonly<{ info?: ISystemInfo }>) => {
       <Flex gap={16} align="center">
         <Link data-testid="logo" to="/" className={styles.logo}>
           <Logo />
-          {PRODUCT_NAME}
+          {ENV.PRODUCT_NAME}
         </Link>
 
         <Divider type="vertical" className={styles.divider} />

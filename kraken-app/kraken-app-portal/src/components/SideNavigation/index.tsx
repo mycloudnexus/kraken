@@ -22,6 +22,7 @@ import styles from "./index.module.scss";
 import { ISystemInfo } from "@/utils/types/user.type";
 import { Text } from "../Text";
 import classNames from "classnames";
+import { ENV } from "@/constants";
 
 const flattenMenu = (
   menuArr: any[],
@@ -78,7 +79,7 @@ const SideNavigation = ({ info }: Readonly<{ info?: ISystemInfo }>) => {
       },
       {
         key: "component/",
-        label: <Link to="/component/mef.sonata/list">Seller API setup</Link>,
+        label: <Link to={`/component/${ENV.PRODUCT_ID}/list`}>Seller API setup</Link>,
         icon: <SellerAPISetupIcon />,
       },
       {
