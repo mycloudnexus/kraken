@@ -9,5 +9,3 @@ export enum EStep {
 }
 
 export const STALE_TIME = 15 * 60 * 1000; // 15 mins
-
-export const PRODUCT_NAME = "MEF LSO API Adaptor";

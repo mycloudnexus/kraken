@@ -29,6 +29,7 @@ import { Dispatch, SetStateAction, useState } from "react";
 import { useNavigate } from "react-router";
 import APIServerCard from "./components/APIServerCard";
 import styles from "./index.module.scss";
+import { ENV } from "@/constants";
 
 type DrawerDetails = {
   apiComponent: string;
@@ -42,9 +43,9 @@ type DrawerDetails = {
 
 const getCardTitle = (componentKey: string) => {
   switch (componentKey) {
-    case "mef.sonata.api.quote":
+    case ENV.PRODUCT_ID + ".api.quote":
       return "Quote Management";
-    case "mef.sonata.api.order":
+    case ENV.PRODUCT_ID + ".api.order":
       return "Order Management";
     default:
       return "";
@@ -53,9 +54,9 @@ const getCardTitle = (componentKey: string) => {
 
 const getCardIcon = (componentKey: string) => {
   switch (componentKey) {
-    case "mef.sonata.api.quote":
+    case ENV.PRODUCT_ID + ".api.quote":
       return <QuoteIcon />;
-    case "mef.sonata.api.order":
+    case ENV.PRODUCT_ID + ".api.order":
       return <OrderIcon />;
     default:
       return <></>;
