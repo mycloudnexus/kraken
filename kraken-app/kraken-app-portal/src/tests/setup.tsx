@@ -17,9 +17,9 @@ class ResizeObserver {
   }
 }
 
-(window as any).ResizeObserver = ResizeObserver;
+(globalThis as any).ResizeObserver = ResizeObserver;
 
-Object.defineProperty(window, "matchMedia", {
+Object.defineProperty(globalThis, "matchMedia", {
   writable: true,
   value: vi.fn().mockImplementation((query) => ({
     matches: false,
@@ -34,8 +34,8 @@ Object.defineProperty(window, "matchMedia", {
 });
 
 beforeAll(() => {
-  const { getComputedStyle } = window;
-  window.getComputedStyle = (elt) => getComputedStyle(elt);
+  const { getComputedStyle } = globalThis;
+  globalThis.getComputedStyle = (elt) => getComputedStyle(elt);
 });
 
 vi.mock("antd", async () => {

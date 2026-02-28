@@ -93,10 +93,10 @@ export function CommonInput({
             });
           }}
           onChange={(value) => {
-            if (!value) {
-              handleChange({ source: value, sourceLocation: undefined });
-            } else {
+            if (value) {
               handleChange({ source: value });
+            } else {
+              handleChange({ source: value, sourceLocation: undefined });
             }
           }}
         />
@@ -136,10 +136,10 @@ export function CommonInput({
             });
           }}
           onChange={(value) => {
-            if (!value) {
-              handleChange({ target: value, targetLocation: undefined });
-            } else {
+            if (value) {
               handleChange({ target: value });
+            } else {
+              handleChange({ target: value, targetLocation: undefined });
             }
           }}
         />
