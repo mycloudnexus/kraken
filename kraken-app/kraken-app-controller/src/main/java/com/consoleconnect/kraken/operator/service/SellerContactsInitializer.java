@@ -43,11 +43,12 @@ public class SellerContactsInitializer implements AssetKeyGenerator {
         unifiedAssetService.existed(sellerContact.getKey()) ? sellerContact.getKey() : null;
     sellerContact
         .getSellerContactDetails()
-        .forEach(detail -> processSellerContactDetail(finalProductId, detail));
+        .forEach(
+            detail -> processSellerContactDetail(sellerContact.getKey(), finalProductId, detail));
   }
 
   private void processSellerContactDetail(
-      String finalProductId, CreateSellerContactRequest detail) {
+      String productId, String finalProductId, CreateSellerContactRequest detail) {
     String sellerContactKey =
         generateSellerContactKey(detail.getComponentKey(), detail.getParentProductType());
     UnifiedAssetDto current = unifiedAssetService.findOneIfExist(sellerContactKey);
@@ -65,10 +66,11 @@ public class SellerContactsInitializer implements AssetKeyGenerator {
       unifiedAssetService.syncAsset(productKey, current, syncMetadata, true);
       return;
     }
-    createSellerContact(finalProductId, detail);
+    createSellerContact(productId, finalProductId, detail);
   }
 
-  private void createSellerContact(String finalProductId, CreateSellerContactRequest detail) {
+  private void createSellerContact(
+      String productId, String finalProductId, CreateSellerContactRequest detail) {
     CreateSellerContactRequest request = new CreateSellerContactRequest();
     request.setComponentKey(detail.getComponentKey());
     request.setParentProductType(detail.getParentProductType());
@@ -77,6 +79,6 @@ public class SellerContactsInitializer implements AssetKeyGenerator {
     request.setEmailAddress(
         StringUtils.isBlank(detail.getEmailAddress()) ? "" : detail.getEmailAddress());
     sellerContactService.createOneSellerContact(
-        finalProductId, detail.getComponentKey(), request, "system");
+        productId, finalProductId, detail.getComponentKey(), request, "system");
   }
 }

@@ -2,6 +2,7 @@ package com.consoleconnect.kraken.operator.core.mapper;
 
 import com.consoleconnect.kraken.operator.core.dto.ApiActivityLog;
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
+import com.consoleconnect.kraken.operator.core.toolkit.StringUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -16,6 +17,10 @@ public interface ApiActivityLogMapper {
     var entity = INSTANCE.mapOnlySelf(request);
     if (request.getRequest() != null || request.getResponse() != null) {
       entity.setApiLogBodyEntity(ApiActivityLogBodyMapper.INSTANCE.map(request));
+      final Object response = request.getResponse();
+      if (response instanceof String resp) {
+        entity.getApiLogBodyEntity().setResponse(StringUtils.convertToJsonSafeString(resp));
+      }
     }
     return entity;
   }

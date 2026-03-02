@@ -58,7 +58,9 @@ public class ApiLogOutputGlobalFilter extends AbstractGlobalFilter {
                             apiActivityLogEntityOptional.get();
                         String finalResponse = convert2String(db, exchange);
                         if (StringUtils.isNoneBlank(finalResponse)) {
-                          apiActivityLogEntity.setResponse(finalResponse);
+                          apiActivityLogEntity.setResponse(
+                              com.consoleconnect.kraken.operator.core.toolkit.StringUtils
+                                  .convertToJsonSafeString(finalResponse));
                         }
                         apiActivityLogEntity.setHttpStatusCode(
                             Objects.requireNonNull(exchange.getResponse().getStatusCode()).value());

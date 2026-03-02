@@ -30,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Slf4j
 public class SellerContactService implements AssetKeyGenerator {
-  private static final String SELLER_CONTACT_PREFIX = "mef.sonata.seller.contact";
+  private static final String SELLER_CONTACT_PREFIX = "%s.seller.contact";
   private static final String SELLER_CONTACT_DESC = "seller contact information";
   private static final String COMPONENT_KEY = "componentKey";
   private static final String QUOTE_ROLE = "sellerContactInformation";
@@ -50,19 +50,23 @@ public class SellerContactService implements AssetKeyGenerator {
     UnifiedAssetDto componentAssetDto = unifiedAssetService.findOne(componentId);
     SellerContactService self = applicationContext.getBean(SellerContactService.class);
     return self.createOneSellerContact(
-        productId, componentAssetDto.getMetadata().getKey(), request, createdBy);
+        productId, productId, componentAssetDto.getMetadata().getKey(), request, createdBy);
   }
 
   @Transactional
   public IngestionDataResult createOneSellerContact(
-      String productId, String componentKey, CreateSellerContactRequest request, String createdBy) {
+      String productId,
+      String finalProductId,
+      String componentKey,
+      CreateSellerContactRequest request,
+      String createdBy) {
     String sellerContactKey =
         generateSellerContactKey(componentKey, request.getParentProductType());
     UnifiedAsset sellerAsset =
         createSellerContact(
-            request, sellerContactKey, request.getParentProductType(), componentKey);
+            request, productId, sellerContactKey, request.getParentProductType(), componentKey);
     SyncMetadata syncMetadata = new SyncMetadata("", "", DateTime.nowInUTCString(), createdBy);
-    return unifiedAssetService.syncAsset(productId, sellerAsset, syncMetadata, true);
+    return unifiedAssetService.syncAsset(finalProductId, sellerAsset, syncMetadata, true);
   }
 
   private String whichRole(String componentKey) {
@@ -77,12 +81,15 @@ public class SellerContactService implements AssetKeyGenerator {
 
   private UnifiedAsset createSellerContact(
       CreateSellerContactRequest request,
+      String productId,
       String sellerContactKey,
       String parentProductType,
       String componentKey) {
     UnifiedAsset unifiedAsset =
         UnifiedAsset.of(
-            COMPONENT_SELLER_CONTACT.getKind(), sellerContactKey, SELLER_CONTACT_PREFIX);
+            COMPONENT_SELLER_CONTACT.getKind(),
+            sellerContactKey,
+            String.format(SELLER_CONTACT_PREFIX, productId));
     unifiedAsset.getMetadata().setDescription(SELLER_CONTACT_DESC);
     unifiedAsset.getMetadata().setStatus(AssetStatusEnum.ACTIVATED.getKind());
     unifiedAsset.getMetadata().getLabels().put(COMPONENT_KEY, componentKey);
