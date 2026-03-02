@@ -101,10 +101,11 @@ public class StringUtils {
   public static String convertToJsonSafeString(String str) {
     try {
       if (str == null) {
-        return null;
+        log.debug("Converting null to json, replacing with blank string");
+        return convertRawString("");
       }
       if (Strings.isBlank(str)) {
-        return "";
+        log.debug("Converting blank string to json");
       }
       objectMapper.readTree(str);
     } catch (JacksonException e) {
@@ -115,6 +116,9 @@ public class StringUtils {
 
   private static String convertRawString(String str) {
     try {
+      if (Strings.isBlank(str)) {
+        log.debug("Converting blank string");
+      }
       return objectMapper.writeValueAsString(str);
     } catch (JacksonException e) {
       return "invalid json string";
