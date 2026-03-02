@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 
 @Slf4j
 public class StringUtils {
@@ -99,6 +100,12 @@ public class StringUtils {
 
   public static String convertToJsonSafeString(String str) {
     try {
+      if (str == null) {
+        return null;
+      }
+      if (Strings.isBlank(str)) {
+        return "";
+      }
       objectMapper.readTree(str);
     } catch (JacksonException e) {
       return convertRawString(str);

@@ -19,6 +19,7 @@ public class StringUtilsTest {
 
   @Test
   void givenInvalidJsonString_whenConvert_returnBlankOrRawString() {
+    Assertions.assertNull(StringUtils.convertToJsonSafeString(null));
     Assertions.assertEquals("", StringUtils.convertToJsonSafeString(""));
     Assertions.assertEquals(
         "\"invalid json <<\"", StringUtils.convertToJsonSafeString("invalid json <<"));
