@@ -11,7 +11,6 @@ import { IComponent } from "@/utils/types/component.type";
 import { DownOutlined, RightOutlined } from "@ant-design/icons";
 import { Button, Input, Spin, Typography, notification } from "antd";
 import clsx from "clsx";
-import { decode } from "js-base64";
 import jsYaml from "js-yaml";
 import { cloneDeep, delay, get, isEmpty } from "lodash";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -20,6 +19,7 @@ import swaggerClient from "swagger-client";
 import { useBoolean } from "usehooks-ts";
 import useGetApiSpec from "../useGetApiSpec";
 import styles from "./index.module.scss";
+import { decodeFileContent } from "@/utils/helpers/base64";
 
 type ItemProps = {
   item: IComponent;
@@ -63,10 +63,9 @@ export const APIItem = ({
     try {
       const encoded = componentDetail?.facets?.baseSpec?.content;
       if (!encoded) return undefined;
-      const yamlContent = extractOpenApiStrings(decode(encoded));
+      const yamlContent = extractOpenApiStrings(decodeFileContent(encoded));
       return jsYaml.load(yamlContent);
     } catch (error) {
-      return "";
     }
   }, [item, componentDetail]);
 

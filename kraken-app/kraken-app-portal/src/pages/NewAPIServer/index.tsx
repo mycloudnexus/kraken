@@ -23,6 +23,7 @@ import UploadYaml from "./components/UploadYaml";
 import styles from "./index.module.scss";
 import renderRequiredMark from '@/components/RequiredFormMark';
 import { decodeFileContent } from "@/utils/helpers/base64";
+import { ENV } from "@/constants";
 
 const NewAPIServer = () => {
   const { componentId } = useParams();
@@ -78,7 +79,7 @@ const NewAPIServer = () => {
           key: get(
             componentDetail,
             "metadata.key",
-            `mef.sonata.api-target-spec.${values.name
+            `${ENV.PRODUCT_ID}.api-target-spec.${values.name
               ?.replace(" ", "")
               ?.substring(0, 3)
               .toLowerCase()}${new Date().getTime()}`

@@ -2,11 +2,11 @@ import loginBg from "@/assets/login/login-bg.svg?url";
 import Logo from "@/assets/logo.svg";
 import Flex from "@/components/Flex";
 import { useLogin } from "@/hooks/login";
-import { PRODUCT_NAME } from "@/utils/constants/common";
 import { Alert, Button, Form, Input, Typography } from "antd";
 import { useState } from "react";
 import styles from "./index.module.scss";
 import { useBasicAuth } from "@/components/AuthProviders/basic/provider/BasicAuthProvider";
+import { ENV } from "@/constants";
 
 const Login = () => {
   const { isPending } = useLogin();
@@ -37,7 +37,7 @@ const Login = () => {
               fontFamily: "Montserrat, sans-serif",
             }}
           >
-            {PRODUCT_NAME}
+            {ENV.PRODUCT_NAME}
           </Typography.Text>
         </Flex>
         <Flex flexDirection="column">
