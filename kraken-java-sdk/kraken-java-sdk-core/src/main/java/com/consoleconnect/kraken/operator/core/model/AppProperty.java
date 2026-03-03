@@ -15,7 +15,7 @@ public class AppProperty {
   private List<String> filterHeaders;
   private List<String> filterPaths;
   private List<String> deletePaths;
-  private RunnerContext runnerContext;
+  private RunnerContext runnerContext = new RunnerContext();
   private List<String> initializeExcludeAssets = new ArrayList<>();
   private List<String> queryExcludeAssetKeys = new ArrayList<>();
   private List<String> noRequiredMappingKeys = new ArrayList<>();
