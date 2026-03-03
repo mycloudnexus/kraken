@@ -1,9 +1,11 @@
 package com.consoleconnect.kraken.operator.gateway.runner;
 
+import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPIFacets;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
@@ -12,15 +14,18 @@ import org.springframework.http.server.reactive.ServerHttpResponse;
 import reactor.core.publisher.Mono;
 
 @Slf4j
+@AllArgsConstructor
 public class MockResponseGatewayFilterFactory
     extends AbstractGatewayFilterFactory<ComponentAPIFacets.Action> implements MappingTransformer {
+
+  private final AppProperty appProperty;
 
   @Override
   public GatewayFilter apply(ComponentAPIFacets.Action config) {
     return (exchange, chain) -> {
       log.info("Running mock response action: {}", config.getActionType());
       Optional<Map<String, Object>> contextOptional =
-          AbstractActionRunner.generateActionContext(exchange, config);
+          AbstractActionRunner.generateActionContext(exchange, config, appProperty);
       Boolean forwardDownstream = forwardDownstream(contextOptional.get(), config);
       if (contextOptional.isPresent() && !Boolean.TRUE.equals(forwardDownstream)) {
         ServerHttpResponse httpResponse = exchange.getResponse();

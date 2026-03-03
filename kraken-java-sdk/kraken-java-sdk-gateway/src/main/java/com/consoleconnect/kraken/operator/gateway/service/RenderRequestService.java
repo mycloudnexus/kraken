@@ -6,6 +6,7 @@ import static com.consoleconnect.kraken.operator.core.toolkit.ConstructExpressio
 import com.consoleconnect.kraken.operator.core.dto.StateValueMappingDto;
 import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.enums.MappingTypeEnum;
+import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.core.model.UnifiedAsset;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentAPITargetFacets;
 import com.consoleconnect.kraken.operator.core.model.facet.ComponentWorkflowFacets;
@@ -25,8 +26,11 @@ public class RenderRequestService implements MappingTransformer {
 
   private final UnifiedAssetService unifiedAssetService;
 
-  public RenderRequestService(UnifiedAssetService unifiedAssetService) {
+  private final AppProperty appProperty;
+
+  public RenderRequestService(UnifiedAssetService unifiedAssetService, AppProperty appProperty) {
     this.unifiedAssetService = unifiedAssetService;
+    this.appProperty = appProperty;
   }
 
   public void handlePath(List<ComponentAPITargetFacets.Endpoint> endpoints) {
@@ -199,7 +203,7 @@ public class RenderRequestService implements MappingTransformer {
       return path.replace("{" + pathParams.get(0) + "}", constructParam(s));
     }
     if (Objects.equals(QUERY.name(), sourceLocation)) {
-      path = path.replace("{" + pathParams.get(0) + "}", constructMefQuery(s));
+      path = path.replace("{" + pathParams.get(0) + "}", constructQuery(s, appProperty));
     } else if (Objects.equals(BODY.name(), sourceLocation)) {
       path = path.replace("{" + pathParams.get(0) + "}", constructMeRequestBody(s));
     } else if (Objects.equals(PATH.name(), sourceLocation)) {
@@ -223,7 +227,7 @@ public class RenderRequestService implements MappingTransformer {
     if (Objects.equals(QUERY.name(), sourceLocation)) {
       path =
           pathBuilder
-              .append(needConvertFromDB ? constructParam(s) : constructMefQuery(s))
+              .append(needConvertFromDB ? constructParam(s) : constructQuery(s, appProperty))
               .toString();
     } else if (Objects.equals(BODY.name(), sourceLocation)) {
       path = pathBuilder.append(constructMeRequestBody(s)).toString();

@@ -59,7 +59,7 @@ public class WorkflowActionFilterFactory
     return (exchange, chain) -> {
       Optional<Map<String, Object>> contextOptional =
           AbstractActionRunner.generateActionContext(
-              exchange, action, config.getAppProperty().getEnv());
+              exchange, action, config.getAppProperty().getEnv(), config.getAppProperty());
 
       Map<String, Object> inputs = contextOptional.get();
       boolean synchronousProcess = getBool(inputs, VAR_SYNCHRONOUS);

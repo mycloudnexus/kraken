@@ -15,6 +15,7 @@ public class AppProperty {
   private List<String> filterHeaders;
   private List<String> filterPaths;
   private List<String> deletePaths;
+  private RunnerContext runnerContext;
   private List<String> initializeExcludeAssets = new ArrayList<>();
   private List<String> queryExcludeAssetKeys = new ArrayList<>();
   private List<String> noRequiredMappingKeys = new ArrayList<>();
@@ -27,6 +28,13 @@ public class AppProperty {
   private DualVersionConfig dualVersionConfig = new DualVersionConfig();
   private List<String> productTypes = new ArrayList<>();
   private Map<String, List<String>> supportedProductTypes = new HashMap<>();
+
+  @Data
+  public static class RunnerContext {
+    private String queryParamsName = "mefQuery";
+    private String requestBodyName = "mefRequestBody";
+    private String responseBodyName = "mefResponseBody";
+  }
 
   @Data
   public static class Features {

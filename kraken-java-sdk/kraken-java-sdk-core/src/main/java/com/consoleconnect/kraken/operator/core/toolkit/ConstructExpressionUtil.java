@@ -3,6 +3,7 @@ package com.consoleconnect.kraken.operator.core.toolkit;
 import static com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants.CUSTOMIZED_PLACE_HOLDER;
 
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
+import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -51,8 +52,8 @@ public class ConstructExpressionUtil {
     return param.replaceAll("\\[(\\*)\\]", "[0]");
   }
 
-  public static String constructMefQuery(String s) {
-    return String.format("${mefQuery.%s}", s);
+  public static String constructQuery(String s, AppProperty appProperty) {
+    return String.format("${%s.%s}", appProperty.getRunnerContext().getQueryParamsName(), s);
   }
 
   public static String constructMeRequestBody(String s) {

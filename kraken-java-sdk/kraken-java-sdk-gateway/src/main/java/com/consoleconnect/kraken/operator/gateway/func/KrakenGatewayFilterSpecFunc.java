@@ -98,7 +98,7 @@ public class KrakenGatewayFilterSpecFunc implements Function<GatewayFilterSpec, 
                         filterHeaderService)
                     .apply(exchange, s));
         case MOCK_RESPONSE -> gatewayFilterSpec.filter(
-            new MockResponseGatewayFilterFactory().apply(action));
+            new MockResponseGatewayFilterFactory(appProperty).apply(action));
         case REWRITE_PATH -> gatewayFilterSpec.filter(
             new ActionGatewayFilterFactory(actionRunners).apply(action),
             RouteToRequestUrlFilter.ROUTE_TO_URL_FILTER_ORDER + 1);

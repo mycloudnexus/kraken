@@ -31,7 +31,7 @@ public abstract class AbstractActionRunner implements ResponseCodeTransform, Map
       ServerWebExchange exchange, ComponentAPIFacets.Action action) {
     log.info("run action:{}", action);
     Optional<Map<String, Object>> contextOptional =
-        generateActionContext(exchange, action, appProperty.getEnv());
+        generateActionContext(exchange, action, appProperty.getEnv(), appProperty);
     if (contextOptional.isEmpty()) {
       log.warn("context is empty,ignore the action,{}", action.getActionType());
       return Optional.empty();
@@ -63,12 +63,15 @@ public abstract class AbstractActionRunner implements ResponseCodeTransform, Map
   }
 
   public static Optional<Map<String, Object>> generateActionContext(
-      ServerWebExchange exchange, ComponentAPIFacets.Action action) {
-    return generateActionContext(exchange, action, new HashMap<>());
+      ServerWebExchange exchange, ComponentAPIFacets.Action action, AppProperty appProperty) {
+    return generateActionContext(exchange, action, new HashMap<>(), appProperty);
   }
 
   public static Optional<Map<String, Object>> generateActionContext(
-      ServerWebExchange exchange, ComponentAPIFacets.Action action, Map<String, Object> env) {
+      ServerWebExchange exchange,
+      ComponentAPIFacets.Action action,
+      Map<String, Object> env,
+      AppProperty appProperty) {
 
     Map<String, Object> context = new HashMap<>();
     if (MapUtils.isNotEmpty(env)) {
@@ -81,7 +84,7 @@ public abstract class AbstractActionRunner implements ResponseCodeTransform, Map
 
     Map<String, String> query = exchange.getRequest().getQueryParams().toSingleValueMap();
     context.put("query", query);
-    context.put("mefRequestBody", context.get("body"));
+    context.put(appProperty.getRunnerContext().getRequestBodyName(), context.get("body"));
     context.put("path", exchange.getRequest().getPath().toString());
     context.put("method", exchange.getRequest().getMethod().name());
     exchange
