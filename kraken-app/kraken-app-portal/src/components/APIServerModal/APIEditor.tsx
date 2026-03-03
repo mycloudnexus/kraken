@@ -14,7 +14,6 @@ import {
   Upload,
   notification,
 } from "antd";
-import { decode } from "js-base64";
 import jsYaml from "js-yaml";
 import {
   cloneDeep,
@@ -31,6 +30,7 @@ import Flex from "../Flex";
 import RequestMethod from "../Method";
 import { Text } from "../Text";
 import styles from "./index.module.scss";
+import { decodeFileContent } from "@/utils/helpers/base64";
 
 type Props = {
   detail: any;
@@ -64,7 +64,7 @@ const APIEditor = ({
       let swaggerData;
       let fileDecode = "";
       if (base64data) {
-        fileDecode = decode(get(detail, "facets.baseSpec.content"));
+        fileDecode = decodeFileContent(get(detail, "facets.baseSpec.content"));
         swaggerData = jsYaml.load(fileDecode);
       }
       const environments = get(detail, "facets.environments");
