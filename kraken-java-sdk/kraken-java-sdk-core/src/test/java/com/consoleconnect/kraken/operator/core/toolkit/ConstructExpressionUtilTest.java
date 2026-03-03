@@ -3,6 +3,7 @@ package com.consoleconnect.kraken.operator.core.toolkit;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.consoleconnect.kraken.operator.core.enums.ExpectTypeEnum;
+import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
@@ -51,5 +52,20 @@ class ConstructExpressionUtilTest {
     String result = ConstructExpressionUtil.convertToJsonPointer(target);
     String expected = "/status";
     Assertions.assertEquals(expected, result);
+  }
+
+  @Test
+  void givenConfiguration_constructQuery_thenOK() {
+    Assertions.assertEquals(
+        "${mefQuery.buyerId}", ConstructExpressionUtil.constructQuery("buyerId", null));
+
+    AppProperty appProperty = new AppProperty();
+    appProperty.getRunnerContext().setQueryParamsName("");
+    Assertions.assertEquals(
+        "${mefQuery.buyerId}", ConstructExpressionUtil.constructQuery("buyerId", appProperty));
+
+    appProperty.getRunnerContext().setQueryParamsName("test");
+    Assertions.assertEquals(
+        "${test.buyerId}", ConstructExpressionUtil.constructQuery("buyerId", appProperty));
   }
 }

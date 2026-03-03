@@ -6,14 +6,18 @@ import com.consoleconnect.kraken.operator.core.exception.KrakenException;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.util.Strings;
 
 public class ConstructExpressionUtil {
 
   public static final String ARRAY_ROOT_PREFIX = "[*].";
   public static final String DOT = "\\.";
+
+  private static final String DEFAULT_QUERY_PREFIX = "mefQuery";
 
   private ConstructExpressionUtil() {}
 
@@ -53,7 +57,15 @@ public class ConstructExpressionUtil {
   }
 
   public static String constructQuery(String s, AppProperty appProperty) {
-    return String.format("${%s.%s}", appProperty.getRunnerContext().getQueryParamsName(), s);
+    if (Objects.isNull(appProperty) || Objects.isNull(appProperty.getRunnerContext())) {
+      return String.format("${%s.%s}", DEFAULT_QUERY_PREFIX, s);
+    }
+
+    final AppProperty.RunnerContext runnerContext = appProperty.getRunnerContext();
+    if (Strings.isBlank(runnerContext.getQueryParamsName())) {
+      return String.format("${%s.%s}", DEFAULT_QUERY_PREFIX, s);
+    }
+    return String.format("${%s.%s}", runnerContext.getQueryParamsName(), s);
   }
 
   public static String constructMeRequestBody(String s) {
