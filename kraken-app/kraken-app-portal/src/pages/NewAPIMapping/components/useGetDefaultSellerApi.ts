@@ -1,7 +1,7 @@
 import { useGetComponentListAPISpec } from "@/hooks/product";
+import { decodeFileContent } from "@/utils/helpers/base64";
 import { extractOpenApiStrings } from "@/utils/helpers/schema";
 import { notification } from "antd";
-import { decode } from "js-base64";
 import jsYaml from "js-yaml";
 import { get } from "lodash";
 import { useEffect, useMemo, useState } from "react";
@@ -31,7 +31,7 @@ const useGetDefaultSellerApi = (
     try {
       const encoded = apiTargetSpecComponent?.facets?.baseSpec?.content;
       if (!encoded) return undefined;
-      const yamlContent = extractOpenApiStrings(decode(encoded));
+      const yamlContent = extractOpenApiStrings(decodeFileContent(encoded));
       const result = jsYaml.load(yamlContent);
       return result;
     } catch (error) {

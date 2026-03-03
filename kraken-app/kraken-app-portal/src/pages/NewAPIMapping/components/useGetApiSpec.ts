@@ -3,8 +3,8 @@ import {
   useGetComponentListSpec,
   useGetComponentListV2,
 } from "@/hooks/product";
+import { decodeFileContent } from "@/utils/helpers/base64";
 import { extractOpenApiStrings } from "@/utils/helpers/schema";
-import { decode } from "js-base64";
 import jsYaml from "js-yaml";
 import { nanoid } from "nanoid";
 import { useMemo, useCallback } from "react";
@@ -46,7 +46,7 @@ const useGetApiSpec = (currentProduct: string, targetMapperKey: string) => {
     if (!apiSpec) return undefined;
 
     const yamlContent = extractOpenApiStrings(
-      decode(apiSpec?.facets?.baseSpec?.content)
+      decodeFileContent(apiSpec?.facets?.baseSpec?.content)
     );
     return jsYaml.load(yamlContent);
   }, [apiSpec]);
