@@ -38,8 +38,10 @@ class RequestMapperTest implements MappingTransformer {
 
   @BeforeAll
   static void init() {
+    AppProperty appProperty = new AppProperty();
+    appProperty.setRunnerContext(new AppProperty.RunnerContext());
     unifiedAssetService = Mockito.mock(UnifiedAssetService.class);
-    renderRequestService = new RenderRequestService(unifiedAssetService);
+    renderRequestService = new RenderRequestService(unifiedAssetService, appProperty);
     runner =
         new LoadTargetAPIConfigActionRunner(
             new AppProperty(), unifiedAssetService, renderRequestService);
