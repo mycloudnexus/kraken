@@ -17,6 +17,7 @@ public class ConstructExpressionUtil {
   public static final String ARRAY_ROOT_PREFIX = "[*].";
   public static final String DOT = "\\.";
 
+  private static final String EXPR_QUERY_PARAMS = "${%s.%s}";
   private static final String DEFAULT_QUERY_PREFIX = "mefQuery";
 
   private ConstructExpressionUtil() {}
@@ -58,18 +59,18 @@ public class ConstructExpressionUtil {
 
   public static String constructQuery(String s, AppProperty appProperty) {
     if (Objects.isNull(appProperty)) {
-      return String.format("${%s.%s}", DEFAULT_QUERY_PREFIX, s);
+      return String.format(EXPR_QUERY_PARAMS, DEFAULT_QUERY_PREFIX, s);
     }
 
     if (Objects.isNull(appProperty.getRunnerContext())) {
-      return String.format("${%s.%s}", DEFAULT_QUERY_PREFIX, s);
+      return String.format(EXPR_QUERY_PARAMS, DEFAULT_QUERY_PREFIX, s);
     }
 
     final AppProperty.RunnerContext runnerContext = appProperty.getRunnerContext();
     if (Strings.isBlank(runnerContext.getQueryParamsName())) {
-      return String.format("${%s.%s}", DEFAULT_QUERY_PREFIX, s);
+      return String.format(EXPR_QUERY_PARAMS, DEFAULT_QUERY_PREFIX, s);
     }
-    return String.format("${%s.%s}", runnerContext.getQueryParamsName(), s);
+    return String.format(EXPR_QUERY_PARAMS, runnerContext.getQueryParamsName(), s);
   }
 
   public static String constructMeRequestBody(String s) {
