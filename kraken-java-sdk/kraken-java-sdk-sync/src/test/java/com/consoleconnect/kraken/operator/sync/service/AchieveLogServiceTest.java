@@ -15,15 +15,15 @@ import org.springframework.test.context.ContextConfiguration;
 @MockIntegrationTest
 @ContextConfiguration(classes = {CustomConfig.class})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class AchieveLogServiceTest extends AbstractIntegrationTest {
+class ArchiveLogServiceTest extends AbstractIntegrationTest {
   @Autowired ApiActivityLogRepository apiActivityLogRepository;
-  @SpyBean private AchieveApiActivityLogService achieveApiActivityLogService;
+  @SpyBean private ArchiveApiActivityLogService archiveApiActivityLogService;
 
   @Test
-  void givenAchieveSuccess_whenAchieveAll_thenSuccess() {
+  void givenArchiveSuccess_whenArchiveAll_thenSuccess() {
 
     // when
-    achieveApiActivityLogService.runIt();
-    Assertions.assertNotNull(this.achieveApiActivityLogService);
+    archiveApiActivityLogService.runIt();
+    Assertions.assertNotNull(this.archiveApiActivityLogService);
   }
 }

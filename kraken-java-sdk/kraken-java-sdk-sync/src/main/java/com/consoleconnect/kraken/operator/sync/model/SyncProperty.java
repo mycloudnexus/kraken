@@ -7,8 +7,8 @@ import lombok.Data;
 @Data
 public class SyncProperty {
   private ControlPlane controlPlane = new ControlPlane();
-  private AppConfig.AchieveApiActivityLogConf achieveLogConf =
-      new AppConfig.AchieveApiActivityLogConf();
+  private AppConfig.ArchiveApiActivityLogConf archiveLogConf =
+      new AppConfig.ArchiveApiActivityLogConf();
   private MgmtPlane mgmtPlane = new MgmtPlane();
   private List<String> acceptAssetKinds = List.of();
   private boolean assetConfigOverwriteFlag = false;

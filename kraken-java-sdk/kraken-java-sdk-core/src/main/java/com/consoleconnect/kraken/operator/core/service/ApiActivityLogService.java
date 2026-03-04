@@ -14,7 +14,7 @@ import com.consoleconnect.kraken.operator.core.dto.UnifiedAssetDto;
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogBodyEntity;
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
 import com.consoleconnect.kraken.operator.core.entity.UnifiedAssetEntity;
-import com.consoleconnect.kraken.operator.core.enums.AchieveScopeEnum;
+import com.consoleconnect.kraken.operator.core.enums.ArchiveScopeEnum;
 import com.consoleconnect.kraken.operator.core.enums.LifeStatusEnum;
 import com.consoleconnect.kraken.operator.core.enums.SyncStatusEnum;
 import com.consoleconnect.kraken.operator.core.mapper.ApiActivityLogMapper;
@@ -243,13 +243,13 @@ public class ApiActivityLogService {
   }
 
   @Transactional(rollbackFor = Exception.class)
-  public boolean achieveOnePage(AppConfig.AchieveApiActivityLogConf activityLogConf) {
-    if (!AppConfig.AchieveApiActivityLogConf.needAchieveMigrate(activityLogConf)) {
+  public boolean archiveOnePage(AppConfig.ArchiveApiActivityLogConf activityLogConf) {
+    if (!AppConfig.ArchiveApiActivityLogConf.needArchiveMigrate(activityLogConf)) {
       return true;
     }
     var list =
         this.repository.listExpiredApiLog(
-            activityLogConf.toAchieve(),
+            activityLogConf.toArchive(),
             LifeStatusEnum.LIVE,
             activityLogConf.getProtocol(),
             PageRequest.of(0, 20));
@@ -273,15 +273,15 @@ public class ApiActivityLogService {
     this.repository.saveAll(list);
 
     this.apiActivityLogBodyRepository.deleteAll(bodySet);
-    if (activityLogConf.getAchieveScope() == AchieveScopeEnum.BASIC) {
+    if (activityLogConf.getArchiveScope() == ArchiveScopeEnum.BASIC) {
       this.repository.deleteAll(list);
     }
     return false;
   }
 
   @Transactional(rollbackFor = Exception.class)
-  public boolean migrateOnePage(AppConfig.AchieveApiActivityLogConf activityLogConf) {
-    if (!AppConfig.AchieveApiActivityLogConf.needAchieveMigrate(activityLogConf)) {
+  public boolean migrateOnePage(AppConfig.ArchiveApiActivityLogConf activityLogConf) {
+    if (!AppConfig.ArchiveApiActivityLogConf.needArchiveMigrate(activityLogConf)) {
       return true;
     }
     var list = this.repository.findAllByMigrateStatus(PageRequest.of(0, 20)).stream().toList();

@@ -1,6 +1,6 @@
 package com.consoleconnect.kraken.operator.sync.service;
 
-import static com.consoleconnect.kraken.operator.core.config.AppConfig.AchieveApiActivityLogConf.ACHIEVE_LOG_CONFIG;
+import static com.consoleconnect.kraken.operator.core.config.AppConfig.ArchiveApiActivityLogConf.ARCHIVE_LOG_CONFIG;
 
 import com.consoleconnect.kraken.operator.core.config.AppConfig;
 import com.consoleconnect.kraken.operator.core.service.ApiActivityLogService;
@@ -15,14 +15,14 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class MigrateApiActivityLogService {
 
-  private final AppConfig.AchieveApiActivityLogConf deleteLogConf;
+  private final AppConfig.ArchiveApiActivityLogConf deleteLogConf;
   private final ApiActivityLogService apiActivityLogService;
 
   public MigrateApiActivityLogService(
       SyncProperty syncProperty, ApiActivityLogService apiActivityLogService) {
-    this.deleteLogConf = syncProperty.getAchieveLogConf();
+    this.deleteLogConf = syncProperty.getArchiveLogConf();
     this.apiActivityLogService = apiActivityLogService;
-    log.info("{}, {}", ACHIEVE_LOG_CONFIG, JsonToolkit.toJson(this.deleteLogConf));
+    log.info("{}, {}", ARCHIVE_LOG_CONFIG, JsonToolkit.toJson(this.deleteLogConf));
   }
 
   @SchedulerLock(
@@ -31,13 +31,13 @@ public class MigrateApiActivityLogService {
       lockAtLeastFor = "${app.cron-job.lock.at-least-for}")
   @Scheduled(cron = "${app.cron-job.migrate-api-activity-log:-}")
   public void runIt() {
-    log.info("{}, {}, run it", ACHIEVE_LOG_CONFIG, JsonToolkit.toJson(this.deleteLogConf));
+    log.info("{}, {}, run it", ARCHIVE_LOG_CONFIG, JsonToolkit.toJson(this.deleteLogConf));
     this.migrateApiLog(this.deleteLogConf);
   }
 
-  public void migrateApiLog(AppConfig.AchieveApiActivityLogConf activityLogConf) {
+  public void migrateApiLog(AppConfig.ArchiveApiActivityLogConf activityLogConf) {
 
-    log.info("{}, start", ACHIEVE_LOG_CONFIG);
+    log.info("{}, start", ARCHIVE_LOG_CONFIG);
 
     for (int page = 0; page < activityLogConf.getPage(); page++) {
       if (this.apiActivityLogService.migrateOnePage(activityLogConf)) {
@@ -45,6 +45,6 @@ public class MigrateApiActivityLogService {
       }
     }
 
-    log.info("{}, end", ACHIEVE_LOG_CONFIG);
+    log.info("{}, end", ARCHIVE_LOG_CONFIG);
   }
 }

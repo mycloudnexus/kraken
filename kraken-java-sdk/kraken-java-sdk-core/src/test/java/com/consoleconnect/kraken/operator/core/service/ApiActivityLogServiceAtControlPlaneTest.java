@@ -5,7 +5,7 @@ import com.consoleconnect.kraken.operator.core.client.ClientEvent;
 import com.consoleconnect.kraken.operator.core.client.ClientEventTypeEnum;
 import com.consoleconnect.kraken.operator.core.config.AppConfig;
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
-import com.consoleconnect.kraken.operator.core.enums.AchieveScopeEnum;
+import com.consoleconnect.kraken.operator.core.enums.ArchiveScopeEnum;
 import com.consoleconnect.kraken.operator.core.enums.LifeStatusEnum;
 import com.consoleconnect.kraken.operator.core.enums.SyncStatusEnum;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogBodyRepository;
@@ -197,10 +197,10 @@ class ApiActivityLogServiceAtControlPlaneTest extends AbstractIntegrationTest {
   @Test
   void migrateExistedData() {
     this.receiveClientApiActivityLog();
-    AppConfig.AchieveApiActivityLogConf achieveApiActivityLogConf =
-        new AppConfig.AchieveApiActivityLogConf();
+    AppConfig.ArchiveApiActivityLogConf archiveApiActivityLogConf =
+        new AppConfig.ArchiveApiActivityLogConf();
 
-    this.apiActivityLogService.migrateOnePage(achieveApiActivityLogConf);
+    this.apiActivityLogService.migrateOnePage(archiveApiActivityLogConf);
     var apiLog = this.apiActivityLogRepository.findAll();
     var apiLogBody = this.apiActivityLogBodyRepository.findAll();
     var toMigrate =
@@ -215,24 +215,24 @@ class ApiActivityLogServiceAtControlPlaneTest extends AbstractIntegrationTest {
   }
 
   @Test
-  void achieveApiActivityLog() {
+  void archiveApiActivityLog() {
     this.migrateExistedData();
 
-    AppConfig.AchieveApiActivityLogConf achieveApiActivityLogConf =
-        new AppConfig.AchieveApiActivityLogConf();
-    achieveApiActivityLogConf.setAchieveScope(AchieveScopeEnum.DETAIL);
-    achieveApiActivityLogConf.setMonth(-1);
-    achieveApiActivityLogConf.setProtocol("GET");
+    AppConfig.ArchiveApiActivityLogConf archiveApiActivityLogConf =
+        new AppConfig.ArchiveApiActivityLogConf();
+    archiveApiActivityLogConf.setArchiveScope(ArchiveScopeEnum.DETAIL);
+    archiveApiActivityLogConf.setMonth(-1);
+    archiveApiActivityLogConf.setProtocol("GET");
 
-    apiActivityLogService.achieveOnePage(achieveApiActivityLogConf);
+    apiActivityLogService.archiveOnePage(archiveApiActivityLogConf);
 
     Assertions.assertEquals(
         0,
         this.apiActivityLogRepository
             .listExpiredApiLog(
-                achieveApiActivityLogConf.toAchieve(),
+                archiveApiActivityLogConf.toArchive(),
                 LifeStatusEnum.LIVE,
-                achieveApiActivityLogConf.getProtocol(),
+                archiveApiActivityLogConf.getProtocol(),
                 PageRequest.of(0, Integer.MAX_VALUE))
             .getContent()
             .size());
@@ -240,9 +240,9 @@ class ApiActivityLogServiceAtControlPlaneTest extends AbstractIntegrationTest {
     var list =
         this.apiActivityLogRepository
             .listExpiredApiLog(
-                achieveApiActivityLogConf.toAchieve(),
+                archiveApiActivityLogConf.toArchive(),
                 LifeStatusEnum.ARCHIVED,
-                achieveApiActivityLogConf.getProtocol(),
+                archiveApiActivityLogConf.getProtocol(),
                 PageRequest.of(0, 20))
             .getContent();
     Assertions.assertEquals(1, list.size());
@@ -258,16 +258,16 @@ class ApiActivityLogServiceAtControlPlaneTest extends AbstractIntegrationTest {
   @Test
   void moreCodeCover() {
 
-    this.apiActivityLogService.achieveOnePage(null);
-    AppConfig.AchieveApiActivityLogConf achieveApiActivityLogConf =
-        new AppConfig.AchieveApiActivityLogConf();
+    this.apiActivityLogService.archiveOnePage(null);
+    AppConfig.ArchiveApiActivityLogConf archiveApiActivityLogConf =
+        new AppConfig.ArchiveApiActivityLogConf();
 
-    this.apiActivityLogService.achieveOnePage(achieveApiActivityLogConf);
+    this.apiActivityLogService.archiveOnePage(archiveApiActivityLogConf);
 
     this.apiActivityLogService.migrateOnePage(null);
-    this.apiActivityLogService.migrateOnePage(achieveApiActivityLogConf);
+    this.apiActivityLogService.migrateOnePage(archiveApiActivityLogConf);
 
-    Assertions.assertNotNull(achieveApiActivityLogConf);
+    Assertions.assertNotNull(archiveApiActivityLogConf);
   }
 
   @Test

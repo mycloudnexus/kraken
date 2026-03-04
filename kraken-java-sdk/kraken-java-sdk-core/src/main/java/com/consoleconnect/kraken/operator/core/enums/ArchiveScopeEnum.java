@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum AchieveScopeEnum {
+public enum ArchiveScopeEnum {
   BASIC("basic"),
   DETAIL("detail");
 
