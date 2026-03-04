@@ -57,7 +57,11 @@ public class ConstructExpressionUtil {
   }
 
   public static String constructQuery(String s, AppProperty appProperty) {
-    if (Objects.isNull(appProperty) || Objects.isNull(appProperty.getRunnerContext())) {
+    if (Objects.isNull(appProperty)) {
+      return String.format("${%s.%s}", DEFAULT_QUERY_PREFIX, s);
+    }
+
+    if (Objects.isNull(appProperty.getRunnerContext())) {
       return String.format("${%s.%s}", DEFAULT_QUERY_PREFIX, s);
     }
 

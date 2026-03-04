@@ -60,6 +60,11 @@ class ConstructExpressionUtilTest {
         "${mefQuery.buyerId}", ConstructExpressionUtil.constructQuery("buyerId", null));
 
     AppProperty appProperty = new AppProperty();
+    appProperty.setRunnerContext(null);
+    Assertions.assertEquals(
+        "${mefQuery.buyerId}", ConstructExpressionUtil.constructQuery("buyerId", appProperty));
+
+    appProperty.setRunnerContext(new AppProperty.RunnerContext());
     appProperty.getRunnerContext().setQueryParamsName("");
     Assertions.assertEquals(
         "${mefQuery.buyerId}", ConstructExpressionUtil.constructQuery("buyerId", appProperty));
