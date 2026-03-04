@@ -1,6 +1,6 @@
 package com.consoleconnect.kraken.operator.core.config;
 
-import com.consoleconnect.kraken.operator.core.enums.AchieveScopeEnum;
+import com.consoleconnect.kraken.operator.core.enums.ArchiveScopeEnum;
 import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import com.consoleconnect.kraken.operator.core.toolkit.JsonToolkit;
 import java.time.ZonedDateTime;
@@ -29,22 +29,22 @@ public class AppConfig {
   }
 
   @Data
-  public static class AchieveApiActivityLogConf {
+  public static class ArchiveApiActivityLogConf {
 
-    public static final String ACHIEVE_LOG_CONFIG = "ACHIEVE_LOG_CONFIG";
+    public static final String ARCHIVE_LOG_CONFIG = "ARCHIVE_LOG_CONFIG";
 
     private int month;
 
     private String protocol; // for example: GET、POST、PATCH、DELETE
-    private AchieveScopeEnum achieveScope;
+    private ArchiveScopeEnum archiveScope;
     private int page;
 
-    public ZonedDateTime toAchieve() {
+    public ZonedDateTime toArchive() {
       return ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS).minusMonths(this.month);
     }
 
-    public static boolean needAchieveMigrate(AchieveApiActivityLogConf conf) {
-      log.info("{},{}", ACHIEVE_LOG_CONFIG, JsonToolkit.toJson(conf));
+    public static boolean needArchiveMigrate(ArchiveApiActivityLogConf conf) {
+      log.info("{},{}", ARCHIVE_LOG_CONFIG, JsonToolkit.toJson(conf));
       return conf != null;
     }
   }

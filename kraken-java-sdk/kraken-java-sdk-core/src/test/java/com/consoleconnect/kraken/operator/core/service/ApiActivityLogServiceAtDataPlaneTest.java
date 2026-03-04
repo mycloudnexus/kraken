@@ -3,7 +3,7 @@ package com.consoleconnect.kraken.operator.core.service;
 import com.consoleconnect.kraken.operator.core.CustomConfig;
 import com.consoleconnect.kraken.operator.core.config.AppConfig;
 import com.consoleconnect.kraken.operator.core.entity.ApiActivityLogEntity;
-import com.consoleconnect.kraken.operator.core.enums.AchieveScopeEnum;
+import com.consoleconnect.kraken.operator.core.enums.ArchiveScopeEnum;
 import com.consoleconnect.kraken.operator.core.enums.LifeStatusEnum;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogBodyRepository;
 import com.consoleconnect.kraken.operator.core.repo.ApiActivityLogRepository;
@@ -108,10 +108,10 @@ class ApiActivityLogServiceAtDataPlaneTest extends AbstractIntegrationTest {
   @Test
   void migrateExistedData() {
     this.insertLogWithoutSubTable();
-    AppConfig.AchieveApiActivityLogConf achieveApiActivityLogConf =
-        new AppConfig.AchieveApiActivityLogConf();
+    AppConfig.ArchiveApiActivityLogConf archiveApiActivityLogConf =
+        new AppConfig.ArchiveApiActivityLogConf();
 
-    this.apiActivityLogService.migrateOnePage(achieveApiActivityLogConf);
+    this.apiActivityLogService.migrateOnePage(archiveApiActivityLogConf);
     var apiLog = this.apiActivityLogRepository.findAll();
     var apiLogBody = this.apiActivityLogBodyRepository.findAll();
     var toMigrate =
@@ -126,24 +126,24 @@ class ApiActivityLogServiceAtDataPlaneTest extends AbstractIntegrationTest {
   }
 
   @Test
-  void achieveApiActivityLog() {
+  void archiveApiActivityLog() {
     this.migrateExistedData();
-    ZonedDateTime toAchieve = ZonedDateTime.now().plusYears(100);
+    ZonedDateTime toArchive = ZonedDateTime.now().plusYears(100);
 
-    AppConfig.AchieveApiActivityLogConf achieveApiActivityLogConf =
-        new AppConfig.AchieveApiActivityLogConf();
-    achieveApiActivityLogConf.setAchieveScope(AchieveScopeEnum.BASIC);
-    achieveApiActivityLogConf.setMonth(-1);
+    AppConfig.ArchiveApiActivityLogConf archiveApiActivityLogConf =
+        new AppConfig.ArchiveApiActivityLogConf();
+    archiveApiActivityLogConf.setArchiveScope(ArchiveScopeEnum.BASIC);
+    archiveApiActivityLogConf.setMonth(-1);
 
-    apiActivityLogService.achieveOnePage(achieveApiActivityLogConf);
+    apiActivityLogService.archiveOnePage(archiveApiActivityLogConf);
 
     Assertions.assertEquals(
         0,
         this.apiActivityLogRepository
             .listExpiredApiLog(
-                toAchieve,
+                toArchive,
                 LifeStatusEnum.LIVE,
-                achieveApiActivityLogConf.getProtocol(),
+                archiveApiActivityLogConf.getProtocol(),
                 PageRequest.of(0, Integer.MAX_VALUE))
             .getContent()
             .size());
