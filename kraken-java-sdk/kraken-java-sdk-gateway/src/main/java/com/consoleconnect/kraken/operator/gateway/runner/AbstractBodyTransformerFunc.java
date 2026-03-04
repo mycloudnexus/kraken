@@ -48,7 +48,7 @@ public abstract class AbstractBodyTransformerFunc
 
   public Publisher<String> transform(ServerWebExchange exchange, String s, boolean postRequest) {
     Optional<Map<String, Object>> contextOptional =
-        AbstractActionRunner.generateActionContext(exchange, action);
+        AbstractActionRunner.generateActionContext(exchange, action, appProperty);
     if (contextOptional.isEmpty()) {
       log.info("context is empty");
       return Mono.just(s);
@@ -185,7 +185,7 @@ public abstract class AbstractBodyTransformerFunc
         SpELEngine.evaluate(
             JsonToolkit.fromJson(retJsonString, Object.class), context, postRequest);
 
-    context.put("mefResponseBody", retJsonString);
+    context.put(appProperty.getRunnerContext().getResponseBodyName(), retJsonString);
     // calculate final state
     if (action.isPostResultRender()) {
       retJsonString = calculateBasedOnResponseBody(retJsonString, context);

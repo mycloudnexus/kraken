@@ -3,16 +3,22 @@ package com.consoleconnect.kraken.operator.core.toolkit;
 import static com.consoleconnect.kraken.operator.core.toolkit.AssetsConstants.CUSTOMIZED_PLACE_HOLDER;
 
 import com.consoleconnect.kraken.operator.core.exception.KrakenException;
+import com.consoleconnect.kraken.operator.core.model.AppProperty;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.util.Strings;
 
 public class ConstructExpressionUtil {
 
   public static final String ARRAY_ROOT_PREFIX = "[*].";
   public static final String DOT = "\\.";
+
+  private static final String EXPR_QUERY_PARAMS = "${%s.%s}";
+  private static final String DEFAULT_QUERY_PREFIX = "mefQuery";
 
   private ConstructExpressionUtil() {}
 
@@ -51,8 +57,20 @@ public class ConstructExpressionUtil {
     return param.replaceAll("\\[(\\*)\\]", "[0]");
   }
 
-  public static String constructMefQuery(String s) {
-    return String.format("${mefQuery.%s}", s);
+  public static String constructQuery(String s, AppProperty appProperty) {
+    if (Objects.isNull(appProperty)) {
+      return String.format(EXPR_QUERY_PARAMS, DEFAULT_QUERY_PREFIX, s);
+    }
+
+    if (Objects.isNull(appProperty.getRunnerContext())) {
+      return String.format(EXPR_QUERY_PARAMS, DEFAULT_QUERY_PREFIX, s);
+    }
+
+    final AppProperty.RunnerContext runnerContext = appProperty.getRunnerContext();
+    if (Strings.isBlank(runnerContext.getQueryParamsName())) {
+      return String.format(EXPR_QUERY_PARAMS, DEFAULT_QUERY_PREFIX, s);
+    }
+    return String.format(EXPR_QUERY_PARAMS, runnerContext.getQueryParamsName(), s);
   }
 
   public static String constructMeRequestBody(String s) {
